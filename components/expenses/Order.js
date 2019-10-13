@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
+import { Flex } from '@rebass/grid';
 
 import colors from '../../lib/constants/colors';
 import { capitalize } from '../../lib/utils';
@@ -11,6 +12,7 @@ import LinkCollective from '../LinkCollective';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
+import CancelPendingOrderBtn from './CancelPendingOrderBtn';
 import OrderDetails from './OrderDetails';
 
 class Order extends React.Component {
@@ -22,6 +24,7 @@ class Order extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
+    onClickCancel: PropTypes.func,
   };
 
   constructor(props) {
@@ -38,6 +41,7 @@ class Order extends React.Component {
       error: { id: 'order.error', defaultMessage: 'error' },
       active: { id: 'order.active', defaultMessage: 'active' },
       cancelled: { id: 'order.cancelled', defaultMessage: 'cancelled' },
+      expired: { id: 'order.expired', defaultMessage: 'expired' },
     });
     this.currencyStyle = {
       style: 'currency',
@@ -222,7 +226,14 @@ class Order extends React.Component {
           </div>
           <OrderDetails order={order} mode={mode} />
           {order.status === 'PENDING' && canMarkOrderAsPaid && (
-            <MarkOrderAsPaidBtn order={order} collective={order.collective} />
+            <Flex>
+              <MarkOrderAsPaidBtn order={order} collective={order.collective} />
+              <CancelPendingOrderBtn
+                orderId={order.id}
+                onClickCancel={this.props.onClickCancel}
+                collective={order.collective}
+              />
+            </Flex>
           )}
         </div>
       </div>

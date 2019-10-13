@@ -1,11 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import { graphql } from 'react-apollo';
 
 import colors from '../../lib/constants/colors';
 
 import Order from './Order';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import { P } from '../Text';
 
 class Orders extends React.Component {
   static propTypes = {
@@ -18,13 +24,19 @@ class Orders extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid/error/active)
     LoggedInUser: PropTypes.object,
+    markPendingOrderAsExpired: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
     this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
-    this.state = { loading: false, isPayActionLocked: false };
+    this.state = {
+      loading: false,
+      isPayActionLocked: false,
+      showModal: false,
+      orderIdToBeCancelled: null,
+    };
   }
 
   fetchMore(e) {
@@ -41,6 +53,22 @@ class Orders extends React.Component {
       this.setState({ loading: false });
     });
   }
+
+  cancelPendingOrder = async () => {
+    const { orderIdToBeCancelled } = this.state;
+    try {
+      await this.props.markPendingOrderAsExpired(orderIdToBeCancelled);
+      this.setState({
+        showModal: false,
+        orderIdToBeCancelled: null,
+      });
+    } catch (err) {
+      this.setState({
+        showModal: false,
+      });
+      console.error(err);
+    }
+  };
 
   render() {
     const { collective, orders, LoggedInUser, editable, view, includeHostedCollectives, filters } = this.props;
@@ -168,6 +196,9 @@ class Orders extends React.Component {
                 view={view}
                 includeHostedCollectives={includeHostedCollectives}
                 LoggedInUser={LoggedInUser}
+                onClickCancel={orderId => {
+                  this.setState({ showModal: true, orderIdToBeCancelled: orderId });
+                }}
               />
             </div>
           ))}
@@ -185,9 +216,56 @@ class Orders extends React.Component {
             </div>
           )}
         </div>
+        <Modal show={this.state.showModal} width="570px" onClose={() => this.setState({ showModal: false })}>
+          <ModalHeader>
+            <FormattedMessage id="order.cancel.modal.header" defaultMessage="Cancel Order" />
+          </ModalHeader>
+          <ModalBody>
+            <P>
+              <FormattedMessage
+                id="order.cancel.modal.body"
+                defaultMessage={'Are you sure you want to cancel this order?'}
+              />
+            </P>
+          </ModalBody>
+          <ModalFooter>
+            <Container display="flex" justifyContent="flex-end">
+              <StyledButton mx={20} onClick={() => this.setState({ showModal: false })}>
+                <FormattedMessage id="order.modal.cancel.btn" defaultMessage={'Cancel'} />
+              </StyledButton>
+              <StyledButton buttonStyle="primary" onClick={this.cancelPendingOrder}>
+                <FormattedMessage id="order.cancel.proceed.btn" defaultMessage={'Proceed'} />
+              </StyledButton>
+            </Container>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   }
 }
 
-export default Orders;
+const markPendingOrderAsExpiredQuery = gql`
+  mutation markPendingOrderAsExpired($id: Int!) {
+    markPendingOrderAsExpired(id: $id) {
+      id
+      status
+      collective {
+        id
+        stats {
+          id
+          balance
+        }
+      }
+    }
+  }
+`;
+
+const addMutation = graphql(markPendingOrderAsExpiredQuery, {
+  props: ({ mutate }) => ({
+    markPendingOrderAsExpired: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+export default addMutation(Orders);
