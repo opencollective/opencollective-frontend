@@ -315,7 +315,7 @@ class EditWebhooks extends React.Component {
           >
             {status === 'saved' ? (
               <Span textTransform="capitalize">
-                <FormattedMessage id="saved" defaultMessage="saved" />
+                <FormattedMessage id="saved" defaultMessage="Saved" />
               </Span>
             ) : (
               <FormattedMessage

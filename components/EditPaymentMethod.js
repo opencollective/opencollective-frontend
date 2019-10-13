@@ -138,7 +138,7 @@ class EditPaymentMethod extends React.Component {
                   onClick={this.save}
                   mx={1}
                 >
-                  <FormattedMessage id="save" defaultMessage="save" />
+                  <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>
               )}
               {hasSubscriptions && (
