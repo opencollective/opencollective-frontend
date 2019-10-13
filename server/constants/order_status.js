@@ -6,6 +6,7 @@
  * pending -> active -> cancelled (subscription)
  * pending -> cancelled
  * pending -> rejected
+ * pending -> expired
  */
 
 export default {
@@ -15,4 +16,5 @@ export default {
   CANCELLED: 'CANCELLED',
   REJECTED: 'REJECTED',
   ERROR: 'ERROR',
+  EXPIRED: 'EXPIRED',
 };
