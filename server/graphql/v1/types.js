@@ -459,6 +459,14 @@ export const ContributorType = new GraphQLObjectType({
         return contributor.isIncognito ? null : contributor.collectiveSlug;
       },
     },
+    collectiveId: {
+      type: GraphQLInt,
+      description: 'Null for incognito collectives otherwise collective id',
+      resolve(contributor) {
+        // Don't return the collective id if the contributor wants to be incognito
+        return contributor.isIncognito ? null : contributor.id;
+      },
+    },
     image: {
       type: GraphQLString,
       description: 'Contributor avatar or logo',
