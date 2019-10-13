@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Fri Oct 11 2019 18:55:07 GMT+0200 (GMT+02:00)
+# timestamp: Sun Oct 13 2019 08:27:44 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -1510,6 +1510,7 @@ type Mutation {
     platformFeeInCollectiveCurrency: Int
   ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
+  markPendingOrderAsExpired(id: Int!): OrderType
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
@@ -1901,6 +1902,7 @@ enum OrderStatus {
   CANCELLED
   REJECTED
   ERROR
+  EXPIRED
 }
 
 """
