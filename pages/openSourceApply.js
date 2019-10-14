@@ -34,6 +34,7 @@ class OpenSourceApplyPage extends Component {
     token: PropTypes.string,
     loadingLoggedInUser: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    refetchLoggedInUser: PropTypes.func,
     createCollectiveFromGithub: PropTypes.func,
     intl: PropTypes.object.isRequired,
   };
@@ -98,6 +99,7 @@ class OpenSourceApplyPage extends Component {
     try {
       const res = await this.props.createCollectiveFromGithub(collectiveInputType);
       const collective = res.data.createCollectiveFromGithub;
+      await this.props.refetchLoggedInUser();
       Router.pushRoute('collective', {
         slug: collective.slug,
         status: 'collectiveCreated',
