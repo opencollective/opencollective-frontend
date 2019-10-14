@@ -190,7 +190,7 @@ class OpenSourceApplyPage extends Component {
         <P mb={4}>
           <FormattedMessage
             id="openSourceApply.description.p3"
-            defaultMessage="Fees: 10% of funds raised. Half goes to Open Collective Inc to continue improving the software paltform, and half to the Open Source Collective to cover its legal and financial services."
+            defaultMessage="Fees: 10% of funds raised. Half goes to Open Collective Inc to continue improving the software platform, and half to the Open Source Collective to cover its legal and financial services."
           />
         </P>
         <P mb={4}>

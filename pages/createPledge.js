@@ -366,7 +366,7 @@ class CreatePledgePage extends React.Component {
                       <P color="black.500" fontSize="Caption" mt={2}>
                         <FormattedMessage
                           id="createPledge.priviledge"
-                          defaultMessage="You’ve earned the priviledge to name and describe this awesome cause. We’ll create a pledged
+                          defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged
                         collective page for it so other people can find it and pledge to it too."
                         />
                       </P>

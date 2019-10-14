@@ -512,7 +512,6 @@
   "EventCover.EventTime": "Event Time",
   "EventCover.LocalTime": "Your Time",
   "EventCover.Location": "Location: {location}",
-  "EventCover.Title": "{title}",
   "EventDetails.showLess": "Show less",
   "EventDetails.showMore": "Show more",
   "events.create.login": "You need to be logged in as a core contributor of this collective to be able to create an event.",

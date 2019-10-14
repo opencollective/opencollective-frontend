@@ -523,9 +523,7 @@ ${description}`;
                 )}
               </Link>
             )}
-            <h1>
-              <FormattedMessage id="EventCover.Title" defaultMessage="{title}" values={{ title }} />
-            </h1>
+            <h1>{title}</h1>
             {this.description && <div className="description">{this.description}</div>}
             {className !== 'small' && (
               <div>

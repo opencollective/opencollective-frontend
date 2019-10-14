@@ -57,7 +57,7 @@ class CreateHostForm extends React.Component {
       'host.types.user.description': {
         id: 'host.types.user.description',
         defaultMessage:
-          "ou will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income.",
+          "You will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income.",
       },
       'host.types.organization.label': {
         id: 'host.types.organization.label',
