@@ -162,7 +162,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                     })
                   }
                 >
-                  <FormattedMessage id="save" defaultMessage="save" />
+                  <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>
               </Flex>
             </Flex>

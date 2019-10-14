@@ -275,7 +275,7 @@ class Update extends React.Component {
             <div className="actions">
               {mode === 'edit' && this.state.modified && (
                 <SmallButton className="primary save" onClick={this.save}>
-                  <FormattedMessage id="save" defaultMessage="save" />
+                  <FormattedMessage id="save" defaultMessage="Save" />
                 </SmallButton>
               )}
               {mode === 'details' && canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}

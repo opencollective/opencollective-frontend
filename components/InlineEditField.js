@@ -178,7 +178,7 @@ class InlineEditField extends Component {
                       updateField({ variables }).then(this.disableEditor);
                     }}
                   >
-                    <FormattedMessage id="save" defaultMessage="save" />
+                    <FormattedMessage id="save" defaultMessage="Save" />
                   </FormButton>
                 </Flex>
               </Box>

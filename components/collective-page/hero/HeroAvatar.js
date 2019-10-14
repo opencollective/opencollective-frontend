@@ -208,7 +208,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                   }
                 }}
               >
-                <FormattedMessage id="save" defaultMessage="save" />
+                <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Container>
           </>

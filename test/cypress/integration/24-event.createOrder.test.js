@@ -75,7 +75,7 @@ describe('event.createOrder page', () => {
       cy.contains('[data-cy="select"]', 'Please select your country').click();
       cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
       cy.get('select[name="VAT"]').select('OWN');
-      cy.contains('button', 'save').click();
+      cy.contains('button', 'Save').click();
 
       // Create event
       cy.visit(`${slug}/events/new`);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get, maxBy, debounce, sortBy, truncate } from 'lodash';
 import styled, { css } from 'styled-components';
-import slugify from 'slugify';
+import uuid from 'uuid/v4';
 
 import { formatCurrency } from '../lib/utils';
 import { fadeIn } from './StyledKeyframes';
@@ -276,14 +276,14 @@ class GoalsCover extends React.Component {
    */
   getCustomGoals(maxCustomGoalsToShow) {
     const settingsGoals = get(this.props.collective, 'settings.goals', []);
-    const goalsWithTitle = settingsGoals.reduce((goals, goal) => (goal.title ? [...goals, goal] : goals), []);
-    const sortedGoals = sortBy(goalsWithTitle, 'amount');
-    const goals = sortedGoals.map((goal, idx) => this.createGoal(`goal-${idx}-${slugify(goal.title)}`, goal));
+    const sortedGoals = sortBy(settingsGoals, 'amount');
+    const goals = sortedGoals.map((goal, idx) => this.createGoal(`goal-${idx}-${goal.key || uuid()}`, goal));
 
     // No need to remove goals
     if (goals.length <= maxCustomGoalsToShow) {
       return goals;
     }
+
     // Filter goals, ensure we keep the last one
     const lastGoal = goals[goals.length - 1];
     if (!maxCustomGoalsToShow) {
@@ -302,7 +302,7 @@ class GoalsCover extends React.Component {
     if (ref && ref.current) {
       return ref.current.offsetWidth + 15; // Add a bigger hit box
     }
-    return Math.min(MAX_TITLE_LENGTH, goal.title.length) * 8;
+    return Math.min(MAX_TITLE_LENGTH, goal.title ? goal.title.length : 0) * 8;
   }
 
   /** Given a percent size, returns its value in pixels */
@@ -454,7 +454,11 @@ class GoalsCover extends React.Component {
             ref={this.labelsRefs[goal.slug]}
             title={this.getDivTitle(goal.title, goal.description)}
           >
-            {truncate(goal.title, { length: MAX_TITLE_LENGTH })}
+            {goal.title ? (
+              truncate(goal.title, { length: MAX_TITLE_LENGTH })
+            ) : (
+              <FormattedMessage id="ContributionType.Goal" defaultMessage="Goal" />
+            )}
           </div>
           <div className="amount">
             {amount}

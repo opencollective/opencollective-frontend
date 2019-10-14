@@ -250,7 +250,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 }
               }}
             >
-              <FormattedMessage id="save" defaultMessage="save" />
+              <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           </Container>
           <Container zIndex={222} position="absolute" right={25} top={75}>
