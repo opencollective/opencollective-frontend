@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
-import { P } from '../../Text';
+import { P, H3 } from '../../Text';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import StyledButton from '../../StyledButton';
@@ -139,6 +139,11 @@ class SectionContributions extends React.PureComponent {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       Collective: PropTypes.shape({
+        stats: PropTypes.shape({
+          collectives: PropTypes.shape({
+            hosted: PropTypes.number,
+          }).isRequired,
+        }).isRequired,
         settings: PropTypes.shape({
           superCollectiveTags: PropTypes.arrayOf(PropTypes.string),
         }),
@@ -161,12 +166,12 @@ class SectionContributions extends React.PureComponent {
     intl: PropTypes.object,
   };
 
-  static NB_MEMBERSHIPS_PER_PAGE = 16;
-
   state = {
     nbMemberships: SectionContributions.NB_MEMBERSHIPS_PER_PAGE,
     selectedFilter: FILTERS.ALL,
   };
+
+  static NB_MEMBERSHIPS_PER_PAGE = 16;
 
   /** There's no point to show all filters if not required */
   getFilters = memoizeOne(memberships => {
@@ -218,8 +223,10 @@ class SectionContributions extends React.PureComponent {
         return -1;
       } else if (m1.role !== roles.HOST && m2.role === roles.HOST) {
         return 1;
-      } else if (m1.role === roles.HOST) {
+      } else if (m1.role === roles.HOST && m1.collective.stats.backers.all !== m2.collective.stats.backers.all) {
         return m1.collective.stats.backers.all > m2.collective.stats.backers.all ? -1 : 1;
+      } else if (m1.stats.totalDonations === m2.stats.totalDonations) {
+        return 0;
       } else {
         return m1.stats.totalDonations > m2.stats.totalDonations ? -1 : 1;
       }
@@ -273,12 +280,21 @@ class SectionContributions extends React.PureComponent {
         ) : (
           <React.Fragment>
             <ContainerSectionContent>
-              <SectionTitle textAlign="left" mb={4}>
+              <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
                 <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
               </SectionTitle>
+              {data.Collective.stats.collectives.hosted > 0 && (
+                <H3 fontSize="H5" fontWeight="500" color="black.600">
+                  <FormattedMessage
+                    id="organization.collective.memberOf.collective.host.title"
+                    values={{ n: data.Collective.stats.collectives.hosted }}
+                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
+                  />
+                </H3>
+              )}
             </ContainerSectionContent>
             {filters.length > 1 && (
-              <Box mb={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+              <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
                 <StyledFilters
                   filters={filters}
                   getLabel={key => intl.formatMessage(I18nFilters[key])}
@@ -294,7 +310,8 @@ class SectionContributions extends React.PureComponent {
               data-cy="Contributions"
               maxWidth={Dimensions.MAX_SECTION_WIDTH}
               pl={Dimensions.PADDING_X}
-              m="0 auto"
+              mt={4}
+              mx="auto"
             >
               <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
                 {sortedMemberships.slice(0, nbMemberships).map(membership => (
@@ -306,7 +323,12 @@ class SectionContributions extends React.PureComponent {
             </Container>
             {nbMemberships < sortedMemberships.length && (
               <Flex mt={3} justifyContent="center">
-                <StyledButton textTransform="capitalize" minWidth={170} onClick={this.showMoreMemberships}>
+                <StyledButton
+                  data-cy="load-more"
+                  textTransform="capitalize"
+                  minWidth={170}
+                  onClick={this.showMoreMemberships}
+                >
                   <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
                 </StyledButton>
               </Flex>
@@ -356,6 +378,13 @@ const withData = graphql(
       Collective(id: $id) {
         id
         settings
+        stats {
+          id
+          collectives {
+            id
+            hosted
+          }
+        }
         memberOf(onlyActiveCollectives: true, limit: 1500) {
           id
           role

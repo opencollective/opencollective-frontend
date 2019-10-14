@@ -100,13 +100,13 @@ describe('New collective page', () => {
 
   describe('About section', () => {
     it('Can add description to about section', () => {
-      const richDescription = 'Hello{selectall}{ctrl}B{rightarrow}{ctrl}B world!';
+      const richDescription = 'Hello world!{selectall}{ctrl}b';
       cy.login({ redirect: `/${collectiveSlug}/v2` });
       scrollToSection(Sections.ABOUT);
       cy.contains('#section-about button', 'Add a description').click();
-      cy.get('#section-about [data-cy="HTMLEditor"] .ql-editor').type(richDescription);
+      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type(richDescription);
       cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
-      cy.get('[data-cy="longDescription"]').should('have.html', '<p><strong>Hello</strong> world!</p>');
+      cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
     });
   });
 });

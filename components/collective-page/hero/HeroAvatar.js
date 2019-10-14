@@ -145,7 +145,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
             params={{ slug: collective.slug }}
             title={intl.formatMessage(Translations.settings)}
           >
-            <StyledRoundButton size={40} color="black.700">
+            <StyledRoundButton size={40} color="black.700" data-cy="edit-collective-btn">
               <Settings size={18} />
             </StyledRoundButton>
           </Link>
@@ -208,7 +208,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                   }
                 }}
               >
-                <FormattedMessage id="save" defaultMessage="save" />
+                <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Container>
           </>

@@ -9,7 +9,7 @@ describe('New host page', () => {
   describe('Contributions section', () => {
     // The rest of the contributions section is already tested in `05-user_v2.test.js`
     it('Show fiscally hosted collectives', () => {
-      cy.get('[data-cy=filter-button]')
+      cy.get('[data-cy~="filter-button"]')
         .contains('Fiscal Host')
         .click({ force: true });
       cy.contains('[data-cy=Contributions]', 'Open Source Collective');
@@ -29,7 +29,7 @@ describe('New host page', () => {
   describe('Transactions section', () => {
     // The rest of the transactions section tests are in `05-user_v2.test.js`
     it("Has no filters (because hosts don't create expenses)", () => {
-      cy.contains('[data-cy=filter-button]', 'Expenses').should('not.exist');
+      cy.contains('[data-cy~="filter-button"]', 'Expenses').should('not.exist');
     });
   });
 });

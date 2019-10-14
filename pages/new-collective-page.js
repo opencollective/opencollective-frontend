@@ -6,10 +6,11 @@ import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
+import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { CollectiveType } from '../lib/constants/collectives';
 import { Router } from '../server/pages';
 import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
+import ErrorPage, { generateError } from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
@@ -30,6 +31,10 @@ const GlobalStyles = createGlobalStyle`
   html {
     scroll-behavior: smooth;
   }
+
+  section {
+    margin: 0;
+  }
 `;
 
 /**
@@ -37,6 +42,13 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
+  static getInitialProps({ req, res, query: { slug, status } }) {
+    if (res && req && (req.language || req.locale === 'en')) {
+      res.set('Cache-Control', 'public, s-maxage=300');
+    }
+    return { slug, status };
+  }
+
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
@@ -70,13 +82,6 @@ class NewCollectivePage extends React.Component {
       }),
     }).isRequired, // from withData
   };
-
-  static getInitialProps({ req, res, query: { slug, status } }) {
-    if (res && req && (req.language || req.locale === 'en')) {
-      res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
-    }
-    return { slug, status };
-  }
 
   componentDidMount() {
     this.redirectIfEvent();
@@ -114,52 +119,54 @@ class NewCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, status } = this.props;
+    const { slug, data, LoggedInUser, status } = this.props;
 
-    if (!data || data.error) {
-      return <ErrorPage data={data} />;
-    } else if (data.loading || !data.Collective || data.Collective.type === CollectiveType.EVENT) {
-      // Show loading if no data yet, or if collective is event because we'll be redirecting
-      return (
-        <Page {...this.getPageMetaData()} withoutGlobalStyles>
-          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
-            <Loading />
-          </Container>
-        </Page>
-      );
-    } else if (data.Collective.isPledged && !data.Collective.isActive) {
-      return <PledgedCollectivePage collective={data.Collective} />;
+    if (!data.loading) {
+      if (!data || data.error) {
+        return <ErrorPage data={data} />;
+      } else if (!data.Collective) {
+        ssrNotFoundError(); // Force 404 when rendered server side
+        return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+      } else if (data.Collective.isPledged && !data.Collective.isActive) {
+        return <PledgedCollectivePage collective={data.Collective} />;
+      }
     }
 
-    const collective = data.Collective;
-    const isAdmin = Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective));
-    const isRoot = Boolean(LoggedInUser && LoggedInUser.isRoot());
+    const collective = data && data.Collective;
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
-        <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
-        <CollectiveThemeProvider collective={collective}>
-          {({ onPrimaryColorChange }) => (
-            <CollectivePage
-              collective={collective}
-              host={collective.host}
-              coreContributors={collective.coreContributors}
-              financialContributors={collective.financialContributors}
-              tiers={collective.tiers}
-              events={collective.events}
-              childCollectives={collective.childCollectives}
-              transactions={collective.transactions}
-              expenses={collective.expenses}
-              stats={collective.stats}
-              updates={collective.updates}
-              LoggedInUser={LoggedInUser}
-              isAdmin={isAdmin}
-              isRoot={isRoot}
-              status={status}
-              onPrimaryColorChange={onPrimaryColorChange}
-            />
-          )}
-        </CollectiveThemeProvider>
+        {data.loading ? (
+          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+            <Loading />
+          </Container>
+        ) : (
+          <React.Fragment>
+            <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
+            <CollectiveThemeProvider collective={collective}>
+              {({ onPrimaryColorChange }) => (
+                <CollectivePage
+                  collective={collective}
+                  host={collective.host}
+                  coreContributors={collective.coreContributors}
+                  financialContributors={collective.financialContributors}
+                  tiers={collective.tiers}
+                  events={collective.events}
+                  childCollectives={collective.childCollectives}
+                  transactions={collective.transactions}
+                  expenses={collective.expenses}
+                  stats={collective.stats}
+                  updates={collective.updates}
+                  LoggedInUser={LoggedInUser}
+                  isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
+                  isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
+                  status={status}
+                  onPrimaryColorChange={onPrimaryColorChange}
+                />
+              )}
+            </CollectiveThemeProvider>
+          </React.Fragment>
+        )}
       </Page>
     );
   }
@@ -169,7 +176,7 @@ class NewCollectivePage extends React.Component {
 const getCollective = graphql(
   gql`
     query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
-      Collective(slug: $slug) {
+      Collective(slug: $slug, throwIfMissing: false) {
         id
         slug
         path
@@ -193,6 +200,7 @@ const getCollective = graphql(
         hostFeePercent
         image
         imageUrl
+        canApply
         stats {
           id
           balance

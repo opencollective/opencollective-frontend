@@ -8,7 +8,7 @@ import { Box, Flex } from '@rebass/grid';
 
 import { Search } from 'styled-icons/octicons/Search';
 
-import { escapeInput } from '../../lib/utils';
+import { escapeInput, reportValidityHTML5 } from '../../lib/utils';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import Logo from '../Logo';
@@ -91,7 +91,7 @@ const useForm = ({ onProfileChange }) => {
       onBlur: event => {
         const hasValue = event.target.value;
         const wasUpdatedOnce = Object.prototype.hasOwnProperty.call(state, event.target.name);
-        if (hasValue || wasUpdatedOnce) event.target.reportValidity();
+        if (hasValue || wasUpdatedOnce) reportValidityHTML5(event.target);
       },
       onInvalid: event => {
         event.persist();

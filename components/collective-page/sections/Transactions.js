@@ -159,7 +159,7 @@ class SectionTransactions extends React.Component {
     return (
       <Box pt={5}>
         <ContainerSectionContent>
-          <SectionTitle mb={4} textAlign="left">
+          <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
             <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
           </SectionTitle>
         </ContainerSectionContent>

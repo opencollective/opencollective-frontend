@@ -1,11 +1,11 @@
 describe('apply to host', () => {
   it('as a new collective', () => {
     cy.visit('/brusselstogetherasbl');
-    cy.get('#hosting h1').contains('We are fiscally hosting 2 Collectives');
-    cy.contains('.CollectiveCover [data-cy="host-apply-btn"]', 'Apply').click();
+    cy.contains('We are fiscally hosting 2 Collectives');
+    cy.contains('[data-cy="host-apply-btn"]', 'Apply').click({ force: true });
     cy.get('#email').type('testuser@opencollective.com');
     cy.wait(500);
-    cy.get('[data-cy="signin-btn"]').click();
+    cy.getByDataCy('signin-btn').click();
     cy.fillInputField('name', 'New collective');
     cy.fillInputField('description', 'short description for new collective');
     cy.fillInputField('website', 'https://xdamman.com');
@@ -13,8 +13,8 @@ describe('apply to host', () => {
     cy.wait(300);
     cy.get('.actions button').click();
     cy.wait(1000);
-    cy.get('.CollectivePage .CollectiveCover h1', { timeout: 10000 }).contains('New collective');
-    cy.get('.CollectivePage .CollectiveCover .website').contains('xdamman.com');
+    cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
+    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://xdamman.com"]');
     cy.get('.NotificationBar h1').contains('success');
     cy.get('.NotificationBar p').contains('BrusselsTogether ASBL');
     cy.url().then(currentUrl => {

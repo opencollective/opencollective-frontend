@@ -2,7 +2,7 @@ const collectiveName = 'New collective';
 
 describe('create a collective', () => {
   it('edit info', () => {
-    cy.login({ email: 'testuser@opencollective.com', redirect: '/create' });
+    cy.signup({ redirect: '/create' });
     cy.get('.CollectiveCategoryPicker .category')
       .first()
       .click();
@@ -38,17 +38,16 @@ describe('create a collective', () => {
       .first()
       .click();
     cy.wait(300);
-    cy.get('.ApplyToHostBtn', { timeout: 15000 }).contains('0% host fee');
+    cy.contains('Host fee: 0%');
     cy.get('[data-cy="host-apply-btn"]').should('not.be.disabled');
-    cy.get('[data-cy="host-apply-btn"]').contains('Apply with New collective');
-    cy.get('[data-cy="host-apply-btn"]').click();
-    cy.get('.LoggedInUser .ApplyToHostBtn').contains(`Application pending for ${collectiveName}`);
+    cy.contains('[data-cy="host-apply-btn"]', 'Apply with New collective').click({ force: true });
+    cy.get('.ApplyToHostBtn').contains(`Application pending for ${collectiveName}`);
     // Go back to collective page
-    cy.get('.LoggedInUser .ApplyToHostBtn a')
+    cy.get('.ApplyToHostBtn a')
       .first()
       .click({ force: true });
     // Click on edit collective
-    cy.get('.desktopOnly .editCollective a').click({ force: true });
+    cy.get('[data-cy="edit-collective-btn"]').click({ force: true });
     cy.get('.MenuItem.host', { timeout: 10000 }).click();
     cy.get('.removeHostBtn').click();
     cy.get('[data-cy=continue]').click();

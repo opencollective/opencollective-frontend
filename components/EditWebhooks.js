@@ -47,6 +47,8 @@ const messages = defineMessages({
   },
 });
 
+const EMPTY_WEBHOOKS = [];
+
 class EditWebhooks extends React.Component {
   static propTypes = {
     title: PropTypes.string,
@@ -76,7 +78,7 @@ class EditWebhooks extends React.Component {
   }
 
   getWebhooksFromProps = props => {
-    return get(props, 'data.Collective.notifications', []);
+    return get(props, 'data.Collective.notifications', EMPTY_WEBHOOKS);
   };
 
   validateWebhookUrl = value => {
@@ -313,7 +315,7 @@ class EditWebhooks extends React.Component {
           >
             {status === 'saved' ? (
               <Span textTransform="capitalize">
-                <FormattedMessage id="saved" defaultMessage="saved" />
+                <FormattedMessage id="saved" defaultMessage="Saved" />
               </Span>
             ) : (
               <FormattedMessage

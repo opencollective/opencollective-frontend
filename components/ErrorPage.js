@@ -20,19 +20,47 @@ import StyledButton from './StyledButton';
 import Container from './Container';
 import StyledLink from './StyledLink';
 import MessageBox from './MessageBox';
+import { withUser } from './UserProvider';
 
+const ErrorTypes = {
+  NOT_FOUND: 'NOT_FOUND',
+};
+
+/** Error generators to be passed with the `error` prop of `ErrorPage` */
+export const generateError = {
+  /**
+   * Generate a error for when an entity is not found. If a search term is provided, it will
+   * be used to show a button to propose user to search the item.
+   * */
+  notFound: searchTerm => {
+    return { type: ErrorTypes.NOT_FOUND, payload: { searchTerm } };
+  },
+};
+
+/**
+ * A flexible error page
+ */
 class ErrorPage extends React.Component {
   static propTypes = {
-    message: PropTypes.string,
+    /** Customize the error type. Check `generateError.*` functions for more info */
+    error: PropTypes.shape({
+      type: PropTypes.oneOf(Object.values(ErrorTypes)),
+      payload: PropTypes.object,
+    }),
+    /** If true, a loading indicator will be displayed instad of an error */
     loading: PropTypes.bool,
-    data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
-    LoggedInUser: PropTypes.object,
     /** Define if error should be logged to console. Default: true */
     log: PropTypes.bool,
+    /** @ignore from withUser */
+    LoggedInUser: PropTypes.object,
+    /** @deprecated please generate errors with the `generateError` helper  */
+    message: PropTypes.string,
+    /** @deprecated please generate errors with the `generateError` helper */
+    data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
   };
 
   getErrorComponent() {
-    const { data, loading, log = true } = this.props;
+    const { error, data, loading, log = true } = this.props;
 
     if (log && get(data, 'error')) {
       if (data.error.message !== 'Test error') {
@@ -49,8 +77,10 @@ class ErrorPage extends React.Component {
       return <Loading />;
     }
 
-    if (get(data, 'error.message', '').includes('No collective found')) {
-      return <NotFound slug={get(this.props.data, 'variables.slug')} />;
+    if (error && error.type === ErrorTypes.NOT_FOUND) {
+      return <NotFound searchTerm={get(error.payload, 'searchTerm')} />;
+    } else if (get(data, 'error.message', '').includes('No collective found')) {
+      return <NotFound searchTerm={get(this.props.data, 'variables.slug')} />;
     }
 
     // If error message is provided, we display it. This behaviour should be deprecated
@@ -190,7 +220,9 @@ ${truncate(stackTrace, { length: 6000 })}
       <div className="ErrorPage">
         <Header LoggedInUser={LoggedInUser} />
         <Body>
-          <div className="content">{component}</div>
+          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+            {component}
+          </Container>
         </Body>
         <Footer />
       </div>
@@ -198,4 +230,4 @@ ${truncate(stackTrace, { length: 6000 })}
   }
 }
 
-export default ErrorPage;
+export default withUser(ErrorPage);

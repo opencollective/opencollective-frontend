@@ -46,7 +46,7 @@ const CoverImage = styled.div`
 `;
 
 /** Tier's description */
-const TierBody = styled.div`
+const Description = styled.div`
   overflow-wrap: break-word;
   margin: 8px 0;
   font-size: 14px;
@@ -103,7 +103,7 @@ const I18nContributionType = defineMessages({
 const getContributeCTA = type => {
   switch (type) {
     case ContributionTypes.FINANCIAL_GOAL:
-      return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute with this goal" />;
+      return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute to this goal" />;
     case ContributionTypes.EVENT_PARTICIPATE:
       return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
     case ContributionTypes.EVENT_PASSED:
@@ -138,11 +138,12 @@ const ContributeCard = ({
   stats,
   hideContributors,
   image,
+  ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
   return (
-    <StyledContributeCard>
+    <StyledContributeCard {...props}>
       <CoverImage image={image}>
         <StyledTag position="absolute" bottom="8px" left="8px" background="white" color="black.700" fontWeight="600">
           {intl.formatMessage(I18nContributionType[type])}
@@ -150,14 +151,14 @@ const ContributeCard = ({
       </CoverImage>
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
-          <P fontSize="H5" mt={1} mb={2} fontWeight="bold" textTransform="capitalize">
+          <P fontSize="H5" mt={1} mb={2} fontWeight="bold" textTransform="capitalize" data-cy="contribute-title">
             {title}
           </P>
-          <TierBody>{children}</TierBody>
+          <Description data-cy="contribute-description">{children}</Description>
         </Flex>
         <Box>
           <Link route={route} params={routeParams}>
-            <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3}>
+            <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
               {buttonText || getContributeCTA(type)}
             </StyledButton>
           </Link>

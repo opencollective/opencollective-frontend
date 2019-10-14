@@ -4,13 +4,14 @@ import { FormattedMessage } from 'react-intl';
 
 import ExpenseWithData from '../components/expenses/ExpenseWithData';
 
+import { ssrNotFoundError } from '../lib/nextjs_utils';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
 import { Box, Flex } from '@rebass/grid';
 import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
-import ErrorPage from '../components/ErrorPage';
+import ErrorPage, { generateError } from '../components/ErrorPage';
 import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
@@ -64,10 +65,13 @@ class ExpensePage extends React.Component {
   }
 
   render() {
-    const { data, ExpenseId, LoggedInUser } = this.props;
+    const { slug, data, ExpenseId, LoggedInUser } = this.props;
 
-    if (!data.Collective) {
+    if (!data || data.error || data.loading) {
       return <ErrorPage data={data} />;
+    } else if (!data.Collective) {
+      ssrNotFoundError(); // Force 404 when rendered server side
+      return <ErrorPage error={generateError.notFound(slug)} log={false} />;
     }
 
     const collective = data.Collective;
@@ -92,7 +96,7 @@ class ExpensePage extends React.Component {
                 </StyledButton>
               </Link>
               <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton my={1} mx={3}>
+                <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
                   <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                 </StyledButton>
               </Link>
@@ -127,4 +131,13 @@ class ExpensePage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveCoverData(ExpensePage));
+export default withUser(
+  addCollectiveCoverData(ExpensePage, {
+    options: props => ({
+      variables: {
+        slug: props.slug,
+        throwIfMissing: false,
+      },
+    }),
+  }),
+);

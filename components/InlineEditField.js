@@ -55,6 +55,8 @@ class InlineEditField extends Component {
     mutation: PropTypes.object.isRequired,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
+    /** Max field length */
+    maxLength: PropTypes.number,
     /** Called to format the value before submitting */
     formatBeforeSubmit: PropTypes.func,
     /** Set to false to disable edit icon even if user is allowed to edit */
@@ -132,6 +134,7 @@ class InlineEditField extends Component {
                 children({
                   isEditing: true,
                   value: draft,
+                  maxLength: this.props.maxLength,
                   setValue: this.setDraft,
                   enableEditor: this.enableEditor,
                   disableEditor: this.disableEditor,
@@ -150,6 +153,7 @@ class InlineEditField extends Component {
                   fontSize="inherit"
                   fontWeight="inherit"
                   lineHeight="inherit"
+                  maxLength={this.props.maxLength}
                   data-cy={`InlineEditField-Textarea-${field}`}
                 />
               )}
@@ -159,7 +163,7 @@ class InlineEditField extends Component {
                     {error.message.replace('GraphQL error: ', '')}
                   </MessageBox>
                 )}
-                <Flex flexWrap="wrap" justifyContent="space-evenly" mt={2}>
+                <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
                   <FormButton data-cy="InlineEditField-Btn-Cancel" disabled={loading} onClick={this.disableEditor}>
                     <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                   </FormButton>
@@ -174,7 +178,7 @@ class InlineEditField extends Component {
                       updateField({ variables }).then(this.disableEditor);
                     }}
                   >
-                    <FormattedMessage id="save" defaultMessage="save" />
+                    <FormattedMessage id="save" defaultMessage="Save" />
                   </FormButton>
                 </Flex>
               </Box>

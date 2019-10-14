@@ -61,17 +61,17 @@ describe('AddFundsSourcePicker component', () => {
           fromCollectives: {
             collectives: [
               {
-                id: 'collective-id',
+                id: 13337,
                 name: 'Example Collective',
                 type: 'COLLECTIVE',
               },
               {
-                id: 'organization-id',
+                id: 13338,
                 name: 'Example Organzation',
                 type: 'ORGANIZATION',
               },
               {
-                id: 'user-id',
+                id: 13339,
                 name: 'Example Person',
                 type: 'USER',
               },

@@ -26,6 +26,9 @@ import ButtonGroup from '../components/ButtonGroup';
 import Link from '../components/Link';
 import StyledLink from '../components/StyledLink';
 import Currency from '../components/Currency';
+import Avatar from '../components/Avatar';
+import Loading from '../components/Loading';
+import Page from '../components/Page';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
@@ -130,6 +133,24 @@ class CreatePledgePage extends React.Component {
     };
   }
 
+  static propTypes = {
+    intl: PropTypes.object.isRequired, // from injectIntl
+    data: PropTypes.object,
+    name: PropTypes.string,
+    slug: PropTypes.string,
+    githubHandle: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    createPledge: PropTypes.func,
+  };
+
+  state = {
+    errorMessage: null,
+    loadingUserLogin: true,
+    LoggedInUser: undefined,
+    submitting: false,
+  };
+
   static messages = defineMessages({
     'menu.createPledge': {
       id: 'menu.createPledge',
@@ -148,24 +169,6 @@ class CreatePledgePage extends React.Component {
       defaultMessage: 'One-Time',
     },
   });
-
-  static propTypes = {
-    intl: PropTypes.object.isRequired, // from injectIntl
-    data: PropTypes.object,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    githubHandle: PropTypes.string,
-    LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    createPledge: PropTypes.func,
-  };
-
-  state = {
-    errorMessage: null,
-    loadingUserLogin: true,
-    LoggedInUser: undefined,
-    submitting: false,
-  };
 
   async createPledge(event) {
     event.preventDefault();
@@ -225,6 +228,16 @@ class CreatePledgePage extends React.Component {
   render() {
     const { errorMessage, submitting } = this.state;
     const { data = {}, name, slug, githubHandle, LoggedInUser, loadingLoggedInUser, intl } = this.props;
+
+    if (data.loading) {
+      return (
+        <Page>
+          <Container my={6}>
+            <Loading />
+          </Container>
+        </Page>
+      );
+    }
 
     let website;
     if (data.Collective) {
@@ -522,21 +535,7 @@ class CreatePledgePage extends React.Component {
                       .map(({ fromCollective }) => (
                         <Box key={fromCollective.id} mr={2} mt={2}>
                           <Link route="collective" params={{ slug: fromCollective.slug }}>
-                            <Container
-                              backgroundImage={`url(${imagePreview(
-                                fromCollective.image,
-                                defaultImage[fromCollective.type],
-                                {
-                                  width: 65,
-                                },
-                              )})`}
-                              backgroundSize="contain"
-                              backgroundRepeat="no-repeat"
-                              backgroundPosition="center center"
-                              borderRadius={100}
-                              height={40}
-                              width={40}
-                            />
+                            <Avatar collective={fromCollective} radius={40} />
                           </Link>
                         </Box>
                       ))}
@@ -647,7 +646,7 @@ class CreatePledgePage extends React.Component {
 
 const addCollectiveData = graphql(
   gql`
-    query getCollective($slug: String!) {
+    query CreatePledgeQuery($slug: String!) {
       Collective(slug: $slug) {
         currency
         id
@@ -655,10 +654,13 @@ const addCollectiveData = graphql(
         website
         githubHandle
         pledges: orders(status: PENDING) {
+          id
           totalAmount
           fromCollective {
-            image
+            id
+            imageUrl(height: 128)
             slug
+            name
             type
           }
         }

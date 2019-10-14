@@ -27,9 +27,9 @@ const CreateNewCard = styled.div`
 /**
  * A special card dedicated to admins to show them a `Create new ...` card (ex: Create new tier).
  */
-const CreateNew = ({ route, children }) => {
+const CreateNew = ({ route, children, ...props }) => {
   return (
-    <CreateNewCard>
+    <CreateNewCard {...props}>
       <Link route={route}>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
           <StyledRoundButton buttonStyle="dark" fontSize={25}>

@@ -37,8 +37,6 @@ class SigninPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
   };
 
-  static routes = { signin: '/signin', join: '/create-account' };
-
   state = { error: null, success: null };
 
   async componentDidMount() {
@@ -77,6 +75,8 @@ class SigninPage extends React.Component {
       }
     }
   }
+
+  static routes = { signin: '/signin', join: '/create-account' };
 
   renderContent() {
     const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;

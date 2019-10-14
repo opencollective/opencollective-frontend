@@ -15,6 +15,7 @@ import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionContribute from './sections/Contribute';
 import SectionContributors from './sections/Contributors';
+import SectionGoals from './sections/Goals';
 import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
 import SectionTransactions from './sections/Transactions';
@@ -87,14 +88,14 @@ class CollectivePage extends Component {
       isFixed = false;
     }
 
-    // Get the currently selected section
-    const distanceThreshold = 500;
-    const currentViewBottom = window.scrollY + window.innerHeight - distanceThreshold;
+    // Get the currently section that is at the top of the screen.
+    const distanceThreshold = 200;
+    const breakpoint = window.scrollY + distanceThreshold;
     const sections = this.getSections(this.props);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
-      if (sectionRef && currentViewBottom > sectionRef.offsetTop) {
+      if (sectionRef && breakpoint >= sectionRef.offsetTop) {
         selectedSection = sectionName;
         break;
       }
@@ -119,12 +120,12 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot) => {
+  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
     return {
       hasContact: isCollective,
       hasSubmitExpense: isCollective,
-      hasApply: isHost,
+      hasApply: canApply,
       hasDashboard: isHost && isAdmin,
       hasManageSubscriptions: isAdmin && !isCollective,
       addFunds: isRoot && type === CollectiveType.ORGANIZATION,
@@ -181,6 +182,8 @@ class CollectivePage extends Component {
         return <SectionContributions collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
+      case Sections.GOALS:
+        return <SectionGoals collective={this.props.collective} />;
       default:
         return null;
     }
@@ -188,9 +191,10 @@ class CollectivePage extends Component {
 
   render() {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
+    const { type, isHost, canApply } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props);
-    const callsToAction = this.getCallsToAction(collective.type, collective.isHost, isAdmin, isRoot);
+    const callsToAction = this.getCallsToAction(type, isHost, isAdmin, isRoot, canApply);
 
     return (
       <Container
@@ -218,7 +222,12 @@ class CollectivePage extends Component {
             isAnimated={true}
             onSectionClick={this.onSectionClick}
             LinkComponent={({ section, label, className }) => (
-              <a href={`#section-${section}`} className={className} onClick={e => e.preventDefault()}>
+              <a
+                data-cy={`section-${section}`}
+                href={`#section-${section}`}
+                className={className}
+                onClick={e => e.preventDefault()}
+              >
                 {label}
               </a>
             )}

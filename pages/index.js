@@ -765,7 +765,7 @@ class HomePage extends React.Component {
                     </P>
                     <P>
                       <a href="https://opencollective.com/discover">
-                        <FormattedMessage id="home.collectives" defaultMessage="collectives" />
+                        <FormattedMessage id="home.collectives" defaultMessage="active collectives" />
                       </a>
                     </P>
                   </Container>

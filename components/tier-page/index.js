@@ -204,6 +204,7 @@ class TierPage extends Component {
                     canEdit={canEdit}
                     values={tier}
                     field="name"
+                    maxLength={255}
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                   />
                 </H1>
@@ -221,6 +222,7 @@ class TierPage extends Component {
                     canEdit={canEdit}
                     values={tier}
                     field="description"
+                    maxLength={510}
                     placeholder={
                       <FormattedMessage id="TierPage.AddDescription" defaultMessage="Add a short description" />
                     }
@@ -281,7 +283,7 @@ class TierPage extends Component {
                             amount={tier.goal}
                             currency={tier.currency}
                             interval={tier.interval}
-                            abbreviateAmount
+                            abbreviateAmount={tier.goal > 1000000}
                             abbreviateInterval
                             amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                           />
@@ -308,7 +310,7 @@ class TierPage extends Component {
                           currency={tier.currency}
                           interval={tier.interval}
                           amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
-                          abbreviateAmount
+                          abbreviateAmount={amountRaised > 1000000}
                           abbreviateInterval
                         />
                       ),

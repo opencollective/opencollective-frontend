@@ -74,7 +74,6 @@ class EditCollectiveForm extends React.Component {
     collective.tos = get(collective, 'settings.tos');
     collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
     collective.application = get(collective, 'settings.apply');
-    collective.goals = get(collective, 'settings.goals');
     collective.markdown = get(collective, 'settings.markdown');
 
     this.state = {
@@ -83,14 +82,13 @@ class EditCollectiveForm extends React.Component {
       collective,
       members: collective.members || [{}],
       tiers: collective.tiers || [{}],
-      goals: collective.settings.goals || [{}],
     };
 
     const isNewCollectivePage = parseToBoolean(process.env.NCP_IS_DEFAULT);
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
     this.showEditImages = !isNewCollectivePage;
-    this.showEditGoals = collective.type === 'COLLECTIVE' && !isNewCollectivePage;
+    this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
@@ -100,8 +98,8 @@ class EditCollectiveForm extends React.Component {
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
-      save: { id: 'save', defaultMessage: 'save' },
-      saved: { id: 'saved', defaultMessage: 'saved' },
+      save: { id: 'save', defaultMessage: 'Save' },
+      saved: { id: 'saved', defaultMessage: 'Saved' },
       'event.create.btn': {
         id: 'event.create.btn',
         defaultMessage: 'Create Event',
@@ -318,7 +316,6 @@ class EditCollectiveForm extends React.Component {
     } else {
       collective[fieldname] = value;
     }
-
     this.setState({
       modified: true,
       collective: Object.assign({}, this.state.collective, collective),
@@ -334,7 +331,6 @@ class EditCollectiveForm extends React.Component {
     const collective = {
       ...this.state.collective,
       tiers: this.state.tiers,
-      goals: this.state.goals,
       members: this.state.members,
     };
     this.props.onSubmit(collective);
@@ -358,7 +354,7 @@ class EditCollectiveForm extends React.Component {
     if (['loading', 'saved'].includes(status)) {
       submitBtnMessageId = status;
     }
-    console.log('>>> submitBtnMessageId', submitBtnMessageId);
+
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
     const type = collective.type.toLowerCase();
@@ -594,10 +590,6 @@ class EditCollectiveForm extends React.Component {
               font-size: 1.5rem;
             }
 
-            .FormInputs {
-              overflow-x: hidden;
-            }
-
             .EditCollectiveForm :global(textarea[name='longDescription']) {
               height: 30rem;
             }
@@ -682,7 +674,7 @@ class EditCollectiveForm extends React.Component {
                 params={{ slug: collective.slug, section: 'goals' }}
                 className="MenuItem goals"
               >
-                <FormattedMessage id="editCollective.menu.goals" defaultMessage="Goals" />
+                <FormattedMessage id="editCollective.menu.goals" defaultMessage="Collective Goals" />
               </MenuItem>
             )}
             {this.showHost && (
@@ -835,15 +827,7 @@ class EditCollectiveForm extends React.Component {
                   defaultType={this.defaultTierType}
                 />
               )}
-              {this.state.section === 'goals' && (
-                <EditGoals
-                  title="goals"
-                  goals={this.state.goals}
-                  collective={collective}
-                  currency={collective.currency}
-                  onChange={this.handleObjectChange}
-                />
-              )}
+              {this.state.section === 'goals' && <EditGoals collective={collective} currency={collective.currency} />}
               {this.state.section === 'host' && (
                 <EditHost
                   collective={collective}
@@ -889,6 +873,7 @@ class EditCollectiveForm extends React.Component {
               'gift-cards-send',
               'payment-methods',
               'webhooks',
+              'goals',
             ].indexOf(this.state.section) === -1 && (
               <div className="actions">
                 <Button

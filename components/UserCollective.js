@@ -15,7 +15,6 @@ import { pick, get, groupBy, uniqBy } from 'lodash';
 import MessageModal from './MessageModal';
 import SectionTitle from './SectionTitle';
 import ApplyToHostBtn from './ApplyToHostBtn';
-import OrderCreated from './OrderCreated';
 import { Button } from 'react-bootstrap';
 import { Router } from '../server/pages';
 
@@ -350,15 +349,6 @@ class UserCollective extends React.Component {
             />
 
             <div>
-              {get(query, 'OrderId') && (
-                <OrderCreated
-                  order={order}
-                  paymentMethodType={query.paymentMethodType}
-                  collectiveType={query.collectiveType}
-                  status={query.status}
-                />
-              )}
-
               {/* Make sure we don't show an empty div.content if no description unless canEditCollective */}
               {(collective.longDescription || canEditCollective) && (
                 <div className="content">

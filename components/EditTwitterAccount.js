@@ -189,17 +189,17 @@ class EditTwitterAccount extends React.Component {
               <FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" />
             </summary>
             {this.notificationTypes.map(this.renderNotification)}
+            <Row>
+              <Col sm={3} />
+              <Col sm={9}>
+                {this.state.isModified && (
+                  <SmallButton className="default" bsStyle="primary" onClick={this.onClick}>
+                    <FormattedMessage id="save" defaultMessage="Save" />
+                  </SmallButton>
+                )}
+              </Col>
+            </Row>
           </details>
-          <Row>
-            <Col sm={3} />
-            <Col sm={9}>
-              {this.state.isModified && (
-                <SmallButton className="default" bsStyle="primary" onClick={this.onClick}>
-                  <FormattedMessage id="save" defaultMessage="save" />
-                </SmallButton>
-              )}
-            </Col>
-          </Row>
         </Form>
       </div>
     );

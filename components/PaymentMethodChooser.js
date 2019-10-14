@@ -44,7 +44,7 @@ class PaymentMethodChooser extends React.Component {
         id: 'paymentMethod.add',
         defaultMessage: 'New Credit Card',
       },
-      'paymentMethod.save': { id: 'save', defaultMessage: 'save' },
+      'paymentMethod.save': { id: 'save', defaultMessage: 'Save' },
       'paymentMethod.cancel': {
         id: 'paymentMethod.cancel',
         defaultMessage: 'Cancel',

@@ -1,12 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { get, maxBy, debounce, sortBy } from 'lodash';
+import { get, maxBy, debounce, sortBy, truncate } from 'lodash';
 import styled, { css } from 'styled-components';
-import slugify from 'slugify';
+import uuid from 'uuid/v4';
 
 import { formatCurrency } from '../lib/utils';
 import { fadeIn } from './StyledKeyframes';
+import { P, Span } from './Text';
+
+const getProgressColor = theme => theme.colors.primary[600];
+const getEmptyProgressColor = () => '#e2e2e2';
+const MAX_TITLE_LENGTH = 32;
 
 const GoalContainer = styled.div`
   position: absolute;
@@ -14,32 +19,34 @@ const GoalContainer = styled.div`
   left: 0;
   text-align: right;
   transition: width 3s;
-  height: 20px;
-  border-right: 1px solid ${props => (props.goal.isReached ? '#64c800' : '#3399ff')};
+  height: 15px;
+  color: ${props => props.theme.colors.black[500]};
+  border-right: 1px solid ${props =>
+    props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme)};
   width: ${props => `${props.goal.progress * 100}%`};
   z-index: ${props => (['balance', 'yearlyBudget'].includes(props.goal.slug) ? 310 : (20 - props.index) * 10)};
   transition: ${props =>
-    `opacity 0.3s, height 1s, padding-top 1s${props.goal.animateProgress ? ', width 2s ease-in-out;' : ''};`}
+    !props.goal.animateProgress
+      ? 'opacity 0.3s, height 1s, padding-top 1s'
+      : 'opacity 2s, height 1s, padding-top 1s, width 2s ease-in-out;'};
 
   .caption {
     padding: 1rem 0.5rem 1rem 0.5rem;
-    color: #aaaeb3;
     font-size: 13px;
     line-height: 15px;
   }
 
   .label {
-    background: #252729;
-    color: #aaaeb3;
+    background: rgb(245, 247, 250);
     padding: 0;
     line-height: 1.5;
     font-size: 13px;
     text-align: right;
+    color: inherit;
   }
 
   .amount {
-    color: white;
-    font-weight: bold;
+    font-weight: 500;
   }
 
   .interval {
@@ -50,20 +57,26 @@ const GoalContainer = styled.div`
 
   ${props =>
     props.goal.isReached &&
+    css`
+      color: ${props.theme.colors.black[600]};
+    `}
+
+  ${props =>
+    props.goal.isReached &&
     props.goal.position === 'below' &&
     css`
-      border-top: 4px solid #64c800;
+      border-top: 4px solid ${getProgressColor(props.theme)};
     `}
 
   ${props =>
     props.goal.position === 'above' &&
     css`
-      border-bottom: 4px solid #3399ff;
+      border-bottom: 4px solid ${getEmptyProgressColor(props.theme)};
       top: auto;
       bottom: 76px;
 
       .caption {
-        margin-top: -4.5rem;
+        margin-top: -5.5rem;
       }
     `}
 
@@ -71,12 +84,14 @@ const GoalContainer = styled.div`
     if (props.goal.level === 1) {
       if (props.goal.position === 'below') {
         return css`
-          height: 60px;
+          height: 50px;
           padding-top: 4rem;
+          border-right-style: dotted;
+          border-right-color: ${props.theme.colors.primary[300]};
         `;
       } else {
         return css`
-          height: 60px;
+          height: 50px;
         `;
       }
     }
@@ -104,7 +119,6 @@ const GoalContainer = styled.div`
 class GoalsCover extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object,
     interpolation: PropTypes.oneOf(['linear', 'logarithm', 'auto']),
     intl: PropTypes.object.isRequired,
   };
@@ -262,14 +276,14 @@ class GoalsCover extends React.Component {
    */
   getCustomGoals(maxCustomGoalsToShow) {
     const settingsGoals = get(this.props.collective, 'settings.goals', []);
-    const goalsWithTitle = settingsGoals.reduce((goals, goal) => (goal.title ? [...goals, goal] : goals), []);
-    const sortedGoals = sortBy(goalsWithTitle, 'amount');
-    const goals = sortedGoals.map((goal, idx) => this.createGoal(`goal-${idx}-${slugify(goal.title)}`, goal));
+    const sortedGoals = sortBy(settingsGoals, 'amount');
+    const goals = sortedGoals.map((goal, idx) => this.createGoal(`goal-${idx}-${goal.key || uuid()}`, goal));
 
     // No need to remove goals
     if (goals.length <= maxCustomGoalsToShow) {
       return goals;
     }
+
     // Filter goals, ensure we keep the last one
     const lastGoal = goals[goals.length - 1];
     if (!maxCustomGoalsToShow) {
@@ -288,7 +302,7 @@ class GoalsCover extends React.Component {
     if (ref && ref.current) {
       return ref.current.offsetWidth + 15; // Add a bigger hit box
     }
-    return goal.title.length * 8;
+    return Math.min(MAX_TITLE_LENGTH, goal.title ? goal.title.length : 0) * 8;
   }
 
   /** Given a percent size, returns its value in pixels */
@@ -419,16 +433,32 @@ class GoalsCover extends React.Component {
     return { goals, maxAmount, maxLevelAbove, hasCustomGoals: customGoals.length > 0 };
   }
 
+  getDivTitle(title, description) {
+    if (title && description) {
+      return `${title}\n\n${description}`;
+    } else {
+      return title || description || '';
+    }
+  }
+
   renderGoal(goal, index) {
     const { collective } = this.props;
     const slug = goal.slug;
-    const amount = formatCurrency(goal.amount, collective.currency, { precision: goal.precision || 0 });
+    const amount = formatCurrency(goal.amount || 0, collective.currency, { precision: goal.precision || 0 });
 
     return (
       <GoalContainer className={`goal ${goal.slug}`} key={slug} goal={goal} index={index}>
         <div className="caption">
-          <div className="label" ref={this.labelsRefs[goal.slug]}>
-            {goal.title}
+          <div
+            className="label"
+            ref={this.labelsRefs[goal.slug]}
+            title={this.getDivTitle(goal.title, goal.description)}
+          >
+            {goal.title ? (
+              truncate(goal.title, { length: MAX_TITLE_LENGTH })
+            ) : (
+              <FormattedMessage id="ContributionType.Goal" defaultMessage="Goal" />
+            )}
           </div>
           <div className="amount">
             {amount}
@@ -462,14 +492,6 @@ class GoalsCover extends React.Component {
               overflow: hidden;
             }
 
-            .budgetText {
-              text-align: center;
-              color: #c2c7cc;
-              font-size: 14px;
-              line-height: 26px;
-              margin: 3rem 0;
-            }
-
             .barContainer {
               position: relative;
               width: 80%;
@@ -485,12 +507,12 @@ class GoalsCover extends React.Component {
               margin-top: 15rem;
             }
 
-            .annualBudget {
-              font-weight: bold;
-              color: white;
-              margin-left: 5px;
-              margin-right: 5px;
+            @media (max-width: 1400px) {
+              .barContainer {
+                width: 90%;
+              }
             }
+
             @media (max-width: 420px) {
               .barContainer {
                 width: 95%;
@@ -500,19 +522,19 @@ class GoalsCover extends React.Component {
         </style>
         <div>
           {get(collective, 'stats.backers.all') > 0 && (
-            <div className="budgetText">
+            <P textAlign="center" color="black.700" mx={2}>
               <FormattedMessage
                 id="cover.budget.text"
                 defaultMessage="Thanks to your financial contributions, we are operating on an estimated annual budget of {yearlyBudget}"
                 values={{
                   yearlyBudget: (
-                    <span className="annualBudget">
+                    <Span fontWeight="bold">
                       {formatCurrency(get(collective, 'stats.yearlyBudget'), collective.currency, { precision: 0 })}
-                    </span>
+                    </Span>
                   ),
                 }}
               />
-            </div>
+            </P>
           )}
           <div
             className={`barContainer max-level-above-${this.state.maxLevelAbove} ${

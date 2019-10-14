@@ -56,12 +56,12 @@ export default class SectionContributors extends React.PureComponent {
     financialContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
   };
 
-  static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
-
   constructor(props) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
   }
+
+  static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
   setFilter = filter => {
     this.setState({ filter });

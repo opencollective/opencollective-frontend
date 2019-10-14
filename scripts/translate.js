@@ -37,7 +37,7 @@ const translatedMessages = (locale, defaultMessages, updatedKeys) => {
   const json = JSON.parse(file);
 
   // Do translate
-  return Object.keys(defaultMessages)
+  const updatedMessages = Object.keys(defaultMessages)
     .map(id => [id, defaultMessages[id]])
     .reduce((collection, [id, defaultMessage]) => {
       if (updatedKeys.includes(id)) {
@@ -50,6 +50,13 @@ const translatedMessages = (locale, defaultMessages, updatedKeys) => {
 
       return collection;
     }, {});
+
+  // Make sure that the result matches the structure of default template
+  if (difference(Object.keys(updatedMessages), Object.keys(defaultMessages)).length !== 0) {
+    throw new Error(`Translations for ${locale} doesn't match the base file`);
+  }
+
+  return updatedMessages;
 };
 
 /**
@@ -100,7 +107,6 @@ diff.updated.forEach(key => console.info(`📥  [UPDATE] "${key}"`));
 
 // Save translations
 mkdirpSync(LANG_DIR);
-fs.writeFileSync(DEFAULT_TRANSLATIONS_FILE, convertToJSON(defaultMessages));
 translate('es', defaultMessages, diff.updated);
 translate('fr', defaultMessages, diff.updated);
 translate('it', defaultMessages, diff.updated);
@@ -112,3 +118,5 @@ translate('nl', defaultMessages, diff.updated);
 translate('de', defaultMessages, diff.updated);
 translate('ko', defaultMessages, diff.updated);
 translate('ar', defaultMessages, diff.updated);
+
+fs.writeFileSync(DEFAULT_TRANSLATIONS_FILE, convertToJSON(defaultMessages));

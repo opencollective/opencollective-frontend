@@ -6,6 +6,117 @@ export const openSourceHost = {
   __typename: 'Organization',
 };
 
+export const randomCollectivesList = [
+  {
+    id: 11526,
+    name: '하 태영',
+    slug: '-4',
+    type: 'USER',
+  },
+  {
+    id: 22282,
+    name: 'ตัน ภาสกรนที',
+    slug: 'rustlik',
+    type: 'USER',
+  },
+  {
+    id: 49082,
+    name: 'ハック　タイ　グェン ドゥオン',
+    slug: 'hakkutaigun-duon',
+    type: 'USER',
+  },
+  {
+    id: 15089,
+    name: 'อิสริยาภรณ์ ศรีวงษ์ชัย',
+    slug: '-7',
+    type: 'USER',
+  },
+  {
+    id: 15090,
+    name: 'อิสริยาภรณ์ ศรีวงษ์ชัย',
+    slug: 'issariyaporn-sriwongchai',
+    type: 'USER',
+  },
+  {
+    id: 42649,
+    name: '½ journée de workshop pour apprendre à tester son code',
+    slug: 'journee-de-workshop-pour-apprendre-a-tester-son-code-16803ev',
+    type: 'EVENT',
+  },
+  {
+    id: 13243,
+    name: 'Georges Washington',
+    slug: 'ade',
+    type: 'USER',
+  },
+  {
+    id: 10176,
+    name: 'David Gilmour',
+    slug: 'David Gilmour',
+    type: 'USER',
+  },
+  {
+    id: 22937,
+    name: 'Airbnb',
+    slug: 'Airbnb',
+    type: 'ORGANIZATION',
+  },
+  {
+    id: 13565,
+    name: 'Gandhi',
+    slug: 'Gandhi',
+    type: 'USER',
+  },
+  {
+    id: 9850,
+    name: 'Paris JS Meetup - 24/05/2019',
+    slug: 'paris-meetup',
+    type: 'EVENT',
+  },
+  {
+    id: 49013,
+    name: 'Babel',
+    slug: 'babel',
+    type: 'COLLECTIVE',
+  },
+  {
+    id: 22549,
+    name: 'Frank Zappa',
+    slug: '1000i100',
+    type: 'USER',
+  },
+  {
+    id: 47269,
+    name: 'Jack',
+    slug: 'Jack',
+    type: 'USER',
+  },
+  {
+    id: 1347,
+    name: 'The big Lebowski',
+    slug: 'The big Lebowski',
+    type: 'USER',
+  },
+  {
+    id: 49831,
+    name: 'John Doe',
+    slug: '105nevesta-105-105nevesta105',
+    type: 'USER',
+  },
+  {
+    id: 41321,
+    name: 'Webpack',
+    slug: 'Webpack',
+    type: 'COLLECTIVE',
+  },
+  {
+    id: 50259,
+    name: 'ParcelJS',
+    slug: '10th-street-media-llc',
+    type: 'COLLECTIVE',
+  },
+];
+
 export const webpackCollective = {
   id: 302,
   isActive: true,

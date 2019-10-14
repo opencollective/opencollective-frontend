@@ -8,9 +8,10 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage from '../components/ErrorPage';
+import ErrorPage, { generateError } from '../components/ErrorPage';
 import Link from '../components/Link';
 
+import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
@@ -35,10 +36,15 @@ class OrderPage extends React.Component {
   }
 
   render() {
-    const { data, OrderId } = this.props;
+    const { slug, data, OrderId } = this.props;
     const { LoggedInUser } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data || data.error || data.loading) {
+      return <ErrorPage data={data} />;
+    } else if (!data.Collective) {
+      ssrNotFoundError(); // Force 404 when rendered server side
+      return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+    }
 
     const collective = data.Collective;
 
@@ -111,4 +117,10 @@ class OrderPage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveCoverData(OrderPage));
+export default withUser(
+  addCollectiveCoverData(OrderPage, {
+    options: props => ({
+      variables: { slug: props.slug, throwIfMissing: false },
+    }),
+  }),
+);

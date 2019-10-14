@@ -33,7 +33,7 @@ const CollectiveCallsToAction = ({
       )}
       {hasSubmitExpense && (
         <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} buttonStyle="secondary">
+          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} buttonStyle="secondary" data-cy="submit-expense-btn">
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </StyledButton>
         </Link>

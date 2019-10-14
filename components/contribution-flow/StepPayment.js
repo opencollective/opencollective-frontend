@@ -36,6 +36,8 @@ const PaymentEntryContainer = styled(Container)`
   }
 `;
 
+const minBalance = 50; // Minimum usable balance for virtual card
+
 const getPaymentMethodIcon = (pm, collective) => {
   if (pm.type === 'creditcard') {
     return <CreditCard />;
@@ -64,7 +66,18 @@ const getPaymentMethodMetadata = pm => {
       />
     );
   } else if (pm.type === 'virtualcard') {
-    if (pm.expiryDate) {
+    if (pm.balance < minBalance) {
+      return (
+        <FormattedMessage
+          id="ContributePayment.unusableBalance"
+          defaultMessage="{balance} left, balance less than {minBalance} cannot be used."
+          values={{
+            balance: formatCurrency(pm.balance, pm.currency),
+            minBalance: formatCurrency(minBalance, pm.currency),
+          }}
+        />
+      );
+    } else if (pm.expiryDate) {
       return (
         <FormattedMessage
           id="ContributePayment.balanceAndExpiry"
@@ -169,7 +182,6 @@ class StepPayment extends React.Component {
 
   generatePaymentsOptions() {
     const { collective, defaultValue, withPaypal, manual } = this.props;
-
     // Add collective payment methods
     const paymentMethodsOptions = (collective.paymentMethods || []).map(pm => ({
       key: `pm-${pm.id}`,
@@ -177,6 +189,7 @@ class StepPayment extends React.Component {
       subtitle: getPaymentMethodMetadata(pm),
       icon: getPaymentMethodIcon(pm, collective),
       paymentMethod: pm,
+      disabled: pm.balance < minBalance,
     }));
 
     // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
@@ -277,14 +290,15 @@ class StepPayment extends React.Component {
           defaultValue={selectedOption.key}
           disabled={this.props.disabled}
         >
-          {({ radio, checked, index, value: { key, title, subtitle, icon, data } }) => (
+          {({ radio, checked, index, value: { key, title, subtitle, icon, data, disabled } }) => (
             <PaymentEntryContainer
               px={[3, 24]}
               py={3}
               borderBottom={index !== paymentMethodsOptions.length - 1 ? '1px solid' : 'none'}
               bg="white.full"
               borderColor="black.200"
-              cursor={this.getCursor(this.props.disabled, checked)}
+              css={disabled ? 'filter: grayscale(1);' : undefined}
+              cursor={this.getCursor(disabled || this.props.disabled, checked)}
             >
               <Flex alignItems="center">
                 <Box as="span" mr={[2, 21]} flexWrap="wrap">
