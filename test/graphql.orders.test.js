@@ -125,7 +125,7 @@ describe('graphql.orders.test.js', () => {
   });
 
   describe('mutation', () => {
-    const mutation = `
+    const markOrderAsPaidQuery = `
     mutation markOrderAsPaid($id: Int!) {
       markOrderAsPaid(id: $id) {
         id
@@ -133,15 +133,24 @@ describe('graphql.orders.test.js', () => {
       }
     }
     `;
+
+    const markPendingOrderAsExpiredQuery = `
+      mutation markPendingOrderAsExpired($id: Int!) {
+        markPendingOrderAsExpired(id: $id) {
+          id
+          status
+        }
+      }
+    `;
     it('fails if not authenticated', async () => {
-      const result = await utils.graphqlQuery(mutation, {
+      const result = await utils.graphqlQuery(markOrderAsPaidQuery, {
         id: orders[0].id,
       });
       expect(result.errors[0].message).to.equal('You need to be authenticated to perform this action');
     });
     it('fails if not authenticated as an admin of the host', async () => {
       const result = await utils.graphqlQuery(
-        mutation,
+        markOrderAsPaidQuery,
         {
           id: orders[0].id,
         },
@@ -151,7 +160,7 @@ describe('graphql.orders.test.js', () => {
     });
     it('fails if order not found', async () => {
       const result = await utils.graphqlQuery(
-        mutation,
+        markOrderAsPaidQuery,
         {
           id: 123,
         },
@@ -161,7 +170,7 @@ describe('graphql.orders.test.js', () => {
     });
     it('marks a pending order as paid', async () => {
       const result = await utils.graphqlQuery(
-        mutation,
+        markOrderAsPaidQuery,
         {
           id: orders[0].id,
         },
@@ -189,6 +198,22 @@ describe('graphql.orders.test.js', () => {
       expect(emailSendMessageSpy.callCount).to.equal(1);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(backers[1].email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.match(/Thank you for your €\s?150 donation to codenplay/);
+    });
+
+    it('marks a pending order as expired', async () => {
+      const result = await utils.graphqlQuery(
+        markPendingOrderAsExpiredQuery,
+        {
+          id: orders[1].id,
+        },
+        hostAdmin,
+      );
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const { markPendingOrderAsExpired } = result.data;
+      expect(markPendingOrderAsExpired.status).to.equal('EXPIRED');
+      const order = await models.Order.findByPk(orders[1].id);
+      expect(order.status).to.equal('EXPIRED');
     });
   });
 });

@@ -21,6 +21,7 @@ import {
   addFundsToCollective,
   completePledge,
   markOrderAsPaid,
+  markPendingOrderAsExpired,
 } from './mutations/orders';
 
 import { createMember, removeMember, editMembership } from './mutations/members';
@@ -317,6 +318,15 @@ const mutations = {
     },
     resolve(_, args, req) {
       return markOrderAsPaid(req.remoteUser, args.id);
+    },
+  },
+  markPendingOrderAsExpired: {
+    type: OrderType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    resolve(_, args, req) {
+      return markPendingOrderAsExpired(req.remoteUser, args.id);
     },
   },
   createExpense: {

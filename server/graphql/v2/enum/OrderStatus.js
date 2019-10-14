@@ -9,5 +9,6 @@ export const OrderStatus = new GraphQLEnumType({
     PENDING: {},
     PAID: {},
     ERROR: {},
+    EXPIRED: {},
   },
 });
