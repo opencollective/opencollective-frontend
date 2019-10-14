@@ -75,6 +75,7 @@ class EditGoals extends React.Component {
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages.amount),
+        defaultValue: 0,
       },
       {
         name: 'title',
