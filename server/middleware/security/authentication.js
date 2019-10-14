@@ -84,9 +84,33 @@ export const checkJwtExpiry = (req, res, next) => {
 export const _authenticateUserByJwt = (req, res, next) => {
   if (!req.jwtPayload) return next();
   const userid = Number(req.jwtPayload.sub);
+  const lastLoginAt = req.jwtPayload.lastLoginAt;
   User.findByPk(userid)
     .then(user => {
       if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
+      /**
+       * Functionality for one-time login links. It checks if the JWT has
+       * lastLoginAt in the payload, which it only has during the first
+       * auth.
+       */
+      if (req.jwtPayload.lastLoginAt) {
+        /**
+         * If the user has just signed up, the JWT has a payload of 'firstLogin'
+         * and lastLoginAt is null in the db; so we allow them in only if both
+         * conditions are met. For normal logins, we check that the lastLoginAt
+         * in the JWT matches the lastLoginAt in the db. If so, we allow the user
+         * to log in, and update the lastLoginAt.
+         */
+        if (req.jwtPayload.lastLoginAt !== 'firstLogin' || user.lastLoginAt) {
+          const lastLoginInJwt = new Date(lastLoginAt);
+          const lastLoginInDb = user.lastLoginAt;
+          if (lastLoginInJwt.getTime() !== lastLoginInDb.getTime()) {
+            throw errors.Unauthorized('Invalid login link - multiple uses');
+          }
+        }
+        const now = new Date();
+        user.update({ lastLoginAt: now });
+      }
       user.update({ seenAt: new Date() });
       req.remoteUser = user;
       return user.populateRoles();
