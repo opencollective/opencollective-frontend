@@ -111,3 +111,4 @@ translate('zh', defaultMessages, diff.updated);
 translate('nl', defaultMessages, diff.updated);
 translate('de', defaultMessages, diff.updated);
 translate('ko', defaultMessages, diff.updated);
+translate('ar', defaultMessages, diff.updated);
