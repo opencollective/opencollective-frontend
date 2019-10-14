@@ -1,6 +1,34 @@
 import { pick } from 'lodash';
+import config from 'config';
 import * as LibTaxes from '@opencollective/taxes';
 import { VAT_OPTIONS } from '../constants/vat';
+import { md5 } from './utils';
+import { types as CollectiveTypes } from '../constants/collectives';
+
+/**
+ * Returns an URL for the given collective params
+ * @param {String} collectiveSlug
+ * @param {String} collectiveType
+ * @param {String|null} image
+ * @param {Object} args
+ *    - height
+ *    - format
+ */
+export const getCollectiveAvatarUrl = (collectiveSlug, collectiveType, image, args) => {
+  const sections = [config.host.images, collectiveSlug];
+
+  if (image) {
+    sections.push(md5(image).substring(0, 7));
+  }
+
+  sections.push(collectiveType === CollectiveTypes.USER ? 'avatar' : 'logo');
+
+  if (args.height) {
+    sections.push(args.height);
+  }
+
+  return `${sections.join('/')}.${args.format || 'png'}`;
+};
 
 /**
  * Whitelist the collective settings that can be updated.

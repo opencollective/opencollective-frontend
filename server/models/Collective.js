@@ -37,6 +37,7 @@ import {
   collectiveSlugBlacklist,
   whitelistSettings,
   validateSettings,
+  getCollectiveAvatarUrl,
 } from '../lib/collectivelib';
 import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5, strip_tags } from '../lib/utils';
 
@@ -2150,19 +2151,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getImageUrl = function(args = {}) {
-    const sections = [config.host.images, this.slug];
-
-    if (this.image) {
-      sections.push(md5(this.image).substring(0, 7));
-    }
-
-    sections.push(this.type === 'USER' ? 'avatar' : 'logo');
-
-    if (args.height) {
-      sections.push(args.height);
-    }
-
-    return `${sections.join('/')}.${args.format || 'png'}`;
+    return getCollectiveAvatarUrl(this.slug, this.type, this.image, args);
   };
 
   Collective.prototype.getBackgroundImageUrl = function(args = {}) {
