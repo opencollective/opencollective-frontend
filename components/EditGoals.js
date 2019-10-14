@@ -223,9 +223,9 @@ class EditGoals extends React.Component {
             {error}
           </MessageBox>
         )}
-        <Flex justifyContent="center" flexWrap="wrap">
+        <Flex justifyContent="center" flexWrap="wrap" mt={5}>
           <Link route="collective" params={{ slug: collective.slug }}>
-            <StyledButton mx={2}>
+            <StyledButton mx={2} minWidth={200}>
               <FormattedMessage id="ViewCollectivePage" defaultMessage="View Collective page" />
             </StyledButton>
           </Link>
@@ -235,6 +235,7 @@ class EditGoals extends React.Component {
             loading={isSubmitting}
             disabled={submitted || !isTouched}
             mx={2}
+            minWidth={200}
           >
             {submitted ? (
               <FormattedMessage id="saved" defaultMessage="Saved" />
