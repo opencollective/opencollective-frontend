@@ -25,7 +25,7 @@ import {
   markPendingOrderAsExpired,
 } from './mutations/orders';
 
-import { createMember, removeMember, editMembership } from './mutations/members';
+import { createMember, removeMember, editMembership, editPublicMessage } from './mutations/members';
 import { editTiers, editTier } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
@@ -431,6 +431,7 @@ const mutations = {
   editMembership: {
     type: MemberType,
     description: 'A mutation to edit membership. Dedicated to the user, not the collective admin.',
+    deprecationReason: '2019-10-12: Please use editPublicMessage',
     args: {
       id: { type: GraphQLNonNull(GraphQLInt) },
       publicMessage: { type: GraphQLString },
@@ -438,6 +439,16 @@ const mutations = {
     resolve(_, args, req) {
       return editMembership(_, args, req);
     },
+  },
+  editPublicMessage: {
+    type: new GraphQLList(MemberType),
+    description: 'A mutation to edit the public message of all matching members.',
+    args: {
+      FromCollectiveId: { type: GraphQLNonNull(GraphQLInt) },
+      CollectiveId: { type: GraphQLNonNull(GraphQLInt) },
+      message: { type: GraphQLString },
+    },
+    resolve: editPublicMessage,
   },
   createOrder: {
     type: OrderType,
