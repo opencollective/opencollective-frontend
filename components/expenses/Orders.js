@@ -231,10 +231,10 @@ class Orders extends React.Component {
           <ModalFooter>
             <Container display="flex" justifyContent="flex-end">
               <StyledButton mx={20} onClick={() => this.setState({ showModal: false })}>
-                <FormattedMessage id="order.modal.cancel.btn" defaultMessage={'Cancel'} />
+                <FormattedMessage id="no" defaultMessage={'No'} />
               </StyledButton>
               <StyledButton buttonStyle="primary" onClick={this.cancelPendingOrder}>
-                <FormattedMessage id="order.cancel.proceed.btn" defaultMessage={'Proceed'} />
+                <FormattedMessage id="yes" defaultMessage={'Yes'} />
               </StyledButton>
             </Container>
           </ModalFooter>
