@@ -81,6 +81,106 @@ const SeparatorLine = styled(Box)`
     `}
 `;
 
+const StepMobile = styled(Flex)`
+  width: 100%;
+  align-items: center;
+`;
+
+const StepsOuter = styled(Flex)`
+  background: #f5f7fa;
+  padding: 16px;
+`;
+
+const StepsMobileLeft = styled(Box)`
+  flex-grow: 2;
+  flex-direction: column;
+`;
+
+const StepsMobileRight = styled(Flex)`
+  margin-left: auto;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+`;
+
+const PieProgressWrapper = styled(Box)`
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+`;
+
+const PieProgress = styled(Box)`
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  ${props => css`
+    clip: rect(0, ${props.pieSize}px, ${props.pieSize}px, ${props.pieSize / 2}px);
+  `}
+  ${props =>
+    props.progress &&
+    props.progress > 50 &&
+    css`
+      clip: rect(auto, auto, auto, auto);
+    `}
+`;
+
+const PieShadow = styled(Box)`
+  width: 100%;
+  height: 100%;
+  ${props => css`
+    border: ${props.pieSize / 10}px solid ${props.bgColor};
+  `}
+  border-radius: 50%;
+`;
+
+const PieHalfCircle = styled(Box)`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  ${props => css`
+    border: ${props.pieSize / 10}px solid #3498db;
+    clip: rect(0, ${props.pieSize / 2}px, ${props.pieSize}px, 0);
+  `}
+  border-radius: 50%;
+
+  ${props =>
+    props.progress &&
+    css`
+      border-color: ${props.color};
+    `}
+`;
+
+const PieHalfCircleLeft = styled(PieHalfCircle)`
+  ${props =>
+    props.progress &&
+    css`
+      transform: rotate(${props.progress * 3.6}deg);
+    `}
+`;
+
+const PieHalfCircleRight = styled(PieHalfCircle)`
+  ${props =>
+    props.progress && props.progress > 50
+      ? css`
+          transform: rotate(180deg);
+        `
+      : css`
+          display: none;
+        `}
+`;
+
 const getBubbleContent = (idx, checked, loading) => {
   if (loading) {
     return <StyledSpinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
@@ -96,7 +196,7 @@ const getBubbleContent = (idx, checked, loading) => {
 };
 
 /**
- * Shows numeroted steps circles that can be clicked.
+ * Shows numerated steps circles that can be clicked.
  */
 const StepsProgress = ({
   steps,
@@ -107,43 +207,71 @@ const StepsProgress = ({
   onStepSelect,
   allCompleted,
   stepWidth,
+  forceMobile,
 }) => {
   const focusIdx = focus ? steps.findIndex(step => step.name === focus.name) : -1;
+  const mobileStepIdx = allCompleted ? steps.length - 1 : focusIdx > -1 ? focusIdx : 0;
+  const mobileNextStepText = mobileStepIdx < steps.length - 1 ? steps[mobileStepIdx + 1].name : 'A small gift for you!';
+
+  // TODO: move to pie progress to a separate comp?
+  const progress = allCompleted ? 100 : (100 / steps.length) * (mobileStepIdx + 1);
+  const color = '#1F87FF';
+  const bgColor = '#D9DBDD';
+  const pieSize = '48';
 
   return (
-    <Flex className="steps-progress">
-      {steps.map((step, idx) => {
-        const stepName = step.name;
-        const checked = idx < focusIdx || allCompleted;
-        const focused = idx === focusIdx;
-        const disabled = disabledStepNames.includes(stepName);
-        const loading = loadingStep && stepName === loadingStep.name;
+    <StepsOuter className="steps-progress">
+      {forceMobile ? (
+        <StepMobile>
+          <StepsMobileLeft>
+            <p>{steps[mobileStepIdx].name}</p>
+            <p>Next: {mobileNextStepText}</p>
+          </StepsMobileLeft>
+          <StepsMobileRight>
+            <PieProgressWrapper>
+              <PieProgress progress={progress} pieSize={pieSize}>
+                <PieHalfCircleLeft progress={progress} pieSize={pieSize} />
+                <PieHalfCircleRight progress={progress} pieSize={pieSize} />
+              </PieProgress>
+              <PieShadow pieSize={pieSize} bgColor={bgColor} />
+            </PieProgressWrapper>
+            {mobileStepIdx + 1} of {steps.length}
+          </StepsMobileRight>
+        </StepMobile>
+      ) : (
+        steps.map((step, idx) => {
+          const stepName = step.name;
+          const checked = idx < focusIdx || allCompleted;
+          const focused = idx === focusIdx;
+          const disabled = disabledStepNames.includes(stepName);
+          const loading = loadingStep && stepName === loadingStep.name;
 
-        return (
-          <Flex
-            key={stepName}
-            className={classNames(`step-${stepName}`, { disabled })}
-            flexDirection="column"
-            alignItems="center"
-            css={{ flexGrow: 1, flexBasis: stepWidth }}
-          >
-            <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
-              <SeparatorLine active={checked || focused} transparent={idx === 0} />
-              <Bubble
-                disabled={disabled}
-                onClick={disabled ? undefined : onStepSelect && (() => onStepSelect(step))}
-                checked={checked}
-                focus={focused}
-              >
-                {getBubbleContent(idx, checked, loading)}
-              </Bubble>
-              <SeparatorLine active={checked} transparent={idx === steps.length - 1} />
+          return (
+            <Flex
+              key={stepName}
+              className={classNames(`step-${stepName}`, { disabled })}
+              flexDirection="column"
+              alignItems="center"
+              css={{ flexGrow: 1, flexBasis: stepWidth }}
+            >
+              <Flex alignItems="center" mb={2} css={{ width: '100%' }}>
+                <SeparatorLine active={checked || focused} transparent={idx === 0} />
+                <Bubble
+                  disabled={disabled}
+                  onClick={disabled ? undefined : onStepSelect && (() => onStepSelect(step))}
+                  checked={checked}
+                  focus={focused}
+                >
+                  {getBubbleContent(idx, checked, loading)}
+                </Bubble>
+                <SeparatorLine active={checked} transparent={idx === steps.length - 1} />
+              </Flex>
+              {children && children({ step, checked, focused })}
             </Flex>
-            {children && children({ step, checked, focused })}
-          </Flex>
-        );
-      })}
-    </Flex>
+          );
+        })
+      )}
+    </StepsOuter>
   );
 };
 
@@ -158,7 +286,7 @@ StepsProgress.propTypes = {
   disabledStepNames: PropTypes.arrayOf(PropTypes.string),
   /** A renderer func. Gets passed an object like `{step, checked, focused}` */
   children: PropTypes.func,
-  /** The curently focused step, or null if none focused yet */
+  /** The currently focused step, or null if none focused yet */
   focus: stepType,
   /** Step will show a loading spinner */
   loadingStep: stepType,
@@ -168,6 +296,8 @@ StepsProgress.propTypes = {
   allCompleted: PropTypes.bool,
   /** Base step width */
   stepWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** Force mobile version, used for "styleguide" development */
+  forceMobile: PropTypes.bool,
 };
 
 StepsProgress.defaultProps = {

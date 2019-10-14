@@ -17,6 +17,20 @@ initialState = { focus: null };
 </div>;
 ```
 
+```js
+initialState = { focus: null };
+<div style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', maxWidth: '95%' }}>
+  <StepsProgress
+    forceMobile
+    steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }]}
+    focus={state.focus}
+    onStepSelect={focus => setState({ focus })}
+  >
+    {({ step }) => <div style={{ textAlign: 'center' }}>{step.name}</div>}
+  </StepsProgress>
+</div>;
+```
+
 ### With disabled steps
 
 ```js
@@ -52,4 +66,44 @@ initialState = { focus: null };
   onStepSelect={focus => setState({ focus })}
   allCompleted
 />;
+```
+
+```js
+initialState = { focus: null };
+<StepsProgress
+  forceMobile
+  steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }]}
+  onStepSelect={focus => setState({ focus })}
+  allCompleted
+/>;
+```
+
+### Mobile, second step and third step of 4
+
+```js
+initialState = { focus: { name: 'COOK POTATOES' } };
+<div style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', maxWidth: '95%' }}>
+  <StepsProgress
+    forceMobile
+    steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }, { name: 'DO DISHES' }]}
+    focus={state.focus}
+    onStepSelect={focus => setState({ focus })}
+  >
+    {({ step }) => <div style={{ textAlign: 'center' }}>{step.name}</div>}
+  </StepsProgress>
+</div>;
+```
+
+```js
+initialState = { focus: { name: 'EAT POTATOES' } };
+<div style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', maxWidth: '95%' }}>
+  <StepsProgress
+    forceMobile
+    steps={[{ name: 'BUY POTATOES' }, { name: 'COOK POTATOES' }, { name: 'EAT POTATOES' }, { name: 'DO DISHES' }]}
+    focus={state.focus}
+    onStepSelect={focus => setState({ focus })}
+  >
+    {({ step }) => <div style={{ textAlign: 'center' }}>{step.name}</div>}
+  </StepsProgress>
+</div>;
 ```
