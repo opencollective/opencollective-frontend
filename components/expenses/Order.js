@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
 import colors from '../../lib/constants/colors';
@@ -9,10 +9,10 @@ import { capitalize } from '../../lib/utils';
 import Avatar from '..//Avatar';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
+import StyledButton from '../StyledButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
-import CancelPendingOrderBtn from './CancelPendingOrderBtn';
 import OrderDetails from './OrderDetails';
 
 class Order extends React.Component {
@@ -228,11 +228,9 @@ class Order extends React.Component {
           {order.status === 'PENDING' && canMarkOrderAsPaid && (
             <Flex>
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />
-              <CancelPendingOrderBtn
-                orderId={order.id}
-                onClickCancel={this.props.onClickCancel}
-                collective={order.collective}
-              />
+              <StyledButton bg="red.500" color="#fff" onClick={() => this.props.onClickCancel(order.id)}>
+                <FormattedMessage id="order.pending.cancel" defaultMessage="Cancel" />
+              </StyledButton>
             </Flex>
           )}
         </div>
