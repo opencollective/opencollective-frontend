@@ -127,10 +127,13 @@ describe('Contribution Flow: Donate', () => {
       cy.contains('Next step').click();
 
       // Should display the contribution details
-      cy.contains('Contribution details:');
-      cy.contains('You’ll contribute with the amount of $42.00 yearly.');
-      cy.contains('First charge: Today');
-      cy.contains('Next charge: May 1, 2043');
+      cy.getByDataCy('contribution-details').then($container => {
+        const text = $container[0].innerText;
+        expect(text).to.contain('Contribution details:');
+        expect(text).to.contain('You’ll contribute with the amount of $42.00 yearly.');
+        expect(text).to.contain('First charge: Today');
+        expect(text).to.contain('Next charge: May 1, 2043');
+      });
 
       // Submit order
       cy.contains('button', 'Make contribution').click();
