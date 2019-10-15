@@ -44,10 +44,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
           </StyledButton>
         </Fragment>
       ) : (
-        <StyledButton
-          onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })}
-          mt={2}
-        >
+        <StyledButton onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })} mt={2}>
           <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
         </StyledButton>
       )}
