@@ -82,6 +82,7 @@ export const getTierPageQuery = gql`
         totalAmountDonated
         type
         isIncognito
+        collectiveId
       }
     }
   }
