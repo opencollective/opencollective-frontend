@@ -131,8 +131,6 @@ export default (Sequelize, DataTypes) => {
         defaultValue: Sequelize.NOW,
       },
 
-      seenAt: DataTypes.DATE,
-
       lastLoginAt: {
         type: DataTypes.DATE,
       },
