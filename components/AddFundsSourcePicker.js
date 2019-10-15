@@ -48,7 +48,7 @@ class AddFundsSourcePicker extends React.Component {
         onChange={this.onChange}
         maxMenuHeight={200}
         collectives={get(data.PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id)}
-        getDefaultOption={() => customOptions[0]}
+        getDefaultOptions={() => customOptions[0]}
         customOptions={customOptions}
       />
     );

@@ -139,7 +139,7 @@ class HostDashboard extends React.Component {
             host={host}
             LoggedInUser={LoggedInUser}
             onChange={selectedCollective => this.pickCollective(selectedCollective)}
-            selectedCollectiveId={selectedCollective.id}
+            defaultSelectedCollective={this.state.selectedCollective}
             saveFilterPreferences={() => this.saveFilterPreferences()}
           />
         )}
@@ -193,12 +193,7 @@ class HostDashboard extends React.Component {
 }
 
 const getDataQuery = gql`
-  query Collective(
-    $hostCollectiveSlug: String
-    $orderBy: CollectiveOrderField
-    $orderDirection: OrderDirection
-    $isActive: Boolean
-  ) {
+  query Collective($hostCollectiveSlug: String) {
     Collective(slug: $hostCollectiveSlug) {
       id
       slug
@@ -215,68 +210,25 @@ const getDataQuery = gql`
         balance
         currency
       }
-      collectives(orderBy: $orderBy, orderDirection: $orderDirection, isActive: $isActive) {
-        total
+      stats {
+        id
         collectives {
           id
-          slug
-          name
-          currency
-          hostFeePercent
-          stats {
-            id
-            balance
-            expenses {
-              id
-              all
-              pending
-              paid
-              rejected
-              approved
-            }
-          }
+          hosted
         }
       }
     }
   }
 `;
 
-const COLLECTIVES_PER_PAGE = 20;
-
 export const addData = graphql(getDataQuery, {
   options(props) {
     return {
       variables: {
         hostCollectiveSlug: props.hostCollectiveSlug,
-        offset: 0,
-        limit: props.limit || COLLECTIVES_PER_PAGE * 2,
-        includeHostedCollectives: true,
-        orderBy: 'name',
-        orderDirection: 'ASC',
-        isActive: true,
       },
     };
   },
-  props: ({ data }) => ({
-    data,
-    fetchMore: () => {
-      return data.fetchMore({
-        variables: {
-          offset: data.allCollectives.length,
-          limit: COLLECTIVES_PER_PAGE,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return previousResult;
-          }
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            allCollectives: [...previousResult.allCollectives, ...fetchMoreResult.allCollectives],
-          });
-        },
-      });
-    },
-  }),
 });
 
 export default withUser(addData(HostDashboard));

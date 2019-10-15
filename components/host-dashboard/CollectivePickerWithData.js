@@ -1,22 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { DropdownButton, MenuItem, Badge } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { pick } from 'lodash';
+import { Box, Flex } from '@rebass/grid';
 
-import Currency from '../Currency';
+import Container from '../Container';
 import ConnectPaypal from '../ConnectPaypal';
 import AddFundsForm from '../AddFundsForm';
+import CollectivePickerAsync from '../CollectivePickerAsync';
+import { CollectiveType } from '../../lib/constants/collectives';
+import { Span, H2 } from '../Text';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
 
 class CollectivePickerWithData extends React.Component {
   static propTypes = {
-    host: PropTypes.object.isRequired,
+    host: PropTypes.shape({
+      id: PropTypes.number,
+      paymentMethods: PropTypes.array,
+      stats: PropTypes.shape({
+        collectives: PropTypes.shape({ hosted: PropTypes.number }).isRequired,
+      }).isRequired,
+    }).isRequired,
     onChange: PropTypes.func,
     saveFilterPreferences: PropTypes.func,
     LoggedInUser: PropTypes.object,
-    selectedCollectiveId: PropTypes.number,
+    defaultSelectedCollective: PropTypes.object,
     addFundsToCollective: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -27,12 +38,8 @@ class CollectivePickerWithData extends React.Component {
       connectingPaypal: false,
       loading: false,
       showAddFunds: false,
-      CollectiveId: props.selectedCollectiveId,
+      selectedCollective: props.defaultSelectedCollective || null,
     };
-    this.addFunds = this.addFunds.bind(this);
-    this.toggleAddFunds = this.toggleAddFunds.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.canEdit = this.canEdit.bind(this);
     this.messages = defineMessages({
       'badge.tooltip.pending': {
         id: 'expenses.badge.tooltip.pending',
@@ -50,15 +57,19 @@ class CollectivePickerWithData extends React.Component {
         id: 'addFunds.error.missingEmail',
         defaultMessage: 'Please provide an email address to identify the source of the money.',
       },
+      allCollectives: {
+        id: 'expenses.allCollectives',
+        defaultMessage: 'All Collectives',
+      },
     });
   }
 
   canEdit = () => {
-    const { LoggedInUser } = this.props;
-    return LoggedInUser && LoggedInUser.canEditCollective(this.hostCollective);
+    const { LoggedInUser, host } = this.props;
+    return LoggedInUser && LoggedInUser.canEditCollective(host);
   };
 
-  async addFunds(form) {
+  addFunds = async form => {
     const { intl } = this.props;
 
     if (form.totalAmount === 0) {
@@ -73,10 +84,10 @@ class CollectivePickerWithData extends React.Component {
     }
 
     this.setState({ loading: true });
-    const hostCollective = this.hostCollective;
+    const hostCollective = this.props.host;
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
     order.collective = {
-      id: this.state.CollectiveId,
+      id: this.state.selectedCollective.id,
     };
 
     if (form.FromCollectiveId === 'other') {
@@ -116,248 +127,93 @@ class CollectivePickerWithData extends React.Component {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
       this.setState({ error, loading: false });
     }
-  }
+  };
 
-  toggleAddFunds() {
+  toggleAddFunds = () => {
     this.setState({ showAddFunds: !this.state.showAddFunds });
-  }
+  };
 
-  onChange(CollectiveId) {
-    const collectives = this.hostCollective.collectives.collectives;
-    const selectedCollective = CollectiveId > 0 && collectives.find(c => c.id === CollectiveId);
-    this.setState({ CollectiveId });
-    this.props.onChange(selectedCollective);
-  }
+  onChange = ({ value: collective }) => {
+    this.setState({ selectedCollective: collective });
+    this.props.onChange(collective);
+  };
 
-  renderCollectiveMenuItem(collective, className) {
-    const { intl } = this.props;
-    const badgeCount = collective.stats.expenses.pending + collective.stats.expenses.approved;
-
-    const tooltipArray = [];
-    if (collective.stats.expenses.pending > 0) {
-      tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.pending'], collective.stats.expenses));
-    }
-    if (collective.stats.expenses.approved > 0) {
-      tooltipArray.push(intl.formatMessage(this.messages['badge.tooltip.approved'], collective.stats.expenses));
-    }
-    const tooltip = tooltipArray.join(', ') || '';
-
-    return (
-      <div className={`MenuItem-Collective ${className}`} title={tooltip}>
-        <style jsx>
-          {`
-            .MenuItem-Collective {
-              display: flex;
-              width: 40rem;
-              justify-content: space-between;
-              align-items: center;
-            }
-
-            .MenuItem-Collective.selected {
-              float: left;
-              margin-right: 1rem;
-            }
-
-            label {
-              margin: 0;
-            }
-
-            .collectiveName {
-              float: left;
-              margin-right: 0.2rem;
-              max-width: 25rem;
-              text-overflow: ellipsis;
-              overflow: hidden;
-            }
-
-            .NameBalance {
-              display: flex;
-              align-items: baseline;
-            }
-
-            .balance {
-              margin-left: 0.5rem;
-              color: #919599;
-              font-size: 1.2rem;
-            }
-
-            .balance label {
-              font-weight: 300;
-            }
-
-            .MenuItem-Collective label {
-              margin-right: 0.2rem;
-            }
-          `}
-        </style>
-        <div className="NameBalance">
-          <div className="collectiveName">{collective.name}</div>
-          <div className="balance">
-            <label>
-              <FormattedMessage id="expenses.balance.label" defaultMessage="balance:" />
-            </label>
-            <Currency value={collective.stats.balance} currency={collective.currency} />
-          </div>
-        </div>
-        {badgeCount > 0 && <Badge pullRight={true}>{badgeCount}</Badge>}
-      </div>
-    );
-  }
+  getDefaultCollectiveOption = buildOptionFromCollective => {
+    return this.state.selectedCollective ? buildOptionFromCollective(this.state.selectedCollective) : undefined;
+  };
 
   render() {
-    const { host, saveFilterPreferences } = this.props;
+    const { host, saveFilterPreferences, intl } = this.props;
+    const { selectedCollective } = this.state;
 
-    this.hostCollective = host;
-    if (!this.hostCollective) {
-      return <div />;
+    if (!host) {
+      return null;
     }
 
-    const collectives = [...this.hostCollective.collectives.collectives];
-
-    const selectedCollective = collectives.find(c => c.id === this.state.CollectiveId);
-    const selectedTitle = selectedCollective ? (
-      this.renderCollectiveMenuItem(selectedCollective, 'selected')
-    ) : (
-      <div className="defaultTitle">
-        <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
-      </div>
-    );
-
+    const allCollectivesLabel = intl.formatMessage(this.messages.allCollectives);
+    const customOptions = selectedCollective ? [{ label: allCollectivesLabel, value: null }] : undefined;
     return (
-      <div className="CollectivesContainer">
-        <style jsx>
-          {`
-            .CollectivesContainer {
-              background: #f2f4f5;
-            }
-
-            .submenu {
-              width: 100%;
-              min-height: 16rem;
-              padding: 3rem 2rem 3rem 6rem;
-              display: flex;
-              justify-content: space-between;
-              align-items: start;
-            }
-
-            .submenu .title {
-              margin: 2rem 0;
-              overflow: hidden;
-              display: flex;
-              align-items: baseline;
-            }
-
-            .submenu .title h1 {
-              font-size: 3.6rem;
-              margin: 0 2rem 0 0;
-              font-weight: 500;
-              color: #18191a;
-              float: left;
-            }
-
-            .submenu .title h2 {
-              font-size: 2.4rem;
-              margin: 0;
-              font-weight: 300;
-              color: #18191a;
-            }
-
-            .collectivesFilter {
-              display: flex;
-            }
-
-            .addFundsLink {
-              display: block;
-              font-size: 1.2rem;
-              padding: 0.8rem;
-            }
-
-            .error {
-              color: red;
-              text-align: center;
-              padding-bottom: 3rem;
-            }
-          `}
-        </style>
-        <style jsx global>
-          {`
-            .CollectivesContainer .defaultTitle {
-              width: 40rem;
-              float: left;
-              text-align: left;
-            }
-
-            .CollectivesContainer .caret {
-              float: right;
-              margin-top: 7px;
-            }
-
-            .right {
-              float: right;
-              text-align: right;
-            }
-          `}
-        </style>
-        <div className="submenu" style={{ flexWrap: 'wrap' }}>
+      <Container background="#f2f4f5" px={2} py={4}>
+        <Flex flexWrap="wrap" justifyContent="space-between" maxWidth={1600} m="16px auto">
           <div>
             <div className="title">
-              <h1>
-                <FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" />
-              </h1>
-              <h2>
-                <FormattedMessage
-                  id="expenses.collectivePicker.subtitle"
-                  defaultMessage="for {n} {n, plural, one {collective} other {collectives}}"
-                  values={{ n: collectives.length }}
-                />
-              </h2>
+              <H2 mb={3}>
+                <FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" />{' '}
+                <Span fontSize="H3" fontWeight="normal">
+                  <FormattedMessage
+                    id="expenses.collectivePicker.subtitle"
+                    defaultMessage="for {n} {n, plural, one {collective} other {collectives}}"
+                    values={{ n: host.stats.collectives.hosted }}
+                  />
+                </Span>
+              </H2>
             </div>
-            {collectives.length > 0 && (
-              <div className="collectivesFilter">
-                <DropdownButton id="collectivePicker" bsStyle="default" title={selectedTitle} onSelect={this.onChange}>
-                  {this.state.CollectiveId && (
-                    <MenuItem key={null} eventKey={null}>
-                      <FormattedMessage id="expenses.allCollectives" defaultMessage="All Collectives" />
-                    </MenuItem>
-                  )}
-                  {collectives.map(collective => (
-                    <MenuItem key={collective.id} eventKey={collective.id} title={collective.name}>
-                      {this.renderCollectiveMenuItem(collective)}
-                    </MenuItem>
-                  ))}
-                </DropdownButton>
-                {selectedCollective && !this.state.showAddFunds && this.canEdit() && (
-                  <a className="addFundsLink" onClick={this.toggleAddFunds}>
-                    <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
-                  </a>
-                )}
-              </div>
+            {host.stats.collectives.hosted > 0 && (
+              <Box mb={2}>
+                <CollectivePickerAsync
+                  placeholder={allCollectivesLabel}
+                  hostCollectiveIds={[host.id]}
+                  types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT]}
+                  onChange={this.onChange}
+                  minWidth={300}
+                  width="100%"
+                  maxWidth={500}
+                  customOptions={customOptions}
+                  disabled={this.state.loading}
+                  getDefaultOptions={this.getDefaultCollectiveOption}
+                />
+              </Box>
+            )}
+            {selectedCollective && !this.state.showAddFunds && this.canEdit() && (
+              <StyledButton onClick={this.toggleAddFunds}>
+                <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
+              </StyledButton>
             )}
           </div>
-          <div className="right" style={{ maxWidth: 450 }}>
-            {this.canEdit() && (
-              <ConnectPaypal onClickRefillBalance={saveFilterPreferences} collective={this.hostCollective} />
-            )}
+          <div style={{ maxWidth: 450 }}>
+            {this.canEdit() && <ConnectPaypal collective={host} onClickRefillBalance={saveFilterPreferences} />}
           </div>
-        </div>
+        </Flex>
         <div>
           {selectedCollective && this.state.showAddFunds && (
             <div>
               <AddFundsForm
                 collective={selectedCollective}
-                host={this.hostCollective}
+                host={host}
                 onSubmit={this.addFunds}
                 onCancel={this.toggleAddFunds}
                 loading={this.state.loading}
                 LoggedInUser={this.props.LoggedInUser}
               />
-              <div className="results">
-                <div className="error">{this.state.error}</div>
-              </div>
+              {this.state.error && (
+                <MessageBox type="error" withIcon maxWidth={700} m="0 auto">
+                  {this.state.error.toString()}
+                </MessageBox>
+              )}
             </div>
           )}
         </div>
-      </div>
+      </Container>
     );
   }
 }
@@ -366,8 +222,14 @@ const addFundsToCollectiveQuery = gql`
   mutation addFundsToCollective($order: OrderInputType!) {
     addFundsToCollective(order: $order) {
       id
+      fromCollective {
+        id
+        slug
+        name
+      }
       collective {
         id
+
         stats {
           id
           balance

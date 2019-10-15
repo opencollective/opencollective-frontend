@@ -20,7 +20,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
       className=" css-1hwfws3"
     >
       <div
-        className=" css-107lb6w-singleValue"
+        className=" css-p9sidn-singleValue"
       >
         Host ()
       </div>
@@ -132,7 +132,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
       className=" css-1hwfws3"
     >
       <div
-        className=" css-1uccc91-singleValue"
+        className=" css-1su2i3t-singleValue"
       >
         Host ()
       </div>
@@ -244,7 +244,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
       className=" css-1hwfws3"
     >
       <div
-        className=" css-107lb6w-singleValue"
+        className=" css-p9sidn-singleValue"
       >
         Host (Example Host)
       </div>
@@ -356,7 +356,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
       className=" css-1hwfws3"
     >
       <div
-        className=" css-107lb6w-singleValue"
+        className=" css-p9sidn-singleValue"
       >
         Host ()
       </div>
