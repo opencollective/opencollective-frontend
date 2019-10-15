@@ -1213,6 +1213,7 @@
   "uploadImage.isDragActive": "Dépose l'image",
   "uploadImage.isDragReject": "🚫 Ce type de fichier n'est pas accepté",
   "uploadImage.placeholder": "Dépose une image ou clique pour sélectionner une image",
+  "uploadImage.sizeRejected": "Image resolution needs to be less than 3000x3000, and file size must be below 5mo.",
   "user.collective.edit": "éditer le profil",
   "user.collective.memberOf.collective.admin.title": "J'administre {n, plural, one {ce Collectif} other {ces {n} Collectifs}}",
   "user.collective.memberOf.collective.backer.title": "Je soutiens financièrement {n, plural, one {ce Collectif} other {ces {n} Collectifs}}",
