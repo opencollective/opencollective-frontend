@@ -35,6 +35,7 @@ import HeroBackground from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
+import MessageBox from '../../MessageBox';
 
 const Translations = defineMessages({
   website: {
@@ -67,11 +68,25 @@ const StyledShortDescription = styled.h2`
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, intl }) => {
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
+  const [hasMessage, showMessage] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
 
+  const handleMessage = message => {
+    if (!message) return showMessage(null);
+    showMessage({
+      type: message.type || 'info',
+      message: message.message || message,
+    });
+  };
+
   return (
     <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
+      {hasMessage && (
+        <MessageBox type={hasMessage.type} withIcon={true}>
+          {hasMessage.message}
+        </MessageBox>
+      )}
       <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
       {isAdmin && !isEditing && (
         // We don't have any mobile view for this one yet
@@ -102,7 +117,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       <ContainerSectionContent pt={40} display="flex" flexDirection="column">
         {/* Collective presentation (name, logo, description...) */}
         <Container position="relative" mb={2} width={128}>
-          <HeroAvatar collective={collective} isAdmin={isAdmin} />
+          <HeroAvatar handleMessage={handleMessage} collective={collective} isAdmin={isAdmin} />
         </Container>
         <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left" data-cy="collective-title">
           {collective.name || collective.slug}

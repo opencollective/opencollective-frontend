@@ -81,13 +81,33 @@ const Translations = defineMessages({
     id: 'collective.settings',
     defaultMessage: 'Settings',
   },
+  uploadImage: {
+    id: 'uploadImage.sizeRejected',
+    defaultMessage: 'Image resolution needs to be less than 3000x3000, and file size must be below 5mo.',
+  },
 });
 
-const HeroAvatar = ({ collective, isAdmin, intl }) => {
+const HeroAvatar = ({ handleMessage, collective, isAdmin, intl }) => {
   const [editing, setEditing] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
+  const [isValidImage, setIsValidImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
+
+  const validateImage = image => {
+    const message = intl.formatMessage(Translations.uploadImage);
+    const img = new Image();
+    img.onload = () => {
+      if (img.width >= 3000 || img.height >= 3000 || image.size >= 5000000) {
+        handleMessage({
+          message,
+          type: 'warning',
+        });
+        setIsValidImage(false);
+      } else setIsValidImage(true);
+    };
+    img.src = image.preview;
+  };
 
   if (!isAdmin) {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
@@ -101,14 +121,12 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
           onDrop={acceptedFiles => {
-            setUploadedImage(
-              ...acceptedFiles.map(file =>
-                Object.assign(file, {
-                  preview: URL.createObjectURL(file),
-                }),
-              ),
-            );
-            setEditing(true);
+            const image = acceptedFiles.map(file => Object.assign(file, { preview: URL.createObjectURL(file) }))[0];
+            if (image) {
+              validateImage(image);
+              setUploadedImage(image);
+              setEditing(true);
+            }
           }}
         >
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
@@ -177,6 +195,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                 onClick={() => {
                   setUploadedImage(null);
                   setEditing(false);
+                  handleMessage();
                 }}
               >
                 <FormattedMessage id="form.cancel" defaultMessage="cancel" />
@@ -187,8 +206,10 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                 ml={3}
                 minWidth={150}
                 loading={submitting}
+                disabled={!isValidImage}
                 onClick={async () => {
                   setSubmitting(true); // Need this because `upload` is not a graphql function
+                  setIsValidImage(null);
 
                   try {
                     // Upload image if changed or remove it
@@ -205,6 +226,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                     setEditing(false);
                   } finally {
                     setSubmitting(false);
+                    handleMessage();
                   }
                 }}
               >
