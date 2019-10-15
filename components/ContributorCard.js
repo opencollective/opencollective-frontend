@@ -116,7 +116,7 @@ ContributorCard.propTypes = {
     isIncognito: PropTypes.bool,
     type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
     totalAmountDonated: PropTypes.number,
-    image: PropTypes.string.isRequired,
+    image: PropTypes.string,
     publicMessage: PropTypes.string,
     roles: PropTypes.arrayOf(PropTypes.string.isRequired),
     isAdmin: PropTypes.bool.isRequired,
