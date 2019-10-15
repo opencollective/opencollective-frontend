@@ -114,11 +114,6 @@ export const _authenticateUserByJwt = (req, res, next) => {
     })
     .then(() => {
       debug('auth')('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
-
-      // Populates req.remoteUser.canEditCurrentCollective, used for GraphQL to keep track whether the remoteUser can see members' details
-      const CollectiveId = get(req, 'body.variables.collective.id') || req.params.collectiveid;
-      req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
-      debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
       next();
       return null;
     })
