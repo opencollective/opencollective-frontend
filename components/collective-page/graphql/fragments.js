@@ -67,5 +67,6 @@ export const ContributorsFieldsFragment = gql`
     publicMessage
     isIncognito
     tiersIds
+    collectiveId
   }
 `;

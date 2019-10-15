@@ -821,6 +821,11 @@ type Contributor {
   collectiveSlug: String
 
   """
+  Null for incognito collectives otherwise collective id
+  """
+  collectiveId: Int
+
+  """
   Contributor avatar or logo
   """
   image(height: Int, format: ImageFormat): String
@@ -1568,6 +1573,12 @@ type Mutation {
   A mutation to edit membership. Dedicated to the user, not the collective admin.
   """
   editMembership(id: Int!, publicMessage: String): Member
+    @deprecated(reason: "2019-10-12: Please use editPublicMessage")
+
+  """
+  A mutation to edit the public message of all matching members.
+  """
+  editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
   createOrder(order: OrderInputType!): OrderType
   confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
