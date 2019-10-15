@@ -164,7 +164,6 @@
   "collective.isArchived.description": "This collective has been archived and can no longer be used for any activities.",
   "collective.isArchived.edit.description": "This {type} has been archived and can no longer be used for any activities.",
   "collective.location.label": "都市",
-  "collective.longDescription.label": "詳細",
   "collective.markdown.description": "Markdown エディターを使う",
   "collective.markdown.label": "デフォルトエディター",
   "collective.meetup.label": "ミートアップ URL",
