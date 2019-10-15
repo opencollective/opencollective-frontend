@@ -164,7 +164,6 @@
   "collective.isArchived.description": "Ce collectif a été archivé et ne peut plus être utilisé.",
   "collective.isArchived.edit.description": "Ce {type} a été archivé et ne peut plus être utilisé.",
   "collective.location.label": "Lieux",
-  "collective.longDescription.label": "Longue description",
   "collective.markdown.description": "Utiliser markdown comme éditeur",
   "collective.markdown.label": "Éditeur de texte par défaut",
   "collective.meetup.label": "URL du Meetup",

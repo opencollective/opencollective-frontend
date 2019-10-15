@@ -164,7 +164,6 @@
   "collective.isArchived.description": "Этот коллектив добавили в архив, и он не может быть использован.",
   "collective.isArchived.edit.description": "Этот {type} был добавлен в архив и больше не может быть использован.",
   "collective.location.label": "Город",
-  "collective.longDescription.label": "Длинное описание",
   "collective.markdown.description": "Использовать редактор markdown",
   "collective.markdown.label": "Редактор по умолчанию",
   "collective.meetup.label": "URL митапа",

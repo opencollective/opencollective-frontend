@@ -164,7 +164,6 @@
   "collective.isArchived.description": "此集体已存档, 不能再用于任何活动。",
   "collective.isArchived.edit.description": "此 {type} 已存档, 不能再用于任何活动。",
   "collective.location.label": "城市",
-  "collective.longDescription.label": "长描述",
   "collective.markdown.description": "使用 markdown 编辑器",
   "collective.markdown.label": "默认编辑器",
   "collective.meetup.label": "Meetup 链接",
