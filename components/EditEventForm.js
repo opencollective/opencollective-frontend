@@ -94,7 +94,7 @@ class EditEventForm extends React.Component {
   }
 
   handleTimezoneChange(timezone) {
-    this.handleChange('timezone', timezone);
+    this.handleChange('timezone', timezone.value);
   }
 
   handleTiersChange(tiers) {

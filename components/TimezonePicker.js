@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import StyledSelect from './StyledSelect';
 import momentTimezone from 'moment-timezone';
+import { Box } from '@rebass/grid';
+import { P } from './Text';
 
 class TimezonePicker extends React.Component {
   static propTypes = {
@@ -15,32 +17,30 @@ class TimezonePicker extends React.Component {
     this.handleTimezoneChange = this.handleTimezoneChange.bind(this);
   }
 
-  handleTimezoneChange(e) {
-    this.props.onChange(e.target.value);
-  }
-
-  renderTimezoneEntry(timezone) {
-    return (
-      <option key={timezone} value={timezone}>
-        {timezone}
-      </option>
-    );
+  handleTimezoneChange(selected) {
+    this.props.onChange(selected);
   }
 
   render() {
+    const { selectedTimezone, label, ...props } = this.props;
+
     return (
-      <FormGroup className="TimezonePicker">
-        <ControlLabel>{this.props.label}</ControlLabel>
-        <FormControl
-          name="timezone"
-          componentClass="select"
-          placeholder="select"
-          onChange={this.handleTimezoneChange}
-          value={this.props.selectedTimezone}
-        >
-          {momentTimezone.tz.names().map(this.renderTimezoneEntry)}
-        </FormControl>
-      </FormGroup>
+      <Box {...props}>
+        {label && (
+          <P as="label" display="block" color="black.900" mb={1}>
+            {label}
+          </P>
+        )}
+        <StyledSelect
+          options={momentTimezone.tz.names().map(tz => ({
+            label: tz,
+            value: tz,
+          }))}
+          defaultValue={{ label: selectedTimezone, value: selectedTimezone }}
+          onChange={selected => this.handleTimezoneChange(selected)}
+          {...props}
+        />
+      </Box>
     );
   }
 }
