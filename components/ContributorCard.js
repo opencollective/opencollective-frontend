@@ -56,6 +56,8 @@ const getMainContributorRole = contributor => {
     return roles.ADMIN;
   } else if (contributor.isCore) {
     return roles.MEMBER;
+  } else if (contributor.isBacker && contributor.totalAmountDonated < 1) {
+    return roles.CONTRIBUTOR;
   } else if (contributor.isBacker) {
     return roles.BACKER;
   } else if (contributor.isFundraiser) {
