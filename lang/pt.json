@@ -837,7 +837,7 @@
   "order.created.tweet": "Acabei de doar {amount} para {collective}. Considere doar também, cada pouquinho ajuda!",
   "order.created.tweet.event": "Eu irei no {event}. Junte-se a mim!",
   "order.error": "erro",
-  "order.expired": "expired",
+  "order.expired": "expirado",
   "order.markAsPaid.btn": "Marcar como pago",
   "Order.NotFound": "Este pedido não existe",
   "order.paid": "pago",
