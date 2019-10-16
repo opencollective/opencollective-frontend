@@ -68,7 +68,7 @@ const StyledShortDescription = styled.h2`
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, intl }) => {
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
-  const [hasMessage, showMessage] = React.useState(false);
+  const [message, showMessage] = React.useState(null);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
 
@@ -76,15 +76,15 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
     if (!message) return showMessage(null);
     showMessage({
       type: message.type || 'info',
-      message: message.message || message,
+      message: message.content || message,
     });
   };
 
   return (
     <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-      {hasMessage && (
-        <MessageBox type={hasMessage.type} withIcon={true}>
-          {hasMessage.message}
+      {message && (
+        <MessageBox type={message.type} withIcon={true}>
+          {message.message}
         </MessageBox>
       )}
       <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />

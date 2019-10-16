@@ -95,12 +95,11 @@ const HeroAvatar = ({ handleMessage, collective, isAdmin, intl }) => {
   const borderRadius = getAvatarBorderRadius(collective.type);
 
   const validateImage = image => {
-    const message = intl.formatMessage(Translations.uploadImage);
     const img = new Image();
     img.onload = () => {
       if (img.width >= 3000 || img.height >= 3000 || image.size >= 5000000) {
         handleMessage({
-          message,
+          content: intl.formatMessage(Translations.uploadImage),
           type: 'warning',
         });
         setIsValidImage(false);
