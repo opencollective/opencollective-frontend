@@ -815,6 +815,7 @@
   "newExpense.paypal.label": "Please provide address",
   "newsletter.container.title": "Stay updated about our news and progress.",
   "newsletter.label": "Receive our monthly newsletter",
+  "no": "No",
   "notFound": "Not found",
   "notFound.search": "Search for {term}",
   "openSourceApply.description.p1": "You're creating software. You don't want to worry about creating a legal entity or seperate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project.",
@@ -829,7 +830,6 @@
   "order.active": "active",
   "order.cancel.modal.body": "Are you sure you want to cancel this order?",
   "order.cancel.modal.header": "Cancel Order",
-  "order.cancel.proceed.btn": "Proceed",
   "order.cancelled": "cancelled",
   "Order.Confirm.Processing": "Confirming your payment method…",
   "Order.Confirm.Success": "Your payment method has now been confirmed and the payment successfully went through.",
@@ -838,7 +838,6 @@
   "order.error": "错误",
   "order.expired": "expired",
   "order.markAsPaid.btn": "Mark as paid",
-  "order.modal.cancel.btn": "Cancel",
   "Order.NotFound": "This order doesn't exist",
   "order.paid": "paid",
   "order.pending": "pending",
@@ -1254,5 +1253,6 @@
   "webhooks.url.label": "URL",
   "widget.becomeBacker": "Become a backer",
   "widget.becomeSponsor": "Become a sponsor",
-  "YearlyBudget": "Yearly budget"
+  "YearlyBudget": "Yearly budget",
+  "yes": "Yes"
 }
