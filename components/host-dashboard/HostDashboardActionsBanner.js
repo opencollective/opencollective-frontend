@@ -15,7 +15,13 @@ import { Span, H2 } from '../Text';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 
-class CollectivePickerWithData extends React.Component {
+/**
+ * An action banner for the host dashboard. Currently holds two features:
+ *  - A collective picker to filter the list of collectives
+ *  - A form to add funds to the selected collective
+ *  - A button to connect PayPal
+ */
+class HostDashboardActionsBanner extends React.Component {
   static propTypes = {
     host: PropTypes.shape({
       id: PropTypes.number,
@@ -25,10 +31,10 @@ class CollectivePickerWithData extends React.Component {
       }).isRequired,
     }).isRequired,
     onChange: PropTypes.func,
-    saveFilterPreferences: PropTypes.func,
     LoggedInUser: PropTypes.object,
-    defaultSelectedCollective: PropTypes.object,
+    /** @ignore from apollo */
     addFundsToCollective: PropTypes.func.isRequired,
+    /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
   };
 
@@ -38,7 +44,7 @@ class CollectivePickerWithData extends React.Component {
       connectingPaypal: false,
       loading: false,
       showAddFunds: false,
-      selectedCollective: props.defaultSelectedCollective || null,
+      selectedCollective: null,
     };
     this.messages = defineMessages({
       'badge.tooltip.pending': {
@@ -138,12 +144,8 @@ class CollectivePickerWithData extends React.Component {
     this.props.onChange(collective);
   };
 
-  getDefaultCollectiveOption = buildOptionFromCollective => {
-    return this.state.selectedCollective ? buildOptionFromCollective(this.state.selectedCollective) : undefined;
-  };
-
   render() {
-    const { host, saveFilterPreferences, intl } = this.props;
+    const { host, intl } = this.props;
     const { selectedCollective } = this.state;
 
     if (!host) {
@@ -180,7 +182,6 @@ class CollectivePickerWithData extends React.Component {
                   maxWidth={500}
                   customOptions={customOptions}
                   disabled={this.state.loading}
-                  getDefaultOptions={this.getDefaultCollectiveOption}
                 />
               </Box>
             )}
@@ -190,9 +191,7 @@ class CollectivePickerWithData extends React.Component {
               </StyledButton>
             )}
           </div>
-          <div style={{ maxWidth: 450 }}>
-            {this.canEdit() && <ConnectPaypal collective={host} onClickRefillBalance={saveFilterPreferences} />}
-          </div>
+          <div style={{ maxWidth: 450 }}>{this.canEdit() && <ConnectPaypal collective={host} />}</div>
         </Flex>
         <div>
           {selectedCollective && this.state.showAddFunds && (
@@ -247,4 +246,9 @@ const addMutation = graphql(addFundsToCollectiveQuery, {
   }),
 });
 
-export default addMutation(injectIntl(CollectivePickerWithData));
+/**
+ * An action banner for the host dashboard. Currently holds two features:
+ *  - A collective picker to filter the list of collectives
+ *  -
+ */
+export default addMutation(injectIntl(HostDashboardActionsBanner));

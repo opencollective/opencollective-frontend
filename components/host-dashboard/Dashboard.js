@@ -11,7 +11,7 @@ import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
 
 import MessageBox from '../MessageBox';
 import Loading from '../Loading';
-import CollectivePicker from './CollectivePickerWithData';
+import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 import { withUser } from '../UserProvider';
 import {
   getFromLocalStorage,
@@ -135,7 +135,7 @@ class HostDashboard extends React.Component {
           `}
         </style>
         {LoggedInUser && (
-          <CollectivePicker
+          <HostDashboardActionsBanner
             host={host}
             LoggedInUser={LoggedInUser}
             onChange={selectedCollective => this.pickCollective(selectedCollective)}
