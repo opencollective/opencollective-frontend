@@ -146,25 +146,16 @@ describe('New collective page', () => {
   });
 
   describe('About section', () => {
-<<<<<<< HEAD
     it('Can add description to about section', () => {
-<<<<<<< HEAD
-      const richDescription = 'Hello world!{selectall}{ctrl}b';
-<<<<<<< HEAD
-=======
-    // TODO: unskip
-    it.skip('Can add description to about section', () => {
-      const richDescription = 'Hello{selectall}{ctrl}B{rightarrow}{ctrl}B world!';
->>>>>>> test(04-collective_v2.test.js): add hero section test for collective - incomplete
-      cy.login({ redirect: `/${collectiveSlug}/v2` });
-=======
->>>>>>> update login process to use beforeEach
-=======
-      const richDescription = '{selectall}Hello world!{ctrl}b';
->>>>>>> test: implement hero, contribute, update section test
+      const richDescription = 'Hello world!';
       scrollToSection(Sections.ABOUT);
       cy.contains('#section-about button', 'Add a description').click();
-      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type(richDescription);
+      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor')
+        .type(richDescription)
+        .type('{selectall}')
+        // {ctrl}b fails on macos
+        // {ctrl} maps control key & {meta} maps command key
+        .type('{ctrl}b');
       cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
       cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
     });
