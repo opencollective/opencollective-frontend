@@ -29,7 +29,7 @@ class AddFundsSourcePicker extends React.Component {
   };
 
   onChange = option => {
-    const FromCollectiveId = option.value;
+    const FromCollectiveId = option.value.id;
     this.props.onChange(FromCollectiveId);
   };
 
@@ -98,12 +98,14 @@ const getSourcesQuery = gql`
     PaymentMethod(id: $id) {
       id
       fromCollectives {
+        id
         total
         collectives {
           id
           type
           name
           slug
+          imageUrl
         }
       }
     }

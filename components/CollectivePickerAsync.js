@@ -8,8 +8,8 @@ import CollectivePicker from './CollectivePicker';
 import gql from 'graphql-tag';
 
 const SEARCH_COLLECTIVES = gql`
-  query SearchCollective($term: String!, $types: [TypeOfCollective], $limit: Int) {
-    search(term: $term, types: $types, limit: $limit, useAlgolia: false) {
+  query SearchCollective($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
+    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, useAlgolia: false) {
       id
       collectives {
         id
@@ -30,9 +30,18 @@ const throttledSearch = throttle((searchFunc, variables) => {
 /**
  * A specialization of `CollectivePicker` that fetches the data based on user search.
  */
-const CollectivePickerAsync = ({ types, limit, ...props }) => {
+const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, ...props }) => {
   const [searchCollectives, { loading, data }] = useLazyQuery(SEARCH_COLLECTIVES);
   const collectives = (data && data.search && data.search.collectives) || [];
+  const search = term => throttledSearch(searchCollectives, { term, types, limit, hostCollectiveIds });
+
+  // If preload is true, trigger a first query on mount or when one of the query param changes
+  React.useEffect(() => {
+    if (preload) {
+      search('');
+    }
+  }, [types, limit, hostCollectiveIds]);
+
   return (
     <CollectivePicker
       isLoading={loading}
@@ -42,7 +51,7 @@ const CollectivePickerAsync = ({ types, limit, ...props }) => {
       sortFunc={collectives => collectives /** Already sorted by the API */}
       onInputChange={(term, { action }) => {
         if (action === 'input-change') {
-          return throttledSearch(searchCollectives, { term: term.trim(), types, limit });
+          return search(term.trim());
         }
       }}
       {...props}
@@ -57,10 +66,14 @@ CollectivePickerAsync.propTypes = {
   groupByType: PropTypes.bool,
   /** Max number of collectives displayed at the same time */
   limit: PropTypes.number,
+  /** If set, only the collectives under this host will be retrieved */
+  hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
+  /** If true, a query will be triggered even if search is empty */
+  preload: PropTypes.bool,
 };
 
 CollectivePickerAsync.defaultProps = {
-  cacheOptions: true,
+  preload: false,
   limit: 20,
 };
 
