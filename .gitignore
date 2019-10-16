@@ -27,6 +27,7 @@ tempStripe.js
 # IDE files
 jsconfig.json
 typings
+.gtm
 # VSCode
 .history
 .vscode
