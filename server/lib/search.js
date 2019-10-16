@@ -85,12 +85,13 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
   // Build dynamic conditions based on arguments
   let dynamicConditions = '';
 
-  if (term && term.length > 0) {
-    term = term.replace(/(_|%|\\)/g, ' ');
-    dynamicConditions += `AND ${tsVector} @@ to_tsquery('simple', :term) OR name ILIKE '%' || :term || '%' `;
-  }
   if (hostCollectiveIds && hostCollectiveIds.length > 0) {
     dynamicConditions += 'AND "HostCollectiveId" IN (:hostCollectiveIds) ';
+  }
+
+  if (term && term.length > 0) {
+    term = term.replace(/(_|%|\\)/g, ' ');
+    dynamicConditions += `AND (${tsVector} @@ to_tsquery('simple', :term) OR name ILIKE '%' || :term || '%') `;
   }
 
   // Build the query
@@ -103,6 +104,7 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
     FROM "Collectives" c
     WHERE "deletedAt" IS NULL 
     AND "deactivatedAt" IS NULL 
+    AND "isActive" = true
     AND type IN (:types) ${dynamicConditions}
     ORDER BY __rank__ DESC
     OFFSET :offset
