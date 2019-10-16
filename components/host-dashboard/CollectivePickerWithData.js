@@ -14,7 +14,9 @@ class CollectivePickerWithData extends React.Component {
   static propTypes = {
     host: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    saveFilterPreferences: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    selectedCollectiveId: PropTypes.number,
     addFundsToCollective: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -25,6 +27,7 @@ class CollectivePickerWithData extends React.Component {
       connectingPaypal: false,
       loading: false,
       showAddFunds: false,
+      CollectiveId: props.selectedCollectiveId,
     };
     this.addFunds = this.addFunds.bind(this);
     this.toggleAddFunds = this.toggleAddFunds.bind(this);
@@ -202,7 +205,7 @@ class CollectivePickerWithData extends React.Component {
   }
 
   render() {
-    const { host } = this.props;
+    const { host, saveFilterPreferences } = this.props;
 
     this.hostCollective = host;
     if (!this.hostCollective) {
@@ -332,7 +335,9 @@ class CollectivePickerWithData extends React.Component {
             )}
           </div>
           <div className="right" style={{ maxWidth: 450 }}>
-            {this.canEdit() && <ConnectPaypal collective={this.hostCollective} />}
+            {this.canEdit() && (
+              <ConnectPaypal onClickRefillBalance={saveFilterPreferences} collective={this.hostCollective} />
+            )}
           </div>
         </div>
         <div>

@@ -12,6 +12,7 @@ class ConnectPaypal extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    onClickRefillBalance: PropTypes.func,
   };
 
   constructor(props) {
@@ -30,6 +31,7 @@ class ConnectPaypal extends React.Component {
     this.setState({ connectingPaypal: true });
     try {
       const json = await connectAccount(this.props.collective.id, 'paypal');
+      this.props.onClickRefillBalance(); // save the current filter preferences before redirect
       window.location.replace(json.redirectUrl);
     } catch (e) {
       this.setState({ connectingPaypal: false });

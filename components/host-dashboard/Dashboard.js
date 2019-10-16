@@ -13,6 +13,12 @@ import MessageBox from '../MessageBox';
 import Loading from '../Loading';
 import CollectivePicker from './CollectivePickerWithData';
 import { withUser } from '../UserProvider';
+import {
+  getFromLocalStorage,
+  setLocalStorage,
+  LOCAL_STORAGE_KEYS,
+  removeFromLocalStorage,
+} from '../../lib/local-storage';
 
 class HostDashboard extends React.Component {
   static propTypes = {
@@ -27,8 +33,33 @@ class HostDashboard extends React.Component {
     this.state = { selectedCollective: null, expensesFilters: null };
   }
 
+  componentDidMount() {
+    this.restoreFilterPreferences();
+  }
+
   pickCollective(selectedCollective) {
     this.setState({ selectedCollective });
+  }
+
+  saveFilterPreferences() {
+    const { selectedCollective, expensesFilters } = this.state;
+    setLocalStorage(
+      LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES,
+      JSON.stringify({
+        selectedCollective,
+        expensesFilters,
+      }),
+    );
+  }
+
+  restoreFilterPreferences() {
+    let filterPreferences = getFromLocalStorage(LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES);
+    if (filterPreferences) {
+      filterPreferences = JSON.parse(filterPreferences);
+      this.setState({ ...filterPreferences }, () => {
+        removeFromLocalStorage(LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES);
+      });
+    }
   }
 
   render() {
@@ -108,6 +139,8 @@ class HostDashboard extends React.Component {
             host={host}
             LoggedInUser={LoggedInUser}
             onChange={selectedCollective => this.pickCollective(selectedCollective)}
+            selectedCollectiveId={selectedCollective.id}
+            saveFilterPreferences={() => this.saveFilterPreferences()}
           />
         )}
         <div className="content">
