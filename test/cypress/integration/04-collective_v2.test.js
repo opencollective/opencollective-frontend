@@ -34,7 +34,8 @@ describe('New collective page', () => {
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/edit` });
+    cy.login({ redirect: `/${collectiveSlug}/v2` });
+    cy.wait(900);
   });
 
   describe('Hero', () => {
@@ -57,10 +58,11 @@ describe('New collective page', () => {
     });
 
     it.skip('Can edit primary color', () => {
-      // TODO - must check hero or buttons CSS to ensure primary color is properly applied
+      // TODO: - must check hero or buttons CSS to ensure primary color is properly applied
     });
 
-    it('Can change cover background image', () => {
+    it.skip('Can change cover background image', () => {
+      // TODO:
       uploadImage({
         dropzone: '[data-cy=heroBackgroundDropzone]',
         file: 'gopherBack.png',
@@ -85,52 +87,68 @@ describe('New collective page', () => {
       cy.contains(`#section-contribute a[href="/${collectiveSlug}/contribute"]`, 'View all the ways to contribute');
     });
 
-    it.skip('Has a link to create new tiers and events if admin', () => {
-      // TODO
+    it('Has a link to create new tiers and events if admin', () => {
+      cy.get('[data-cy=create-contribute-tier]').should('be.visible');
+      cy.get('[data-cy=create-event]').should('be.visible');
     });
 
-    it.skip('Displays top contributors', () => {
-      // TODO
+    it('Displays top contributors', () => {
+      scrollToSection(Sections.CONTRIBUTORS);
+      cy.get('[data-cy=Contributors] [data-cy=ContributorsGrid_ContributorCard]').should('be.visible');
     });
   });
 
   describe('Updates section', () => {
-    it.skip('Has a link to create new update and one to view all updates', () => {
-      // TODO
+    it('Has a link to create new update and one to view all updates', () => {
+      scrollToSection(Sections.UPDATES);
+      cy.get('[data-cy=create-new-update-btn]').click();
+      cy.get('[data-cy=editUpdateForm] [data-cy=titleInput]').type('Sample Update');
+      cy.get('[data-cy=editUpdateForm-submit-btn]').click();
+      cy.get('[data-cy=PublishUpdateBtn] button').click();
+      cy.visit(`/${collectiveSlug}/v2`);
+      scrollToSection(Sections.UPDATES);
+      cy.get('[data-cy=view-all-updates-btn]').should('be.visible');
     });
 
-    it.skip('Shows latest updates', () => {
-      // TODO
+    it('Shows latest updates', () => {
+      scrollToSection(Sections.UPDATES);
+      cy.get('[data-cy=view-all-updates-btn]').click();
+      cy.get('[data-cy=updatesList]').should('have.length', 1);
     });
   });
 
   describe('Budget section', () => {
     it.skip('Shows latest transactions with amount and type (credit/debit)', () => {
-      // TODO
+      scrollToSection(Sections.BUDGET);
+      // TODO:
     });
 
     it.skip('Has button to view all transactions and expenses', () => {
-      // TODO
+      scrollToSection(Sections.BUDGET);
+      cy.get('[data-cy=view-all-transactions-btn]').should('be.visible');
+      cy.contains('[data-cy=view-all-expenses-btn]').should('be.visible');
     });
 
     it.skip("Shows today's balance and estimated annual budget", () => {
-      // TODO
+      cy.get('[data-cy=budgetSection-today-balance]').contains("Today's balance");
+      cy.get('[data-cy=budgetSection-estimated-budget]').should('be.visible');
     });
   });
 
   describe('Contributors section', () => {
     it.skip('Shows contributors with role, public message and total amount contributor', () => {
-      // TODO
+      // TODO:
     });
 
     it.skip('Can filter contributors', () => {
-      // TODO
+      // TODO:
     });
   });
 
   describe('About section', () => {
 <<<<<<< HEAD
     it('Can add description to about section', () => {
+<<<<<<< HEAD
       const richDescription = 'Hello world!{selectall}{ctrl}b';
 <<<<<<< HEAD
 =======
@@ -141,6 +159,9 @@ describe('New collective page', () => {
       cy.login({ redirect: `/${collectiveSlug}/v2` });
 =======
 >>>>>>> update login process to use beforeEach
+=======
+      const richDescription = '{selectall}Hello world!{ctrl}b';
+>>>>>>> test: implement hero, contribute, update section test
       scrollToSection(Sections.ABOUT);
       cy.contains('#section-about button', 'Add a description').click();
       cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type(richDescription);
@@ -151,12 +172,10 @@ describe('New collective page', () => {
 });
 
 describe('New Collective page with euro currency', () => {
-  // TODO: uncomment out before
-  // before(() => {
-  //   cy.visit('/brusselstogether/v2');
-  // });
-  // TODO: unskip
-  it.skip('contributors amount in euro', () => {
+  before(() => {
+    cy.visit('/brusselstogether/v2');
+  });
+  it('contributors amount in euro', () => {
     cy.get('[data-cy=ContributorsGrid_ContributorCard]')
       .first()
       .contains('€5,140 EUR');
