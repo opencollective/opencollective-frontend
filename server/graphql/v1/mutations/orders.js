@@ -1008,6 +1008,14 @@ export async function addFundsToCollective(order, remoteUser) {
     fromCollective = await models.Collective.findByPk(order.fromCollective.id);
     if (!fromCollective) {
       throw new Error(`From collective id ${order.fromCollective.id} not found`);
+    } else if ([types.COLLECTIVE, types.EVENT].includes(fromCollective.type)) {
+      const isAdminOfFromCollective = remoteUser.isRoot() || remoteUser.isAdmin(fromCollective.id);
+      if (!isAdminOfFromCollective && fromCollective.HostCollectiveId !== HostCollectiveId) {
+        const fromCollectiveHostId = await fromCollective.getHostCollectiveId();
+        if (!remoteUser.isAdmin(fromCollectiveHostId)) {
+          throw new Error("You don't have the permission to add funds from collectives you don't own or host.");
+        }
+      }
     }
   } else {
     fromCollective = await models.Collective.createOrganization(order.fromCollective, user, remoteUser);
