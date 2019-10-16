@@ -583,6 +583,7 @@
   "Expense.Type.Invoice": "Fatura",
   "Expense.Type.Receipt": "Recibo",
   "expense.type.tooltip": "Selecione 'recibo' para receber o reembolso de uma compra já feita. Selecione 'fatura' se estiver cobrando pelo seu tempo, sendo pago antecipadamente ou se não tiver um recibo.",
+  "expense.unapprove.btn": "Unapprove",
   "expense.viewDetails": "Ver detalhes",
   "expenseNeedsTaxForm.hover": "Não podemos lhe pagar enquanto não recebermos suas informações fiscais. Confira sua caixa de entrada com um email da HelloWorks. Precisa de ajuda? Contate support@opencollective.com",
   "expenseNeedsTaxForm.taxFormRequired": "formulário de taxas requerido",
