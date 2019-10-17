@@ -53,6 +53,7 @@ export const getContributorsForCollective = async (collectiveId, { limit = 5000,
         FROM        "Collectives" c
         INNER JOIN  "Members" m ON m."MemberCollectiveId" = c.id
         WHERE       m."CollectiveId" = :collectiveId
+        AND         m."deletedAt" IS NULL AND c."deletedAt" IS NULL
         ${getRolesCondition(roles)}
         GROUP BY    c.id
       ) SELECT
@@ -71,11 +72,13 @@ export const getContributorsForCollective = async (collectiveId, { limit = 5000,
       FROM
         "member_collectives_matching_roles" mc
       INNER JOIN
-        "Members" m ON m."MemberCollectiveId" = mc.id AND m."deletedAt" IS NULL
+        "Members" m ON m."MemberCollectiveId" = mc.id
       LEFT JOIN
         "Tiers" tier ON m."TierId" = tier.id
       WHERE
         m."CollectiveId" = :collectiveId
+      AND
+        m."deletedAt" IS NULL AND mc."deletedAt" IS NULL
       GROUP BY
         mc.id
       ORDER BY
@@ -136,11 +139,13 @@ export const getContributorsForTier = async (tierId, { limit = 5000 } = {}) => {
       FROM
         "Collectives" mc
       INNER JOIN
-        "Members" m ON m."MemberCollectiveId" = mc.id AND m."deletedAt" IS NULL
+        "Members" m ON m."MemberCollectiveId" = mc.id
       INNER JOIN
         "Tiers" tier ON m."TierId" = tier.id
       WHERE
         m."TierId" = ?
+      AND
+        m."deletedAt" IS NULL AND mc."deletedAt" IS NULL
       GROUP BY
         tier.id, mc.id
       ORDER BY
