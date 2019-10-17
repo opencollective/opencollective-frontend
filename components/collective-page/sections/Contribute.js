@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
+import { orderBy } from 'lodash';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { H3 } from '../../Text';
@@ -102,6 +103,10 @@ class SectionContribute extends React.PureComponent {
     return contributors.find(c => c.isBacker);
   });
 
+  sortTiers = memoizeOne(tiers => {
+    return orderBy([...tiers], ['endsAt'], ['desc']);
+  });
+
   getContributeCardsScrollDistance(width) {
     const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
     if (width <= oneCardScrollDistance * 2) {
@@ -119,6 +124,7 @@ class SectionContribute extends React.PureComponent {
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
+    const sortedTiers = this.sortTiers(tiers);
 
     return (
       <Box pt={[4, 5]}>
@@ -152,7 +158,7 @@ class SectionContribute extends React.PureComponent {
                       hideContributors={hasNoContributor}
                     />
                   </Box>
-                  {tiers.map(tier => (
+                  {sortedTiers.map(tier => (
                     <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
                       <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
                     </Box>

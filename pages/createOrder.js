@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Flex } from '@rebass/grid';
 import { get } from 'lodash';
+import { Flex } from '@rebass/grid';
 
 import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
@@ -15,9 +15,12 @@ import Link from '../components/Link';
 import { withStripeLoader } from '../components/StripeProvider';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Container from '../components/Container';
+import StyledButton from '../components/StyledButton';
 
 import ContributionFlow from '../components/contribution-flow';
-import MessageBox from '../components/MessageBox';
+import ContributionFlowCover from '../components/contribution-flow/Cover';
 
 const messages = defineMessages({
   collectiveTitle: {
@@ -27,6 +30,22 @@ const messages = defineMessages({
   eventTitle: {
     id: 'CreateOrder.TitleForEvent',
     defaultMessage: 'Order tickets for {event}',
+  },
+  missingHost: {
+    id: 'createOrder.missingHost',
+    defaultMessage: "This collective doesn't have a host and can't accept financial contributions",
+  },
+  inactiveCollective: {
+    id: 'createOrder.inactiveCollective',
+    defaultMessage: "This collective is not active and can't accept financial contributions",
+  },
+  missingTier: {
+    id: 'createOrder.missingTier',
+    defaultMessage: "Oops! This tier doesn't exist or has been removed by the collective admins.",
+  },
+  expiredTier: {
+    id: 'Tier.Past',
+    defaultMessage: 'This contribution type is not active anymore.',
   },
 });
 
@@ -112,51 +131,35 @@ class CreateOrderPage extends React.Component {
     };
   }
 
-  renderPageContent() {
+  renderMessage(type, content, showOtherWaysToContribute = false) {
     const { data } = this.props;
-
-    if (data.loading) {
-      return (
-        <Flex py={5} justifyContent="center">
-          <Loading />
-        </Flex>
-      );
-    } else if (!data.Collective.host) {
-      return (
-        <Flex py={5} justifyContent="center">
-          <MessageBox type="info" withIcon>
-            <FormattedMessage
-              id="createOrder.missingHost"
-              defaultMessage="This collective doesn't have a host and can't accept financial contributions"
-            />
-          </MessageBox>
-        </Flex>
-      );
-    } else if (!data.Collective.isActive) {
-      return (
-        <Flex py={5} justifyContent="center">
-          <MessageBox type="info" withIcon>
-            <FormattedMessage
-              id="createOrder.inactiveCollective"
-              defaultMessage="This collective is not active and can't accept financial contributions"
-            />
-          </MessageBox>
-        </Flex>
-      );
-    } else if (this.props.tierId && !data.Tier) {
-      return (
-        <Flex py={5} justifyContent="center">
-          <MessageBox type="error" withIcon>
-            <FormattedMessage
-              id="createOrder.missingTier"
-              defaultMessage="Oops! This tier doesn't exist or has been removed by the collective admins."
-            />
-            <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
+    return (
+      <Flex flexDirection="column" alignItems="center" py={5}>
+        <MessageBox type={type} withIcon maxWidth={800}>
+          {content}
+        </MessageBox>
+        {showOtherWaysToContribute && (
+          <Link route="contribute" params={{ collectiveSlug: data.Collective.slug, verb: 'contribute' }}>
+            <StyledButton buttonStyle="primary" buttonSize="large" mt={5}>
               <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
-            </Link>
-          </MessageBox>
-        </Flex>
-      );
+            </StyledButton>
+          </Link>
+        )}
+      </Flex>
+    );
+  }
+
+  renderPageContent() {
+    const { data, intl } = this.props;
+
+    if (!data.Collective.host) {
+      return this.renderMessage('info', intl.formatMessage(messages.missingHost));
+    } else if (!data.Collective.isActive) {
+      return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
+    } else if (this.props.tierId && !data.Tier) {
+      return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
+    } else if (data.Tier && data.Tier.endsAt && new Date(data.Tier.endsAt) < new Date()) {
+      return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
     } else {
       return (
         <ContributionFlow
@@ -183,7 +186,20 @@ class CreateOrderPage extends React.Component {
     if (!data.loading && (!data || !data.Collective)) {
       return <ErrorPage data={data} />;
     } else {
-      return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
+      return (
+        <Page {...this.getPageMetadata()}>
+          {data.loading ? (
+            <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+              <Loading />
+            </Container>
+          ) : (
+            <React.Fragment>
+              <ContributionFlowCover collective={data.Collective} tier={data.Tier} />
+              {this.renderPageContent()}
+            </React.Fragment>
+          )}
+        </Page>
+      );
     }
   }
 }
@@ -244,6 +260,7 @@ const CollectiveWithTierDataQuery = gql`
       type
       name
       slug
+      endsAt
       description
       amount
       amountType
