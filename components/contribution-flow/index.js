@@ -36,7 +36,6 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import Steps from '../Steps';
 import EventDetails from '../EventDetails';
 
-import Cover from './Cover';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionDetails from './ContributionDetails';
 import StepProfile from './StepProfile';
@@ -937,51 +936,48 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { collective, tier, loadingLoggedInUser, LoggedInUser } = this.props;
+    const { loadingLoggedInUser, LoggedInUser } = this.props;
 
     return (
-      <React.Fragment>
-        <Cover collective={collective} tier={tier} />
-        <Steps
-          steps={this.getSteps()}
-          currentStepName={this.props.step}
-          onStepChange={this.onStepChange}
-          onInvalidStep={this.onInvalidStep}
-          onComplete={this.submitOrder}
-        >
-          {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
-            <Flex data-cy="cf-content" flexDirection="column" alignItems="center" pt={2} pb={[4, 5]} px={2}>
-              {(loadingLoggedInUser || LoggedInUser) && (
-                <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
-                  <ContributionFlowStepsProgress
-                    steps={steps}
-                    currentStep={currentStep}
-                    lastVisitedStep={lastVisitedStep}
-                    goToStep={goToStep}
-                    stepProfile={this.state.stepProfile}
-                    stepDetails={this.state.stepDetails}
-                    stepPayment={this.state.stepPayment}
-                    submitted={this.state.submitted}
-                    loading={loadingLoggedInUser || this.state.loading || this.state.submitting}
-                    currency={this.getCurrency()}
-                    isFreeTier={this.getOrderMinAmount() === 0}
-                  />
-                </Box>
-              )}
-              {this.state.error && (
-                <MessageBox type="error" mb={3} mx={2} withIcon>
-                  {this.state.error.replace('GraphQL error: ', '')}
-                </MessageBox>
-              )}
-              {loadingLoggedInUser || !isValidStep ? (
-                <Loading />
-              ) : (
-                this.renderContent(currentStep, goNext, goBack, isValidating)
-              )}
-            </Flex>
-          )}
-        </Steps>
-      </React.Fragment>
+      <Steps
+        steps={this.getSteps()}
+        currentStepName={this.props.step}
+        onStepChange={this.onStepChange}
+        onInvalidStep={this.onInvalidStep}
+        onComplete={this.submitOrder}
+      >
+        {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
+          <Flex data-cy="cf-content" flexDirection="column" alignItems="center" pt={2} pb={[4, 5]} px={2}>
+            {(loadingLoggedInUser || LoggedInUser) && (
+              <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+                <ContributionFlowStepsProgress
+                  steps={steps}
+                  currentStep={currentStep}
+                  lastVisitedStep={lastVisitedStep}
+                  goToStep={goToStep}
+                  stepProfile={this.state.stepProfile}
+                  stepDetails={this.state.stepDetails}
+                  stepPayment={this.state.stepPayment}
+                  submitted={this.state.submitted}
+                  loading={loadingLoggedInUser || this.state.loading || this.state.submitting}
+                  currency={this.getCurrency()}
+                  isFreeTier={this.getOrderMinAmount() === 0}
+                />
+              </Box>
+            )}
+            {this.state.error && (
+              <MessageBox type="error" mb={3} mx={2} withIcon>
+                {this.state.error.replace('GraphQL error: ', '')}
+              </MessageBox>
+            )}
+            {loadingLoggedInUser || !isValidStep ? (
+              <Loading />
+            ) : (
+              this.renderContent(currentStep, goNext, goBack, isValidating)
+            )}
+          </Flex>
+        )}
+      </Steps>
     );
   }
 }

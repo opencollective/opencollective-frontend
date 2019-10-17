@@ -90,7 +90,7 @@ class MarkOrderAsPaidBtn extends React.Component {
           disabled={this.props.disabled || disabled}
           title={title}
         >
-          <FormattedMessage id="order.markAsPaid.btn" defaultMessage="mark as paid" />
+          <FormattedMessage id="order.markAsPaid.btn" defaultMessage="Mark as paid" />
         </SmallButton>
         <div className="error">{error}</div>
       </div>

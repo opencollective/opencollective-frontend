@@ -171,7 +171,7 @@ class EditHost extends React.Component {
                       <Fineprint>
                         <FormattedMessage
                           id="editCollective.host.change.removeFirst"
-                          defaultMessage="Once removed, your Collective won't be able to accept financial anymore. You will be able to apply to another host."
+                          defaultMessage="Once removed, your Collective won't be able to accept financial contributions anymore. You will be able to apply to another host."
                         />
                       </Fineprint>
                     </div>

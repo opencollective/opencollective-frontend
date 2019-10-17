@@ -32,7 +32,7 @@ const SelectContainer = ({ innerProps, ...props }) => (
 );
 
 /**
- * A map to override the default components of reac-select
+ * A map to override the default components of react-select
  */
 const customComponents = { SelectContainer, Option };
 
@@ -66,7 +66,8 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
       const customStyles = {};
 
       if (state.isSelected) {
-        customStyles.backgroundColor = state.isFocused ? theme.colors.primary[400] : theme.colors.primary[500];
+        customStyles.backgroundColor = theme.colors.primary[200];
+        customStyles.color = undefined;
       } else if (state.isFocused) {
         customStyles.backgroundColor = theme.colors.primary[100];
       } else {
@@ -75,6 +76,10 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
 
       return { ...baseStyles, ...customStyles };
     },
+    singleValue: baseStyles => ({
+      ...baseStyles,
+      width: '100%',
+    }),
     menu: baseStyles => ({
       ...baseStyles,
       overflow: 'hidden', // for children border-radius to apply
@@ -101,6 +106,8 @@ StyledSelect.propTypes = {
   disabled: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,
+  /** Rendered when there's no option to show */
+  noOptionsMessage: PropTypes.func,
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   // Styled-system

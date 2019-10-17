@@ -267,7 +267,13 @@ const StepDetails = ({
         customFields.map(customField => {
           const value = customData && customData[customField.name] ? customData[customField.name] : '';
           return (
-            <StyledInputField mt={2} key={customField.name} htmlFor={customField.name} label={customField.label}>
+            <StyledInputField
+              mt={3}
+              key={customField.name}
+              htmlFor={customField.name}
+              label={customField.label}
+              width="100%"
+            >
               {fieldProps => (
                 <StyledInput
                   type={customField.type}

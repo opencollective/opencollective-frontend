@@ -301,8 +301,13 @@ class GoalsCover extends React.Component {
     const ref = this.labelsRefs[goal.slug];
     if (ref && ref.current) {
       return ref.current.offsetWidth + 15; // Add a bigger hit box
+    } else if (goal.title) {
+      return Math.min(MAX_TITLE_LENGTH, goal.title.length) * 8;
+    } else {
+      // When there's no title we just show a single word - "Goal".
+      // 12 characters should be enough for most languages.
+      return 12 * 8;
     }
-    return Math.min(MAX_TITLE_LENGTH, goal.title ? goal.title.length : 0) * 8;
   }
 
   /** Given a percent size, returns its value in pixels */

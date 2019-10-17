@@ -123,7 +123,7 @@ class CollectivePage extends Component {
   getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
     return {
-      hasContact: isCollective,
+      hasContact: isCollective || (isHost && !isAdmin),
       hasSubmitExpense: isCollective,
       hasApply: canApply,
       hasDashboard: isHost && isAdmin,

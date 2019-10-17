@@ -13,14 +13,14 @@ import Container from '../Container';
  */
 const ContributionDetails = ({ totalAmount, interval, currency, tax }) => {
   return (
-    <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px">
+    <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px" data-cy="contribution-details">
       <Container fontSize="Paragraph" mb={3}>
         <P fontSize="LeadParagraph" fontWeight="bold" mb={2}>
           <FormattedMessage id="contribute.ContributionDetailsTitle" defaultMessage="Contribution details:" />
         </P>
         <FormattedMessage
           id="contribute.tierDetails"
-          defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month {monthly.} year {yearly.} other {.}}"
+          defaultMessage="You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}."
           values={{
             amount: (
               <strong>

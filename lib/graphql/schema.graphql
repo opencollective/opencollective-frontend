@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Sun Oct 06 2019 22:51:40 GMT+0100 (West Africa Standard Time)
+# timestamp: Sun Oct 13 2019 08:27:44 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -1501,6 +1501,7 @@ type Mutation {
   ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
   approveExpense(id: Int!): ExpenseType
+  unapproveExpense(id: Int!): ExpenseType
   rejectExpense(id: Int!): ExpenseType
   payExpense(
     id: Int!
@@ -1509,6 +1510,7 @@ type Mutation {
     platformFeeInCollectiveCurrency: Int
   ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
+  markPendingOrderAsExpired(id: Int!): OrderType
   createExpense(expense: ExpenseInputType!): ExpenseType
   editExpense(expense: ExpenseInputType!): ExpenseType
   deleteExpense(id: Int!): ExpenseType
@@ -1900,6 +1902,7 @@ enum OrderStatus {
   CANCELLED
   REJECTED
   ERROR
+  EXPIRED
 }
 
 """
@@ -2533,6 +2536,8 @@ type Query {
     orderDirection: OrderDirection = DESC
     limit: Int = 10
     offset: Int = 0
+    onlyOpenHosts: Boolean = true
+    minNbCollectivesHosted: Int! = 0
   ): CollectiveSearchResults
   allCollectiveTags: [String]
   member(id: Int, CollectiveId: Int, MemberCollectiveId: Int, TierId: Int): Member
@@ -2579,6 +2584,11 @@ type Query {
     Fetch collectives related to this term based on name, description, tags, slug, mission, and location
     """
     term: String
+
+    """
+    [NON AVAILABLE WITH ALGOLIA] Limit the search to collectives under these hosts
+    """
+    hostCollectiveIds: [Int]
 
     """
     Only return collectives of this type

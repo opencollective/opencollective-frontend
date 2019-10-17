@@ -32,6 +32,7 @@ import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
+import Container from './Container';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -138,10 +139,6 @@ class EditCollectiveForm extends React.Component {
       'description.label': {
         id: 'collective.description.label',
         defaultMessage: 'Short description',
-      },
-      'longDescription.label': {
-        id: 'collective.longDescription.label',
-        defaultMessage: 'Long description',
       },
       'expensePolicy.label': {
         id: 'collective.expensePolicy.label',
@@ -479,12 +476,6 @@ class EditCollectiveForm extends React.Component {
           },
         },
         {
-          name: 'longDescription',
-          type: 'textarea',
-          placeholder: '',
-          description: 'Protip: you can use markdown',
-        },
-        {
           name: 'tags',
           maxLength: 128,
           type: 'tags',
@@ -588,10 +579,6 @@ class EditCollectiveForm extends React.Component {
             :global(textarea) {
               width: 300px;
               font-size: 1.5rem;
-            }
-
-            .EditCollectiveForm :global(textarea[name='longDescription']) {
-              height: 30rem;
             }
 
             .EditCollectiveForm :global(textarea[name='expensePolicy']) {
@@ -841,14 +828,14 @@ class EditCollectiveForm extends React.Component {
               )}
               {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
                 <Flex flexDirection="column">
-                  <Box mb="3em">
+                  <Container mb={4} pb={4} borderBottom="1px solid #E8E9EB">
                     <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
                       <StyledButton>
                         <ArrowBack size="1em" />{' '}
                         <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                       </StyledButton>
                     </Link>
-                  </Box>
+                  </Container>
                   <CreateVirtualCardsForm
                     collectiveId={collective.id}
                     collectiveSlug={collective.slug}

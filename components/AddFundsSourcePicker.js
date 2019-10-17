@@ -29,14 +29,17 @@ class AddFundsSourcePicker extends React.Component {
   };
 
   onChange = option => {
-    const FromCollectiveId = option.value;
-    this.props.onChange(FromCollectiveId);
+    if (option.value === 'other') {
+      this.props.onChange('other');
+    } else {
+      this.props.onChange(option.value.id);
+    }
   };
 
   render() {
     const { intl, host, data } = this.props;
     const customOptions = [
-      { value: host.id, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
+      { value: { id: host.id }, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
       { value: 'other', label: intl.formatMessage(messages.addFundsFromOther) },
     ];
 
@@ -48,7 +51,7 @@ class AddFundsSourcePicker extends React.Component {
         onChange={this.onChange}
         maxMenuHeight={200}
         collectives={get(data.PaymentMethod, 'fromCollectives.collectives', []).filter(c => c.id !== host.id)}
-        getDefaultOption={() => customOptions[0]}
+        getDefaultOptions={() => customOptions[0]}
         customOptions={customOptions}
       />
     );
@@ -98,12 +101,14 @@ const getSourcesQuery = gql`
     PaymentMethod(id: $id) {
       id
       fromCollectives {
+        id
         total
         collectives {
           id
           type
           name
           slug
+          imageUrl
         }
       }
     }

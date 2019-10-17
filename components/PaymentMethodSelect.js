@@ -20,7 +20,7 @@ class PaymentMethodSelect extends Component {
 
   paymentMethodValueAndLabel = (intl, paymentMethod) => {
     return {
-      value: paymentMethod.id,
+      value: paymentMethod,
       label: paymentMethodLabelWithIcon(intl, paymentMethod),
     };
   };
