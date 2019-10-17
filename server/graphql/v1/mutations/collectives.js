@@ -24,13 +24,6 @@ const debugDelete = debug('delete');
 
 const hourInSeconds = 60 * 60;
 
-/**
- * Check if the collective can be contacted
- */
-async function isContactable(collective) {
-  return (await collective.isHost()) || collective.type === types.COLLECTIVE || collective.type === types.EVENT;
-}
-
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
     throw new errors.Unauthorized({
@@ -930,14 +923,14 @@ export async function sendMessageToCollective(_, args, req) {
     });
   }
 
-  const collective = await models.Collective.findByPk(args.id);
+  const collective = await models.Collective.findByPk(args.collectiveId);
   if (!collective) {
     throw new errors.NotFound({
       message: `Collective with id ${args.id} not found`,
     });
   }
 
-  if (!(await isContactable(collective))) {
+  if (!(await collective.canContact())) {
     throw new errors.Unauthorized({
       message: `You can't contact this type of collective`,
     });
@@ -966,7 +959,7 @@ export async function sendMessageToCollective(_, args, req) {
     user,
   };
   const recipient = `hello@${collective.slug}.opencollective.com`;
-  emailLib.send('collective.contact.message', recipient, data);
+  emailLib.send('collective.contact.message', recipient, data, { replyTo: user.email });
   cache.set(countCacheKey, existingCount + 1, hourInSeconds);
   return { success: true };
 }

@@ -190,7 +190,7 @@ const mutations = {
       },
     }),
     args: {
-      id: { type: new GraphQLNonNull(GraphQLInt) },
+      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
       message: { type: new GraphQLNonNull(GraphQLString) },
       subject: { type: GraphQLString },
     },
