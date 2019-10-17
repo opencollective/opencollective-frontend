@@ -1,0 +1,12 @@
+Subject: {{#if subject}}{{subject}}{{else}}New message from {{fromCollective.name}} on Open Collective{{/if}}
+
+<p>Hi {{collective.name}},</p>
+
+<p><a href="{{config.host.website}}/{{fromCollective.slug}}">{{fromCollective.name}}</a> just sent you a message on Open Collective:</p>
+
+<blockquote>
+  {{message}}
+</blockquote>
+
+<p>You can send a message to {{user.firstName}} (<a href="mailto:{{user.email}}">{{user.email}}</a>) by replying to this email.</p>
+<p>If this is a spam, please forward the message to <a href="mailto:support@opencollective.com">support@opencollective.com</a></p>
