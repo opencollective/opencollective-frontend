@@ -29,26 +29,21 @@ const CollectiveTypesI18n = defineMessages({
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
  */
-const DefaultCollectiveLabel = ({ __collective_picker_collective__, label, value: collective }) =>
-  !__collective_picker_collective__ ? (
-    label
-  ) : (
-    <Flex alignItems="center">
-      <Avatar collective={collective} radius={28} />
-      <Flex flexDirection="column" ml={2}>
-        <Span fontSize="Caption" color="black.700">
-          {collective.name}
-        </Span>
-        <Span fontSize="Caption" color="black.500">
-          @{collective.slug}
-        </Span>
-      </Flex>
+const DefaultCollectiveLabel = ({ value: collective }) => (
+  <Flex alignItems="center">
+    <Avatar collective={collective} radius={28} />
+    <Flex flexDirection="column" ml={2}>
+      <Span fontSize="Caption" lineHeight={1.2} color="black.700">
+        {collective.name}
+      </Span>
+      <Span fontSize="Caption" lineHeight={1.2} color="black.500">
+        @{collective.slug}
+      </Span>
     </Flex>
-  );
+  </Flex>
+);
 
 DefaultCollectiveLabel.propTypes = {
-  __collective_picker_collective__: PropTypes.bool,
-  label: PropTypes.string,
   value: PropTypes.shape({
     id: PropTypes.number,
     type: PropTypes.string,
@@ -66,6 +61,13 @@ DefaultCollectiveLabel.propTypes = {
  */
 class CollectivePicker extends React.PureComponent {
   /**
+   * Function to generate a single select option
+   */
+  buildCollectiveOption(collective) {
+    return { value: collective, label: collective.name, __collective_picker_collective__: true };
+  }
+
+  /**
    * From a collectives list, returns a list of options that can be provided to a `StyledSelect`.
    *
    * @param {Array|null} collectives
@@ -78,14 +80,9 @@ class CollectivePicker extends React.PureComponent {
       return [];
     }
 
-    // Function to generate a single select option
-    const buildCollectiveOption = collective => {
-      return { value: collective, label: collective.name, __collective_picker_collective__: true };
-    };
-
     // If not grouped, just sort the collectives by names and return their options
     if (!groupByType) {
-      return sortFunc(collectives).map(buildCollectiveOption);
+      return sortFunc(collectives).map(this.buildCollectiveOption);
     }
 
     // Group collectives under categories, sort the categories labels and the collectives inside them
@@ -97,7 +94,7 @@ class CollectivePicker extends React.PureComponent {
       const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, { n: sortedCollectives.length }) : type;
       return {
         label: sectionLabel || '',
-        options: sortedCollectives.map(buildCollectiveOption),
+        options: sortedCollectives.map(this.buildCollectiveOption),
       };
     });
   });
@@ -109,10 +106,29 @@ class CollectivePicker extends React.PureComponent {
   });
 
   render() {
-    const { collectives, groupByType, customOptions, getDefaultOption, intl, sortFunc, ...props } = this.props;
+    const {
+      collectives,
+      groupByType,
+      customOptions,
+      getDefaultOptions,
+      intl,
+      sortFunc,
+      formatOptionLabel,
+      ...props
+    } = this.props;
+
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
     const allOptions = this.getAllOptions(collectiveOptions, customOptions);
-    return <StyledSelect options={allOptions} defaultValue={getDefaultOption(allOptions)} {...props} />;
+    return (
+      <StyledSelect
+        options={allOptions}
+        defaultValue={getDefaultOptions(this.buildCollectiveOption, allOptions)}
+        formatOptionLabel={(option, context) =>
+          option.__collective_picker_collective__ ? formatOptionLabel(option, context) : option.label
+        }
+        {...props}
+      />
+    );
   }
 }
 
@@ -135,7 +151,7 @@ CollectivePicker.propTypes = {
   /** Function to sort collectives. Default to sorty by name */
   sortFunc: PropTypes.func,
   /** Get passed the options list, returns the default one */
-  getDefaultOption: PropTypes.func.isRequired,
+  getDefaultOptions: PropTypes.func.isRequired,
   /** Function to generate a label from the collective + index */
   formatOptionLabel: PropTypes.func.isRequired,
   /** Whether we should group collectives by type */
@@ -146,7 +162,7 @@ CollectivePicker.propTypes = {
 
 CollectivePicker.defaultProps = {
   groupByType: true,
-  getDefaultOption: () => undefined,
+  getDefaultOptions: () => undefined,
   formatOptionLabel: DefaultCollectiveLabel,
   sortFunc: collectives => sortBy(collectives, 'name'),
 };
