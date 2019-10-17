@@ -955,7 +955,10 @@ export async function sendMessageToCollective(_, args, req) {
     fromCollective,
     collective,
     subject: args.subject || null,
-    message: sanitize(args.message.trim()),
+    message: sanitize(args.message.trim(), {
+      allowedTags: [],
+      allowedAttributes: {},
+    }),
     user,
   };
   const recipient = `hello@${collective.slug}.opencollective.com`;
