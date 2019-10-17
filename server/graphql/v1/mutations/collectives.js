@@ -923,7 +923,7 @@ export async function deleteUserCollective(_, args, req) {
     .then(() => userCollective);
 }
 
-export async function sendCollectiveMessage(_, args, req) {
+export async function sendMessageToCollective(_, args, req) {
   if (!req.remoteUser) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in to contact a collective',
