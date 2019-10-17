@@ -22,7 +22,7 @@ const debugClaim = debug('claim');
 const debugGithub = debug('github');
 const debugDelete = debug('delete');
 
-const fiveHoursInSeconds = 5 * 60 * 60;
+const hourInSeconds = 60 * 60;
 
 /**
  * Check if the collective can be contacted
@@ -967,6 +967,6 @@ export async function sendMessageToCollective(_, args, req) {
   };
   const recipient = `hello@${collective.slug}.opencollective.com`;
   emailLib.send('collective.contact.message', recipient, data);
-  cache.set(countCacheKey, existingCount + 1, fiveHoursInSeconds);
+  cache.set(countCacheKey, existingCount + 1, hourInSeconds);
   return { success: true };
 }
