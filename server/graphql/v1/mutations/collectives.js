@@ -4,12 +4,14 @@ import { get, omit, truncate } from 'lodash';
 import { map } from 'bluebird';
 import config from 'config';
 import uuidv4 from 'uuid/v4';
+import sanitize from 'sanitize-html';
 
 import models, { Op } from '../../../models';
 import * as errors from '../../errors';
 import emailLib from '../../../lib/email';
 import * as github from '../../../lib/github';
 import { defaultHostCollective } from '../../../lib/utils';
+import cache from '../../../lib/cache';
 
 import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
@@ -19,6 +21,15 @@ import { purgeCacheForPage } from '../../../lib/cloudflare';
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
 const debugDelete = debug('delete');
+
+const fiveHoursInSeconds = 5 * 60 * 60;
+
+/**
+ * Check if the collective can be contacted
+ */
+async function isContactable(collective) {
+  return (await collective.isHost()) || collective.type === types.COLLECTIVE || collective.type === types.EVENT;
+}
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -910,4 +921,52 @@ export async function deleteUserCollective(_, args, req) {
       return user.destroy();
     })
     .then(() => userCollective);
+}
+
+export async function sendCollectiveMessage(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to contact a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!(await isContactable(collective))) {
+    throw new errors.Unauthorized({
+      message: `You can't contact this type of collective`,
+    });
+  }
+
+  if (!collective.isActive) {
+    throw new errors.Unauthorized({
+      message: `Collective is inactive, unable to contact.`,
+    });
+  }
+
+  const user = req.remoteUser;
+  // Limit email sent to 5 per hour
+  const maxEmailMessagePerHour = config.limits.collectiveEmailMessagePerHour;
+  const countCacheKey = `user_contact_collective_email_${user.id}`;
+  const existingCount = (await cache.get(countCacheKey)) || 0;
+  if (existingCount > maxEmailMessagePerHour) {
+    throw new errors.RateLimitExceeded();
+  }
+  const fromCollective = await models.Collective.findByPk(req.remoteUser.CollectiveId);
+  const data = {
+    fromCollective,
+    collective,
+    subject: args.subject || null,
+    message: sanitize(args.message),
+    user,
+  };
+  const recipient = `hello@${collective.slug}.opencollective.com`;
+  emailLib.send('collective.contact.message', recipient, data);
+  cache.set(countCacheKey, existingCount + 1, fiveHoursInSeconds);
+  return { success: true };
 }
