@@ -29,14 +29,17 @@ class AddFundsSourcePicker extends React.Component {
   };
 
   onChange = option => {
-    const FromCollectiveId = option.value.id;
-    this.props.onChange(FromCollectiveId);
+    if (option.value === 'other') {
+      this.props.onChange('other');
+    } else {
+      this.props.onChange(option.value.id);
+    }
   };
 
   render() {
     const { intl, host, data } = this.props;
     const customOptions = [
-      { value: host.id, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
+      { value: { id: host.id }, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
       { value: 'other', label: intl.formatMessage(messages.addFundsFromOther) },
     ];
 
