@@ -1370,7 +1370,7 @@ export const TierType = new GraphQLObjectType({
       endsAt: {
         type: DateString,
         resolve(tier) {
-          return tier.startsAt;
+          return tier.endsAt;
         },
       },
       collective: {
