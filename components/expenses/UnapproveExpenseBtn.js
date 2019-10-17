@@ -16,7 +16,7 @@ const UnapproveExpenseBtn = ({ id, unapproveExpense }) => {
   };
 
   return (
-    <StyledButton mr={2} buttonStyle="secondary" onClick={() => handleOnClick()}>
+    <StyledButton mr={2} onClick={() => handleOnClick()}>
       <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
     </StyledButton>
   );
