@@ -93,6 +93,7 @@ const getTierData = graphql(gql`
       goal
       currency
       interval
+      endsAt
 
       stats {
         id

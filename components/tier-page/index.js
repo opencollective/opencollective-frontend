@@ -111,6 +111,7 @@ class TierPage extends Component {
       slug: PropTypes.string.isRequired,
       interval: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      endsAt: PropTypes.string,
       goal: PropTypes.number,
       description: PropTypes.string,
       longDescription: PropTypes.string,
@@ -156,6 +157,7 @@ class TierPage extends Component {
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
     const shareBlock = this.renderShareBlock();
+    const isPassed = tier.endsAt && new Date(tier.endsAt) < new Date();
 
     return (
       <Container borderTop="1px solid #E6E8EB" pb={4}>
@@ -237,7 +239,7 @@ class TierPage extends Component {
                     right={[null, null, null, -390, -490]}
                     width={['100%', null, null, 380, 472]}
                     mb={[4, 5]}
-                    top={0}
+                    top={[0, null, null, -50]}
                   >
                     <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
                   </Container>
@@ -299,23 +301,25 @@ class TierPage extends Component {
                   mb={[0, null, null, 2]}
                   truncateOverflow
                 >
-                  <FormattedMessage
-                    id="TierPage.AmountRaised"
-                    defaultMessage="{amountWithInterval} raised"
-                    values={{
-                      amountWithInterval: (
-                        <FormattedMoneyAmount
-                          color="black.700"
-                          amount={amountRaised}
-                          currency={tier.currency}
-                          interval={tier.interval}
-                          amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
-                          abbreviateAmount={amountRaised > 1000000}
-                          abbreviateInterval
-                        />
-                      ),
-                    }}
-                  />
+                  {amountRaised > 0 && (
+                    <FormattedMessage
+                      id="TierPage.AmountRaised"
+                      defaultMessage="{amountWithInterval} raised"
+                      values={{
+                        amountWithInterval: (
+                          <FormattedMoneyAmount
+                            color="black.700"
+                            amount={amountRaised}
+                            currency={tier.currency}
+                            interval={tier.interval}
+                            amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                            abbreviateAmount={amountRaised > 1000000}
+                            abbreviateInterval
+                          />
+                        ),
+                      }}
+                    />
+                  )}
                   {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
                 </P>
                 {tier.goal && (
@@ -327,19 +331,32 @@ class TierPage extends Component {
               {/** Contribute button */}
               <Flex alignItems="center">
                 <Box width={1}>
-                  <Link
-                    route="orderCollectiveTierNew"
-                    params={{
-                      verb: 'contribute',
-                      tierId: tier.id,
-                      tierSlug: tier.slug,
-                      collectiveSlug: collective.slug,
-                    }}
-                  >
-                    <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
-                      <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
-                    </StyledButton>
-                  </Link>
+                  {isPassed ? (
+                    <P textAlign="center">
+                      <FormattedMessage id="Tier.Past" defaultMessage="This contribution type is not active anymore." />{' '}
+                      <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+                        <FormattedMessage
+                          id="createOrder.backToTier"
+                          defaultMessage="View all the other ways to contribute"
+                        />
+                        .
+                      </Link>
+                    </P>
+                  ) : (
+                    <Link
+                      route="orderCollectiveTierNew"
+                      params={{
+                        verb: 'contribute',
+                        tierId: tier.id,
+                        tierSlug: tier.slug,
+                        collectiveSlug: collective.slug,
+                      }}
+                    >
+                      <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
+                        <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
+                      </StyledButton>
+                    </Link>
+                  )}
                 </Box>
               </Flex>
               {/** Share buttons (desktop only) */}

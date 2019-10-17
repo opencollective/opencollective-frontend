@@ -245,6 +245,7 @@ const getCollective = graphql(
           minimumAmount
           button
           amountType
+          endsAt
           type
           stats {
             id
