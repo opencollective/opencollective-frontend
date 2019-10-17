@@ -184,7 +184,7 @@ const mutations = {
   },
   sendMessageToCollective: {
     type: new GraphQLObjectType({
-      name: 'SendCollectiveMessageResult',
+      name: 'SendMessageToCollectiveResult',
       fields: {
         success: { type: GraphQLBoolean },
       },
