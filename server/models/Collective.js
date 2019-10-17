@@ -857,6 +857,13 @@ export default function(Sequelize, DataTypes) {
     return Boolean(this.settings && this.settings.apply);
   };
 
+  /**
+   *  Checks if the collective can be contacted.
+   */
+  Collective.prototype.canContact = async function() {
+    return this.type === types.COLLECTIVE || this.type === types.EVENT || (await this.isHost());
+  };
+
   // This is quite ugly, and only needed for events.
   // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
   Collective.prototype.getUrlPath = function() {

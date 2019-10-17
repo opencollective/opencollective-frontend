@@ -556,6 +556,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       isHost: { type: GraphQLBoolean },
       isIncognito: { type: GraphQLBoolean },
       canApply: { type: GraphQLBoolean },
+      canContact: { type: GraphQLBoolean },
       isArchived: { type: GraphQLBoolean },
       isApproved: { type: GraphQLBoolean },
       isDeletable: { type: GraphQLBoolean },
@@ -967,6 +968,13 @@ const CollectiveFields = () => {
       type: GraphQLBoolean,
       resolve(collective) {
         return collective.canApply();
+      },
+    },
+    canContact: {
+      description: 'Returns whether this collectives can be contacted',
+      type: GraphQLBoolean,
+      resolve(collective) {
+        return collective.canContact();
       },
     },
     isIncognito: {
