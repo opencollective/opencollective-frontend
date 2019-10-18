@@ -962,7 +962,7 @@ export async function sendMessageToCollective(_, args, req) {
     user,
   };
   const recipient = `hello@${collective.slug}.opencollective.com`;
-  emailLib.send('collective.contact.message', recipient, data, { replyTo: user.email });
+  emailLib.send('collective.contact', recipient, data, { replyTo: user.email });
   cache.set(countCacheKey, existingCount + 1, hourInSeconds);
   return { success: true };
 }

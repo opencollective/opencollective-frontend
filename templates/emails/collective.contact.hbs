@@ -1,0 +1,54 @@
+Subject: New message from {{fromCollective.name}} on Open Collective{{#if subject}}: {{subject}}{{/if}}
+
+{{> header}}
+
+<p style="font-size: 17px; padding: 1em;">
+  Hi {{collective.name}},
+  <br /><br />
+  <a href="{{config.host.website}}/{{fromCollective.slug}}">{{fromCollective.name}}</a> just sent you a message on Open
+  Collective:
+</p>
+
+<table style="width: 100%; border: 1px solid #e8edee; border-radius: 6px; padding: 1em;">
+  <tbody>
+    <tr>
+      <td>
+        <center>
+          {{> collectivecard fromCollective}}
+          <br/><br/>
+        </center>
+      </td>
+    </tr>
+    <tr>
+      <td style="border-top: 1px solid #f3f3f3;">
+        <br/>
+        {{#if subject}}
+          <p style="font-size: 18px; font-weight: bold;">Subject</p>
+          <blockquote style="color: #6a737d;font-size: 16px;text-align: left;padding: 0.5em 0.75em;margin: 1em 0;border-left: 3px solid #e4e4e4;white-space: pre-line;">{{subject}}</blockquote>
+          <br/>
+        {{/if}}
+        <p style="font-size: 18px; font-weight: bold;">Message</p>
+        <blockquote style="color: #6a737d;font-size: 16px;text-align: left;padding: 0.5em 0.75em;margin: 1em 0;border-left: 3px solid #e4e4e4;white-space: pre-line;">{{message}}</blockquote>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table>
+  <tbody>
+    <tr>
+      <td>
+        <center>
+          <p style="font-size: 17px; padding: 1em;">
+            You can send a message to {{fromCollective.name}} (<a href="mailto:{{user.email}}">{{user.email}}</a>) by
+            replying to this email.
+            <br /><br />If this is a spam, please forward the message to
+            <a href="mailto:support@opencollective.com">support@opencollective.com</a>.<br />
+          </p>
+        </center>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+{{> footer}}
