@@ -199,6 +199,8 @@ const addTiersData = graphql(
           minimumAmount
           button
           amountType
+          endsAt
+          type
           stats {
             id
             totalDonated
