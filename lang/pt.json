@@ -197,7 +197,7 @@
   "collective.stats.totalAmountRaised.label": "Quantia arrecadada total",
   "collective.stats.totalAmountSpent.label": "Quantia contribuída total",
   "collective.tags.description": "Tags ajudam pessoas a descobrir seu coletivo",
-  "collective.tags.edit.description": "Faça seu coletivo aparecer mais (separado por vírgula)",
+  "collective.tags.edit.description": "Faça seu coletivo aparecer mais",
   "collective.tags.label": "Tags",
   "collective.tiers.donate": "Ou faça uma contribuição financeira personalizada",
   "collective.tos.description": "Link para os termos pelos quais este organizador vai coletar dinheiro em nome dos seus coletivos",

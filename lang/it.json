@@ -197,7 +197,7 @@
   "collective.stats.totalAmountRaised.label": "Importo totale raccolto",
   "collective.stats.totalAmountSpent.label": "Total amount contributed",
   "collective.tags.description": "I tag aiutano le persone a scoprire il tuo collettivo",
-  "collective.tags.edit.description": "Rendi il tuo Collettivo più visibile (separato da una virgola)",
+  "collective.tags.edit.description": "Rendi il tuo Collettivo più visibile",
   "collective.tags.label": "Tags",
   "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Link ai termini in base ai quali questo organizzatore raccoglierà denaro per conto dei loro collettivi",

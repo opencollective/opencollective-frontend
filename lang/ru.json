@@ -197,7 +197,7 @@
   "collective.stats.totalAmountRaised.label": "Всего получено",
   "collective.stats.totalAmountSpent.label": "Всего пожертвовано",
   "collective.tags.description": "Tags helps people discover your collective",
-  "collective.tags.edit.description": "Make your Collective more discoverable (comma separated)",
+  "collective.tags.edit.description": "Make your Collective more discoverable",
   "collective.tags.label": "Теги",
   "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Link to the terms by which this host will collect money on behalf of their collectives",

@@ -197,7 +197,7 @@
   "collective.stats.totalAmountRaised.label": "調達総額",
   "collective.stats.totalAmountSpent.label": "Total amount contributed",
   "collective.tags.description": "タグはあなたのコレクティブをほかの人が探すのを助けます",
-  "collective.tags.edit.description": "Make your Collective more discoverable (comma separated)",
+  "collective.tags.edit.description": "Make your Collective more discoverable",
   "collective.tags.label": "タグ",
   "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Link to the terms by which this host will collect money on behalf of their collectives",

@@ -197,7 +197,7 @@
   "collective.stats.totalAmountRaised.label": "Montant total levé",
   "collective.stats.totalAmountSpent.label": "Montant total contribué",
   "collective.tags.description": "Les tags aident la communauté à découvrir votre collectif",
-  "collective.tags.edit.description": "Rendre votre collectif plus facilement trouvable (séparez les termes par des virgules)",
+  "collective.tags.edit.description": "Rendre votre collectif plus facilement trouvable",
   "collective.tags.label": "Tags",
   "collective.tiers.donate": "Ou faire une contribution personnalisée",
   "collective.tos.description": "Lien vers les conditions d'utilisation que les collectifs qui souhaitent être hébergés doivent accepter",

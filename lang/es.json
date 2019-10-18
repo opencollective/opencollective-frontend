@@ -197,7 +197,7 @@
   "collective.stats.totalAmountRaised.label": "Monto total donado",
   "collective.stats.totalAmountSpent.label": "Total amount contributed",
   "collective.tags.description": "Las etiquetas ayudan a la gente a encontrar tu colecta",
-  "collective.tags.edit.description": "Make your Collective more discoverable (comma separated)",
+  "collective.tags.edit.description": "Make your Collective more discoverable",
   "collective.tags.label": "Tags",
   "collective.tiers.donate": "Or make a custom financial contribution",
   "collective.tos.description": "Enlace a los términos y condiciones por los cuales este anfitrión realiza la colecta de dinero en nombre de sus colectas",
