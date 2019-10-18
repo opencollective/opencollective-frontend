@@ -93,6 +93,7 @@ const getExpenseQuery = gql`
       category
       amount
       currency
+      type
       payoutMethod
       privateMessage
       userTaxFormRequiredBeforePayment

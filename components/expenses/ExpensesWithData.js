@@ -91,6 +91,7 @@ const getExpensesQuery = gql`
       incurredAt
       category
       amount
+      type
       currency
       payoutMethod
       privateMessage
