@@ -4,7 +4,7 @@ import '../../server/env';
 import PQueue from 'p-queue';
 import { assign, get, isArray, pick } from 'lodash';
 
-import models from '../../server/models';
+import models, { Op } from '../../server/models';
 import cache from '../../server/lib/cache';
 import logger from '../../server/lib/logger';
 import * as github from '../../server/lib/github';
@@ -123,16 +123,18 @@ const run = async () => {
   let collectives = await Collective.findAll({
     where: {
       type: 'COLLECTIVE',
+      deactivatedAt: { [Op.is]: null },
     },
+    order: [['createdAt', 'DESC']],
   });
 
   logger.info(`Found ${collectives.length} total collective(s)`);
 
-  collectives = collectives
-    .filter(collective => get(collective, 'settings.githubOrg') || get(collective, 'settings.githubRepo'))
-    .filter(collective => collective.isActive);
+  collectives = collectives.filter(
+    collective => get(collective, 'settings.githubOrg') || get(collective, 'settings.githubRepo'),
+  );
 
-  logger.info(`Found ${collectives.length} active collective(s) with GitHub settings`);
+  logger.info(`Found ${collectives.length} collective(s) with GitHub settings`);
 
   for (const collective of collectives) {
     let org = get(collective, 'settings.githubOrg');
