@@ -105,6 +105,7 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
     WHERE "deletedAt" IS NULL 
     AND "deactivatedAt" IS NULL 
     AND "isActive" = true
+    AND "isIncognito" = FALSE
     AND type IN (:types) ${dynamicConditions}
     ORDER BY __rank__ DESC
     OFFSET :offset
