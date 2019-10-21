@@ -8,6 +8,8 @@ import { Flex } from '@rebass/grid';
 
 import { Cog } from 'styled-icons/typicons/Cog';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
+import DefinedTerm, { Terms } from './DefinedTerm';
+import { Span } from './Text';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import Container from './Container';
@@ -303,6 +305,20 @@ const CollectiveNavbar = ({
           )}
         </Flex>
         <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />
+        <Container>
+          <FormattedMessage
+            id="Collective.Hero.Host"
+            defaultMessage="{FiscalHost}: {hostName}"
+            values={{
+              FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
+              hostName: (
+                <LinkCollective collective={collective.host}>
+                  <Span color="black.600">{collective.host.name}</Span>
+                </LinkCollective>
+              ),
+            }}
+          />
+        </Container>
       </InfosContainer>
 
       {/** Navbar items and buttons */}
