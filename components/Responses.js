@@ -17,6 +17,7 @@ class Responses extends React.Component {
           {`
             .Responses {
               width: 100%;
+              display: inline-block;
             }
             .innerResponses {
               margin: 3rem auto;
