@@ -201,6 +201,7 @@ const getCollective = graphql(
         image
         imageUrl
         canApply
+        canContact
         stats {
           id
           balance

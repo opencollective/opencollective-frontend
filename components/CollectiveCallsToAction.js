@@ -25,11 +25,11 @@ const CollectiveCallsToAction = ({
   return (
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
-        <a href={`mailto:hello@${collective.slug}.opencollective.com`}>
+        <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="Contact" defaultMessage="Contact" />
           </StyledButton>
-        </a>
+        </Link>
       )}
       {hasSubmitExpense && (
         <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
