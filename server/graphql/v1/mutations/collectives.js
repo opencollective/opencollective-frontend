@@ -5,13 +5,13 @@ import { map } from 'bluebird';
 import config from 'config';
 import uuidv4 from 'uuid/v4';
 import sanitize from 'sanitize-html';
+import sequelize from 'sequelize';
 
 import models, { Op } from '../../../models';
 import * as errors from '../../errors';
 import emailLib from '../../../lib/email';
 import * as github from '../../../lib/github';
 import { defaultHostCollective } from '../../../lib/utils';
-import cache from '../../../lib/cache';
 
 import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
@@ -21,8 +21,6 @@ import { purgeCacheForPage } from '../../../lib/cloudflare';
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
 const debugDelete = debug('delete');
-
-const hourInSeconds = 60 * 60;
 
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
@@ -936,33 +934,54 @@ export async function sendMessageToCollective(_, args, req) {
     });
   }
 
-  if (!collective.isActive) {
-    throw new errors.Unauthorized({
-      message: `Collective is inactive, unable to contact.`,
+  const message = args.message && sanitize(args.message, { allowedTags: [], allowedAttributes: {} }).trim();
+  if (!message || message.length < 10) {
+    throw new Error('Message is too short');
+  }
+
+  const subject =
+    args.subject &&
+    sanitize(args.subject, { allowedTags: [], allowedAttributes: {} })
+      .trim()
+      .slice(0, 60);
+
+  // User sending the email must have an associated collective
+  const fromCollective = await models.Collective.findByPk(req.remoteUser.CollectiveId);
+  if (!fromCollective) {
+    throw new Error("Your user account doesn't have any profile associated. Please contact support");
+  }
+
+  // Limit email sent per user
+  const user = req.remoteUser;
+  const maxEmailMessagePerHour = config.limits.collectiveEmailMessagePerHour;
+  const existingCount = await models.Activity.count({
+    where: {
+      type: activities.COLLECTIVE_CONTACT,
+      UserId: user.id,
+      createdAt: {
+        [Op.gte]: sequelize.literal("NOW() - INTERVAL '1 hour'"),
+      },
+    },
+  });
+  if (existingCount > maxEmailMessagePerHour) {
+    throw new errors.RateLimitExceeded({
+      message: 'Too many messages sent in a limited time frame. Please try again later.',
     });
   }
 
-  const user = req.remoteUser;
-  // Limit email sent to 5 per hour
-  const maxEmailMessagePerHour = config.limits.collectiveEmailMessagePerHour;
-  const countCacheKey = `user_contact_collective_email_${user.id}`;
-  const existingCount = (await cache.get(countCacheKey)) || 0;
-  if (existingCount > maxEmailMessagePerHour) {
-    throw new errors.RateLimitExceeded();
-  }
-  const fromCollective = await models.Collective.findByPk(req.remoteUser.CollectiveId);
-  const data = {
-    fromCollective,
-    collective,
-    subject: args.subject || null,
-    message: sanitize(args.message.trim(), {
-      allowedTags: [],
-      allowedAttributes: {},
-    }),
-    user,
-  };
-  const recipient = `hello@${collective.slug}.opencollective.com`;
-  emailLib.send('collective.contact', recipient, data, { replyTo: user.email });
-  cache.set(countCacheKey, existingCount + 1, hourInSeconds);
+  // Create the activity (which will send the message to the users)
+  await models.Activity.create({
+    type: activities.COLLECTIVE_CONTACT,
+    UserId: user.id,
+    CollectiveId: collective.id,
+    data: {
+      fromCollective,
+      collective,
+      user,
+      subject: subject || null,
+      message: message,
+    },
+  });
+
   return { success: true };
 }

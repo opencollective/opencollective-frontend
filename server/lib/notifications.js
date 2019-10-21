@@ -212,7 +212,11 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_EXPENSE_CREATED:
-      notifyAdminsOfCollective(activity.data.collective.id, activity);
+      notifyAdminsOfCollective(activity.CollectiveId, activity);
+      break;
+
+    case activityType.COLLECTIVE_CONTACT:
+      notifyAdminsOfCollective(activity.data.collective.id, activity, { replyTo: activity.data.user.email });
       break;
 
     case activityType.COLLECTIVE_COMMENT_CREATED:
