@@ -53,6 +53,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           values={collective}
           field="longDescription"
           canEdit={canEdit}
+          topEdit={-20}
           showEditIcon={!isEmptyDescription}
           formatBeforeSubmit={v => (isEmptyValue(v) ? null : v)}
         >
