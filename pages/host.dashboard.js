@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { omit } from 'lodash';
 
-import { Wallet } from 'styled-icons/boxicons-regular/Wallet';
+import { Receipt as ReceiptIcon } from 'styled-icons/material/Receipt';
+import { Donate as DonateIcon } from 'styled-icons/fa-solid/Donate';
 import { CheckDouble } from 'styled-icons/boxicons-regular/CheckDouble';
 
 import styled, { css } from 'styled-components';
@@ -142,7 +143,7 @@ class HostDashboardPage extends React.Component {
                 params={{ hostCollectiveSlug: slug, view: 'expenses' }}
                 isActive={view === 'expenses'}
               >
-                <Wallet size="1em" />
+                <ReceiptIcon size="1em" />
                 <FormattedMessage id="host.dashboard.tab.expenses" defaultMessage="Expenses" />
               </MenuLink>
               <MenuLink
@@ -150,8 +151,11 @@ class HostDashboardPage extends React.Component {
                 params={{ hostCollectiveSlug: slug, view: 'donations' }}
                 isActive={view === 'donations'}
               >
-                <Wallet size="1em" />
-                <FormattedMessage id="host.dashboard.tab.donations" defaultMessage="Donations" />
+                <DonateIcon size="1em" />
+                <FormattedMessage
+                  id="host.dashboard.tab.financialContributions"
+                  defaultMessage="Financial Contributions"
+                />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"
