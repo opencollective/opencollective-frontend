@@ -42,6 +42,27 @@ class HostDashboard extends React.Component {
     this.setState({ selectedCollective });
   }
 
+  saveFilterPreferences() {
+    const { selectedCollective, expensesFilters } = this.state;
+    setLocalStorage(
+      LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES,
+      JSON.stringify({
+        selectedCollective,
+        expensesFilters,
+      }),
+    );
+  }
+
+  restoreFilterPreferences() {
+    let filterPreferences = getFromLocalStorage(LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES);
+    if (filterPreferences) {
+      filterPreferences = JSON.parse(filterPreferences);
+      this.setState({ ...filterPreferences }, () => {
+        removeFromLocalStorage(LOCAL_STORAGE_KEYS.HOST_DASHBOARD_FILTER_PREFERENCES);
+      });
+    }
+  }
+
   renderExpenses(selectedCollective, includeHostedCollectives) {
     const { LoggedInUser, data } = this.props;
     const host = data.Collective;
