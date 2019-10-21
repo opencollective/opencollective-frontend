@@ -210,31 +210,45 @@ const mutations = {
         type: GraphQLString,
         description: 'The website URL originating the request',
       },
+      throwIfExists: {
+        type: GraphQLBoolean,
+        description: 'If set to false, will act like just like a Sign In and returns the user',
+        defaultValue: true,
+      },
+      sendSignInLink: {
+        type: GraphQLBoolean,
+        description: 'If true, a signIn link will be sent to the user',
+        defaultValue: true,
+      },
     },
     resolve(_, args) {
       return sequelize.transaction(async transaction => {
-        // Create user
-        if (await models.User.findOne({ where: { email: args.user.email.toLowerCase() } }, { transaction })) {
+        let user = await models.User.findOne({ where: { email: args.user.email.toLowerCase() } }, { transaction });
+        let organization = null;
+
+        if (args.throwIfExists && user) {
           throw new Error('User already exists for given email');
-        }
-
-        const user = await models.User.createUserWithCollective(args.user, transaction);
-        const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl);
-
-        if (!args.organization) {
-          emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
-          return { user, organization: null };
+        } else if (!user) {
+          // Create user
+          user = await models.User.createUserWithCollective(args.user, transaction);
         }
 
         // Create organization
-        const organizationParams = {
-          type: 'ORGANIZATION',
-          ...pick(args.organization, ['name', 'website', 'twitterHandle', 'githubHandle']),
-        };
-        const organization = await models.Collective.create(organizationParams, { transaction });
-        await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, transaction);
+        if (args.organization) {
+          const organizationParams = {
+            type: 'ORGANIZATION',
+            ...pick(args.organization, ['name', 'website', 'twitterHandle', 'githubHandle']),
+          };
+          organization = await models.Collective.create(organizationParams, { transaction });
+          await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, transaction);
+        }
 
-        emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
+        // Sent signIn link
+        if (args.sendSignInLink) {
+          const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl);
+          emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
+        }
+
         return { user, organization };
       });
     },
