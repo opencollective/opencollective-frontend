@@ -83,11 +83,13 @@ import {
   UserInputType,
   StripeCreditCardDataInputType,
   NotificationInputType,
+  MemberInputType,
 } from './inputTypes';
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
 import models, { sequelize } from '../../models';
 import emailLib from '../../lib/email';
 import roles from '../../constants/roles';
+import errors from '../../lib/errors';
 
 const mutations = {
   createCollective: {
@@ -387,6 +389,28 @@ const mutations = {
     },
     resolve(_, args, req) {
       return editTiers(_, args, req);
+    },
+  },
+  editCoreContributors: {
+    type: CollectiveInterfaceType,
+    description: 'Updates all the core contributors (role = ADMIN or MEMBER) for this collective.',
+    args: {
+      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      members: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MemberInputType))) },
+    },
+    async resolve(_, args, req) {
+      const collective = await models.Collective.findByPk(args.collectiveId);
+      if (!collective) {
+        throw new errors.NotFound();
+      } else if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+        throw new errors.Unauthorized();
+      } else {
+        await collective.editMembers(args.members, {
+          CreatedByUserId: req.remoteUser.id,
+          remoteUserCollectiveId: req.remoteUser.CollectiveId,
+        });
+        return collective;
+      }
     },
   },
   createMember: {

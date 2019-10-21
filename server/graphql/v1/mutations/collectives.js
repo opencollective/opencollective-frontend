@@ -417,12 +417,15 @@ export function editCollective(_, args, req) {
     })
     .then(() => collective.update(omit(newCollectiveData, ['HostCollectiveId', 'hostFeePercent']))) // we omit those attributes that have already been updated above
     .then(() => collective.editTiers(args.collective.tiers))
-    .then(() =>
-      collective.editMembers(args.collective.members, {
-        CreatedByUserId: req.remoteUser.id,
-        remoteUserCollectiveId: req.remoteUser.CollectiveId,
-      }),
-    )
+    .then(() => {
+      // @deprecated since 2019-10-21: now using dedicated `editCoreContributors` endpoint
+      if (args.collective.members) {
+        return collective.editMembers(args.collective.members, {
+          CreatedByUserId: req.remoteUser.id,
+          remoteUserCollectiveId: req.remoteUser.CollectiveId,
+        });
+      }
+    })
     .then(() => {
       // Ask cloudflare to refresh the cache for this collective's page
       purgeCacheForPage(`/${collective.slug}`);
