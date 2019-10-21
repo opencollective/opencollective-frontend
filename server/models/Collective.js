@@ -1657,7 +1657,26 @@ export default function(Sequelize, DataTypes) {
             };
 
             member.CollectiveId = this.id;
-            if (member.CreatedByUserId) {
+            if (member.member && member.member.id) {
+              // Add member from collective ID. Ignore incognito profiles.
+              return models.User.findOne({
+                where: { CollectiveId: member.member.id },
+                include: {
+                  model: models.Collective,
+                  as: 'collective',
+                  attributes: ['id'],
+                  where: { type: types.USER, isIncognito: false },
+                },
+              }).then(user => {
+                if (!user) {
+                  logger.error('[Edit Members] No user found for member', member);
+                  throw new Error(`No profile found for ${member.member.name}. Please contact support`);
+                } else {
+                  return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...memberAttrs });
+                }
+              });
+            } else if (member.CreatedByUserId) {
+              // @deprecated since 2019-10-21 this path doesn't seems to be used anymore
               const user = {
                 id: member.CreatedByUserId,
                 CollectiveId: member.MemberCollectiveId,
@@ -1667,6 +1686,7 @@ export default function(Sequelize, DataTypes) {
                 ...memberAttrs,
               });
             } else {
+              // @deprecated since 2019-10-21 we now expect user to create the collective and pass an ID
               return models.User.findOrCreateByEmail(member.member.email, member.member).then(user => {
                 return this.addUserWithRole(user, member.role, {
                   TierId: member.TierId,
