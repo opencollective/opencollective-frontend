@@ -111,7 +111,12 @@ class CreateOrganization extends React.Component {
           `}
         </style>
 
-        <Header title={title} className={this.state.status} LoggedInUser={LoggedInUser} />
+        <Header
+          title={title}
+          className={this.state.status}
+          LoggedInUser={LoggedInUser}
+          menuItems={{ pricing: true, howItWorks: true }}
+        />
 
         <Body>
           <CollectiveCover

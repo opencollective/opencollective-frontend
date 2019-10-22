@@ -64,6 +64,17 @@ function importAll(r) {
   return map;
 }
 
+function getmenuItem(pageSlug) {
+  if (
+    pageSlug == 'how-it-works' ||
+    pageSlug == 'pricing' ||
+    pageSlug == 'become-a-sponsor' ||
+    pageSlug == 'become-a-fiscal-host'
+  )
+    return { pricing: true, howItWorks: true };
+  else return { pricing: false, howItWorks: false };
+}
+
 class MarketingPage extends React.Component {
   static getInitialProps({ query: { pageSlug } }) {
     return { pageSlug };
@@ -112,7 +123,7 @@ class MarketingPage extends React.Component {
     return (
       <Fragment>
         <div>
-          <Header LoggedInUser={LoggedInUser} />
+          <Header LoggedInUser={LoggedInUser} menuItems={getmenuItem(pageSlug)} />
           <Body>
             <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
             <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
