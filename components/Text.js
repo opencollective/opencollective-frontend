@@ -86,7 +86,6 @@ H5.defaultProps = {
   fontSize: 'H5',
   letterSpacing: '-0.4px',
   lineHeight: 'H5',
-  textAlign: 'center',
   fontWeight: 500,
   color: 'black.800',
 };

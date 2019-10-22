@@ -217,7 +217,7 @@ class RedeemedPage extends React.Component {
             <Box width={['320px', '640px']}>
               <SearchFormContainer>
                 <Box mb={3}>
-                  <H5>
+                  <H5 textAlign="center">
                     <FormattedMessage
                       id="redeemed.findCollectives"
                       defaultMessage="Find open collectives to support."

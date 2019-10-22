@@ -83,7 +83,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, ...props 
       </CollectiveLogoContainer>
       <Flex flexDirection="column" alignItems="center" p={2} pt={1}>
         <LinkContributor contributor={contributor}>
-          <H5 fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" title={contributor.name}>
+          <H5 fontSize="Paragraph" fontWeight="bold" textAlign="center" lineHeight="Caption" title={contributor.name}>
             {truncate(contributor.name, { length: 16 })}
           </H5>
         </LinkContributor>
