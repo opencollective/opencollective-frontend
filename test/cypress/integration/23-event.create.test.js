@@ -49,7 +49,7 @@ describe('event.create.test.js', () => {
     cy.wait(300);
     cy.screenshot(`s${i++}`);
     cy.get('.actions button')
-      .eq(0)
+      .eq(1)
       .click();
     cy.wait(500);
     cy.screenshot(`s${i++}`);
@@ -66,7 +66,7 @@ describe('event.create.test.js', () => {
     cy.get('.EditTiers .tier:nth-child(2) .removeTier').click();
     cy.wait(300);
     cy.get('.actions button')
-      .eq(0)
+      .eq(1)
       .click();
     cy.wait(500);
     cy.reload(true);
