@@ -48,7 +48,7 @@
     "express-limiter": "1.6.1",
     "express-server-status": "1.0.3",
     "express-session": "1.17.0",
-    "flat": "4.1.0",
+    "flat": "5.0.0",
     "forest-express-sequelize": "4.0.2",
     "fs-extra": "8.1.0",
     "graphql": "14.5.8",
