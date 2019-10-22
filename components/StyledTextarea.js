@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { space, layout, border, color, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import { omit } from 'lodash';
 
 import { overflow, resize } from '../lib/styled_system_custom';
+import Container from './Container';
+import StyledTag from './StyledTag';
 
 const TextArea = styled.textarea`
   /** Size */
@@ -53,6 +54,8 @@ export default class StyledTextarea extends React.PureComponent {
     borderRadius: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** If not provided, the value will be set to `none` if `autoSize` is true, `vertical` otherwise */
     resize: PropTypes.oneOf(['vertical', 'horizontal', 'both', 'none']),
+    /** If true, max text length will be displayed at the bottom right */
+    showCount: PropTypes.bool,
     /** @ignore */
     px: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** @ignore */
@@ -78,13 +81,6 @@ export default class StyledTextarea extends React.PureComponent {
     }
   }
 
-  _handleChange = e => {
-    this.props.onChange(e);
-    if (this.props.autoSize) {
-      this._adjustHeight(e.target);
-    }
-  };
-
   _adjustHeight(target) {
     // Reset height to 0 so component will auto-size
     target.style.height = 0;
@@ -93,14 +89,36 @@ export default class StyledTextarea extends React.PureComponent {
   }
 
   render() {
-    return (
+    const { onChange, autoSize, showCount, resize, ...props } = this.props;
+    const value = props.value || props.defaultValue || '';
+
+    const textarea = (
       <TextArea
         ref={this.textareaRef}
         as="textarea"
-        onChange={this._handleChange}
-        resize={this.props.resize || (this.props.autoSize ? 'none' : 'vertical')}
-        {...omit(this.props, ['onChange', 'autoSize'])}
+        onChange={e => {
+          onChange(e);
+          if (this.props.autoSize) {
+            this._adjustHeight(e.target);
+          }
+        }}
+        resize={resize || (autoSize ? 'none' : 'vertical')}
+        {...props}
       />
+    );
+
+    return !showCount ? (
+      textarea
+    ) : (
+      <Container position="relative">
+        {textarea}
+        <Container position="absolute" bottom="1.25em" right="1.5em">
+          <StyledTag>
+            <span>{value.length}</span>
+            {props.maxLength && <span> / {props.maxLength}</span>}
+          </StyledTag>
+        </Container>
+      </Container>
     );
   }
 }
