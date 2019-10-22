@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H3, P } from '../components/Text';
@@ -49,9 +49,7 @@ class SignInLinkSent extends Component {
           <P color="black.700" mt={3}>
             You&apos;ll be automatically redirected to the page before signing in. You can close this tab.
           </P>
-          <P>
-            <OpenEmailProviderButton email={email} />
-          </P>
+          <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>
         </Container>
       </Page>
     );

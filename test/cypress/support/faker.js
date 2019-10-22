@@ -15,12 +15,12 @@ export const randomEmail = (directSignIn = true) => {
 
 export const randomGmailEmail = () => {
   const randomID = uuidv4().split('-')[0];
-  return `test-${randomID}@gmail.com`;
+  return `oc-test-${randomID}@gmail.com`;
 };
 
 export const randomHotMail = () => {
   const randomID = uuidv4().split('-')[0];
-  return `test-${randomID}@outlook.com`;
+  return `oc-test-${randomID}@outlook.com`;
 };
 
 export const randomSlug = () => {
