@@ -99,7 +99,7 @@ class Expense extends React.Component {
       },
       'unapprove.modal.body': {
         id: 'unapprove.modal.body',
-        defaultMessage: 'Are you sure you want to unapprove this expense',
+        defaultMessage: 'Are you sure you want to unapprove this expense?',
       },
       no: { id: 'no', defaultMessage: 'No' },
       yes: { id: 'yes', defaultMessage: 'Yes' },
