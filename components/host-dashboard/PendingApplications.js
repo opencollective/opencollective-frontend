@@ -20,26 +20,8 @@ import StyledHr from '../StyledHr';
 import ExternalLink from '../ExternalLink';
 import Avatar from '../Avatar';
 import MessageBox from '../MessageBox';
-
-const GetPendingApplications = gql`
-  query HostPendingApplications($hostCollectiveSlug: String!) {
-    Collective(slug: $hostCollectiveSlug) {
-      id
-      slug
-      name
-      pending: collectives(isActive: false, isArchived: false, orderBy: createdAt, orderDirection: DESC) {
-        collectives {
-          id
-          slug
-          name
-          githubHandle
-          type
-          isActive
-        }
-      }
-    }
-  }
-`;
+import AppRejectionReasonModal from './AppRejectionReasonModal';
+import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
 
 const ApproveCollectiveMutation = gql`
   mutation approveCollective($id: Int!) {
@@ -54,6 +36,14 @@ class HostPendingApplications extends React.Component {
   static propTypes = {
     hostCollectiveSlug: PropTypes.string.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      showRejectionModal: false,
+      collectiveId: null,
+    };
+  }
 
   renderPendingCollectives(data, loading) {
     if (loading) {
@@ -116,17 +106,40 @@ class HostPendingApplications extends React.Component {
                   <Check size={39} />
                 </Box>
               ) : (
-                <Mutation mutation={ApproveCollectiveMutation}>
-                  {(approveCollective, { loading }) => (
-                    <StyledButton loading={loading} onClick={() => approveCollective({ variables: { id: c.id } })}>
-                      <FormattedMessage id="host.pending-applications.approve" defaultMessage="Approve" />
-                    </StyledButton>
-                  )}
-                </Mutation>
+                <>
+                  <Mutation mutation={ApproveCollectiveMutation}>
+                    {(approveCollective, { loading }) => (
+                      <StyledButton
+                        mx={4}
+                        loading={loading}
+                        onClick={() => approveCollective({ variables: { id: c.id } })}
+                      >
+                        <FormattedMessage id="host.pending-applications.approve" defaultMessage="Approve" />
+                      </StyledButton>
+                    )}
+                  </Mutation>
+                  <StyledButton
+                    color="#fff"
+                    bg="red.500"
+                    mx={4}
+                    onClick={() => this.setState({ showRejectionModal: true, collectiveId: c.id })}
+                  >
+                    <FormattedMessage id="host.pending-applications.reject" defaultMessage="Reject" />
+                  </StyledButton>
+                </>
               )}
             </Flex>
           </StyledCard>
         ))}
+
+        {this.state.showRejectionModal && (
+          <AppRejectionReasonModal
+            show={this.state.showRejectionModal}
+            onClose={() => this.setState({ showRejectionModal: false })}
+            collectiveId={this.state.collectiveId}
+            hostCollectiveSlug={this.props.hostCollectiveSlug}
+          />
+        )}
       </Container>
     );
   }
@@ -135,7 +148,7 @@ class HostPendingApplications extends React.Component {
     const { hostCollectiveSlug } = this.props;
 
     return (
-      <Query query={GetPendingApplications} variables={{ hostCollectiveSlug }}>
+      <Query query={getHostPendingApplicationsQuery} variables={{ hostCollectiveSlug }}>
         {({ loading, error, data }) =>
           !data || error ? (
             <MessageBox type="error" withIcon>
