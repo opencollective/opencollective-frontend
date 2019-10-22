@@ -5,6 +5,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import Button from './Button';
 import InputField from './InputField';
 import EditTiers from './EditTiers';
+import TimezonePicker from './TimezonePicker';
 
 class EditEventForm extends React.Component {
   static propTypes = {
@@ -19,6 +20,7 @@ class EditEventForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleTiersChange = this.handleTiersChange.bind(this);
+    this.handleTimezoneChange = this.handleTimezoneChange.bind(this);
 
     const event = { ...(props.event || {}) };
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
@@ -89,6 +91,10 @@ class EditEventForm extends React.Component {
     }
 
     this.setState({ event: Object.assign({}, this.state.event, event) });
+  }
+
+  handleTimezoneChange(timezone) {
+    this.handleChange('timezone', timezone.value);
   }
 
   handleTiersChange(tiers) {
@@ -209,6 +215,11 @@ class EditEventForm extends React.Component {
 
         <div className="FormInputs">
           <div className="inputs">
+            <TimezonePicker
+              label="Timezone"
+              selectedTimezone={this.state.event.timezone}
+              onChange={this.handleTimezoneChange}
+            />
             {this.fields.map(field => (
               <InputField
                 key={field.name}
