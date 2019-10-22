@@ -264,7 +264,7 @@ class EditEventForm extends React.Component {
         <div className="actions">
           {!isNew && (
             <>
-              <Button className="blue" label={deleteBtnLabel} onClick={this.handleModal} />
+              <Button className="red" label={deleteBtnLabel} onClick={this.handleModal} />
               <Modal width="570px" show={this.state.showDeleteModal} onClose={this.handleModal}>
                 <ModalHeader>
                   <FormattedMessage

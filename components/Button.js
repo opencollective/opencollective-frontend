@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../lib/constants/colors';
+import defaultColors from '../lib/theme/colors';
 import { Router } from '../server/pages';
 import HashLink from 'react-scrollchor';
 
@@ -123,6 +124,19 @@ class Button extends React.Component {
             .blue:active {
               background-color: ${colors.blueActive};
               border-color: ${colors.blueActive};
+            }
+            .red {
+              color: white;
+              border-color: ${colors.white};
+              background-color: ${defaultColors.red[500]};
+            }
+            .red:hover {
+              background-color: ${defaultColors.red[400]};
+              border-color: ${defaultColors.red[400]};
+            }
+            .red:active {
+              background-color: ${defaultColors.red[600]};
+              border-color: ${defaultColors.red[600]};
             }
             .gray {
               color: ${colors.darkgray};
