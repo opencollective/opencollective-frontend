@@ -923,6 +923,7 @@
   "PledgeCard.HasPledged": "Has pledged:",
   "pledgedCollective": "Pledged Collective",
   "Prepaid": "Prepagato",
+  "processorFeeRefunded.checkbox.label": "Has the payout provider also refunded the payment processor fees?",
   "profile.incognito": "Incognito",
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
   "profilemenu.memberships.tooltip.balance": "Bilancio {balance}",
