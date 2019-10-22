@@ -8,6 +8,7 @@ export default {
   COLLECTIVE_CREATED_GITHUB: 'collective.created.github',
   COLLECTIVE_APPLY: 'collective.apply',
   COLLECTIVE_APPROVED: 'collective.approved',
+  COLLECTIVE_REJECTED: 'collective.rejected',
   COLLECTIVE_CREATED: 'collective.created',
   COLLECTIVE_COMMENT_CREATED: 'collective.comment.created',
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
