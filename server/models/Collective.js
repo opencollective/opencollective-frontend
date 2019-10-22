@@ -1164,23 +1164,6 @@ export default function(Sequelize, DataTypes) {
     }).then(member => member.role);
   };
 
-  Collective.prototype.getSuperCollectiveCollectivesIds = function() {
-    if (!this.isSupercollective) return Promise.resolve([this.id]);
-    if (this.superCollectiveCollectivesIds) return Promise.resolve(this.superCollectiveCollectivesIds);
-    return models.Collective.findAll({
-      attributes: ['id'],
-      where: {
-        tags: { [Op.contains]: [this.settings.superCollectiveTag] },
-      },
-    })
-      .then(rows => rows.map(r => r.id))
-      .then(ids => {
-        ids.push(this.id);
-        this.superCollectiveCollectivesIds = ids;
-        return ids;
-      });
-  };
-
   /**
    * returns the tiers with their users
    * e.g. collective.tiers = [
