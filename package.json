@@ -70,7 +70,7 @@
     "lodash": "4.17.15",
     "lru-cache": "5.1.1",
     "memjs": "1.2.2",
-    "merge-options": "1.0.1",
+    "merge-options": "2.0.0",
     "moment": "2.24.0",
     "moment-timezone": "0.5.27",
     "morgan": "1.9.1",
