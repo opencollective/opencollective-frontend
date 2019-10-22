@@ -1,6 +1,0 @@
-{
-  "name": "opencollective-styleguide",
-  "alias": ["opencollective-styleguide", "styleguide.opencollective.com"],
-  "version": 1,
-  "files": ["index.html", "build", "static"]
-}

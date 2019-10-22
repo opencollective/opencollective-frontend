@@ -142,7 +142,6 @@
     "prettier:write": "npm run prettier -- --write",
     "start": "node dist/server",
     "styleguide:build": "styleguidist build",
-    "styleguide:deploy": "NODE_ENV=production npm run styleguide:build && npx now styleguide && npx now alias -A styleguide/now.json",
     "styleguide:dev": "styleguidist server",
     "test": "npm run test:jest",
     "test:clean": "shx rm -rf test/cypress/screenshots test/cypress/videos",
