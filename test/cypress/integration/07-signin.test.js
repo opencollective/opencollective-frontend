@@ -124,7 +124,7 @@ describe('signin', () => {
     cy.getByDataCy('open-inbox-link').should(
       'have.prop',
       'href',
-      'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Login&amp;subset=all&amp;within=1d',
+      'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Login&amp;subset=all&amp;within=2d',
     );
   });
 
