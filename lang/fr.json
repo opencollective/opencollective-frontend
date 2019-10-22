@@ -1006,7 +1006,7 @@
   "SignIn.LinkSent": "Your magic link is on its way!",
   "signin.noAccount": "Pas encore de compte ?",
   "SignIn.SentTo": "We've sent it to {email}.",
-  "SignIn.SuccessDetails": "You'll be automatically redirected to the page before signing in. You can close this tab.",
+  "SignIn.SuccessDetails": "You’ll be redirected from the link in the email, you can safely close this tab.",
   "signin.unknownEmail": "Il n'y a aucun utilisateur avec cette adresse e-mail.",
   "signin.usingEmail": "Connectez-vous avec votre adresse email :",
   "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributeur} other {{prettyCount} contributeurs}}",

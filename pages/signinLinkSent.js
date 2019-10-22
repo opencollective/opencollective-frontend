@@ -54,7 +54,7 @@ class SignInLinkSent extends Component {
           <P color="black.700" mt={3}>
             <FormattedMessage
               id="SignIn.SuccessDetails"
-              defaultMessage="You'll be automatically redirected to the page before signing in. You can close this tab."
+              defaultMessage="You’ll be redirected from the link in the email, you can safely close this tab."
             />
           </P>
           <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>
