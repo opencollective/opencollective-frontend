@@ -985,3 +985,51 @@ export async function sendMessageToCollective(_, args, req) {
 
   return { success: true };
 }
+
+export async function rejectCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to reject a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  const hostCollective = await collective.getHostCollective();
+  if (!hostCollective) {
+    throw new errors.ValidationFailed({
+      message: 'We could not get the Host data for the Collective. Maybe they cancel their application.',
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(hostCollective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as an admin of the host of this collective to reject it',
+      data: { HostCollectiveId: hostCollective.id },
+    });
+  }
+
+  const rejectionReason =
+    args.rejectionReason && sanitize(args.rejectionReason, { allowedTags: [], allowedAttributes: {} }).trim();
+
+  models.Activity.create({
+    type: activities.COLLECTIVE_REJECTED,
+    UserId: req.remoteUser.id,
+    CollectiveId: hostCollective.id,
+    data: {
+      collective: collective.info,
+      host: hostCollective.info,
+      user: {
+        email: req.remoteUser.email,
+      },
+      rejectionReason: rejectionReason || null,
+    },
+  });
+
+  return collective.update({ HostCollectiveId: null });
+}

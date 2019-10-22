@@ -11,6 +11,7 @@ import {
   archiveCollective,
   unarchiveCollective,
   sendMessageToCollective,
+  rejectCollective,
 } from './mutations/collectives';
 import {
   createOrder,
@@ -162,6 +163,17 @@ const mutations = {
     },
     resolve(_, args, req) {
       return approveCollective(req.remoteUser, args.id);
+    },
+  },
+  rejectCollective: {
+    type: CollectiveInterfaceType,
+    description: 'Reject a collective',
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      rejectionReason: { type: GraphQLString },
+    },
+    resolve(_, args, req) {
+      return rejectCollective(_, args, req);
     },
   },
   archiveCollective: {
