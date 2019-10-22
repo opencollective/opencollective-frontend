@@ -17,6 +17,7 @@ export const templateNames = [
   'collective.apply',
   'collective.apply.for.host',
   'collective.approved',
+  'collective.rejected',
   'collective.comment.created',
   'collective.confirm',
   'collective.created',
