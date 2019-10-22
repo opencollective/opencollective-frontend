@@ -81,7 +81,6 @@ class EditCollectiveForm extends React.Component {
       modified: false,
       section: 'info',
       collective,
-      members: collective.members || [{}],
       tiers: collective.tiers || [{}],
     };
 
@@ -94,7 +93,6 @@ class EditCollectiveForm extends React.Component {
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
     this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
     this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
-    this.members = collective.members && collective.members.filter(m => ['ADMIN', 'MEMBER'].includes(m.role));
     this.showVirtualCards = collective.type === 'ORGANIZATION';
 
     this.messages = defineMessages({
@@ -325,11 +323,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   async handleSubmit() {
-    const collective = {
-      ...this.state.collective,
-      tiers: this.state.tiers,
-      members: this.state.members,
-    };
+    const collective = { ...this.state.collective, tiers: this.state.tiers };
     this.props.onSubmit(collective);
     this.setState({ modified: false });
   }
@@ -792,14 +786,7 @@ class EditCollectiveForm extends React.Component {
                     </div>
                   ),
               )}
-              {this.state.section === 'members' && (
-                <EditMembers
-                  title="Edit Core Contributors"
-                  members={this.members}
-                  collective={collective}
-                  onChange={this.handleObjectChange}
-                />
-              )}
+              {this.state.section === 'members' && <EditMembers collective={collective} LoggedInUser={LoggedInUser} />}
               {this.state.section === 'webhooks' && (
                 <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
               )}
@@ -860,6 +847,7 @@ class EditCollectiveForm extends React.Component {
               'gift-cards-send',
               'payment-methods',
               'webhooks',
+              'members',
               'goals',
             ].indexOf(this.state.section) === -1 && (
               <div className="actions">
