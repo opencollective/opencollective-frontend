@@ -6,7 +6,7 @@ import { P } from './Text';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 
 const ConfirmationModal = ({ show, header, body, onClose, actions }) => (
-  <Modal width="570px" show={show} onClose={() => onClose()}>
+  <Modal width="570px" show={show} onClose={onClose}>
     <ModalHeader>{header}</ModalHeader>
     <ModalBody>
       <P>{body}</P>
