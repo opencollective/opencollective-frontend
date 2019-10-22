@@ -24,7 +24,7 @@ const StyledSVG = styled.svg`
  * to ensure consistency with third-party imported icons.
  */
 const CustomStyledIcon = ({ size, ...props }) => {
-  return <StyledSVG height={size} width={size} {...props} />;
+  return <StyledSVG stroke="currentColor" height={size} width={size} {...props} />;
 };
 
 CustomStyledIcon.defaultProps = {
