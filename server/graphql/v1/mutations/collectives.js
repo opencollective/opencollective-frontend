@@ -4,6 +4,8 @@ import { get, omit, truncate } from 'lodash';
 import { map } from 'bluebird';
 import config from 'config';
 import uuidv4 from 'uuid/v4';
+import sanitize from 'sanitize-html';
+import sequelize from 'sequelize';
 
 import models, { Op } from '../../../models';
 import * as errors from '../../errors';
@@ -910,4 +912,76 @@ export async function deleteUserCollective(_, args, req) {
       return user.destroy();
     })
     .then(() => userCollective);
+}
+
+export async function sendMessageToCollective(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to contact a collective',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.collectiveId);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!(await collective.canContact())) {
+    throw new errors.Unauthorized({
+      message: `You can't contact this type of collective`,
+    });
+  }
+
+  const message = args.message && sanitize(args.message, { allowedTags: [], allowedAttributes: {} }).trim();
+  if (!message || message.length < 10) {
+    throw new Error('Message is too short');
+  }
+
+  const subject =
+    args.subject &&
+    sanitize(args.subject, { allowedTags: [], allowedAttributes: {} })
+      .trim()
+      .slice(0, 60);
+
+  // User sending the email must have an associated collective
+  const fromCollective = await models.Collective.findByPk(req.remoteUser.CollectiveId);
+  if (!fromCollective) {
+    throw new Error("Your user account doesn't have any profile associated. Please contact support");
+  }
+
+  // Limit email sent per user
+  const user = req.remoteUser;
+  const maxEmailMessagePerHour = config.limits.collectiveEmailMessagePerHour;
+  const existingCount = await models.Activity.count({
+    where: {
+      type: activities.COLLECTIVE_CONTACT,
+      UserId: user.id,
+      createdAt: {
+        [Op.gte]: sequelize.literal("NOW() - INTERVAL '1 hour'"),
+      },
+    },
+  });
+  if (existingCount > maxEmailMessagePerHour) {
+    throw new errors.RateLimitExceeded({
+      message: 'Too many messages sent in a limited time frame. Please try again later.',
+    });
+  }
+
+  // Create the activity (which will send the message to the users)
+  await models.Activity.create({
+    type: activities.COLLECTIVE_CONTACT,
+    UserId: user.id,
+    CollectiveId: collective.id,
+    data: {
+      fromCollective,
+      collective,
+      user,
+      subject: subject || null,
+      message: message,
+    },
+  });
+
+  return { success: true };
 }

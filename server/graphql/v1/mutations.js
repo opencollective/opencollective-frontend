@@ -10,6 +10,7 @@ import {
   createCollectiveFromGithub,
   archiveCollective,
   unarchiveCollective,
+  sendMessageToCollective,
 } from './mutations/collectives';
 import {
   createOrder,
@@ -179,6 +180,22 @@ const mutations = {
     },
     resolve(_, args, req) {
       return unarchiveCollective(_, args, req);
+    },
+  },
+  sendMessageToCollective: {
+    type: new GraphQLObjectType({
+      name: 'SendMessageToCollectiveResult',
+      fields: {
+        success: { type: GraphQLBoolean },
+      },
+    }),
+    args: {
+      collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      message: { type: new GraphQLNonNull(GraphQLString) },
+      subject: { type: GraphQLString },
+    },
+    resolve(_, args, req) {
+      return sendMessageToCollective(_, args, req);
     },
   },
   createUser: {
