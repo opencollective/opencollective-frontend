@@ -262,12 +262,6 @@ class EditEventForm extends React.Component {
           />
         </div>
         <div className="actions">
-          <Button
-            className="blue"
-            label={submitBtnLabel}
-            onClick={this.handleSubmit}
-            disabled={this.state.disabled ? true : loading}
-          />
           {!isNew && (
             <>
               <Button className="blue" label={deleteBtnLabel} onClick={this.handleModal} />
@@ -310,6 +304,12 @@ class EditEventForm extends React.Component {
               </Modal>
             </>
           )}
+          <Button
+            className="blue"
+            label={submitBtnLabel}
+            onClick={this.handleSubmit}
+            disabled={this.state.disabled ? true : loading}
+          />
         </div>
       </div>
     );
