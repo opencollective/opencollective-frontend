@@ -11,4 +11,16 @@ const text = 'The Daily Cron Job successfully completed again today.';
 
 const html = text;
 
-return email.sendMessage(recipients, subject, html, { text });
+function run() {
+  return email.sendMessage(recipients, subject, html, { text });
+}
+
+run()
+  .then(() => {
+    console.log(text);
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error(error);
+    process.exit(1);
+  });
