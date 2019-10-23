@@ -398,38 +398,23 @@ export const ContributorType = new GraphQLObjectType({
     isAdmin: {
       type: new GraphQLNonNull(GraphQLBoolean),
       description: 'True if the contributor is a collective admin',
-      resolve(contributor) {
-        return contributor.roles.includes(roles.ADMIN);
-      },
     },
     isCore: {
       type: new GraphQLNonNull(GraphQLBoolean),
       description: 'True if the contributor is a core contributor',
-      resolve(contributor) {
-        return contributor.roles.some(role => role === roles.MEMBER || role === roles.ADMIN);
-      },
     },
     isBacker: {
       type: new GraphQLNonNull(GraphQLBoolean),
       description: 'True if the contributor is a financial contributor',
-      resolve(contributor) {
-        return contributor.roles.includes(roles.BACKER);
-      },
     },
     isFundraiser: {
       type: new GraphQLNonNull(GraphQLBoolean),
       description: 'True if the contributor is a core contributor (admin)',
-      resolve(contributor) {
-        return contributor.roles.includes(roles.FUNDRAISER);
-      },
     },
     tiersIds: {
       type: new GraphQLNonNull(new GraphQLList(GraphQLInt)),
       description:
         'A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.',
-      resolve(contributor) {
-        return contributor.tiersIds || [];
-      },
     },
     since: {
       type: new GraphQLNonNull(IsoDateString),
@@ -1429,7 +1414,7 @@ export const TierType = new GraphQLObjectType({
           },
         },
         resolve(tier, args) {
-          return getContributorsForTier(tier.id, { limit: args.limit });
+          return getContributorsForTier(tier.CollectiveId, tier.id, { limit: args.limit });
         },
       },
       stats: {
