@@ -1,4 +1,4 @@
-import Historical from 'sequelize-historical';
+import Temporal from 'sequelize-temporal';
 import config from 'config';
 import deepmerge from 'deepmerge';
 import prependHttp from 'prepend-http';
@@ -2412,7 +2412,7 @@ export default function(Sequelize, DataTypes) {
     Collective.belongsTo(m.Collective, { as: 'HostCollective' });
   };
 
-  Historical(Collective, Sequelize);
+  Temporal(Collective, Sequelize);
 
   return Collective;
 }

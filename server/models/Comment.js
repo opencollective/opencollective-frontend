@@ -2,7 +2,7 @@
  * Dependencies.
  */
 import _, { pick } from 'lodash';
-import Historical from 'sequelize-historical';
+import Temporal from 'sequelize-temporal';
 import activities from '../constants/activities';
 import { mustBeLoggedInTo } from '../lib/auth';
 import Promise from 'bluebird';
@@ -215,7 +215,7 @@ export default function(Sequelize, DataTypes) {
     Comment.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'user' });
   };
 
-  Historical(Comment, Sequelize);
+  Temporal(Comment, Sequelize);
 
   return Comment;
 }
