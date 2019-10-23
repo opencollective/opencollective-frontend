@@ -10,7 +10,7 @@ import StyledCheckBox from '../StyledCheckbox';
 const messages = defineMessages({
   'processorFeeRefunded.checkbox.label': {
     id: 'processorFeeRefunded.checkbox.label',
-    defaultMessage: 'Has the payout provider also refunded the payment processor fees?',
+    defaultMessage: 'Also refund payment processor fees',
   },
 });
 
