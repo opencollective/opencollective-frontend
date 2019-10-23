@@ -923,7 +923,7 @@
   "PledgeCard.HasPledged": "A promis :",
   "pledgedCollective": "Collectifs demandés",
   "Prepaid": "Prépayé",
-  "processorFeeRefunded.checkbox.label": "Has the payout provider also refunded the payment processor fees?",
+  "processorFeeRefunded.checkbox.label": "Also refund payment processor fees",
   "profile.incognito": "Incognito",
   "profile.incognito.description": "Garder cette contribution privée (voir la FAQ pour + d'infos)",
   "profilemenu.memberships.tooltip.balance": "Solde {balance}",
