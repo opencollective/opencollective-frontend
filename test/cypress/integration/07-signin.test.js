@@ -1,4 +1,4 @@
-import { randomEmail } from '../support/faker';
+import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
 import generateToken from '../support/token';
 
 describe('signin', () => {
@@ -110,6 +110,34 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${email}.`);
+  });
+
+  it('can signup a user with gmail and show Open Gmail button ', () => {
+    // Submit the form using the email providers--gmail)
+    const gmail_email = randomGmailEmail(false);
+    cy.visit('/signin');
+    cy.contains('a', 'Join Free').click();
+    cy.get('input[name=email]').type(`{selectall}${gmail_email}`);
+    cy.get('button[type=submit]').click();
+    cy.contains('Your magic link is on its way!');
+    cy.contains(`We've sent it to ${gmail_email}.`);
+    cy.getByDataCy('open-inbox-link').should(
+      'have.prop',
+      'href',
+      'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Login&amp;subset=all&amp;within=2d',
+    );
+  });
+
+  it('can signup a user with Hotmail and show Open Hotmail button', () => {
+    // Submit the form using the email providers--hotmail
+    const hotmail = randomHotMail(false);
+    cy.visit('/signin');
+    cy.contains('a', 'Join Free').click();
+    cy.get('input[name=email]').type(`{selectall}${hotmail}`);
+    cy.get('button[type=submit]').click();
+    cy.contains('Your magic link is on its way!');
+    cy.contains(`We've sent it to ${hotmail}.`);
+    cy.getByDataCy('open-inbox-link').should('have.prop', 'href', 'https://outlook.live.com/mail/inbox');
   });
 
   it('can signup as organization', () => {
