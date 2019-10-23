@@ -77,7 +77,7 @@
     "react-datetime": "2.16.3",
     "react-dnd": "5.0.0",
     "react-dnd-html5-backend": "3.0.2",
-    "react-dom": "16.10.2",
+    "react-dom": "16.11.0",
     "react-dropzone": "10.1.10",
     "react-easy-crop": "^1.16.1",
     "react-geosuggest": "2.12.0",
