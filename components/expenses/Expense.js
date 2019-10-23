@@ -408,12 +408,10 @@ class Expense extends React.Component {
               header={intl.formatMessage(this.messages['unapprove.modal.header'])}
               body={intl.formatMessage(this.messages['unapprove.modal.body'])}
               onClose={() => this.setState({ showUnapproveModal: false })}
-              actions={{
-                cancelText: intl.formatMessage(this.messages['no']),
-                cancelHandler: () => this.setState({ showUnapproveModal: false }),
-                continueText: intl.formatMessage(this.messages['yes']),
-                continueHandler: () => this.handleUnapproveExpense(expense.id),
-              }}
+              cancelLabel={intl.formatMessage(this.messages['no'])}
+              cancelHandler={() => this.setState({ showUnapproveModal: false })}
+              continueLabel={intl.formatMessage(this.messages['yes'])}
+              continueHandler={() => this.handleUnapproveExpense(expense.id)}
             />
           )}
           {editable && (
