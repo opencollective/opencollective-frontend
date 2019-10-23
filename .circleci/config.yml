@@ -34,7 +34,7 @@ aliases:
 jobs:
   lint:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
     environment:
       NODE_ENV: circleci
     steps:
@@ -47,7 +47,7 @@ jobs:
 
   typescript:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
     environment:
       NODE_ENV: circleci
     steps:
@@ -59,7 +59,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached

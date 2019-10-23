@@ -5,8 +5,8 @@
   "author": "@philmod @arnaudbenard @xdamman @asood123",
   "main": "server/index.js",
   "engines": {
-    "node": "11.8.0",
-    "npm": "6.5.0"
+    "node": "12.13.0",
+    "npm": "6.12.0"
   },
   "dependencies": {
     "@babel/core": "7.6.4",
