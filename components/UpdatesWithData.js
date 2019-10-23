@@ -6,6 +6,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import SectionTitle from './SectionTitle';
+import StyledButton from './StyledButton';
 
 class UpdatesWithData extends React.Component {
   static propTypes = {
@@ -49,7 +50,12 @@ class UpdatesWithData extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/updates/new`,
-        label: <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />,
+        label: (
+          <StyledButton buttonStyle="primary">
+            {' '}
+            <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />{' '}
+          </StyledButton>
+        ),
       };
     }
 
