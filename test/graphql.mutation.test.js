@@ -37,10 +37,12 @@ describe('Mutation Tests', () => {
         .then(SubscriptionId => order.update({ SubscriptionId, processedAt: new Date() }))
         .then(() => models.Collective.findByPk(order.CollectiveId))
         .then(collective =>
-          collective.addUserWithRole(user, roles.BACKER, {
-            MemberCollectiveId: order.FromCollectiveId,
-            TierId: order.TierId,
-          }),
+          collective.addUserWithRole(
+            user,
+            roles.BACKER,
+            { MemberCollectiveId: order.FromCollectiveId, TierId: order.TierId },
+            { order },
+          ),
         );
     });
   });

@@ -140,7 +140,7 @@ export async function addUserToCollective(order) {
   const userId = order.createdByUser.id;
   const donorInfo = { id: userId, CollectiveId: order.FromCollectiveId };
   const tierInfo = { CreatedByUserId: userId, TierId: order.TierId };
-  return order.collective.findOrAddUserWithRole(donorInfo, roles.BACKER, tierInfo);
+  return order.collective.findOrAddUserWithRole(donorInfo, roles.BACKER, tierInfo, { order });
 }
 
 /** Process order in paypal and create transactions in our db */

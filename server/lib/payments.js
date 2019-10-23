@@ -232,13 +232,6 @@ export const sendEmailNotifications = (order, transaction) => {
   }
 };
 
-export const addBackerToCollective = async (user, collective, TierId) => {
-  return await collective.findOrAddUserWithRole(user, roles.BACKER, {
-    CreatedByUserId: user.id,
-    TierId,
-  });
-};
-
 export const createSubscription = async order => {
   const subscription = await models.Subscription.create({
     amount: order.totalAmount,
@@ -313,32 +306,32 @@ export const executeOrder = async (user, order, options) => {
     order.paymentMethod.save();
   }
 
-  // Register user as collective backer
-  await addBackerToCollective(
-    { id: user.id, CollectiveId: order.FromCollectiveId },
-    order.collective,
-    get(order, 'tier.id'),
-  );
-  sendEmailNotifications(order, transaction);
-
-  // Register VirtualCard emitter as collective backer too
-  if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
-    addBackerToCollective(
-      {
-        id: user.id,
-        CollectiveId: transaction.UsingVirtualCardFromCollectiveId,
-      },
-      order.collective,
-      get(order, 'tier.id'),
-    );
-  }
-
   // Credit card charges are synchronous. If the transaction is
   // created here it means that the payment went through so it's
   // safe to create subscription after this.
 
   // The order will be updated to ACTIVE
   order.interval && transaction && (await createSubscription(order));
+
+  // Register user as collective backer
+  await order.collective.findOrAddUserWithRole(
+    { id: user.id, CollectiveId: order.FromCollectiveId },
+    roles.BACKER,
+    { TierId: get(order, 'tier.id') },
+    { order },
+  );
+
+  sendEmailNotifications(order, transaction);
+
+  // Register VirtualCard emitter as collective backer too
+  if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
+    await order.collective.findOrAddUserWithRole(
+      { id: user.id, CollectiveId: transaction.UsingVirtualCardFromCollectiveId },
+      roles.BACKER,
+      { TierId: get(order, 'tier.id') },
+      { order, skipActivity: true },
+    );
+  }
 };
 
 const validatePayment = payment => {
