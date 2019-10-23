@@ -1,5 +1,5 @@
 import CustomDataTypes from './DataTypes';
-import Historical from 'sequelize-historical';
+import Temporal from 'sequelize-temporal';
 
 export default (Sequelize, DataTypes) => {
   const Subscription = Sequelize.define(
@@ -64,7 +64,7 @@ export default (Sequelize, DataTypes) => {
     return this.save();
   };
 
-  Historical(Subscription, Sequelize);
+  Temporal(Subscription, Sequelize);
 
   return Subscription;
 };

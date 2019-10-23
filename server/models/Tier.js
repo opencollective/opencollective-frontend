@@ -1,4 +1,4 @@
-import Historical from 'sequelize-historical';
+import Temporal from 'sequelize-temporal';
 import Promise from 'bluebird';
 import _ from 'lodash';
 import debugLib from 'debug';
@@ -370,6 +370,7 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
-  Historical(Tier, Sequelize);
+  Temporal(Tier, Sequelize);
+
   return Tier;
 }
