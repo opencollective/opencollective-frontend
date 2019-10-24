@@ -39,6 +39,7 @@ import {
   validateSettings,
   getCollectiveAvatarUrl,
 } from '../lib/collectivelib';
+import { invalidateContributorsCache } from '../lib/contributors';
 import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5, strip_tags } from '../lib/utils';
 
 import roles from '../constants/roles';
@@ -1704,11 +1705,12 @@ export default function(Sequelize, DataTypes) {
           }
         });
       })
-      .then(() =>
-        this.getMembers({
+      .then(() => {
+        invalidateContributorsCache(this.id);
+        return this.getMembers({
           where: { role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
-        }),
-      );
+        });
+      });
   };
 
   // edit the tiers of this collective (create/update/remove)

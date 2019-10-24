@@ -2,8 +2,8 @@ import { pick } from 'lodash';
 
 import models from '../../../models';
 import errors from '../../../lib/errors';
-import cache from '../../../lib/cache';
 import roles from '../../../constants/roles';
+import { invalidateContributorsCache } from '../../../lib/contributors';
 
 export async function createMember(_, args, req) {
   const checkPermission = collective => {
@@ -118,13 +118,9 @@ export async function editPublicMessage(_, { FromCollectiveId, CollectiveId, mes
   }
 
   /**
-   * TODO: Update cache deletion based on the solution implemented in issue
-   * https://github.com/opencollective/opencollective/issues/2494
-   */
-  /**
    * After updating the public message it is necessary to update the cache
    * used in the collective page.
    */
-  cache.del(`collective_contributors_${CollectiveId}_150_BACKER`);
+  invalidateContributorsCache(CollectiveId);
   return updatedMembers;
 }
