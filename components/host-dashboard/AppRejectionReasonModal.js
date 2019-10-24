@@ -9,7 +9,6 @@ import Container from '../Container';
 import StyledTextarea from '../StyledTextarea';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
-import { getErrorFromGraphqlException } from '../../lib/utils';
 import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
 
 const rejectCollectiveQuery = gql`
@@ -21,16 +20,15 @@ const rejectCollectiveQuery = gql`
 `;
 
 const messages = defineMessages({
-  'appRejectionReason.textarea.placeholder': {
-    id: 'appRejectionReason.textarea.placeholder',
+  placeholder: {
+    id: 'placeholder',
     defaultMessage: 'What is the reason for rejecting this application?',
   },
 });
 
 const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSlug }) => {
   const [rejectionReason, setRejectionReason] = useState('');
-  const [error, setError] = useState(null);
-  const [rejectCollective] = useMutation(rejectCollectiveQuery);
+  const [rejectCollective, { loading, error }] = useMutation(rejectCollectiveQuery);
   const intl = useIntl();
 
   return (
@@ -52,7 +50,7 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
             minHeight={200}
             value={rejectionReason}
             onChange={({ target }) => setRejectionReason(target.value)}
-            placeholder={intl.formatMessage(messages['appRejectionReason.textarea.placeholder'])}
+            placeholder={intl.formatMessage(messages['placeholder'])}
           />
         </Container>
       </ModalBody>
@@ -64,18 +62,15 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
           <StyledButton
             buttonStyle="primary"
             data-cy="action"
+            loading={loading}
             onClick={async () => {
-              try {
-                await rejectCollective({
-                  variables: { id: collectiveId, rejectionReason },
-                  refetchQueries: [{ query: getHostPendingApplicationsQuery, variables: { hostCollectiveSlug } }],
-                  awaitRefetchQueries: true,
-                  ignoreResults: true,
-                });
-                onClose();
-              } catch (err) {
-                setError(getErrorFromGraphqlException(err));
-              }
+              await rejectCollective({
+                variables: { id: collectiveId, rejectionReason },
+                refetchQueries: [{ query: getHostPendingApplicationsQuery, variables: { hostCollectiveSlug } }],
+                awaitRefetchQueries: true,
+                ignoreResults: true,
+              });
+              onClose();
             }}
           >
             <FormattedMessage id="appRejectionReason.modal.continue.btn" defaultMessage="Continue" />
