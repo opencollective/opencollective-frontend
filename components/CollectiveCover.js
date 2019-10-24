@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled from 'styled-components';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
+import dynamic from 'next/dynamic';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
@@ -16,13 +17,15 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
 import Link from './Link';
-import GoalsCover from './GoalsCover';
-import MenuBar from './MenuBar';
-import TopBackersCoverWithData from './TopBackersCoverWithData';
 import UserCompany from './UserCompany';
 import CollectiveNavbar from './CollectiveNavbar';
 import Container from './Container';
 import { AllSectionsNames } from './collective-page/_constants';
+
+// Dynamicly load HTMLEditor to download it only if user can edit the page
+const GoalsCover = dynamic(() => import('./GoalsCover'));
+const MenuBar = dynamic(() => import('./MenuBar'));
+const TopBackersCoverWithData = dynamic(() => import('./TopBackersCoverWithData'));
 
 const ContributeLink = styled(Link)`
   --webkit-appearance: none;
