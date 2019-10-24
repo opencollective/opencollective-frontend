@@ -1490,6 +1490,16 @@ type Mutation {
     The website URL originating the request
     """
     websiteUrl: String
+
+    """
+    If set to false, will act like just like a Sign In and returns the user
+    """
+    throwIfExists: Boolean = true
+
+    """
+    If true, a signIn link will be sent to the user
+    """
+    sendSignInLink: Boolean = true
   ): CreateUserResult
 
   """
@@ -1538,6 +1548,11 @@ type Mutation {
     tier: TierInputType!
   ): Tier
   editTiers(id: Int!, tiers: [TierInputType]): [Tier]
+
+  """
+  Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
+  """
+  editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
   createMember(
     member: CollectiveAttributesInputType!
     collective: CollectiveAttributesInputType!

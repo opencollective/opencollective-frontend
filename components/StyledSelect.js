@@ -55,6 +55,8 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
         customStyles['&:hover'] = { borderColor: theme.colors.red[300] };
       } else if (!state.isFocused) {
         customStyles['&:hover'] = { borderColor: theme.colors.primary[300] };
+      } else if (state.isDisabled) {
+        customStyles.boxShadow = 'none';
       } else {
         customStyles.borderColor = theme.colors.primary[500];
         customStyles.boxShadow = `inset 0px 2px 2px ${theme.colors.primary[50]}`;
@@ -65,7 +67,10 @@ const StyledSelect = styled(Select).attrs(({ theme, intl, placeholder, disabled,
     option: (baseStyles, state) => {
       const customStyles = {};
 
-      if (state.isSelected) {
+      if (state.data.__background__) {
+        // Ability to force background by setting a special option prop
+        customStyles.background = state.data.__background__;
+      } else if (state.isSelected) {
         customStyles.backgroundColor = theme.colors.primary[200];
         customStyles.color = undefined;
       } else if (state.isFocused) {
