@@ -96,7 +96,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   componentDidMount() {
-    Router.events.on('routeChangeStart', url => {
+    Router.events.on('routeChangeComplete', url => {
       if (window && window._paq) {
         window._paq.push(['setCustomUrl', url]);
         window._paq.push(['trackPageView']);
