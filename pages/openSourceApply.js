@@ -76,7 +76,7 @@ class OpenSourceApplyPage extends Component {
     } catch (error) {
       this.setState({
         loadingRepos: false,
-        result: { type: 'error', mesg: 'Error: An unknown error occured' },
+        result: { type: 'error', mesg: error.toString() },
       });
     }
   }
