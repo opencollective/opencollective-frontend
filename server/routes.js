@@ -13,7 +13,6 @@ import { get } from 'lodash';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
 import * as collectives from './controllers/collectives';
-import * as RestApi from './graphql/v1/restapi';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import { createPaymentMethod } from './controllers/paymentMethods';
@@ -142,7 +141,6 @@ export default app => {
   app.param('transactionuuid', params.transactionuuid);
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
-  app.param('idOrUuid', params.idOrUuid);
 
   /**
    * GraphQL v1
@@ -211,14 +209,6 @@ export default app => {
    * Collectives.
    */
   app.get('/groups/:collectiveid/:tierSlug(backers|users)', cacheControlMaxAge(60), collectives.getUsers); // Get collective backers
-
-  /**
-   * Transactions (financial).
-   */
-
-  // Get transactions of a collective given its slug.
-  app.get('/v1/collectives/:collectiveSlug/transactions', RestApi.getLatestTransactions);
-  app.get('/v1/collectives/:collectiveSlug/transactions/:idOrUuid', RestApi.getTransaction);
 
   /**
    * Separate route for uploading images to S3
