@@ -93,7 +93,6 @@ class CollectiveCover extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
     cta: PropTypes.object, // { href, label }
-    context: PropTypes.string,
     displayContributeLink: PropTypes.bool,
     selectedSection: PropTypes.oneOf(AllSectionsNames),
     /** If true, the component will never render the new collective navbar */
@@ -226,14 +225,6 @@ ${description}`;
     return tooltip;
   }
 
-  getDefaultCallsToAction() {
-    if (!this.props.collective) {
-      return {};
-    } else {
-      return { hasContact: this.props.collective.type === CollectiveType.COLLECTIVE };
-    }
-  }
-
   checkTimeDiff() {
     if (this.props.collective.timezone) {
       const eventTimezone = moment()
@@ -247,7 +238,7 @@ ${description}`;
   }
 
   render() {
-    const { collective, context, className, LoggedInUser, intl, forceLegacy } = this.props;
+    const { collective, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
@@ -262,7 +253,7 @@ ${description}`;
             collective={collective}
             isAdmin={canEdit}
             showEdit
-            callsToAction={this.props.callsToAction || this.getDefaultCallsToAction()}
+            callsToAction={this.props.callsToAction}
             selected={this.props.selectedSection}
           />
         </Container>
@@ -633,7 +624,7 @@ ${description}`;
               </div>
             )}
 
-          {collective.type === 'COLLECTIVE' && context !== 'createUpdate' && collective.isActive && collective.host && (
+          {collective.type === 'COLLECTIVE' && collective.isActive && collective.host && (
             <div className={`statsContainer ${showGoalsCover ? 'goals' : ''}`}>
               {className !== 'small' && collective.type === 'COLLECTIVE' && (
                 <div className="topContributors">

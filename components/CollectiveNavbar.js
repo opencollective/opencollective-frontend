@@ -261,6 +261,20 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   return sections.filter(section => !toRemove.has(section));
 };
 
+const getDefaultCallsToactions = (collective, isAdmin) => {
+  if (!collective) {
+    return {};
+  }
+
+  const isCollective = collective.type === CollectiveType.COLLECTIVE;
+  return {
+    hasContact: collective.canContact,
+    hasSubmitExpense: isCollective,
+    hasApply: collective.canApply,
+    hasManageSubscriptions: isAdmin && !isCollective,
+  };
+};
+
 /**
  * The NavBar that displays all the invidual sections.
  */
@@ -280,6 +294,7 @@ const CollectiveNavbar = ({
 }) => {
   const [isExpended, setExpended] = React.useState(false);
   sections = sections || getSectionsForCollective(collective, isAdmin);
+  callsToAction = { ...getDefaultCallsToactions(collective, isAdmin), ...callsToAction };
 
   return (
     <MainContainer>
@@ -382,6 +397,8 @@ CollectiveNavbar.propTypes = {
     type: PropTypes.string.isRequired,
     path: PropTypes.string,
     isArchived: PropTypes.bool,
+    canContact: PropTypes.bool,
+    canApply: PropTypes.bool,
     host: PropTypes.object,
   }).isRequired,
   /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */

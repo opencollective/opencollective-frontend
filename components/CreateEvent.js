@@ -9,7 +9,7 @@ import Body from './Body';
 import Footer from './Footer';
 import EventTemplatePicker from './EventTemplatePicker';
 import EditEventForm from './EditEventForm';
-import CollectiveCover from './CollectiveCover';
+import CollectiveNavbar from './CollectiveNavbar';
 
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 
@@ -114,7 +114,7 @@ class CreateEvent extends React.Component {
         <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
-          <CollectiveCover href={`/${collective.slug}`} className="small" title={title} collective={collective} />
+          <CollectiveNavbar collective={collective} isAdmin={canCreateEvent} />
 
           <div className="content">
             {!canCreateEvent && (
