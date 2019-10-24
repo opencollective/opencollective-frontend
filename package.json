@@ -134,8 +134,6 @@
     "nyc": "^14.1.1",
     "post-merge-install": "^0.3.0",
     "prettier": "1.18.2",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
     "sinon": "^7.5.0",
     "supertest": "^4.0.2",
     "supertest-as-promised": "^4.0.2",
