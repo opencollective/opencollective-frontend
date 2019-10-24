@@ -72,12 +72,15 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
 
-  const handleMessage = message => {
-    if (!message) return showMessage(null);
+  const handleMessage = _message => {
+    if (!_message) return showMessage(null);
     showMessage({
-      type: message.type || 'info',
-      message: message.content || message,
+      type: _message.type || 'info',
+      message: _message.content || _message,
     });
+
+    const clearMessage = setTimeout(handleMessage, 8000);
+    if (message) clearTimeout(clearMessage);
   };
 
   return (
