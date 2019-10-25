@@ -171,6 +171,14 @@ class Expense extends React.Component {
           (Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
             LoggedInUser.canEditCollective(collective.host))));
 
+    let precision = 0;
+
+    // Check if the remainder is not 0, this check is important in order to know the amount that needs precision
+    // i.e display $10.21 as $10.21 instead of $10
+    if ((expense.amount / 100) % 1 !== 0) {
+      precision = 2;
+    }
+
     const canApprove =
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
@@ -318,7 +326,7 @@ class Expense extends React.Component {
         <div className="body">
           <div className="header">
             <div className="amount pullRight">
-              <AmountCurrency amount={-expense.amount} currency={expense.currency} />
+              <AmountCurrency amount={-expense.amount} currency={expense.currency} precision={precision} />
             </div>
             <div className="description">
               <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
