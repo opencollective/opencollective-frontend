@@ -1288,7 +1288,7 @@ export default function(Sequelize, DataTypes) {
       case roles.BACKER:
       case roles.ATTENDEE:
         if (!context.skipActivity) {
-          await this.createCollectiveMemberCreatedActivity(member, context, sequelizeParams);
+          await this.createMemberCreatedActivity(member, context, sequelizeParams);
         }
         break;
 
@@ -1301,7 +1301,7 @@ export default function(Sequelize, DataTypes) {
     return member;
   };
 
-  Collective.prototype.createCollectiveMemberCreatedActivity = async function(member, context, sequelizeParams) {
+  Collective.prototype.createMemberCreatedActivity = async function(member, context, sequelizeParams) {
     // We refetch to preserve historic behavior and make sure it's up to date
     let order;
     if (context.order) {

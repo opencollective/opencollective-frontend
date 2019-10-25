@@ -306,13 +306,6 @@ export const executeOrder = async (user, order, options) => {
     order.paymentMethod.save();
   }
 
-  // Credit card charges are synchronous. If the transaction is
-  // created here it means that the payment went through so it's
-  // safe to create subscription after this.
-
-  // The order will be updated to ACTIVE
-  order.interval && transaction && (await createSubscription(order));
-
   // Register user as collective backer
   await order.collective.findOrAddUserWithRole(
     { id: user.id, CollectiveId: order.FromCollectiveId },
@@ -332,6 +325,13 @@ export const executeOrder = async (user, order, options) => {
       { order, skipActivity: true },
     );
   }
+
+  // Credit card charges are synchronous. If the transaction is
+  // created here it means that the payment went through so it's
+  // safe to create subscription after this.
+
+  // The order will be updated to ACTIVE
+  order.interval && transaction && (await createSubscription(order));
 };
 
 const validatePayment = payment => {
