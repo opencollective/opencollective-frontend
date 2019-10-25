@@ -91,7 +91,7 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
 
   if (term && term.length > 0) {
     term = term.replace(/(_|%|\\)/g, ' ');
-    dynamicConditions += `AND (${tsVector} @@ to_tsquery('simple', :term) OR name ILIKE '%' || :term || '%') OR slug ILIKE '%' || :term || '%') `;
+    dynamicConditions += `AND (${tsVector} @@ to_tsquery('simple', :term) OR name ILIKE '%' || :term || '%' OR slug ILIKE '%' || :term || '%') `;
   }
 
   // Build the query
