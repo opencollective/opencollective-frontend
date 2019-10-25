@@ -45,7 +45,7 @@ class UserCollective extends React.Component {
         <Header
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}
-          href={`/${collective.slug}`}
+          metas={{ robots: 'noindex' }}
           meta={{ robots: 'noindex' }}
         />
 
