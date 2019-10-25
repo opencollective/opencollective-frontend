@@ -14,7 +14,6 @@ import * as store from './stores';
 /* Support code */
 import models from '../server/models';
 import emailLib from '../server/lib/email';
-import * as libtransactions from '../server/lib/transactions';
 import { getFxRate } from '../server/lib/currency';
 
 import paypalAdaptive from '../server/paymentProviders/paypal/adaptiveGateway';
@@ -861,7 +860,7 @@ describe('GraphQL Expenses API', () => {
     });
 
     describe('success', () => {
-      let hostAdmin, hostCollective, collective, expense, user, userCollective;
+      let hostAdmin, hostCollective, collective, expense, user;
 
       beforeEach(async () => {
         // Given that we have a host and a collective
@@ -873,7 +872,7 @@ describe('GraphQL Expenses API', () => {
         ));
 
         // And given a user to file expenses
-        ({ user, userCollective } = await store.newUser('someone cool', {
+        ({ user } = await store.newUser('someone cool', {
           paypalEmail: 'paypal@user.com',
         }));
 
@@ -958,36 +957,6 @@ describe('GraphQL Expenses API', () => {
         expect(emailSendMessageSpy.args[3][0]).to.equal(hostAdmin.email);
         expect(emailSendMessageSpy.args[3][1]).to.contain('Expense paid on WWCode Berlin');
       }); /* End of "pays the expense manually and reduces the balance of the collective" */
-
-      it('Pay expense in kind', async () => {
-        // And the expense will be paid in kind
-        expense.payoutMethod = 'donation';
-        await expense.save();
-        // When the expense is paid by the host admin
-        const parameters = {
-          id: expense.id,
-          paymentProcessorFeeInCollectiveCurrency: 0,
-        };
-        const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
-        result.errors && console.log(result.errors);
-        // Then the collective's balance should stay 0
-        expect(await collective.getBalance()).to.equal(0);
-        // And then it should create a transaction for the user
-        expect(
-          await libtransactions.sum({
-            FromCollectiveId: userCollective.id,
-            CollectiveId: collective.id,
-            currency: 'EUR',
-            type: 'CREDIT',
-          }),
-        ).to.equal(expense.amount);
-        // And then the user should become a backer of the project
-        const membership = await models.Member.findOne({
-          where: { CollectiveId: collective.id, role: 'BACKER' },
-        });
-        expect(membership).to.exist;
-        expect(membership.MemberCollectiveId).to.equal(user.CollectiveId);
-      });
 
       it('Mark expense as paid if expense paypal is the same as host paypal', async () => {
         emailSendMessageSpy.resetHistory();

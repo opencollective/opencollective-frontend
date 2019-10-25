@@ -139,36 +139,6 @@ export async function createFromPaidExpense(
   return models.Transaction.createDoubleEntry(transaction);
 }
 
-/** Create transaction for donation in kind
- *
- * After paying an expense of the type donation, a transaction is
- * created to subtract the payment from the collective's ledger. This
- * function creates a transaction that acknowledge the contribution
- * from the user and also zeroing out the previous transaction on the
- * collective's ledger.
- *
- * @param {models.Transaction} expenseTransaction is the transaction
- *  created on the collective's ledger.
- */
-export async function createTransactionFromInKindDonation(expenseTransaction) {
-  return models.Transaction.createDoubleEntry({
-    netAmountInCollectiveCurrency: -expenseTransaction.amount,
-    amount: -expenseTransaction.amount,
-    amountInHostCurrency: -expenseTransaction.amount,
-    hostCurrency: expenseTransaction.hostCurrency,
-    type: TransactionTypes.DEBIT,
-    currency: expenseTransaction.currency,
-    description: expenseTransaction.description,
-    CreatedByUserId: expenseTransaction.CreatedByUserId,
-    CollectiveId: expenseTransaction.CollectiveId,
-    FromCollectiveId: expenseTransaction.FromCollectiveId,
-    HostCollectiveId: expenseTransaction.HostCollectiveId,
-    PaymentMethodId: expenseTransaction.PaymentMethodId,
-    paymentProcessorFeeInHostCurrency: expenseTransaction.paymentProcessorFeeInHostCurrency,
-    ExpenseId: expenseTransaction.ExpenseId,
-  });
-}
-
 /**
  * Calculate net amount of a transaction in the currency of the collective
  * Notes:

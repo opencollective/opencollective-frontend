@@ -57,8 +57,9 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.STRING,
         validate: {
           isIn: {
+            // donation is deprecated but we keep it in the model because of existing entries
             args: [['paypal', 'manual', 'donation', 'other']],
-            msg: 'Must be paypal, manual, donation or other',
+            msg: 'Must be paypal or other. Deprecated: donation and manual.',
           },
         },
         allowNull: false,
