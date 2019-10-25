@@ -291,9 +291,14 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.COLLECTIVE_REJECTED:
-      notifyAdminsOfCollective(activity.data.collective.id, activity, {
-        template: 'collective.rejected',
-      });
+      notifyAdminsOfCollective(
+        activity.data.collective.id,
+        activity,
+        {
+          template: 'collective.rejected',
+        },
+        { replyTo: `hello@${activity.data.host.slug}.opencollective.com` },
+      );
       break;
 
     case activityType.COLLECTIVE_APPLY:
