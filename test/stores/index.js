@@ -53,6 +53,7 @@ function slugify(value) {
  * @return {Object} with references for `user` and `userCollective`.
  */
 export async function newUser(name, data = {}) {
+  name = name || uuidv4().split('-')[0];
   const slug = slugify(name);
   const email = randEmail(`${slug}@oc.com`);
   const user = await models.User.createUserWithCollective({
