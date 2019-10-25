@@ -113,7 +113,9 @@ describe('comment expense', () => {
     cy.wait(300);
     cy.get('.Comments .itemsList .comment', { timeout: 5000 }).should('have.length', 1);
     cy.get('.Comments .itemsList .comment:first .description').contains('This is a first comment');
-    cy.getByDataCy('submit-expense-btn').click();
+    cy.getByDataCy('submit-expense-btn')
+      .first()
+      .click();
     cy.get('.descriptionField input').should('have.value', '');
     cy.get('.amountField input').should('have.value', '');
   });
