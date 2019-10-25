@@ -6,7 +6,7 @@ import themeGet from '@styled-system/theme-get';
 import { Flex } from '@rebass/grid';
 
 import { getCollectiveImage, getAvatarBorderRadius } from '../lib/utils';
-import { defaultImage } from '../lib/constants/collectives';
+import { defaultImage, CollectiveType } from '../lib/constants/collectives';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
@@ -91,6 +91,11 @@ ContributorAvatar.propTypes = {
     type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   }).isRequired,
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+/** A simple avatar for incognito users */
+export const IncognitoAvatar = avatarProps => {
+  return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.ANONYMOUS} />;
 };
 
 /** @component */
