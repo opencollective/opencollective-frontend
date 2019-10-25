@@ -1,2 +1,2 @@
-// eslint-disable-next-line node/no-unpublished-require
+/* eslint-disable */
 require('@babel/register')({ extensions: ['.js', '.ts'] });

@@ -13,8 +13,10 @@
     "no-process-exit": "off",
     "node/shebang": "off",
     "no-useless-escape": "off",
+    "prefer-rest-params": "off",
     // relaxing because we have many errors
-    "require-atomic-updates": "warn",
+    "require-atomic-updates": "off",
+
     // typescript
     "node/no-missing-import": ["error", { "tryExtensions": [".js", ".ts"] }]
   },
@@ -25,7 +27,8 @@
       "rules": {
         "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/indent": "off"
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/explicit-function-return-type": "off"
       }
     }
   ],
