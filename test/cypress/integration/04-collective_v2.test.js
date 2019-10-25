@@ -13,16 +13,15 @@ const uploadImage = ({ dropzone, file }) => {
   cy.wait(900);
 };
 
+const scrollToSection = section => {
+  // Wait for new collective page to load before disabling smooth scroll
+  cy.contains('Become a financial contributor');
+  disableSmoothScroll();
+  cy.get(`#section-${section}`).scrollIntoView();
+};
+
 describe('New collective page', () => {
   let collectiveSlug = null;
-
-  const scrollToSection = section => {
-    // Wait for new collective page to load before disabling smooth scroll
-    cy.contains('Become a financial contributor');
-    disableSmoothScroll();
-    cy.get(`#section-${section}`).scrollIntoView();
-  };
-
   before(() => {
     cy.createHostedCollective({
       twitterHandle: 'testCollective',
@@ -57,12 +56,26 @@ describe('New collective page', () => {
       cy.get('[data-cy=heroAvatarDropzoneSave]').click();
     });
 
-    it.skip('Can edit primary color', () => {
-      // TODO: - must check hero or buttons CSS to ensure primary color is properly applied
+    it('Can edit primary color', () => {
+      let color = null;
+
+      cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click({ force: true });
+      cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]').then($colorBtn => {
+        const randomPick = Math.round(Math.random() * $colorBtn.length);
+        const withFailSafe = $colorBtn[randomPick] || $colorBtn[0];
+
+        cy.wrap(withFailSafe).click();
+        color = withFailSafe.style.backgroundColor;
+      });
+
+      cy.get('[data-cy=collective-color-picker-save-btn]').then($saveBtn => {
+        cy.wrap($saveBtn).should('have.css', 'background-color', color);
+        cy.wrap($saveBtn).click();
+      });
     });
 
-    it.skip('Can change cover background image', () => {
-      // TODO:
+    it('Can change cover background image', () => {
+      cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-cover-btn]').click({ force: true });
       uploadImage({
         dropzone: '[data-cy=heroBackgroundDropzone]',
         file: 'gopherBack.png',
@@ -102,8 +115,11 @@ describe('New collective page', () => {
     it('Has a link to create new update and one to view all updates', () => {
       scrollToSection(Sections.UPDATES);
       cy.get('[data-cy=create-new-update-btn]').click();
-      cy.get('[data-cy=editUpdateForm] [data-cy=titleInput]').type('Sample Update');
-      cy.get('[data-cy=editUpdateForm-submit-btn]').click();
+      cy.wait(3000);
+      cy.get('[data-cy=edit-update-form]').within(() => {
+        cy.get('[data-cy=titleInput]').type('Sample Update');
+        cy.get('[data-cy=edit-update-submit-btn]').click();
+      });
       cy.get('[data-cy=PublishUpdateBtn] button').click();
       cy.visit(`/${collectiveSlug}/v2`);
       scrollToSection(Sections.UPDATES);
@@ -118,20 +134,10 @@ describe('New collective page', () => {
   });
 
   describe('Budget section', () => {
-    it.skip('Shows latest transactions with amount and type (credit/debit)', () => {
+    it("Shows today's balance and estimated annual budget", () => {
       scrollToSection(Sections.BUDGET);
-      // TODO:
-    });
-
-    it.skip('Has button to view all transactions and expenses', () => {
-      scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy=view-all-transactions-btn]').should('be.visible');
-      cy.contains('[data-cy=view-all-expenses-btn]').should('be.visible');
-    });
-
-    it.skip("Shows today's balance and estimated annual budget", () => {
-      cy.get('[data-cy=budgetSection-today-balance]').contains("Today's balance");
-      cy.get('[data-cy=budgetSection-estimated-budget]').should('be.visible');
+      cy.get('[data-cy=budgetSection-today-balance]').contains('$0.00');
+      cy.get('[data-cy=budgetSection-estimated-budget]').contains('$0.00');
     });
   });
 
@@ -141,10 +147,6 @@ describe('New collective page', () => {
         cy.wrap($contributorCard).should('have.length', 1);
         cy.wrap($contributorCard).contains('Collective Admin');
       });
-    });
-
-    it.skip('Can filter contributors', () => {
-      // TODO:
     });
   });
 
@@ -169,9 +171,34 @@ describe('New Collective page with euro currency', () => {
   before(() => {
     cy.visit('/brusselstogether/v2');
   });
+
   it('contributors amount in euro', () => {
     cy.get('[data-cy=ContributorsGrid_ContributorCard]')
       .first()
       .contains('€5,140 EUR');
+  });
+
+  it('Can filter contributors', () => {
+    cy.get('[data-cy=filters] [data-cy="filter-button all"]').should('be.visible');
+    cy.get('[data-cy=filters] [data-cy="filter-button core"]').should('be.visible');
+    cy.get('[data-cy=filters] [data-cy="filter-button financial"]').should('be.visible');
+  });
+
+  describe('Budget section', () => {
+    it('Shows latest transactions with amount and type (credit/debit)', () => {
+      scrollToSection(Sections.BUDGET);
+      cy.get('[data-cy="contributions transactions"] [data-cy=transaction-amount]')
+        .first()
+        .within($firstTransactionAmount => {
+          cy.get('[data-cy=transaction-sign]').should('have.text', '-');
+          cy.wrap($firstTransactionAmount).contains('€242.00');
+        });
+    });
+
+    it('Has button to view all transactions and expenses', () => {
+      scrollToSection(Sections.BUDGET);
+      cy.get('[data-cy=view-all-transactions-btn]').should('be.visible');
+      cy.get('[data-cy=view-all-expenses-btn]').should('be.visible');
+    });
   });
 });

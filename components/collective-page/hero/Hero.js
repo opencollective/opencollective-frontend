@@ -75,14 +75,21 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
       {isAdmin && !isEditing && (
         // We don't have any mobile view for this one yet
-        <Container display={['none', null, null, 'block']} position="absolute" right={25} top={25} zIndex={222}>
-          <StyledButton onClick={() => editCover(true)}>
+        <Container
+          data-cy="edit-collective-display-features"
+          display={['none', null, null, 'block']}
+          position="absolute"
+          right={25}
+          top={25}
+          zIndex={222}
+        >
+          <StyledButton data-cy="edit-cover-btn" onClick={() => editCover(true)}>
             <Span mr={2}>
               <Camera size="1.2em" />
             </Span>
             <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
           </StyledButton>
-          <StyledButton ml={3} onClick={() => showColorPicker(true)}>
+          <StyledButton data-cy="edit-main-color-btn" ml={3} onClick={() => showColorPicker(true)}>
             <Span mr={2}>
               <Palette size="1.2em" />
             </Span>

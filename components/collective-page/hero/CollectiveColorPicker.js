@@ -57,7 +57,12 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   return (
     <Mutation mutation={EditCollectiveSettingsMutation}>
       {(editSettings, { loading }) => (
-        <StyledCard flexDirection="column" boxShadow="4px 4px 10px #c7c5c5" width={360}>
+        <StyledCard
+          data-cy="collective-color-picker-card"
+          flexDirection="column"
+          boxShadow="4px 4px 10px #c7c5c5"
+          width={360}
+        >
           <Box px={32} py={24}>
             <P fontSize="H5" fontWeight={600} mb={3}>
               <FormattedMessage id="CollectiveColorPicker.Title" defaultMessage="Select page color" />
@@ -67,7 +72,12 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
             </P>
             <Flex flexWrap="wrap" justifyContent="space-between">
               {PRESET_COLORS.map(preset => (
-                <ColorPreset key={preset} style={{ background: preset }} onClick={() => dispatchValue(preset)}>
+                <ColorPreset
+                  data-cy="collective-color-picker-options-btn"
+                  key={preset}
+                  style={{ background: preset }}
+                  onClick={() => dispatchValue(preset)}
+                >
                   {color === preset && <Check size={12} color="white" />}
                 </ColorPreset>
               ))}
@@ -145,6 +155,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                   <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                 </StyledButton>
                 <StyledButton
+                  data-cy="collective-color-picker-save-btn"
                   mx={2}
                   buttonStyle="primary"
                   textTransform="capitalize"
