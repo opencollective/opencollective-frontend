@@ -12,7 +12,6 @@ import { formatError } from 'apollo-errors';
 import { get } from 'lodash';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
-import * as collectives from './controllers/collectives';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import { createPaymentMethod } from './controllers/paymentMethods';
@@ -39,14 +38,6 @@ import graphqlSchemaV2 from './graphql/v2/schema';
 import helloworks from './controllers/helloworks';
 
 const upload = multer();
-
-const cacheControlMaxAge = maxAge => {
-  maxAge = maxAge || 5;
-  return (req, res, next) => {
-    res.setHeader('Cache-Control', `public, max-age=${maxAge}`);
-    next();
-  };
-};
 
 export default app => {
   /**
@@ -204,11 +195,6 @@ export default app => {
    *  Let's assume for now a paymentMethod is linked to a user.
    */
   app.post('/v1/payment-methods', createPaymentMethod);
-
-  /**
-   * Collectives.
-   */
-  app.get('/groups/:collectiveid/:tierSlug(backers|users)', cacheControlMaxAge(60), collectives.getUsers); // Get collective backers
 
   /**
    * Separate route for uploading images to S3
