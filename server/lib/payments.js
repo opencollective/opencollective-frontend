@@ -232,13 +232,6 @@ export const sendEmailNotifications = (order, transaction) => {
   }
 };
 
-export const addBackerToCollective = async (user, collective, TierId) => {
-  return await collective.findOrAddUserWithRole(user, roles.BACKER, {
-    CreatedByUserId: user.id,
-    TierId,
-  });
-};
-
 export const createSubscription = async order => {
   const subscription = await models.Subscription.create({
     amount: order.totalAmount,
@@ -314,22 +307,22 @@ export const executeOrder = async (user, order, options) => {
   }
 
   // Register user as collective backer
-  await addBackerToCollective(
+  await order.collective.findOrAddUserWithRole(
     { id: user.id, CollectiveId: order.FromCollectiveId },
-    order.collective,
-    get(order, 'tier.id'),
+    roles.BACKER,
+    { TierId: get(order, 'tier.id') },
+    { order },
   );
+
   sendEmailNotifications(order, transaction);
 
   // Register VirtualCard emitter as collective backer too
   if (transaction && transaction.UsingVirtualCardFromCollectiveId) {
-    addBackerToCollective(
-      {
-        id: user.id,
-        CollectiveId: transaction.UsingVirtualCardFromCollectiveId,
-      },
-      order.collective,
-      get(order, 'tier.id'),
+    await order.collective.findOrAddUserWithRole(
+      { id: user.id, CollectiveId: transaction.UsingVirtualCardFromCollectiveId },
+      roles.BACKER,
+      { TierId: get(order, 'tier.id') },
+      { order, skipActivity: true },
     );
   }
 

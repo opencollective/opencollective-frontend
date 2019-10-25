@@ -1265,14 +1265,14 @@ export default function(Sequelize, DataTypes) {
    * @param {*} role
    * @param {*} defaultAttributes
    */
-  Collective.prototype.addUserWithRole = function(user, role, defaultAttributes = {}, transaction) {
+  Collective.prototype.addUserWithRole = async function(user, role, defaultAttributes = {}, context = {}, transaction) {
     if (role === roles.HOST) {
       return logger.info('Please use Collective.addHost(hostCollective, remoteUser);');
     }
 
     const sequelizeParams = transaction ? { transaction } : undefined;
 
-    const member = {
+    const memberAttributes = {
       role,
       CreatedByUserId: user.id,
       MemberCollectiveId: user.CollectiveId,
@@ -1280,119 +1280,118 @@ export default function(Sequelize, DataTypes) {
       ...defaultAttributes,
     };
 
-    debug('addUserWithRole', user.id, role, 'member', member);
-    return Promise.all([
-      models.Member.create(member, sequelizeParams),
-      models.User.findByPk(
-        member.CreatedByUserId,
+    debug('addUserWithRole', user.id, role, 'member', memberAttributes);
+
+    const member = await models.Member.create(memberAttributes, sequelizeParams);
+
+    switch (role) {
+      case roles.BACKER:
+      case roles.ATTENDEE:
+        if (!context.skipActivity) {
+          await this.createMemberCreatedActivity(member, context, sequelizeParams);
+        }
+        break;
+
+      case roles.MEMBER:
+      case roles.ADMIN:
+        await this.sendNewMemberEmail(user, role, member, sequelizeParams);
+        break;
+    }
+
+    return member;
+  };
+
+  Collective.prototype.createMemberCreatedActivity = async function(member, context, sequelizeParams) {
+    // We refetch to preserve historic behavior and make sure it's up to date
+    let order;
+    if (context.order) {
+      order = await models.Order.findOne(
         {
-          include: [{ model: models.Collective, as: 'collective' }],
+          where: { id: context.order.id },
+          include: [{ model: models.Tier }, { model: models.Subscription }],
         },
         sequelizeParams,
-      ),
-      models.User.findByPk(
-        user.id,
-        {
-          include: [{ model: models.Collective, as: 'collective' }],
+      );
+    }
+
+    const urlPath = await this.getUrlPath();
+    const memberCollective = await models.Collective.findByPk(member.MemberCollectiveId, sequelizeParams);
+
+    const data = {
+      collective: { ...this.minimal, urlPath },
+      member: {
+        ...member.info,
+        memberCollective: memberCollective.activity,
+      },
+      order: order && {
+        ...order.activity,
+        tier: order.Tier && order.Tier.minimal,
+        subscription: {
+          interval: order.Subscription && order.Subscription.interval,
         },
-        sequelizeParams,
-      ),
-    ]).then(results => {
-      const member = results[0];
-      const remoteUser = results[1];
-      const memberUser = results[2];
+      },
+    };
 
-      switch (role) {
-        case roles.BACKER:
-        case roles.ATTENDEE:
-        case roles.FOLLOWER:
-          return Promise.props({
-            memberCollective: models.Collective.findByPk(member.MemberCollectiveId, sequelizeParams),
-            order: models.Order.findOne(
-              {
-                where: {
-                  CollectiveId: this.id,
-                  FromCollectiveId: member.MemberCollectiveId,
-                  // status: { [Op.in]: ['ACTIVE', 'PAID'] },
-                },
-                include: [{ model: models.Tier }, { model: models.Subscription }],
-                order: [['createdAt', 'DESC']],
-              },
-              sequelizeParams,
-            ),
-            urlPath: this.getUrlPath(),
-          }).then(({ order, urlPath, memberCollective }) => {
-            const data = {
-              collective: { ...this.minimal, urlPath },
-              member: {
-                ...member.info,
-                memberCollective: memberCollective.activity,
-              },
-              order: order && {
-                ...order.activity,
-                tier: order.Tier && order.Tier.minimal,
-                subscription: {
-                  interval: order.Subscription && order.Subscription.interval,
-                },
-              },
-            };
-            return models.Activity.create(
-              {
-                CollectiveId: this.id,
-                type: activities.COLLECTIVE_MEMBER_CREATED,
-                data,
-              },
-              sequelizeParams,
-            );
-          });
+    return models.Activity.create(
+      { CollectiveId: this.id, type: activities.COLLECTIVE_MEMBER_CREATED, data },
+      sequelizeParams,
+    );
+  };
 
-        case roles.MEMBER:
-        case roles.ADMIN:
-          // We don't notify if the new member is the logged in user
-          if (get(remoteUser, 'collective.id') === get(memberUser, 'collective.id')) {
-            return member;
-          }
-          // We only send the notification for new member for role MEMBER and ADMIN
-          return emailLib.send(
-            `${this.type}.newmember`.toLowerCase(),
-            memberUser.email,
-            {
-              remoteUser: {
-                email: remoteUser.email,
-                collective: pick(remoteUser.collective, ['slug', 'name', 'image']),
-              },
-              role: role.toLowerCase(),
-              isAdmin: role === roles.ADMIN,
-              collective: {
-                slug: this.slug,
-                name: this.name,
-                type: this.type.toLowerCase(),
-              },
-              recipient: {
-                collective: memberUser.collective.activity,
-              },
-              loginLink: `${config.host.website}/signin?next=/${memberUser.collective.slug}/edit`,
-            },
-            { cc: remoteUser.email },
-          );
-        default:
-          return member;
-      }
-    });
+  Collective.prototype.sendNewMemberEmail = async function(user, role, member, sequelizeParams) {
+    const remoteUser = await models.User.findByPk(
+      member.CreatedByUserId,
+      { include: [{ model: models.Collective, as: 'collective' }] },
+      sequelizeParams,
+    );
+
+    const memberUser = await models.User.findByPk(
+      user.id,
+      { include: [{ model: models.Collective, as: 'collective' }] },
+      sequelizeParams,
+    );
+
+    // We don't notify if the new member is the logged in user
+    if (get(remoteUser, 'collective.id') === get(memberUser, 'collective.id')) {
+      return;
+    }
+
+    // We only send the notification for new member for role MEMBER and ADMIN
+    return emailLib.send(
+      `${this.type}.newmember`.toLowerCase(),
+      memberUser.email,
+      {
+        remoteUser: {
+          email: remoteUser.email,
+          collective: pick(remoteUser.collective, ['slug', 'name', 'image']),
+        },
+        role: role.toLowerCase(),
+        isAdmin: role === roles.ADMIN,
+        collective: {
+          slug: this.slug,
+          name: this.name,
+          type: this.type.toLowerCase(),
+        },
+        recipient: {
+          collective: memberUser.collective.activity,
+        },
+        loginLink: `${config.host.website}/signin?next=/${memberUser.collective.slug}/edit`,
+      },
+      { cc: remoteUser.email },
+    );
   };
 
   // Used when creating a transactin to add a user to the collective as a backer if needed
-  Collective.prototype.findOrAddUserWithRole = function(user, role, defaultAttributes) {
+  Collective.prototype.findOrAddUserWithRole = function(user, role, defaultAttributes, context, transaction) {
     return models.Member.findOne({
       where: {
         role,
-        CreatedByUserId: user.id,
         MemberCollectiveId: user.CollectiveId,
         CollectiveId: this.id,
       },
     }).then(Member => {
       if (!Member) {
-        return this.addUserWithRole(user, role, defaultAttributes);
+        return this.addUserWithRole(user, role, defaultAttributes, context, transaction);
       } else {
         return Member;
       }

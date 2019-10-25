@@ -257,7 +257,7 @@ const mutations = {
             ...pick(args.organization, ['name', 'website', 'twitterHandle', 'githubHandle']),
           };
           organization = await models.Collective.create(organizationParams, { transaction });
-          await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, transaction);
+          await organization.addUserWithRole(user, roles.ADMIN, { CreatedByUserId: user.id }, {}, transaction);
         }
 
         // Sent signIn link
