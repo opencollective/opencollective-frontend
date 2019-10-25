@@ -62,7 +62,7 @@ aliases:
 jobs:
   lint:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
     environment:
       NODE_ENV: circleci
     steps:
@@ -75,7 +75,7 @@ jobs:
 
   jest:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
     environment:
       NODE_ENV: circleci
     steps:
@@ -87,7 +87,7 @@ jobs:
 
   update-langs:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
     environment:
       NODE_ENV: circleci
     steps:
@@ -99,7 +99,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
     environment:
       NODE_ENV: circleci
     steps:
@@ -142,7 +142,7 @@ jobs:
 
   build-api:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
     environment:
       NODE_ENV: circleci
@@ -194,7 +194,7 @@ jobs:
 
   test-e2e-0:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -208,7 +208,7 @@ jobs:
 
   test-e2e-1:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -222,7 +222,7 @@ jobs:
 
   test-e2e-2:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -236,7 +236,7 @@ jobs:
 
   test-e2e-3:
     docker:
-      - image: circleci/node:11.8.0
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
