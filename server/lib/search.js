@@ -4,6 +4,7 @@
 
 import config from 'config';
 import { sortBy, get } from 'lodash';
+import slugify from 'limax';
 
 import { CollectiveTypesList } from '../constants/collectives';
 import { RateLimitExceeded } from '../graphql/errors';
@@ -65,10 +66,7 @@ export const searchCollectivesByEmail = async (email, user, offset = 0, limit = 
  * Ex: "open potatoes" => "open|potatoes"
  */
 const searchTermToTsVector = term => {
-  return term
-    .trim()
-    .split(/\s+/g)
-    .join('|');
+  return term.replace(/\s+/g, '|');
 };
 
 /**
@@ -90,8 +88,10 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
   }
 
   if (term && term.length > 0) {
-    term = term.replace(/(_|%|\\)/g, ' ');
-    dynamicConditions += `AND (${tsVector} @@ to_tsquery('simple', :term) OR name ILIKE '%' || :term || '%' OR slug ILIKE '%' || :term || '%') `;
+    term = term.replace(/(_|%|\\)/g, ' ').trim();
+    dynamicConditions += `AND (${tsVector} @@ to_tsquery('simple', :vectorizedTerm) OR name ILIKE '%' || :term || '%' OR slug ILIKE '%' || :term || '%') `;
+  } else {
+    term = '';
   }
 
   // Build the query
@@ -100,7 +100,13 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
     SELECT 
       c.*, 
       COUNT(*) OVER() AS __total__,
-      ts_rank(${tsVector}, to_tsquery('simple', :term)) AS __rank__
+      (
+        CASE WHEN (slug = :slugifiedTerm OR name ILIKE :term) THEN
+          1
+        ELSE
+          ts_rank(${tsVector}, to_tsquery('simple', :vectorizedTerm))
+        END
+      ) AS __rank__
     FROM "Collectives" c
     WHERE "deletedAt" IS NULL 
     AND "deactivatedAt" IS NULL 
@@ -116,7 +122,9 @@ export const searchCollectivesInDB = async (term, offset = 0, limit = 100, types
       mapToModel: true,
       replacements: {
         types: types || CollectiveTypesList,
-        term: searchTermToTsVector(term),
+        term: term,
+        slugifiedTerm: slugify(term),
+        vectorizedTerm: searchTermToTsVector(term),
         offset,
         limit,
         hostCollectiveIds,
