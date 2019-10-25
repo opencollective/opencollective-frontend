@@ -132,7 +132,6 @@
     "nock": "^11.6.0",
     "nodemon": "^1.19.4",
     "nyc": "^14.1.1",
-    "post-merge-install": "^0.3.0",
     "prettier": "1.18.2",
     "sinon": "^7.5.0",
     "supertest": "^4.0.2",
@@ -206,9 +205,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "post-merge": "post-merge-install",
-      "post-rebase": "post-merge-install"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
