@@ -100,9 +100,11 @@ export const _authenticateUserByJwt = (req, res, next) => {
         if (!req.jwtPayload.lastLoginAt) {
           // This should only happen with pre-migration tokens, that don't have this field.
           // Should be turned into an error in the future.
-          logger.warn('Using a token without `lastLoginAt`');
+          if (process.env.NODE_ENV === 'production') {
+            logger.warn('Using a token without `lastLoginAt`');
+          }
         } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
-          throw errors.Unauthorized('This login link is expired or has already been used');
+          logger.error('This login link is expired or has already been used');
         }
       }
 
