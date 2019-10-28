@@ -8,7 +8,6 @@ import { Op } from 'sequelize';
 
 import logger from '../lib/logger';
 import * as auth from '../lib/auth';
-import errors from '../lib/errors';
 import userLib from '../lib/userlib';
 import roles from '../constants/roles';
 import { isValidEmail } from '../lib/utils';
@@ -131,7 +130,9 @@ export default (Sequelize, DataTypes) => {
         defaultValue: Sequelize.NOW,
       },
 
-      seenAt: DataTypes.DATE,
+      lastLoginAt: {
+        type: DataTypes.DATE,
+      },
 
       newsletterOptIn: {
         allowNull: false,
@@ -257,7 +258,8 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.prototype.generateLoginLink = function(redirect = '/', websiteUrl) {
-    const token = this.jwt({ scope: 'login' });
+    const lastLoginAt = this.lastLoginAt ? this.lastLoginAt.getTime() : null;
+    const token = this.jwt({ scope: 'login', lastLoginAt });
     // if a different websiteUrl is passed
     // we don't accept that in production to avoid fishing related issues
     if (websiteUrl && config.env !== 'production') {
@@ -429,34 +431,6 @@ export default (Sequelize, DataTypes) => {
    */
   User.createMany = (users, defaultValues = {}) => {
     return Promise.map(users, u => User.create(defaults({}, u, defaultValues)), { concurrency: 1 });
-  };
-
-  User.auth = (email, password, cb) => {
-    if (!email) return cb(new errors.BadRequest(msg));
-
-    const msg = 'Invalid email or password.';
-    email = email.toLowerCase();
-
-    User.find({
-      where: ['email = ?', email],
-    })
-      .then(user => {
-        if (!user) return cb(new errors.BadRequest(msg));
-
-        bcrypt.compare(password, user.password_hash, (err, matched) => {
-          if (!err && matched) {
-            user
-              .updateAttributes({
-                seenAt: new Date(),
-              })
-              .tap(user => cb(null, user))
-              .catch(cb);
-          } else {
-            cb(new errors.BadRequest(msg));
-          }
-        });
-      })
-      .catch(cb);
   };
 
   User.findOrCreateByEmail = (email, otherAttributes) => {

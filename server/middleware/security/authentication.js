@@ -8,6 +8,7 @@ import { URLSearchParams } from 'url';
 
 import models from '../../models';
 import errors from '../../lib/errors';
+import logger from '../../lib/logger';
 import paymentProviders from '../../paymentProviders';
 import {
   createOrUpdate as createOrUpdateConnectedAccount,
@@ -86,18 +87,33 @@ export const _authenticateUserByJwt = (req, res, next) => {
   const userid = Number(req.jwtPayload.sub);
   User.findByPk(userid)
     .then(user => {
-      if (!user) throw errors.Unauthorized(`User id ${userid} not found`);
-      user.update({ seenAt: new Date() });
-      req.remoteUser = user;
-      return user.populateRoles();
+      if (!user) {
+        throw errors.Unauthorized(`User id ${userid} not found`);
+      }
+
+      /**
+       * Functionality for one-time login links. We check that the lastLoginAt
+       * in the JWT matches the lastLoginAt in the db. If so, we allow the user
+       * to log in, and update the lastLoginAt.
+       */
+      if (user.lastLoginAt) {
+        if (!req.jwtPayload.lastLoginAt) {
+          // This should only happen with pre-migration tokens, that don't have this field.
+          // Should be turned into an error in the future.
+          logger.warn('Using a token without `lastLoginAt`');
+        } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
+          throw errors.Unauthorized('This login link is expired or has already been used');
+        }
+      }
+
+      const now = new Date();
+      return user.update({ lastLoginAt: now }).then(user => {
+        req.remoteUser = user;
+        return user.populateRoles();
+      });
     })
     .then(() => {
       debug('auth')('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
-
-      // Populates req.remoteUser.canEditCurrentCollective, used for GraphQL to keep track whether the remoteUser can see members' details
-      const CollectiveId = get(req, 'body.variables.collective.id') || req.params.collectiveid;
-      req.remoteUser.canEditCurrentCollective = CollectiveId && req.remoteUser.isAdmin(CollectiveId);
-      debug('auth')('Can edit current collective', CollectiveId, '?', req.remoteUser.canEditCollective);
       next();
       return null;
     })
