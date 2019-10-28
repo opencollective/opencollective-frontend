@@ -34,13 +34,6 @@ class CreateExpensePage extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      expenseCreated: false,
-    };
-  }
-
   createExpense = async expense => {
     const { LoggedInUser } = this.props;
     const collective = this.props.data.Collective;
@@ -66,13 +59,12 @@ class CreateExpensePage extends React.Component {
 
   render() {
     const { data, LoggedInUser } = this.props;
-    const { expenseCreated } = this.state;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data.Collective) {
+      return <ErrorPage data={data} />;
+    }
 
     const collective = data.Collective;
-    const showNewExpenseForm = !expenseCreated;
-
     return (
       <div className="ExpensesPage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
@@ -88,9 +80,7 @@ class CreateExpensePage extends React.Component {
 
           <Flex flexDirection={['column', null, 'row']}>
             <Box width={[1, null, 3 / 4]}>
-              {showNewExpenseForm && (
-                <CreateExpenseForm collective={collective} LoggedInUser={LoggedInUser} onSubmit={this.createExpense} />
-              )}
+              <CreateExpenseForm collective={collective} LoggedInUser={LoggedInUser} onSubmit={this.createExpense} />
             </Box>
 
             <Box width={[1, null, 1 / 4]} pb={4} px={3}>
