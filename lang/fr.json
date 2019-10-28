@@ -654,6 +654,7 @@
   "Frequency.Year": "Annuel",
   "GiftCard": "Carte cadeau",
   "GiftCard.definition": "Les cartes cadeaux permettent à vos employés et aux membres de votre communauté de soutenir les projets qu'ils aiment.",
+  "Giftcard.learnMore": "Learn more about Gift Cards",
   "giftcard.user.name": "Re-bonjour {name}!",
   "giftcard.user.text": "Vous pouvez désormais soutenir des collectifs avec cette carte cadeau, de la part de {emitter}.",
   "GithubFlow.CollectiveName": "Nom du Collectif",

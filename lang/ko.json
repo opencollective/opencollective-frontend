@@ -654,6 +654,7 @@
   "Frequency.Year": "Yearly",
   "GiftCard": "Gift card",
   "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love.",
+  "Giftcard.learnMore": "Learn more about Gift Cards",
   "giftcard.user.name": "Hello again, {name}!",
   "giftcard.user.text": "You can now support open collectives with this gift card, courtesy of {emitter}.",
   "GithubFlow.CollectiveName": "Collective name",

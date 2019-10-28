@@ -654,6 +654,7 @@
   "Frequency.Year": "Anualmente",
   "GiftCard": "Vale-Presente",
   "GiftCard.definition": "Vales-presente empoderam seus funcionários ou membros da comunidade a contribuir com os projetos que eles amam.",
+  "Giftcard.learnMore": "Learn more about Gift Cards",
   "giftcard.user.name": "Olá novamente, {name}!",
   "giftcard.user.text": "Você agora pode colaborar com coletivos abertos com este vale-presente, cortesia de {emitter}.",
   "GithubFlow.CollectiveName": "Nome do Coletivo",

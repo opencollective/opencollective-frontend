@@ -654,6 +654,7 @@
   "Frequency.Year": "Yearly",
   "GiftCard": "Cadeaubon",
   "GiftCard.definition": "Cadeaubonnen stellen je werknemers of gemeenschap in staat om de projecten te steunen waar zij van houden.",
+  "Giftcard.learnMore": "Learn more about Gift Cards",
   "giftcard.user.name": "Hallo alweer, {name}!",
   "giftcard.user.text": "Je kan nu open collectieven steunen met deze cadeaubon, met dank aan {emitter}.",
   "GithubFlow.CollectiveName": "Collective name",
