@@ -54,16 +54,6 @@ class CommentsWithData extends React.Component {
           </LoginBtn>
         </div>
       );
-    else if (!LoggedInUser.canCreateCommentOnExpense(expense))
-      return (
-        <div>
-          <hr />
-          <FormattedMessage
-            id="comment.badPermissions"
-            defaultMessage="You don't have permission to comment on this expense."
-          />
-        </div>
-      );
     return <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} notice={notice} />;
   }
 
