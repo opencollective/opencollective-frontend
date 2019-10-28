@@ -183,16 +183,26 @@ export const webhook = (req, res, next) => {
   // If an email is sent to [info|hello|members|admins|organizers]@:collectiveSlug.opencollective.com,
   // we simply forward it to admins who subscribed to that mailinglist (no approval process)
   if (mailinglist === 'admins') {
-    return sendEmailToList(recipient, {
-      subject: email.subject,
-      body,
-      from: email.from,
-    })
-      .then(() => res.send('ok'))
-      .catch(e => {
-        debugWebhook('Error: ', e);
-        next(e);
-      });
+    return models.Collective.findOne({ where: { slug: collectiveSlug } }).then(collective => {
+      if (!collective || !collective.canContact()) {
+        return res.send({
+          error: {
+            message: `This Collective doesn't exist or can't be emailed directly using this address`,
+          },
+        });
+      } else {
+        return sendEmailToList(recipient, {
+          subject: email.subject,
+          body,
+          from: email.from,
+        })
+          .then(() => res.send('ok'))
+          .catch(e => {
+            debugWebhook('Error: ', e);
+            next(e);
+          });
+      }
+    });
   }
 
   // If the email is sent to :tierSlug or :eventSlug@:collectiveSlug.opencollective.com
