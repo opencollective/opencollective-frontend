@@ -61,6 +61,7 @@ class Expense extends React.Component {
     unlockPayAction: PropTypes.func,
     editExpense: PropTypes.func,
     unapproveExpense: PropTypes.func,
+    refetch: PropTypes.func,
     intl: PropTypes.object.isRequired,
   };
 
@@ -139,6 +140,7 @@ class Expense extends React.Component {
     try {
       await this.props.unapproveExpense(id);
       this.setState({ showUnapproveModal: false });
+      await this.props.refetch();
     } catch (err) {
       console.error(err);
       this.setState({ showUnapproveModal: false });
@@ -450,6 +452,7 @@ class Expense extends React.Component {
                         collective={collective}
                         host={host}
                         {...this.state.fees}
+                        refetch={this.props.refetch}
                         disabled={!this.props.allowPayAction}
                         lock={this.props.lockPayAction}
                         unlock={this.props.unlockPayAction}
@@ -460,9 +463,9 @@ class Expense extends React.Component {
                         <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
                       </StyledButton>
                     )}
-                    {canApprove && <ApproveExpenseBtn id={expense.id} />}
-                    {canReject && <RejectExpenseBtn id={expense.id} />}
-                    {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn id={expense.id} />}
+                    {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn refetch={this.props.refetch} id={expense.id} />}
+                    {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
+                    {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                   </div>
                 </div>
               )}

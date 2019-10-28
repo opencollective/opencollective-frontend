@@ -55,6 +55,7 @@ class ExpensesWithData extends React.Component {
           loading={data.loading}
           status={this.getStatus()}
           filters={this.props.hasFilters}
+          refetch={data.refetch}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
         />

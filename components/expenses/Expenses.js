@@ -22,6 +22,7 @@ class Expenses extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     filters: PropTypes.bool, // show or hide filters (all/pending/paid)
     LoggedInUser: PropTypes.object,
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -43,6 +44,7 @@ class Expenses extends React.Component {
           host={host}
           expense={expense}
           editable={editable}
+          refetch={this.props.refetch}
           view={view}
           includeHostedCollectives={includeHostedCollectives}
           LoggedInUser={LoggedInUser}

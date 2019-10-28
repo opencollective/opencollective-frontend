@@ -14,7 +14,7 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
+const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
   const [state, setState] = useState({
     showProcessorFeeConfirmation: false,
     processorFeeRefunded: false,
@@ -27,6 +27,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
     try {
       setState({ ...state, disableBtn: true });
       await markExpenseAsUnpaid(id, state.processorFeeRefunded);
+      await refetch();
     } catch (err) {
       console.log('>>> payExpense error: ', err);
       setState({ ...state, disableBtn: false });
@@ -64,6 +65,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
 MarkExpenseAsUnpaidBtn.propTypes = {
   id: PropTypes.number.isRequired,
   markExpenseAsUnpaid: PropTypes.func.isRequired,
+  refetch: PropTypes.func,
 };
 
 const markExpenseAsUnpaidQuery = gql`

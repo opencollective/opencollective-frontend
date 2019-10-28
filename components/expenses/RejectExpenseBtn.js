@@ -10,6 +10,7 @@ class RejectExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     rejectExpense: PropTypes.func.isRequired,
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -20,6 +21,7 @@ class RejectExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     await this.props.rejectExpense(id);
+    await this.props.refetch();
   }
 
   render() {
