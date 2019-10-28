@@ -1,0 +1,19 @@
+Subject: Your application to {{host.name}}
+
+{{> header}}
+
+<h1>Hey {{collective.name}}</h1>
+
+<p>Thank you for applying to host your Collective {{collective.name}} with {{host.name}}. Unfortunately your application has been rejected.</p>
+
+{{#if rejectionReason}}
+  <p>Note from {{host.name}}:</p>
+  <blockquote style="color:#6a737d;font-size: 16px;text-align: left;padding: 0.5em 0.75em;margin: 1em 0;border-left: 3px solid #e4e4e4;white-space: pre-line;">{{rejectionReason}}</blockquote>
+{{/if}}
+
+<p>
+  If you would like to apply to another fiscal host, click the "apply" button on their page (if you meet their acceptance criteria). View fiscal hosts <a href="{{config.host.website}}/hosts">here</a>. You may also consider hosting your own Collective (<a href="https://docs.opencollective.com/help/hosts/become-host">more details</a>).
+</p>
+
+<p>If you have questions, reply to this email to reach {{host.name}}, or contact <a href="mailto:support@opencollective.com">support@opencollective.com</a> for general inquiries.</p>
+{{> footer}}
