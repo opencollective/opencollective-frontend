@@ -1,9 +1,9 @@
-Subject: New expense approved on {{collective.name}}: {{{currency expense.amount currency=expense.currency}}} for {{expense.description}}
+Subject: New expense approved on {{collective.name}}: {{{currency expense.amount currency=expense.currency precision=2}}} for {{expense.description}}
 
 {{> header}}
 
 <center>
-  <h1>{{{currency expense.amount currency=expense.currency}}}</h1>
+  <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
   <div>{{expense.description}}</div>
 </center>
 

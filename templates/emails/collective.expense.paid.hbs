@@ -1,4 +1,4 @@
-Subject: {{#ifCond expense.currency '===' 'USD'}}💵 {{/ifCond}}{{#ifCond expense.currency '===' 'EUR'}}💶 {{/ifCond}}{{#ifCond expense.currency '===' 'GBP'}}💷 {{/ifCond}}{{{currency expense.amount currency=expense.currency}}} from {{collective.name}} for {{expense.description}}
+Subject: {{#ifCond expense.currency '===' 'USD'}}💵 {{/ifCond}}{{#ifCond expense.currency '===' 'EUR'}}💶 {{/ifCond}}{{#ifCond expense.currency '===' 'GBP'}}💷 {{/ifCond}}{{{currency expense.amount currency=expense.currency precision=2}}} from {{collective.name}} for {{expense.description}}
 
 {{> header}}
 
