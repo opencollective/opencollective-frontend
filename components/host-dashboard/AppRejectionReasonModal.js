@@ -21,7 +21,7 @@ const rejectCollectiveQuery = gql`
 
 const messages = defineMessages({
   placeholder: {
-    id: 'placeholder',
+    id: 'appRejectionReason.placeholder',
     defaultMessage: 'What is the reason for rejecting this application?',
   },
 });
@@ -50,7 +50,7 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
             minHeight={200}
             value={rejectionReason}
             onChange={({ target }) => setRejectionReason(target.value)}
-            placeholder={intl.formatMessage(messages['placeholder'])}
+            placeholder={intl.formatMessage(messages.placeholder)}
           />
         </Container>
       </ModalBody>
