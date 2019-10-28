@@ -858,10 +858,16 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
-   *  Checks if the collective can be contacted.
+   *  Checks if the collective can be contacted by `remoteUser`.
    */
-  Collective.prototype.canContact = async function() {
-    return this.isActive && (this.type === types.COLLECTIVE || this.type === types.EVENT || (await this.isHost()));
+  Collective.prototype.canContact = async function(remoteUser) {
+    if (!remoteUser || get(remoteUser.data, 'disableContact', false)) {
+      return false;
+    } else if (!this.isActive) {
+      return false;
+    } else {
+      return [types.COLLECTIVE, types.EVENT].includes(this.type) || (await this.isHost());
+    }
   };
 
   // This is quite ugly, and only needed for events.

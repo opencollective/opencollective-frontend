@@ -973,8 +973,8 @@ const CollectiveFields = () => {
     canContact: {
       description: 'Returns whether this collectives can be contacted',
       type: GraphQLBoolean,
-      resolve(collective) {
-        return collective.canContact();
+      resolve(collective, _, req) {
+        return collective.canContact(req.remoteUser);
       },
     },
     isIncognito: {

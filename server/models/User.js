@@ -138,6 +138,11 @@ export default (Sequelize, DataTypes) => {
         defaultValue: false,
         type: DataTypes.BOOLEAN,
       },
+
+      data: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
     },
     {
       paranoid: true,
