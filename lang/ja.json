@@ -122,6 +122,7 @@
   "collective.create.title": "オープンコレクティブを作る",
   "collective.created": "コレクティブの作成に成功しました。",
   "collective.created.description": "While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.",
+  "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   "Collective.CreateNew": "Create new Collective",
   "collective.delete.button": "{type} を削除",
   "collective.delete.cancel.btn": "キャンセル",

@@ -122,6 +122,7 @@
   "collective.create.title": "Create an Open Collective",
   "collective.created": "Your collective has been created with success.",
   "collective.created.description": "While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.",
+  "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   "Collective.CreateNew": "Create new Collective",
   "collective.delete.button": "Delete this {type}",
   "collective.delete.cancel.btn": "Abbrechen",

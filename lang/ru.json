@@ -122,6 +122,7 @@
   "collective.create.title": "Создать открытй коллектив",
   "collective.created": "Ваш коллектив успешно создан.",
   "collective.created.description": "Пока вы ждёте подтверждения от вашего представителя ({host}), вы уже можете задать настройки для своего коллектива, расходов и даже создавать события.",
+  "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   "Collective.CreateNew": "Create new Collective",
   "collective.delete.button": "Удалить этот {type}",
   "collective.delete.cancel.btn": "Отмена",

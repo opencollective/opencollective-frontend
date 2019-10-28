@@ -15,6 +15,11 @@ const messages = defineMessages({
     defaultMessage:
       'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
   },
+  collectiveGithubCreatedDescription: {
+    id: 'collective.githubflow.created.description',
+    defaultMessage:
+      "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
+  },
   organizationCreated: {
     id: 'organization.created',
     defaultMessage: 'Your Organization has been created.',
@@ -45,6 +50,12 @@ const messages = defineMessages({
 });
 
 const getNotification = (intl, status, collective, host) => {
+  if (status === 'collectiveCreated' && host.name === 'Open Source Collective 501(c)(6)') {
+    return {
+      title: intl.formatMessage(messages.collectiveCreated),
+      description: intl.formatMessage(messages.collectiveGithubCreatedDescription, { host: host.name }),
+    };
+  }
   if (status === 'collectiveCreated') {
     switch (collective.type) {
       case CollectiveType.ORGANIZATION:
