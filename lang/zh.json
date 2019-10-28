@@ -263,7 +263,6 @@
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
-  "comment.badPermissions": "您没有权限对此费用发表评论。",
   "comment.btn": "评论",
   "comment.cancelEdit": "取消编辑",
   "comment.edit": "编辑",

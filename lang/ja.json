@@ -263,7 +263,6 @@
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
-  "comment.badPermissions": "この請求にコメントをする権限がありません。",
   "comment.btn": "コメント",
   "comment.cancelEdit": "編集をキャンセル",
   "comment.edit": "編集",

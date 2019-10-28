@@ -263,7 +263,6 @@
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
-  "comment.badPermissions": "У вас нет прав комментировать данную затрату.",
   "comment.btn": "Комментировать",
   "comment.cancelEdit": "отменить редактирование",
   "comment.edit": "редактировать",
