@@ -502,7 +502,7 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.callCount).to.equal(1);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(admin.email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
-        'New expense on Test Collective: $10 for Test expense for pizza',
+        'New expense on Test Collective: $10.00 for Test expense for pizza',
       );
       expect(emailSendMessageSpy.firstCall.args[2]).to.contain('/test-collective/expenses/1/approve');
 
@@ -633,7 +633,7 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('Your expense');
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('has been approved');
       expect(emailSendMessageSpy.secondCall.args[0]).to.equal(hostAdmin.email);
-      expect(emailSendMessageSpy.secondCall.args[1]).to.contain('New expense approved on rollup: $10 for Pizza');
+      expect(emailSendMessageSpy.secondCall.args[1]).to.contain('New expense approved on rollup: $10.00 for Pizza');
       expect(emailSendMessageSpy.secondCall.args[2]).to.contain('PayPal (testuser@paypal.com)');
       expect(emailSendMessageSpy.secondCall.args[2]).to.contain('Private instructions to reimburse this expense');
     }); /* End of "successfully approve expense and send notification email to author of expense" */
