@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Mon Oct 21 2019 12:57:04 GMT+0200 (GMT+02:00)
+# timestamp: Tue Oct 22 2019 22:27:00 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -1463,6 +1463,11 @@ type Mutation {
   Approve a collective
   """
   approveCollective(id: Int!): CollectiveInterface
+
+  """
+  Reject a collective
+  """
+  rejectCollective(id: Int!, rejectionReason: String): CollectiveInterface
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
   sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
