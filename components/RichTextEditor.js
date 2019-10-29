@@ -96,6 +96,7 @@ export default class RichTextEditor extends React.Component {
     this.editorRef.current.removeEventListener('trix-change', this.handleChange);
     this.editorRef.current.removeEventListener('trix-attachment-add', this.handleUpload);
     this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
+    this.editorRef.current.removeEventListener('trix-blur', this.handlerais);
   }
 
   initialize = () => {
@@ -104,23 +105,23 @@ export default class RichTextEditor extends React.Component {
       this.editorRef.current.addEventListener('trix-change', this.handleChange, false);
       this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
+      this.editorRef.current.addEventListener('trix-blur', this.handlerais);
 
       // Component ready!
       this.isReady = true;
     }
   };
 
-  handleChange = e => {
-    // Support for adding codeblocks suing backtickes (```)
-    if (/```([\s\S]*)```/.test(e.target.value)) {
-      var editor = e.target.editor;
-
-      var match = editor
-        .getDocument()
-        .toString()
-        .match(/```([\s\S]*)```/);
-      var position = match.index;
-      var length = match[1].length;
+  handlerais = e => {
+    // Support for adding codeblocks using backtickes (```)
+    const editor = e.target.editor;
+    const match = editor
+      .getDocument()
+      .toString()
+      .match(/```([\s\S]*)```/);
+    if (match) {
+      let position = match.index;
+      const length = match[1].length;
 
       // Delete the opening ```
       editor.setSelectedRange([position, position + 4]);
@@ -136,7 +137,9 @@ export default class RichTextEditor extends React.Component {
       editor.setSelectedRange([position, position + 3]);
       editor.deleteInDirection('backward');
     }
+  };
 
+  handleChange = e => {
     if (this.props.onChange) {
       this.props.onChange(e.target.innerHTML, e.target.innerText);
     }
