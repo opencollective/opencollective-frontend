@@ -7,6 +7,7 @@ import { pick } from 'lodash';
 
 import models from '../../models';
 import status from '../../constants/order_status';
+import activities from '../../constants/activities';
 import * as paymentsLib from '../payments';
 
 export function getNextDispatchingDate(interval, currentDispatchDate) {
@@ -147,4 +148,36 @@ export async function dispatchFunds(order) {
     },
     { concurrency: 3 },
   );
+}
+
+export function backgroundDispatch(order, subscription) {
+  dispatchFunds(order)
+    .then(async dispatchedOrders => {
+      // update subscription next dispatch date
+      if (dispatchedOrders) {
+        const currentDispatchDate = (subscription.data && subscription.data.nextDispatchDate) || new Date();
+        subscription.data = {
+          nextDispatchDate: getNextDispatchingDate(subscription.interval, currentDispatchDate),
+        };
+        await subscription.save();
+      }
+      return dispatchedOrders;
+    })
+    .then(async dispatchedOrders => {
+      const collective = await models.Collective.findByPk(order.FromCollectiveId);
+      // send confirmation email to collective admins
+      models.Activity.create({
+        type: activities.BACKYOURSTACK_DISPATCH_CONFIRMED,
+        UserId: order.CreatedByUserId,
+        CollectiveId: collective.id,
+        data: {
+          orders: dispatchedOrders,
+          collective: collective.info,
+        },
+      });
+    })
+    .catch(err => {
+      console.log('>>>> Background dispatch failed');
+      console.error(err);
+    });
 }

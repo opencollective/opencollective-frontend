@@ -901,7 +901,12 @@ const mutations = {
     },
   },
   backyourstackDispatchOrder: {
-    type: new GraphQLList(OrderType),
+    type: new GraphQLObjectType({
+      name: 'BackYourStackResult',
+      fields: {
+        dispatching: { type: GraphQLBoolean },
+      },
+    }),
     args: {
       id: {
         type: new GraphQLNonNull(GraphQLInt),
