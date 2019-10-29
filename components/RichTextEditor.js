@@ -111,6 +111,32 @@ export default class RichTextEditor extends React.Component {
   };
 
   handleChange = e => {
+    // Support for adding codeblocks suing backtickes (```)
+    if (/```([\s\S]*)```/.test(e.target.value)) {
+      var editor = e.target.editor;
+
+      var match = editor
+        .getDocument()
+        .toString()
+        .match(/```([\s\S]*)```/);
+      var position = match.index;
+      var length = match[1].length;
+
+      // Delete the opening ```
+      editor.setSelectedRange([position, position + 4]);
+      editor.deleteInDirection('backward');
+
+      // Format the code block
+      position = editor.getSelectedRange()[0];
+      editor.setSelectedRange([position, position + length - 1]);
+      editor.activateAttribute('code');
+
+      // Delete the closing ```
+      position = editor.getSelectedRange()[1];
+      editor.setSelectedRange([position, position + 3]);
+      editor.deleteInDirection('backward');
+    }
+
     if (this.props.onChange) {
       this.props.onChange(e.target.innerHTML, e.target.innerText);
     }
