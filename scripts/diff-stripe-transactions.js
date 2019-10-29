@@ -6,14 +6,14 @@ import stripe from '../server/lib/stripe';
 
 if (process.argv.length < 3) {
   console.error(
-    'Usage: ./scripts/diff-stripe-transactions.js STRIPE_ACCOUNT_ID [NB_CHARGES_TO_CHECK=100] [START_PAGE=0]',
+    'Usage: ./scripts/diff-stripe-transactions.js STRIPE_ACCOUNT_ID [NB_CHARGES_TO_CHECK=100] [LAST_CHARGE_ID]',
   );
   process.exit(1);
 }
 
 const STRIPE_ACCOUNT = process.argv[2];
 const NB_CHARGES_TO_CHECK = parseInt(process.argv[3]) || 100;
-const START_PAGE = parseInt(process.argv[4]) || 0;
+const LAST_CHARGE_ID = process.argv[4] || undefined;
 const NB_CHARGES_PER_QUERY = 100; // Max allowed by Stripe
 const NB_PAGES = NB_CHARGES_TO_CHECK / NB_CHARGES_PER_QUERY;
 
@@ -56,11 +56,11 @@ async function checkCharge(charge) {
 }
 
 async function main() {
-  let lastChargeId;
+  let lastChargeId = LAST_CHARGE_ID;
   let totalAlreadyChecked = 0;
 
   console.info(`Starting the diff of Stripe VS Transactions for the latest ${NB_CHARGES_TO_CHECK} charges`);
-  for (let pageNum = START_PAGE; pageNum < NB_PAGES; pageNum++) {
+  for (let pageNum = 0; pageNum < NB_PAGES; pageNum++) {
     // Log the current page
     const nbToCheckInThisPage = Math.min(NB_CHARGES_PER_QUERY, NB_CHARGES_TO_CHECK - totalAlreadyChecked);
     console.info(`🔎️ Checking transactions ${totalAlreadyChecked} to ${totalAlreadyChecked + nbToCheckInThisPage}`);
