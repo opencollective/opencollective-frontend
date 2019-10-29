@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled from 'styled-components';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
+import dynamic from 'next/dynamic';
 import { Github } from 'styled-icons/fa-brands/Github';
 import { Twitter } from 'styled-icons/fa-brands/Twitter';
 import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
@@ -16,13 +17,15 @@ import Avatar from './Avatar';
 import Logo from './Logo';
 import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
 import Link from './Link';
-import GoalsCover from './GoalsCover';
-import MenuBar from './MenuBar';
-import TopBackersCoverWithData from './TopBackersCoverWithData';
 import UserCompany from './UserCompany';
 import CollectiveNavbar from './CollectiveNavbar';
 import Container from './Container';
 import { AllSectionsNames } from './collective-page/_constants';
+
+// Dynamicly load HTMLEditor to download it only if user can edit the page
+const GoalsCover = dynamic(() => import('./GoalsCover'));
+const MenuBar = dynamic(() => import('./MenuBar'));
+const TopBackersCoverWithData = dynamic(() => import('./TopBackersCoverWithData'));
 
 const ContributeLink = styled(Link)`
   --webkit-appearance: none;
@@ -93,7 +96,6 @@ class CollectiveCover extends React.Component {
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
     cta: PropTypes.object, // { href, label }
-    context: PropTypes.string,
     displayContributeLink: PropTypes.bool,
     selectedSection: PropTypes.oneOf(AllSectionsNames),
     /** If true, the component will never render the new collective navbar */
@@ -226,14 +228,6 @@ ${description}`;
     return tooltip;
   }
 
-  getDefaultCallsToAction() {
-    if (!this.props.collective) {
-      return {};
-    } else {
-      return { hasContact: this.props.collective.type === CollectiveType.COLLECTIVE };
-    }
-  }
-
   checkTimeDiff() {
     if (this.props.collective.timezone) {
       const eventTimezone = moment()
@@ -247,7 +241,7 @@ ${description}`;
   }
 
   render() {
-    const { collective, context, className, LoggedInUser, intl, forceLegacy } = this.props;
+    const { collective, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
@@ -262,7 +256,7 @@ ${description}`;
             collective={collective}
             isAdmin={canEdit}
             showEdit
-            callsToAction={this.props.callsToAction || this.getDefaultCallsToAction()}
+            callsToAction={this.props.callsToAction}
             selected={this.props.selectedSection}
           />
         </Container>
@@ -633,7 +627,7 @@ ${description}`;
               </div>
             )}
 
-          {collective.type === 'COLLECTIVE' && context !== 'createUpdate' && collective.isActive && collective.host && (
+          {collective.type === 'COLLECTIVE' && collective.isActive && collective.host && (
             <div className={`statsContainer ${showGoalsCover ? 'goals' : ''}`}>
               {className !== 'small' && collective.type === 'COLLECTIVE' && (
                 <div className="topContributors">
