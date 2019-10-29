@@ -92,6 +92,7 @@ export const templateNames = [
   'user.new.token.text',
   'user.yearlyreport',
   'user.yearlyreport.text',
+  'backyourstack.dispatch.confirmed',
 ];
 
 const templatesPath = `${__dirname}/../../templates`;

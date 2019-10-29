@@ -32,6 +32,7 @@ export default {
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
   COLLECTIVE_MONTHLY: 'collective.monthly',
   ORDERS_SUSPICIOUS: 'orders.suspicious',
+  BACKYOURSTACK_DISPATCH_CONFIRMED: 'backyourstack.dispatch.confirmed',
 
   // Not used anymore, leaving for historical reference
   COLLECTIVE_TRANSACTION_PAID: 'collective.transaction.paid', // replaced with COLLECTIVE_EXPENSE_PAID
