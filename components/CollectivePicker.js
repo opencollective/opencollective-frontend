@@ -191,7 +191,7 @@ class CollectivePicker extends React.PureComponent {
           defaultValue={getDefaultOptions(this.buildCollectiveOption, allOptions)}
           value={getOptions(this.buildCollectiveOption)}
           menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
-          isDisabled={createFormCollectiveType || isDisabled}
+          isDisabled={Boolean(createFormCollectiveType) || isDisabled}
           onMenuOpen={this.openMenu}
           onMenuClose={this.closeMenu}
           formatOptionLabel={(option, context) => {
