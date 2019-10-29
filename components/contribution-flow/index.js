@@ -655,7 +655,9 @@ class CreateOrderPage extends React.Component {
   /** Returns manual payment method if supported by the host and not using an interval, null otherwise */
   getManualPaymentMethod() {
     const pm = get(this.props.host.settings, 'paymentMethods.manual');
-    if (!pm || get(this.state, 'stepDetails.interval')) {
+    const interval = get(this.state, 'stepDetails.interval');
+
+    if (interval || (!pm && !this.props.LoggedInUser.isRoot())) {
       return null;
     }
 
