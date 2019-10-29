@@ -621,10 +621,6 @@ class EditCollectiveForm extends React.Component {
               text-align: center;
               margin: 1rem 0 3rem 0;
             }
-            #learnMore {
-              float: right;
-              padding-top: 8px;
-            }
           `}
         </style>
 
@@ -832,14 +828,21 @@ class EditCollectiveForm extends React.Component {
               )}
               {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
                 <Flex flexDirection="column">
-                  <Container mb={4} pb={4} borderBottom="1px solid #E8E9EB">
+                  <Container
+                    mb={4}
+                    pb={4}
+                    borderBottom="1px solid #E8E9EB"
+                    display="flex"
+                    justifyContent="space-between"
+                    flexWrap="wrap"
+                  >
                     <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
                       <StyledButton>
                         <ArrowBack size="1em" />{' '}
                         <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                       </StyledButton>
                     </Link>
-                    <a id="learnMore" href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq">
+                    <a href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq">
                       <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />.
                     </a>
                   </Container>
