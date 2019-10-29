@@ -52,7 +52,7 @@ const MemberCard = ({ role, since, collective, ...cardProps }) => (
     </CollectiveLogoContainer>
     <Flex flexDirection="column" alignItems="center" p={2}>
       <Link route="collective" params={{ slug: collective.slug }}>
-        <H5 fontSize="Paragraph" fontWeight="bold" lineHeight="Caption">
+        <H5 textAlign="center" fontSize="Paragraph" fontWeight="bold" lineHeight="Caption">
           {collective.name}
         </H5>
       </Link>

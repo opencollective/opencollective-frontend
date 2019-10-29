@@ -16,6 +16,7 @@ import Container from '../components/Container';
 import { P, H1, H5 } from '../components/Text';
 import GiftCard from '../components/GiftCard';
 import SearchForm from '../components/SearchForm';
+import MessageBox from '../components/MessageBox';
 
 import withData from '../lib/withData';
 
@@ -204,10 +205,19 @@ class RedeemedPage extends React.Component {
               </Flex>
             </Hero>
 
+            <Box width={['320px', '640px']} my={3}>
+              <MessageBox type="info" withIcon>
+                <FormattedMessage
+                  id="redeemed.incognito"
+                  defaultMessage="Please note that gifts cards cannot be used with incognito profiles."
+                />
+              </MessageBox>
+            </Box>
+
             <Box width={['320px', '640px']}>
               <SearchFormContainer>
                 <Box mb={3}>
-                  <H5>
+                  <H5 textAlign="center">
                     <FormattedMessage
                       id="redeemed.findCollectives"
                       defaultMessage="Find open collectives to support."

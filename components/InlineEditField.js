@@ -68,10 +68,13 @@ class InlineEditField extends Component {
      * Highly recommended if field is nullable.
      */
     placeholder: PropTypes.node,
+    /** Editing the top value. */
+    topEdit: PropTypes.number,
   };
 
   static defaultProps = {
     showEditIcon: true,
+    topEdit: -5,
   };
 
   state = { isEditing: false, draft: '' };
@@ -109,16 +112,25 @@ class InlineEditField extends Component {
   }
   z;
   render() {
-    const { field, values, mutation, canEdit, formatBeforeSubmit, showEditIcon, placeholder, children } = this.props;
+    const {
+      field,
+      values,
+      mutation,
+      canEdit,
+      formatBeforeSubmit,
+      showEditIcon,
+      placeholder,
+      children,
+      topEdit,
+    } = this.props;
     const { isEditing, draft } = this.state;
     const value = get(values, field);
     const touched = draft !== value;
-
     if (!isEditing) {
       return (
         <Container position="relative">
           {canEdit && showEditIcon && (
-            <Container position="absolute" top={-5} right={-5} zIndex={2}>
+            <Container position="absolute" top={topEdit} right={-5} zIndex={2}>
               <EditIcon size={24} onClick={this.enableEditor} data-cy={`InlineEditField-Trigger-${field}`} />
             </Container>
           )}

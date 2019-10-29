@@ -32,6 +32,8 @@ class HostDashboardActionsBanner extends React.Component {
     }).isRequired,
     onChange: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    saveFilterPreferences: PropTypes.func,
+    defaultSelectedCollective: PropTypes.object,
     /** @ignore from apollo */
     addFundsToCollective: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
@@ -44,7 +46,7 @@ class HostDashboardActionsBanner extends React.Component {
       connectingPaypal: false,
       loading: false,
       showAddFunds: false,
-      selectedCollective: null,
+      selectedCollective: props.defaultSelectedCollective || null,
     };
     this.messages = defineMessages({
       'badge.tooltip.pending': {
@@ -144,8 +146,12 @@ class HostDashboardActionsBanner extends React.Component {
     this.props.onChange(collective);
   };
 
+  getDefaultCollectiveOption = buildOptionFromCollective => {
+    return this.state.selectedCollective ? buildOptionFromCollective(this.state.selectedCollective) : undefined;
+  };
+
   render() {
-    const { host, intl } = this.props;
+    const { host, intl, saveFilterPreferences } = this.props;
     const { selectedCollective } = this.state;
 
     if (!host) {
@@ -182,6 +188,7 @@ class HostDashboardActionsBanner extends React.Component {
                   maxWidth={500}
                   customOptions={customOptions}
                   disabled={this.state.loading}
+                  getDefaultOptions={this.getDefaultCollectiveOption}
                 />
               </Box>
             )}
@@ -191,7 +198,9 @@ class HostDashboardActionsBanner extends React.Component {
               </StyledButton>
             )}
           </div>
-          <div style={{ maxWidth: 450 }}>{this.canEdit() && <ConnectPaypal collective={host} />}</div>
+          <div style={{ maxWidth: 450 }}>
+            {this.canEdit() && <ConnectPaypal collective={host} onClickRefillBalance={saveFilterPreferences} />}
+          </div>
         </Flex>
         <div>
           {selectedCollective && this.state.showAddFunds && (
@@ -246,9 +255,4 @@ const addMutation = graphql(addFundsToCollectiveQuery, {
   }),
 });
 
-/**
- * An action banner for the host dashboard. Currently holds two features:
- *  - A collective picker to filter the list of collectives
- *  -
- */
 export default addMutation(injectIntl(HostDashboardActionsBanner));

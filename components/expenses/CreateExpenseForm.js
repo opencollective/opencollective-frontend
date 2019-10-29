@@ -94,7 +94,8 @@ class CreateExpenseForm extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.expense.paypalEmail) {
+    const hasLoggedIn = !prevProps.LoggedInUser && this.props.LoggedInUser;
+    if (hasLoggedIn && !this.state.expense.paypalEmail && this.props.LoggedInUser.paypalEmail) {
       this.handleChange('paypalEmail', this.props.LoggedInUser.paypalEmail);
     }
   }

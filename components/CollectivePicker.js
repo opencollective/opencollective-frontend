@@ -9,6 +9,10 @@ import { CollectiveType } from '../lib/constants/collectives';
 import StyledSelect from './StyledSelect';
 import Avatar from './Avatar';
 import { Span } from './Text';
+import CollectiveTypePicker from './CollectiveTypePicker';
+import Container from './Container';
+import StyledCard from './StyledCard';
+import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
 
 const CollectiveTypesI18n = defineMessages({
   [CollectiveType.COLLECTIVE]: {
@@ -22,6 +26,13 @@ const CollectiveTypesI18n = defineMessages({
   [CollectiveType.USER]: {
     id: 'collective.types.user',
     defaultMessage: '{n, plural, one {people} other {people}}',
+  },
+});
+
+const Messages = defineMessages({
+  createNew: {
+    id: 'CollectivePicker.CreateNew',
+    defaultMessage: 'Create new',
   },
 });
 
@@ -60,6 +71,11 @@ DefaultCollectiveLabel.propTypes = {
  * If you want the collectives to be automatically loaded from the API, check `CollectivePickerAsync`.
  */
 class CollectivePicker extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = { createFormCollectiveType: null, menuIsOpen: props.menuIsOpen };
+  }
+
   /**
    * Function to generate a single select option
    */
@@ -99,35 +115,110 @@ class CollectivePicker extends React.PureComponent {
     });
   });
 
-  getAllOptions = memoizeOne((collectivesOptions, customOptions) => {
-    return !customOptions || customOptions.length === 0
-      ? collectivesOptions
-      : [...customOptions, ...collectivesOptions];
+  getAllOptions = memoizeOne((collectivesOptions, customOptions, creatable, intl) => {
+    let options = collectivesOptions;
+
+    if (customOptions && customOptions.length > 0) {
+      options = [...customOptions, ...options];
+    }
+
+    if (creatable) {
+      options = [
+        ...options,
+        {
+          label: intl.formatMessage(Messages.createNew).toUpperCase(),
+          options: [
+            {
+              label: null,
+              value: null,
+              isDisabled: true,
+              __collective_picker_new__: true,
+              __background__: 'white',
+            },
+          ],
+        },
+      ];
+    }
+
+    return options;
   });
+
+  setCreateFormCollectiveType = type => {
+    this.setState({ createFormCollectiveType: type || null });
+  };
+
+  getMenuIsOpen(menuIsOpenFromProps) {
+    if (this.state.createFormCollectiveType || this.props.isDisabled) {
+      return false;
+    } else if (typeof menuIsOpenFromProps !== 'undefined') {
+      return menuIsOpenFromProps;
+    } else {
+      return this.state.menuIsOpen;
+    }
+  }
+
+  openMenu = () => this.setState({ menuIsOpen: true });
+
+  closeMenu = () => this.setState({ menuIsOpen: false });
 
   render() {
     const {
-      collectives,
-      groupByType,
-      customOptions,
-      getDefaultOptions,
       intl,
-      sortFunc,
+      collectives,
+      creatable,
+      customOptions,
       formatOptionLabel,
+      getDefaultOptions,
+      getOptions,
+      groupByType,
+      sortFunc,
+      types,
+      isDisabled,
+      menuIsOpen,
+      minWidth,
+      maxWidth,
+      width,
       ...props
     } = this.props;
-
+    const { createFormCollectiveType } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
-    const allOptions = this.getAllOptions(collectiveOptions, customOptions);
+    const allOptions = this.getAllOptions(collectiveOptions, customOptions, creatable, intl);
+
     return (
-      <StyledSelect
-        options={allOptions}
-        defaultValue={getDefaultOptions(this.buildCollectiveOption, allOptions)}
-        formatOptionLabel={(option, context) =>
-          option.__collective_picker_collective__ ? formatOptionLabel(option, context) : option.label
-        }
-        {...props}
-      />
+      <Container position="relative" minWidth={minWidth} maxWidth={maxWidth} width={width}>
+        <StyledSelect
+          options={allOptions}
+          defaultValue={getDefaultOptions(this.buildCollectiveOption, allOptions)}
+          value={getOptions(this.buildCollectiveOption)}
+          menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
+          isDisabled={createFormCollectiveType || isDisabled}
+          onMenuOpen={this.openMenu}
+          onMenuClose={this.closeMenu}
+          formatOptionLabel={(option, context) => {
+            if (option.__collective_picker_collective__) {
+              return formatOptionLabel(option, context);
+            } else if (option.__collective_picker_new__) {
+              return <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={types} />;
+            } else {
+              return option.label;
+            }
+          }}
+          {...props}
+        />
+        {createFormCollectiveType && (
+          <StyledCard position="absolute" p={3} mt={1} width="100%" zIndex={9}>
+            <CreateCollectiveMiniForm
+              type={createFormCollectiveType}
+              onCancel={this.setCreateFormCollectiveType}
+              onSuccess={collective => {
+                props.onChange({ label: collective.name, value: collective });
+                this.closeMenu();
+                this.setCreateFormCollectiveType(null);
+              }}
+            />
+          </StyledCard>
+        )}
+      </Container>
     );
   }
 }
@@ -152,10 +243,26 @@ CollectivePicker.propTypes = {
   sortFunc: PropTypes.func,
   /** Get passed the options list, returns the default one */
   getDefaultOptions: PropTypes.func.isRequired,
+  /** Use this to control the component */
+  getOptions: PropTypes.func.isRequired,
   /** Function to generate a label from the collective + index */
   formatOptionLabel: PropTypes.func.isRequired,
   /** Whether we should group collectives by type */
   groupByType: PropTypes.bool,
+  /** If true, a permanent option to create a collective will be displayed in the select */
+  creatable: PropTypes.bool,
+  /** Force menu to be open. Ignored during collective creation */
+  menuIsOpen: PropTypes.bool,
+  /** Disabled */
+  isDisabled: PropTypes.isDisabled,
+  /** Component min width */
+  minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** Component max width */
+  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** Component width */
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  /** If creatable is true, only these types will be displayed in the create form */
+  types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };
@@ -163,6 +270,7 @@ CollectivePicker.propTypes = {
 CollectivePicker.defaultProps = {
   groupByType: true,
   getDefaultOptions: () => undefined,
+  getOptions: () => undefined,
   formatOptionLabel: DefaultCollectiveLabel,
   sortFunc: collectives => sortBy(collectives, 'name'),
 };
