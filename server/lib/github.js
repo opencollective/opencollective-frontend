@@ -77,13 +77,18 @@ export async function getAllUserPublicRepos(accessToken) {
 
   let repos = [];
   let fetchRepos;
+  const maxNbPages = 15; // More than that would probably timeout the request
   do {
     // https://octokit.github.io/rest.js/#api-Repos-list
     // https://developer.github.com/v3/repos/#list-your-repositories
     fetchRepos = await octokit.repos.list(parameters).then(getData);
     repos = [...repos, ...fetchRepos];
     parameters.page++;
-  } while (fetchRepos.length === parameters.per_page);
+  } while (fetchRepos.length === parameters.per_page && parameters.page < maxNbPages);
+
+  if (parameters.page === maxNbPages) {
+    logger.error(`Aborted: Too many repos to fetch for user with token ${accessToken}`);
+  }
 
   repos = repos.map(compactRepo);
 
