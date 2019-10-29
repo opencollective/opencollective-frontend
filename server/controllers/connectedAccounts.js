@@ -197,9 +197,13 @@ const getGithubAccount = async req => {
   return githubAccount;
 };
 
+// Use a 1 minutes timeout as the default 25 seconds can leads to failing requests.
+const GITHUB_REPOS_FETCH_TIMEOUT = 1 * 60 * 1000;
+
 export const fetchAllRepositories = async (req, res, next) => {
   const githubAccount = await getGithubAccount(req);
   try {
+    req.setTimeout(GITHUB_REPOS_FETCH_TIMEOUT);
     let repos = await github.getAllUserPublicRepos(githubAccount.token);
     if (repos.length !== 0) {
       repos = repos.filter(repo => {
