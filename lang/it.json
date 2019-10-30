@@ -1190,6 +1190,8 @@
   "transactions.emptysearch": "Non ci sono transazioni per questo intervallo di date.",
   "transactions.viewAll": "Vedi Tutte le transazioni",
   "tweetIt": "Tweet it",
+  "unapprove.modal.body": "Are you sure you want to unapprove this expense?",
+  "unapprove.modal.header": "Unapprove Expense",
   "unsubscribe.success": "You've unsubscribed successfully!",
   "unsubscribe.unsubscribing": "Unsubscribing your email...",
   "update.approved": "approvato",

@@ -1190,6 +1190,8 @@
   "transactions.emptysearch": "Il n'y a pas de transactions pour cette période.",
   "transactions.viewAll": "Voir toutes les transactions",
   "tweetIt": "Tweeter",
+  "unapprove.modal.body": "Are you sure you want to unapprove this expense?",
+  "unapprove.modal.header": "Unapprove Expense",
   "unsubscribe.success": "Désinscription réussie !",
   "unsubscribe.unsubscribing": "Désabonnement de votre adresse email...",
   "update.approved": "approuvé",
