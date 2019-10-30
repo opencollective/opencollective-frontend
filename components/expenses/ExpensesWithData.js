@@ -153,6 +153,7 @@ export const addExpensesData = graphql(getExpensesQuery, {
     return {
       variables: getExpensesVariables(props),
       fetchPolicy: 'network-only',
+      notifyOnNetworkStatusChange: true,
     };
   },
   props: ({ data }) => ({
