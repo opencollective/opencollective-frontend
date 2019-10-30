@@ -26,6 +26,12 @@ const PledgedCollectivePage = dynamic(
   { loading: Loading },
 );
 
+/** A page rendered when collective is incognito */
+const IncognitoUserCollective = dynamic(
+  () => import(/* webpackChunkName: 'IncognitoUserCollective' */ '../components/IncognitoUserCollective'),
+  { loading: Loading },
+);
+
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
   html {
@@ -68,6 +74,7 @@ class NewCollectivePage extends React.Component {
         isHost: PropTypes.bool,
         isActive: PropTypes.bool,
         isPledged: PropTypes.bool,
+        isIncognito: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
         stats: PropTypes.object,
@@ -129,6 +136,8 @@ class NewCollectivePage extends React.Component {
         return <ErrorPage error={generateError.notFound(slug)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
+      } else if (data.Collective.isIncognito) {
+        return <IncognitoUserCollective />;
       }
     }
 
@@ -197,10 +206,12 @@ const getCollective = graphql(
         isApproved
         isArchived
         isHost
+        isIncognito
         hostFeePercent
         image
         imageUrl
         canApply
+        canContact
         stats {
           id
           balance

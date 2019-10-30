@@ -1,6 +1,8 @@
 import { mount } from 'enzyme';
 import React from 'react';
 import EditEventForm from '../EditEventForm';
+import { ThemeProvider } from 'styled-components';
+import theme from '../../lib/theme';
 
 import eventData from '../../test/mocks/Event.json';
 const event = eventData.data.Collective;
@@ -15,7 +17,9 @@ describe('EditEventForm component', () => {
 
   const component = mount(
     <IntlProvider locale="en">
-      <EditEventForm event={event} onSubmit={onSubmit} />
+      <ThemeProvider theme={theme}>
+        <EditEventForm event={event} onSubmit={onSubmit} />
+      </ThemeProvider>
     </IntlProvider>,
   );
 

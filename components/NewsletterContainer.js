@@ -9,7 +9,7 @@ class NewsletterContainer extends React.Component {
   render() {
     return (
       <Container py={5}>
-        <H5 mb={4} px={3}>
+        <H5 mb={4} px={3} textAlign="center">
           <FormattedMessage
             id="newsletter.container.title"
             defaultMessage="Stay updated about our news and progress."

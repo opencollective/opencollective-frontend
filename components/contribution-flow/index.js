@@ -29,6 +29,7 @@ import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import ContributeDetailsFAQ from '../faqs/ContributeDetailsFAQ';
+import ContributePaymentFAQ from '../faqs/ContributePaymentFAQ';
 import Container from '../Container';
 import { fadeIn } from '../StyledKeyframes';
 import MessageBox from '../MessageBox';
@@ -654,7 +655,9 @@ class CreateOrderPage extends React.Component {
   /** Returns manual payment method if supported by the host and not using an interval, null otherwise */
   getManualPaymentMethod() {
     const pm = get(this.props.host.settings, 'paymentMethods.manual');
-    if (!pm || get(this.state, 'stepDetails.interval')) {
+    const interval = get(this.state, 'stepDetails.interval');
+
+    if (interval || (!pm && !this.props.LoggedInUser.isRoot())) {
       return null;
     }
 
@@ -824,16 +827,26 @@ class CreateOrderPage extends React.Component {
                 disabled={this.state.submitting || this.state.submitted}
               />
             </Flex>
-            {this.isFixedContribution() ? (
-              <ContributionDetails
-                totalAmount={get(stepDetails, 'totalAmount')}
-                interval={interval}
-                currency={this.getCurrency()}
-                tax={this.state.stepSummary}
-              />
-            ) : (
-              <Box width={[0, null, null, 1 / 5]} />
-            )}
+            <Container width={[0, null, null, 1 / 5]}>
+              {this.isFixedContribution() && (
+                <ContributionDetails
+                  totalAmount={get(stepDetails, 'totalAmount')}
+                  interval={interval}
+                  currency={this.getCurrency()}
+                  tax={this.state.stepSummary}
+                />
+              )}
+              {isIncognito && (
+                <ContributePaymentFAQ
+                  mt={4}
+                  display={['none', null, 'block']}
+                  width={1 / 5}
+                  minWidth="300px"
+                  maxWidth="370px"
+                  marginLeft="8px"
+                />
+              )}
+            </Container>
           </Flex>
         );
       }

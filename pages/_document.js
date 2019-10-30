@@ -7,6 +7,8 @@ import flush from 'styled-jsx/server';
 import { pick } from 'lodash';
 import * as Sentry from '@sentry/browser';
 
+import { parseToBoolean } from '../lib/utils';
+
 process.on('unhandledRejection', err => {
   Sentry.captureException(err);
 });
@@ -19,10 +21,24 @@ process.on('uncaughtException', err => {
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
-    const { locale, localeDataScript } = ctx.req;
+    const { locale, localeDataScript, url } = ctx.req;
 
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
+
+    const clientAnalytics = {
+      enabled: parseToBoolean(process.env.CLIENT_ANALYTICS_ENABLED),
+      siteId: Number(process.env.CLIENT_ANALYTICS_SITE_ID),
+      customUrl: null,
+    };
+    if (url.match(/\.html/) || url.match(/\/button/)) {
+      clientAnalytics.enabled = false;
+    }
+    if (url.match(/\/signin\/sent/)) {
+      clientAnalytics.customUrl = '/signin/sent';
+    } else if (url.match(/\/signin\//)) {
+      clientAnalytics.customUrl = '/signin/token';
+    }
 
     try {
       // The new recommended way to process Styled Components
@@ -45,6 +61,7 @@ export default class IntlDocument extends Document {
         ...page,
         locale,
         localeDataScript,
+        clientAnalytics,
         styles: (
           <React.Fragment>
             {initialProps.styles}
@@ -74,6 +91,24 @@ export default class IntlDocument extends Document {
     ]);
   }
 
+  clientAnalyticsCode() {
+    const lines = [];
+    lines.push(`var _paq = window._paq || [];`);
+    if (this.props.clientAnalytics.customUrl) {
+      lines.push(`_paq.push(['setCustomUrl', '${this.props.clientAnalytics.customUrl}']);`);
+    }
+    lines.push(`_paq.push(['trackPageView']);`);
+    lines.push(`_paq.push(['enableLinkTracking']);`);
+    lines.push(`(function() {
+      var u="https://opencollective.matomo.cloud/";
+      _paq.push(['setTrackerUrl', u+'matomo.php']);
+      _paq.push(['setSiteId', '${this.props.clientAnalytics.siteId}']);
+      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+      g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://cdn.matomo.cloud/opencollective.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+    })();`);
+    return lines.join('\n');
+  }
+
   render() {
     return (
       <html>
@@ -86,6 +121,9 @@ export default class IntlDocument extends Document {
             }}
           />
           <NextScript />
+          {this.props.clientAnalytics.enabled && (
+            <script dangerouslySetInnerHTML={{ __html: this.clientAnalyticsCode() }} />
+          )}
         </body>
       </html>
     );

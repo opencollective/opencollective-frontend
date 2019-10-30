@@ -19,6 +19,7 @@ class Header extends React.Component {
     title: PropTypes.string,
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
+    metas: PropTypes.object,
   };
 
   getTitle() {
@@ -65,6 +66,7 @@ class Header extends React.Component {
       'twitter:description': truncate(description, 256),
       'twitter:image': image || defaultImage,
       'og:title': metaTitle,
+      ...this.props.metas,
     };
 
     return Object.keys(metas).map(key => ({ key, value: metas[key] }));

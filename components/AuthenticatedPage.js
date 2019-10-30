@@ -8,6 +8,7 @@ import Page from './Page';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import SignInOrJoinFree from './SignInOrJoinFree';
+import Container from './Container';
 
 /**
  * A wrapper arround `Page` that will display a spinner while user is loading.
@@ -39,7 +40,7 @@ class AuthenticatedPage extends React.Component {
   renderContent(loadingLoggedInUser, LoggedInUser) {
     if (!LoggedInUser) {
       return (
-        <Flex justifyContent="center" my={[5, null, 6]} px={2}>
+        <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2} borderTop="1px solid #E6E8EB">
           {loadingLoggedInUser ? (
             <Loading />
           ) : (
@@ -53,7 +54,7 @@ class AuthenticatedPage extends React.Component {
               <SignInOrJoinFree />
             </Flex>
           )}
-        </Flex>
+        </Container>
       );
     } else if (typeof this.props.children === 'function') {
       return this.props.children(LoggedInUser);
