@@ -931,7 +931,7 @@ describe('graphql.collective.test.js', () => {
       );
       // Check contributors cache is deleted after edition
       expect(cacheDelSpy.callCount).to.equal(1);
-      expect(cacheDelSpy.firstCall.args[0]).to.equal(`collective_contributors_${pubnubCollective.id}_150_BACKER`);
+      expect(cacheDelSpy.firstCall.args[0]).to.equal(`collective_contributors_${pubnubCollective.id}`);
     });
     it('deletes public message', async () => {
       await store.stripeConnectedAccount(pubnubHostCollective.id);
@@ -983,7 +983,7 @@ describe('graphql.collective.test.js', () => {
       );
       // Check contributors cache is deleted after edition
       expect(cacheDelSpy.callCount).to.equal(1);
-      expect(cacheDelSpy.firstCall.args[0]).to.equal(`collective_contributors_${pubnubCollective.id}_150_BACKER`);
+      expect(cacheDelSpy.firstCall.args[0]).to.equal(`collective_contributors_${pubnubCollective.id}`);
     });
     it('error trying to edit members public message where user is not admin', async () => {
       const { user } = await store.newUser('test');
