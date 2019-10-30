@@ -18,6 +18,7 @@ class Header extends React.Component {
     className: PropTypes.string,
     title: PropTypes.string,
     showSearch: PropTypes.bool,
+    menuItems: PropTypes.object,
     metas: PropTypes.object,
   };
 
@@ -89,7 +90,7 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        <TopBar className={className} showSearch={this.props.showSearch} />
+        <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
       </header>
     );
   }
