@@ -31,6 +31,7 @@ import {
   ContributorType,
   UpdateType,
   ContributorRoleEnum,
+  PaymentMethodBatchInfo,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -738,11 +739,17 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           },
         },
       },
+      virtualCardsBatches: {
+        type: new GraphQLList(PaymentMethodBatchInfo),
+        description:
+          'List all the gift cards batches emitted by this collective. May include `null` as key for unbatched gift cards.',
+      },
       createdVirtualCards: {
         type: PaginatedPaymentMethodsType,
         args: {
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          batch: { type: GraphQLString },
           isConfirmed: {
             type: GraphQLBoolean,
             description: 'Wether the virtual card has been claimed or not',
@@ -1547,12 +1554,26 @@ const CollectiveFields = () => {
         return paymentMethods;
       },
     },
+    virtualCardsBatches: {
+      type: new GraphQLList(PaymentMethodBatchInfo),
+      description:
+        'List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.',
+      resolve: async (collective, _args, req) => {
+        // Must be admin of the collective
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+          return [];
+        }
+
+        return queries.getVirtualCardBatchesForCollective(collective.id);
+      },
+    },
     createdVirtualCards: {
       type: PaginatedPaymentMethodsType,
       description: 'Get the virtual cards created by this collective. RemoteUser must be a collective admin.',
       args: {
         limit: { type: GraphQLInt },
         offset: { type: GraphQLInt },
+        batch: { type: GraphQLString },
         isConfirmed: {
           type: GraphQLBoolean,
           description: 'Wether the virtual card has been claimed or not',
@@ -1567,7 +1588,7 @@ const CollectiveFields = () => {
         const offset = args.offset || 0;
         const limit = args.limit || 15;
         const query = {
-          where: { type: 'virtualcard' },
+          where: { type: 'virtualcard', service: 'opencollective' },
           limit: args.limit,
           offset: args.offset,
           order: [['createdAt', 'DESC'], ['id', 'DESC']],
@@ -1584,6 +1605,10 @@ const CollectiveFields = () => {
 
         if (args.isConfirmed !== undefined) {
           query.where.confirmedAt = { [args.isConfirmed ? Op.ne : Op.eq]: null };
+        }
+
+        if (args.batch !== undefined) {
+          query.where.batch = args.batch;
         }
 
         const result = await models.PaymentMethod.findAndCountAll(query);
