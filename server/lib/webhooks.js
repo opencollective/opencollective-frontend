@@ -62,10 +62,10 @@ export const sanitizeActivity = activity => {
       'member.role',
       'member.description',
       'member.since',
-      'member.order.id',
-      'member.order.totalAmount',
-      'member.order.currency',
-      'member.order.description',
+      'order.id',
+      'order.totalAmount',
+      'order.currency',
+      'order.description',
     ]);
     cleanActivity.data.member.memberCollective = getCollectiveInfo(activity.data.member.memberCollective);
   }
