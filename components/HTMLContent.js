@@ -78,6 +78,10 @@ const HTMLContent = styled(({ content, ...props }) => {
       position: relative;
       padding: 0 0 0 1em;
       margin-bottom: 0.4em;
+
+      & > p:first-child {
+        display: inline;
+      }
       
       &::before {
         content: "◯";
