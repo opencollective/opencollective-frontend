@@ -69,7 +69,7 @@
   "collective.archive.availableBalance": "Solo se pueden archivar los Colectivos con balance igual a cero. Para pagar los fondos, envíe un gasto, done su remanente a otro Colectivo o envíe fondos a su anfitrión fiscal utilizando la opción 'saldo vacío'.",
   "collective.archive.button": "Archive esto {type}",
   "collective.archive.cancel.btn": "Cancelar",
-  "collective.archive.confirm.btn": "Archive",
+  "collective.archive.confirm.btn": "Archivo",
   "collective.archive.description": "Archiving a {type} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.modal.body": "Are you sure you want to archive this {type}?",
   "collective.archive.modal.header": "Archive collective",
