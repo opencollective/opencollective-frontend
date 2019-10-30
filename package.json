@@ -128,7 +128,7 @@
     "cypress:run": "cross-env TZ=UTC cypress run",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production master",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging master",
-    "dev": "babel-node server",
+    "dev": "node server",
     "git:clean": "cross-env ./scripts/git_clean.sh",
     "graphql:get-schema": "npm run graphql:update",
     "graphql:update": "npx graphql-cli get-schema -p opencollective -e dev && prettier lib/graphql/schema.graphql --write",
