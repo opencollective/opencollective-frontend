@@ -219,6 +219,10 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
       tier = await models.Tier.findByPk(order.tier.id);
       if (!tier) {
         throw new Error(`No tier found with tier id: ${order.tier.id} for collective slug ${order.collective.slug}`);
+      } else if (tier.CollectiveId !== collective.id) {
+        throw new Error(
+          `This tier (#${tier.id}) doesn't belong to the given Collective (${collective.name} #${collective.id})`,
+        );
       }
     }
 
