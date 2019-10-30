@@ -185,7 +185,6 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['FIXED', 'FLEXIBLE']),
         label: intl.formatMessage(this.messages['amountType.label']),
-        when: tier => ['DONATION', 'TIER'].indexOf(tier.type) !== -1,
       },
       {
         name: 'amount',
