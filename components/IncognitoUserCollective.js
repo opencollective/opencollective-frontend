@@ -4,13 +4,12 @@ import classNames from 'classnames';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
-import Avatar from './Avatar';
+import { IncognitoAvatar } from './Avatar';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
 class UserCollective extends React.Component {
   static propTypes = {
-    collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     query: PropTypes.object,
     intl: PropTypes.object.isRequired,
@@ -30,7 +29,7 @@ class UserCollective extends React.Component {
   }
 
   render() {
-    const { intl, collective } = this.props;
+    const { intl } = this.props;
 
     return (
       <div className={classNames('UserCollectivePage')}>
@@ -45,13 +44,12 @@ class UserCollective extends React.Component {
         <Header
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}
-          href={`/${collective.slug}`}
-          meta={{ robots: 'noindex' }}
+          metas={{ robots: 'noindex' }}
         />
 
         <Body>
           <Flex justifyContent="center" alignItems="center" flexDirection="column" my={4}>
-            <Avatar collective={collective} />
+            <IncognitoAvatar />
             <h1>{intl.formatMessage(this.messages['incognito.title'])}</h1>
             <p>{intl.formatMessage(this.messages['incognito.description'])}</p>
             <p>¯\_(ツ)_/¯</p>
