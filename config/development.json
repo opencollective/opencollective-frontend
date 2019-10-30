@@ -1,4 +1,8 @@
 {
+  "maildev": {
+    "client": true,
+    "server": true
+  },
   "limits": {
     "ordersPerHour": {
       "perAccount": 100,

@@ -1,0 +1,6 @@
+{
+  "maildev": {
+    "client": true,
+    "server": true
+  }
+}
