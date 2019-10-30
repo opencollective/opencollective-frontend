@@ -104,7 +104,11 @@ class OpenCollectiveFrontendApp extends App {
   componentDidMount() {
     Router.events.on('routeChangeComplete', url => {
       if (window && window._paq) {
-        window._paq.push(['setCustomUrl', url]);
+        if (url.match(/\/signin\/sent/)) {
+          window._paq.push(['setCustomUrl', '/signin/sent']);
+        } else {
+          window._paq.push(['setCustomUrl', url]);
+        }
         window._paq.push(['trackPageView']);
       }
     });
