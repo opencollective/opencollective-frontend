@@ -82,44 +82,46 @@ export const checkJwtExpiry = (req, res, next) => {
  *  - req.remoteUser
  *  - req.remoteUser.memberships[CollectiveId] = [roles]
  */
-export const _authenticateUserByJwt = (req, res, next) => {
-  if (!req.jwtPayload) return next();
-  const userid = Number(req.jwtPayload.sub);
-  User.findByPk(userid)
-    .then(user => {
-      if (!user) {
-        throw errors.Unauthorized(`User id ${userid} not found`);
-      }
+export const _authenticateUserByJwt = async (req, res, next) => {
+  if (!req.jwtPayload) {
+    return next();
+  }
 
-      /**
-       * Functionality for one-time login links. We check that the lastLoginAt
-       * in the JWT matches the lastLoginAt in the db. If so, we allow the user
-       * to log in, and update the lastLoginAt.
-       */
-      if (user.lastLoginAt) {
-        if (!req.jwtPayload.lastLoginAt) {
-          // This should only happen with pre-migration tokens, that don't have this field.
-          // Should be turned into an error in the future.
-          if (process.env.NODE_ENV === 'production') {
-            logger.warn('Using a token without `lastLoginAt`');
-          }
-        } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
-          logger.error('This login link is expired or has already been used');
+  const userId = Number(req.jwtPayload.sub);
+  const user = await User.findByPk(userId);
+  if (!user) {
+    throw errors.Unauthorized(`User id ${userId} not found`);
+  }
+
+  /**
+   * Functionality for one-time login links. We check that the lastLoginAt
+   * in the JWT matches the lastLoginAt in the db. If so, we allow the user
+   * to log in, and update the lastLoginAt.
+   */
+  if (req.jwtPayload.scope === 'login') {
+    if (user.lastLoginAt) {
+      if (!req.jwtPayload.lastLoginAt) {
+        // This should only happen with pre-migration tokens, that don't have this field.
+        // Should be turned into an error in the future.
+        if (process.env.NODE_ENV === 'production') {
+          logger.warn('Using a token without `lastLoginAt`');
+          logger.warn(req.jwtPayload);
         }
+      } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
+        logger.error('This login link is expired or has already been used');
+      } else {
+        const now = new Date();
+        await user.update({ lastLoginAt: now });
       }
+    }
+  }
 
-      const now = new Date();
-      return user.update({ lastLoginAt: now }).then(user => {
-        req.remoteUser = user;
-        return user.populateRoles();
-      });
-    })
-    .then(() => {
-      debug('auth')('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
-      next();
-      return null;
-    })
-    .catch(next);
+  await user.populateRoles();
+
+  req.remoteUser = user;
+
+  debug('auth')('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
+  next();
 };
 
 /**
