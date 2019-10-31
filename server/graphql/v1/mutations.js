@@ -902,7 +902,7 @@ const mutations = {
   },
   backyourstackDispatchOrder: {
     type: new GraphQLObjectType({
-      name: 'BackYourStackResult',
+      name: 'BackYourStackDispatchState',
       fields: {
         dispatching: { type: GraphQLBoolean },
       },

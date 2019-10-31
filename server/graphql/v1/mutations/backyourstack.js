@@ -1,6 +1,6 @@
 import moment from 'moment';
 import models from '../../../models';
-import { backgroundDispatch, needsDispatching } from '../../../lib/backyourstack/dispatcher';
+import { dispatch, needsDispatching } from '../../../lib/backyourstack/dispatcher';
 
 import status from '../../../constants/order_status';
 
@@ -25,7 +25,7 @@ export async function dispatchOrder(orderId) {
       `Your BackYourStack order is already complete for this month. The next dispatch of funds will be on ${nextDispatchDate}`,
     );
   }
-  // Funds are dispatched asynchronously
-  backgroundDispatch(order, subscription);
+  // Funds are dispatched asynchronously, we're not waiting here on purpose
+  dispatch(order, subscription);
   return { dispatching: true };
 }

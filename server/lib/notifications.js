@@ -328,10 +328,10 @@ async function notifyByEmail(activity) {
       break;
 
     case activityType.BACKYOURSTACK_DISPATCH_CONFIRMED:
-      activity.data.orders.map(async order => {
+      for (const order of activity.data.orders) {
         order.collective = await models.Collective.findByPk(order.CollectiveId);
-        return order;
-      });
+      }
+
       notifyAdminsOfCollective(activity.data.collective.id, activity, {
         template: 'backyourstack.dispatch.confirmed',
       });
