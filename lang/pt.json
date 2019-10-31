@@ -263,7 +263,6 @@
   "CollectiveType.Event": "{count, plural, one {Evento} other {Eventos}}",
   "CollectiveType.Organization": "{count, plural, one {Organização} other {Organizações}}",
   "CollectiveType.User": "{count, plural, one {Usuário} other {Usuários}}",
-  "comment.badPermissions": "Você não tem permissão para comentar nesta despesa.",
   "comment.btn": "Comentar",
   "comment.cancelEdit": "cancelar edição",
   "comment.edit": "editar",
