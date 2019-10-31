@@ -100,11 +100,7 @@ class AddFundsForm extends React.Component {
         when: () => !this.isAddFundsToOrg,
         component: AddFundsSourcePickerWithData,
         options: {
-          collective: this.props.collective,
           host: this.props.host,
-          paymentMethod: get(this, 'props.host.paymentMethods')
-            ? this.props.host.paymentMethods.find(pm => pm.service === 'opencollective')
-            : null,
         },
       },
       {
@@ -116,22 +112,6 @@ class AddFundsForm extends React.Component {
         options: {
           LoggedInUser: this.props.LoggedInUser,
         },
-      },
-      {
-        name: 'name',
-        when: form => form.FromCollectiveId === 'other',
-      },
-      {
-        name: 'email',
-        when: form => form.FromCollectiveId === 'other',
-      },
-      {
-        name: 'organization',
-        when: form => form.FromCollectiveId === 'other',
-      },
-      {
-        name: 'website',
-        when: form => form.FromCollectiveId === 'other',
       },
       {
         name: 'hostFeePercent',
@@ -192,7 +172,7 @@ class AddFundsForm extends React.Component {
       newState[obj] = Object.assign({}, this.state[obj], attr);
     }
 
-    if (attr === 'FromCollectiveId' && value !== 'other') {
+    if (attr === 'FromCollectiveId') {
       value = Number(value);
       if (host && value !== host.id) {
         newState[obj].hostFeePercent = this.props.collective.hostFeePercent;
@@ -206,9 +186,6 @@ class AddFundsForm extends React.Component {
     }
 
     this.setState(newState);
-    if (typeof window !== 'undefined') {
-      window.state = newState;
-    }
   };
 
   handleSubmit(e) {
@@ -269,9 +246,6 @@ class AddFundsForm extends React.Component {
               max-width: 700px;
               margin: 0 auto;
             }
-            .userDetailsForm {
-              overflow: hidden;
-            }
             .paymentDetails {
               overflow: hidden;
             }
@@ -323,8 +297,8 @@ class AddFundsForm extends React.Component {
           `}
         </style>
         <div>
-          <Form horizontal onSubmit={this.handleSubmit}>
-            <div className="userDetailsForm">
+          <Form horizontal onSubmit={e => e.preventDefault()}>
+            <div>
               <h2>
                 <FormattedMessage
                   id="addfunds.title"

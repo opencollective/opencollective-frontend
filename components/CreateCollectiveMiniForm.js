@@ -124,7 +124,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
   const isCollective = type === CollectiveType.COLLECTIVE;
   const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
-  const { handleSubmit, register, formState, errors } = useForm({ mode: 'onBlur' });
+  const { handleSubmit, register, formState, errors } = useForm();
   const { formatMessage } = useIntl();
 
   return (
@@ -195,13 +195,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
         <StyledButton mr={2} minWidth={100} onClick={() => onCancel()} disabled={formState.isSubmitting}>
           {formatMessage(msg.cancel)}
         </StyledButton>
-        <StyledButton
-          type="submit"
-          buttonStyle="primary"
-          minWidth={100}
-          disabled={!formState.isValid}
-          loading={formState.isSubmitting}
-        >
+        <StyledButton type="submit" buttonStyle="primary" minWidth={100} loading={formState.isSubmitting}>
           {formatMessage(msg.save)}
         </StyledButton>
       </Container>

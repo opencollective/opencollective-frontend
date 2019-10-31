@@ -61,9 +61,9 @@ class HostDashboardActionsBanner extends React.Component {
         id: 'addFunds.error.amountMustBeGreatherThanZero',
         defaultMessage: 'Total amount must be greater than 0',
       },
-      'addFunds.error.missingEmail': {
-        id: 'addFunds.error.missingEmail',
-        defaultMessage: 'Please provide an email address to identify the source of the money.',
+      addFundsMissingFromCollective: {
+        id: 'addFunds.error.missingFromCollective',
+        defaultMessage: 'You must specify the source of the funds',
       },
       allCollectives: {
         id: 'expenses.allCollectives',
@@ -84,9 +84,8 @@ class HostDashboardActionsBanner extends React.Component {
       const error = intl.formatMessage(this.messages['addFunds.error.amountMustBeGreatherThanZero']);
       this.setState({ error });
       return console.error(error);
-    }
-    if (form.FromCollectiveId === 'other' && !form.email) {
-      const error = intl.formatMessage(this.messages['addFunds.error.missingEmail']);
+    } else if (!form.FromCollectiveId) {
+      const error = intl.formatMessage(this.messages.addFundsMissingFromCollective);
       this.setState({ error });
       return console.error(error);
     }
@@ -94,28 +93,8 @@ class HostDashboardActionsBanner extends React.Component {
     this.setState({ loading: true });
     const hostCollective = this.props.host;
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
-    order.collective = {
-      id: this.state.selectedCollective.id,
-    };
-
-    if (form.FromCollectiveId === 'other') {
-      if (form.email) {
-        order.user = {
-          email: form.email,
-          name: form.name,
-        };
-      }
-      if (form.organization) {
-        order.fromCollective = {
-          name: form.organization,
-          website: form.website,
-        };
-      }
-    } else {
-      order.fromCollective = {
-        id: Number(form.FromCollectiveId) || hostCollective.id,
-      };
-    }
+    order.collective = { id: this.state.selectedCollective.id };
+    order.fromCollective = { id: Number(form.FromCollectiveId) };
 
     const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
     if (!pm) {

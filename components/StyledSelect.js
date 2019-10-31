@@ -62,7 +62,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     components: useSearchIcon ? searchableCustomComponents : customComponents,
     styles: {
       control: (baseStyles, state) => {
-        const customStyles = { borderColor: theme.colors.black[400] };
+        const customStyles = { borderColor: theme.colors.black[400], cursor: 'text' };
 
         if (error) {
           customStyles.borderColor = theme.colors.red[500];
