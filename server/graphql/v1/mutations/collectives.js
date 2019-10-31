@@ -922,6 +922,11 @@ export async function sendMessageToCollective(_, args, req) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in to contact a collective',
     });
+  } else if (get(req.remoteUser.data, 'disableContact', false)) {
+    throw new errors.Unauthorized({
+      message:
+        'You are not authorized to contact Collectives. Please contact support@opencollective.com if you think this is an error.',
+    });
   }
 
   const collective = await models.Collective.findByPk(args.collectiveId);
@@ -931,9 +936,9 @@ export async function sendMessageToCollective(_, args, req) {
     });
   }
 
-  if (!(await collective.canContact())) {
+  if (!(await collective.canContact(req.remoteUser))) {
     throw new errors.Unauthorized({
-      message: `You can't contact this type of collective`,
+      message: `You can't contact this collective`,
     });
   }
 
