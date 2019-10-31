@@ -161,6 +161,7 @@
   "collective.expensePolicy.label": "Politique de remboursement du collectif",
   "collective.expensePolicy.placeholder": "Par exemple : quel type de dépenses seront acceptées, les limites sur le montant, les documents requis et qui contacter s'il y a des questions.",
   "collective.expenses.title": "{n, plural, one {Dernière dépense} other {Dernières dépenses}}",
+  "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   "collective.githubHandle.label": "Github",
   "Collective.Hero.Host": "{FiscalHost} : {hostName}",
   "collective.hostFeePercent.description": "Commission sur les contributions financières faites aux Collectifs que vous hébergez.",

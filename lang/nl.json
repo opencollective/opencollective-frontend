@@ -161,6 +161,7 @@
   "collective.expensePolicy.label": "Richtlijnen voor onkosten",
   "collective.expensePolicy.placeholder": "Bijvoorbeeld: wat voor soort onkosten zullen goedgekeurd worden, is er een maximumbedrag, welke documentatie is vereist en wie moet gecontacteerd worden bij vragen.",
   "collective.expenses.title": "{n, plural, one {Meest recente onkostennota} other {Meest recente onkostennota's}}",
+  "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   "collective.githubHandle.label": "Github",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
   "collective.hostFeePercent.description": "Commissies op financiële bijdragen aan Collectieven die fiscaal beheerd.",
