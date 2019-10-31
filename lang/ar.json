@@ -263,7 +263,6 @@
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
-  "comment.badPermissions": "You don't have permission to comment on this expense.",
   "comment.btn": "Comment",
   "comment.cancelEdit": "cancel edit",
   "comment.edit": "edit",
