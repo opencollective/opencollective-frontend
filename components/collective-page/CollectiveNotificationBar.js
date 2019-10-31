@@ -58,11 +58,12 @@ const getNotification = (intl, status, collective, host) => {
           description: intl.formatMessage(messages.organizationCreateDescription),
         };
       default:
-        if (collective.isApproved)
+        if (collective.isApproved) {
           return {
             title: intl.formatMessage(messages.collectiveCreated),
             description: intl.formatMessage(messages.collectiveApprovedDescription, { host: host.name }),
           };
+        }
         return {
           title: intl.formatMessage(messages.collectiveCreated),
           description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
