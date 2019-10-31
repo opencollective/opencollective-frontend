@@ -251,10 +251,17 @@ export default {
       user: order.createdByUser,
     });
 
-    const transactions = await createChargeAndTransactions(hostStripeAccount, {
-      order,
-      hostStripeCustomer,
-    });
+    let transactions;
+    try {
+      transactions = await createChargeAndTransactions(hostStripeAccount, {
+        order,
+        hostStripeCustomer,
+      });
+    } catch (error) {
+      logger.error(`Stripe Payment Error: ${error.message}`);
+      logger.error(error);
+      throw error;
+    }
 
     await order.paymentMethod.update({ confirmedAt: new Date() });
 
