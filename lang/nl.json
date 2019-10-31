@@ -263,7 +263,6 @@
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
-  "comment.badPermissions": "Je hebt geen toestemming om te reageren op deze onkostennota.",
   "comment.btn": "Reactie",
   "comment.cancelEdit": "annuleer bewerking",
   "comment.edit": "bewerken",
