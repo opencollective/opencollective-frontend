@@ -4,7 +4,11 @@ Subject: Backyourstack dispatch confirmation.
 
 <div>
    <h1>Woot woot! 🎉</h1>
-    <h3>Your first payment was successfully dispatched.</h3>
+    {{#if recurringDispatch}}
+      <h3>Your first payment was successfully dispatched.</h3>
+    {{else}}
+      <h3>Your payment was successfully dispatched.</h3>
+    {{/if}}
     <div>
         <p>
           You&apos;re contributing to the following Collectives:
