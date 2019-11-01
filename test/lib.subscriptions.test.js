@@ -538,10 +538,10 @@ describe('LibSubscription', () => {
       });
 
       // When the orders with pending charges are listed
-      const output = await ordersWithPendingCharges();
+      const { rows } = await ordersWithPendingCharges();
 
       // Then nothing should be returned
-      expect(output.length).to.equal(0);
+      expect(rows.length).to.equal(0);
     });
 
     it('should return orders with subscription active & due', async () => {
@@ -574,11 +574,11 @@ describe('LibSubscription', () => {
       });
 
       // When the orders with pending charges are listed
-      const output = await ordersWithPendingCharges();
+      const { rows } = await ordersWithPendingCharges();
 
       // Then we get just one. The second one doesn't have a
       // subscription id
-      expect(output.length).to.equal(1);
+      expect(rows.length).to.equal(1);
     });
   });
 
