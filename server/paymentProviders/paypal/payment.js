@@ -146,6 +146,8 @@ export async function addUserToCollective(order) {
 /** Process order in paypal and create transactions in our db */
 export async function processOrder(order) {
   const paymentInfo = await executePayment(order);
+  logger.info('PayPal Payment');
+  logger.info(paymentInfo);
   const transaction = await createTransaction(order, paymentInfo);
   await addUserToCollective(order);
   await order.update({ processedAt: new Date() });
