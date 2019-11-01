@@ -80,8 +80,9 @@ Cypress.Commands.add('getInbox', () => {
 /**
  * Navigate to an email in maildev.
  *
- * API must be configured to use maildev (MAILDEV=true) and the service must be
- * started (`npm run maildev` on the API).
+ * API must be configured to use maildev
+ * - configured by default in development, e2e and circleci environments
+ * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
  *
  * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
  *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
