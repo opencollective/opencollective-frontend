@@ -33,15 +33,21 @@ async function callback(req, res) {
   } = req;
 
   if (status && status === 'completed' && workflowId == HELLO_WORKS_WORKFLOW_ID) {
-    const { email, year } = metadata;
+    const { userId, email, year } = metadata;
     const documentId = Object.keys(data)[0];
 
     logger.info('Completed Tax form. Metadata:', metadata);
-    const user = await User.findOne({
-      where: {
-        email,
-      },
-    });
+
+    let user;
+    if (userId) {
+      user = await User.findOne({ where: { id: userId } });
+    } else if (email) {
+      user = await User.findOne({ where: { email } });
+    }
+    if (!user) {
+      logger.error('Tax Form: could not find user matching metadata', metadata);
+      res.sendStatus(400);
+    }
 
     const userCollectiveName = await user.username;
 

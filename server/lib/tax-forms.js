@@ -99,6 +99,7 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
           documentDelivery: true,
           participants,
           metadata: {
+            userId: user.id,
             email: user.email,
             year,
           },
