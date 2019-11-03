@@ -148,7 +148,11 @@ class SectionContribute extends React.PureComponent {
 =======
     const sortedTiers = this.sortTiers(tiers);
     const joinedEvents = events.concat(childCollectives);
+<<<<<<< HEAD
 >>>>>>> feat: extracted events and tiers panel. add update settings mutation
+=======
+    const handleSettingsUpdate = this.handleSettingsUpdate;
+>>>>>>> fix: handleSettingsUpdate -> this.handleSettingsUpdate
 
     return (
       <Box pt={[4, 5]}>
