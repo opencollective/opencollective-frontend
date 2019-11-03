@@ -4,18 +4,17 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 import { orderBy } from 'lodash';
+import { graphql } from 'react-apollo';
 
+import { EditCollectiveSettingsMutation } from '../graphql/mutations';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
-import ContributeCustom from '../../contribute-cards/ContributeCustom';
-import ContributeTier from '../../contribute-cards/ContributeTier';
-import ContributeEvent from '../../contribute-cards/ContributeEvent';
-import ContributeCollective from '../../contribute-cards/ContributeCollective';
-import CreateNew from '../../contribute-cards/CreateNew';
+import ContributeEventPanel from '../../contribute-cards/ContributeEventsPanel';
+import ContributeTiersPanel from '../../contribute-cards/ContributeTiersPanel';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 
 import ContributeCardsContainer from '../ContributeCardsContainer';
@@ -60,6 +59,7 @@ class SectionContribute extends React.PureComponent {
       }),
     ),
     isAdmin: PropTypes.bool,
+    EditCollectiveSettings: PropTypes.func,
   };
 
   getTopContributors = memoizeOne(contributors => {
@@ -127,18 +127,28 @@ class SectionContribute extends React.PureComponent {
     }
   }
 
+  handleSettingsUpdate(settings) {
+    const { id } = this.collective;
+    this.props.EditCollectiveSettings(id, settings);
+  }
+
   render() {
     const { collective, tiers, events, childCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
+<<<<<<< HEAD
     const sortedTiers = this.sortTiers(this.removeTickets(tiers));
     const isEvent = collective.type === CollectiveType.EVENT;
 
     const createContributionTierRoute = isEvent
       ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
       : `/${collective.slug}/edit/tiers`;
+=======
+    const sortedTiers = this.sortTiers(tiers);
+    const joinedEvents = events.concat(childCollectives);
+>>>>>>> feat: extracted events and tiers panel. add update settings mutation
 
     return (
       <Box pt={[4, 5]}>
@@ -164,6 +174,7 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
+<<<<<<< HEAD
                   <Box px={CONTRIBUTE_CARD_PADDING_X}>
                     <ContributeCustom
                       collective={collective}
@@ -184,6 +195,18 @@ class SectionContribute extends React.PureComponent {
                       </CreateNew>
                     </Box>
                   )}
+=======
+                  <ContributeTiersPanel
+                    isAdmin={isAdmin}
+                    collective={collective}
+                    sortedTiers={sortedTiers}
+                    hasNoContributor={hasNoContributor}
+                    contributorsStats={contributorsStats}
+                    handleSettingsUpdate={handleSettingsUpdate}
+                    CONTRIBUTE_CARD_PADDING_X={CONTRIBUTE_CARD_PADDING_X}
+                    financialContributorsWithoutTier={financialContributorsWithoutTier}
+                  />
+>>>>>>> feat: extracted events and tiers panel. add update settings mutation
                 </ContributeCardsContainer>
               </div>
             )}
@@ -209,27 +232,14 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  {childCollectives.map(childCollective => (
-                    <Box key={childCollective.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeCollective collective={childCollective} />
-                    </Box>
-                  ))}
-                  {events.map(event => (
-                    <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeEvent
-                        collective={collective}
-                        event={event}
-                        hideContributors={hasNoContributorForEvents}
-                      />
-                    </Box>
-                  ))}
-                  {isAdmin && (
-                    <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-                      <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-                        <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                      </CreateNew>
-                    </Box>
-                  )}
+                  <ContributeEventPanel
+                    isAdmin={isAdmin}
+                    collective={collective}
+                    joinedEvents={joinedEvents}
+                    handleSettingsUpdate={handleSettingsUpdate}
+                    hasNoContributorForEvents={hasNoContributorForEvents}
+                    CONTRIBUTE_CARD_PADDING_X={CONTRIBUTE_CARD_PADDING_X}
+                  />
                 </ContributeCardsContainer>
               </div>
             )}
@@ -238,7 +248,7 @@ class SectionContribute extends React.PureComponent {
         <ContainerSectionContent>
           <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
             <StyledButton buttonSize="large" mt={3} width={1} p="10px">
-              <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
+              <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" />
             </StyledButton>
           </Link>
         </ContainerSectionContent>
@@ -254,4 +264,12 @@ class SectionContribute extends React.PureComponent {
   }
 }
 
-export default SectionContribute;
+const addMutation = graphql(EditCollectiveSettingsMutation, {
+  props: ({ mutate }) => ({
+    EditCollectiveSettings: async (id, settings) => {
+      return await mutate({ variables: { id, settings } });
+    },
+  }),
+});
+
+export default addMutation(SectionContribute);
