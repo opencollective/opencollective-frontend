@@ -158,7 +158,11 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
         {editAvatar => (
           <>
             <EditingAvatarContainer borderRadius={borderRadius}>
-              <img src={uploadedImage ? uploadedImage.preview : collective.imageUrl} alt="" />
+              <img
+                data-cy="collective-avatar-image-preview"
+                src={uploadedImage ? uploadedImage.preview : collective.imageUrl}
+                alt=""
+              />
             </EditingAvatarContainer>
             <Container
               position="absolute"

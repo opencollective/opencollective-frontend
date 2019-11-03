@@ -1,14 +1,10 @@
 import { disableSmoothScroll } from '../support/helpers';
 import { Sections } from '../../../components/collective-page/_constants';
-import 'cypress-file-upload';
 
-const uploadImage = ({ dropzone, file }) => {
-  cy.fixture(`./images/${file}`).then(picture => {
-    cy.get(dropzone).upload({
-      fileContent: picture,
-      fileName: file,
-      mimeType: 'image/'.concat(file.includes('.png') ? 'png' : 'jpeg'),
-    });
+const uploadImage = ({ dropzone, fileName }) => {
+  cy.fixture(`./images/${fileName}`).then(fileContent => {
+    const mimeType = 'image/'.concat(fileName.includes('.png') ? 'png' : 'jpeg');
+    cy.get(dropzone).upload({ fileContent, fileName, mimeType });
   });
   cy.wait(900);
 };
@@ -45,14 +41,19 @@ describe('New collective page', () => {
     });
 
     it('Must have the fiscal host displayed', () => {
-      cy.get('[data-cy=fiscalHostName]').should('have.visible');
+      cy.get('[data-cy=fiscalHostName]').contains('Open Source Collective');
     });
 
     it('Can change avatar', () => {
       uploadImage({
         dropzone: '[data-cy=heroAvatarDropzone]',
-        file: 'gophercon.jpg',
+        fileName: 'gophercon.jpg',
       });
+
+      cy.get('[data-cy=collective-avatar-image-preview]')
+        .invoke('attr', 'src')
+        .should('not.be.empty');
+
       cy.get('[data-cy=heroAvatarDropzoneSave]').click();
     });
 
@@ -78,8 +79,15 @@ describe('New collective page', () => {
       cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-cover-btn]').click({ force: true });
       uploadImage({
         dropzone: '[data-cy=heroBackgroundDropzone]',
-        file: 'gopherBack.png',
+        fileName: 'gopherBack.png',
       });
+
+      cy.get('[data-cy=collective-background-image-styledBackground]').within(() => {
+        cy.get('img')
+          .invoke('attr', 'src')
+          .should('not.be.empty');
+      });
+
       cy.get('[data-cy=heroBackgroundDropzoneSave]').click();
     });
   });

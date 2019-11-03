@@ -126,7 +126,11 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
   ) : (
     <Mutation mutation={EditCollectiveBackgroundMutation}>
       {editBackground => (
-        <StyledBackground backgroundImage={collective.backgroundImage} isEditing>
+        <StyledBackground
+          data-cy="collective-background-image-styledBackground"
+          backgroundImage={collective.backgroundImage}
+          isEditing
+        >
           <Cropper
             image={uploadedImage ? uploadedImage.preview : collective.backgroundImage}
             cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}

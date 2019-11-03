@@ -1,3 +1,4 @@
+import 'cypress-file-upload';
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
 import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
