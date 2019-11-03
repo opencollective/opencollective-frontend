@@ -131,6 +131,7 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const sortedTiers = this.sortTiers(tiers);
     const joinedEvents = events.concat(childCollectives);
+    const handleSettingsUpdate = this.handleSettingsUpdate;
 
     return (
       <Box pt={[4, 5]}>
