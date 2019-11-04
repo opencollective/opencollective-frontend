@@ -8,7 +8,7 @@ if [ "$NODE_ENV" = "circleci" ]; then
   MAILDEV_PID=$!
 
   echo "> Starting api server"
-  PG_DATABASE=opencollective_dvl MAILDEV=true npm start &
+  PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm start &
   API_PID=$!
   cd -
   echo "> Starting frontend server"
