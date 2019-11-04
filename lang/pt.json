@@ -161,7 +161,7 @@
   "collective.expensePolicy.label": "Política de despesas do Coletivo",
   "collective.expensePolicy.placeholder": "Por exemplo: que tipo de despesa será aprovada, quaisquer limitações de valores, que documentação é necessária e com quem entrar em contato em caso de perguntas.",
   "collective.expenses.title": "{n, plural, one {Última despesa} other {Últimas despesas}}",
-  "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
+  "collective.githubflow.created.description": "Já foi aprovado pelo organizador ({host}), você já pode receber doações. Sinta-se livre para customizar seu coletivo, registrar despesas e até criar eventos.",
   "collective.githubHandle.label": "Github",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
   "collective.hostFeePercent.description": "Comissão de contribuições financeiras a Coletivos que você administra fiscalmente.",
