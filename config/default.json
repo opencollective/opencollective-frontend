@@ -1,4 +1,9 @@
 {
+  "port": "3060",
+  "maildev": {
+    "client": false,
+    "server": false
+  },
   "database": {
     "url": "postgres://opencollective@127.0.0.1:5432/opencollective_dvl",
     "options": {

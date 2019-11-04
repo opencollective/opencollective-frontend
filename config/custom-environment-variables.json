@@ -1,5 +1,10 @@
 {
+  "port": "PORT",
   "env": "NODE_ENV",
+  "maildev": {
+    "client": "MAILDEV_CLIENT",
+    "server": "MAILDEV_SERVER"
+  },
   "database": {
     "url": "PG_URL",
     "override": {

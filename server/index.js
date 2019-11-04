@@ -22,8 +22,7 @@ routes(app);
 /**
  * Start server
  */
-const port = process.env.PORT || 3060;
-const server = app.listen(port, () => {
+const server = app.listen(config.port, () => {
   const host = os.hostname();
   logger.info(
     'Open Collective API listening at http://%s:%s in %s environment.\n',
@@ -31,6 +30,10 @@ const server = app.listen(port, () => {
     server.address().port,
     config.env,
   );
+  if (config.maildev.server) {
+    const maildev = require('./maildev'); // eslint-disable-line @typescript-eslint/no-var-requires
+    maildev.listen();
+  }
 });
 
 server.timeout = 25000; // sets timeout to 25 seconds

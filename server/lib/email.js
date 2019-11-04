@@ -16,7 +16,7 @@ import { md5 } from './utils';
 const debug = debugLib('email');
 
 export const getMailer = () => {
-  if (process.env.MAILDEV) {
+  if (config.maildev.client) {
     return nodemailer.createTransport({
       ignoreTLS: true,
       port: 1025,
