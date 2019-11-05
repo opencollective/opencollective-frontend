@@ -1,6 +1,6 @@
 describe('host dashboard', () => {
   it('mark pending order as paid', () => {
-    cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
+    cy.login({ redirect: '/brusselstogetherasbl/dashboard/donations' });
     cy.get('.Orders .item:first .status').contains('pending');
     cy.get('.MarkOrderAsPaidBtn button')
       .first()

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -10,6 +10,7 @@ import OrdersWithData from '../expenses/OrdersWithData';
 import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
 
 import MessageBox from '../MessageBox';
+import { H5 } from '../Text';
 import Loading from '../Loading';
 import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 import { withUser } from '../UserProvider';
@@ -23,7 +24,7 @@ import {
 class HostDashboard extends React.Component {
   static propTypes = {
     hostCollectiveSlug: PropTypes.string, // for addData
-    view: PropTypes.oneOf(['finances', 'pending-applications']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'donations']).isRequired,
     LoggedInUser: PropTypes.object,
     data: PropTypes.object, // from addData
   };
@@ -62,8 +63,63 @@ class HostDashboard extends React.Component {
     }
   }
 
-  render() {
+  renderExpenses(selectedCollective, includeHostedCollectives) {
     const { LoggedInUser, data } = this.props;
+    const host = data.Collective;
+
+    return (
+      <Fragment>
+        <div id="expenses" className="col first center-block">
+          <div className="header">
+            <H5 my={3}>
+              <FormattedMessage id="host.expenses.title" defaultMessage="Expenses" />
+            </H5>
+          </div>
+          <ExpensesWithData
+            collective={selectedCollective}
+            host={host}
+            includeHostedCollectives={includeHostedCollectives}
+            LoggedInUser={LoggedInUser}
+            hasFilters
+            filters={this.state.expensesFilters}
+            onFiltersChange={expensesFilters => this.setState({ expensesFilters })}
+            editable={true}
+          />
+        </div>
+        {this.state.selectedCollective && (
+          <div className="second col pullRight">
+            <ExpensesStatsWithData slug={selectedCollective.slug} />
+          </div>
+        )}
+      </Fragment>
+    );
+  }
+
+  renderDonations(selectedCollective, includeHostedCollectives) {
+    const { LoggedInUser } = this.props;
+    return (
+      <div id="orders" className="col center-block">
+        <div className="header">
+          <H5 my={3}>
+            <FormattedMessage
+              id="collective.orders.title"
+              values={{ n: this.totalOrders }}
+              defaultMessage="Financial Contributions"
+            />
+          </H5>
+        </div>
+        <OrdersWithData
+          collective={selectedCollective}
+          includeHostedCollectives={includeHostedCollectives}
+          filters={true}
+          LoggedInUser={LoggedInUser}
+        />
+      </div>
+    );
+  }
+
+  render() {
+    const { LoggedInUser, data, view } = this.props;
 
     if (data.loading) {
       return (
@@ -145,47 +201,9 @@ class HostDashboard extends React.Component {
         )}
         <div className="content">
           <div className="columns">
-            <div id="expenses" className="first col">
-              <div className="header">
-                <h2>
-                  <FormattedMessage id="host.expenses.title" defaultMessage="Expenses" />
-                </h2>
-              </div>
-              <ExpensesWithData
-                collective={selectedCollective}
-                host={host}
-                includeHostedCollectives={includeHostedCollectives}
-                LoggedInUser={LoggedInUser}
-                hasFilters
-                filters={this.state.expensesFilters}
-                onFiltersChange={expensesFilters => this.setState({ expensesFilters })}
-                editable={true}
-              />
-            </div>
-            <div id="orders" className="second col">
-              <div className="header">
-                <h2>
-                  <FormattedMessage
-                    id="collective.orders.title"
-                    values={{ n: this.totalOrders }}
-                    defaultMessage="Financial Contributions"
-                  />
-                </h2>
-              </div>
-              <OrdersWithData
-                collective={selectedCollective}
-                includeHostedCollectives={includeHostedCollectives}
-                filters={true}
-                LoggedInUser={LoggedInUser}
-              />
-            </div>
+            {view === 'expenses' && this.renderExpenses(selectedCollective, includeHostedCollectives)}
+            {view === 'donations' && this.renderDonations(selectedCollective, includeHostedCollectives)}
           </div>
-
-          {this.state.selectedCollective && (
-            <div className="col side pullLeft">
-              <ExpensesStatsWithData slug={selectedCollective.slug} />
-            </div>
-          )}
         </div>
       </div>
     );
