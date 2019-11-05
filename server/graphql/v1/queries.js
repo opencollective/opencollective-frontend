@@ -893,21 +893,37 @@ const queries = {
       }
 
       if (args.orderBy === 'totalDonations') {
-        query.attributes = {
-          include: [
-            [
-              sequelize.literal(`(
-                SELECT  COALESCE(SUM("netAmountInCollectiveCurrency"), 0)
-                FROM    "Transactions" t
-                WHERE   t."type" = 'CREDIT'
-                AND     t."CollectiveId" = "Collective".id
-              )`),
-              'totalDonations',
+        if (args.isPledged) {
+          query.attributes = {
+            include: [
+              [
+                sequelize.literal(`(
+                  SELECT  COALESCE(SUM("totalAmount"), 0)
+                  FROM    "Orders" o, "Collectives" c
+                  WHERE   c."isPledged" IS TRUE
+                  AND     o."CollectiveId" = "Collective".id
+                )`),
+                'totalDonations',
+              ],
             ],
-          ],
-        };
-
-        query.order = [[sequelize.col('totalDonations'), args.orderDirection]];
+          };
+          query.order = [[sequelize.col('totalDonations'), args.orderDirection]];
+        } else {
+          query.attributes = {
+            include: [
+              [
+                sequelize.literal(`(
+                  SELECT  COALESCE(SUM("netAmountInCollectiveCurrency"), 0)
+                  FROM    "Transactions" t
+                  WHERE   t."type" = 'CREDIT'
+                  AND     t."CollectiveId" = "Collective".id
+                )`),
+                'totalDonations',
+              ],
+            ],
+          };
+          query.order = [[sequelize.col('totalDonations'), args.orderDirection]];
+        }
       } else {
         query.order = [[args.orderBy, args.orderDirection]];
       }
