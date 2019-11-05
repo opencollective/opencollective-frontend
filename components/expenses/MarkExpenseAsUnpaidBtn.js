@@ -2,10 +2,17 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import StyledButton from '../StyledButton';
 import StyledCheckBox from '../StyledCheckbox';
+
+const messages = defineMessages({
+  'processorFeeRefunded.checkbox.label': {
+    id: 'processorFeeRefunded.checkbox.label',
+    defaultMessage: 'Also refund payment processor fees',
+  },
+});
 
 const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
   const [state, setState] = useState({
@@ -13,6 +20,8 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
     processorFeeRefunded: false,
     disableBtn: false,
   });
+
+  const intl = useIntl();
 
   async function handleOnClickContinue() {
     try {
@@ -32,7 +41,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid }) => {
             name="processorFeeRefunded"
             checked={state.processorFeeRefunded}
             onChange={({ checked }) => setState({ ...state, processorFeeRefunded: checked })}
-            label="Has the payout provider refunded the payment processor fees?"
+            label={intl.formatMessage(messages['processorFeeRefunded.checkbox.label'])}
           />
           <StyledButton
             mt={2}
