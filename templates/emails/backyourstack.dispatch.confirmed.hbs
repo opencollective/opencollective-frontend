@@ -1,0 +1,45 @@
+Subject: Backyourstack dispatch confirmation.
+
+{{> header}}
+
+<div>
+   <h1>Woot woot! 🎉</h1>
+    {{#if recurringDispatch}}
+      <h3>Your first payment was successfully dispatched.</h3>
+    {{else}}
+      <h3>Your payment was successfully dispatched.</h3>
+    {{/if}}
+    <div>
+        <p>
+          You&apos;re contributing to the following Collectives:
+        </p>
+        <table>
+          <tr>
+            <th style="border-bottom: 1px solid #dcdee0;padding: 0.5em;white-space: nowrap;text-transform: uppercase;font-weight: bold;font-size: 10px;">Collective</th>
+            <th style="border-bottom: 1px solid #dcdee0;padding: 0.5em;white-space: nowrap;text-transform: uppercase;font-weight: bold;font-size: 10px;">Amount</th>
+          </tr>
+          {{#each orders}}
+             <tr>
+               <td style="border-bottom: 1px solid #dcdee0;padding: 0.5em;white-space: nowrap;font-size: 14px;">
+                  <a
+                    style="color: #76777a;"
+                    href="{{config.host.website}}/{{collective.slug}}"
+                  >
+                    {{collective.name}}
+                  </a>
+                <td style="border-bottom: 1px solid #dcdee0;padding: 0.5em;white-space: nowrap;font-size: 14px;">{{{currency totalAmount currency=currency}}}</td>
+             </tr>
+          {{/each}}
+        </table>
+        <p>
+          That&apos;s it! You will be charged for the first time
+          today, then on the 1st of each month from now on. The funds
+          will be automatically distributed to your dependencies.
+        </p>
+        <h3>
+          Thank you for Backing Your Stack!
+        </h3>
+      </div>
+    </div>
+
+{{> footer}}

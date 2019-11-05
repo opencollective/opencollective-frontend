@@ -68,12 +68,7 @@ const createOrderQuery = `
 const backyourstackDispatchOrder = `
   mutation backyourstackDispatchOrder($id: Int!) {
     backyourstackDispatchOrder(id: $id) {
-      id
-      totalAmount
-      collective {
-        name
-        slug
-      }
+      dispatching
     }
   }
   `;
@@ -194,7 +189,6 @@ describe('createOrder', () => {
   it('it dispatch the donation accross dependencies', async () => {
     // When the order is created
     const res = await utils.graphqlQuery(backyourstackDispatchOrder, { id: orderCreated.id }, xdamman);
-
     // There should be no errors
     res.errors && console.error(res.errors);
     expect(res.errors).to.not.exist;

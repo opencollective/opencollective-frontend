@@ -326,5 +326,14 @@ async function notifyByEmail(activity) {
         template: 'collective.created.opensource',
       });
       break;
+
+    case activityType.BACKYOURSTACK_DISPATCH_CONFIRMED:
+      for (const order of activity.data.orders) {
+        order.collective = await models.Collective.findByPk(order.CollectiveId);
+      }
+
+      notifyAdminsOfCollective(activity.data.collective.id, activity, {
+        template: 'backyourstack.dispatch.confirmed',
+      });
   }
 }

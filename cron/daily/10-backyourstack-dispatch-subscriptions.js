@@ -6,6 +6,7 @@ import { Op } from 'sequelize';
 
 import models from '../../server/models';
 import status from '../../server/constants/order_status';
+import activities from '../../server/constants/activities';
 import { dispatchFunds, getNextDispatchingDate, needsDispatching } from '../../server/lib/backyourstack/dispatcher';
 
 async function run() {
@@ -59,7 +60,7 @@ async function run() {
   }).map(
     async order => {
       return dispatchFunds(order)
-        .then(async () => {
+        .then(async dispatchedOrders => {
           const nextDispatchDate = getNextDispatchingDate(
             order.Subscription.interval,
             order.Subscription.data.nextDispatchDate,
@@ -67,6 +68,16 @@ async function run() {
           order.Subscription.data = { nextDispatchDate };
           await order.Subscription.save();
           await order.save();
+          await models.Activity.create({
+            type: activities.BACKYOURSTACK_DISPATCH_CONFIRMED,
+            UserId: order.CreatedByUserId,
+            CollectiveId: order.fromCollective.id,
+            data: {
+              orders: dispatchedOrders,
+              collective: order.fromCollective,
+              recurringDispatch: true,
+            },
+          });
         })
         .catch(error => {
           console.log(`Error occured processing and dispatching order ${order.id}`);
