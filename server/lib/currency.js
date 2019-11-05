@@ -4,6 +4,7 @@ import debugLib from 'debug';
 import Promise from 'bluebird';
 
 import logger from './logger';
+import { currencyFormats } from '../constants/currency_format';
 
 const debug = debugLib('currency');
 const cache = {};
@@ -16,6 +17,14 @@ function getDate(date = 'latest') {
     date = [date.getFullYear(), (mm > 9 ? '' : '0') + mm, (dd > 9 ? '' : '0') + dd].join('-');
   }
   return date;
+}
+
+export function formatCurrency(currency, value) {
+  const _currency = currency.toUpperCase();
+  const currencyStr = currencyFormats[_currency];
+
+  if (!currencyStr) return `${value} ${_currency}`;
+  return currencyStr.concat(value);
 }
 
 export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
