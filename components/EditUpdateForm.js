@@ -155,7 +155,7 @@ class EditUpdateForm extends React.Component {
             }
           `}
         </style>
-        <form onSubmit={this.onSubmit}>
+        <form data-cy="edit-update-form" onSubmit={this.onSubmit}>
           <div className="row">
             <div className="col large">
               <Container mb={2} fontWeight="500" fontSize="1.6rem" lineHeight="1.7">
@@ -252,6 +252,7 @@ class EditUpdateForm extends React.Component {
 
           <ActionButtonWrapper className="row actions" mx={2} my={4}>
             <StyledButton
+              data-cy="edit-update-submit-btn"
               className="bluewhite"
               buttonSize="large"
               buttonStyle="primary"

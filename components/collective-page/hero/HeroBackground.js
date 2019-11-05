@@ -126,7 +126,11 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
   ) : (
     <Mutation mutation={EditCollectiveBackgroundMutation}>
       {editBackground => (
-        <StyledBackground backgroundImage={collective.backgroundImage} isEditing>
+        <StyledBackground
+          data-cy="collective-background-image-styledBackground"
+          backgroundImage={collective.backgroundImage}
+          isEditing
+        >
           <Cropper
             image={uploadedImage ? uploadedImage.preview : collective.backgroundImage}
             cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}
@@ -161,7 +165,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             >
               {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
                 <div {...getRootProps()}>
-                  <input {...getInputProps()} />
+                  <input data-cy="heroBackgroundDropzone" {...getInputProps()} />
                   <StyledButton minWidth={150} disabled={submitting}>
                     {!isDragActive && (
                       <React.Fragment>
@@ -210,6 +214,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
               <FormattedMessage id="form.cancel" defaultMessage="cancel" />
             </StyledButton>
             <StyledButton
+              data-cy="heroBackgroundDropzoneSave"
               textTransform="capitalize"
               buttonStyle="primary"
               ml={3}

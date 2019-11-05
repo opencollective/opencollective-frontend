@@ -131,7 +131,7 @@ class SectionUpdates extends React.PureComponent {
           </P>
           {isAdmin && (
             <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
-              <StyledButton buttonStyle="primary">
+              <StyledButton data-cy="create-new-update-btn" buttonStyle="primary">
                 <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
                   +
                 </Span>
@@ -150,7 +150,7 @@ class SectionUpdates extends React.PureComponent {
             </MessageBox>
           </div>
         ) : (
-          <StyledCard>
+          <StyledCard data-cy="updatesList">
             {updates.map((update, idx) => (
               <Container
                 key={update.id}
@@ -230,7 +230,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton buttonSize="large" mt={4} width={1} p="10px">
+            <StyledButton data-cy="view-all-updates-btn" buttonSize="large" mt={4} width={1} p="10px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>

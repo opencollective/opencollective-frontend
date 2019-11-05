@@ -31,7 +31,7 @@ class PublishUpdateBtn extends React.Component {
     const update = this.props.data.Update;
 
     return (
-      <div className="PublishUpdateBtn">
+      <div data-cy="PublishUpdateBtn" className="PublishUpdateBtn">
         <style jsx>
           {`
             .PublishUpdateBtn {

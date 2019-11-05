@@ -75,14 +75,21 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
       {isAdmin && !isEditing && (
         // We don't have any mobile view for this one yet
-        <Container display={['none', null, null, 'block']} position="absolute" right={25} top={25} zIndex={222}>
-          <StyledButton onClick={() => editCover(true)}>
+        <Container
+          data-cy="edit-collective-display-features"
+          display={['none', null, null, 'block']}
+          position="absolute"
+          right={25}
+          top={25}
+          zIndex={222}
+        >
+          <StyledButton data-cy="edit-cover-btn" onClick={() => editCover(true)}>
             <Span mr={2}>
               <Camera size="1.2em" />
             </Span>
             <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
           </StyledButton>
-          <StyledButton ml={3} onClick={() => showColorPicker(true)}>
+          <StyledButton data-cy="edit-main-color-btn" ml={3} onClick={() => showColorPicker(true)}>
             <Span mr={2}>
               <Palette size="1.2em" />
             </Span>
@@ -122,21 +129,36 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
           <Flex my={2}>
             {collective.twitterHandle && (
-              <ExternalLink href={twitterProfileUrl(collective.twitterHandle)} title="Twitter" openInNewTab>
+              <ExternalLink
+                data-cy="twitterProfileUrl"
+                href={twitterProfileUrl(collective.twitterHandle)}
+                title="Twitter"
+                openInNewTab
+              >
                 <StyledRoundButton size={32} mr={3}>
                   <Twitter size={12} />
                 </StyledRoundButton>
               </ExternalLink>
             )}
             {collective.githubHandle && (
-              <ExternalLink href={githubProfileUrl(collective.githubHandle)} title="Github" openInNewTab>
+              <ExternalLink
+                data-cy="githubProfileUrl"
+                href={githubProfileUrl(collective.githubHandle)}
+                title="Github"
+                openInNewTab
+              >
                 <StyledRoundButton size={32} mr={3}>
                   <Github size={12} />
                 </StyledRoundButton>
               </ExternalLink>
             )}
             {collective.website && (
-              <ExternalLink href={collective.website} title={intl.formatMessage(Translations.website)} openInNewTab>
+              <ExternalLink
+                data-cy="collectiveWebsite"
+                href={collective.website}
+                title={intl.formatMessage(Translations.website)}
+                openInNewTab
+              >
                 <StyledRoundButton size={32} mr={3}>
                   <Globe size={14} />
                 </StyledRoundButton>
@@ -152,7 +174,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
                   hostName: (
                     <LinkCollective collective={host}>
-                      <Span color="black.600">{host.name}</Span>
+                      <Span data-cy="fiscalHostName" color="black.600">
+                        {host.name}
+                      </Span>
                     </LinkCollective>
                   ),
                 }}

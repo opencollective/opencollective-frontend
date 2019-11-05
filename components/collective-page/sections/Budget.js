@@ -76,7 +76,14 @@ const SectionBudget = ({ collective, stats }) => {
                 <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
                   <Box flex="1 1" mx={[0, 2]}>
                     <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-                      <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
+                      <StyledButton
+                        data-cy="view-all-transactions-btn"
+                        buttonSize="large"
+                        my={2}
+                        minWidth={290}
+                        width="100%"
+                        py="10px"
+                      >
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAll"
                           defaultMessage="View all transactions"
@@ -86,7 +93,14 @@ const SectionBudget = ({ collective, stats }) => {
                   </Box>
                   <Box flex="1 1" mx={[0, 2]}>
                     <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
-                      <StyledButton buttonSize="large" my={2} minWidth={290} width="100%" py="10px">
+                      <StyledButton
+                        data-cy="view-all-expenses-btn"
+                        buttonSize="large"
+                        my={2}
+                        minWidth={290}
+                        width="100%"
+                        py="10px"
+                      >
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAllExpenses"
                           defaultMessage="View all expenses"
@@ -111,7 +125,7 @@ const SectionBudget = ({ collective, stats }) => {
           mx={[null, null, 3]}
           minWidth={300}
         >
-          <Box flex="1" py={16} px={4}>
+          <Box data-cy="budgetSection-today-balance" flex="1" py={16} px={4}>
             <P fontSize="Tiny" textTransform="uppercase" color="black.700">
               <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
             </P>
@@ -119,7 +133,7 @@ const SectionBudget = ({ collective, stats }) => {
               {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
             </P>
           </Box>
-          <Container flex="1" background="#F5F7FA" py={16} px={4}>
+          <Container data-cy="budgetSection-estimated-budget" flex="1" background="#F5F7FA" py={16} px={4}>
             <DefinedTerm term={Terms.ESTIMATED_BUDGET} fontSize="Tiny" textTransform="uppercase" color="black.700" />
             <P fontSize="H5" mt={2}>
               <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
