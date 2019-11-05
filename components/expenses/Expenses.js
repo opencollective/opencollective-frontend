@@ -33,20 +33,31 @@ class Expenses extends React.Component {
     this.setState({ isPayActionLocked: val });
   }
 
+  renderExpense(expense) {
+    const { host, collective, LoggedInUser, editable, view, includeHostedCollectives } = this.props;
+
+    return (
+      <div className="item" key={expense.id}>
+        <Expense
+          collective={expense.collective || collective}
+          host={host}
+          expense={expense}
+          editable={editable}
+          view={view}
+          includeHostedCollectives={includeHostedCollectives}
+          LoggedInUser={LoggedInUser}
+          allowPayAction={!this.state.isPayActionLocked[(expense.collective || collective).id]}
+          lockPayAction={this.setPayActionLock.bind(this, { [(expense.collective || collective).id]: true })}
+          unlockPayAction={this.setPayActionLock.bind(this, {
+            [(expense.collective || collective).id]: false,
+          })}
+        />
+      </div>
+    );
+  }
+
   render() {
-    const {
-      collective,
-      host,
-      expenses,
-      LoggedInUser,
-      editable,
-      view,
-      includeHostedCollectives,
-      filters,
-      status,
-      loading,
-      updateVariables,
-    } = this.props;
+    const { collective, expenses, filters, status, loading, updateVariables } = this.props;
 
     if (!expenses) {
       return <div />;
@@ -163,27 +174,14 @@ class Expenses extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           )}
-          {expenses.map(
-            expense =>
-              (status !== 'READY' || get(expense.collective || collective, 'stats.balance') > expense.amount) && (
-                <div className="item" key={expense.id}>
-                  <Expense
-                    collective={expense.collective || collective}
-                    host={host}
-                    expense={expense}
-                    editable={editable}
-                    view={view}
-                    includeHostedCollectives={includeHostedCollectives}
-                    LoggedInUser={LoggedInUser}
-                    allowPayAction={!this.state.isPayActionLocked[(expense.collective || collective).id]}
-                    lockPayAction={this.setPayActionLock.bind(this, { [(expense.collective || collective).id]: true })}
-                    unlockPayAction={this.setPayActionLock.bind(this, {
-                      [(expense.collective || collective).id]: false,
-                    })}
-                  />
-                </div>
-              ),
-          )}
+          {expenses.map(expense => {
+            if (status !== 'READY' || get(expense.collective || collective, 'stats.balance') > expense.amount) {
+              if (status === 'READY' && expense.userTaxFormRequiredBeforePayment) {
+                return; // Don't show expense that requires tax form in "ready to pay" filter
+              }
+              return this.renderExpense(expense);
+            }
+          })}
           {expenses.length === 0 && (
             <div className="empty">
               <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
