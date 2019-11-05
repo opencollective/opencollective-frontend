@@ -87,23 +87,34 @@ const Translations = defineMessages({
   },
 });
 
-const HeroAvatar = ({ handleMessage, collective, isAdmin, intl }) => {
+const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [editing, setEditing] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
+
+  const onDropImage = async ([image]) => {
+    if (image) {
+      Object.assign(image, { preview: URL.createObjectURL(image) });
+      const isValid = await validateImage(image);
+      if (isValid) {
+        setUploadedImage(image);
+        setEditing(true);
+      }
+    }
+  };
 
   const validateImage = image => {
     return new Promise(resolve => {
       const img = new Image();
       img.onload = () => {
         if (img.width >= 3000 || img.height >= 3000 || image.size >= 5000000) {
-          handleMessage({
-            content: intl.formatMessage(Translations.uploadImage),
-            type: 'warning',
-          });
+          handleHeroMessage({ content: intl.formatMessage(Translations.uploadImage), type: 'warning' });
           resolve(false);
-        } else resolve(true);
+        } else {
+          handleHeroMessage(null);
+          resolve(true);
+        }
       };
       img.src = image.preview;
     });
@@ -120,16 +131,7 @@ const HeroAvatar = ({ handleMessage, collective, isAdmin, intl }) => {
           accept="image/jpeg, image/png"
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
-          onDrop={async ([image]) => {
-            if (!image) return;
-            Object.assign(image, { preview: URL.createObjectURL(image) });
-
-            const isValid = await validateImage(image);
-            if (!isValid) return;
-
-            setUploadedImage(image);
-            setEditing(true);
-          }}
+          onDrop={onDropImage}
         >
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
@@ -230,7 +232,7 @@ const HeroAvatar = ({ handleMessage, collective, isAdmin, intl }) => {
                     setEditing(false);
                   } finally {
                     setSubmitting(false);
-                    handleMessage();
+                    handleHeroMessage(null);
                   }
                 }}
               >
