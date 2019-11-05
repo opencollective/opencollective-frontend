@@ -956,6 +956,7 @@
   "PledgeCard.HasPledged": "Has pledged:",
   "pledgedCollective": "Pledged Collective",
   "Prepaid": "Prepaid",
+  "processorFeeRefunded.checkbox.label": "Also refund payment processor fees",
   "profile.incognito": "Incognito",
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
   "profilemenu.memberships.tooltip.balance": "残高 {balance}",
