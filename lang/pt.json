@@ -956,6 +956,7 @@
   "PledgeCard.HasPledged": "Prometeu:",
   "pledgedCollective": "Coletivo Prometido",
   "Prepaid": "Pré-pago",
+  "processorFeeRefunded.checkbox.label": "Also refund payment processor fees",
   "profile.incognito": "Anônimo",
   "profile.incognito.description": "Manter minha contribuição anônima (veja a FAQ para mais informações)",
   "profilemenu.memberships.tooltip.balance": "Saldo {balance}",
