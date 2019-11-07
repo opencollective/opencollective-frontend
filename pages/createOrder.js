@@ -213,7 +213,7 @@ const collectiveFields = `
   twitterHandle
   type
   website
-  image
+  imageUrl
   backgroundImage
   currency
   hostFeePercent
@@ -233,7 +233,6 @@ const collectiveFields = `
   }
   parentCollective {
     slug
-    image
     settings
     location {
       country
