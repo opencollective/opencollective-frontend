@@ -109,7 +109,7 @@ export const _authenticateUserByJwt = async (req, res, next) => {
         }
       } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
         logger.error('This login link is expired or has already been used');
-        throw new Error('This login link is expired or has already been used');
+        throw errors.Unauthorized('This login link is expired or has already been used');
       } else {
         const now = new Date();
         await user.update({ lastLoginAt: now });
