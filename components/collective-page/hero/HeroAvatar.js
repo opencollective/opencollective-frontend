@@ -81,13 +81,44 @@ const Translations = defineMessages({
     id: 'collective.settings',
     defaultMessage: 'Settings',
   },
+  uploadImage: {
+    id: 'uploadImage.sizeRejected',
+    defaultMessage: 'Image resolution needs to be less than 3000x3000, and file size must be below 5MB.',
+  },
 });
 
-const HeroAvatar = ({ collective, isAdmin, intl }) => {
+const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [editing, setEditing] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
+
+  const onDropImage = async ([image]) => {
+    if (image) {
+      Object.assign(image, { preview: URL.createObjectURL(image) });
+      const isValid = await validateImage(image);
+      if (isValid) {
+        setUploadedImage(image);
+        setEditing(true);
+      }
+    }
+  };
+
+  const validateImage = image => {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width >= 3000 || img.height >= 3000 || image.size >= 5000000) {
+          handleHeroMessage({ content: intl.formatMessage(Translations.uploadImage), type: 'warning' });
+          resolve(false);
+        } else {
+          handleHeroMessage(null);
+          resolve(true);
+        }
+      };
+      img.src = image.preview;
+    });
+  };
 
   if (!isAdmin) {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
@@ -100,16 +131,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           accept="image/jpeg, image/png"
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
-          onDrop={acceptedFiles => {
-            setUploadedImage(
-              ...acceptedFiles.map(file =>
-                Object.assign(file, {
-                  preview: URL.createObjectURL(file),
-                }),
-              ),
-            );
-            setEditing(true);
-          }}
+          onDrop={onDropImage}
         >
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
@@ -210,6 +232,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                     setEditing(false);
                   } finally {
                     setSubmitting(false);
+                    handleHeroMessage(null);
                   }
                 }}
               >

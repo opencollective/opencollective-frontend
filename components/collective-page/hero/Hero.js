@@ -35,6 +35,7 @@ import HeroBackground from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
+import MessageBox from '../../MessageBox';
 
 const Translations = defineMessages({
   website: {
@@ -67,10 +68,27 @@ const StyledShortDescription = styled.h2`
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, intl }) => {
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
+  const [message, showMessage] = React.useState(null);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
 
-  return (
+  const handleHeroMessage = msg => {
+    if (!msg) {
+      showMessage(null);
+    } else {
+      showMessage({
+        type: msg.type || 'info',
+        content: msg.content || msg,
+      });
+    }
+  };
+
+  return [
+    message && (
+      <MessageBox type={message.type} withIcon={true}>
+        {message.content}
+      </MessageBox>
+    ),
     <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
       <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
       {isAdmin && !isEditing && (
@@ -109,7 +127,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
       <ContainerSectionContent pt={40} display="flex" flexDirection="column">
         {/* Collective presentation (name, logo, description...) */}
         <Container position="relative" mb={2} width={128}>
-          <HeroAvatar collective={collective} isAdmin={isAdmin} />
+          <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
         </Container>
         <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left" data-cy="collective-title">
           {collective.name || collective.slug}
@@ -228,8 +246,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           buttonsMinWidth={140}
         />
       </ContainerSectionContent>
-    </Container>
-  );
+    </Container>,
+  ];
 };
 
 Hero.propTypes = {
