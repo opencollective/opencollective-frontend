@@ -109,12 +109,13 @@ export const _authenticateUserByJwt = async (req, res, next) => {
         }
       } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
         logger.error('This login link is expired or has already been used');
-        throw errors.Unauthorized('This login link is expired or has already been used');
-      } else {
-        const now = new Date();
-        await user.update({ lastLoginAt: now });
+        return next(errors.Unauthorized('This login link is expired or has already been used'));
       }
     }
+    // The login was accepted, we can update lastLoginAt
+    // this will invalidate all older tokens
+    const now = new Date();
+    await user.update({ lastLoginAt: now });
   }
 
   await user.populateRoles();
