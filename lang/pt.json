@@ -1227,6 +1227,7 @@
   "uploadImage.isDragActive": "Me solta, pô 🔥",
   "uploadImage.isDragReject": "🚫 Este tipo de arquivo não é aceito",
   "uploadImage.placeholder": "Solte uma imagem ou clique para enviar",
+  "uploadImage.sizeRejected": "Image resolution needs to be less than 3000x3000, and file size must be below 5MB.",
   "user.collective.edit": "editar perfil",
   "user.collective.memberOf.collective.admin.title": "Sou um Colaborador Central e administrador {n, plural, one {deste Coletivo} other {destes {n} Coletivos}}",
   "user.collective.memberOf.collective.backer.title": "Eu estou contribuindo financeiramente para {n, plural, one {este Coletivo} other {estes {n} Coletivos}}",
