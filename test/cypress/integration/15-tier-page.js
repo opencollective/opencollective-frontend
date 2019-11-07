@@ -32,7 +32,7 @@ describe('Tier page', () => {
   });
 
   it('Can edit long description', () => {
-    const richDescription = 'Hello{selectall}{ctrl}B{rightarrow}{ctrl}B world!';
+    const richDescription = '{ctrl}BHello{ctrl}B world!';
     cy.login({ redirect: tierUrl });
     cy.get('[data-cy="Btn-Add-longDescription"]').click();
     cy.get('[data-cy="HTMLEditor"] .ql-editor').type(richDescription);
