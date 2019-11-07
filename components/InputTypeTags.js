@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import { WithContext as ReactTags } from 'react-tag-input';
 
-import '../static/styles/react-tags.css';
+import '../public/static/styles/react-tags.css';
 
 const KeyCodes = {
   comma: 188,

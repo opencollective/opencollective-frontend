@@ -51,7 +51,7 @@ const nextConfig = {
             limit: 8192,
             fallback: 'file-loader',
             publicPath: '/_next/static/fonts/',
-            outputPath: 'static/fonts/',
+            outputPath: 'public/static/fonts/',
             name: '[name]-[hash].[ext]',
           },
         },
@@ -78,7 +78,7 @@ const nextConfig = {
           loader: 'file-loader',
           options: {
             publicPath: '/_next/static/img/',
-            outputPath: 'static/img/',
+            outputPath: 'public/static/img/',
             name: '[name]-[hash].[ext]',
           },
         },

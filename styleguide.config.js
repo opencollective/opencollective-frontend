@@ -6,7 +6,7 @@ const fileExistsCaseInsensitive = require('react-styleguidist/lib/scripts/utils/
 
 module.exports = {
   assetsDir: 'styleguide',
-  require: [path.join(__dirname, 'static/styles/app.css')],
+  require: [path.join(__dirname, 'public/static/styles/app.css')],
   getExampleFilename(componentPath) {
     const parsedPath = path.parse(componentPath);
     const parentDirName = parsedPath.dir.split('components/')[1] || '';
