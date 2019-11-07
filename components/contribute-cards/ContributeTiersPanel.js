@@ -7,6 +7,8 @@ import dynamic from 'next/dynamic';
 import CreateNew from './CreateNew';
 import ContributeTier from './ContributeTier';
 import ContributeCustom from './ContributeCustom';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import { CONTRIBUTE_CARD_WIDTH } from './Contribute';
 
 const ContributeTiersPanel = ({
   isAdmin,
@@ -18,7 +20,20 @@ const ContributeTiersPanel = ({
   CONTRIBUTE_CARD_PADDING_X,
   financialContributorsWithoutTier,
 }) => {
-  const StyledDragDrop = dynamic(() => import(/* webpackChunkName: 'StyledDragDrop' */ '../StyledDragDrop'));
+  const CONTRIBUTE_CARD_HEIGHT = 341;
+
+  const StyledDropPanel = dynamic(() => import(/* webpackChunkName: 'StyledDropPanel' */ '../StyledDropPanel'), {
+    ssr: true,
+  });
+
+  const StyledDragDropPlaceHolder = () => (
+    <LoadingPlaceholder width={CONTRIBUTE_CARD_WIDTH} heigth={CONTRIBUTE_CARD_HEIGHT} />
+  );
+  const dynamicOptions = { loading: StyledDragDropPlaceHolder, ssr: false };
+  const StyledDragCard = dynamic(
+    () => import(/* webpackChunkName: 'StyledDragCard' */ '../StyledDragCard'),
+    dynamicOptions,
+  );
 
   if (!isAdmin) {
     return (

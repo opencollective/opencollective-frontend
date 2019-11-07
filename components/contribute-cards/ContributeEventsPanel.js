@@ -18,12 +18,12 @@ const ContributeEventPanel = ({
   CONTRIBUTE_CARD_PADDING_X,
   hasNoContributorForEvents,
 }) => {
-  const StyledDragDropPlaceHolder = () => <LoadingPlaceholder width={CONTRIBUTE_CARD_WIDTH} />;
-  const dynamicOptions = { loading: StyledDragDropPlaceHolder, ssr: false };
-  const StyledDragDrop = dynamic(
-    () => import(/* webpackChunkName: 'StyledDragDrop' */ '../StyledDragDrop'),
-    dynamicOptions,
-  );
+  //   const StyledDragDropPlaceHolder = () => <LoadingPlaceholder width={CONTRIBUTE_CARD_WIDTH} />;
+  //   const dynamicOptions = { loading: StyledDragDropPlaceHolder, ssr: false };
+  //   const StyledDragDrop = dynamic(
+  //     () => import(/* webpackChunkName: 'StyledDragDrop' */ '../StyledDropPanel'),
+  //     dynamicOptions,
+  //   );
 
   if (!isAdmin) {
     return (
@@ -44,13 +44,11 @@ const ContributeEventPanel = ({
   } else
     return (
       <Fragment>
-        {isAdmin && (
-          <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
-            <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
-              <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-            </CreateNew>
-          </Box>
-        )}
+        <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
+          <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
+            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+          </CreateNew>
+        </Box>
         {joinedEvents.map(item =>
           item.__typename.toLowerCase().includes('event') ? (
             <Box key={item.id} px={CONTRIBUTE_CARD_PADDING_X}>

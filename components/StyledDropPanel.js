@@ -2,16 +2,16 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 /**
- * Styled Drag and Drop Panel -
+ * Styled Drag Panel -
  * Display card list sorted by handle
  * @param {*} param0
  */
-const StyledDragDrop = ({ children }) => {
+const StyledDropPanel = ({ children }) => {
   return <Fragment>{children}</Fragment>;
 };
 
-StyledDragDrop.propTypes = {
+StyledDropPanel.propTypes = {
   children: PropTypes.any,
 };
 
-export default StyledDragDrop;
+export default StyledDropPanel;
