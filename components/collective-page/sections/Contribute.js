@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
-import { orderBy } from 'lodash';
+import { orderBy, partial } from 'lodash';
 import { graphql } from 'react-apollo';
 
 import { EditCollectiveSettingsMutation } from '../graphql/mutations';
@@ -12,7 +12,7 @@ import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
-import ContributeEventPanel from '../../contribute-cards/ContributeEventsPanel';
+import ContributeEventsPanel from '../../contribute-cards/ContributeEventsPanel';
 import ContributeTiersPanel from '../../contribute-cards/ContributeTiersPanel';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 
@@ -107,6 +107,10 @@ class SectionContribute extends React.PureComponent {
     return orderBy([...tiers], ['endsAt'], ['desc']);
   });
 
+  joinedEvents = memoizeOne((events, childCollectives) => {
+    return events.concat(childCollectives);
+  });
+
   getContributeCardsScrollDistance(width) {
     const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
     if (width <= oneCardScrollDistance * 2) {
@@ -118,20 +122,28 @@ class SectionContribute extends React.PureComponent {
     }
   }
 
-  handleSettingsUpdate(settings) {
-    const { id } = this.collective;
-    this.props.EditCollectiveSettings(id, settings);
+  async handleSettingsUpdate(fn, id, settings) {
+    await fn(id, settings);
   }
 
   render() {
-    const { collective, tiers, events, childCollectives, contributors, contributorsStats, isAdmin } = this.props;
+    const {
+      collective,
+      tiers,
+      events,
+      childCollectives,
+      contributors,
+      contributorsStats,
+      isAdmin,
+      EditCollectiveSettings,
+    } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const sortedTiers = this.sortTiers(tiers);
-    const joinedEvents = events.concat(childCollectives);
-    const handleSettingsUpdate = this.handleSettingsUpdate;
+    const joinedEvents = this.joinedEvents(events, childCollectives);
+    const handleSettingsUpdate = partial(this.handleSettingsUpdate, EditCollectiveSettings, collective.id);
 
     return (
       <Box pt={[4, 5]}>
@@ -192,7 +204,7 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  <ContributeEventPanel
+                  <ContributeEventsPanel
                     isAdmin={isAdmin}
                     collective={collective}
                     joinedEvents={joinedEvents}
