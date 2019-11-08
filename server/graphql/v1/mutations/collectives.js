@@ -729,7 +729,7 @@ export async function deleteCollective(_, args, req) {
     throw new Error('Can not delete collective with paid expenses.');
   }
 
-  const eventCount = await models.Collectives.count({
+  const eventCount = await models.Collective.count({
     where: { ParentCollectiveId: collective.id, type: types.EVENT },
   });
 
