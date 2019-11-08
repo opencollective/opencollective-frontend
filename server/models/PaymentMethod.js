@@ -225,6 +225,8 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
+  PaymentMethod.schema('public');
+
   PaymentMethod.payoutMethods = payoutMethods;
 
   /**

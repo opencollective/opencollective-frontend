@@ -249,6 +249,8 @@ export default (Sequelize, DataTypes) => {
     },
   );
 
+  User.schema('public');
+
   /** Instance Methods */
 
   /**
