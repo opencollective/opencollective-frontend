@@ -36,6 +36,8 @@ export default function(Sequelize, DataTypes) {
     },
   });
 
+  RequiredLegalDocument.schema('public');
+
   RequiredLegalDocument.documentType = {};
   RequiredLegalDocument.documentType.US_TAX_FORM = US_TAX_FORM;
 

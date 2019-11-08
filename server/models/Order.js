@@ -195,6 +195,8 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
+  Order.schema('public');
+
   /**
    * Instance Methods
    */

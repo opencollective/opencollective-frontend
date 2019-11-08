@@ -65,6 +65,8 @@ export default (Sequelize, DataTypes) => {
     },
   );
 
+  ConnectedAccount.schema('public');
+
   ConnectedAccount.associate = m => {
     ConnectedAccount.belongsTo(m.Collective, {
       foreignKey: 'CollectiveId',

@@ -99,5 +99,7 @@ export default function(Sequelize, DataTypes) {
     return Application.build(props).save();
   };
 
+  Application.schema('public');
+
   return Application;
 }
