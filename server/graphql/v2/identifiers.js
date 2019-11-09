@@ -30,3 +30,22 @@ export const idEncode = (integer, type) => {
 export const idDecode = (string, type) => {
   return getInstance(type).decode(string.split('-').join(''));
 };
+
+/**
+ * Returns a function to be used as the resolver for identifier fields.
+ * The returned resolver function encodes the identifier field (idField)
+ * @param {string} type - Type the fields belongs to. For example: 'comment' and 'transaction'
+ * @param {string} idField - Field that represents the id. By default 'id'
+ */
+export const getIdEncodeResolver = (type, idField = 'id') => entity => idEncode(entity[idField], type);
+
+/**
+ * Resolve original id by decoding if string, otherwise return as is.
+ * @param {number|string} id - ide to decode
+ * @returns {number} decoded id
+ */
+export function getDecodedId(id) {
+  return isNaN(id) && typeof id === 'string'
+    ? idDecode(id)[0] // idDecode returns an array.
+    : id;
+}

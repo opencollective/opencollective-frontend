@@ -60,7 +60,10 @@ export default app => {
   // Setup rate limiter
   if (get(config, 'redis.serverUrl')) {
     const client = redis.createClient(get(config, 'redis.serverUrl'));
-    const rateLimiter = expressLimiter(app, client)({
+    const rateLimiter = expressLimiter(
+      app,
+      client,
+    )({
       lookup: function(req, res, opts, next) {
         if (req.clientApp) {
           opts.lookup = 'clientApp.id';
