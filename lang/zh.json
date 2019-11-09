@@ -395,7 +395,7 @@
   "ContributorsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed",
   "ContributorsFilter.All": "所有贡献者",
   "ContributorsFilter.Core": "核心贡献者",
-  "ContributorsFilter.Financial": "Financial contributors",
+  "ContributorsFilter.Financial": "财务贡献者",
   "ContributorsFilter.Github": "GitHub 贡献者",
   "cover.bar.balance": "今天的结余",
   "cover.bar.yearlyBudget": "预计的年度预算",
