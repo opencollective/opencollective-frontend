@@ -97,7 +97,7 @@ describe('signin', () => {
     // Test frontend validations
     cy.get('input[name=email]').type('Incorrect value');
     cy.get('button[type=submit]').click();
-    cy.contains("Please include an '@' in the email address. 'Incorrectvalue' is missing an '@'.");
+    cy.contains("Please include an '@' in the email address. 'Incorrect value' is missing an '@'.");
 
     // Test backend validations
     cy.get('input[name=email]').type('{selectall}Incorrect@value');
@@ -153,7 +153,7 @@ describe('signin', () => {
     cy.get('input[name=orgName]').type('Test Organization');
     cy.get('input[name=email]').type('Incorrect value');
     cy.get('button[type=submit]').click();
-    cy.contains("Please include an '@' in the email address. 'Incorrectvalue' is missing an '@'.");
+    cy.contains("Please include an '@' in the email address. 'Incorrect value' is missing an '@'.");
 
     // Test backend validations
     cy.get('input[name=email]').type('{selectall}Incorrect@value');
