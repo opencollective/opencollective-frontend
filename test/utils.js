@@ -1,6 +1,7 @@
 import config from 'config';
 import debug from 'debug';
 import nock from 'nock';
+import { expect } from 'chai';
 
 import Promise from 'bluebird';
 import { graphql } from 'graphql';
@@ -13,7 +14,8 @@ import jsonData from './mocks/data';
 /* Server code being used */
 import userlib from '../server/lib/userlib';
 import stripe from '../server/lib/stripe';
-import schema from '../server/graphql/v1/schema';
+import schemaV1 from '../server/graphql/v1/schema';
+import schemaV2 from '../server/graphql/v2/schema';
 import { loaders } from '../server/graphql/loaders';
 import { sequelize } from '../server/models';
 import cache from '../server/lib/cache';
@@ -103,7 +105,14 @@ export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) =
     isConditionMet();
   });
 
-export const graphqlQuery = async (query, variables, remoteUser) => {
+/**
+ * This function allows to test queries and mutations against a specific schema.
+ * @param {string} query - Queries and Mutations to serve against the type schema. Example: `query Expense($id: Int!) { Expense(id: $id) { description } }`
+ * @param {object} variables - Variables to use in the queries and mutations. Example: { id: 1 }
+ * @param {object} remoteUser - The user to add to the context. It is not required.
+ * @param {object} schema - Schema to which queries and mutations will be served against. Schema v1 by default.
+ */
+export const graphqlQuery = async (query, variables, remoteUser, schema = schemaV1) => {
   const prepare = () => {
     if (remoteUser) {
       remoteUser.rolesByCollectiveId = null; // force refetching the roles
@@ -129,6 +138,16 @@ export const graphqlQuery = async (query, variables, remoteUser) => {
     ),
   );
 };
+
+/**
+ * This function allows to test queries and mutations against schema v2.
+ * @param {string} query - Queries and Mutations to serve against the type schema. Example: `query Expense($id: Int!) { Expense(id: $id) { description } }`
+ * @param {object} variables - Variables to use in the queries and mutations. Example: { id: 1 }
+ * @param {object} remoteUser - The user to add to the context. It is not required.
+ */
+export async function graphqlQueryV2(query, variables, remoteUser) {
+  return graphqlQuery(query, variables, remoteUser, schemaV2);
+}
 
 /** Helper for interpreting fee description in BDD tests
  *
@@ -243,4 +262,9 @@ export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0,
     type: 'charge',
   };
   sandbox.stub(stripe.balanceTransactions, 'retrieve').callsFake(() => Promise.resolve(balanceTransaction));
+}
+
+export function expectNoErrorsFromResult(res) {
+  res.errors && console.error(res.errors);
+  expect(res.errors).to.not.exist;
 }

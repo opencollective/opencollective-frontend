@@ -9,11 +9,6 @@ import * as expenses from '../server/graphql/v1/mutations/expenses';
 import * as utils from './utils';
 import * as store from './stores';
 
-function expectNotErrorsFromResult(res) {
-  res.errors && console.error(res.errors);
-  expect(res.errors).to.not.exist;
-}
-
 describe('graphql.collective.test.js', () => {
   beforeEach(async () => {
     await utils.resetTestDB();
@@ -913,7 +908,7 @@ describe('graphql.collective.test.js', () => {
         },
         pubnubAdmin,
       );
-      expectNotErrorsFromResult(res);
+      utils.expectNoErrorsFromResult(res);
       // Check only two members where returned by the mutation
       expect(res.data.editPublicMessage.length).to.equal(2);
       // Find all members modified by the mutation in the database.
@@ -966,7 +961,7 @@ describe('graphql.collective.test.js', () => {
         },
         pubnubAdmin,
       );
-      expectNotErrorsFromResult(res);
+      utils.expectNoErrorsFromResult(res);
       // Check only two members where returned by the mutation
       expect(res.data.editPublicMessage.length).to.equal(2);
       // Find all members modified by the mutation in the database.
