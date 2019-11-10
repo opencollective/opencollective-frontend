@@ -207,7 +207,7 @@ class Comment extends React.Component {
                     {' '}
                     |{' '}
                     <a className="toggleEditComment" onClick={() => this.setState({ showDeleteModal: true })}>
-                      delete
+                      {intl.formatMessage(this.messages['delete'])}
                     </a>
                   </span>
                 </>
