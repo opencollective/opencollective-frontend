@@ -241,7 +241,10 @@ Cypress.Commands.add('fillInputField', (fieldname, value) => {
  */
 Cypress.Commands.add('getByDataCy', (query, params) => {
   if (Array.isArray(query)) {
-    return cy.get(query.map(elem => `[data-cy="${elem}"]`), params);
+    return cy.get(
+      query.map(elem => `[data-cy="${elem}"]`),
+      params,
+    );
   } else {
     return cy.get(`[data-cy="${query}"]`, params);
   }
@@ -253,7 +256,11 @@ Cypress.Commands.add('getByDataCy', (query, params) => {
  */
 Cypress.Commands.add('containsInDataCy', (query, content, params) => {
   if (Array.isArray(query)) {
-    return cy.contains(query.map(elem => `[data-cy="${elem}"]`), content, params);
+    return cy.contains(
+      query.map(elem => `[data-cy="${elem}"]`),
+      content,
+      params,
+    );
   } else {
     return cy.contains(`[data-cy="${query}"]`, content, params);
   }

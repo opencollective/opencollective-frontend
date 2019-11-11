@@ -519,9 +519,6 @@ const editExpense = graphql(
   },
 );
 
-const addMutations = compose(
-  unapproveExpense,
-  editExpense,
-);
+const addMutations = compose(unapproveExpense, editExpense);
 
 export default injectIntl(addMutations(Expense));

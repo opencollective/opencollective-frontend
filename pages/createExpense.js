@@ -217,9 +217,6 @@ const addMutation = graphql(createExpenseQuery, {
 
 const addCollectiveData = graphql(getCollectiveQuery);
 
-const addData = compose(
-  addCollectiveData,
-  addMutation,
-);
+const addData = compose(addCollectiveData, addMutation);
 
 export default withUser(addData(CreateExpensePage));

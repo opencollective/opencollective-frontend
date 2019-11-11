@@ -21,18 +21,7 @@ import { overflow } from '../lib/styled_system_custom';
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledCard = styled.div(
-  compose(
-    flexbox,
-    typography,
-    background,
-    border,
-    shadow,
-    color,
-    layout,
-    position,
-    space,
-    overflow,
-  ),
+  compose(flexbox, typography, background, border, shadow, color, layout, position, space, overflow),
 );
 
 StyledCard.propTypes = {

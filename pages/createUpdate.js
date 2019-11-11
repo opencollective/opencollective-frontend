@@ -196,9 +196,6 @@ const addMutation = graphql(createUpdateQuery, {
   }),
 });
 
-const addGraphQL = compose(
-  addCollectiveCoverData,
-  addMutation,
-);
+const addGraphQL = compose(addCollectiveCoverData, addMutation);
 
 export default withUser(addGraphQL(CreateUpdatePage));

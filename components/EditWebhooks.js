@@ -376,9 +376,6 @@ const editWebhooks = graphql(
   },
 );
 
-const addData = compose(
-  graphql(getCollectiveWithNotificationsQuery),
-  editWebhooks,
-);
+const addData = compose(graphql(getCollectiveWithNotificationsQuery), editWebhooks);
 
 export default injectIntl(addData(EditWebhooks));

@@ -235,9 +235,6 @@ const addMutation = graphql(createCommentQuery, {
   }),
 });
 
-const addData = compose(
-  addCommentsData,
-  addMutation,
-);
+const addData = compose(addCommentsData, addMutation);
 
 export default addData(CommentsWithData);

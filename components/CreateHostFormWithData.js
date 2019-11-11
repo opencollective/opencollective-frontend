@@ -165,9 +165,6 @@ const addMutation = graphql(createCollectiveQuery, {
   }),
 });
 
-const addGraphQL = compose(
-  addConnectedAccountsQuery,
-  addMutation,
-);
+const addGraphQL = compose(addConnectedAccountsQuery, addMutation);
 
 export default addGraphQL(CreateHostFormWithData);
