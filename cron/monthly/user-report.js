@@ -206,7 +206,10 @@ const processBacker = async FromCollectiveId => {
     include: [{ model: models.Subscription }],
   });
   // group orders(by collective) that either don't have subscription or have active subscription
-  const ordersByCollectiveId = groupBy(orders.filter(o => !o.Subscription || o.Subscription.isActive), 'CollectiveId');
+  const ordersByCollectiveId = groupBy(
+    orders.filter(o => !o.Subscription || o.Subscription.isActive),
+    'CollectiveId',
+  );
   const collectivesWithOrders = [];
   collectives.map(collective => {
     if (ordersByCollectiveId[collective.id]) {
@@ -321,7 +324,10 @@ const processCollective = async CollectiveId => {
     collective.getEvents({
       where: { startsAt: { [Op.gte]: startDate } },
       order: [['startsAt', 'DESC']],
-      include: [{ model: models.Member, as: 'members' }, { model: models.Order, as: 'orders' }],
+      include: [
+        { model: models.Member, as: 'members' },
+        { model: models.Order, as: 'orders' },
+      ],
     }),
     models.Update.findAll({
       where: {

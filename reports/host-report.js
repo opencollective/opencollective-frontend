@@ -141,7 +141,10 @@ async function HostReport(year, month, hostId) {
         {
           where: {
             ...whereWithDateRange,
-            [Op.or]: [{ type: 'CREDIT', OrderId: { [Op.ne]: null } }, { type: 'DEBIT', ExpenseId: { [Op.ne]: null } }],
+            [Op.or]: [
+              { type: 'CREDIT', OrderId: { [Op.ne]: null } },
+              { type: 'DEBIT', ExpenseId: { [Op.ne]: null } },
+            ],
           },
         },
         host.currency,

@@ -115,7 +115,11 @@ async function notifySubscribers(users, activity, options = {}) {
     debug('notifySubscribers: no user to notify for activity', activity.type);
     return;
   }
-  debug('notifySubscribers', users.length, users.map(u => u && u.email, activity.type));
+  debug(
+    'notifySubscribers',
+    users.length,
+    users.map(u => u && u.email, activity.type),
+  );
   const unsubscribedUserIds = await models.Notification.getUnsubscribersUserIds(
     get(options, 'template', activity.type),
     get(options, 'collective.id', activity.CollectiveId),

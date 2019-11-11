@@ -186,7 +186,7 @@ const queries = {
       const month = args.invoiceSlug.substr(4, 2);
       const hostSlug = args.invoiceSlug.substring(7, args.invoiceSlug.lastIndexOf('.'));
       const fromCollectiveSlug = args.invoiceSlug.substr(args.invoiceSlug.lastIndexOf('.') + 1);
-      if (!hostSlug || year < 2015 || (month < 1 || month > 12)) {
+      if (!hostSlug || year < 2015 || month < 1 || month > 12) {
         throw new errors.ValidationFailed(
           'Invalid invoiceSlug format. Should be :year:2digitMonth.:hostSlug.:fromCollectiveSlug',
         );
@@ -540,7 +540,10 @@ const queries = {
       const query = { where: {} };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [['publishedAt', 'DESC'], ['createdAt', 'DESC']];
+      query.order = [
+        ['publishedAt', 'DESC'],
+        ['createdAt', 'DESC'],
+      ];
       if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
         query.where.publishedAt = { [Op.ne]: null };
       }
@@ -592,7 +595,10 @@ const queries = {
       if (args.category) query.where.category = { [Op.iLike]: args.category };
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
-      query.order = [['createdAt', 'DESC'], ['id', 'DESC']];
+      query.order = [
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ];
       const getCollectiveIds = () => {
         // if is host, we get all the orders across all the hosted collectives
         if (args.includeHostedCollectives) {
@@ -1235,7 +1241,10 @@ const queries = {
             where.ParentCollectiveId = collective.id;
             return models.Collective.findAll({
               where,
-              order: [['startsAt', 'DESC'], ['createdAt', 'DESC']],
+              order: [
+                ['startsAt', 'DESC'],
+                ['createdAt', 'DESC'],
+              ],
               limit: args.limit || 10,
               offset: args.offset || 0,
             });

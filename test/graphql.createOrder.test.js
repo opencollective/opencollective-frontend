@@ -689,9 +689,11 @@ describe('createOrder', () => {
 
   it('fails if trying to donate using an existing email without being logged in', async () => {
     const order = cloneDeep(baseOrder);
-    const legitUser = (await store.newUser('legit user', {
-      email: store.randEmail('legit@opencollective.com'),
-    })).user;
+    const legitUser = (
+      await store.newUser('legit user', {
+        email: store.randEmail('legit@opencollective.com'),
+      })
+    ).user;
     const remoteUser = null;
     order.collective = { id: fearlesscitiesbrussels.id };
     const res = await utils.graphqlQuery(
@@ -706,10 +708,12 @@ describe('createOrder', () => {
 
   it('fails if trying to donate using an existing paypal email without being logged in', async () => {
     const order = cloneDeep(baseOrder);
-    const legitUser = (await store.newUser('legit user', {
-      email: store.randEmail('legit@opencollective.com'),
-      paypalEmail: store.randEmail('legit-paypal@opencollective.com'),
-    })).user;
+    const legitUser = (
+      await store.newUser('legit user', {
+        email: store.randEmail('legit@opencollective.com'),
+        paypalEmail: store.randEmail('legit-paypal@opencollective.com'),
+      })
+    ).user;
     const remoteUser = null;
     order.collective = { id: fearlesscitiesbrussels.id };
     const res = await utils.graphqlQuery(

@@ -66,9 +66,10 @@ const replaceHostStripeTokens = () => {
 };
 
 const replaceUsersStripeTokens = () => {
-  return models.PaymentMethod.update({ token: 'tok_mastercard' }, { where: { service: 'stripe' }, force: true }).catch(
-    e => console.error("Can't remove users stripe tokens. Please do it manually", e),
-  );
+  return models.PaymentMethod.update(
+    { token: 'tok_mastercard' },
+    { where: { service: 'stripe' }, force: true },
+  ).catch(e => console.error("Can't remove users stripe tokens. Please do it manually", e));
 };
 
 // Removes all tokens from connected accounts
