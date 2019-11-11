@@ -131,7 +131,7 @@
   "collective.delete.cancel.btn": "Cancelar",
   "collective.delete.confirm.btn": "Eliminar",
   "collective.delete.description": "Este {type} será borrado, junto con todos los datos relacionados como los roles de los Contribuyentes principales y métodos de pago.",
-  "collective.delete.isNotDeletable-message": "{type} con transacciones, ordenes o gastos pagados no pueden ser borrados. Por favor archívalos.",
+  "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",
   "collective.delete.modal.body": "¿Seguro que quieres eliminar esto {type}?",
   "collective.delete.modal.header": "Eliminar {name}",
   "collective.delete.title": "Eliminar este {type}",
