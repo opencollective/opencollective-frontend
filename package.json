@@ -190,7 +190,7 @@
     "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.5",
     "post-merge-install": "^0.3.0",
-    "prettier": "1.18.2",
+    "prettier": "1.19.1",
     "raf": "^3.4.1",
     "raw-loader": "^3.1.0",
     "react-styleguidist": "9.0.4",
