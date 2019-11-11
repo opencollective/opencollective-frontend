@@ -131,7 +131,7 @@
   "collective.delete.cancel.btn": "Отмена",
   "collective.delete.confirm.btn": "Удалить",
   "collective.delete.description": "This {type} will be deleted, along with all related data like Core Contributor roles and payment methods.",
-  "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, or paid expenses cannot be deleted. Please archive it instead.",
+  "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",
   "collective.delete.modal.body": "Вы уверены что хотите удалить {type}?",
   "collective.delete.modal.header": "Удалить {name}",
   "collective.delete.title": "Удалить этот {type}",
