@@ -232,9 +232,6 @@ const addMutation = graphql(editCollectiveMutation, {
   }),
 });
 
-const addGraphQL = compose(
-  addQuery,
-  addMutation,
-);
+const addGraphQL = compose(addQuery, addMutation);
 
 export default addGraphQL(ApplyToHostBtnLoggedIn);

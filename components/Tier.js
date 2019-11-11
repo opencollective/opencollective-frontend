@@ -88,7 +88,7 @@ class Tier extends React.Component {
     const values = this.props.values;
 
     // handle the initial condition of starting without an amount
-    if (currentValues.amount && (values && !values.amount)) {
+    if (currentValues.amount && values && !values.amount) {
       this.handleChange('amount', currentValues.amount);
     }
   }

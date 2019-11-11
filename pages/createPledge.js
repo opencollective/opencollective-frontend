@@ -709,10 +709,7 @@ export const addCreatePledgeMutation = graphql(
   },
 );
 
-const addGraphQL = compose(
-  addCollectiveData,
-  addCreatePledgeMutation,
-);
+const addGraphQL = compose(addCollectiveData, addCreatePledgeMutation);
 
 export { CreatePledgePage as MockCreatePledgePage };
 export default injectIntl(withUser(addGraphQL(CreatePledgePage)));

@@ -93,7 +93,10 @@ class TopBarProfileMenu extends React.Component {
   renderProfileMenu() {
     const { LoggedInUser, intl } = this.props;
 
-    const memberships = uniqBy(LoggedInUser.memberOf.filter(m => m.role !== 'BACKER'), m => m.collective.id);
+    const memberships = uniqBy(
+      LoggedInUser.memberOf.filter(m => m.role !== 'BACKER'),
+      m => m.collective.id,
+    );
 
     const incognitoProfileMembership = memberships.find(m => m.collective.isIncognito);
 

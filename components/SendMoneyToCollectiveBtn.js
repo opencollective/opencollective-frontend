@@ -155,9 +155,6 @@ const addMutation = graphql(createOrderQuery, {
   }),
 });
 
-const addData = compose(
-  addMutation,
-  addPaymentMethods,
-);
+const addData = compose(addMutation, addPaymentMethods);
 
 export default addData(SendMoneyToCollectiveBtn);
