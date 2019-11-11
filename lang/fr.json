@@ -131,7 +131,7 @@
   "collective.delete.cancel.btn": "Annuler",
   "collective.delete.confirm.btn": "Supprimer",
   "collective.delete.description": "Ce {type} va être supprimé ainsi que toutes les données associées, comme les abonnements et les moyens de paiement.",
-  "collective.delete.isNotDeletable-message": "Un {type} avec des transactions, des commandes ou des dépenses ne peut pas être supprimé. Veuillez plutôt l'archiver.",
+  "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",
   "collective.delete.modal.body": "Êtes-vous sûr de vouloir supprimer ce {type} ?",
   "collective.delete.modal.header": "Supprimer {name}",
   "collective.delete.title": "Supprimer ce {type}",
