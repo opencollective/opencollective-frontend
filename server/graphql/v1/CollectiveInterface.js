@@ -1451,7 +1451,10 @@ const CollectiveFields = () => {
       resolve(collective, args) {
         const query = {
           where: { type: 'EVENT', ParentCollectiveId: collective.id },
-          order: [['startsAt', 'DESC'], ['endsAt', 'DESC']],
+          order: [
+            ['startsAt', 'DESC'],
+            ['endsAt', 'DESC'],
+          ],
         };
 
         if (args.limit) query.limit = args.limit;
@@ -1573,7 +1576,10 @@ const CollectiveFields = () => {
           where: { type: 'virtualcard' },
           limit: args.limit,
           offset: args.offset,
-          order: [['createdAt', 'DESC'], ['id', 'DESC']],
+          order: [
+            ['createdAt', 'DESC'],
+            ['id', 'DESC'],
+          ],
           include: [
             {
               model: models.PaymentMethod,

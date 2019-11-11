@@ -49,9 +49,17 @@ export default (err, req, res, next) => {
   const e = name && name.toLowerCase ? name.toLowerCase() : '';
 
   if (e.indexOf('validation') !== -1) {
-    err = new errors.ValidationFailed(null, _.map(err.errors, e => e.path), err.message);
+    err = new errors.ValidationFailed(
+      null,
+      _.map(err.errors, e => e.path),
+      err.message,
+    );
   } else if (e.indexOf('uniqueconstraint') !== -1) {
-    err = new errors.ValidationFailed(null, _.map(err.errors, e => e.path), 'Unique Constraint Error.');
+    err = new errors.ValidationFailed(
+      null,
+      _.map(err.errors, e => e.path),
+      'Unique Constraint Error.',
+    );
   }
 
   if (!err.code || !Number.isInteger(err.code)) {

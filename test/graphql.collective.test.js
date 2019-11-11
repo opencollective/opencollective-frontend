@@ -747,9 +747,11 @@ describe('graphql.collective.test.js', () => {
 
     beforeEach(async () => {
       pubnubAdmin = (await store.newUser('pubnub admin')).user;
-      pubnubCollective = (await store.newCollectiveWithHost('pubnub', 'USD', 'USD', 10, pubnubAdmin, {
-        isActive: true,
-      })).collective;
+      pubnubCollective = (
+        await store.newCollectiveWithHost('pubnub', 'USD', 'USD', 10, pubnubAdmin, {
+          isActive: true,
+        })
+      ).collective;
       adminMembership = await models.Member.findOne({
         where: {
           MemberCollectiveId: pubnubAdmin.id,

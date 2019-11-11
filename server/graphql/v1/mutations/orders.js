@@ -187,10 +187,12 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.collective.id) {
       collective = await loaders.collective.findById.load(order.collective.id);
     } else if (order.collective.website) {
-      collective = (await models.Collective.findOrCreate({
-        where: { website: order.collective.website },
-        defaults: order.collective,
-      }))[0];
+      collective = (
+        await models.Collective.findOrCreate({
+          where: { website: order.collective.website },
+          defaults: order.collective,
+        })
+      )[0];
     } else if (order.collective.githubHandle) {
       collective = await models.Collective.findOne({ where: { githubHandle: order.collective.githubHandle } });
       if (!collective) {
@@ -606,7 +608,10 @@ export async function confirmOrder(order, remoteUser) {
 export async function completePledge(remoteUser, order) {
   const existingOrder = await models.Order.findOne({
     where: { id: order.id },
-    include: [{ model: models.Collective, as: 'collective' }, { model: models.Collective, as: 'fromCollective' }],
+    include: [
+      { model: models.Collective, as: 'collective' },
+      { model: models.Collective, as: 'fromCollective' },
+    ],
   });
 
   if (!existingOrder) {

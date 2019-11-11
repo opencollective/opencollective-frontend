@@ -191,7 +191,10 @@ async function PlatformReport(year, month) {
       attributes: ['email'],
       where: { CollectiveId: { [Op.in]: platformAdmins.map(m => m.MemberCollectiveId) } },
     });
-    await sendEmail(adminUsers.map(u => u.email), data);
+    await sendEmail(
+      adminUsers.map(u => u.email),
+      data,
+    );
     return data;
   };
 

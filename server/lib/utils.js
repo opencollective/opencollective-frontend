@@ -471,7 +471,10 @@ export function formatCurrencyObject(currencyObj, options = { precision: 0, conj
   }
   if (array.length === 1) return array[0].str;
   array.sort((a, b) => b.value - a.value);
-  return formatArrayToString(array.map(r => r.str), options.conjonction);
+  return formatArrayToString(
+    array.map(r => r.str),
+    options.conjonction,
+  );
 }
 
 export function isUUID(str) {

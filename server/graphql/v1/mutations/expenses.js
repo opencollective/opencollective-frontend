@@ -358,7 +358,10 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId, processorFeeRef
   }
 
   const expense = await models.Expense.findByPk(ExpenseId, {
-    include: [{ model: models.Collective, as: 'collective' }, { model: models.User, as: 'User' }],
+    include: [
+      { model: models.Collective, as: 'collective' },
+      { model: models.User, as: 'User' },
+    ],
   });
 
   if (!expense) {

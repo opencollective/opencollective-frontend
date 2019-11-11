@@ -11,7 +11,11 @@ describe('diffDBEntries', () => {
 
   it('returns correct results', () => {
     const [toCreate, toRemove, toUpdate] = diffDBEntries(
-      [{ id: 1, msg: 'I am 1' }, { id: 2, msg: 'I am 2' }, { id: 3, msg: 'I am 3' }],
+      [
+        { id: 1, msg: 'I am 1' },
+        { id: 2, msg: 'I am 2' },
+        { id: 3, msg: 'I am 3' },
+      ],
       [{ id: 1, msg: 'I am 1 edited' }, { id: 2, msg: 'I am 2' }, { msg: 'I am the new one!' }],
       ['msg'],
     );

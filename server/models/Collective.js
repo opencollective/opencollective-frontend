@@ -1708,7 +1708,10 @@ export default function(Sequelize, DataTypes) {
     return this.getTiers()
       .then(oldTiers => {
         // remove the tiers that are not present anymore in the updated collective
-        const diff = difference(oldTiers.map(t => t.id), tiers.map(t => t.id));
+        const diff = difference(
+          oldTiers.map(t => t.id),
+          tiers.map(t => t.id),
+        );
         return models.Tier.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diff } } });
       })
       .then(() => {
@@ -2164,7 +2167,12 @@ export default function(Sequelize, DataTypes) {
   Collective.prototype.getTopBackers = function(since, until, limit) {
     return queries
       .getMembersWithTotalDonations({ CollectiveId: this.id, role: 'BACKER' }, { since, until, limit })
-      .tap(backers => debug('getTopBackers', backers.map(b => b.dataValues)));
+      .tap(backers =>
+        debug(
+          'getTopBackers',
+          backers.map(b => b.dataValues),
+        ),
+      );
   };
 
   Collective.prototype.getImageUrl = function(args = {}) {
@@ -2227,9 +2235,12 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.getTopBackers = (since, until, tags, limit) => {
-    return queries
-      .getTopBackers(since || 0, until || new Date(), tags, limit || 5)
-      .tap(backers => debug('getTopBackers', backers.map(b => b.dataValues)));
+    return queries.getTopBackers(since || 0, until || new Date(), tags, limit || 5).tap(backers =>
+      debug(
+        'getTopBackers',
+        backers.map(b => b.dataValues),
+      ),
+    );
   };
 
   Collective.prototype.doesUserHaveTotalExpensesOverThreshold = async function({ threshold, year, UserId }) {
