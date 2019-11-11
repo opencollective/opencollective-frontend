@@ -1015,8 +1015,11 @@ const CollectiveFields = () => {
         const expenseCount = await models.Expense.count({
           where: { CollectiveId: collective.id, status: 'PAID' },
         });
+        const eventCount = await models.Collective.count({
+          where: { ParentCollectiveId: collective.id, type: types.EVENT },
+        });
 
-        if (transactionCount > 0 || orderCount > 0 || expenseCount > 0) {
+        if (transactionCount > 0 || orderCount > 0 || expenseCount > 0 || eventCount > 0) {
           return false;
         }
         return true;
