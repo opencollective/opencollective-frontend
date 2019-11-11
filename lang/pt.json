@@ -131,7 +131,7 @@
   "collective.delete.cancel.btn": "Cancelar",
   "collective.delete.confirm.btn": "Excluir",
   "collective.delete.description": "Este {type} será excluído, junto com todos os dados relacionados como cargos de Colaborador Central e métodos de pagamento.",
-  "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",
+  "collective.delete.isNotDeletable-message": "{type}s com transações, pedidos ou despesas pagas não podem ser excluídas. Por favor, arquive-as.",
   "collective.delete.modal.body": "Você tem certeza de que deseja arquivar este {type}?",
   "collective.delete.modal.header": "Exclua {name}",
   "collective.delete.title": "Exclua este {type}",
