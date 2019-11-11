@@ -98,7 +98,7 @@
     "regenerator-runtime": "0.13.3",
     "rehype-react": "4.0.1",
     "rehype-sanitize": "3.0.0",
-    "remark-parse": "7.0.1",
+    "remark-parse": "7.0.2",
     "remark-rehype": "5.0.0",
     "sanitize-html": "1.20.1",
     "showdown": "1.9.1",
