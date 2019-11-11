@@ -140,8 +140,6 @@ const StyledDragDrop = ({
     setSortedItems(orderByItemsOrder(items, confirmedItemsOrder, identifier));
   }, [items]);
 
-  console.log('render');
-
   const onDragEnd = memoizeOne(result => {
     const { source, destination } = result;
 
