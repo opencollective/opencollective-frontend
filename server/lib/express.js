@@ -56,30 +56,32 @@ export default function(app) {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-  // check for slow requests
-  app.use((req, res, next) => {
-    req.startAt = new Date();
-    const temp = res.end;
+  // Slow requests if enabled (default false)
+  if (get(config, 'log.slowRequest')) {
+    app.use((req, res, next) => {
+      req.startAt = new Date();
+      const temp = res.end;
 
-    res.end = function() {
-      const timeElapsed = new Date() - req.startAt;
-      if (timeElapsed > (process.env.SLOW_REQUEST_THRESHOLD || 1000)) {
-        if (req.body && req.body.query) {
-          console.log(
-            `>>> slow request ${timeElapsed}ms`,
-            req.body.operationName,
-            'query:',
-            req.body.query.substr(0, req.body.query.indexOf(')') + 1),
-          );
-          if (req.body.variables) {
-            console.log('>>> variables: ', sanitizeForLogs(req.body.variables));
+      res.end = function() {
+        const timeElapsed = new Date() - req.startAt;
+        if (timeElapsed > get(config, 'log.slowRequestThreshold', 1000)) {
+          if (req.body && req.body.query) {
+            console.log(
+              `>>> slow request ${timeElapsed}ms`,
+              req.body.operationName,
+              'query:',
+              req.body.query.substr(0, req.body.query.indexOf(')') + 1),
+            );
+            if (req.body.variables) {
+              console.log('>>> variables: ', sanitizeForLogs(req.body.variables));
+            }
           }
         }
-      }
-      temp.apply(this, arguments);
-    };
-    next();
-  });
+        temp.apply(this, arguments);
+      };
+      next();
+    });
+  }
 
   // Cache Middleware
   if (get(config, 'cache.middleware')) {

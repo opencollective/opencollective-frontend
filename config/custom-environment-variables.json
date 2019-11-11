@@ -47,7 +47,9 @@
   },
   "log": {
     "level": "LOG_LEVEL",
-    "accessLogs": "ACCESS_LOGS"
+    "accessLogs": "ACCESS_LOGS",
+    "slowRequest": "SLOW_REQUEST",
+    "slowRequestThreshold": "SLOW_REQUEST_THRESHOLD"
   },
   "stripe": {
     "secret": "STRIPE_SECRET",

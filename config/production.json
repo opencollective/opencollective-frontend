@@ -21,6 +21,9 @@
     "images": "https://images.opencollective.com",
     "invoices": "https://invoices.opencollective.com"
   },
+  "log": {
+    "slowRequest": true
+  },
   "stripe": {
     "redirectUri": "https://api.opencollective.com/connected-accounts/stripe/callback"
   },

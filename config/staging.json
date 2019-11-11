@@ -17,6 +17,9 @@
     "frontend": "https://frontend-staging.opencollective.com",
     "website": "https://staging.opencollective.com"
   },
+  "log": {
+    "slowRequest": true
+  },
   "stripe": {
     "redirectUri": "https://api-staging.opencollective.com/connected-accounts/stripe/callback"
   },
