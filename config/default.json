@@ -67,7 +67,9 @@
   },
   "log": {
     "level": "info",
-    "accessLogs": false
+    "accessLogs": false,
+    "slowRequest": false,
+    "slowRequestThreshold": 1000
   },
   "aws": {
     "s3": {
