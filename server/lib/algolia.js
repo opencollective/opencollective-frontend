@@ -32,6 +32,12 @@ function getIndex() {
   }
 }
 
+/** Returns true if Algolia is configured and usable */
+function isAvailable() {
+  return Boolean(getClient());
+}
+
 export default {
   getIndex,
+  isAvailable,
 };
