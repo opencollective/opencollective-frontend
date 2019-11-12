@@ -90,9 +90,13 @@ const addFunds = async (user, hostCollective, collective, amount) => {
 };
 
 describe('GraphQL Expenses API', () => {
-  beforeEach(utils.resetTestDB);
+  beforeEach(async () => {
+    await utils.resetTestDB();
+  });
 
-  beforeEach(utils.resetCaches);
+  beforeEach(async () => {
+    await utils.resetCaches();
+  });
 
   describe('#allExpenses', () => {
     it('fails if collective not found', async () => {
