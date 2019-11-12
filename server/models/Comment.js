@@ -161,6 +161,8 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
+  Comment.schema('public');
+
   /**
    * Instance Methods
    */

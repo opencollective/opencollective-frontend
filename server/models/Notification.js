@@ -56,6 +56,8 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
+  Notification.schema('public');
+
   Notification.prototype.getUser = function() {
     return models.User.findByPk(this.UserId);
   };

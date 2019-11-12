@@ -214,6 +214,8 @@ export default (Sequelize, DataTypes) => {
     },
   );
 
+  Transaction.schema('public');
+
   /**
    * Instance Methods
    */

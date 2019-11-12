@@ -24,6 +24,8 @@ export default function(Sequelize, DataTypes) {
     },
   );
 
+  Activity.schema('public');
+
   return Activity;
 }
 

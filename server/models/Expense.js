@@ -210,6 +210,8 @@ export default function(Sequelize, DataTypes) {
     });
   };
 
+  Expense.schema('public');
+
   Expense.prototype.addUserIdToHostW9ReceivedList = async function() {
     const host = await this.collective.getHostCollective();
     // If user is already included in Host data List, don't do anything
