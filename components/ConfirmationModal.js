@@ -26,10 +26,10 @@ const ConfirmationModal = ({
     </ModalBody>
     <ModalFooter>
       <Container display="flex" justifyContent="flex-end">
-        <StyledButton mx={20} onClick={() => cancelHandler()}>
+        <StyledButton mx={20} onClick={() => cancelHandler()} data-cy="confirmation-modal-cancel">
           {cancelLabel}
         </StyledButton>
-        <StyledButton data-cy="action" buttonStyle="primary" onClick={() => continueHandler()}>
+        <StyledButton buttonStyle="primary" onClick={() => continueHandler()} data-cy="confirmation-modal-continue">
           {continueLabel}
         </StyledButton>
       </Container>

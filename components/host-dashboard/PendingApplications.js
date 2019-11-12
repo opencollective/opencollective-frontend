@@ -102,7 +102,7 @@ class HostPendingApplications extends React.Component {
             <StyledHr my={3} borderColor="black.200" />
             <Flex justifyContent="center">
               {c.isActive ? (
-                <Box color="green.700">
+                <Box color="green.700" data-cy={`${c.slug}-approved`}>
                   <Check size={39} />
                 </Box>
               ) : (
@@ -113,6 +113,7 @@ class HostPendingApplications extends React.Component {
                         mx={4}
                         loading={loading}
                         onClick={() => approveCollective({ variables: { id: c.id } })}
+                        data-cy={`${c.slug}-approve`}
                       >
                         <FormattedMessage id="host.pending-applications.approve" defaultMessage="Approve" />
                       </StyledButton>
