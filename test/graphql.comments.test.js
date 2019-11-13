@@ -224,53 +224,52 @@ describe('graphql.comments.test', () => {
   });
 
   describe('query comments', () => {
-    const allCommentsQuery = `
-    query allComments($ExpenseId: Int, $limit: Int, $offset: Int) {
-      allComments(ExpenseId: $ExpenseId, limit: $limit, offset: $offset) {
-        id
-        markdown
-      }
-    }
-    `;
-
-    before(() => {
-      return models.Comment.destroy({ where: {}, truncate: true }).then(() =>
-        models.Comment.createMany(
-          [
-            { markdown: 'draft comment 1', createdAt: new Date('2018-01-11') },
-            { markdown: 'comment 1', createdAt: new Date('2018-01-01') },
-            { markdown: 'comment 2', createdAt: new Date('2018-01-02') },
-            { markdown: 'comment 3', createdAt: new Date('2018-01-03') },
-            { markdown: 'comment 4', createdAt: new Date('2018-01-04') },
-            { markdown: 'comment 5', createdAt: new Date('2018-01-05') },
-            { markdown: 'comment 6', createdAt: new Date('2018-01-06') },
-            { markdown: 'comment 7', createdAt: new Date('2018-01-07') },
-            { markdown: 'comment 8', createdAt: new Date('2018-01-08') },
-            { markdown: 'comment 9', createdAt: new Date('2018-01-09') },
-            { markdown: 'comment 10', createdAt: new Date('2018-01-10') },
-          ],
-          {
-            CreatedByUserId: collectiveAdmin.id,
-            CollectiveId: collective1.id,
-            ExpenseId: expense1.id,
-          },
-        ),
+    function populateComments() {
+      return models.Comment.createMany(
+        [
+          { markdown: 'comment 1', createdAt: new Date('2018-01-01'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 2', createdAt: new Date('2018-01-02'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 3', createdAt: new Date('2018-01-03'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 4', createdAt: new Date('2018-01-04'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 5', createdAt: new Date('2018-01-05'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 6', createdAt: new Date('2018-01-06'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 7', createdAt: new Date('2018-01-07'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 8', createdAt: new Date('2018-01-08'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 9', createdAt: new Date('2018-01-09'), FromCollectiveId: collectiveAdmin.CollectiveId },
+          { markdown: 'comment 10', createdAt: new Date('2018-01-10'), FromCollectiveId: collectiveAdmin.CollectiveId },
+        ],
+        {
+          CreatedByUserId: collectiveAdmin.id,
+          CollectiveId: collective1.id,
+          ExpenseId: expense1.id,
+        },
       );
-    });
+    }
+    beforeEach(() => models.Comment.destroy({ where: {}, truncate: true }));
 
     it('get all the comments', async () => {
+      await populateComments();
+      const allCommentsQuery = `
+      query allComments($ExpenseId: Int, $limit: Int, $offset: Int) {
+        allComments(ExpenseId: $ExpenseId, limit: $limit, offset: $offset) {
+          id
+          markdown
+        }
+      }
+      `;
       const result = await utils.graphqlQuery(allCommentsQuery, {
         ExpenseId: expense1.id,
         limit: 5,
         offset: 2,
       });
+      utils.expectNoErrorsFromResult(result);
       const comments = result.data.allComments;
-      expect(result.errors).to.not.exist;
       expect(comments).to.have.length(5);
       expect(comments[0].markdown).to.equal('comment 3');
     });
 
     it('get an expense with associated comments', async () => {
+      await populateComments();
       const expenseQuery = `
       query Expense($id: Int!, $limit: Int) {
         Expense(id: $id) {
@@ -279,6 +278,7 @@ describe('graphql.comments.test', () => {
           comments(limit: $limit) {
             total
             comments {
+              id
               markdown
               html
             }
@@ -290,11 +290,37 @@ describe('graphql.comments.test', () => {
         id: expense1.id,
         limit: 5,
       });
-      result.errors && console.error(result.errors);
-      expect(result.errors).to.not.exist;
+      utils.expectNoErrorsFromResult(result);
       const expense = result.data.Expense;
-      expect(expense.comments.total).to.equal(11);
+      expect(expense.comments.total).to.equal(10);
       expect(expense.comments.comments).to.have.length(5);
+    });
+
+    it('get an expense with associated comments empty', async () => {
+      const ExpenseQuery = `
+      query ExpenseQuery($id: Int!, $limit: Int) {
+        Expense(id: $id) {
+          description
+          amount
+          comments(limit: $limit) {
+            total
+            comments {
+              id
+              markdown
+              html
+            }
+          }
+        }
+      }
+      `;
+      const result = await utils.graphqlQuery(ExpenseQuery, {
+        id: expense1.id,
+        limit: 5,
+      });
+      utils.expectNoErrorsFromResult(result);
+      const expense = result.data.Expense;
+      expect(expense.comments.total).to.equal(0);
+      expect(expense.comments.comments).to.have.length(0);
     });
   });
 });
