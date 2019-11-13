@@ -415,6 +415,7 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
     type: 'virtualcard',
     createdAt: new Date(),
     updatedAt: new Date(),
+    batch: args.batch,
     data,
   };
 }

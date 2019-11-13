@@ -776,6 +776,10 @@ const mutations = {
         type: GraphQLInt,
         description: 'The amount as an Integer with cents.',
       },
+      batch: {
+        type: GraphQLString,
+        description: 'Batch name for the created gift cards.',
+      },
       monthlyLimitPerMember: { type: GraphQLInt },
       limitedToTags: {
         type: new GraphQLList(GraphQLString),

@@ -144,6 +144,19 @@ export default function(Sequelize, DataTypes) {
         },
       },
 
+      batch: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        description: 'To group multiple payment methods. Used for Gift Cards',
+        set(batchName) {
+          if (batchName) {
+            batchName = batchName.trim();
+          }
+
+          this.setDataValue('batch', batchName || null);
+        },
+      },
+
       limitedToCollectiveIds: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
         description: 'if not null, this payment method can only be used for collectives listed by their id',

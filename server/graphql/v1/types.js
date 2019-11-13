@@ -1778,6 +1778,10 @@ export const PaymentMethodType = new GraphQLObjectType({
           return paymentMethod.service;
         },
       },
+      batch: {
+        type: GraphQLString,
+        description: 'To group multiple payment methods. Used for Gift Cards',
+      },
       SourcePaymentMethodId: {
         type: GraphQLInt,
         resolve(paymentMethod) {
@@ -2081,6 +2085,21 @@ export const PaginatedExpensesType = new GraphQLObjectType({
     limit: { type: GraphQLInt },
     offset: { type: GraphQLInt },
     total: { type: GraphQLInt },
+  },
+});
+
+export const PaymentMethodBatchInfo = new GraphQLObjectType({
+  name: 'PaymentMethodBatchInfo',
+  description: 'Provides rich information about a payment methods batch',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLString) }, // For caching
+    collectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+    count: { type: new GraphQLNonNull(GraphQLInt) },
+    type: { type: new GraphQLNonNull(GraphQLString) },
+    name: {
+      type: GraphQLString,
+      description: 'The batch name, or null for unbatched payment methods',
+    },
   },
 });
 
