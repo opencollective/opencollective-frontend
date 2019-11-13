@@ -7,7 +7,6 @@ import { FormattedMessage } from 'react-intl';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
-import EventTemplatePicker from './EventTemplatePicker';
 import EditEventForm from './EditEventForm';
 import CollectiveNavbar from './CollectiveNavbar';
 
@@ -134,15 +133,17 @@ class CreateEvent extends React.Component {
             )}
             {canCreateEvent && (
               <div>
-                <div className="EventTemplatePicker">
-                  <div className="field">
-                    <EventTemplatePicker
-                      label="Template"
-                      collectiveSlug={collective.slug}
-                      onChange={this.handleTemplateChange}
-                    />
-                  </div>
-                </div>
+                {/* Hide event template picker to avoid getting old markdown content into events 
+                   while transitioning to the new editor
+                  <div className="EventTemplatePicker">
+                    <div className="field">
+                      <EventTemplatePicker
+                        label="Template"
+                        collectiveSlug={collective.slug}
+                        onChange={this.handleTemplateChange}
+                      />
+                    </div>
+                </div> */}
 
                 <EditEventForm
                   event={this.state.event}

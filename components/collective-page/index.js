@@ -19,6 +19,9 @@ import SectionGoals from './sections/Goals';
 import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
 import SectionTransactions from './sections/Transactions';
+import SectionTickets from './sections/Tickets';
+import SectionParticipants from './sections/Participants';
+import SectionLocation from './sections/Location';
 import SectionContainer from './SectionContainer';
 
 /**
@@ -122,12 +125,13 @@ class CollectivePage extends Component {
 
   getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply, canContact) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
+    const isEvent = type === CollectiveType.EVENT;
     return {
       hasContact: !isAdmin && canContact,
-      hasSubmitExpense: isCollective,
+      hasSubmitExpense: isCollective || isEvent,
       hasApply: canApply,
       hasDashboard: isHost && isAdmin,
-      hasManageSubscriptions: isAdmin && !isCollective,
+      hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
       addFunds: isRoot && type === CollectiveType.ORGANIZATION,
     };
   });
@@ -184,6 +188,19 @@ class CollectivePage extends Component {
         return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
       case Sections.GOALS:
         return <SectionGoals collective={this.props.collective} />;
+      case Sections.TICKETS:
+        return (
+          <SectionTickets
+            collective={this.props.collective}
+            tiers={this.props.tiers}
+            isAdmin={this.props.isAdmin}
+            contributors={this.props.financialContributors}
+          />
+        );
+      case Sections.PARTICIPANTS:
+        return <SectionParticipants collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
+      case Sections.LOCATION:
+        return <SectionLocation collective={this.props.collective} />;
       default:
         return null;
     }

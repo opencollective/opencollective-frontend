@@ -22,7 +22,6 @@ const pages = routes()
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
-  .add('event', '/:parentCollectiveSlug/events/:eventSlug')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit')
   .add('editCollective', '/:slug/edit/:section?')
   .add('events', '/:collectiveSlug/events')
@@ -54,6 +53,15 @@ const pages = routes()
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
   .add('discover', '/discover');
+
+// Events using new collective page
+if (process.env.NEW_EVENTS === 'true') {
+  pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
+  pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
+} else {
+  pages.add('event', '/:parentCollectiveSlug/events/:eventSlug');
+  pages.add('new-event', '/:parentCollectiveSlug/events/:eventSlug/new', 'new-collective-page');
+}
 
 // Tier page
 // ---------------

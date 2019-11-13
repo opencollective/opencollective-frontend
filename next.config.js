@@ -21,6 +21,7 @@ const nextConfig = {
         WEBSITE_URL: null,
         NCP_BETA_COLLECTIVES: null,
         NCP_IS_DEFAULT: null,
+        NEW_EVENTS: null,
       }),
     );
 

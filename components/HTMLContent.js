@@ -48,6 +48,8 @@ const HTMLContent = styled(({ content, ...props }) => {
   h3 {
     margin: 0;
     margin-bottom: 0.5em;
+    font-weight: normal;
+    text-align: left;
   }
 
   img {

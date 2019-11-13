@@ -18,10 +18,13 @@ export const AnimationsDurations = {
  */
 export const Sections = {
   GOALS: 'goals',
+  TICKETS: 'tickets',
   CONTRIBUTIONS: 'contributions',
   CONTRIBUTE: 'contribute',
   // CONVERSATIONS: 'conversations',
   UPDATES: 'updates',
+  PARTICIPANTS: 'participants',
+  LOCATION: 'location',
   BUDGET: 'budget',
   CONTRIBUTORS: 'contributors',
   TRANSACTIONS: 'transactions',

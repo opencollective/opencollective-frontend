@@ -10,6 +10,7 @@ import { Settings } from 'styled-icons/feather/Settings';
 
 import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/utils';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import Avatar from '../../Avatar';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledRoundButton from '../../StyledRoundButton';
@@ -92,6 +93,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -163,8 +165,12 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
         </Dropzone>
         <Container position="absolute" right={0} bottom={0}>
           <Link
-            route="editCollective"
-            params={{ slug: collective.slug }}
+            route={isEvent ? 'editEvent' : 'editCollective'}
+            params={
+              isEvent
+                ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                : { slug: collective.slug }
+            }
             title={intl.formatMessage(Translations.settings)}
           >
             <StyledRoundButton size={40} color="black.700" data-cy="edit-collective-btn">
