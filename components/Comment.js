@@ -41,7 +41,7 @@ class Comment extends React.Component {
       edit: { id: 'comment.edit', defaultMessage: 'Edit' },
       cancelEdit: { id: 'comment.cancelEdit', defaultMessage: 'Cancel edit' },
       delete: { id: 'comment.delete', defaultMessage: 'Delete' },
-      'delete.modal.cancel': { id: 'delete.modal.cancel', defaultMessage: 'Cancel' },
+      'delete.modal.cancel': { id: 'cancel', defaultMessage: 'Cancel' },
       'delete.modal.header': {
         id: 'delete.modal.header',
         defaultMessage: 'Delete comment',
