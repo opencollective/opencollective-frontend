@@ -9,6 +9,7 @@ import { types as CollectiveTypes } from '../../constants/collectives';
 import models, { sequelize, Op } from '../../models';
 import { fetchCollectiveId } from '../../lib/cache';
 import { searchCollectivesByEmail, searchCollectivesOnAlgolia, searchCollectivesInDB } from '../../lib/search';
+import Algolia from '../../lib/algolia';
 
 import {
   CollectiveInterfaceType,
@@ -1343,7 +1344,7 @@ const queries = {
         };
       };
 
-      if (useAlgolia) {
+      if (useAlgolia && Algolia.isAvailable()) {
         if (isEmptyTerm) {
           return generateResults([], 0);
         } else {
