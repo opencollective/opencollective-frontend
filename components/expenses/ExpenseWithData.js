@@ -68,6 +68,7 @@ class ExpenseWithData extends React.Component {
           allowPayAction={allowPayAction}
           lockPayAction={lockPayAction}
           unlockPayAction={unlockPayAction}
+          refetch={data.refetch}
         />
 
         {view === 'details' && (

@@ -10,7 +10,7 @@ class ApproveExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     approveExpense: PropTypes.func.isRequired,
-    refetch: PropTypes.func,
+    refetch: PropTypes.func.isRequired,
   };
 
   constructor(props) {
