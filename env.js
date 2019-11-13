@@ -20,6 +20,7 @@ const defaults = {
   RECAPTCHA_ENABLED: false,
   NCP_IS_DEFAULT: 'true',
   CLIENT_ANALYTICS_ENABLED: false,
+  NEW_EVENTS: false,
 };
 
 for (const key in defaults) {

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Oct 30 2019 20:48:06 GMT+0100 (GMT+01:00)
+# timestamp: Tue Nov 19 2019 13:59:31 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -58,6 +58,10 @@ type BackersStatsType {
   Number of collectives that have given money to this collective
   """
   collectives: Int
+}
+
+type BackYourStackDispatchState {
+  dispatching: Boolean
 }
 
 """
@@ -466,7 +470,7 @@ interface CollectiveInterface {
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
-  transactions(type: String, limit: Int, offset: Int): [Transaction]
+  transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
   role: String
   twitterHandle: String
@@ -1778,7 +1782,7 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
-  backyourstackDispatchOrder(id: Int!): [OrderType]
+  backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 }
 
 """

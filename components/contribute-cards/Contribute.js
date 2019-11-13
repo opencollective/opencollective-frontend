@@ -113,6 +113,7 @@ const getContributeCTA = type => {
     case ContributionTypes.FINANCIAL_GOAL:
       return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute to this goal" />;
     case ContributionTypes.EVENT_PARTICIPATE:
+    case ContributionTypes.TICKET:
       return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
     case ContributionTypes.EVENT_PASSED:
       return <FormattedMessage id="ContributeCard.BtnEventPassed" defaultMessage="View event" />;
