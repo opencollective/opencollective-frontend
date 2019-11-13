@@ -61,7 +61,7 @@ class Expense extends React.Component {
     unlockPayAction: PropTypes.func,
     editExpense: PropTypes.func,
     unapproveExpense: PropTypes.func,
-    refetch: PropTypes.func,
+    refetch: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
 
