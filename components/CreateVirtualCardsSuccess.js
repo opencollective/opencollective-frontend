@@ -46,9 +46,10 @@ export default class CreateVirtualCardsSuccess extends React.Component {
     this.redeemLinkTextareaRef = React.createRef();
   }
 
-  getRedeemLinkFromVC(vc) {
-    return `${process.env.WEBSITE_URL}/redeem/${vc.uuid.split('-')[0]}`;
-  }
+  getRedeemLinkFromVC = vc => {
+    const code = vc.uuid.split('-')[0];
+    return `${process.env.WEBSITE_URL}/${this.props.collectiveSlug}/redeem/${code}`;
+  };
 
   copyLinksToClipboard = () => {
     try {

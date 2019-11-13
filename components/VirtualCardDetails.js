@@ -58,7 +58,9 @@ class VirtualCardDetails extends React.Component {
   static propTypes = {
     /** The virtual card, which is actually a PaymentMethod */
     virtualCard: PropTypes.object.isRequired,
-    /** Provided by styled-component withTheme(...) */
+    /** Collective slug */
+    collectiveSlug: PropTypes.string.isRequired,
+    /** @ignore Provided by styled-component withTheme(...) */
     theme: PropTypes.object,
   };
 
@@ -81,10 +83,10 @@ class VirtualCardDetails extends React.Component {
   }
 
   renderDetails() {
-    const { virtualCard } = this.props;
+    const { virtualCard, collectiveSlug } = this.props;
     const redeemCode = virtualCard.uuid.split('-')[0];
     const email = get(virtualCard, 'data.email');
-    const linkParams = email ? { code: redeemCode, email } : { code: redeemCode };
+    const linkParams = email ? { code: redeemCode, email, collectiveSlug } : { code: redeemCode, collectiveSlug };
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
