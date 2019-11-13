@@ -9,7 +9,6 @@ class Comments extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     comments: PropTypes.array,
-    refetch: PropTypes.func,
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     LoggedInUser: PropTypes.object,
@@ -17,7 +16,6 @@ class Comments extends React.Component {
 
   constructor(props) {
     super(props);
-    this.refetch = this.refetch.bind(this);
     this.fetchMore = this.fetchMore.bind(this);
     this.state = { loading: false, isPayActionLocked: false };
   }
@@ -26,13 +24,6 @@ class Comments extends React.Component {
     e.target.blur();
     this.setState({ loading: true });
     this.props.fetchMore().then(() => {
-      this.setState({ loading: false });
-    });
-  }
-
-  refetch(status) {
-    this.setState({ status, loading: true });
-    this.props.refetch({ status }).then(() => {
       this.setState({ loading: false });
     });
   }
