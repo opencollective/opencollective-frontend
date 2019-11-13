@@ -668,6 +668,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
           type: { type: GraphQLString },
           limit: { type: GraphQLInt },
           offset: { type: GraphQLInt },
+          includeExpenseTransactions: { type: GraphQLBoolean },
         },
       },
       expenses: {
