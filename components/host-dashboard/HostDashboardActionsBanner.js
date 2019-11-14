@@ -179,7 +179,6 @@ class HostDashboardActionsBanner extends React.Component {
             {host.stats.collectives.hosted > 0 && (
               <Box mb={2}>
                 <CollectivePickerAsync
-                  placeholder={allCollectivesLabel}
                   hostCollectiveIds={[host.id]}
                   types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT]}
                   onChange={this.onChange}
@@ -189,6 +188,7 @@ class HostDashboardActionsBanner extends React.Component {
                   customOptions={customOptions}
                   disabled={this.state.loading}
                   getDefaultOptions={this.getDefaultCollectiveOption}
+                  preload
                 />
               </Box>
             )}
