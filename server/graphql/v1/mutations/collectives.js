@@ -944,7 +944,7 @@ export async function sendMessageToCollective(_, args, req) {
     });
   }
 
-  if (!(await collective.canContact(req.remoteUser))) {
+  if (get(req.remoteUser.data, 'disableContact', false) || !(await collective.canContact())) {
     throw new errors.Unauthorized({
       message: `You can't contact this collective`,
     });
