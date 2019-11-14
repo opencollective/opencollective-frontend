@@ -859,12 +859,10 @@ export default function(Sequelize, DataTypes) {
   };
 
   /**
-   *  Checks if the collective can be contacted by `remoteUser`.
+   *  Checks if the collective can be contacted.
    */
-  Collective.prototype.canContact = async function(remoteUser) {
-    if (!remoteUser || get(remoteUser.data, 'disableContact', false)) {
-      return false;
-    } else if (!this.isActive) {
+  Collective.prototype.canContact = async function() {
+    if (!this.isActive) {
       return false;
     } else {
       return [types.COLLECTIVE, types.EVENT].includes(this.type) || (await this.isHost());
