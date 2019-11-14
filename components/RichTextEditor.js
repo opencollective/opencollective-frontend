@@ -3,13 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import css from '@styled-system/css';
 import uuid from 'uuid/v4';
-import Trix from 'trix';
 import 'trix/dist/trix.css';
 
 import { uploadImageWithXHR } from '../lib/api';
 import MessageBox from './MessageBox';
-
-Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
 
 const TrixEditorContainer = styled.form`
   trix-editor {
@@ -32,11 +29,20 @@ const TrixEditorContainer = styled.form`
     margin-bottom: 14px;
 
     /** Hide some buttons on mobile */
-    @media (max-width: 400px) {
-      .trix-button--icon-strike, .trix-button--icon-number-list, .trix-button--icon-decrease-nesting-level, .trix-button--icon-increase-nesting-level {
+    @media (max-width: 500px) {
+      .trix-button--icon-strike,
+      .trix-button--icon-number-list,
+      .trix-button--icon-decrease-nesting-level,
+      .trix-button--icon-increase-nesting-level {
         display: none;
       }
     }
+
+    ${props =>
+      props.toolbarOffsetY &&
+      css({
+        marginTop: props.toolbarOffsetY,
+      })}
 
     /** Sticky mode */
     ${props =>
@@ -45,6 +51,7 @@ const TrixEditorContainer = styled.form`
         position: 'sticky',
         top: props.toolbarTop,
       })}
+}
 `;
 
 /**
@@ -64,11 +71,14 @@ export default class RichTextEditor extends React.Component {
     withStickyToolbar: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
     toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** Usefull to compensate the height of the toolbar when editing inline */
+    toolbarOffsetY: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   };
 
   static defaultProps = {
     withStickyToolbar: false,
     toolbarTop: 0,
+    toolbarOffsetY: -62, // Default Trix toolbar height
   };
 
   constructor(props) {
@@ -76,6 +86,11 @@ export default class RichTextEditor extends React.Component {
     this.editorRef = React.createRef();
     this.state = { id: props.id, error: null };
     this.isReady = false;
+
+    if (typeof window !== 'undefined') {
+      this.Trix = require('trix');
+      this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
+    }
   }
 
   componentDidMount() {
@@ -93,13 +108,15 @@ export default class RichTextEditor extends React.Component {
   }
 
   componentWillUnmount() {
-    this.editorRef.current.removeEventListener('trix-change', this.handleChange);
-    this.editorRef.current.removeEventListener('trix-attachment-add', this.handleUpload);
-    this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
+    if (this.isReady) {
+      this.editorRef.current.removeEventListener('trix-change', this.handleChange);
+      this.editorRef.current.removeEventListener('trix-attachment-add', this.handleUpload);
+      this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
+    }
   }
 
   initialize = () => {
-    if (this.editorRef.current) {
+    if (this.Trix && this.editorRef.current) {
       // Listen for changes
       this.editorRef.current.addEventListener('trix-change', this.handleChange, false);
       this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
@@ -142,9 +159,14 @@ export default class RichTextEditor extends React.Component {
   };
 
   render() {
-    const { defaultValue, withStickyToolbar, toolbarTop, autoFocus, placeholder } = this.props;
+    const { defaultValue, withStickyToolbar, toolbarTop, toolbarOffsetY, autoFocus, placeholder } = this.props;
     return !this.state.id ? null : (
-      <TrixEditorContainer withStickyToolbar={withStickyToolbar} toolbarTop={toolbarTop} data-cy="RichTextEditor">
+      <TrixEditorContainer
+        withStickyToolbar={withStickyToolbar}
+        toolbarTop={toolbarTop}
+        toolbarOffsetY={toolbarOffsetY}
+        data-cy="RichTextEditor"
+      >
         {this.state.error && (
           <MessageBox type="error" withIcon>
             {this.state.error.toString()}
