@@ -122,8 +122,8 @@ RadioButtonWithLabel.propTypes = {
 };
 
 const FieldLabelDetails = styled.span`
-  color: ${themeGet('colors.black.400')};
-  font-weight: 400;
+  color: ${themeGet('colors.black.600')};
+  font-weight: normal;
 `;
 
 class CreateVirtualCardsForm extends Component {
@@ -429,18 +429,6 @@ class CreateVirtualCardsForm extends Component {
     return (
       <form ref={this.form} onSubmit={this.onSubmit}>
         <Flex flexDirection="column">
-          <InlineField name="batch" label={<FormattedMessage id="virtualCards.batch" defaultMessage="Batch name" />}>
-            <StyledSelectCreatable
-              id="virtualcard-batch"
-              onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
-              minWidth={300}
-              disabled={submitting}
-              fontSize="Paragraph"
-              options={batchesOptions}
-              defaultValue={batchesOptions[0]}
-            />
-          </InlineField>
-
           <InlineField
             name="amount"
             label={<FormattedMessage id="virtualCards.create.amount" defaultMessage="Amount" />}
@@ -489,55 +477,90 @@ class CreateVirtualCardsForm extends Component {
             />
           </InlineField>
 
+          <InlineField
+            name="batch"
+            label={
+              <Flex flexDirection="column">
+                <FormattedMessage id="virtualCards.batch" defaultMessage="Batch name" />
+                <FieldLabelDetails>
+                  <FormattedMessage id="forms.optional" defaultMessage="Optional" />
+                </FieldLabelDetails>
+              </Flex>
+            }
+          >
+            <StyledSelectCreatable
+              id="virtualcard-batch"
+              onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
+              minWidth={300}
+              disabled={submitting}
+              fontSize="Paragraph"
+              options={batchesOptions}
+              defaultValue={batchesOptions[0]}
+            />
+          </InlineField>
+
           {canLimitToCollectives && (
             <React.Fragment>
-              <InlineField
-                name="limitToHosts"
-                label={
-                  <FormattedMessage
-                    id="virtualCards.create.limitToHosts"
-                    defaultMessage="Limit to the following hosts"
+              <details>
+                <summary>Limitations</summary>
+                <InlineField
+                  name="limitToHosts"
+                  label={
+                    <Flex flexDirection="column">
+                      <FormattedMessage
+                        id="virtualCards.create.limitToHosts"
+                        defaultMessage="Limit to the following hosts"
+                      />
+                      <FieldLabelDetails>
+                        <FormattedMessage id="forms.optional" defaultMessage="Optional" />
+                      </FieldLabelDetails>
+                    </Flex>
+                  }
+                >
+                  <CollectivePicker
+                    placeholder={intl.formatMessage(messages.limitToHostsPlaceholder)}
+                    disabled={hosts.length === 0}
+                    minWidth={300}
+                    maxWidth={600}
+                    sortFunc={collectives => collectives} /** Sort is handled by the API */
+                    groupByType={false}
+                    collectives={hosts}
+                    defaultValue={values.limitedToHosts}
+                    onChange={options => this.onChange('limitedToHosts', options)}
+                    isMulti
                   />
-                }
-              >
-                <CollectivePicker
-                  placeholder={intl.formatMessage(messages.limitToHostsPlaceholder)}
-                  disabled={hosts.length === 0}
-                  minWidth={300}
-                  maxWidth={600}
-                  sortFunc={collectives => collectives} /** Sort is handled by the API */
-                  groupByType={false}
-                  collectives={hosts}
-                  defaultValue={values.limitedToHosts}
-                  onChange={options => this.onChange('limitedToHosts', options)}
-                  isMulti
-                />
-              </InlineField>
+                </InlineField>
 
-              <InlineField
-                name="limitToCollectives"
-                label={
-                  <FormattedMessage
-                    id="virtualCards.create.limitToCollectives"
-                    defaultMessage="Limit to the following collectives"
+                <InlineField
+                  name="limitToCollectives"
+                  label={
+                    <Flex flexDirection="column">
+                      <FormattedMessage
+                        id="virtualCards.create.limitToCollectives"
+                        defaultMessage="Limit to the following collectives"
+                      />
+                      <FieldLabelDetails>
+                        <FormattedMessage id="forms.optional" defaultMessage="Optional" />
+                      </FieldLabelDetails>
+                    </Flex>
+                  }
+                >
+                  <CollectivePickerAsync
+                    isMulti
+                    minWidth={300}
+                    maxWidth={600}
+                    preload={values.limitedToHosts.length > 0}
+                    sortFunc={collectives => collectives} /** Sort is handled by the API */
+                    types={[CollectiveType.COLLECTIVE]}
+                    defaultValue={values.limitedToCollectives}
+                    onChange={options => this.onChange('limitedToCollectives', options)}
+                    hostCollectiveIds={this.optionsToIdsList(values.limitedToHosts)}
+                    placeholder={intl.formatMessage(messages.limitToCollectivesPlaceholder, {
+                      nbHosts: values.limitedToHosts.length,
+                    })}
                   />
-                }
-              >
-                <CollectivePickerAsync
-                  isMulti
-                  minWidth={300}
-                  maxWidth={600}
-                  preload={values.limitedToHosts.length > 0}
-                  sortFunc={collectives => collectives} /** Sort is handled by the API */
-                  types={[CollectiveType.COLLECTIVE]}
-                  defaultValue={values.limitedToCollectives}
-                  onChange={options => this.onChange('limitedToCollectives', options)}
-                  hostCollectiveIds={this.optionsToIdsList(values.limitedToHosts)}
-                  placeholder={intl.formatMessage(messages.limitToCollectivesPlaceholder, {
-                    nbHosts: values.limitedToHosts.length,
-                  })}
-                />
-              </InlineField>
+                </InlineField>
+              </details>
             </React.Fragment>
           )}
 
