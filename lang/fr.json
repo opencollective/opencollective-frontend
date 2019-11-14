@@ -987,6 +987,8 @@
   "saved": "Enregistré",
   "Search": "Rechercher",
   "SearchFor": "Rechercher des {entity}",
+  "SearchFor2": "Search for {entity1} or {entity2}",
+  "SearchFor3": "Search for {entity1}, {entity2} or {entity3}",
   "section.admin": "Administrateur",
   "section.attendee": "Événements",
   "section.backer": "Contributeur financier",

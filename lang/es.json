@@ -987,6 +987,8 @@
   "saved": "Saved",
   "Search": "Search",
   "SearchFor": "Search for {entity}",
+  "SearchFor2": "Search for {entity1} or {entity2}",
+  "SearchFor3": "Search for {entity1}, {entity2} or {entity3}",
   "section.admin": "Administrating",
   "section.attendee": "Eventos",
   "section.backer": "Financial contributor",

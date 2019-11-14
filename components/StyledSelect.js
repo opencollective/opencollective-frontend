@@ -5,6 +5,7 @@ import { typography, layout, space } from 'styled-system';
 import Select, { components } from 'react-select';
 import { injectIntl, defineMessages } from 'react-intl';
 import propTypes from '@styled-system/prop-types';
+import SearchIcon from './SearchIcon';
 
 const Messages = defineMessages({
   loading: {
@@ -32,21 +33,33 @@ const SelectContainer = ({ innerProps, ...props }) => (
 );
 
 /**
+ * Override the default "Caret Down" indicator to use a search icon instead
+ */
+const DropdownSearchIndicator = props => {
+  return (
+    <components.DropdownIndicator {...props}>
+      <SearchIcon size={16} fill="#aaaaaa" />
+    </components.DropdownIndicator>
+  );
+};
+
+/**
  * A map to override the default components of react-select
  */
-const customComponents = { SelectContainer, Option };
+export const customComponents = { SelectContainer, Option };
+export const searchableCustomComponents = { SelectContainer, Option, DropdownIndicator: DropdownSearchIndicator };
 
 /**
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
 export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs(
-  ({ theme, intl, placeholder, disabled, isDisabled, error }) => ({
+  ({ theme, intl, placeholder, disabled, isDisabled, useSearchIcon, error }) => ({
     isDisabled: disabled || isDisabled,
     placeholder: placeholder || intl.formatMessage(Messages.placeholder),
     loadingMessage: () => intl.formatMessage(Messages.loading),
     noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
-    components: customComponents,
+    components: useSearchIcon ? searchableCustomComponents : customComponents,
     styles: {
       control: (baseStyles, state) => {
         const customStyles = { borderColor: theme.colors.black[400] };
@@ -117,6 +130,8 @@ StyledSelect.propTypes = {
   isDisabled: PropTypes.bool,
   /** Rendered when there's no option to show */
   noOptionsMessage: PropTypes.func,
+  /** If true, a search icon will be used instead of the default caret down */
+  useSearchIcon: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   // Styled-system
