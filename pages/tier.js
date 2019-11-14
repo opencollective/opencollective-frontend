@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import { withUser } from '../components/UserProvider';
@@ -10,6 +9,7 @@ import Page from '../components/Page';
 import Loading from '../components/Loading';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import TierPageContent from '../components/tier-page';
+import { getTierPageQuery } from '../components/tier-page/graphql/queries';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -81,91 +81,6 @@ class TierPage extends React.Component {
   }
 }
 
-const getTierData = graphql(gql`
-  query TierPage($tierId: Int!) {
-    Tier(id: $tierId) {
-      id
-      name
-      slug
-      description
-      longDescription
-      videoUrl
-      goal
-      currency
-      interval
-      endsAt
-
-      stats {
-        id
-        totalDonated
-        totalRecurringDonations
-        contributors {
-          id
-          all
-          collectives
-          organizations
-          users
-        }
-      }
-
-      collective {
-        id
-        slug
-        type
-        name
-        backgroundImage
-        settings
-        currency
-        isArchived
-        path
-        host {
-          id
-        }
-        stats {
-          id
-          updates
-          balance
-          transactions {
-            id
-            all
-          }
-        }
-        admins: members(role: "ADMIN") {
-          id
-          role
-          collective: member {
-            id
-            type
-            slug
-            name
-            image
-          }
-        }
-        parentCollective {
-          id
-          twitterHandle
-          image
-        }
-      }
-
-      contributors {
-        id
-        name
-        roles
-        isAdmin
-        isCore
-        isBacker
-        isFundraiser
-        since
-        description
-        publicMessage
-        collectiveSlug
-        totalAmountDonated
-        type
-        isIncognito
-      }
-    }
-  }
-`);
+const getTierData = graphql(getTierPageQuery);
 
 export default withUser(getTierData(TierPage));
