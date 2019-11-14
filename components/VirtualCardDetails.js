@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import moment from 'moment';
@@ -11,6 +11,7 @@ import GiftCard from './icons/GiftCard';
 import Link from './Link';
 import Avatar from './Avatar';
 import { formatCurrency } from '../lib/utils';
+import { Span } from './Text';
 
 const DetailsColumnHeader = styled.span`
   text-transform: uppercase;
@@ -84,16 +85,9 @@ class VirtualCardDetails extends React.Component {
     const redeemCode = virtualCard.uuid.split('-')[0];
     const email = get(virtualCard, 'data.email');
     const linkParams = email ? { code: redeemCode, email } : { code: redeemCode };
-    const time = moment(virtualCard.createdAt);
 
     return (
       <Flex mt="0.75em" fontSize="0.8em">
-        <Flex flexDirection="column" mr="2em">
-          <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.emmited" defaultMessage="Emmited" />
-          </DetailsColumnHeader>
-          {time.format('LLLL')} ({time.fromNow()})
-        </Flex>
         {!virtualCard.isConfirmed && (
           <Flex flexDirection="column" mr="2em">
             <DetailsColumnHeader>
@@ -106,9 +100,27 @@ class VirtualCardDetails extends React.Component {
         )}
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
+            <FormattedMessage id="virtualCards.emmited" defaultMessage="Emmited" />
+          </DetailsColumnHeader>
+          <FormattedDate value={virtualCard.createdAt} />
+        </Flex>
+        <Flex flexDirection="column" mr="2em">
+          <DetailsColumnHeader>
             <FormattedMessage id="virtualCards.expiryDate" defaultMessage="EXPIRY DATE" />
           </DetailsColumnHeader>
           <span>{moment(virtualCard.expiryDate).format('MM/Y')}</span>
+        </Flex>
+        <Flex flexDirection="column" mr="2em">
+          <DetailsColumnHeader>
+            <FormattedMessage id="virtualCards.batch" defaultMessage="Batch name" />
+          </DetailsColumnHeader>
+          <span>
+            {virtualCard.batch || (
+              <Span fontStyle="italic" color="black.500">
+                <FormattedMessage id="virtualCards.notBatched" defaultMessage="Not batched" />
+              </Span>
+            )}
+          </span>
         </Flex>
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
