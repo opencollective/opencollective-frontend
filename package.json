@@ -54,7 +54,7 @@
     "graphql": "14.5.8",
     "graphql-iso-date": "3.6.1",
     "graphql-type-json": "0.3.0",
-    "handlebars": "4.5.1",
+    "handlebars": "4.5.2",
     "hashids": "2.1.0",
     "he": "1.2.0",
     "helloworks-sdk": "pietgeursen/helloworks-nodejs-sdk",
