@@ -74,6 +74,49 @@ InlineField.propTypes = {
   isLabelClickable: PropTypes.bool,
 };
 
+const Entry = styled.details`
+  &[open] {
+    summary::after {
+      content: '−';
+    }
+  }
+
+  summary {
+    margin-top: ${themeGet('space.2')}px;
+    margin-bottom: ${themeGet('space.4')}px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: ${themeGet('colors.black.800')};
+    /* Remove arrow on Firefox */
+    list-style: none;
+
+    &:hover {
+      color: ${themeGet('colors.black.700')};
+    }
+  }
+
+  summary:focus {
+    outline: 1px dashed ${themeGet('colors.black.200')};
+    outline-offset: ${themeGet('space.1')}px;
+  }
+
+  summary::after {
+    content: '+';
+    display: inline-block;
+    padding-left: ${themeGet('space.2')}px;
+    color: ${themeGet('colors.black.600')};
+    font-weight: bold;
+  }
+
+  /* Remove arrow on Chrome */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+`;
+
+/** Entry title */
+export const Title = styled.summary``;
+
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
   align-items: center;
@@ -501,8 +544,8 @@ class CreateVirtualCardsForm extends Component {
 
           {canLimitToCollectives && (
             <React.Fragment>
-              <details>
-                <summary>Limitations</summary>
+              <Entry>
+                <Title>Limitations</Title>
                 <InlineField
                   name="limitToHosts"
                   label={
@@ -560,7 +603,7 @@ class CreateVirtualCardsForm extends Component {
                     })}
                   />
                 </InlineField>
-              </details>
+              </Entry>
             </React.Fragment>
           )}
 
