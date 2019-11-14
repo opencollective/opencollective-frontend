@@ -71,12 +71,18 @@ export default class SignIn extends React.Component {
               id="email"
               name="email"
               onChange={({ target }) => {
-                onEmailChange(target.value.trim());
+                onEmailChange(target.value);
                 // Feel free to remove the setTimeout when that issue is fixed
                 // https://bugzilla.mozilla.org/show_bug.cgi?id=1524212
                 setTimeout(() => {
                   this.setState({ error: target.validationMessage, showError: false });
                 }, 0);
+              }}
+              onKeyDown={e => {
+                // See https://github.com/facebook/react/issues/6368
+                if (e.key === ' ') {
+                  e.preventDefault();
+                }
               }}
               onBlur={() => this.setState({ showError: true })}
               onInvalid={event => {
