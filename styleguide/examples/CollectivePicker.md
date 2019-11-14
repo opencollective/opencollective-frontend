@@ -28,6 +28,12 @@ import { randomCollectivesList } from '../mocks/collectives';
 <CollectivePicker placeholder="Pick a collective to destroy" />
 ```
 
+### Creatable
+
+```jsx
+<CollectivePicker creatable />
+```
+
 ### Async
 
 This is just to demonstrate how the component can be used asynchronously. Prefer
