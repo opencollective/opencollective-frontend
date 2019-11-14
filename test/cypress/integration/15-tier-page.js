@@ -34,14 +34,11 @@ describe('Tier page', () => {
   it('Can edit long description', () => {
     cy.login({ redirect: tierUrl });
     cy.get('[data-cy="Btn-Add-longDescription"]').click();
-    cy.get('[data-cy="HTMLEditor"] .ql-editor').type('Hello');
-    cy.get('[data-cy="HTMLEditor"] .ql-editor').type('{selectall}');
-    cy.get('[data-cy="HTMLEditor"] .ql-editor').type('{ctrl}B');
-    cy.get('[data-cy="HTMLEditor"] .ql-editor').type('{rightarrow}');
-    cy.get('[data-cy="HTMLEditor"] .ql-editor').type('{ctrl}B');
-    cy.get('[data-cy="HTMLEditor"] .ql-editor').type(' world!');
+    cy.get('[data-cy="RichTextEditor"] trix-editor').type('Hello world!');
+    cy.get('[data-cy="RichTextEditor"] trix-editor').type('{selectall}');
+    cy.get('[data-cy="RichTextEditor"] trix-editor').type('{ctrl}b');
     cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
-    cy.get('[data-cy="longDescription"]').should('have.html', '<p><strong>Hello</strong> world!</p>');
+    cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
   });
 
   it('Goes to the contribution flow when we click on "Contribute"', () => {
