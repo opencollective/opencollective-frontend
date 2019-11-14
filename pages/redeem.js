@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import styled from 'styled-components';
 import sanitizeHtml from 'sanitize-html';
 import { graphql } from 'react-apollo';
-import { backgroundSize, fontSize, minHeight, maxWidth } from 'styled-system';
+import { fontSize, maxWidth } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
@@ -19,23 +19,19 @@ import Container from '../components/Container';
 import RedeemForm from '../components/RedeemForm';
 import RedeemSuccess from '../components/RedeemSuccess';
 import { P, H1, H5 } from '../components/Text';
+import LinkCollective from '../components/LinkCollective';
 
 import { getLoggedInUserQuery } from '../lib/graphql/queries';
 import { isValidEmail } from '../lib/utils';
 
 import StyledButton from '../components/StyledButton';
-
-const Error = styled(P)`
-  color: red;
-`;
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import RedeemBackground from '../components/virtual-cards/RedeemBackground';
+import CollectiveCard from '../components/virtual-cards/CollectiveCard';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);
-`;
-
-const Title = styled(H1)`
-  color: white;
-  ${fontSize};
 `;
 
 const Subtitle = styled(H5)`
@@ -46,19 +42,10 @@ const Subtitle = styled(H5)`
   ${maxWidth};
 `;
 
-const Hero = styled(Box)`
-  width: 100%;
-  ${minHeight};
-  background-image: url('/static/images/redeem-hero.svg');
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: auto 376px;
-  ${backgroundSize};
-`;
-
 class RedeemPage extends React.Component {
-  static getInitialProps({ query: { code, email, name } }) {
+  static getInitialProps({ query: { code, email, name, collectiveSlug } }) {
     return {
+      collectiveSlug,
       code: sanitizeHtml(code || '', {
         allowedTags: [],
         allowedAttributes: [],
@@ -79,9 +66,20 @@ class RedeemPage extends React.Component {
     intl: PropTypes.object.isRequired, // from injectIntl
     claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
     LoggedInUser: PropTypes.object, // from withUser
+    loadingLoggedInUser: PropTypes.bool, // from withUser
     code: PropTypes.string,
     name: PropTypes.string,
+    collectiveSlug: PropTypes.string,
     email: PropTypes.string,
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      Collective: PropTypes.shape({
+        slug: PropTypes.string,
+        backgroundImageUrl: PropTypes.string,
+        imageUrl: PropTypes.string,
+        name: PropTypes.string,
+      }),
+    }),
   };
 
   constructor(props) {
@@ -117,7 +115,7 @@ class RedeemPage extends React.Component {
 
         // Refresh LoggedInUser
         this.props.refetchLoggedInUser();
-        Router.pushRoute('redeemed', { code });
+        Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
         return;
       } else {
         res = await this.props.claimPaymentMethod(code, { email, name });
@@ -153,8 +151,63 @@ class RedeemPage extends React.Component {
     this.claimPaymentMethod();
   }
 
+  renderHeroContent() {
+    const { data } = this.props;
+
+    if (!data || (!data.loading && !data.Collective)) {
+      return (
+        <React.Fragment>
+          <Box mt={5}>
+            <H1 color="white.full" fontSize={['3rem', null, '4rem']}>
+              <FormattedMessage id="redeem.title" defaultMessage="Redeem Gift Card" />
+            </H1>
+          </Box>
+
+          <Box mt={2}>
+            <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+              <Box>
+                <FormattedMessage
+                  id="redeem.subtitle.line1"
+                  defaultMessage="Open Collective helps communities - like open source projects, meetups and social movements - raise funds spend them transparently."
+                />
+              </Box>
+            </Subtitle>
+          </Box>
+        </React.Fragment>
+      );
+    } else if (data.loading) {
+      return <LoadingPlaceholder height={400} />;
+    } else {
+      const collective = data.Collective;
+      return (
+        <CollectiveCard collective={collective} mt={5}>
+          <LinkCollective collective={collective}>
+            <H1 color="black.900" fontSize="3rem" lineHeight="1em" wordBreak="break-word" my={2}>
+              {collective.name}
+            </H1>
+          </LinkCollective>
+          <P mb={3}>
+            <FormattedMessage
+              id="redeem.fromCollective"
+              defaultMessage="You're about to redeem a gift card, courtesy of {collective}"
+              values={{
+                collective: (
+                  <strong>
+                    <LinkCollective collective={data.Collective} />
+                  </strong>
+                ),
+              }}
+            />
+          </P>
+        </CollectiveCard>
+      );
+    }
+  }
+
   render() {
-    const { code, email, name, LoggedInUser } = this.props;
+    const { code, email, name, LoggedInUser, loadingLoggedInUser, data } = this.props;
+    const { form } = this.state;
+    const collective = data && data.Collective;
 
     return (
       <div className="RedeemedPage">
@@ -164,25 +217,13 @@ class RedeemPage extends React.Component {
           LoggedInUser={LoggedInUser}
         />
         <Body>
-          <Flex alignItems="center" flexDirection="column">
-            <Hero minHeight={['500px', null, '700px']} backgroundSize={['auto 300px', 'auto 380px']}>
-              <Flex alignItems="center" flexDirection="column">
-                <Box mt={5}>
-                  <Title fontSize={['3rem', null, '4rem']}>Redeem Gift Card</Title>
-                </Box>
-
-                <Box mt={2}>
-                  <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
-                    <Box>
-                      <FormattedMessage
-                        id="redeem.subtitle.line1"
-                        defaultMessage="Open Collective helps communities - like open source projects, meetups and social movements - raise funds spend them transparently."
-                      />
-                    </Box>
-                  </Subtitle>
-                </Box>
-
-                <Box mt={[4, 5]}>
+          <CollectiveThemeProvider collective={collective}>
+            <Flex alignItems="center" flexDirection="column">
+              <RedeemBackground collective={collective}>
+                <div>{this.renderHeroContent()}</div>
+              </RedeemBackground>
+              <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
+                <Container mt={54} zIndex={2}>
                   <Flex justifyContent="center" flexDirection="column">
                     <Container background="white" borderRadius="16px" maxWidth="400px">
                       <ShadowBox py="24px" px="32px">
@@ -192,6 +233,7 @@ class RedeemPage extends React.Component {
                             name={name}
                             email={email}
                             LoggedInUser={LoggedInUser}
+                            loadingLoggedInUser={loadingLoggedInUser}
                             onChange={this.handleChange}
                           />
                         )}
@@ -205,6 +247,7 @@ class RedeemPage extends React.Component {
                           buttonSize="large"
                           onClick={this.handleSubmit}
                           loading={this.state.loading}
+                          disabled={!form.code || this.props.loadingLoggedInUser}
                           mb={2}
                           maxWidth={335}
                           width={1}
@@ -216,20 +259,40 @@ class RedeemPage extends React.Component {
                             <FormattedMessage id="redeem.form.redeem.btn" defaultMessage="redeem" />
                           )}
                         </StyledButton>
-                        {this.state.error && <Error>{this.state.error}</Error>}
+                        {this.state.error && <P color="red.500">{this.state.error}</P>}
                       </Flex>
                     )}
                   </Flex>
-                </Box>
+                </Container>
               </Flex>
-            </Hero>
-          </Flex>
+            </Flex>
+          </CollectiveThemeProvider>
         </Body>
         <Footer />
       </div>
     );
   }
 }
+
+const getPageData = graphql(
+  gql`
+    query RedeemPageData($collectiveSlug: String!) {
+      Collective(slug: $collectiveSlug) {
+        id
+        name
+        type
+        slug
+        imageUrl
+        backgroundImageUrl
+        description
+        settings
+      }
+    }
+  `,
+  {
+    skip: props => !props.collectiveSlug,
+  },
+);
 
 const redeemMutation = gql`
   mutation claimPaymentMethod($code: String!, $user: UserInputType) {
@@ -254,4 +317,4 @@ const addMutation = graphql(redeemMutation, {
   }),
 });
 
-export default injectIntl(withUser(addMutation(RedeemPage)));
+export default injectIntl(withUser(addMutation(getPageData(RedeemPage))));

@@ -157,7 +157,7 @@ class EditVirtualCards extends React.Component {
             )}
             {paymentMethods.map(v => (
               <div key={v.id}>
-                <VirtualCardDetails virtualCard={v} />
+                <VirtualCardDetails virtualCard={v} collectiveSlug={this.props.collectiveSlug} />
                 {v !== lastVirtualCard && <hr />}
               </div>
             ))}
