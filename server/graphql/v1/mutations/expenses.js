@@ -70,12 +70,12 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   switch (status) {
     case statuses.APPROVED:
       if (expense.status === statuses.PAID) {
-        throw new errors.Unauthorized("You can't reject an expense that is already paid");
+        throw new errors.Unauthorized("You can't approve an expense that is already paid");
       }
       break;
     case statuses.REJECTED:
       if (expense.status === statuses.PAID) {
-        throw new errors.Unauthorized("You can't approve an expense that is already paid");
+        throw new errors.Unauthorized("You can't reject an expense that is already paid");
       }
       break;
     case statuses.PAID:
