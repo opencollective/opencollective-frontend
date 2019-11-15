@@ -8,6 +8,7 @@ import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
+import { Span } from '../Text';
 import Link from '../Link';
 import SmallButton from '../SmallButton';
 import Moment from '../Moment';
@@ -84,6 +85,10 @@ class Expense extends React.Component {
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
       approved: { id: 'expense.approved', defaultMessage: 'approved' },
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
+      expenseTypeMissing: {
+        id: 'expense.error.expenseTypeMissing',
+        defaultMessage: 'Please pick the type of this expense',
+      },
       closeDetails: {
         id: 'expense.closeDetails',
         defaultMessage: 'Close Details',
@@ -426,7 +431,7 @@ class Expense extends React.Component {
           )}
           {editable && (
             <div className="actions">
-              {mode === 'edit' && this.state.modified && (
+              {mode === 'edit' && this.state.modified && this.state.expense['type'] !== 'UNCLASSIFIED' && (
                 <div>
                   <div className="leftColumn" />
                   <div className="rightColumn">
@@ -435,6 +440,9 @@ class Expense extends React.Component {
                     </SmallButton>
                   </div>
                 </div>
+              )}
+              {mode === 'edit' && this.state.modified && this.state.expense['type'] === 'UNCLASSIFIED' && (
+                <Span color="red.500">{intl.formatMessage(this.messages['expenseTypeMissing'])}</Span>
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
                 <div className="manageExpense">
@@ -504,6 +512,7 @@ const editExpense = graphql(
         amount
         attachment
         category
+        type
         privateMessage
         payoutMethod
         status

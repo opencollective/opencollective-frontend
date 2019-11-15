@@ -9,6 +9,8 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage
 import { capitalize, getCurrencySymbol, imagePreview } from '../../lib/utils';
 import InputField from '../../components/InputField';
 import categories from '../../lib/constants/categories';
+import DefinedTerm, { Terms } from '../DefinedTerm';
+import titlecase from 'title-case';
 
 import TransactionDetails from './TransactionDetails';
 
@@ -85,6 +87,15 @@ class ExpenseDetails extends React.Component {
     });
     const categoriesOptions = categories(expense.collective.slug).map(category => {
       return { [category]: category };
+    });
+    const expenseTypes = { DEFAULT: '', INVOICE: 'INVOICE', RECEIPT: 'RECEIPT' };
+    this.state.expense = { type: expense.type, ...this.state.expense };
+    // Delete default type if expense is receipt or invoice.
+    if (this.state.expense['type'] === 'RECEIPT' || this.state.expense['type'] === 'INVOICE') {
+      delete expenseTypes['DEFAULT'];
+    }
+    const expenseTypesOptions = Object.entries(expenseTypes).map(([key, value]) => {
+      return { [key]: titlecase(value) };
     });
 
     return (
@@ -251,6 +262,26 @@ class ExpenseDetails extends React.Component {
             </div>
           )}
 
+          {editMode && (
+            <div className="col">
+              <label>
+                <DefinedTerm term={Terms.EXPENSE_TYPE} />
+              </label>
+              <div className="expenseType">
+                <span className="expenseType">
+                  <InputField
+                    type="select"
+                    options={expenseTypesOptions}
+                    defaultValue={expense.type}
+                    name="type"
+                    className="expenseField"
+                    onChange={expenseType => this.handleChange('type', expenseTypes[expenseType])}
+                  />
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="col">
             <label>
               <FormattedMessage id="expense.amount" defaultMessage="amount" />
@@ -338,6 +369,7 @@ const getExpenseQuery = gql`
       currency
       attachment
       payoutMethod
+      type
       privateMessage
       collective {
         id
