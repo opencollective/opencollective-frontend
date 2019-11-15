@@ -12,6 +12,7 @@ class Comments extends React.Component {
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
