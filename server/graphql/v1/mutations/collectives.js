@@ -54,7 +54,7 @@ export async function createCollective(_, args, req) {
 
   collectiveData.isActive = false;
   if (args.collective.ParentCollectiveId) {
-    parentCollective = await req.loaders.collective.findById.load(args.collective.ParentCollectiveId);
+    parentCollective = await req.loaders.Collective.byId.load(args.collective.ParentCollectiveId);
     if (!parentCollective) {
       return Promise.reject(new Error(`Parent collective with id ${args.collective.ParentCollectiveId} not found`));
     } else if (!req.remoteUser.hasRole([roles.ADMIN, roles.MEMBER], parentCollective.id)) {
@@ -69,7 +69,7 @@ export async function createCollective(_, args, req) {
   }
 
   if (collectiveData.HostCollectiveId) {
-    hostCollective = await req.loaders.collective.findById.load(collectiveData.HostCollectiveId);
+    hostCollective = await req.loaders.Collective.byId.load(collectiveData.HostCollectiveId);
     if (!hostCollective) {
       return Promise.reject(new Error(`Host collective with id ${args.collective.HostCollectiveId} not found`));
     } else if (req.remoteUser.hasRole([roles.ADMIN], hostCollective.id)) {
@@ -356,7 +356,7 @@ export function editCollective(_, args, req) {
 
   let collective, parentCollective;
 
-  return req.loaders.collective.findById
+  return req.loaders.Collective.byId
     .load(args.collective.id)
     .then(c => {
       if (!c) {
@@ -366,7 +366,7 @@ export function editCollective(_, args, req) {
     })
     .then(() => {
       if (collective.ParentCollectiveId) {
-        return req.loaders.collective.findById.load(collective.ParentCollectiveId).then(pc => {
+        return req.loaders.Collective.byId.load(collective.ParentCollectiveId).then(pc => {
           if (!pc) {
             return Promise.reject(new Error(`Parent collective with id ${collective.ParentCollectiveId} not found`));
           }

@@ -6,7 +6,7 @@ export function editTiers(_, args, req) {
     throw new errors.Unauthorized('You need to be logged in to edit tiers');
   }
 
-  return req.loaders.collective.findById
+  return req.loaders.Collective.byId
     .load(args.id)
     .then(c => {
       if (!c) throw new Error(`Collective with id ${args.id} not found`);
@@ -30,7 +30,7 @@ export async function editTier(_, args, req) {
     throw new errors.Unauthorized();
   }
 
-  const tier = await req.loaders.tiers.findById.load(args.tier.id);
+  const tier = await req.loaders.Tier.byId.load(args.tier.id);
   if (!req.remoteUser.isAdmin(tier.CollectiveId)) {
     throw new errors.Unauthorized();
   }

@@ -253,7 +253,7 @@ const TransactionFields = () => {
         const paymentMethodId = transaction.PaymentMethodId || get(transaction, 'paymentMethod.id');
         if (!paymentMethodId) return null;
         // TODO: put behind a login check
-        return req.loaders.paymentMethods.findById.load(paymentMethodId);
+        return req.loaders.PaymentMethod.byId.load(paymentMethodId);
       },
     },
   };
@@ -283,9 +283,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
           // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
           return transaction.ExpenseId
-            ? req.loaders.expense.findById
-                .load(transaction.ExpenseId)
-                .then(expense => expense && expense.privateMessage)
+            ? req.loaders.Expense.byId.load(transaction.ExpenseId).then(expense => expense && expense.privateMessage)
             : null;
         },
       },
@@ -296,7 +294,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
           // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
           return transaction.ExpenseId
-            ? req.loaders.expense.findById.load(transaction.ExpenseId).then(expense => expense && expense.category)
+            ? req.loaders.Expense.byId.load(transaction.ExpenseId).then(expense => expense && expense.category)
             : null;
         },
       },
@@ -305,7 +303,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
         resolve(transaction, args, req) {
           // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
-          return transaction.ExpenseId ? req.loaders.expense.findById.load(transaction.ExpenseId) : null;
+          return transaction.ExpenseId ? req.loaders.Expense.byId.load(transaction.ExpenseId) : null;
         },
       },
       attachment: {
@@ -315,7 +313,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
           // If it's a expense transaction it'll have an ExpenseId
           // otherwise we return null
           return transaction.ExpenseId
-            ? req.loaders.expense.findById.load(transaction.ExpenseId).then(expense => expense && expense.attachment)
+            ? req.loaders.Expense.byId.load(transaction.ExpenseId).then(expense => expense && expense.attachment)
             : null;
         },
       },

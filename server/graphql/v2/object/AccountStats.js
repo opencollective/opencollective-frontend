@@ -24,7 +24,7 @@ export const AccountStats = new GraphQLObjectType({
         type: Amount,
         resolve(collective, args, req) {
           return {
-            value: req.loaders.collective.balance.load(collective.id),
+            value: req.loaders.Collective.balance.load(collective.id),
             currency: 'USD',
           };
         },
