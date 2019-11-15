@@ -551,7 +551,7 @@ describe('GraphQL Expenses API', () => {
       // Then there should be an error
       expect(result.errors).to.exist;
       // And then the error message should be set accordingly
-      expect(result.errors[0].message).to.equal("You can't reject an expense that is already paid");
+      expect(result.errors[0].message).to.equal("You can't approve an expense that is already paid");
     }); /* End of "fails to approve expense if expense.status is PAID" */
 
     it('successfully approve expense and send notification email to author of expense', async () => {
