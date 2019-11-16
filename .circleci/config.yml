@@ -124,7 +124,7 @@ jobs:
           key: next-build-cache-{{ .Revision }}
           paths:
             # In Next.js 8 it will be
-            - ./node_modules/.cache/next-minifier
+            - ./.next/cache
 
       # # We prune to save space in node_modules persistence
       # # If we don't persist node_modules, we don't need it
