@@ -216,7 +216,7 @@ class Expense extends React.Component {
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
     return (
-      <div className={`expense ${status} ${this.state.mode}View`}>
+      <div className={`expense ${status} ${this.state.mode}View`} data-cy={`expense-${status}`}>
         <style jsx>
           {`
             .expense {
@@ -373,7 +373,9 @@ class Expense extends React.Component {
                   {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
                 </span>
               )}
-              <span className="status">{intl.formatMessage(this.messages[status])}</span>
+              <span className="status" data-cy="expense-status-div">
+                {intl.formatMessage(this.messages[status])}
+              </span>
               {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
                 <ExpenseNeedsTaxFormBadge isTaxFormRequired={expense.userTaxFormRequiredBeforePayment} />
@@ -453,7 +455,7 @@ class Expense extends React.Component {
                       onChange={fees => this.handleChange({ fees })}
                     />
                   )}
-                  <div className="expenseActions">
+                  <div className="expenseActions" data-cy="expense-actions">
                     {canPay && (
                       <PayExpenseBtn
                         expense={expense}
