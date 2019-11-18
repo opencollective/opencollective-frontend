@@ -49,7 +49,7 @@ const ContributeEventsPanel = ({
   const StyledDragDropPlaceHolder = () => (
     <LoadingPlaceholder width={CONTRIBUTE_CARD_WIDTH} heigth={CONTRIBUTE_CARD_HEIGHT} />
   );
-  const dynamicOptions = { loading: StyledDragDropPlaceHolder, ssr: false };
+  const dynamicOptions = { loading: StyledDragDropPlaceHolder, ssr: true };
   const StyledDragDrop = dynamic(
     () => import(/* webpackChunkName: 'StyledDragDrop' */ '../StyledDragDrop'),
     dynamicOptions,
