@@ -877,6 +877,8 @@
   "order.error": "error",
   "order.expired": "expired",
   "order.markAsPaid.btn": "Mark as paid",
+  "order.markAsPaid.processing": "Marking order as paid...",
+  "order.markAsPaid.success": "The order was marked as paid successfully.",
   "Order.NotFound": "This order doesn't exist",
   "order.paid": "pagado",
   "order.pending": "pendiente",

@@ -877,6 +877,8 @@
   "order.error": "erro",
   "order.expired": "expirado",
   "order.markAsPaid.btn": "Marcar como pago",
+  "order.markAsPaid.processing": "Marking order as paid...",
+  "order.markAsPaid.success": "The order was marked as paid successfully.",
   "Order.NotFound": "Este pedido não existe",
   "order.paid": "pago",
   "order.pending": "pendente",
