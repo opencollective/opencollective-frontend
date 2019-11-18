@@ -1,0 +1,31 @@
+Subject: Pending financial contribution confirmation: {{{currency order.totalAmount
+currency=order.currency}}} for {{collective.name}}
+
+<style>
+  code {
+    display: inline-block;
+    border: 1px solid #ccc;
+    background: #ddd;
+    padding: 1px 3px;
+    margin: 0px 1px;
+  }
+</style>
+
+{{> header}}
+
+{{> toplogo}}
+
+<p>
+  Has {{{currency order.totalAmount
+    currency=order.currency}}} arrived in the bank account of {{host.name}} from {{fromCollective.name}} for {{collective.name}}?
+</p>
+
+<p>Mark as paid:
+  <a href="{{markAsPaidLink}}">{{markAsPaidLink}}</a>.
+</p>
+
+<p>View details:
+  <a href="{{viewDetailsLink}}">{{viewDetailsLink}}</a>.
+</p>
+
+{{> footer}}

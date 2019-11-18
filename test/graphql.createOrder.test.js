@@ -274,13 +274,13 @@ describe('createOrder', () => {
     });
     expect(transactionsCount).to.equal(0);
     await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
-    expect(emailSendMessageSpy.callCount).to.equal(2);
-    expect(emailSendMessageSpy.secondCall.args[0]).to.equal(remoteUser.email);
-    expect(emailSendMessageSpy.secondCall.args[2]).to.match(/IBAN 1234567890987654321/);
-    expect(emailSendMessageSpy.secondCall.args[2]).to.match(
+    expect(emailSendMessageSpy.callCount).to.equal(3);
+    expect(emailSendMessageSpy.thirdCall.args[0]).to.equal(remoteUser.email);
+    expect(emailSendMessageSpy.thirdCall.args[2]).to.match(/IBAN 1234567890987654321/);
+    expect(emailSendMessageSpy.thirdCall.args[2]).to.match(
       /for the amount of \$20 with the mention: webpack event backer order: [0-9]+/,
     );
-    expect(emailSendMessageSpy.secondCall.args[1]).to.equal(
+    expect(emailSendMessageSpy.thirdCall.args[1]).to.equal(
       'ACTION REQUIRED: your $20 registration to meetup is pending',
     );
   });
