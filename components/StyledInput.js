@@ -38,13 +38,22 @@ const StyledInput = styled.input`
   box-sizing: border-box;
   outline: none;
 
+
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
     cursor: not-allowed;
   }
 
-  &:focus, &:hover:not(:disabled) {
+  &:focus {
     border-color: ${themeGet('colors.primary.300')};
+    background-color: ${themeGet('colors.primary.500')};
+    color:white;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: ${themeGet('colors.primary.300')};
+    color: ${props => (props.onFocus ? themeGet('colors.primary.300') : 'black')};
+    
   }
 
   &::placeholder {

@@ -11,12 +11,14 @@ import StyledInput from './StyledInput';
 const InputContainer = styled(Container)`
   &:hover {
     border-color: ${themeGet('colors.primary.300')};
+    color: ${themeGet('colors.primary.300')};
   }
 
   &:focus-within {
-    border-color: ${themeGet('colors.primary.500')};
+    border-color: ${themeGet('colors.primary.300')};
+    background-color: ${themeGet('colors.primary.500')};
+    color: white;
   }
-
   input {
     border: none;
     outline: none;
@@ -46,7 +48,7 @@ const getColor = ({ error, focused, success }) => {
 
 const getBgColor = ({ error, focused, success }) => {
   if (focused) {
-    return 'primary.100';
+    return 'primary.500';
   }
 
   if (error) {

@@ -72,7 +72,7 @@ class OpenCollectiveFrontendApp extends App {
           try {
             await loadGoogleMaps();
           } catch (e) {
-            console.error(e);
+            console.error(e, '-----------------');
           }
         }
       }

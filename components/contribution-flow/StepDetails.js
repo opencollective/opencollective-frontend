@@ -93,6 +93,7 @@ const StepDetails = ({
   const hasOptions = get(amountOptions, 'length', 0) > 0;
   const displayMap = amountOptions ? buildDisplayMap(amountOptions) : {};
   const [showModal, setShowModal] = useState(false);
+  const [onActive, setOnActive] = useState(false);
   const [tempInterval, setTempInterval] = useState(interval);
   const verifyIntervalChange = ({ interval }) => {
     if (changeIntervalWarning == true) {
@@ -168,9 +169,14 @@ const StepDetails = ({
                 {...fieldProps}
                 value={amount / 100}
                 width={1}
-                onChange={({ target }) => dispatchChange({ amount: Math.round(parseFloat(target.value) * 100) })}
+                onFocus={e => {
+                  setOnActive(true);
+                }}
+                onChange={({ target }) => {
+                  dispatchChange({ amount: Math.round(parseFloat(target.value) * 100) });
+                }}
                 containerProps={{ borderRadius: hasOptions ? '0 4px 4px 0' : 3, ml: '-1px' }}
-                prependProps={{ pl: 2, pr: 0, bg: 'white.full', color: 'black.800' }}
+                prependProps={{ pl: 2, pr: 0, bg: onActive ? 'blue' : 'black', color: 'black.full' }}
                 px="2px"
               />
             )}
