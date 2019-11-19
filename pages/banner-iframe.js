@@ -94,7 +94,7 @@ class BannerIframe extends React.Component {
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
-        <style jsx global>
+        <style jsx>
           {`
             @font-face {
               font-family: 'Inter';
