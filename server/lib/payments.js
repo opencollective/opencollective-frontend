@@ -298,6 +298,14 @@ export const executeOrder = async (user, order, options) => {
   const transaction = await processOrder(order, options);
   if (transaction) {
     await order.update({ status: status.PAID, processedAt: new Date() });
+
+    // Register user as collective backer
+    await order.collective.findOrAddUserWithRole(
+      { id: user.id, CollectiveId: order.FromCollectiveId },
+      roles.BACKER,
+      { TierId: get(order, 'tier.id') },
+      { order },
+    );
   }
 
   // If the user asked for it, mark the payment method as saved for future financial contributions
@@ -305,14 +313,6 @@ export const executeOrder = async (user, order, options) => {
     order.paymentMethod.saved = true;
     order.paymentMethod.save();
   }
-
-  // Register user as collective backer
-  await order.collective.findOrAddUserWithRole(
-    { id: user.id, CollectiveId: order.FromCollectiveId },
-    roles.BACKER,
-    { TierId: get(order, 'tier.id') },
-    { order },
-  );
 
   sendEmailNotifications(order, transaction);
 
