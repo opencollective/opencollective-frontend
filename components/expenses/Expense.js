@@ -63,6 +63,7 @@ class Expense extends React.Component {
     unlockPayAction: PropTypes.func,
     editExpense: PropTypes.func,
     unapproveExpense: PropTypes.func,
+    deleteExpense: PropTypes.func,
     refetch: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -75,6 +76,8 @@ class Expense extends React.Component {
       expense: {},
       mode: undefined,
       showUnapproveModal: false,
+      showDeleteExpenseModal: false,
+      error: null,
     };
 
     this.save = this.save.bind(this);
@@ -110,6 +113,14 @@ class Expense extends React.Component {
       },
       no: { id: 'no', defaultMessage: 'No' },
       yes: { id: 'yes', defaultMessage: 'Yes' },
+      'delete.modal.header': {
+        id: 'delete.modal.header',
+        defaultMessage: 'Delete Expense',
+      },
+      'delete.modal.body': {
+        id: 'delete.modal.body',
+        defaultMessage: 'Are you sure you want to delete this expense?',
+      },
     });
     this.currencyStyle = {
       style: 'currency',
@@ -149,7 +160,18 @@ class Expense extends React.Component {
       await this.props.refetch();
     } catch (err) {
       console.error(err);
+      this.setState({ showUnapproveModal: false, error: err.message });
+    }
+  };
+
+  handleDeleteExpense = async id => {
+    try {
+      await this.props.deleteExpense(id);
       this.setState({ showUnapproveModal: false });
+      await this.props.refetch();
+    } catch (err) {
+      console.error(err);
+      this.setState({ showDeleteExpenseModal: false, error: err.message });
     }
   };
 
@@ -207,6 +229,8 @@ class Expense extends React.Component {
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
+
+    const canDelete = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'REJECTED';
 
     return (
       <div className={`expense ${status} ${this.state.mode}View`} data-cy={`expense-${status}`}>
@@ -423,6 +447,18 @@ class Expense extends React.Component {
               continueHandler={() => this.handleUnapproveExpense(expense.id)}
             />
           )}
+          {this.state.showDeleteExpenseModal && (
+            <ConfirmationModal
+              show={this.state.showDeleteExpenseModal}
+              header={intl.formatMessage(this.messages['delete.modal.header'])}
+              body={intl.formatMessage(this.messages['delete.modal.body'])}
+              onClose={() => this.setState({ showDeleteExpenseModal: false })}
+              cancelLabel={intl.formatMessage(this.messages['no'])}
+              cancelHandler={() => this.setState({ showDeleteExpenseModal: false })}
+              continueLabel={intl.formatMessage(this.messages['yes'])}
+              continueHandler={() => this.handleDeleteExpense(expense.id)}
+            />
+          )}
           {editable && (
             <div className="actions">
               {mode === 'edit' && this.state.modified && this.state.expense['type'] !== 'UNCLASSIFIED' && (
@@ -438,9 +474,9 @@ class Expense extends React.Component {
               {mode === 'edit' && this.state.modified && this.state.expense['type'] === 'UNCLASSIFIED' && (
                 <Span color="red.500">{intl.formatMessage(this.messages['expenseTypeMissing'])}</Span>
               )}
-              {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
+              {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid || canDelete) && (
                 <Flex flexDirection="column">
-                  {canPay && (
+                  {canPay && expense.payoutMethod === 'other' && (
                     <EditPayExpenseFeesForm
                       canEditPlatformFee={LoggedInUser.isRoot()}
                       currency={collective.currency}
@@ -473,6 +509,15 @@ class Expense extends React.Component {
                     {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn refetch={this.props.refetch} id={expense.id} />}
                     {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
+                    {canDelete && (
+                      <StyledButton
+                        bg="red.600"
+                        buttonStyle="primary"
+                        onClick={() => this.setState({ showDeleteExpenseModal: true })}
+                      >
+                        <FormattedMessage id="expense.delete.btn" defaultMessage="Delete" />
+                      </StyledButton>
+                    )}
                   </Flex>
                 </Flex>
               )}
@@ -483,6 +528,24 @@ class Expense extends React.Component {
     );
   }
 }
+
+const deleteExpense = graphql(
+  gql`
+    mutation deleteExpense($id: Int!) {
+      deleteExpense(id: $id) {
+        id
+        status
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      deleteExpense: async id => {
+        return await mutate({ variables: { id } });
+      },
+    }),
+  },
+);
 
 const unapproveExpense = graphql(
   gql`
@@ -527,6 +590,6 @@ const editExpense = graphql(
   },
 );
 
-const addMutations = compose(unapproveExpense, editExpense);
+const addMutations = compose(unapproveExpense, editExpense, deleteExpense);
 
 export default injectIntl(addMutations(Expense));

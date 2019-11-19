@@ -155,6 +155,14 @@ class Expenses extends React.Component {
                 <FormattedMessage id="expenses.pending" defaultMessage="pending" />
               </Button>
               <Button
+                className="filterBtn pending"
+                bsSize="small"
+                bsStyle={status === 'REJECTED' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'REJECTED' })}
+              >
+                <FormattedMessage id="expenses.rejected" defaultMessage="rejected" />
+              </Button>
+              <Button
                 className="filterBtn approved"
                 bsSize="small"
                 bsStyle={status === 'APPROVED' ? 'primary' : 'default'}
