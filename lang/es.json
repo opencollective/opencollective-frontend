@@ -971,6 +971,7 @@
   "redeem.subtitle.line1": "Open Collective helps communities - like open source projects, meetups and social movements - raise funds spend them transparently.",
   "redeem.title": "Redeem Gift Card",
   "redeemed.backyourstack": "or discover the open source projects that your organization is depending on and that need funding on {link}",
+  "redeemed.collective-recommendations": "Collectives recommended by {emitter}",
   "redeemed.findCollectives": "Find open collectives to support.",
   "redeemed.mismatch": "Accounts mismatch",
   "redeemed.subtitle.line1": "The card has been added to your account.",
