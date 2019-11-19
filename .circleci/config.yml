@@ -109,10 +109,10 @@ jobs:
       - <<: *persist_npm_cache
 
       - restore_cache:
-          name: Restore next build cache
+          name: Restore next cache
           keys:
-            - next-build-cache-{{ .Revision }}
-            - next-build-cache-
+            - next-cache-{{ .Revision }}
+            - next-cache-
 
       - run: npm run build:clean
       - run: npm run build:updates
@@ -120,10 +120,9 @@ jobs:
       - run: npm run build:server
 
       - save_cache:
-          name: Persist next build cache
-          key: next-build-cache-{{ .Revision }}
+          name: Persist next cache
+          key: next-cache-{{ .Revision }}
           paths:
-            # In Next.js 8 it will be
             - ./.next/cache
 
       # # We prune to save space in node_modules persistence
