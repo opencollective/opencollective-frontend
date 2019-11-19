@@ -861,10 +861,6 @@ export const UpdateType = new GraphQLObjectType({
             return null;
           }
 
-          if (update.markdown) {
-            // we only keep the first paragraph (up to 255 chars)
-            return update.markdown.replace(/\n.*/g, '').trunc(255, true);
-          }
           if (update.html.substr(0, 3) === '<p>') {
             // we only keep the first paragraph
             return he
@@ -873,6 +869,12 @@ export const UpdateType = new GraphQLObjectType({
               .replace(/<\/p>.*/g, '')
               .replace('<p>', '');
           }
+
+          if (update.markdown) {
+            // we only keep the first paragraph (up to 255 chars)
+            return update.markdown.replace(/\n.*/g, '').trunc(255, true);
+          }
+
           return '';
         },
       },
