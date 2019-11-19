@@ -12,6 +12,7 @@ import { buttonSize, buttonStyle } from '../lib/theme';
  */
 const StyledLink = styled.a`
   color: ${themeGet('colors.primary.500')};
+  cursor: pointer;
 
   &:hover {
     color: ${themeGet('colors.primary.300')};
@@ -38,7 +39,6 @@ const StyledLink = styled.a`
   ${props =>
     props.buttonStyle &&
     css`
-      cursor: pointer;
       outline: 0;
       border: 1px solid;
       border-radius: 100px;

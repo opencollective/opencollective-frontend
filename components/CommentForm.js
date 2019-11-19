@@ -11,6 +11,7 @@ import MessageBox from './MessageBox';
 /**
  * Component to render for for **new** comments. Comment Edit form is created
  * with an `InputField` (see `opencollective-frontend/components/Comment.js`).
+ * @deprecated Please use `components/conversations/CommentForm.js`
  */
 class CommentForm extends React.Component {
   static propTypes = {

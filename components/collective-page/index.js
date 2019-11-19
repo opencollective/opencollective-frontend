@@ -18,6 +18,7 @@ import SectionContributors from './sections/Contributors';
 import SectionGoals from './sections/Goals';
 import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
+import SectionConversations from './sections/Conversations';
 import SectionTransactions from './sections/Transactions';
 import SectionTickets from './sections/Tickets';
 import SectionParticipants from './sections/Participants';
@@ -40,6 +41,7 @@ class CollectivePage extends Component {
     topIndividuals: PropTypes.arrayOf(PropTypes.object),
     tiers: PropTypes.arrayOf(PropTypes.object),
     transactions: PropTypes.arrayOf(PropTypes.object),
+    conversations: PropTypes.object,
     expenses: PropTypes.arrayOf(PropTypes.object),
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
@@ -184,6 +186,8 @@ class CollectivePage extends Component {
         );
       case Sections.CONTRIBUTIONS:
         return <SectionContributions collective={this.props.collective} />;
+      case Sections.CONVERSATIONS:
+        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
       case Sections.GOALS:

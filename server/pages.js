@@ -69,6 +69,12 @@ if (process.env.NEW_EVENTS === 'true') {
 pages.add('contribute', '/:collectiveSlug/:verb(tiers|contribute)');
 pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)');
 
+// Conversations
+// ---------------
+pages.add('conversations', '/:collectiveSlug/conversations');
+pages.add('create-conversation', '/:collectiveSlug/conversations/new');
+pages.add('conversation', '/:collectiveSlug/conversations/:id([0-9]+)');
+
 // Contribute Flow
 // ---------------
 

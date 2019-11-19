@@ -223,6 +223,7 @@ const DEFAULT_SECTIONS = {
     Sections.GOALS,
     Sections.CONTRIBUTE,
     Sections.UPDATES,
+    Sections.CONVERSATIONS,
     Sections.BUDGET,
     Sections.CONTRIBUTORS,
     Sections.ABOUT,

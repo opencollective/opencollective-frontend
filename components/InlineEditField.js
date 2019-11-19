@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { Mutation } from 'react-apollo';
@@ -13,6 +13,7 @@ import Container from './Container';
 import MessageBox from './MessageBox';
 import StyledTextarea from './StyledTextarea';
 import { fadeIn } from './StyledKeyframes';
+import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 
 /** Container used to show the description to users than can edit it */
 const EditIcon = styled(PencilAlt)`
@@ -40,6 +41,13 @@ const FormButton = styled(StyledButton).attrs({
   animation: ${fadeIn} 0.3s;
 `;
 
+const messages = defineMessages({
+  warnDiscardChanges: {
+    id: 'warning.discardUnsavedChanges',
+    defaultMessage: 'Are you sure you want to discard your unsaved changes?',
+  },
+});
+
 /**
  * A field that can be edited inline. Relies directly on GraphQL to handle errors and
  * loading states properly. By default this component will use `TextAreaAutosize`
@@ -55,10 +63,16 @@ class InlineEditField extends Component {
     mutation: PropTypes.object.isRequired,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
+    /** Use this to control the component state */
+    isEditing: PropTypes.bool,
+    /** Add a confirm if trying to leave the form with unsaved changes */
+    warnIfUnsavedChanges: PropTypes.bool,
     /** Max field length */
     maxLength: PropTypes.number,
-    /** Called to format the value before submitting */
-    formatBeforeSubmit: PropTypes.func,
+    /** Gets passed the item, the new value and must return the mutation variables */
+    prepareVariables: PropTypes.func,
+    /** For cases when component is controlled */
+    disableEditor: PropTypes.func,
     /** Set to false to disable edit icon even if user is allowed to edit */
     showEditIcon: PropTypes.bool,
     /** If given, this function will be used to render the field */
@@ -70,6 +84,8 @@ class InlineEditField extends Component {
     placeholder: PropTypes.node,
     /** Editing the top value. */
     topEdit: PropTypes.number,
+    /** @ignore from injectIntl */
+    intl: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -84,7 +100,16 @@ class InlineEditField extends Component {
   };
 
   disableEditor = () => {
+    const { warnIfUnsavedChanges, intl } = this.props;
+    if (warnIfUnsavedChanges && !confirm(intl.formatMessage(messages.warnDiscardChanges))) {
+      return;
+    }
+
     this.setState({ isEditing: false });
+
+    if (this.props.disableEditor) {
+      this.props.disableEditor();
+    }
   };
 
   setDraft = draft => {
@@ -110,22 +135,25 @@ class InlineEditField extends Component {
       return <span>{value}</span>;
     }
   }
-  z;
+
   render() {
     const {
       field,
       values,
       mutation,
       canEdit,
-      formatBeforeSubmit,
+      prepareVariables,
       showEditIcon,
       placeholder,
       children,
       topEdit,
+      warnIfUnsavedChanges,
     } = this.props;
-    const { isEditing, draft } = this.state;
+    const { draft } = this.state;
+    const isEditing = typeof this.props.isEditing === 'undefined' ? this.state.isEditing : this.props.isEditing;
     const value = get(values, field);
     const touched = draft !== value;
+
     if (!isEditing) {
       return (
         <Container position="relative">
@@ -139,67 +167,75 @@ class InlineEditField extends Component {
       );
     } else {
       return (
-        <Mutation mutation={mutation}>
-          {(updateField, { loading, error }) => (
-            <React.Fragment>
-              {children ? (
-                children({
-                  isEditing: true,
-                  value: draft,
-                  maxLength: this.props.maxLength,
-                  setValue: this.setDraft,
-                  enableEditor: this.enableEditor,
-                  disableEditor: this.disableEditor,
-                })
-              ) : (
-                <StyledTextarea
-                  autoSize
-                  autoFocus
-                  width={1}
-                  value={draft || ''}
-                  onChange={e => this.setDraft(e.target.value)}
-                  px={0}
-                  py={0}
-                  border="0"
-                  letterSpacing="inherit"
-                  fontSize="inherit"
-                  fontWeight="inherit"
-                  lineHeight="inherit"
-                  maxLength={this.props.maxLength}
-                  data-cy={`InlineEditField-Textarea-${field}`}
-                />
-              )}
-              <Box width={1}>
-                {error && (
-                  <MessageBox type="error" my={2} withIcon>
-                    {error.message.replace('GraphQL error: ', '')}
-                  </MessageBox>
+        <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && touched}>
+          <Mutation mutation={mutation}>
+            {(updateField, { loading, error }) => (
+              <React.Fragment>
+                {children ? (
+                  children({
+                    isEditing: true,
+                    value: draft,
+                    maxLength: this.props.maxLength,
+                    setValue: this.setDraft,
+                    enableEditor: this.enableEditor,
+                    disableEditor: this.disableEditor,
+                  })
+                ) : (
+                  <StyledTextarea
+                    autoSize
+                    autoFocus
+                    width={1}
+                    value={draft || ''}
+                    onChange={e => this.setDraft(e.target.value)}
+                    px={0}
+                    py={0}
+                    border="0"
+                    letterSpacing="inherit"
+                    fontSize="inherit"
+                    fontWeight="inherit"
+                    lineHeight="inherit"
+                    maxLength={this.props.maxLength}
+                    data-cy={`InlineEditField-Textarea-${field}`}
+                  />
                 )}
-                <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
-                  <FormButton data-cy="InlineEditField-Btn-Cancel" disabled={loading} onClick={this.disableEditor}>
-                    <FormattedMessage id="form.cancel" defaultMessage="cancel" />
-                  </FormButton>
-                  <FormButton
-                    buttonStyle="primary"
-                    loading={loading}
-                    disabled={!touched}
-                    data-cy="InlineEditField-Btn-Save"
-                    onClick={() => {
-                      const variables = pick(values, ['id']);
-                      variables[field] = formatBeforeSubmit ? formatBeforeSubmit(draft) : draft;
-                      updateField({ variables }).then(this.disableEditor);
-                    }}
-                  >
-                    <FormattedMessage id="save" defaultMessage="Save" />
-                  </FormButton>
-                </Flex>
-              </Box>
-            </React.Fragment>
-          )}
-        </Mutation>
+                <Box width={1}>
+                  {error && (
+                    <MessageBox type="error" my={2} withIcon>
+                      {error.message.replace('GraphQL error: ', '')}
+                    </MessageBox>
+                  )}
+                  <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
+                    <FormButton data-cy="InlineEditField-Btn-Cancel" disabled={loading} onClick={this.disableEditor}>
+                      <FormattedMessage id="form.cancel" defaultMessage="cancel" />
+                    </FormButton>
+                    <FormButton
+                      buttonStyle="primary"
+                      loading={loading}
+                      disabled={!touched}
+                      data-cy="InlineEditField-Btn-Save"
+                      onClick={() => {
+                        let variables = null;
+                        if (prepareVariables) {
+                          variables = prepareVariables(values, draft);
+                        } else {
+                          variables = pick(values, ['id']);
+                          variables[field] = draft;
+                        }
+
+                        updateField({ variables }).then(this.disableEditor);
+                      }}
+                    >
+                      <FormattedMessage id="save" defaultMessage="Save" />
+                    </FormButton>
+                  </Flex>
+                </Box>
+              </React.Fragment>
+            )}
+          </Mutation>
+        </WarnIfUnsavedChanges>
       );
     }
   }
 }
 
-export default InlineEditField;
+export default injectIntl(InlineEditField);

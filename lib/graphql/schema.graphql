@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Mon Nov 25 2019 15:10:44 GMT+0100 (GMT+01:00)
+# timestamp: Thu Nov 28 2019 11:33:18 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -219,6 +219,20 @@ type Collective implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): PaginatedConversation
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   events(
     limit: Int
     offset: Int
@@ -477,6 +491,20 @@ interface CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): PaginatedConversation
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   events(
     limit: Int
     offset: Int
@@ -701,10 +729,15 @@ input CommentInputType {
   id: Int
   markdown: String
   html: String
-  FromCollectiveId: Int!
-  CollectiveId: Int!
+
+  """
+  Not supported yet. Defaults to user collective ID.
+  """
+  FromCollectiveId: Int
+  CollectiveId: Int
   ExpenseId: Int
   UpdateId: Int
+  ConversationId: Int
 }
 
 """
@@ -731,6 +764,7 @@ type CommentType {
   collective: CollectiveInterface
   expense: ExpenseType
   update: UpdateType
+  conversation: Conversation
 }
 
 """
@@ -894,6 +928,26 @@ type ContributorsStats {
   Number of collectives
   """
   collectives: Int
+}
+
+"""
+A conversation thread
+"""
+type Conversation {
+  id: Int!
+  title: String!
+  createdAt: DateString!
+  updatedAt: DateString!
+  tags: [String]
+  summary: String!
+  collective: CollectiveInterface
+  fromCollective: CollectiveInterface
+
+  """
+  The root comment / starter for this conversation
+  """
+  body: CommentType
+  comments(limit: Int, offset: Int): PaginatedComment
 }
 
 type CreateUserResult {
@@ -1082,6 +1136,20 @@ type Event implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): PaginatedConversation
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   events(
     limit: Int
     offset: Int
@@ -1585,6 +1653,22 @@ type Mutation {
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
+  createMember(
+    member: CollectiveAttributesInputType!
+    collective: CollectiveAttributesInputType!
+    role: String!
+  ): Member
+  removeMember(
+    member: CollectiveAttributesInputType!
+    collective: CollectiveAttributesInputType!
+    role: String!
+  ): Member
+
+  """
+  A mutation to edit membership. Dedicated to the user, not the collective admin.
+  """
+  editMembership(id: Int!, publicMessage: String): Member
+    @deprecated(reason: "2019-10-12: Please use editPublicMessage")
 
   """
   A mutation to edit the public message of all matching members.
@@ -1595,6 +1679,27 @@ type Mutation {
   addFundsToCollective(order: OrderInputType!): OrderType
   updateOrder(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
+  createConversation(
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    The body of the conversation initial comment
+    """
+    html: String!
+
+    """
+    ID of the Collective where the conversation will be created
+    """
+    CollectiveId: Int!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
   editUpdate(update: UpdateAttributesInputType!): UpdateType
   publishUpdate(id: Int!): UpdateType
   unpublishUpdate(id: Int!): UpdateType
@@ -2225,6 +2330,20 @@ type Organization implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): PaginatedConversation
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   events(
     limit: Int
     offset: Int
@@ -2279,6 +2398,26 @@ type Organization implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   stats: CollectiveStatsType
   email: String
+}
+
+"""
+A list of Comment with pagination info
+"""
+type PaginatedComment {
+  nodes: [CommentType]
+  total: Int
+  limit: Int
+  offset: Int
+}
+
+"""
+A list of Conversation with pagination info
+"""
+type PaginatedConversation {
+  nodes: [Conversation]
+  total: Int
+  limit: Int
+  offset: Int
 }
 
 """
@@ -2506,6 +2645,7 @@ type Query {
     type: TransactionType
   ): PaginatedTransactions
   Update(collectiveSlug: String, updateSlug: String, id: Int): UpdateType
+  Conversation(id: Int!): Conversation
   Application(id: Int): Application
   allComments(ExpenseId: Int, UpdateId: Int, limit: Int, offset: Int): [UpdateType]
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
@@ -2785,6 +2925,26 @@ type Subscription {
   interval: String
   stripeSubscriptionId: String
   isActive: Boolean
+}
+
+"""
+Statistics for a given tag
+"""
+type TagStat {
+  """
+  An unique identified for this tag
+  """
+  id: String
+
+  """
+  Name/Label of the tag
+  """
+  tag: String
+
+  """
+  Number of entries for this tag
+  """
+  count: Int
 }
 
 """
@@ -3248,6 +3408,20 @@ type User implements CollectiveInterface {
   githubHandle: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): PaginatedConversation
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   events(
     limit: Int
     offset: Int
