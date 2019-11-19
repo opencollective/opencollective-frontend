@@ -191,6 +191,8 @@ class RedeemedPage extends React.Component {
     const { amount, collective, currency, expiryDate, loading } = this.state;
     const error = this.getError();
     const emitter = this.state.emitter || (data && data.Collective);
+    const recommendedCollectives =
+      get(emitter, 'settings.recommendedCollectives') || get(data.Collective, 'settings.recommendedCollectives');
 
     return (
       <div className="RedeemedPage">
@@ -239,6 +241,26 @@ class RedeemedPage extends React.Component {
                 </Container>
               )}
 
+              {recommendedCollectives && (
+                <Box my={5}>
+                  <H5 textAlign={'center'}>
+                    <FormattedMessage
+                      id="redeemed.collective-recommendations"
+                      defaultMessage="Collectives recommended by {emitter}"
+                      values={{ emitter: emitter.name }}
+                    />
+                  </H5>
+                  <Container maxWidth="1200px">
+                    <CollectivesWithData
+                      slugs={recommendedCollectives}
+                      orderBy="name"
+                      orderDirection="ASC"
+                      limit={12}
+                    />
+                  </Container>
+                </Box>
+              )}
+
               <Box width={['320px', '640px']}>
                 <SearchFormContainer>
                   <Box mb={3}>
@@ -276,6 +298,8 @@ class RedeemedPage extends React.Component {
                 <Container maxWidth="1200px">
                   <CollectivesWithData
                     HostCollectiveId={11004} // hard-coded to only show open source projects
+                    // hostCollectiveSlug={'babel'}
+
                     orderBy="balance"
                     orderDirection="DESC"
                     limit={12}
