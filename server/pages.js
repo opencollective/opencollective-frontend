@@ -28,7 +28,6 @@ const pages = routes()
   .add('events', '/:collectiveSlug/events')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/contact')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
-  .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
