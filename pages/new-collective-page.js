@@ -136,7 +136,7 @@ class NewCollectivePage extends React.Component {
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {
-        return <IncognitoUserCollective />;
+        return <IncognitoUserCollective collective={data.Collective} />;
       }
     }
 

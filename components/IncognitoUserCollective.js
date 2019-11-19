@@ -8,12 +8,10 @@ import { IncognitoAvatar } from './Avatar';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
-class UserCollective extends React.Component {
+class IncognitoUserCollective extends React.Component {
   static propTypes = {
-    LoggedInUser: PropTypes.object,
-    query: PropTypes.object,
+    collective: PropTypes.object,
     intl: PropTypes.object.isRequired,
-    message: PropTypes.string,
   };
 
   constructor(props) {
@@ -29,7 +27,7 @@ class UserCollective extends React.Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, collective } = this.props;
 
     return (
       <div className={classNames('UserCollectivePage')}>
@@ -44,7 +42,7 @@ class UserCollective extends React.Component {
         <Header
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}
-          metas={{ robots: 'noindex' }}
+          collective={{ collective }}
         />
 
         <Body>
@@ -61,4 +59,4 @@ class UserCollective extends React.Component {
   }
 }
 
-export default injectIntl(UserCollective);
+export default injectIntl(IncognitoUserCollective);
