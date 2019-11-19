@@ -2610,6 +2610,12 @@ type Query {
     Fetch all collectives that are a child of `ParentCollectiveId`. Used for "SuperCollectives"
     """
     ParentCollectiveId: Int
+
+    """
+    Fetch all collectives with slug within slugs
+    """
+    slugs: [String]
+
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
     limit: Int = 10

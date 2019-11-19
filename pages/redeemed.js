@@ -191,8 +191,7 @@ class RedeemedPage extends React.Component {
     const { amount, collective, currency, expiryDate, loading } = this.state;
     const error = this.getError();
     const emitter = this.state.emitter || (data && data.Collective);
-    const recommendedCollectives =
-      get(emitter, 'settings.recommendedCollectives') || get(data.Collective, 'settings.recommendedCollectives');
+    const recommendedCollectives = get(emitter, 'settings.recommendedCollectives');
 
     return (
       <div className="RedeemedPage">
@@ -298,8 +297,6 @@ class RedeemedPage extends React.Component {
                 <Container maxWidth="1200px">
                   <CollectivesWithData
                     HostCollectiveId={11004} // hard-coded to only show open source projects
-                    // hostCollectiveSlug={'babel'}
-
                     orderBy="balance"
                     orderDirection="DESC"
                     limit={12}
