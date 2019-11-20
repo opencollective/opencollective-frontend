@@ -229,12 +229,7 @@
     }
   },
   "lint-staged": {
-    "*.{js}": [
-      "eslint --fix",
-      "prettier --write",
-      "git add"
-    ],
-    "*.{json,md,graphql}": [
+    "*.{js,json,md,graphql}": [
       "prettier --write",
       "git add"
     ]
