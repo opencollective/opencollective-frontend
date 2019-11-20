@@ -78,7 +78,7 @@ class CommentForm extends React.Component {
     };
 
     return (
-      <div className={'CommentForm'}>
+      <div className={'CommentForm'} data-cy="CommentForm">
         <style jsx>
           {`
             .CommentForm {
@@ -147,7 +147,7 @@ class CommentForm extends React.Component {
                 </MessageBox>
               )}
               <div className="actions">
-                <SmallButton className="primary save" onClick={this.onSubmit}>
+                <SmallButton className="primary save" onClick={this.onSubmit} data-cy="SaveCommentButton">
                   <FormattedMessage id="comment.btn" defaultMessage="Comment" />
                 </SmallButton>
                 {notice && <div className="notice">{notice}</div>}

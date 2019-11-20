@@ -95,28 +95,3 @@ describe('new expense when logged in', () => {
     cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains('approved');
   });
 });
-
-describe('comment expense', () => {
-  beforeEach(() => {
-    cy.login({ redirect: '/testcollective/expenses' });
-  });
-
-  it('submits a comment on an expense', () => {
-    cy.visit('/testcollective/expenses');
-    cy.get('.Expenses .expense:first .description a').click();
-    cy.wait(300);
-    cy.get('.CommentForm', { timeout: 10000 });
-    cy.get('.ql-editor').type('This is a first comment');
-    cy.get('.ql-editor').blur();
-    cy.wait(500);
-    cy.get('.CommentForm .actions .Button.save', { timeout: 5000 }).click();
-    cy.wait(300);
-    cy.get('.Comments .itemsList .comment', { timeout: 5000 }).should('have.length', 1);
-    cy.get('.Comments .itemsList .comment:first .description').contains('This is a first comment');
-    cy.getByDataCy('submit-expense-btn')
-      .first()
-      .click();
-    cy.get('.descriptionField input').should('have.value', '');
-    cy.get('.amountField input').should('have.value', '');
-  });
-});
