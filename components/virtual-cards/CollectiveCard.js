@@ -4,7 +4,6 @@ import { Flex } from '@rebass/grid';
 import { has } from 'lodash';
 
 import Container from '../Container';
-import { H1 } from '../Text';
 import LinkCollective from '../LinkCollective';
 import Avatar from '../Avatar';
 
@@ -40,6 +39,7 @@ CollectiveCard.propTypes = {
   size: PropTypes.number,
   fontSize: PropTypes.string,
   p: PropTypes.number,
+  avatarSize: PropTypes.number,
 };
 
 CollectiveCard.defaultProps = {
