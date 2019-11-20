@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
@@ -124,7 +124,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
   } else if (!editing) {
     return (
-      <React.Fragment>
+      <Fragment>
         <Dropzone
           style={{}}
           multiple={false}
@@ -172,13 +172,13 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
             </StyledRoundButton>
           </Link>
         </Container>
-      </React.Fragment>
+      </Fragment>
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
       <Mutation mutation={EditAvatarMutation}>
         {editAvatar => (
-          <>
+          <Fragment>
             <EditingAvatarContainer borderRadius={borderRadius}>
               <img
                 data-cy="collective-avatar-image-preview"
@@ -239,7 +239,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
                 <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Container>
-          </>
+          </Fragment>
         )}
       </Mutation>
     ) : (
