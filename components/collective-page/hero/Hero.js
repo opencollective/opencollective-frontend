@@ -39,7 +39,7 @@ import HeroAvatar from './HeroAvatar';
 import MessageBox from '../../MessageBox';
 
 // Dynamic imports
-const EventDetails = dynamic(() => import('./EventDetails'));
+const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
 
 const Translations = defineMessages({
   website: {
@@ -241,7 +241,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             </Flex>
           )}
           <StyledShortDescription>{collective.description}</StyledShortDescription>
-          {isEvent && <EventDetails collective={collective} />}
+          {isEvent && <HeroEventDetails collective={collective} />}
 
           {!isCollective && !isEvent && !collective.isHost && (
             <HeroTotalCollectiveContributionsWithData collective={collective} />

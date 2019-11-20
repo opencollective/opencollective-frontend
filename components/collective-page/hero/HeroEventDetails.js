@@ -62,7 +62,7 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => (
   </>
 );
 
-class EventDetails extends React.Component {
+class HeroEventDetails extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
       startsAt: PropTypes.string,
@@ -167,4 +167,4 @@ class EventDetails extends React.Component {
   }
 }
 
-export default EventDetails;
+export default HeroEventDetails;
