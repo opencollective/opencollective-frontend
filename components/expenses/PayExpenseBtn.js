@@ -126,6 +126,9 @@ class PayExpenseBtn extends React.Component {
             .processorFee .inputField {
               margin-top: 0.5rem;
             }
+            .recordAsPaid {
+              margin-right: 5px;
+            }
           `}
         </style>
         <StyledButton

@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
+import styled from 'styled-components';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
+import { Flex } from '@rebass/grid';
 
 import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
@@ -22,6 +24,11 @@ import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
+import Container from '../Container';
+
+const ExpenseActionsWrapper = styled(Container)`
+  display: flex;
+`;
 
 class Expense extends React.Component {
   static propTypes = {
@@ -438,7 +445,7 @@ class Expense extends React.Component {
                 <Span color="red.500">{intl.formatMessage(this.messages['expenseTypeMissing'])}</Span>
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
-                <div className="manageExpense">
+                <Flex flexDirection="column">
                   {canPay && (
                     <EditPayExpenseFeesForm
                       canEditPlatformFee={LoggedInUser.isRoot()}
@@ -447,7 +454,7 @@ class Expense extends React.Component {
                       payoutMethod={expense.payoutMethod}
                     />
                   )}
-                  <div className="expenseActions" data-cy="expense-actions">
+                  <ExpenseActionsWrapper className="expenseActions" data-cy="expense-actions">
                     {canPay && (
                       <PayExpenseBtn
                         expense={expense}
@@ -472,8 +479,8 @@ class Expense extends React.Component {
                     {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn refetch={this.props.refetch} id={expense.id} />}
                     {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
-                  </div>
-                </div>
+                  </ExpenseActionsWrapper>
+                </Flex>
               )}
             </div>
           )}
