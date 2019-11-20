@@ -358,20 +358,20 @@ export const CommentInputType = new GraphQLInputObjectType({
   description: 'Input type for CommentType',
   fields: () => ({
     id: { type: GraphQLInt },
-    markdown: { type: GraphQLString },
+    markdown: { type: GraphQLString, deprecationReason: 'Markdown editor is deprecated, please use html instead.' },
     html: { type: GraphQLString },
-    /** @deprecated since 2019-11-25: This field is now taken from the logged user. It has no effect. */
     FromCollectiveId: {
       type: GraphQLInt,
-      description: 'Deprecated since 2019-11-25: This field is now taken from the logged user. It has no effect.',
+      description: 'Not supported yet. Defaults to user collective ID.',
     },
-    /** @deprecated since 2019-11-25: This field is now taken from the expense. It has no effect. */
     CollectiveId: {
       type: GraphQLInt,
-      description: 'Deprecated since 2019-11-25: This field is now taken from the expense. It has no effect.',
+      deprecationReason:
+        '2019-11-28: This field is not used by the query. Collective ID is automatically guessed from linked entity (expense, update or conversation)',
     },
     ExpenseId: { type: GraphQLInt },
     UpdateId: { type: GraphQLInt },
+    ConversationId: { type: GraphQLInt },
   }),
 });
 

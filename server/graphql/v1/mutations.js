@@ -44,6 +44,7 @@ import * as commentMutations from './mutations/comments';
 import * as applicationMutations from './mutations/applications';
 import * as backyourstackMutations from './mutations/backyourstack';
 import { updateUserEmail, confirmUserEmail } from './mutations/users';
+import { createConversation } from './mutations/conversations';
 
 import statuses from '../../constants/expense_status';
 
@@ -60,6 +61,7 @@ import {
   PaymentMethodType,
   UserType,
   NotificationType,
+  ConversationType,
 } from './types';
 
 import { CollectiveInterfaceType } from './CollectiveInterface';
@@ -523,6 +525,30 @@ const mutations = {
     },
     resolve(_, args, req) {
       return updateMutations.createUpdate(_, args, req);
+    },
+  },
+  createConversation: {
+    type: ConversationType,
+    args: {
+      title: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: "Conversation's title",
+      },
+      html: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'The body of the conversation initial comment',
+      },
+      CollectiveId: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the Collective where the conversation will be created',
+      },
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        description: 'A list of tags for this conversation',
+      },
+    },
+    resolve(_, args, req) {
+      return createConversation(req.remoteUser, args);
     },
   },
   editUpdate: {

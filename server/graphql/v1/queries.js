@@ -43,6 +43,7 @@ import {
   OrderType,
   PaginatedExpensesType,
   PaymentMethodType,
+  ConversationType,
 } from './types';
 
 const queries = {
@@ -474,6 +475,16 @@ const queries = {
       return models.Update.findOne({
         where: { CollectiveId, slug: args.updateSlug },
       });
+    },
+  },
+
+  Conversation: {
+    type: ConversationType,
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+    },
+    async resolve(_, args) {
+      return models.Conversation.findByPk(args.id);
     },
   },
 

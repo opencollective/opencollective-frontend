@@ -1,27 +1,49 @@
+import { pick } from 'lodash';
 import models from '../../models';
 import * as errors from '../errors';
 import { mustBeLoggedInTo } from '../../lib/auth';
 import { strip_tags } from '../../lib/utils';
 
 /**
- * Fetch comment by id
- * @param {number} id - comment id
+ * Return the collective ID for the given comment based on it's association (conversation,
+ * expense or update).
  */
-async function fetchComment(id) {
-  const comment = await models.Comment.findByPk(id);
-  if (!comment) throw new errors.NotFound({ message: `Comment with id ${id} not found` });
-  return comment;
-}
+const getCollectiveIdForCommentEntity = async commentValues => {
+  if (commentValues.ExpenseId) {
+    const expense = await models.Expense.findByPk(commentValues.ExpenseId);
+    return expense && expense.CollectiveId;
+  } else if (commentValues.ConversationId) {
+    const conversation = await models.Conversation.findByPk(commentValues.ConversationId);
+    return conversation && conversation.CollectiveId;
+  } else if (commentValues.UpdateId) {
+    const update = await models.Update.findByPk(commentValues.UpdateId);
+    return update && update.CollectiveId;
+  }
+};
 
 /**
  *  Edits a comment
  * @param {object} comment - comment to edit
  * @param {object} remoteUser - logged user
  */
-async function editComment(comment, remoteUser) {
+async function editComment(commentData, remoteUser) {
   mustBeLoggedInTo(remoteUser, 'edit this comment');
-  const toEditComment = await fetchComment(comment.id);
-  return toEditComment.edit(remoteUser, comment);
+
+  const comment = await models.Comment.findByPk(commentData.id);
+  if (!comment) {
+    throw new errors.NotFound({ message: `This comment does not exist or has been deleted.` });
+  }
+
+  // Check permissions
+  if (remoteUser.id !== comment.CreatedByUserId || !remoteUser.isAdmin(comment.CollectiveId)) {
+    throw new errors.Unauthorized({
+      message: 'You must be the author or an admin of this collective to edit this comment',
+    });
+  }
+
+  // Prepare args and update
+  const editableAttributes = ['markdown', 'html'];
+  return await comment.update(pick(commentData, editableAttributes));
 }
 
 /**
@@ -31,40 +53,56 @@ async function editComment(comment, remoteUser) {
  */
 async function deleteComment(id, remoteUser) {
   mustBeLoggedInTo(remoteUser, 'delete this comment');
-  const comment = await fetchComment(id);
-  return await comment.delete(remoteUser);
+  const comment = await models.Comment.findByPk(id);
+  if (!comment) {
+    throw new errors.NotFound({ message: `This comment does not exist or has been deleted.` });
+  }
+
+  // Check permissions
+  if (remoteUser.id !== comment.CreatedByUserId || !remoteUser.isAdmin(comment.CollectiveId)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as a core contributor or as a host to delete this comment',
+    });
+  }
+
+  return comment.destroy();
 }
 
 async function createCommentResolver(_, { comment }, { remoteUser }) {
   mustBeLoggedInTo(remoteUser, 'create a comment');
 
-  // Validate required fields
   if (!comment.markdown && !comment.html) {
     throw new errors.ValidationFailed({
       message: 'comment.markdown or comment.html required',
     });
   }
 
-  const { ExpenseId, UpdateId, markdown, html } = comment;
+  const { ConversationId, ExpenseId, UpdateId, markdown, html } = comment;
 
-  const expense = await models.Expense.findByPk(ExpenseId);
-  if (!expense) throw new errors.NotFound({ message: `Expense with id ${ExpenseId} not found` });
+  // Ensure at least (and only) one entity to comment is specified
+  if ([ConversationId, ExpenseId, UpdateId].filter(Boolean).length !== 1) {
+    throw new errors.ValidationFailed({ message: 'You must specify one entity to comment' });
+  }
 
-  const commentData = {
+  // Load entity and its collective id
+  const CollectiveId = await getCollectiveIdForCommentEntity(comment);
+  if (!CollectiveId) {
+    throw new errors.ValidationFailed({
+      message: "The item you're trying to comment doesn't exist or has been deleted.",
+    });
+  }
+
+  // Create comment
+  return models.Comment.create({
+    CollectiveId,
     ExpenseId,
     UpdateId,
-    CollectiveId: expense.CollectiveId,
+    ConversationId,
+    html, // HTML is sanitized at the model level, no need to do it here
+    markdown, // DEPRECATED - sanitized at the model level, no need to do it here
     CreatedByUserId: remoteUser.id,
     FromCollectiveId: remoteUser.CollectiveId,
-  };
-  if (markdown) {
-    commentData.markdown = strip_tags(markdown);
-  }
-  if (html) {
-    commentData.html = strip_tags(html);
-  }
-
-  return models.Comment.create(commentData);
+  });
 }
 
 function collectiveResolver({ CollectiveId }, _, { loaders }) {
@@ -84,7 +122,6 @@ const getStripTagsResolver = prop => obj => strip_tags(obj[prop] || '');
 export {
   editComment,
   deleteComment,
-  fetchComment,
   createCommentResolver,
   collectiveResolver,
   fromCollectiveResolver,

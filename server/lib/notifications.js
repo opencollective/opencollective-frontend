@@ -230,11 +230,15 @@ async function notifyByEmail(activity) {
         activity.data.expense = await models.Expense.findByPk(activity.data.ExpenseId);
         activity.data.UserId = activity.data.expense.UserId;
         activity.data.path = `/${activity.data.collective.slug}/expenses/${activity.data.expense.id}`;
-      } else {
+      } else if (activity.data.UpdateId) {
         activity.data.update = await models.Update.findByPk(activity.data.UpdateId);
         activity.data.UserId = activity.data.update.CreatedByUserId;
         activity.data.path = `/${activity.data.collective.slug}/updates/${activity.data.update.slug}`;
+      } else if (activity.data.ConversationId) {
+        activity.data.conversation = await models.Conversation.findByPk(activity.data.ConversationId);
+        activity.data.UserId = get(activity.data.conversation, 'CreatedByUserId');
       }
+
       // if the author of the comment is the one who submitted the expense
       if (activity.UserId === activity.data.UserId) {
         const HostCollectiveId = await activity.data.collective.getHostCollectiveId();
@@ -252,7 +256,7 @@ async function notifyByEmail(activity) {
             exclude: [activity.UserId],
           });
         }
-      } else {
+      } else if (activity.data.UserId) {
         // if the comment was sent by one of the admins of the collective or the host, we just notify the author of the expense
         activity.data.recipientIsAuthor = true;
         notifyUserId(activity.data.UserId, activity);

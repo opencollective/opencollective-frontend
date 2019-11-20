@@ -23,3 +23,7 @@ export const NotFound = createError('NotFound', {
 export const InvalidToken = createError('InvalidToken', {
   message: 'The provided token is not valid',
 });
+
+export const FeatureNotSupportedForCollective = createError('FeatureNotSupportedForCollective', {
+  message: 'This feature is not supported by the Collective',
+});
