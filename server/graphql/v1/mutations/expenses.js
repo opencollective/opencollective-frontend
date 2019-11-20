@@ -194,11 +194,15 @@ export async function deleteExpense(remoteUser, expenseId) {
   });
 
   if (!expense) {
-    throw new errors.Unauthorized('Expense not found');
+    throw new errors.NotFound('Expense not found');
   }
 
   if (!canEditExpense(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to delete this expense");
+  }
+
+  if (expense.status !== statuses.REJECTED) {
+    throw new errors.Unauthorized('Only rejected expense can be deleted');
   }
 
   const res = await expense.destroy();
