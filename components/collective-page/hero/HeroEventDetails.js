@@ -1,3 +1,4 @@
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -34,14 +35,14 @@ const StyledEventNote = styled.div`
 `;
 
 const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => (
-  <>
+  <Fragment>
     <FormattedDate value={startsAt} timeZone={timezone} weekday="short" day="numeric" month="long" year="numeric" />
     , <FormattedTime value={startsAt} timeZone={timezone} />{' '}
     {endsAt && (
-      <>
+      <Fragment>
         -{' '}
         {!isSameDay && (
-          <>
+          <Fragment>
             <FormattedDate
               value={endsAt}
               timeZone={timezone}
@@ -51,15 +52,15 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => (
               year="numeric"
             />
             ,{' '}
-          </>
+          </Fragment>
         )}
         <FormattedTime value={endsAt} timeZone={timezone} />{' '}
-      </>
+      </Fragment>
     )}
     {moment()
       .tz(timezone)
       .zoneAbbr()}
-  </>
+  </Fragment>
 );
 
 class HeroEventDetails extends React.Component {
@@ -100,16 +101,16 @@ class HeroEventDetails extends React.Component {
     const locationRoute = '#section-location';
 
     return (
-      <>
+      <Fragment>
         {startsAt && (
           <StyledEventNote>
             <Clock size={16} />
             {this.isNotLocalTimeZone() ? (
-              <>
+              <Fragment>
                 <StyledTooltip
                   place="bottom"
                   content={() => (
-                    <>
+                    <Fragment>
                       <Timerange
                         startsAt={startsAt}
                         endsAt={endsAt}
@@ -117,7 +118,7 @@ class HeroEventDetails extends React.Component {
                         isSameDay={this.isSameDay(startsAt, endsAt, moment.tz.guess())}
                       />
                       (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
-                    </>
+                    </Fragment>
                   )}
                 >
                   {props => (
@@ -131,7 +132,7 @@ class HeroEventDetails extends React.Component {
                     </div>
                   )}
                 </StyledTooltip>
-              </>
+              </Fragment>
             ) : (
               <Timerange
                 startsAt={startsAt}
@@ -142,6 +143,7 @@ class HeroEventDetails extends React.Component {
             )}
           </StyledEventNote>
         )}
+
         {location.name && (
           <StyledEventNote>
             <MapPin size={16} />
@@ -162,7 +164,7 @@ class HeroEventDetails extends React.Component {
             />
           </span>
         </StyledEventNote>
-      </>
+      </Fragment>
     );
   }
 }
