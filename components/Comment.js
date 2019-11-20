@@ -310,8 +310,5 @@ const editCommentMutation = graphql(editCommentQuery, {
   }),
 });
 
-const addMutation = compose(
-  deleteCommentMutation,
-  editCommentMutation,
-);
+const addMutation = compose(deleteCommentMutation, editCommentMutation);
 export default injectIntl(addMutation(Comment));
