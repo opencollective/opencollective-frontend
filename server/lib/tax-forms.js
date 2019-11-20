@@ -109,7 +109,7 @@ export function SendHelloWorksTaxForm({ client, callbackUrl, workflowId, year })
         logger.info(`${user.email} is an external email address, skipping HelloWorks in development environment`);
       }
     } catch (error) {
-      logger.error(`Failed to initialize tax form for user #${user.id} (${user.email})`, error);
+      logger.info(`Failed to initialize tax form for user #${user.id} (${user.email})`);
       return saveDocumentStatus(LegalDocument.requestStatus.ERROR);
     }
   };
