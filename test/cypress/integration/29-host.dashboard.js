@@ -1,8 +1,6 @@
 describe('host dashboard', () => {
-  let user = null;
-
   before(() => {
-    cy.signup({ redirect: '/brusselstogetherasbl' }).then(u => (user = u));
+    cy.signup({ redirect: '/brusselstogetherasbl' });
   });
 
   it('mark pending application approved', () => {
