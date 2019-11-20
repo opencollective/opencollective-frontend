@@ -191,6 +191,9 @@ ContributeTier.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    parentCollective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+    }),
   }),
   tier: PropTypes.shape({
     id: PropTypes.number.isRequired,
@@ -206,10 +209,12 @@ ContributeTier.propTypes = {
     goal: PropTypes.number,
     minimumAmount: PropTypes.number,
     amount: PropTypes.number,
+    maxQuantity: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
       totalDonated: PropTypes.number,
       contributors: PropTypes.object,
+      availableQuantity: PropTypes.number,
     }).isRequired,
     contributors: PropTypes.arrayOf(PropTypes.object),
   }),

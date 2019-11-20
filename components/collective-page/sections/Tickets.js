@@ -27,6 +27,9 @@ class SectionTickets extends React.PureComponent {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
     contributors: PropTypes.arrayOf(
       PropTypes.shape({

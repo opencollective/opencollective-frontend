@@ -45,7 +45,11 @@ class SectionContribute extends React.PureComponent {
     ),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
     contributorsStats: PropTypes.object,
     contributors: PropTypes.arrayOf(
