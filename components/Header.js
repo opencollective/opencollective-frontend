@@ -69,6 +69,10 @@ class Header extends React.Component {
       ...this.props.metas,
     };
 
+    if (collective && collective.isIncognito) {
+      metas.robots = 'none';
+    }
+
     return Object.keys(metas).map(key => ({ key, value: metas[key] }));
   }
 
