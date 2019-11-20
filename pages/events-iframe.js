@@ -5,7 +5,11 @@ import Head from 'next/head';
 import EventsWithData from '../components/EventsWithData';
 
 class EventsIframe extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id } }) {
+  static getInitialProps({ query: { collectiveSlug, id }, res }) {
+    // Allow to be embeded as Iframe everywhere
+    if (res) {
+      res.removeHeader('X-Frame-Options');
+    }
     return { collectiveSlug, id };
   }
 

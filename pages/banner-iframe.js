@@ -9,7 +9,11 @@ import gql from 'graphql-tag';
 import MembersWithData from '../components/MembersWithData';
 
 class BannerIframe extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id, style } }) {
+  static getInitialProps({ query: { collectiveSlug, id, style }, res }) {
+    // Allow to be embeded as Iframe everywhere
+    if (res) {
+      res.removeHeader('X-Frame-Options');
+    }
     return { collectiveSlug, id, style };
   }
 
