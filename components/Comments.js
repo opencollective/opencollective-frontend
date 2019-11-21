@@ -12,6 +12,7 @@ class Comments extends React.Component {
     fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     LoggedInUser: PropTypes.object,
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -93,6 +94,7 @@ class Comments extends React.Component {
               comment={comment}
               editable={editable}
               LoggedInUser={LoggedInUser}
+              refetch={this.props.refetch}
             />
           ))}
           {comments.length >= 10 && comments.length % 10 === 0 && (
