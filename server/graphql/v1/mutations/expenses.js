@@ -341,7 +341,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
       await createTransactions(host, expense, feesInHostCurrency);
     } else if (processorFeeInputed && processorFeeInputed > 0) {
-      // For paypal method mannaully recorded as paid.
+      // For paypal method manually recorded as paid.
       await createTransactions(host, expense, feesInHostCurrency);
     } else {
       await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);
