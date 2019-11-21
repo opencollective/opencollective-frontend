@@ -523,6 +523,11 @@ class Expense extends React.Component {
               )}
             </div>
           )}
+          {this.state.error && (
+            <P color="red.500" data-cy="errorMessage">
+              <p>{this.state.error}</p>
+            </div>
+          )}
         </div>
       </div>
     );
