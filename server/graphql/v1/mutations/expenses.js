@@ -293,6 +293,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   }
 
   const balance = await expense.collective.getBalance();
+  const processorFeeInputed = fees.paymentProcessorFeeInCollectiveCurrency;
 
   if (expense.amount > balance) {
     throw new errors.Unauthorized(
@@ -338,6 +339,9 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
     // then we simply mark the expense as paid
     if (expense.paypalEmail === paymentMethod.name) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
+      await createTransactions(host, expense, feesInHostCurrency);
+    } else if (processorFeeInputed && processorFeeInputed > 0) {
+      // For paypal method mannaully recorded as paid.
       await createTransactions(host, expense, feesInHostCurrency);
     } else {
       await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);
