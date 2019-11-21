@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
+import styled from 'styled-components';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { Flex } from '@rebass/grid';
@@ -9,7 +10,7 @@ import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
-import { Span } from '../Text';
+import { Span, P } from '../Text';
 import Link from '../Link';
 import SmallButton from '../SmallButton';
 import Moment from '../Moment';
@@ -23,6 +24,23 @@ import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
+
+const DeleteButton = styled(StyledButton)`
+  border-color: #f51d57;
+  background: #f51d57;
+
+  &:visited {
+    background: #d60940;
+  }
+
+  &:focus {
+    background: #f51d57;
+  }
+
+  &:hover {
+    background: #ff4778;
+  }
+`;
 
 class Expense extends React.Component {
   static propTypes = {
@@ -65,6 +83,7 @@ class Expense extends React.Component {
     unapproveExpense: PropTypes.func,
     deleteExpense: PropTypes.func,
     refetch: PropTypes.func.isRequired,
+    deleteExpense: PropTypes.func,
     intl: PropTypes.object.isRequired,
   };
 
@@ -510,13 +529,12 @@ class Expense extends React.Component {
                     {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canDelete && (
-                      <StyledButton
-                        bg="red.600"
-                        buttonStyle="primary"
+                      <DeleteButton
+                        buttonStyle="standard"
                         onClick={() => this.setState({ showDeleteExpenseModal: true })}
                       >
                         <FormattedMessage id="expense.delete.btn" defaultMessage="Delete" />
-                      </StyledButton>
+                      </DeleteButton>
                     )}
                   </Flex>
                 </Flex>
@@ -525,8 +543,8 @@ class Expense extends React.Component {
           )}
           {this.state.error && (
             <P color="red.500" data-cy="errorMessage">
-              <p>{this.state.error}</p>
-            </div>
+              {this.state.error}
+            </P>
           )}
         </div>
       </div>
