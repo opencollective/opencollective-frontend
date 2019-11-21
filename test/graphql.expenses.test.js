@@ -1102,6 +1102,8 @@ describe('GraphQL Expenses API', () => {
         description: 'Pizza',
         ...data,
       });
+      expense.status = 'REJECTED';
+      expense.save();
       // When the above user tries to delete the expense
       const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, user);
       result.errors && console.log(result.errors);
@@ -1110,6 +1112,34 @@ describe('GraphQL Expenses API', () => {
       // And then the expense should be deleted from the database
       expect(await models.Expense.findByPk(expense.id)).to.be.null;
     }); /* End of "works if logged in as author" */
+
+    it('fails if expense is not rejected', async () => {
+      // Given a collective
+      const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
+      // And given an admin for the above collective
+      const admin = (await store.newUser('collectives-admin')).user;
+      await collective.addUserWithRole(admin, 'ADMIN');
+      // And given a user to file expenses
+      const { user } = await store.newUser('someone cool');
+      // And given the above collective has one expense (created by
+      // the regular user above)
+      const data = {
+        currency: 'USD',
+        payoutMethod: 'manual',
+        collective: { id: collective.id },
+      };
+      const expense = await store.createExpense(user, {
+        amount: 1000,
+        description: 'Pizza',
+        ...data,
+      });
+
+      // When the admin of the collective tries to delete the expense
+      const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, admin);
+      expect(result.errors).to.exist;
+      // And then the error message should be set accordingly.
+      expect(result.errors[0].message).to.equal('Only rejected expense can be deleted');
+    }); /* End of "fails if expense is not rejected" */
 
     it('works if logged in as admin of collective', async () => {
       // Given a collective
@@ -1131,6 +1161,8 @@ describe('GraphQL Expenses API', () => {
         description: 'Pizza',
         ...data,
       });
+      expense.status = 'REJECTED';
+      expense.save();
       // When the admin of the collective tries to delete the expense
       const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, admin);
       result.errors && console.log(result.errors);
@@ -1157,6 +1189,9 @@ describe('GraphQL Expenses API', () => {
         description: 'Pizza',
         ...data,
       });
+
+      expense.status = 'REJECTED';
+      expense.save();
       // When the admin of the host collective tries to delete the expense
       const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, hostAdmin);
       result.errors && console.log(result.errors);
