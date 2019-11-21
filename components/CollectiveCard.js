@@ -58,9 +58,7 @@ class CollectiveCard extends React.Component {
       coverStyle.backgroundPosition = 'center center';
     }
 
-    const truncatedDescription =
-      (collective.description && firstSentence(collective.description, 80)) ||
-      (collective.longDescription && firstSentence(collective.longDescription, 80));
+    const truncatedDescription = collective.description && firstSentence(collective.description, 80);
     const description = collective.description;
 
     let route, params;
