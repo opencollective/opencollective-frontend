@@ -34,34 +34,44 @@ const StyledEventNote = styled.div`
   }
 `;
 
-const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => (
-  <Fragment>
-    <FormattedDate value={startsAt} timeZone={timezone} weekday="short" day="numeric" month="long" year="numeric" />
-    , <FormattedTime value={startsAt} timeZone={timezone} />{' '}
-    {endsAt && (
-      <Fragment>
-        -{' '}
-        {!isSameDay && (
-          <Fragment>
-            <FormattedDate
-              value={endsAt}
-              timeZone={timezone}
-              weekday="short"
-              day="numeric"
-              month="long"
-              year="numeric"
-            />
-            ,{' '}
-          </Fragment>
-        )}
-        <FormattedTime value={endsAt} timeZone={timezone} />{' '}
-      </Fragment>
-    )}
-    {moment()
-      .tz(timezone)
-      .zoneAbbr()}
-  </Fragment>
-);
+const FormattedDateProps = (value, timeZone) => {
+  const props = {
+    value,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  };
+  return process.browser ? { ...props, timeZone } : props;
+};
+
+const FormattedTimeProps = (value, timeZone) => {
+  const props = { value };
+  return process.browser ? { ...props, timeZone } : props;
+};
+
+const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
+  return (
+    <Fragment>
+      <FormattedDate {...FormattedDateProps(startsAt, timezone)} />
+      , <FormattedTime {...FormattedTimeProps(startsAt, timezone)} />{' '}
+      {endsAt && (
+        <Fragment>
+          -{' '}
+          {!isSameDay && (
+            <Fragment>
+              <FormattedDate {...FormattedDateProps(endsAt, timezone)} />,{' '}
+            </Fragment>
+          )}
+          <FormattedTime {...FormattedTimeProps(endsAt, timezone)} />{' '}
+        </Fragment>
+      )}
+      {moment()
+        .tz(timezone)
+        .zoneAbbr()}
+    </Fragment>
+  );
+};
 
 Timerange.propTypes = {
   startsAt: PropTypes.string,
