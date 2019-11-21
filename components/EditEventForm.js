@@ -177,6 +177,10 @@ class EditEventForm extends React.Component {
       },
     ];
 
+    if (process.env.NEW_EVENTS === 'true') {
+      this.fields = this.fields.filter(field => field.name !== 'longDescription');
+    }
+
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
