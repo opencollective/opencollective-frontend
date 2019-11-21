@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
@@ -195,7 +195,7 @@ class Comment extends React.Component {
                 <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
               </span>
               {editable && LoggedInUser && LoggedInUser.canEditComment(comment) && (
-                <>
+                <Fragment>
                   <span>
                     {' '}
                     |{' '}
@@ -210,7 +210,7 @@ class Comment extends React.Component {
                       {intl.formatMessage(this.messages['delete'])}
                     </a>
                   </span>
-                </>
+                </Fragment>
               )}
             </div>
             <div className="description">
