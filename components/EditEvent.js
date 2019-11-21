@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Button } from 'react-bootstrap';
+
+import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../lib/graphql/mutations';
+import { Router } from '../server/pages';
+
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
 import EditEventForm from './EditEventForm';
+import CollectiveNavbar from './CollectiveNavbar';
 import CollectiveCover from './CollectiveCover';
-import { Button } from 'react-bootstrap';
-import { addEditCollectiveMutation, addDeleteCollectiveMutation } from '../lib/graphql/mutations';
-import { Router } from '../server/pages';
-import { FormattedMessage } from 'react-intl';
 
 class EditEvent extends React.Component {
   static propTypes = {
@@ -92,12 +94,11 @@ class EditEvent extends React.Component {
         <Header collective={parentCollective} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            collective={parentCollective}
-            className="small"
-            title={<FormattedMessage id="menu.edit.event" defaultMessage="edit event" />}
-            forceLegacy
-          />
+          {process.env.NEW_EVENTS === 'true' && <CollectiveNavbar collective={event} />}
+
+          {process.env.NEW_EVENTS !== 'true' && (
+            <CollectiveCover collective={parentCollective} className="small" forceLegacy />
+          )}
 
           <div className="content">
             {!canEditEvent && (
