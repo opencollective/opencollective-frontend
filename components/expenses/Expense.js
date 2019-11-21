@@ -118,7 +118,7 @@ class Expense extends React.Component {
         defaultMessage: 'Delete Expense',
       },
       'delete.modal.body': {
-        id: 'delete.modal.body',
+        id: 'deleteExpense.modal.body',
         defaultMessage: 'Are you sure you want to delete this expense?',
       },
     });
