@@ -31,7 +31,7 @@ class PublishUpdateBtn extends React.Component {
     const update = this.props.data.Update;
 
     return (
-      <div className="PublishUpdateBtn">
+      <div data-cy="PublishUpdateBtn" className="PublishUpdateBtn">
         <style jsx>
           {`
             .PublishUpdateBtn {
@@ -96,9 +96,6 @@ const addMutation = graphql(publishUpdateQuery, {
   }),
 });
 
-const addGraphQL = compose(
-  addMutation,
-  addGetUpdate,
-);
+const addGraphQL = compose(addMutation, addGetUpdate);
 
 export default addGraphQL(PublishUpdateBtn);

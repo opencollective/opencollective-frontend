@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { omit } from 'lodash';
 
-import { Wallet } from 'styled-icons/boxicons-regular/Wallet';
+import { Receipt as ReceiptIcon } from 'styled-icons/material/Receipt';
+import { Donate as DonateIcon } from 'styled-icons/fa-solid/Donate';
 import { CheckDouble } from 'styled-icons/boxicons-regular/CheckDouble';
 
 import styled, { css } from 'styled-components';
@@ -49,7 +50,7 @@ const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
 
 class HostDashboardPage extends React.Component {
   static getInitialProps({ query: { hostCollectiveSlug, view } }) {
-    return { slug: hostCollectiveSlug, ssr: false, view: view || 'finances' };
+    return { slug: hostCollectiveSlug, ssr: false, view: view || 'expenses' };
   }
 
   static propTypes = {
@@ -58,7 +59,7 @@ class HostDashboardPage extends React.Component {
     data: PropTypes.object, // from withData
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    view: PropTypes.oneOf(['finances', 'pending-applications']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'donations', 'pending-applications']).isRequired,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -93,10 +94,10 @@ class HostDashboardPage extends React.Component {
       );
     }
 
-    if (view === 'finances') {
-      return <Dashboard hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
-    } else if (view === 'pending-applications') {
+    if (view === 'pending-applications') {
       return <PendingApplications hostCollectiveSlug={host.slug} />;
+    } else {
+      return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
     }
   }
 
@@ -136,10 +137,26 @@ class HostDashboardPage extends React.Component {
               borderBottom="#E6E8EB"
               boxShadow="0px 6px 10px 1px #E6E8EB"
               height={60}
+              data-cy="host-dashboard-menu-bar"
             >
-              <MenuLink route="host.dashboard" params={{ hostCollectiveSlug: slug }} isActive={view === 'finances'}>
-                <Wallet size="1em" />
-                Finances
+              <MenuLink
+                route="host.dashboard"
+                params={{ hostCollectiveSlug: slug, view: 'expenses' }}
+                isActive={view === 'expenses'}
+              >
+                <ReceiptIcon size="1em" />
+                <FormattedMessage id="host.dashboard.tab.expenses" defaultMessage="Expenses" />
+              </MenuLink>
+              <MenuLink
+                route="host.dashboard"
+                params={{ hostCollectiveSlug: slug, view: 'donations' }}
+                isActive={view === 'donations'}
+              >
+                <DonateIcon size="1em" />
+                <FormattedMessage
+                  id="host.dashboard.tab.financialContributions"
+                  defaultMessage="Financial Contributions"
+                />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"
@@ -147,7 +164,7 @@ class HostDashboardPage extends React.Component {
                 isActive={view === 'pending-applications'}
               >
                 <CheckDouble size="1.2em" />
-                Pending applications
+                <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
               </MenuLink>
             </Container>
             <div>{this.renderView(host)}</div>

@@ -19,7 +19,7 @@
   "addFunds.error.amountMustBeGreatherThanZero": "A quantia total deve ser maior que 0",
   "addFunds.error.missingEmail": "Por favor providencie um endereço de e-mail para identificar a origem do dinheiro.",
   "addfunds.fromCollective.host": "Organizador ({host})",
-  "addfunds.fromCollective.other": "Outro (especifique)",
+  "addfunds.fromCollective.other": "Other (please specify)",
   "addfunds.FromCollectiveId.label": "fonte",
   "addfunds.hostFeePercent.label": "Comissão ao organizador",
   "addfunds.hostFees": "Comissões ao organizador ({hostFees})",

@@ -170,6 +170,12 @@ const CreateProfile = ({
                   type="email"
                   placeholder="i.e. yourname@yourhost.com"
                   value={email}
+                  onKeyDown={e => {
+                    // See https://github.com/facebook/react/issues/6368
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                    }
+                  }}
                   required
                 />
               )}
@@ -236,6 +242,12 @@ const CreateProfile = ({
                   type="email"
                   value={email}
                   placeholder="i.e. yourname@yourhost.com"
+                  onKeyDown={e => {
+                    // See https://github.com/facebook/react/issues/6368
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                    }
+                  }}
                   required
                 />
               )}

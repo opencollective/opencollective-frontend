@@ -15,9 +15,9 @@ describe('Contribution Flow: Create profile', () => {
     cy.get('[data-cy="join-conditions"] a[href="/privacypolicy"]');
 
     // Test frontend validations
-    cy.get('[data-cy="cf-content"] input[name=email]').type('Incorrect value');
+    cy.get('[data-cy="cf-content"] input[name=email]').type('IncorrectValue');
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
-    cy.contains("Please include an '@' in the email address. 'Incorrectvalue' is missing an '@'.");
+    cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
 
     // Test backend validations
     cy.get('[data-cy="cf-content"] input[name=email]').type('{selectall}Incorrect@value');
@@ -47,9 +47,9 @@ describe('Contribution Flow: Create profile', () => {
 
     // Test frontend validations
     cy.get('[data-cy="cf-content"] input[name=orgName]').type('Test Organization');
-    cy.get('[data-cy="cf-content"] input[name=email]').type('Incorrect value');
+    cy.get('[data-cy="cf-content"] input[name=email]').type('IncorrectValue');
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
-    cy.contains("Please include an '@' in the email address. 'Incorrectvalue' is missing an '@'.");
+    cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
 
     // Test backend validations
     cy.get('[data-cy="cf-content"] input[name=email]').type('{selectall}Incorrect@value');

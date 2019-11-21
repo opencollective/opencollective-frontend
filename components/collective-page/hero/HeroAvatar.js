@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
@@ -81,39 +81,61 @@ const Translations = defineMessages({
     id: 'collective.settings',
     defaultMessage: 'Settings',
   },
+  uploadImage: {
+    id: 'uploadImage.sizeRejected',
+    defaultMessage: 'Image resolution needs to be less than 3000x3000, and file size must be below 5MB.',
+  },
 });
 
-const HeroAvatar = ({ collective, isAdmin, intl }) => {
+const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [editing, setEditing] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
 
+  const onDropImage = async ([image]) => {
+    if (image) {
+      Object.assign(image, { preview: URL.createObjectURL(image) });
+      const isValid = await validateImage(image);
+      if (isValid) {
+        setUploadedImage(image);
+        setEditing(true);
+      }
+    }
+  };
+
+  const validateImage = image => {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width >= 3000 || img.height >= 3000 || image.size >= 5000000) {
+          handleHeroMessage({ content: intl.formatMessage(Translations.uploadImage), type: 'warning' });
+          resolve(false);
+        } else {
+          handleHeroMessage(null);
+          resolve(true);
+        }
+      };
+      img.src = image.preview;
+    });
+  };
+
   if (!isAdmin) {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
   } else if (!editing) {
     return (
-      <React.Fragment>
+      <Fragment>
         <Dropzone
           style={{}}
           multiple={false}
           accept="image/jpeg, image/png"
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
-          onDrop={acceptedFiles => {
-            setUploadedImage(
-              ...acceptedFiles.map(file =>
-                Object.assign(file, {
-                  preview: URL.createObjectURL(file),
-                }),
-              ),
-            );
-            setEditing(true);
-          }}
+          onDrop={onDropImage}
         >
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
-              <input {...getInputProps()} />
+              <input data-cy="heroAvatarDropzone" {...getInputProps()} />
               <EditableAvatarContainer isDragActive={isDragActive}>
                 <EditOverlay borderRadius={borderRadius}>
                   {!isDragActive && (
@@ -150,15 +172,19 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
             </StyledRoundButton>
           </Link>
         </Container>
-      </React.Fragment>
+      </Fragment>
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
       <Mutation mutation={EditAvatarMutation}>
         {editAvatar => (
-          <>
+          <Fragment>
             <EditingAvatarContainer borderRadius={borderRadius}>
-              <img src={uploadedImage ? uploadedImage.preview : collective.imageUrl} alt="" />
+              <img
+                data-cy="collective-avatar-image-preview"
+                src={uploadedImage ? uploadedImage.preview : collective.imageUrl}
+                alt=""
+              />
             </EditingAvatarContainer>
             <Container
               position="absolute"
@@ -182,6 +208,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                 <FormattedMessage id="form.cancel" defaultMessage="cancel" />
               </StyledButton>
               <StyledButton
+                data-cy="heroAvatarDropzoneSave"
                 textTransform="capitalize"
                 buttonStyle="primary"
                 ml={3}
@@ -205,13 +232,14 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                     setEditing(false);
                   } finally {
                     setSubmitting(false);
+                    handleHeroMessage(null);
                   }
                 }}
               >
                 <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Container>
-          </>
+          </Fragment>
         )}
       </Mutation>
     ) : (

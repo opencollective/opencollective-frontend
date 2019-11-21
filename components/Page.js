@@ -18,6 +18,7 @@ const Page = ({
   title,
   twitterHandle,
   showSearch,
+  menuItems,
   canonicalURL,
   withoutGlobalStyles,
   collective,
@@ -38,6 +39,7 @@ const Page = ({
         image={image}
         canonicalURL={canonicalURL}
         collective={collective}
+        menuItems={menuItems}
       />
       <Body withoutGlobalStyles={withoutGlobalStyles}>
         {typeof children === 'function' ? children(childProps) : children}
@@ -64,6 +66,7 @@ Page.propTypes = {
   title: PropTypes.string,
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
+  menuItems: PropTypes.object,
 };
 
 Page.defaultProps = {

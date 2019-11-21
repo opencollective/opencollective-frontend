@@ -352,9 +352,6 @@ const deleteUpdateMutation = graphql(deleteUpdateQuery, {
   }),
 });
 
-const addUpdateMutations = compose(
-  editUpdateMutation,
-  deleteUpdateMutation,
-);
+const addUpdateMutations = compose(editUpdateMutation, deleteUpdateMutation);
 
 export default injectIntl(addUpdateMutations(StyledUpdate));

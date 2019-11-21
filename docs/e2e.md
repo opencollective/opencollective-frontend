@@ -9,7 +9,7 @@ https://docs.opencollective.com/help/developers/testing-with-cypress
 
 ## Running the E2E tests in development environment
 
-In dev environment, to execute the E2E tests, you will need to open 4 different terminals in 2 different projects.
+In dev environment, to execute the E2E tests, you will need to open 3 different terminals in 2 different projects.
 
 ### 1. API: Server
 
@@ -26,29 +26,29 @@ We also recommend to restore the development dump of the database before you sta
 
 Then start the API:
 
-- `TZ=UTC NODE_ENV=e2e E2E_TEST=1 MAILDEV=1 npm run start`
+- `TZ=UTC NODE_ENV=e2e E2E_TEST=1 npm run start`
 
-### 2. API: Maildev
+### 2. Frontend: Server
 
-Some tests are relying on Maildev to check that emails are properly sent.
+If it's not already setup, look at the "Install" instructions in the [README](README.md).
 
-From the the API repository, start Maildev with:
+Make sure the Frontend is talking to the local API:
 
-- `npm run maildev`
-
-### 3. Frontend: Server
+- copy [`.env.local`](.env.local) to `.env`.
 
 We recommend to run a production build of the Frontend. It will be faster and more reliable.
 
-- clone and install [opencollective-frontend](https://github.com/opencollective/opencollective-frontend)
 - `NODE_ENV=e2e npm run build`
+
+Start from the build:
+
 - `TZ=UTC NODE_ENV=e2e npm run start`
 
 When investigating a specific test, feel free to switch to the development environment:
 
 - `TZ=UTC npm run dev`
 
-### 4. Frontend: Cypress
+### 3. Frontend: Cypress
 
 You can run all the Cypress tests in CLI mode with the following command:
 

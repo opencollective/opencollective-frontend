@@ -18,6 +18,8 @@ class Header extends React.Component {
     className: PropTypes.string,
     title: PropTypes.string,
     showSearch: PropTypes.bool,
+    menuItems: PropTypes.object,
+    metas: PropTypes.object,
   };
 
   getTitle() {
@@ -64,7 +66,12 @@ class Header extends React.Component {
       'twitter:description': truncate(description, 256),
       'twitter:image': image || defaultImage,
       'og:title': metaTitle,
+      ...this.props.metas,
     };
+
+    if (collective && collective.isIncognito) {
+      metas.robots = 'none';
+    }
 
     return Object.keys(metas).map(key => ({ key, value: metas[key] }));
   }
@@ -87,7 +94,7 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        <TopBar className={className} showSearch={this.props.showSearch} />
+        <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
       </header>
     );
   }

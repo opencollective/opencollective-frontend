@@ -24,7 +24,7 @@ describe('Contribution Flow: Order success', () => {
     const publicMessage = "Wow such an amazing project 💙 Let's take it to the moon!!! 🚀";
 
     // Public message popup
-    cy.contains('[data-cy=public-message-popup]', 'Leave a public message (Optional)');
+    cy.contains('[data-cy=EditPublicMessagePopup]', 'Leave a public message (Optional)');
 
     // Limited to 140 characters
     cy.get('textarea[name=publicMessage]').type('.'.repeat(142), { delay: 1 });
@@ -36,11 +36,9 @@ describe('Contribution Flow: Order success', () => {
     cy.contains('button', 'Submit').click();
 
     // Card should be updated with the message, can be edited on click
-    cy.get('[data-cy=public-message-popup]').should('not.exist');
-    cy.get('.collective-card')
-      .contains(`“${publicMessage}”`)
-      .click();
-    cy.contains('[data-cy=public-message-popup]', 'Leave a public message (Optional)');
+    cy.get('[data-cy=EditPublicMessagePopup]').should('not.exist');
+    cy.contains(`“${publicMessage}”`).click();
+    cy.contains('[data-cy=EditPublicMessagePopup]', 'Leave a public message (Optional)');
     cy.get('textarea[name=publicMessage]').should('have.value', publicMessage);
   });
 });

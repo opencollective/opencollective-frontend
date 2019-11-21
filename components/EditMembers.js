@@ -1,59 +1,82 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get } from 'lodash';
+import { get, update } from 'lodash';
+import styled from 'styled-components';
+import { Flex, Box } from '@rebass/grid';
+import memoizeOne from 'memoize-one';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+
+import { CollectiveType } from '../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../lib/utils';
 import InputField from './InputField';
+import CollectivePickerAsync from './CollectivePickerAsync';
+import StyledButton from './StyledButton';
+import StyledTooltip from './StyledTooltip';
+import Container from './Container';
+import { H3, P } from './Text';
+import MessageBox from './MessageBox';
+import Link from './Link';
+import Loading from './Loading';
+import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
+
+/**
+ * This pages sets some global styles that are causing troubles in new components. This
+ * wrapper resets the global styles for children.
+ */
+const ResetGlobalStyles = styled.div`
+  input {
+    width: 100%;
+  }
+`;
+
+const BORDER = '1px solid #efefef';
+
+const EMPTY_MEMBERS = [{}];
 
 class EditMembers extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    members: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onChange: PropTypes.func.isRequired,
+    LoggedInUser: PropTypes.object.isRequired,
+    /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
-    defaultType: PropTypes.string,
-    title: PropTypes.string,
+    /** @ignore from Apollo */
+    mutate: PropTypes.func.isRequired,
+    /** @ignore from Apollo */
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      data: PropTypes.object,
+    }),
   };
 
   constructor(props) {
     super(props);
     const { intl } = props;
-
-    this.state = { members: [...props.members] || [{}] };
-    this.renderMember = this.renderMember.bind(this);
-    this.addMember = this.addMember.bind(this);
-    this.removeMember = this.removeMember.bind(this);
-    this.editMember = this.editMember.bind(this);
-    this.onChange = props.onChange.bind(this);
-
-    this.defaultType = this.props.defaultType || 'TICKET';
-
+    this.state = {
+      members: this.getMembersFromProps(props),
+      isTouched: false,
+      isSubmitting: false,
+      isSubmitted: false,
+    };
     this.messages = defineMessages({
-      'members.role.label': {
-        id: 'members.role.label',
-        defaultMessage: 'role',
-      },
-      'members.add': {
-        id: 'members.add',
-        defaultMessage: 'add Core Contributor',
-      },
-      'members.remove': {
-        id: 'members.remove',
-        defaultMessage: 'remove Core Contributor',
-      },
+      roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
+      addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
+      removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
       ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
-      'user.name.label': { id: 'user.name.label', defaultMessage: 'name' },
-      'user.description.label': {
-        id: 'user.description.label',
-        defaultMessage: 'description',
+      descriptionLabel: { id: 'user.description.label', defaultMessage: 'description' },
+      sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
+      cantRemoveYourself: {
+        id: 'members.remove.cantRemoveYourself',
+        defaultMessage:
+          'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
       },
-      'user.email.label': { id: 'user.email.label', defaultMessage: 'email' },
-      'user.since.label': { id: 'user.since.label', defaultMessage: 'since' },
-      'members.remove.confirm': {
+      removeConfirm: {
         id: 'members.remove.confirm',
-        defaultMessage: `Do you really want to remove {name} ({email}) from the core contributors of the collective?`,
+        defaultMessage: `Do you really want to remove {name} @{slug} {hasEmail, select, 1 {({email})} other {}} from the core contributors of the collective?`,
       },
     });
 
@@ -70,112 +93,149 @@ class EditMembers extends React.Component {
         name: 'role',
         type: 'select',
         options: getOptions(['ADMIN', 'MEMBER']),
-        defaultValue: this.defaultType,
-        label: intl.formatMessage(this.messages['members.role.label']),
-      },
-      {
-        name: 'member.name',
-        maxLength: 255,
-        disabled: member => member.id > 0,
-        label: intl.formatMessage(this.messages['user.name.label']),
-      },
-      {
-        name: 'member.email',
-        type: 'email',
-        disabled: member => member.id > 0,
-        label: intl.formatMessage(this.messages['user.email.label']),
+        defaultValue: 'ADMIN',
+        label: intl.formatMessage(this.messages.roleLabel),
       },
       {
         name: 'description',
         maxLength: 255,
-        label: intl.formatMessage(this.messages['user.description.label']),
+        label: intl.formatMessage(this.messages.descriptionLabel),
       },
       {
         name: 'since',
         type: 'date',
         defaultValue: new Date(),
-        label: intl.formatMessage(this.messages['user.since.label']),
+        label: intl.formatMessage(this.messages.sinceLabel),
       },
     ];
   }
 
-  editMember(index, fieldname, value) {
-    const members = this.state.members;
-    members[index] = {
-      ...members[index],
-      role: members[index].role || 'ADMIN',
-    };
-    const obj = {};
-    if (fieldname.indexOf('.') !== -1) {
-      const tokens = fieldname.split('.');
-      const parent = tokens[0];
-      fieldname = tokens[1];
-      obj[parent] = {};
-      obj[parent][fieldname] = value;
-      members[index][parent] = {
-        ...members[index][parent],
-        [fieldname]: value,
-      };
-    } else {
-      members[index][fieldname] = value;
-    }
-
-    this.updateMembers(members);
-  }
-
-  addMember(member) {
-    const members = this.state.members;
-    members.push(member || {});
-    this.updateMembers(members);
-  }
-
-  removeMember(index, event) {
-    event.preventDefault();
-
-    const members = this.state.members;
-
-    // Invalid Index
-    if (index < 0 || index > members.length - 1) {
-      return;
-    }
-
-    const memberEntry = members[index];
-    const result = this.confirmRemoveMember(memberEntry);
-    if (result === true) {
-      members.splice(index, 1);
-      this.updateMembers(members);
+  componentDidUpdate(oldProps) {
+    const members = this.getMembersFromProps(this.props);
+    if (members !== this.getMembersFromProps(oldProps)) {
+      this.setState({ members });
     }
   }
 
-  confirmRemoveMember(memberEntry) {
-    if (!memberEntry.member) {
-      return true;
-    }
+  getMembersFromProps(props) {
+    return get(props.data, 'Collective.members', EMPTY_MEMBERS);
+  }
 
-    const confirmMessage = this.props.intl.formatMessage(this.messages['members.remove.confirm'], {
-      name: memberEntry.member.name,
-      email: memberEntry.member.email,
+  getMembersCollectiveIds = memoizeOne(members => {
+    return members.map(member => member.member && member.member.id);
+  });
+
+  editMember = (index, fieldname, value) => {
+    this.setState(state => ({
+      ...state,
+      isTouched: true,
+      members: update([...state.members], index, member => ({ ...member, [fieldname]: value })),
+    }));
+  };
+
+  addMember = () => {
+    this.setState(state => ({
+      ...state,
+      isTouched: true,
+      members: [...state.members, { role: 'ADMIN' }],
+    }));
+  };
+
+  removeMember = index => {
+    return this.setState(state => {
+      const memberEntry = state.members[index];
+      if (memberEntry.member && !this.confirmRemoveMember(memberEntry)) {
+        return state;
+      } else {
+        const members = [...state.members];
+        members.splice(index, 1);
+        return { ...state, isTouched: true, members };
+      }
     });
+  };
 
-    return window.confirm(confirmMessage);
+  confirmRemoveMember = memberEntry => {
+    return window.confirm(
+      this.props.intl.formatMessage(this.messages.removeConfirm, {
+        ...memberEntry.member,
+        hasEmail: Number(memberEntry.member.email),
+      }),
+    );
+  };
+
+  handleSubmit = async () => {
+    if (!this.validate) {
+      return false;
+    }
+
+    try {
+      this.setState({ isSubmitting: true, error: null });
+      await this.props.mutate({
+        variables: {
+          collectiveId: this.props.collective.id,
+          members: this.state.members.map(member => ({
+            id: member.id,
+            role: member.role,
+            description: member.description,
+            since: member.since,
+            member: {
+              id: member.member.id,
+              name: member.member.name,
+              email: member.member.email,
+            },
+          })),
+        },
+      });
+      this.setState({ isSubmitting: false, isSubmitted: true, isTouched: false });
+    } catch (e) {
+      this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
+    }
+  };
+
+  validate() {
+    // Ensure all members have a collective associated
+    return !this.state.members.some(m => !m.member);
   }
 
-  updateMembers(members) {
-    this.setState({ members });
-    // Make sure no empty members are sent to the parent
-    this.onChange({ members: members.filter(memberEntry => (memberEntry.member ? true : false)) });
-  }
-
-  renderMember(member, index) {
-    const { intl } = this.props;
+  renderMember = (member, index) => {
+    const { intl, LoggedInUser } = this.props;
+    const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
+    const memberCollective = member.member;
+    const isSelf = memberCollective && memberCollective.id === LoggedInUser.CollectiveId;
 
     return (
-      <div className="member" key={`member-${index}-${member.id}`}>
-        <div className="memberActions">
-          <a className="removeMember" href="#" onClick={event => this.removeMember(index, event)}>
-            {intl.formatMessage(this.messages['members.remove'])}
-          </a>
-        </div>
+      <Container key={`member-${index}-${member.id}`} mt={4} pb={4} borderBottom={BORDER}>
+        <ResetGlobalStyles>
+          <Flex mt={2} flexWrap="wrap">
+            <div className="col-sm-2" />
+            <Flex flex="1" justifyContent="space-between" flexWrap="wrap">
+              <Box ml={1}>
+                <CollectivePickerAsync
+                  creatable
+                  width="100%"
+                  minWidth={325}
+                  maxWidth={450}
+                  onChange={option => this.editMember(index, 'member', option.value)}
+                  getOptions={memberCollective && (buildOption => buildOption(memberCollective))}
+                  isDisabled={Boolean(memberCollective)}
+                  types={[CollectiveType.USER]}
+                  filterResults={collectives => collectives.filter(c => !membersCollectiveIds.includes(c.id))}
+                />
+              </Box>
+              {isSelf ? (
+                <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
+                  <StyledButton mb={2} disabled>
+                    {intl.formatMessage(this.messages.removeMember)}
+                  </StyledButton>
+                </StyledTooltip>
+              ) : (
+                <StyledButton onClick={() => this.removeMember(index)} mb={2} disabled={isSelf}>
+                  {intl.formatMessage(this.messages.removeMember)}
+                </StyledButton>
+              )}
+            </Flex>
+          </Flex>
+        </ResetGlobalStyles>
         <Form horizontal>
           {this.fields.map(
             field =>
@@ -196,57 +256,136 @@ class EditMembers extends React.Component {
               ),
           )}
         </Form>
-      </div>
+      </Container>
+    );
+  };
+
+  renderForm() {
+    const { intl, collective } = this.props;
+    const { members, error, isSubmitting, isSubmitted, isTouched } = this.state;
+    const isValid = this.validate();
+
+    return (
+      <WarnIfUnsavedChanges hasUnsavedChanges={isTouched}>
+        <div className="EditMembers">
+          <div className="members">
+            <H3>
+              <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Core Contributors" />
+            </H3>
+            {collective.type === 'COLLECTIVE' && (
+              <P>
+                <FormattedMessage
+                  id="members.edit.description"
+                  defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
+                />
+              </P>
+            )}
+            <hr />
+            {members.map(this.renderMember)}
+          </div>
+          <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
+            <StyledButton onClick={() => this.addMember()}>
+              + {intl.formatMessage(this.messages.addMember)}
+            </StyledButton>
+          </Container>
+          {error && (
+            <MessageBox type="error" withIcon my={3}>
+              {error.message}
+            </MessageBox>
+          )}
+          <Flex justifyContent="center" flexWrap="wrap" mt={5}>
+            <Link route="collective" params={{ slug: collective.slug }}>
+              <StyledButton mx={2} minWidth={200}>
+                <FormattedMessage id="ViewCollectivePage" defaultMessage="View Collective page" />
+              </StyledButton>
+            </Link>
+            <StyledButton
+              buttonStyle="primary"
+              onClick={this.handleSubmit}
+              loading={isSubmitting}
+              disabled={(isSubmitted && !isTouched) || !isValid}
+              mx={2}
+              minWidth={200}
+            >
+              {isSubmitted && !isTouched ? (
+                <FormattedMessage id="saved" defaultMessage="Saved" />
+              ) : (
+                <FormattedMessage id="save" defaultMessage="Save" />
+              )}
+            </StyledButton>
+          </Flex>
+        </div>
+      </WarnIfUnsavedChanges>
     );
   }
 
   render() {
-    const { intl, collective } = this.props;
+    const { data } = this.props;
 
-    return (
-      <div className="EditMembers">
-        <style jsx>
-          {`
-            :global(.memberActions) {
-              text-align: right;
-              font-size: 1.3rem;
-            }
-            :global(.field) {
-              margin: 1rem;
-            }
-            .editMembersActions {
-              text-align: right;
-              margin-top: -1rem;
-            }
-            p {
-              font-size: 1.3rem;
-            }
-            :global(.member) {
-              margin: 3rem 0;
-            }
-          `}
-        </style>
-
-        <div className="members">
-          <h2>{this.props.title}</h2>
-          {collective.type === 'COLLECTIVE' && (
-            <p>
-              <FormattedMessage
-                id="members.edit.description"
-                defaultMessage="Note: Only Collective Admins can edit this Collective and approve or reject expenses."
-              />
-            </p>
-          )}
-          {this.state.members.map(this.renderMember)}
-        </div>
-        <div className="editMembersActions">
-          <Button bsStyle="primary" onClick={() => this.addMember({})}>
-            {intl.formatMessage(this.messages['members.add'])}
-          </Button>
-        </div>
-      </div>
-    );
+    if (data.loading) {
+      return <Loading />;
+    } else if (data.error) {
+      return (
+        <MessageBox type="error" withIcon>
+          {getErrorFromGraphqlException(data.error).message}
+        </MessageBox>
+      );
+    } else {
+      return this.renderForm();
+    }
   }
 }
 
-export default injectIntl(EditMembers);
+const MemberFieldsFragment = gql`
+  fragment MemberFieldsFragment on Member {
+    id
+    role
+    since
+    createdAt
+    description
+    member {
+      id
+      name
+      slug
+      type
+      imageUrl(height: 64)
+      ... on User {
+        email
+      }
+    }
+  }
+`;
+
+const addGetCoreContributorsQuery = graphql(
+  gql`
+    query CollectiveCoreContributors($collectiveId: Int!) {
+      Collective(id: $collectiveId) {
+        id
+        members(roles: ["ADMIN", "MEMBER"]) {
+          ...MemberFieldsFragment
+        }
+      }
+    }
+    ${MemberFieldsFragment}
+  `,
+  {
+    options: props => ({
+      fetchPolicy: 'network-only',
+      variables: { collectiveId: props.collective.id },
+    }),
+  },
+);
+
+const addEditCoreContributorsMutation = graphql(gql`
+  mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
+    editCoreContributors(collectiveId: $collectiveId, members: $members) {
+      id
+      members(roles: ["ADMIN", "MEMBER"]) {
+        ...MemberFieldsFragment
+      }
+    }
+  }
+  ${MemberFieldsFragment}
+`);
+
+export default injectIntl(addEditCoreContributorsMutation(addGetCoreContributorsQuery(EditMembers)));

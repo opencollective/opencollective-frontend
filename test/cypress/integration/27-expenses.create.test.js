@@ -76,7 +76,7 @@ describe('new expense when logged in', () => {
     cy.screenshot('expenseApproved');
     cy.get('.Expenses .expense:first .toggleEditExpense').click();
     cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
-    cy.get('.Expenses .expense:first .inputField.amount input').type('13');
+    cy.get('.Expenses .expense:first .inputField.amount input').type('{selectall}13');
     cy.get('.Expenses .expense:first .inputField.category select').select('Team');
     cy.get('.Expenses .expense:first .inputField.privateMessage textarea').type(
       '{selectall}Another private note (edited)',
@@ -113,7 +113,9 @@ describe('comment expense', () => {
     cy.wait(300);
     cy.get('.Comments .itemsList .comment', { timeout: 5000 }).should('have.length', 1);
     cy.get('.Comments .itemsList .comment:first .description').contains('This is a first comment');
-    cy.getByDataCy('submit-expense-btn').click();
+    cy.getByDataCy('submit-expense-btn')
+      .first()
+      .click();
     cy.get('.descriptionField input').should('have.value', '');
     cy.get('.amountField input').should('have.value', '');
   });

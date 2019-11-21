@@ -197,6 +197,7 @@ class CreateCollective extends React.Component {
           description={description}
           className={this.state.status}
           LoggedInUser={LoggedInUser}
+          menuItems={{ pricing: true, howItWorks: true }}
         />
 
         <Body>

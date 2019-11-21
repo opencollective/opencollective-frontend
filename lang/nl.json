@@ -19,7 +19,7 @@
   "addFunds.error.amountMustBeGreatherThanZero": "Totaalbedrag moet groter zijn dan 0",
   "addFunds.error.missingEmail": "Gelieve een email address in te geven om de oorsprong van het geld te identificeren.",
   "addfunds.fromCollective.host": "Beheerder ({host})",
-  "addfunds.fromCollective.other": "Anders (gelieve te specificeren)",
+  "addfunds.fromCollective.other": "Other (please specify)",
   "addfunds.FromCollectiveId.label": "oorsprong",
   "addfunds.hostFeePercent.label": "Beheerderskosten",
   "addfunds.hostFees": "Beheerderskosten ({hostFees})",

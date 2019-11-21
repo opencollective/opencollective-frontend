@@ -7,7 +7,7 @@ import Body from './Body';
 import Footer from './Footer';
 import SignInOrJoinFree from './SignInOrJoinFree';
 import EditCollectiveForm from './EditCollectiveForm';
-import CollectiveCover from './CollectiveCover';
+import CollectiveNavbar from './CollectiveNavbar';
 import NotificationBar from './NotificationBar';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import Loading from './Loading';
@@ -103,7 +103,6 @@ class EditCollective extends React.Component {
 
     if (!collective || !collective.slug) return <div />;
 
-    const title = `Edit ${collective.name} ${collective.type.toLowerCase()}`;
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};
     if (collective.isArchived && collective.type === 'USER') {
@@ -150,7 +149,7 @@ class EditCollective extends React.Component {
               description={notification.description}
             />
           )}
-          <CollectiveCover href={`/${collective.slug}`} collective={collective} title={title} className="small" />
+          <CollectiveNavbar collective={collective} isAdmin={canEditCollective} />
           <div className="content">
             {!canEditCollective && (
               <div className="login">

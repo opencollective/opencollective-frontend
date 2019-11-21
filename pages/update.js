@@ -4,13 +4,14 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import ErrorPage from '../components/ErrorPage';
 import UpdateWithData from '../components/UpdateWithData';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
+import { Sections } from '../components/collective-page/_constants';
 
 class UpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, updateSlug } }) {
@@ -38,11 +39,10 @@ class UpdatePage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
+          <CollectiveNavbar
             collective={collective}
-            key={collective.slug}
-            href={`/${collective.slug}`}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
+            isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+            selected={Sections.UPDATES}
           />
 
           <div className="content">

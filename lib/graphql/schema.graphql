@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Oct 22 2019 22:27:00 GMT+0100 (West Africa Standard Time)
+# timestamp: Wed Oct 30 2019 20:48:06 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -249,11 +249,17 @@ type Collective implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
+  """
+  virtualCardsBatches: [PaymentMethodBatchInfo]
+
+  """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
   """
   createdVirtualCards(
     limit: Int
     offset: Int
+    batch: String
 
     """
     Wether the virtual card has been claimed or not
@@ -511,9 +517,15 @@ interface CollectiveInterface {
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
+
+  """
+  List all the gift cards batches emitted by this collective. May include `null` as key for unbatched gift cards.
+  """
+  virtualCardsBatches: [PaymentMethodBatchInfo]
   createdVirtualCards(
     limit: Int
     offset: Int
+    batch: String
 
     """
     Wether the virtual card has been claimed or not
@@ -821,6 +833,11 @@ type Contributor {
   collectiveSlug: String
 
   """
+  Null for incognito collectives otherwise collective id
+  """
+  collectiveId: Int
+
+  """
   Contributor avatar or logo
   """
   image(height: Int, format: ImageFormat): String
@@ -1095,11 +1112,17 @@ type Event implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
+  """
+  virtualCardsBatches: [PaymentMethodBatchInfo]
+
+  """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
   """
   createdVirtualCards(
     limit: Int
     offset: Int
+    batch: String
 
     """
     Wether the virtual card has been claimed or not
@@ -1183,7 +1206,7 @@ input ExpenseInputType {
   type: String
 
   """
-  Can be paypal, donation, manual, other
+  Can be: paypal, other. Also deprecated: donation, manual
   """
   payoutMethod: String
   privateMessage: String
@@ -1573,6 +1596,12 @@ type Mutation {
   A mutation to edit membership. Dedicated to the user, not the collective admin.
   """
   editMembership(id: Int!, publicMessage: String): Member
+    @deprecated(reason: "2019-10-12: Please use editPublicMessage")
+
+  """
+  A mutation to edit the public message of all matching members.
+  """
+  editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
   createOrder(order: OrderInputType!): OrderType
   confirmOrder(order: ConfirmOrderInputType!): OrderType
   addFundsToCollective(order: OrderInputType!): OrderType
@@ -1660,6 +1689,11 @@ type Mutation {
     The amount as an Integer with cents.
     """
     amount: Int
+
+    """
+    Batch name for the created gift cards.
+    """
+    batch: String
     monthlyLimitPerMember: Int
 
     """
@@ -2237,11 +2271,17 @@ type Organization implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
+  """
+  virtualCardsBatches: [PaymentMethodBatchInfo]
+
+  """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
   """
   createdVirtualCards(
     limit: Int
     offset: Int
+    batch: String
 
     """
     Wether the virtual card has been claimed or not
@@ -2294,6 +2334,21 @@ enum PaymenMethodOrderField {
 }
 
 """
+Provides rich information about a payment methods batch
+"""
+type PaymentMethodBatchInfo {
+  id: String!
+  collectiveId: Int!
+  count: Int!
+  type: String!
+
+  """
+  The batch name, or null for unbatched payment methods
+  """
+  name: String
+}
+
+"""
 Input for virtual card (meta)data
 """
 input PaymentMethodDataVirtualCardInputType {
@@ -2339,6 +2394,11 @@ type PaymentMethodType {
   isConfirmed: Boolean
   expiryDate: DateString
   service: String
+
+  """
+  To group multiple payment methods. Used for Gift Cards
+  """
+  batch: String
   SourcePaymentMethodId: Int
   type: String
   data: JSON
@@ -2550,6 +2610,12 @@ type Query {
     Fetch all collectives that are a child of `ParentCollectiveId`. Used for "SuperCollectives"
     """
     ParentCollectiveId: Int
+
+    """
+    Fetch all collectives with slug within slugs
+    """
+    slugs: [String]
+
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
     limit: Int = 10
@@ -3229,11 +3295,17 @@ type User implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
+  """
+  virtualCardsBatches: [PaymentMethodBatchInfo]
+
+  """
   Get the virtual cards created by this collective. RemoteUser must be a collective admin.
   """
   createdVirtualCards(
     limit: Int
     offset: Int
+    batch: String
 
     """
     Wether the virtual card has been claimed or not

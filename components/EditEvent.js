@@ -78,6 +78,7 @@ class EditEvent extends React.Component {
             collective={parentCollective}
             className="small"
             title={<FormattedMessage id="menu.edit.event" defaultMessage="edit event" />}
+            forceLegacy
           />
 
           <div className="content">

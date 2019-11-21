@@ -165,7 +165,7 @@ class SectionContribute extends React.PureComponent {
                   ))}
                   {isAdmin && (
                     <Box px={CONTRIBUTE_CARD_PADDING_X}>
-                      <CreateNew route={`/${collective.slug}/edit/tiers`}>
+                      <CreateNew data-cy="create-contribute-tier" route={`/${collective.slug}/edit/tiers`}>
                         <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
                       </CreateNew>
                     </Box>

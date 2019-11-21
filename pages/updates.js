@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import ErrorPage from '../components/ErrorPage';
 import UpdatesWithData from '../components/UpdatesWithData';
 
@@ -37,12 +37,10 @@ class UpdatesPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
+          <CollectiveNavbar
             collective={collective}
-            href={`/${collective.slug}`}
-            key={collective.slug}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
-            selectedSection={Sections.UPDATES}
+            isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+            selected={Sections.UPDATES}
           />
 
           <div className="content">

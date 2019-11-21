@@ -5,7 +5,11 @@ import Head from 'next/head';
 import MembershipsWithData from '../components/MembershipsWithData';
 
 class CollectivesIframe extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id, role, orderBy, limit } }) {
+  static getInitialProps({ query: { collectiveSlug, id, role, orderBy, limit }, res }) {
+    // Allow to be embeded as Iframe everywhere
+    if (res) {
+      res.removeHeader('X-Frame-Options');
+    }
     return { collectiveSlug, id, role, orderBy, limit: Number(limit) };
   }
 

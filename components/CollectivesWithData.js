@@ -14,6 +14,7 @@ class CollectivesWithData extends React.Component {
     HostCollectiveId: PropTypes.number, // only fetch collectives that are hosted by this collective id
     hostCollectiveSlug: PropTypes.string, // only fetch collectives that are hosted by this collective slug
     memberOfCollectiveSlug: PropTypes.string, // only fetch collectives that are a member of this collective slug
+    slugs: PropTypes.arrayOf(PropTypes.string), // manual render of collective by slug
     role: PropTypes.string, // filter collectives that have this given role (use only with memberOfCollectiveSlug)
     type: PropTypes.string, // COLLECTIVE, EVENT, ORGANIZATION or USER
     ParentCollectiveId: PropTypes.number, // only fetch collectives that are under this collective id
@@ -135,6 +136,7 @@ const getCollectivesQuery = gql`
     $offset: Int
     $orderBy: CollectiveOrderField
     $orderDirection: OrderDirection
+    $slugs: [String]
   ) {
     allCollectives(
       HostCollectiveId: $HostCollectiveId
@@ -148,6 +150,7 @@ const getCollectivesQuery = gql`
       offset: $offset
       orderBy: $orderBy
       orderDirection: $orderDirection
+      slugs: $slugs
     ) {
       total
       collectives {
@@ -182,6 +185,7 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
         HostCollectiveId: props.HostCollectiveId,
         hostCollectiveSlug: props.hostCollectiveSlug,
         memberOfCollectiveSlug: props.memberOfCollectiveSlug,
+        slugs: props.slugs,
         role: props.role,
         type: props.type,
         orderBy: props.orderBy,

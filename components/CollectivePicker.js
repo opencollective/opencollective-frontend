@@ -191,7 +191,7 @@ class CollectivePicker extends React.PureComponent {
           defaultValue={getDefaultOptions(this.buildCollectiveOption, allOptions)}
           value={getOptions(this.buildCollectiveOption)}
           menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
-          isDisabled={createFormCollectiveType || isDisabled}
+          isDisabled={Boolean(createFormCollectiveType) || isDisabled}
           onMenuOpen={this.openMenu}
           onMenuClose={this.closeMenu}
           formatOptionLabel={(option, context) => {
@@ -254,7 +254,7 @@ CollectivePicker.propTypes = {
   /** Force menu to be open. Ignored during collective creation */
   menuIsOpen: PropTypes.bool,
   /** Disabled */
-  isDisabled: PropTypes.isDisabled,
+  isDisabled: PropTypes.bool,
   /** Component min width */
   minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Component max width */

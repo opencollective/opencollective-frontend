@@ -228,6 +228,7 @@ const getItemInfo = (item, isInverted) => {
         paymentMethod: item.transaction && item.transaction.paymentMethod,
         transaction: item.transaction,
         isExpense: true,
+        route: `/${item.collective.slug}/expenses/${item.id}`,
       };
     case 'Expense':
       return {
@@ -294,7 +295,7 @@ const getAmountDetailsStr = (amount, currency, transaction) => {
 const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   const { description, createdAt, currency } = item;
-  const { isCredit, amount, paymentMethod, transaction, isExpense, collective } = getItemInfo(item, isInverted);
+  const { isCredit, amount, paymentMethod, transaction, isExpense, collective, route } = getItemInfo(item, isInverted);
   const ItemContainer = isCredit ? CreditItem : DebitItem;
   const hasRefund = Boolean(transaction && transaction.refundTransaction);
   const hasAccessToInvoice = canDownloadInvoice && transaction && transaction.uuid;
@@ -330,11 +331,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
             mt={[2, 0]}
           >
             <Flex data-cy="transaction-description" alignItems="center" flexWrap="wrap">
-              {isExpense ? (
-                <Link route={`/${collective.slug}/expenses/${item.id}`}>{formattedDescription}</Link>
-              ) : (
-                formattedDescription
-              )}
+              {route ? <Link route={route}>{formattedDescription}</Link> : formattedDescription}
               {isExpense && (
                 <StyledTag type={getExpenseStatusMsgType(item.status)} ml={3} py="6px">
                   {item.status}

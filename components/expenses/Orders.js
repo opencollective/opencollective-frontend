@@ -93,6 +93,7 @@ class Orders extends React.Component {
               width: 100%;
               max-width: 400px;
               margin: 0 auto;
+              margin-bottom: 20px;
             }
             :global(.filterBtnGroup) {
               width: 100%;

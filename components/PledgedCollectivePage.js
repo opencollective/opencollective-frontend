@@ -37,6 +37,7 @@ const CollectivePledgesQuery = gql`
           imageUrl(height: 128)
           slug
           type
+          isIncognito
         }
       }
     }

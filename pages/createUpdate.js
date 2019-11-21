@@ -14,7 +14,6 @@ import { Router } from '../server/pages';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
 import ErrorPage from '../components/ErrorPage';
 import EditUpdateForm from '../components/EditUpdateForm';
 import Button from '../components/Button';
@@ -23,6 +22,7 @@ import MessageBox from '../components/MessageBox';
 import Link from '../components/Link';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
@@ -90,7 +90,7 @@ class CreateUpdatePage extends React.Component {
     }
 
     const collective = data.Collective;
-    const canCreateUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     return (
       <div className="CreateUpdatePage">
@@ -104,12 +104,7 @@ class CreateUpdatePage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            context="createUpdate"
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            key={collective.slug}
-          />
+          <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
           <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
             <BackButtonWrapper>
               <Link href={`/${collective.slug}/updates`}>
@@ -122,7 +117,7 @@ class CreateUpdatePage extends React.Component {
               </Link>
             </BackButtonWrapper>
             <Container width={1}>
-              {!canCreateUpdate && (
+              {!isAdmin && (
                 <div className="login">
                   <p>
                     <FormattedMessage
@@ -137,14 +132,14 @@ class CreateUpdatePage extends React.Component {
                   </p>
                 </div>
               )}
-              {canCreateUpdate && (
+              {isAdmin && (
                 <Container my={3}>
                   <H1 textAlign="left" fontSize="34px">
                     <FormattedMessage id="updates.new.title" defaultMessage="New update" />
                   </H1>
                 </Container>
               )}
-              {canCreateUpdate && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
+              {isAdmin && <EditUpdateForm collective={collective} onSubmit={this.createUpdate} />}
               {this.state.status === 'error' && (
                 <MessageBox type="error" withIcon>
                   <FormattedMessage
@@ -201,9 +196,6 @@ const addMutation = graphql(createUpdateQuery, {
   }),
 });
 
-const addGraphQL = compose(
-  addCollectiveCoverData,
-  addMutation,
-);
+const addGraphQL = compose(addCollectiveCoverData, addMutation);
 
 export default withUser(addGraphQL(CreateUpdatePage));

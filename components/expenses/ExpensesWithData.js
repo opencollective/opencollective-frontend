@@ -55,6 +55,7 @@ class ExpensesWithData extends React.Component {
           loading={data.loading}
           status={this.getStatus()}
           filters={this.props.hasFilters}
+          refetch={data.refetch}
           LoggedInUser={LoggedInUser}
           includeHostedCollectives={includeHostedCollectives}
         />
@@ -90,6 +91,7 @@ const getExpensesQuery = gql`
       incurredAt
       category
       amount
+      type
       currency
       payoutMethod
       privateMessage
@@ -125,6 +127,8 @@ const getExpensesQuery = gql`
   }
 `;
 
+const EXPENSES_PER_PAGE = 10;
+
 const getExpensesVariables = props => {
   const filters = { ...props.filters };
   if (filters.status === 'READY') {
@@ -146,7 +150,6 @@ const getExpensesVariables = props => {
   return vars;
 };
 
-const EXPENSES_PER_PAGE = 10;
 export const addExpensesData = graphql(getExpensesQuery, {
   options(props) {
     return {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
@@ -58,12 +58,12 @@ const CollectiveCallsToAction = ({
         </Box>
       )}
       {addFunds && (
-        <>
+        <Fragment>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} onClick={() => showAddFundsModal(true)}>
             <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
           </StyledButton>
           <AddFundsModal collective={collective} show={hasAddFundsModal} setShow={showAddFundsModal} />
-        </>
+        </Fragment>
       )}
     </Container>
   );

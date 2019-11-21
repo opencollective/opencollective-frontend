@@ -3,8 +3,8 @@ const routes = require('next-routes');
 const pages = routes()
   .add('home', '/', 'index')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
-  .add('redeem', '/redeem/:code?')
-  .add('redeemed', '/redeemed/:code?')
+  .add('redeem', '/:collectiveSlug?/redeem/:code?')
+  .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
   .add('signinLinkSent', '/signin/sent')
   .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
@@ -28,9 +28,12 @@ const pages = routes()
   .add('events', '/:collectiveSlug/events')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/contact')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
-  .add('tiers-iframe', '/:collectiveSlug/tiers/iframe')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
-  .add('host.dashboard', '/:hostCollectiveSlug/dashboard/:view(pending-applications)?', 'host.dashboard')
+  .add(
+    'host.dashboard',
+    '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|donations)?',
+    'host.dashboard',
+  )
   .add(
     'host.expenses.approve',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)',

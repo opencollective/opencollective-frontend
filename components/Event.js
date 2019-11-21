@@ -237,6 +237,7 @@ class Event extends React.Component {
                 title={event.name}
                 LoggedInUser={LoggedInUser}
                 cta={canOrderTickets ? { label: 'tickets', href: '#tickets' } : null}
+                forceLegacy
               />
 
               <div>

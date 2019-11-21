@@ -52,16 +52,24 @@ class TopBar extends React.Component {
     className: PropTypes.string,
     loadingLoggedInUser: PropTypes.bool,
     showSearch: PropTypes.bool,
+    menuItems: PropTypes.object,
   };
 
   static defaultProps = {
     className: '',
     showSearch: true,
+    menuItems: {
+      discover: true,
+      docs: true,
+      howItWorks: false,
+      pricing: false,
+    },
   };
 
   render() {
-    const { showSearch } = this.props;
-
+    const { showSearch, menuItems } = this.props;
+    const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
+    const merged = { ...defaultMenu, ...menuItems };
     return (
       <Flex
         px={3}
@@ -115,30 +123,38 @@ class TopBar extends React.Component {
 
           <Hide xs>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-              <NavLinkContainer>
-                <Link route="discover" passHref>
-                  <NavLink>
-                    <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+              {merged.discover && (
+                <NavLinkContainer>
+                  <Link route="discover" passHref>
+                    <NavLink>
+                      <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+                    </NavLink>
+                  </Link>
+                </NavLinkContainer>
+              )}
+              {merged.howItWorks && (
+                <NavLinkContainer>
+                  <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
+                    <NavLink>
+                      <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                    </NavLink>
+                  </Link>
+                </NavLinkContainer>
+              )}
+              {merged.pricing && (
+                <NavLinkContainer>
+                  <NavLink href="/pricing">
+                    <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                   </NavLink>
-                </Link>
-              </NavLinkContainer>
-              <NavLinkContainer>
-                <Link route="marketing" params={{ pageSlug: 'how-it-works' }} passHref>
-                  <NavLink>
-                    <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                </NavLinkContainer>
+              )}
+              {merged.docs && (
+                <NavLinkContainer>
+                  <NavLink href="https://docs.opencollective.com">
+                    <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
                   </NavLink>
-                </Link>
-              </NavLinkContainer>
-              <NavLinkContainer>
-                <NavLink href="/pricing">
-                  <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-                </NavLink>
-              </NavLinkContainer>
-              <NavLinkContainer>
-                <NavLink href="https://docs.opencollective.com">
-                  <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
-                </NavLink>
-              </NavLinkContainer>
+                </NavLinkContainer>
+              )}
             </NavList>
           </Hide>
 

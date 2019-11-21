@@ -10,6 +10,7 @@ class RejectExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     rejectExpense: PropTypes.func.isRequired,
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -20,11 +21,12 @@ class RejectExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     await this.props.rejectExpense(id);
+    await this.props.refetch();
   }
 
   render() {
     return (
-      <div className="RejectExpenseBtn">
+      <div className="RejectExpenseBtn" data-cy="reject-expense-btn">
         <SmallButton className="reject" bsStyle="danger" onClick={this.onClick}>
           <FormattedMessage id="expense.reject.btn" defaultMessage="reject" />
         </SmallButton>

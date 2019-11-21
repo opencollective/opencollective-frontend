@@ -31,12 +31,12 @@ const NotFound = ({ searchTerm }) => {
         ¯\_(ツ)_/¯
       </P>
       {searchTerm && (
-        <Flex flexWrap="wrap">
-          <StyledButton mx={2} onClick={() => Router.back()}>
+        <Flex flexWrap="wrap" justifyContent="center">
+          <StyledButton m={2} onClick={() => Router.back()}>
             &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
           </StyledButton>
           <Link route="search" params={{ q: searchTerm }}>
-            <StyledButton mx={2} buttonStyle="primary">
+            <StyledButton m={2} buttonStyle="primary">
               <FormattedMessage
                 id="notFound.search"
                 defaultMessage="Search for {term}"

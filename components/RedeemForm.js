@@ -5,6 +5,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { P } from './Text';
 import InputField from './InputField';
 import styled from 'styled-components';
+import LoadingPlaceholder from './LoadingPlaceholder';
 
 const Description = styled(P)`
   color: #4e5052;
@@ -20,6 +21,7 @@ class RedeemForm extends React.Component {
     email: PropTypes.string,
     name: PropTypes.string,
     LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -68,7 +70,7 @@ class RedeemForm extends React.Component {
   }
 
   render() {
-    const { intl, LoggedInUser } = this.props;
+    const { intl, LoggedInUser, loadingLoggedInUser } = this.props;
     const { code, email, name } = this.state.form;
 
     return (
@@ -88,22 +90,28 @@ class RedeemForm extends React.Component {
           )}
         </Description>
         <Flex flexDirection="column">
-          <InputField
-            label={intl.formatMessage(this.messages['name'])}
-            name="name"
-            type="name"
-            defaultValue={name}
-            disabled={LoggedInUser}
-            onChange={value => this.handleChange('name', value)}
-          />
-          <InputField
-            label={intl.formatMessage(this.messages['email'])}
-            name="email"
-            type="email"
-            defaultValue={email}
-            disabled={LoggedInUser}
-            onChange={value => this.handleChange('email', value)}
-          />
+          {loadingLoggedInUser ? (
+            <LoadingPlaceholder height={156} mb={2} />
+          ) : (
+            <React.Fragment>
+              <InputField
+                label={intl.formatMessage(this.messages['name'])}
+                name="name"
+                type="name"
+                defaultValue={name}
+                disabled={LoggedInUser}
+                onChange={value => this.handleChange('name', value)}
+              />
+              <InputField
+                label={intl.formatMessage(this.messages['email'])}
+                name="email"
+                type="email"
+                defaultValue={email}
+                disabled={LoggedInUser}
+                onChange={value => this.handleChange('email', value)}
+              />
+            </React.Fragment>
+          )}
           <InputField
             label={intl.formatMessage(this.messages['code'])}
             name="code"

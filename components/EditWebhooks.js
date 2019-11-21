@@ -207,9 +207,6 @@ class EditWebhooks extends React.Component {
             <Span fontSize="Paragraph" mb={1}>
               {intl.formatMessage(messages['webhooks.url.label'])}
             </Span>
-            <Span fontSize="3rem" color="#D7D9E0" css={'transform: translate(-60px, 23px); position: absolute;'}>
-              {index + 1}
-            </Span>
             <StyledInputGroup
               type="type"
               name="webhookUrl"
@@ -379,9 +376,6 @@ const editWebhooks = graphql(
   },
 );
 
-const addData = compose(
-  graphql(getCollectiveWithNotificationsQuery),
-  editWebhooks,
-);
+const addData = compose(graphql(getCollectiveWithNotificationsQuery), editWebhooks);
 
 export default injectIntl(addData(EditWebhooks));
