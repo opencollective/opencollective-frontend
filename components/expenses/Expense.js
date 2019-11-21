@@ -114,7 +114,7 @@ class Expense extends React.Component {
       no: { id: 'no', defaultMessage: 'No' },
       yes: { id: 'yes', defaultMessage: 'Yes' },
       'delete.modal.header': {
-        id: 'delete.modal.header',
+        id: 'deleteExpense.modal.header',
         defaultMessage: 'Delete Expense',
       },
       'delete.modal.body': {
