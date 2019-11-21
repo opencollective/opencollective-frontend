@@ -171,6 +171,10 @@ class EditEventForm extends React.Component {
         },
       },
       {
+        name: 'timezone',
+        type: 'TimezonePicker',
+      },
+      {
         name: 'location',
         placeholder: '',
         type: 'location',
@@ -232,29 +236,32 @@ class EditEventForm extends React.Component {
 
         <div className="FormInputs">
           <div className="inputs">
-            {this.fields.map(field => (
-              <InputField
-                key={field.name}
-                defaultValue={this.state.event[field.name] || field.defaultValue}
-                validate={field.validate}
-                ref={field.name}
-                name={field.name}
-                label={field.label}
-                description={field.description}
-                placeholder={field.placeholder}
-                type={field.type}
-                pre={field.pre}
-                context={{
-                  timezone: this.state.event.timezone,
-                }}
-                onChange={value => this.handleChange(field.name, value)}
-              />
-            ))}
-            <TimezonePicker
-              label="Timezone"
-              selectedTimezone={this.state.event.timezone}
-              onChange={this.handleTimezoneChange}
-            />
+            {this.fields.map(field =>
+              field.name === 'timezone' ? (
+                <TimezonePicker
+                  label="Timezone"
+                  selectedTimezone={this.state.event.timezone}
+                  onChange={this.handleTimezoneChange}
+                />
+              ) : (
+                <InputField
+                  key={field.name}
+                  defaultValue={this.state.event[field.name] || field.defaultValue}
+                  validate={field.validate}
+                  ref={field.name}
+                  name={field.name}
+                  label={field.label}
+                  description={field.description}
+                  placeholder={field.placeholder}
+                  type={field.type}
+                  pre={field.pre}
+                  context={{
+                    timezone: this.state.event.timezone,
+                  }}
+                  onChange={value => this.handleChange(field.name, value)}
+                />
+              ),
+            )}
           </div>
           <EditTiers
             title="Tickets"
