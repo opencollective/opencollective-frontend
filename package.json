@@ -117,7 +117,7 @@
     "winston": "3.2.1"
   },
   "scripts": {
-    "build": "npm-run-all build:updates build:clean build:next build:server",
+    "build": "npm-run-all build:updates build:next build:server",
     "build:clean": "shx rm -rf dist .next",
     "build:langs": "npm run langs:update",
     "build:next": "cross-env scripts/build_next.sh",
