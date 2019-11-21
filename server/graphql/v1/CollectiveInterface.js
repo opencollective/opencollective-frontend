@@ -899,7 +899,13 @@ const CollectiveFields = () => {
     },
     image: {
       type: GraphQLString,
-      resolve(collective) {
+      async resolve(collective, args, req) {
+        if (collective.type === 'EVENT' && !collective.image) {
+          const parentCollective = await req.loaders.collective.findById.load(collective.ParentCollectiveId);
+          if (parentCollective) {
+            return parentCollective.image;
+          }
+        }
         return collective.image;
       },
     },
@@ -911,7 +917,13 @@ const CollectiveFields = () => {
           type: ImageFormatType,
         },
       },
-      resolve(collective, args) {
+      async resolve(collective, args, req) {
+        if (collective.type === 'EVENT' && !collective.image) {
+          const parentCollective = await req.loaders.collective.findById.load(collective.ParentCollectiveId);
+          if (parentCollective) {
+            return parentCollective.getImageUrl(args);
+          }
+        }
         return collective.getImageUrl(args);
       },
     },
