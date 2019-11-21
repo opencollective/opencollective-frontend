@@ -167,7 +167,7 @@ class Expense extends React.Component {
   handleDeleteExpense = async id => {
     try {
       await this.props.deleteExpense(id);
-      this.setState({ showUnapproveModal: false });
+      this.setState({ showDeleteExpenseModal: false, error: null });
       await this.props.refetch();
     } catch (err) {
       console.error(err);
