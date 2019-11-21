@@ -228,11 +228,6 @@ class EditEventForm extends React.Component {
 
         <div className="FormInputs">
           <div className="inputs">
-            <TimezonePicker
-              label="Timezone"
-              selectedTimezone={this.state.event.timezone}
-              onChange={this.handleTimezoneChange}
-            />
             {this.fields.map(field => (
               <InputField
                 key={field.name}
@@ -251,6 +246,11 @@ class EditEventForm extends React.Component {
                 onChange={value => this.handleChange(field.name, value)}
               />
             ))}
+            <TimezonePicker
+              label="Timezone"
+              selectedTimezone={this.state.event.timezone}
+              onChange={this.handleTimezoneChange}
+            />
           </div>
           <EditTiers
             title="Tickets"
