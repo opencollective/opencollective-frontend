@@ -114,7 +114,6 @@ jobs:
             - next-cache-{{ .Revision }}
             - next-cache-
 
-      - run: npm run build:clean
       - run: npm run build:updates
       - run: npm run build:next
       - run: npm run build:server
