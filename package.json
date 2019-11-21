@@ -113,7 +113,7 @@
     "unified": "8.4.2",
     "universal-url": "^2.0.0",
     "uuid": "3.3.3",
-    "validator": "12.0.0",
+    "validator": "12.1.0",
     "winston": "3.2.1"
   },
   "scripts": {
