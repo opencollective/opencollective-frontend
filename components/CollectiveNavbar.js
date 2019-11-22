@@ -9,6 +9,7 @@ import { Flex } from '@rebass/grid';
 import { Cog } from 'styled-icons/typicons/Cog';
 import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
 
+import { canOrderTicketsFromEvent } from '../lib/events';
 import { CollectiveType } from '../lib/constants/collectives';
 import Container from './Container';
 import { Sections, AllSectionsNames, Dimensions } from './collective-page/_constants';
@@ -200,6 +201,18 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Goals',
     defaultMessage: 'Goals',
   },
+  [Sections.TICKETS]: {
+    id: 'CollectivePage.NavBar.Tickets',
+    defaultMessage: 'Tickets',
+  },
+  [Sections.LOCATION]: {
+    id: 'CollectivePage.NavBar.Location',
+    defaultMessage: 'Location',
+  },
+  [Sections.PARTICIPANTS]: {
+    id: 'CollectivePage.NavBar.Participants',
+    defaultMessage: 'Participants',
+  },
 });
 
 /**
@@ -208,11 +221,34 @@ const i18nSection = defineMessages({
 const getCollectiveTypeBlacklistedSections = collectiveType => {
   switch (collectiveType) {
     case CollectiveType.USER:
-      return [Sections.CONTRIBUTORS, Sections.CONTRIBUTE, Sections.UPDATES, Sections.BUDGET];
+      return [
+        Sections.CONTRIBUTORS,
+        Sections.CONTRIBUTE,
+        Sections.UPDATES,
+        Sections.BUDGET,
+        Sections.TICKETS,
+        Sections.LOCATION,
+        Sections.PARTICIPANTS,
+      ];
     case CollectiveType.ORGANIZATION:
-      return [Sections.CONTRIBUTE, Sections.UPDATES, Sections.BUDGET];
+      return [
+        Sections.CONTRIBUTE,
+        Sections.UPDATES,
+        Sections.BUDGET,
+        Sections.TICKETS,
+        Sections.LOCATION,
+        Sections.PARTICIPANTS,
+      ];
     case CollectiveType.COLLECTIVE:
-      return [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS];
+      return [
+        Sections.CONTRIBUTIONS,
+        Sections.TRANSACTIONS,
+        Sections.TICKETS,
+        Sections.LOCATION,
+        Sections.PARTICIPANTS,
+      ];
+    case CollectiveType.EVENT:
+      return [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.CONTRIBUTORS];
     default:
       return [];
   }
@@ -258,6 +294,32 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     }
   }
 
+  if (collective.type === CollectiveType.EVENT) {
+    // Should not see tickets section if you can't order them
+    if (!canOrderTicketsFromEvent(collective)) {
+      toRemove.add(Sections.TICKETS);
+    }
+
+    if (!collective.orders || collective.orders.length === 0) {
+      toRemove.add(Sections.PARTICIPANTS);
+    }
+
+    if (!(collective.location && collective.location.name)) {
+      toRemove.add(Sections.LOCATION);
+    }
+
+    // Put about section first for events
+    sections.sort((a, b) => {
+      if (a === Sections.ABOUT) {
+        return -1;
+      } else if (b === Sections.ABOUT) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+
   return sections.filter(section => !toRemove.has(section));
 };
 
@@ -267,11 +329,12 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
   }
 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
+  const isEvent = collective.type === CollectiveType.EVENT;
   return {
     hasContact: collective.canContact,
-    hasSubmitExpense: isCollective,
+    hasSubmitExpense: isCollective || isEvent,
     hasApply: collective.canApply,
-    hasManageSubscriptions: isAdmin && !isCollective,
+    hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
   };
 };
 

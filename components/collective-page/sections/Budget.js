@@ -17,19 +17,30 @@ import MessageBox from '../../MessageBox';
 
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
-import { TransactionsAndExpensesFragment } from '../graphql/fragments';
-import BudgetItemsList from '../../BudgetItemsList';
+
+import BudgetItemsList, {
+  BudgetItemExpenseTypeFragment,
+  BudgetItemOrderFragment,
+  BudgetItemExpenseFragment,
+} from '../../BudgetItemsList';
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`
   query NewCollectivePage($slug: String!) {
     Collective(slug: $slug) {
       id
-      ...TransactionsAndExpensesFragment
+      transactions(limit: 3, includeExpenseTransactions: false) {
+        ...BudgetItemOrderFragment
+        ...BudgetItemExpenseFragment
+      }
+      expenses(limit: 3) {
+        ...BudgetItemExpenseTypeFragment
+      }
     }
   }
-
-  ${TransactionsAndExpensesFragment}
+  ${BudgetItemExpenseFragment}
+  ${BudgetItemOrderFragment}
+  ${BudgetItemExpenseTypeFragment}
 `;
 
 /**

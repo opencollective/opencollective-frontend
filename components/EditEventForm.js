@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
@@ -171,11 +171,19 @@ class EditEventForm extends React.Component {
         },
       },
       {
+        name: 'timezone',
+        type: 'TimezonePicker',
+      },
+      {
         name: 'location',
         placeholder: '',
         type: 'location',
       },
     ];
+
+    if (process.env.NEW_EVENTS === 'true') {
+      this.fields = this.fields.filter(field => field.name !== 'longDescription');
+    }
 
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {
@@ -228,29 +236,32 @@ class EditEventForm extends React.Component {
 
         <div className="FormInputs">
           <div className="inputs">
-            <TimezonePicker
-              label="Timezone"
-              selectedTimezone={this.state.event.timezone}
-              onChange={this.handleTimezoneChange}
-            />
-            {this.fields.map(field => (
-              <InputField
-                key={field.name}
-                defaultValue={this.state.event[field.name] || field.defaultValue}
-                validate={field.validate}
-                ref={field.name}
-                name={field.name}
-                label={field.label}
-                description={field.description}
-                placeholder={field.placeholder}
-                type={field.type}
-                pre={field.pre}
-                context={{
-                  timezone: this.state.event.timezone,
-                }}
-                onChange={value => this.handleChange(field.name, value)}
-              />
-            ))}
+            {this.fields.map(field =>
+              field.name === 'timezone' ? (
+                <TimezonePicker
+                  label="Timezone"
+                  selectedTimezone={this.state.event.timezone}
+                  onChange={this.handleTimezoneChange}
+                />
+              ) : (
+                <InputField
+                  key={field.name}
+                  defaultValue={this.state.event[field.name] || field.defaultValue}
+                  validate={field.validate}
+                  ref={field.name}
+                  name={field.name}
+                  label={field.label}
+                  description={field.description}
+                  placeholder={field.placeholder}
+                  type={field.type}
+                  pre={field.pre}
+                  context={{
+                    timezone: this.state.event.timezone,
+                  }}
+                  onChange={value => this.handleChange(field.name, value)}
+                />
+              ),
+            )}
           </div>
           <EditTiers
             title="Tickets"
@@ -263,7 +274,7 @@ class EditEventForm extends React.Component {
         </div>
         <div className="actions">
           {!isNew && event.isDeletable && (
-            <>
+            <Fragment>
               <Button className="red delete" label={deleteBtnLabel} onClick={this.handleModal} />
               <Modal width="570px" show={this.state.showDeleteModal} onClose={this.handleModal}>
                 <ModalHeader>
@@ -304,7 +315,7 @@ class EditEventForm extends React.Component {
                   </Container>
                 </ModalFooter>
               </Modal>
-            </>
+            </Fragment>
           )}
           <Button
             className="blue save"

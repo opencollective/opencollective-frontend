@@ -4,6 +4,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { get } from 'lodash';
+import dynamic from 'next/dynamic';
 
 // Icons
 import { Twitter } from 'styled-icons/feather/Twitter';
@@ -36,6 +37,9 @@ import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContr
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
 import MessageBox from '../../MessageBox';
+
+// Dynamic imports
+const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
 
 const Translations = defineMessages({
   website: {
@@ -71,6 +75,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const [message, showMessage] = React.useState(null);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -137,105 +142,110 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           {collective.company && (
             <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
           )}
-
-          <Flex alignItems="center" flexWrap="wrap">
-            {isCollective && (
-              <StyledTag mx={2} my={2} mb={2}>
-                <I18nCollectiveTags
-                  tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-                />
-              </StyledTag>
-            )}
-            <Flex my={2}>
-              {collective.twitterHandle && (
-                <ExternalLink
-                  data-cy="twitterProfileUrl"
-                  href={twitterProfileUrl(collective.twitterHandle)}
-                  title="Twitter"
-                  openInNewTab
-                >
-                  <StyledRoundButton size={32} mr={3}>
-                    <Twitter size={12} />
-                  </StyledRoundButton>
-                </ExternalLink>
+          {!isEvent && (
+            <Flex alignItems="center" flexWrap="wrap">
+              {isCollective && (
+                <StyledTag mx={2} my={2} mb={2}>
+                  <I18nCollectiveTags
+                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+                  />
+                </StyledTag>
               )}
-              {collective.githubHandle && (
-                <ExternalLink
-                  data-cy="githubProfileUrl"
-                  href={githubProfileUrl(collective.githubHandle)}
-                  title="Github"
-                  openInNewTab
-                >
-                  <StyledRoundButton size={32} mr={3}>
-                    <Github size={12} />
-                  </StyledRoundButton>
-                </ExternalLink>
-              )}
-              {collective.website && (
-                <ExternalLink
-                  data-cy="collectiveWebsite"
-                  href={collective.website}
-                  title={intl.formatMessage(Translations.website)}
-                  openInNewTab
-                >
-                  <StyledRoundButton size={32} mr={3}>
-                    <Globe size={14} />
-                  </StyledRoundButton>
-                </ExternalLink>
-              )}
-            </Flex>
-            {host && collective.isApproved && (
-              <Container mx={1} color="#969ba3" my={2}>
-                <FormattedMessage
-                  id="Collective.Hero.Host"
-                  defaultMessage="{FiscalHost}: {hostName}"
-                  values={{
-                    FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
-                    hostName: (
-                      <LinkCollective collective={host}>
-                        <Span data-cy="fiscalHostName" color="black.600">
-                          {host.name}
-                        </Span>
-                      </LinkCollective>
-                    ),
-                  }}
-                />
-              </Container>
-            )}
-            {collective.canApply && (
-              <Fragment>
-                {collective.settings.tos && (
-                  <StyledLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={collective.settings.tos}
-                    borderBottom="2px dotted #969ba3"
-                    color="black.700"
-                    textDecoration="none"
-                    fontSize="Caption"
-                    mr={2}
+              <Flex my={2}>
+                {collective.twitterHandle && (
+                  <ExternalLink
+                    data-cy="twitterProfileUrl"
+                    href={twitterProfileUrl(collective.twitterHandle)}
+                    title="Twitter"
+                    openInNewTab
                   >
-                    <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
-                  </StyledLink>
+                    <StyledRoundButton size={32} mr={3}>
+                      <Twitter size={12} />
+                    </StyledRoundButton>
+                  </ExternalLink>
                 )}
-                <Container ml={2} mr={3} color="black.500" fontSize="Caption">
+                {collective.githubHandle && (
+                  <ExternalLink
+                    data-cy="githubProfileUrl"
+                    href={githubProfileUrl(collective.githubHandle)}
+                    title="Github"
+                    openInNewTab
+                  >
+                    <StyledRoundButton size={32} mr={3}>
+                      <Github size={12} />
+                    </StyledRoundButton>
+                  </ExternalLink>
+                )}
+                {collective.website && (
+                  <ExternalLink
+                    data-cy="collectiveWebsite"
+                    href={collective.website}
+                    title={intl.formatMessage(Translations.website)}
+                    openInNewTab
+                  >
+                    <StyledRoundButton size={32} mr={3}>
+                      <Globe size={14} />
+                    </StyledRoundButton>
+                  </ExternalLink>
+                )}
+              </Flex>
+              {host && collective.isApproved && !isEvent && (
+                <Container mx={1} color="#969ba3" my={2}>
                   <FormattedMessage
-                    id="Hero.HostFee"
-                    defaultMessage="Host fee: {fee}"
+                    id="Collective.Hero.Host"
+                    defaultMessage="{FiscalHost}: {hostName}"
                     values={{
-                      fee: (
-                        <DefinedTerm term={Terms.HOST_FEE} color="black.700">
-                          {collective.hostFeePercent || 0}%
-                        </DefinedTerm>
+                      FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
+                      hostName: (
+                        <LinkCollective collective={host}>
+                          <Span data-cy="fiscalHostName" color="black.600">
+                            {host.name}
+                          </Span>
+                        </LinkCollective>
                       ),
                     }}
                   />
                 </Container>
-              </Fragment>
-            )}
-          </Flex>
+              )}
+              {collective.canApply && (
+                <Fragment>
+                  {collective.settings.tos && (
+                    <StyledLink
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={collective.settings.tos}
+                      borderBottom="2px dotted #969ba3"
+                      color="black.700"
+                      textDecoration="none"
+                      fontSize="Caption"
+                      mr={2}
+                    >
+                      <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
+                    </StyledLink>
+                  )}
+                  <Container ml={2} mr={3} color="black.500" fontSize="Caption">
+                    <FormattedMessage
+                      id="Hero.HostFee"
+                      defaultMessage="Host fee: {fee}"
+                      values={{
+                        fee: (
+                          <DefinedTerm term={Terms.HOST_FEE} color="black.700">
+                            {collective.hostFeePercent || 0}%
+                          </DefinedTerm>
+                        ),
+                      }}
+                    />
+                  </Container>
+                </Fragment>
+              )}
+            </Flex>
+          )}
           <StyledShortDescription>{collective.description}</StyledShortDescription>
-          {!isCollective && !collective.isHost && <HeroTotalCollectiveContributionsWithData collective={collective} />}
+          {isEvent && <HeroEventDetails collective={collective} />}
+
+          {!isCollective && !isEvent && !collective.isHost && (
+            <HeroTotalCollectiveContributionsWithData collective={collective} />
+          )}
           {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
           <CollectiveCallsToAction
             display={['flex', null, 'none']}
