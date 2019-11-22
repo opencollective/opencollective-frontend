@@ -230,5 +230,9 @@
       "prettier --write",
       "git add"
     ]
-  }
+  },
+  "cacheDirectories": [
+    "node_modules",
+    ".next/cache"
+  ]
 }
