@@ -574,7 +574,7 @@ class CreateOrderPage extends React.Component {
   isFixedContribution() {
     const tier = this.props.tier;
     const forceInterval = Boolean(tier) || Boolean(this.props.fixedInterval);
-    const forceAmount = !get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.fixedAmount);
+    const forceAmount = (tier && tier.amountType === AmountTypes.FIXED) || this.props.fixedAmount;
     const isFlexible = tier && tier.amountType === AmountTypes.FLEXIBLE;
     return !isFlexible && forceInterval && forceAmount;
   }
