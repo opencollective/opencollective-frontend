@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
@@ -274,7 +274,7 @@ class EditEventForm extends React.Component {
         </div>
         <div className="actions">
           {!isNew && event.isDeletable && (
-            <>
+            <Fragment>
               <Button className="red delete" label={deleteBtnLabel} onClick={this.handleModal} />
               <Modal width="570px" show={this.state.showDeleteModal} onClose={this.handleModal}>
                 <ModalHeader>
@@ -315,7 +315,7 @@ class EditEventForm extends React.Component {
                   </Container>
                 </ModalFooter>
               </Modal>
-            </>
+            </Fragment>
           )}
           <Button
             className="blue save"
