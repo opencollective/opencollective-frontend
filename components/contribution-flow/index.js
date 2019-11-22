@@ -505,10 +505,14 @@ class CreateOrderPage extends React.Component {
     );
   }
 
-  /** Returns tier presets, defaults presets, or null if using a tier with fixed amount */
+  /** If not a fixed amount, returns tier presets or defaults presets */
   getAmountsPresets() {
     const tier = this.props.tier || {};
-    return tier.presets || (isNil(tier.amount) ? [500, 1000, 2000, 5000] : null);
+    if (tier.amountType !== AmountTypes.FIXED) {
+      return tier.presets || [500, 1000, 2000, 5000];
+    } else {
+      return null;
+    }
   }
 
   /** Get the min authorized amount for order, in cents */
