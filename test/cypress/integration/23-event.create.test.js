@@ -1,3 +1,4 @@
+const collectiveTitle = 'Test Collective';
 const longDescription = 'This is a longer description in **markdown**';
 const title = `New event ${Math.round(Math.random() * 10000)}`;
 const updatedTitle = `New event updated ${Math.round(Math.random() * 10000)}`;
@@ -48,7 +49,7 @@ describe('event.create.test.js', () => {
       .blur();
     cy.wait(300);
     cy.screenshot(`s${i++}`);
-    cy.get('.actions button').click();
+    cy.get('.actions button.save').click();
     cy.wait(500);
     cy.screenshot(`s${i++}`);
     cy.get('#location .address').contains('Lesbroussart');
@@ -63,11 +64,20 @@ describe('event.create.test.js', () => {
     cy.get('.inputs .inputField.name input', { timeout: 10000 }).type(`{selectall}${updatedTitle}`);
     cy.get('.EditTiers .tier:nth-child(2) .removeTier').click();
     cy.wait(300);
-    cy.get('.actions button').click();
+    cy.get('.actions button.save').click();
     cy.wait(500);
     cy.reload(true);
     cy.wait(500);
     cy.get('#tickets .tier').should('have.length', 1);
     cy.get('.CollectiveCover h1').contains(updatedTitle);
+    cy.wait(300);
+    // testing delete
+    cy.get('.desktopOnly .editCollective a').click();
+    cy.wait(1000);
+    cy.get('.actions button.delete').click();
+    cy.wait(300);
+    cy.get('button.confirmDelete').click();
+    cy.wait(3000);
+    cy.get('h1').contains(collectiveTitle);
   });
 });
