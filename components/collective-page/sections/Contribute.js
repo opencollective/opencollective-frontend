@@ -43,6 +43,7 @@ class SectionContribute extends React.PureComponent {
       }),
     ),
     collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       currency: PropTypes.string,
@@ -112,13 +113,12 @@ class SectionContribute extends React.PureComponent {
     return orderBy([...tiers], ['endsAt'], ['desc']);
   });
 
-<<<<<<< HEAD
-  removeTickets = memoizeOne(tiers => {
-    return tiers.filter(tier => tier.type !== TierTypes.TICKET);
-=======
   joinedEvents = memoizeOne((events, childCollectives) => {
     return events.concat(childCollectives);
->>>>>>> fix EditCollectiveSettings
+  });
+
+  removeTickets = memoizeOne(tiers => {
+    return tiers.filter(tier => tier.type !== TierTypes.TICKET);
   });
 
   getContributeCardsScrollDistance(width) {
@@ -151,26 +151,15 @@ class SectionContribute extends React.PureComponent {
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-<<<<<<< HEAD
+
+    const joinedEvents = this.joinedEvents(events, childCollectives);
+    const handleSettingsUpdate = partial(this.handleSettingsUpdate, EditCollectiveSettings, collective.id);
+
     const sortedTiers = this.sortTiers(this.removeTickets(tiers));
     const isEvent = collective.type === CollectiveType.EVENT;
-
     const createContributionTierRoute = isEvent
       ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
       : `/${collective.slug}/edit/tiers`;
-=======
-    const sortedTiers = this.sortTiers(tiers);
-<<<<<<< HEAD
-    const joinedEvents = events.concat(childCollectives);
-<<<<<<< HEAD
->>>>>>> feat: extracted events and tiers panel. add update settings mutation
-=======
-    const handleSettingsUpdate = this.handleSettingsUpdate;
->>>>>>> fix: handleSettingsUpdate -> this.handleSettingsUpdate
-=======
-    const joinedEvents = this.joinedEvents(events, childCollectives);
-    const handleSettingsUpdate = partial(this.handleSettingsUpdate, EditCollectiveSettings, collective.id);
->>>>>>> fix EditCollectiveSettings
 
     return (
       <Box pt={[4, 5]}>
@@ -196,28 +185,6 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-<<<<<<< HEAD
-                  <Box px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeCustom
-                      collective={collective}
-                      contributors={financialContributorsWithoutTier}
-                      stats={contributorsStats}
-                      hideContributors={hasNoContributor}
-                    />
-                  </Box>
-                  {sortedTiers.map(tier => (
-                    <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
-                    </Box>
-                  ))}
-                  {isAdmin && (
-                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
-                      <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
-                        <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
-                      </CreateNew>
-                    </Box>
-                  )}
-=======
                   <ContributeTiersPanel
                     isAdmin={isAdmin}
                     collective={collective}
@@ -226,9 +193,9 @@ class SectionContribute extends React.PureComponent {
                     contributorsStats={contributorsStats}
                     handleSettingsUpdate={handleSettingsUpdate}
                     CONTRIBUTE_CARD_PADDING_X={CONTRIBUTE_CARD_PADDING_X}
+                    createContributionTierRoute={createContributionTierRoute}
                     financialContributorsWithoutTier={financialContributorsWithoutTier}
                   />
->>>>>>> feat: extracted events and tiers panel. add update settings mutation
                 </ContributeCardsContainer>
               </div>
             )}
