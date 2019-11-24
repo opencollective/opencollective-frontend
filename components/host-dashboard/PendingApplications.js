@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Mutation, Query } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -102,17 +102,18 @@ class HostPendingApplications extends React.Component {
             <StyledHr my={3} borderColor="black.200" />
             <Flex justifyContent="center">
               {c.isActive ? (
-                <Box color="green.700">
+                <Box color="green.700" data-cy={`${c.slug}-approved`}>
                   <Check size={39} />
                 </Box>
               ) : (
-                <>
+                <Fragment>
                   <Mutation mutation={ApproveCollectiveMutation}>
                     {(approveCollective, { loading }) => (
                       <StyledButton
                         mx={4}
                         loading={loading}
                         onClick={() => approveCollective({ variables: { id: c.id } })}
+                        data-cy={`${c.slug}-approve`}
                       >
                         <FormattedMessage id="host.pending-applications.approve" defaultMessage="Approve" />
                       </StyledButton>
@@ -126,7 +127,7 @@ class HostPendingApplications extends React.Component {
                   >
                     <FormattedMessage id="host.pending-applications.reject" defaultMessage="Reject" />
                   </StyledButton>
-                </>
+                </Fragment>
               )}
             </Flex>
           </StyledCard>

@@ -60,7 +60,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {
               return (
-                <HTMLContent mt={-60}>
+                <HTMLContent>
                   <HTMLEditor
                     defaultValue={collective.longDescription}
                     onChange={setValue}
@@ -129,6 +129,7 @@ SectionAbout.propTypes = {
 
   /** Can user edit the description? */
   canEdit: PropTypes.bool,
+
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };

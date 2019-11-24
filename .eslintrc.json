@@ -10,6 +10,7 @@
     "graphql/capitalized-type-name": ["error"],
     "graphql/no-deprecated-fields": ["warn"],
     "react-hooks/rules-of-hooks": ["error"],
+    "react/jsx-fragments": ["error", "element"],
     // We can be stricter with these rules
     // because we don't have any occurences anymore
     "react/react-in-jsx-scope": ["error"],

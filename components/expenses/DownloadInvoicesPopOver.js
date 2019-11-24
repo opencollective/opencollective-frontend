@@ -39,7 +39,7 @@ class Overlay extends React.Component {
   }
 
   renderInvoiceLabel(isLoading, totalAmount, currency, host) {
-    const formattedAmount = formatCurrency(totalAmount, currency, { precision: 0 });
+    const formattedAmount = formatCurrency(totalAmount, currency, { precision: 2 });
     const image = isLoading ? '/static/images/loading.gif' : getCollectiveImage(host);
     return (
       <React.Fragment>

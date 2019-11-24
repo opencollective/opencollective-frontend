@@ -96,9 +96,6 @@ const addMutation = graphql(publishUpdateQuery, {
   }),
 });
 
-const addGraphQL = compose(
-  addMutation,
-  addGetUpdate,
-);
+const addGraphQL = compose(addMutation, addGetUpdate);
 
 export default addGraphQL(PublishUpdateBtn);

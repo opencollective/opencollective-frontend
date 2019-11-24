@@ -9,7 +9,11 @@ import gql from 'graphql-tag';
 import MembersWithData from '../components/MembersWithData';
 
 class BannerIframe extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id, style } }) {
+  static getInitialProps({ query: { collectiveSlug, id, style }, res }) {
+    // Allow to be embeded as Iframe everywhere
+    if (res) {
+      res.removeHeader('X-Frame-Options');
+    }
     return { collectiveSlug, id, style };
   }
 
@@ -94,7 +98,7 @@ class BannerIframe extends React.Component {
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
-        <style jsx global>
+        <style jsx>
           {`
             @font-face {
               font-family: 'Inter';

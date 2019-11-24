@@ -43,6 +43,7 @@ const ExpectedContributorsPropTypes = PropTypes.shape({
 export default class SectionContributors extends React.PureComponent {
   static propTypes = {
     collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
@@ -137,7 +138,7 @@ export default class SectionContributors extends React.PureComponent {
               </P>
             </React.Fragment>
           ) : (
-            <SectionTitle>
+            <SectionTitle data-cy="section-contributors-title">
               <FormattedMessage id="ContributorsFilter.Core" defaultMessage="Core contributors" />
             </SectionTitle>
           )}
@@ -155,6 +156,7 @@ export default class SectionContributors extends React.PureComponent {
         )}
         <ContributorsGrid
           contributors={contributors}
+          collectiveId={collective.id}
           currency={collective.currency}
           getPaddingLeft={({ width, rowWidth, nbRows }) => {
             if (width < Dimensions.MAX_SECTION_WIDTH) {

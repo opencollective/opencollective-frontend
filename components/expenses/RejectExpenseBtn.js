@@ -26,7 +26,7 @@ class RejectExpenseBtn extends React.Component {
 
   render() {
     return (
-      <div className="RejectExpenseBtn">
+      <div className="RejectExpenseBtn" data-cy="reject-expense-btn">
         <SmallButton className="reject" bsStyle="danger" onClick={this.onClick}>
           <FormattedMessage id="expense.reject.btn" defaultMessage="reject" />
         </SmallButton>

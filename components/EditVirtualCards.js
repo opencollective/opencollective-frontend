@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from 'react-apollo';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
+import gql from 'graphql-tag';
+import memoizeOne from 'memoize-one';
 
 import { Add } from 'styled-icons/material/Add';
 
-import { getCollectiveVirtualCards } from '../lib/graphql/queries';
+import { Router } from '../server/pages';
+import StyledSelect from './StyledSelect';
 import VirtualCardDetails from './VirtualCardDetails';
 import Loading from './Loading';
 import Pagination from './Pagination';
@@ -16,6 +19,19 @@ import Link from './Link';
 import StyledButtonSet from './StyledButtonSet';
 import { P } from './Text';
 import StyledButton from './StyledButton';
+
+const messages = defineMessages({
+  notBatched: {
+    id: 'virtualCards.notBatched',
+    defaultMessage: 'Not batched',
+  },
+  allBatches: {
+    id: 'virtualCards.batches.all',
+    defaultMessage: 'All batches',
+  },
+});
+
+const NOT_BATCHED_KEY = '__not-batched__';
 
 /**
  * A filterable list of virtual cards meant to be displayed for organization
@@ -31,8 +47,8 @@ class EditVirtualCards extends React.Component {
     data: PropTypes.object,
     /** Provided by withRouter */
     router: PropTypes.object,
-    /** Provided by addTransactionsData */
-    setConfirmedFilter: PropTypes.func,
+    /** @ignore */
+    intl: PropTypes.object,
   };
 
   constructor(props) {
@@ -80,19 +96,38 @@ class EditVirtualCards extends React.Component {
     }
   }
 
+  /** Get batch options for select. First option is always "No batch" */
+  getBatchesOptions = memoizeOne((batches, selected, intl) => {
+    if (!batches || batches.length < 2) {
+      return [[], null];
+    } else {
+      const options = [
+        { label: intl.formatMessage(messages.allBatches), value: undefined },
+        ...batches.map(batch => ({
+          label: `${batch.name || intl.formatMessage(messages.notBatched)} (${batch.count})`,
+          value: batch.name || NOT_BATCHED_KEY,
+        })),
+      ];
+
+      return [options, options.find(option => option.value === selected)];
+    }
+  });
+
   render() {
-    const { loading } = this.props.data;
-    const queryResult = get(this.props, 'data.Collective.createdVirtualCards', {});
-    const onlyConfirmed = get(this.props, 'data.variables.isConfirmed');
+    const { data, collectiveSlug, intl } = this.props;
+    const queryResult = get(data, 'Collective.createdVirtualCards', {});
+    const onlyConfirmed = get(data, 'variables.isConfirmed');
+    const batches = get(data, 'Collective.virtualCardsBatches');
     const { offset, limit, total, paymentMethods = [] } = queryResult;
     const lastVirtualCard = last(paymentMethods);
+    const [batchesOptions, selectedOption] = this.getBatchesOptions(batches, get(data, 'variables.batch'), intl);
 
     return (
-      <div>
+      <Box mt={3}>
         <Flex mb={4} flexDirection={['column-reverse', 'row']} justifyContent="space-between" flexWrap="wrap">
           {this.renderFilters(onlyConfirmed)}
           <Flex justifyContent="center">
-            <Link route="editCollective" params={{ slug: this.props.collectiveSlug, section: 'gift-cards-create' }}>
+            <Link route="editCollective" params={{ slug: collectiveSlug, section: 'gift-cards-create' }}>
               <StyledButton buttonStyle="primary" buttonSize="medium">
                 <Add size="1em" />
                 {'  '}
@@ -101,7 +136,17 @@ class EditVirtualCards extends React.Component {
             </Link>
           </Flex>
         </Flex>
-        {loading ? (
+        {batchesOptions.length > 1 && (
+          <Box mb={4}>
+            <StyledSelect
+              options={batchesOptions}
+              onChange={({ value }) => Router.pushRoute('editCollective', { ...this.props.router.query, batch: value })}
+              defaultValue={selectedOption}
+            />
+          </Box>
+        )}
+        <hr />
+        {data.loading ? (
           <Loading />
         ) : (
           <div className="virtualcards-list">
@@ -112,7 +157,7 @@ class EditVirtualCards extends React.Component {
             )}
             {paymentMethods.map(v => (
               <div key={v.id}>
-                <VirtualCardDetails virtualCard={v} />
+                <VirtualCardDetails virtualCard={v} collectiveSlug={this.props.collectiveSlug} />
                 {v !== lastVirtualCard && <hr />}
               </div>
             ))}
@@ -123,7 +168,7 @@ class EditVirtualCards extends React.Component {
             )}
           </div>
         )}
-      </div>
+      </Box>
     );
   }
 }
@@ -137,19 +182,64 @@ const getIsConfirmedFromFilter = filter => {
   return filter === 'redeemed';
 };
 
-const getGraphQLVariablesFromProps = props => ({
-  CollectiveId: props.collectiveId,
-  isConfirmed: getIsConfirmedFromFilter(props.router.query.filter),
-  offset: Number(props.router.query.offset) || 0,
-  limit: props.limit || VIRTUALCARDS_PER_PAGE,
+/** A query to get the virtual cards created by a collective. Must be authenticated. */
+export const getCollectiveVirtualCards = gql`
+  query CollectiveVirtualCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
+    Collective(id: $CollectiveId) {
+      id
+      virtualCardsBatches {
+        id
+        name
+        count
+      }
+      createdVirtualCards(isConfirmed: $isConfirmed, limit: $limit, offset: $offset, batch: $batch) {
+        offset
+        limit
+        total
+        paymentMethods {
+          id
+          uuid
+          currency
+          name
+          service
+          type
+          batch
+          data
+          initialBalance
+          monthlyLimitPerMember
+          balance
+          expiryDate
+          isConfirmed
+          data
+          createdAt
+          expiryDate
+          description
+          collective {
+            id
+            slug
+            imageUrl
+            type
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+const getGraphQLVariablesFromProps = ({ collectiveId, router, limit }) => ({
+  CollectiveId: collectiveId,
+  isConfirmed: getIsConfirmedFromFilter(router.query.filter),
+  batch: router.query.batch === NOT_BATCHED_KEY ? null : router.query.batch,
+  offset: Number(router.query.offset) || 0,
+  limit: limit || VIRTUALCARDS_PER_PAGE,
 });
 
-export const addTransactionsData = graphql(getCollectiveVirtualCards, {
-  options: props => ({ variables: getGraphQLVariablesFromProps(props) }),
-  props: ({ data }) => ({
-    data,
-    setConfirmedFilter: isConfirmed => data.refetch({ ...data.variables, isConfirmed: isConfirmed }),
+export const addData = graphql(getCollectiveVirtualCards, {
+  options: props => ({
+    variables: getGraphQLVariablesFromProps(props),
+    fetchPolicy: 'network-only',
   }),
 });
 
-export default withRouter(addTransactionsData(EditVirtualCards));
+export default withRouter(addData(injectIntl(EditVirtualCards)));

@@ -76,7 +76,7 @@ describe('new expense when logged in', () => {
     cy.screenshot('expenseApproved');
     cy.get('.Expenses .expense:first .toggleEditExpense').click();
     cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
-    cy.get('.Expenses .expense:first .inputField.amount input').type('13');
+    cy.get('.Expenses .expense:first .inputField.amount input').type('{selectall}13');
     cy.get('.Expenses .expense:first .inputField.category select').select('Team');
     cy.get('.Expenses .expense:first .inputField.privateMessage textarea').type(
       '{selectall}Another private note (edited)',

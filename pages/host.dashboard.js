@@ -137,6 +137,7 @@ class HostDashboardPage extends React.Component {
               borderBottom="#E6E8EB"
               boxShadow="0px 6px 10px 1px #E6E8EB"
               height={60}
+              data-cy="host-dashboard-menu-bar"
             >
               <MenuLink
                 route="host.dashboard"

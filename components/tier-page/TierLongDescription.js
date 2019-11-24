@@ -1,19 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from '../StyledButton';
 import InlineEditField from '../InlineEditField';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import HTMLContent, { isEmptyValue } from '../HTMLContent';
-
-// Dynamicly load heavy inputs only if user can edit the page
-const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ '../HTMLEditor'), {
-  loading: HTMLEditorLoadingPlaceholder,
-  ssr: false,
-});
+import RichTextEditor from '../RichTextEditor';
 
 /**
  * Displays the tier long description on the page, with an optional form to edit it
@@ -26,7 +18,13 @@ const TierLongDescription = ({ tier, editMutation, canEdit }) => {
         if (isEditing) {
           return (
             <HTMLContent>
-              <HTMLEditor defaultValue={value} onChange={setValue} allowedHeaders={[false, 2, 3]} /** Disable H1 */ />
+              <RichTextEditor
+                defaultValue={value}
+                onChange={setValue}
+                withStickyToolbar
+                toolbarTop={[60, null, 119]}
+                toolbarOffsetY={-30}
+              />
             </HTMLContent>
           );
         } else if (isEmptyValue(tier.longDescription)) {

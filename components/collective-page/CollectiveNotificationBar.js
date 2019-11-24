@@ -86,6 +86,9 @@ const getNotification = (intl, status, collective, host) => {
  * Adds a notification bar for the collective.
  */
 const CollectiveNotificationBar = ({ intl, status, collective, host }) => {
+  // Quickfix for events (as they are not inheriting isApproved status)
+  if (collective.type === CollectiveType.EVENT) return null;
+
   const notification = getNotification(intl, status, collective, host);
 
   return !notification ? null : (

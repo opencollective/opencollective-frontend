@@ -80,7 +80,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
             values={{ type: collectiveType }}
             id="collective.delete.isNotDeletable-message"
             defaultMessage={
-              '{type}s with transactions, orders, or paid expenses cannot be deleted. Please archive it instead.'
+              '{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.'
             }
           />{' '}
         </P>

@@ -43,7 +43,7 @@ Sentry.init({
 // Use JSDOM on server-side so that react-intl can render rich messages
 // See https://github.com/formatjs/react-intl/blob/c736c2e6c6096b1d5ad1fb6be85fa374891d0a6c/docs/Getting-Started.md#domparser
 if (!process.browser) {
-  global.DOMParser = new (require('jsdom')).JSDOM().window.DOMParser;
+  global.DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
 }
 
 class OpenCollectiveFrontendApp extends App {

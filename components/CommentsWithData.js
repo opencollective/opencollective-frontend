@@ -99,7 +99,6 @@ class CommentsWithData extends React.Component {
         <Comments
           collective={collective}
           comments={comments}
-          refetch={data.refetch}
           editable={view !== 'compact'}
           fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
@@ -235,9 +234,6 @@ const addMutation = graphql(createCommentQuery, {
   }),
 });
 
-const addData = compose(
-  addCommentsData,
-  addMutation,
-);
+const addData = compose(addCommentsData, addMutation);
 
 export default addData(CommentsWithData);

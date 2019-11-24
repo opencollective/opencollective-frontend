@@ -1,5 +1,13 @@
 import { disableSmoothScroll } from '../support/helpers';
 import { Sections } from '../../../components/collective-page/_constants';
+import mockRecaptcha from '../mocks/recaptcha';
+
+const scrollToSection = section => {
+  // Wait for new collective page to load before disabling smooth scroll
+  cy.contains('Become a financial contributor');
+  disableSmoothScroll();
+  cy.get(`#section-${section}`).scrollIntoView();
+};
 
 const uploadImage = ({ dropzone, fileName }) => {
   cy.fixture(`./images/${fileName}`).then(fileContent => {
@@ -7,13 +15,6 @@ const uploadImage = ({ dropzone, fileName }) => {
     cy.get(dropzone).upload({ fileContent, fileName, mimeType });
   });
   cy.wait(900);
-};
-
-const scrollToSection = section => {
-  // Wait for new collective page to load before disabling smooth scroll
-  cy.contains('Become a financial contributor');
-  disableSmoothScroll();
-  cy.get(`#section-${section}`).scrollIntoView();
 };
 
 describe('New collective page', () => {
@@ -207,6 +208,45 @@ describe('New Collective page with euro currency', () => {
       scrollToSection(Sections.BUDGET);
       cy.get('[data-cy=view-all-transactions-btn]').should('be.visible');
       cy.get('[data-cy=view-all-expenses-btn]').should('be.visible');
+    });
+  });
+});
+
+describe('Edit public message after contribution', () => {
+  it('can edit public message', () => {
+    cy.createHostedCollective().then(({ slug }) => {
+      /** Make a donation by a new user */
+      cy.signup({ redirect: `/${slug}/donate`, visitParams: { onBeforeLoad: mockRecaptcha } }).then(() => {
+        // SECTION: Make a donation to the collective
+        cy.contains('button', 'Next step').click();
+        cy.wait(50);
+        cy.contains('button', 'Next step').click();
+        cy.wait(1000); // Wait for stripe to be loaded
+        cy.fillStripeInput();
+        cy.contains('button', 'Make contribution').click();
+        cy.wait(1000); // It takes a little bit of time to create the order.
+        // Wait for the popup to appear before moving to the collective page.
+        cy.get('[data-cy=EditPublicMessagePopup]');
+
+        // SECTION: Go to the collective page and change the public message
+        cy.visit(`/${slug}/v2`);
+        /** Cypress can't find the public message text unless we do this.
+         * Probably related to this issue: https://github.com/cypress-io/cypress/issues/695
+         */
+        cy.wait(1000);
+        scrollToSection(Sections.CONTRIBUTORS);
+        cy.get('[data-cy=ContributorCard_EditPublicMessageButton]').click();
+        const publicMessage = 'Writing a long public message!';
+        cy.get('[data-cy=EditPublicMessagePopup]').within(() => {
+          cy.get('textarea').type(publicMessage);
+          cy.get('[data-cy=EditPublicMessagePopup_SubmitButton]').click();
+        });
+        cy.get('[data-cy=EditPublicMessagePopup]').should('not.exist');
+        cy.contains('[data-cy=ContributorsGrid_ContributorCard]', publicMessage);
+        cy.reload();
+        // Makes sure the cache in the backend was deleted.
+        cy.contains('[data-cy=ContributorsGrid_ContributorCard]', publicMessage);
+      });
     });
   });
 });

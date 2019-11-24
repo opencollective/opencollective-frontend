@@ -10,7 +10,7 @@ class ApproveExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     approveExpense: PropTypes.func.isRequired,
-    refetch: PropTypes.func,
+    refetch: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -26,7 +26,7 @@ class ApproveExpenseBtn extends React.Component {
 
   render() {
     return (
-      <div className="ApproveExpenseBtn">
+      <div className="ApproveExpenseBtn" data-cy="approve-expense-btn">
         <SmallButton className="approve" bsStyle="success" onClick={this.onClick}>
           <FormattedMessage id="expense.approve.btn" defaultMessage="approve" />
         </SmallButton>

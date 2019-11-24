@@ -109,22 +109,20 @@ jobs:
       - <<: *persist_npm_cache
 
       - restore_cache:
-          name: Restore next build cache
+          name: Restore next cache
           keys:
-            - next-build-cache-{{ .Revision }}
-            - next-build-cache-
+            - next-cache-{{ .Revision }}
+            - next-cache-
 
-      - run: npm run build:clean
       - run: npm run build:updates
       - run: npm run build:next
       - run: npm run build:server
 
       - save_cache:
-          name: Persist next build cache
-          key: next-build-cache-{{ .Revision }}
+          name: Persist next cache
+          key: next-cache-{{ .Revision }}
           paths:
-            # In Next.js 8 it will be
-            - ./node_modules/.cache/next-minifier
+            - ./.next/cache
 
       # # We prune to save space in node_modules persistence
       # # If we don't persist node_modules, we don't need it
@@ -204,6 +202,8 @@ jobs:
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 0*.js
+      CYPRESS_RECORD: false
+      CYPRESS_VIDEO: false
     <<: *e2e_steps
 
   test-e2e-1:
@@ -218,6 +218,8 @@ jobs:
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 1*.js
+      CYPRESS_RECORD: false
+      CYPRESS_VIDEO: false
     <<: *e2e_steps
 
   test-e2e-2:
@@ -232,6 +234,8 @@ jobs:
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 2*.js
+      CYPRESS_RECORD: false
+      CYPRESS_VIDEO: false
     <<: *e2e_steps
 
   test-e2e-3:
@@ -246,6 +250,8 @@ jobs:
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 3*.js
+      CYPRESS_RECORD: false
+      CYPRESS_VIDEO: false
     <<: *e2e_steps
 
 workflows:

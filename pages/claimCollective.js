@@ -372,10 +372,7 @@ const addClaimCollectiveMutation = graphql(
   },
 );
 
-const addGraphQL = compose(
-  addPledgesData,
-  addClaimCollectiveMutation,
-);
+const addGraphQL = compose(addPledgesData, addClaimCollectiveMutation);
 
 export { ClaimCollectivePage as MockClaimCollectivePage };
 export default withUser(addGraphQL(ClaimCollectivePage));

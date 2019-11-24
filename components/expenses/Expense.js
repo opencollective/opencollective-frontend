@@ -8,6 +8,7 @@ import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
+import { Span } from '../Text';
 import Link from '../Link';
 import SmallButton from '../SmallButton';
 import Moment from '../Moment';
@@ -61,7 +62,7 @@ class Expense extends React.Component {
     unlockPayAction: PropTypes.func,
     editExpense: PropTypes.func,
     unapproveExpense: PropTypes.func,
-    refetch: PropTypes.func,
+    refetch: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
 
@@ -84,6 +85,10 @@ class Expense extends React.Component {
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
       approved: { id: 'expense.approved', defaultMessage: 'approved' },
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
+      expenseTypeMissing: {
+        id: 'expense.error.expenseTypeMissing',
+        defaultMessage: 'Please pick the type of this expense',
+      },
       closeDetails: {
         id: 'expense.closeDetails',
         defaultMessage: 'Close Details',
@@ -196,14 +201,6 @@ class Expense extends React.Component {
           (Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
             LoggedInUser.canEditCollective(collective.host))));
 
-    let precision = 0;
-
-    // Check if the remainder is not 0, this check is important in order to know the amount that needs precision
-    // i.e display $10.21 as $10.21 instead of $10
-    if ((expense.amount / 100) % 1 !== 0) {
-      precision = 2;
-    }
-
     const canApprove =
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
@@ -211,7 +208,7 @@ class Expense extends React.Component {
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
     return (
-      <div className={`expense ${status} ${this.state.mode}View`}>
+      <div className={`expense ${status} ${this.state.mode}View`} data-cy={`expense-${status}`}>
         <style jsx>
           {`
             .expense {
@@ -351,7 +348,7 @@ class Expense extends React.Component {
         <div className="body">
           <div className="header">
             <div className="amount pullRight">
-              <AmountCurrency amount={-expense.amount} currency={expense.currency} precision={precision} />
+              <AmountCurrency amount={-expense.amount} currency={expense.currency} precision={2} />
             </div>
             <div className="description">
               <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
@@ -368,7 +365,9 @@ class Expense extends React.Component {
                   {formatCurrency(expense.collective.stats.balance, expense.collective.currency)}){' | '}
                 </span>
               )}
-              <span className="status">{intl.formatMessage(this.messages[status])}</span>
+              <span className="status" data-cy="expense-status-div">
+                {intl.formatMessage(this.messages[status])}
+              </span>
               {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
                 <ExpenseNeedsTaxFormBadge isTaxFormRequired={expense.userTaxFormRequiredBeforePayment} />
@@ -426,7 +425,7 @@ class Expense extends React.Component {
           )}
           {editable && (
             <div className="actions">
-              {mode === 'edit' && this.state.modified && (
+              {mode === 'edit' && this.state.modified && this.state.expense['type'] !== 'UNCLASSIFIED' && (
                 <div>
                   <div className="leftColumn" />
                   <div className="rightColumn">
@@ -435,6 +434,9 @@ class Expense extends React.Component {
                     </SmallButton>
                   </div>
                 </div>
+              )}
+              {mode === 'edit' && this.state.modified && this.state.expense['type'] === 'UNCLASSIFIED' && (
+                <Span color="red.500">{intl.formatMessage(this.messages['expenseTypeMissing'])}</Span>
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
                 <div className="manageExpense">
@@ -445,7 +447,7 @@ class Expense extends React.Component {
                       onChange={fees => this.handleChange({ fees })}
                     />
                   )}
-                  <div className="expenseActions">
+                  <div className="expenseActions" data-cy="expense-actions">
                     {canPay && (
                       <PayExpenseBtn
                         expense={expense}
@@ -504,6 +506,7 @@ const editExpense = graphql(
         amount
         attachment
         category
+        type
         privateMessage
         payoutMethod
         status
@@ -519,9 +522,6 @@ const editExpense = graphql(
   },
 );
 
-const addMutations = compose(
-  unapproveExpense,
-  editExpense,
-);
+const addMutations = compose(unapproveExpense, editExpense);
 
 export default injectIntl(addMutations(Expense));

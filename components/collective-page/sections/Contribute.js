@@ -8,6 +8,7 @@ import { graphql } from 'react-apollo';
 
 import { EditCollectiveSettingsMutation } from '../graphql/mutations';
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { TierTypes } from '../../../lib/constants/tiers-types';
 import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
@@ -43,7 +44,11 @@ class SectionContribute extends React.PureComponent {
     ),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
     contributorsStats: PropTypes.object,
     contributors: PropTypes.arrayOf(
@@ -107,8 +112,13 @@ class SectionContribute extends React.PureComponent {
     return orderBy([...tiers], ['endsAt'], ['desc']);
   });
 
+
   joinedEvents = memoizeOne((events, childCollectives) => {
     return events.concat(childCollectives);
+  });
+
+  removeTickets = memoizeOne(tiers => {
+    return tiers.filter(tier => tier.type !== TierTypes.TICKET);
   });
 
   getContributeCardsScrollDistance(width) {
@@ -141,9 +151,15 @@ class SectionContribute extends React.PureComponent {
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-    const sortedTiers = this.sortTiers(tiers);
+
     const joinedEvents = this.joinedEvents(events, childCollectives);
     const handleSettingsUpdate = partial(this.handleSettingsUpdate, EditCollectiveSettings, collective.id);
+
+    const sortedTiers = this.sortTiers(this.removeTickets(tiers));
+    const isEvent = collective.type === CollectiveType.EVENT;
+    const createContributionTierRoute = isEvent
+      ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
+      : `/${collective.slug}/edit/tiers`;
 
     return (
       <Box pt={[4, 5]}>
@@ -177,6 +193,7 @@ class SectionContribute extends React.PureComponent {
                     contributorsStats={contributorsStats}
                     handleSettingsUpdate={handleSettingsUpdate}
                     CONTRIBUTE_CARD_PADDING_X={CONTRIBUTE_CARD_PADDING_X}
+                    createContributionTierRoute={createContributionTierRoute}
                     financialContributorsWithoutTier={financialContributorsWithoutTier}
                   />
                 </ContributeCardsContainer>
@@ -184,7 +201,7 @@ class SectionContribute extends React.PureComponent {
             )}
           </HorizontalScroller>
         </Box>
-        {(isAdmin || events.length > 0 || childCollectives.length > 0) && (
+        {!isEvent && (isAdmin || events.length > 0 || childCollectives.length > 0) && (
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>

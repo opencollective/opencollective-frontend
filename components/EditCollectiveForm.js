@@ -9,6 +9,8 @@ import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
+import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle';
+
 import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
 import { parseToBoolean } from '../lib/utils';
 import { VAT_OPTIONS } from '../lib/constants/vat';
@@ -33,6 +35,7 @@ import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
 import Container from './Container';
+import ExternalLink from './ExternalLink';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -814,13 +817,14 @@ class EditCollectiveForm extends React.Component {
                 <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />
               )}
               {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
-                <Flex flexDirection="column">
+                <Flex mt={3} flexDirection="column">
                   <Container
-                    mb={4}
+                    mb={5}
                     pb={4}
                     borderBottom="1px solid #E8E9EB"
                     display="flex"
                     justifyContent="space-between"
+                    alignItems="center"
                     flexWrap="wrap"
                   >
                     <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
@@ -829,9 +833,15 @@ class EditCollectiveForm extends React.Component {
                         <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                       </StyledButton>
                     </Link>
-                    <a href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq">
-                      <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />.
-                    </a>
+
+                    <ExternalLink
+                      href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq"
+                      openInNewTab
+                    >
+                      <InfoCircle size="1em" />
+                      &nbsp;
+                      <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
+                    </ExternalLink>
                   </Container>
                   <CreateVirtualCardsForm
                     collectiveId={collective.id}

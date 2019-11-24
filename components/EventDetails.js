@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import StyledLink from './StyledLink';
 import { Box } from '@rebass/grid';
 import { Span } from './Text';
+import HTMLContent from './HTMLContent';
 
 const TruncatedLength = 400;
 
@@ -35,7 +36,14 @@ const EventDetails = ({ event, tier }) => {
       )}
       {description && (
         <Box>
-          <Markdown source={truncatedDescription} />
+          {/* Fallback for handling both markdown and html descriptions */}
+          {description[0] !== '<' ? (
+            <HTMLContent>
+              <Markdown source={truncatedDescription} />
+            </HTMLContent>
+          ) : (
+            <HTMLContent content={truncatedDescription} />
+          )}
           {(isExpended || truncatedDescription.length !== description.length) &&
             (isExpended ? (
               <StyledLink onClick={() => setExpended(false)}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FixedSizeGrid } from 'react-window';
+import get from 'lodash/get';
 import styled from 'styled-components';
 
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
@@ -8,6 +9,7 @@ import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 
 import { fadeIn } from './StyledKeyframes';
 import ContributorCard from './ContributorCard';
+import { withUser } from './UserProvider';
 
 // Define static dimensions
 export const COLLECTIVE_CARD_MARGIN_X = 32;
@@ -101,7 +103,16 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
-const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport, getPaddingLeft, currency }) => {
+const ContributorsGrid = ({
+  contributors,
+  width,
+  maxNbRowsForViewports,
+  viewport,
+  getPaddingLeft,
+  currency,
+  LoggedInUser,
+  collectiveId,
+}) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
 
@@ -110,7 +121,7 @@ const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport
   const rowWidth = nbCols * COLLECTIVE_CARD_FULL_WIDTH + COLLECTIVE_CARD_MARGIN_X;
   const paddingLeft = getPaddingLeft ? getPaddingLeft({ width, rowWidth, nbRows }) : 0;
   const hasScroll = rowWidth + paddingLeft > width;
-
+  const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
   return (
     <FixedSizeGrid
       columnCount={nbCols}
@@ -129,7 +140,6 @@ const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport
       {({ columnIndex, rowIndex, style }) => {
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
         const contributor = contributors[idx];
-
         return !contributor ? null : (
           <ContributorCardContainer
             key={contributor.id}
@@ -141,6 +151,8 @@ const ContributorsGrid = ({ contributors, width, maxNbRowsForViewports, viewport
               height={COLLECTIVE_CARD_HEIGHT}
               contributor={contributor}
               currency={currency}
+              collectiveId={collectiveId}
+              isLoggedUser={loggedUserCollectiveId === contributor.collectiveId}
             />
           </ContributorCardContainer>
         );
@@ -154,6 +166,7 @@ ContributorsGrid.propTypes = {
   contributors: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
+      collectiveId: PropTypes.number.isRequired,
     }),
   ),
 
@@ -177,6 +190,14 @@ ContributorsGrid.propTypes = {
 
   /** @ignore from withViewport */
   width: PropTypes.number.isRequired,
+
+  /** @ignore from withUser */
+  LoggedInUser: PropTypes.shape({
+    CollectiveId: PropTypes.number,
+  }),
+
+  /** Collective id */
+  collectiveId: PropTypes.number,
 };
 
 ContributorsGrid.defaultProps = {
@@ -191,4 +212,4 @@ ContributorsGrid.defaultProps = {
   },
 };
 
-export default withViewport(ContributorsGrid, { withWidth: true });
+export default withViewport(withUser(ContributorsGrid), { withWidth: true });

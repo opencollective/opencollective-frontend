@@ -254,7 +254,7 @@ CollectivePicker.propTypes = {
   /** Force menu to be open. Ignored during collective creation */
   menuIsOpen: PropTypes.bool,
   /** Disabled */
-  isDisabled: PropTypes.isDisabled,
+  isDisabled: PropTypes.bool,
   /** Component min width */
   minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Component max width */

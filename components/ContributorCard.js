@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { truncate } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import formatMemberRole from '../lib/i18n-member-role';
 import { H5, P } from './Text';
@@ -12,6 +12,7 @@ import StyledCard from './StyledCard';
 import { ContributorAvatar } from './Avatar';
 import StyledTag from './StyledTag';
 import LinkContributor from './LinkContributor';
+import EditPublicMessagePopup from './EditPublicMessagePopup';
 import roles from '../lib/constants/roles';
 
 /** Main card */
@@ -33,8 +34,7 @@ const CollectiveLogoContainer = styled.div`
   border-top: 1px solid #e6e8eb;
 `;
 
-/** User-submitted public message */
-const PublicMessage = styled.p`
+const publicMessageStyle = css`
   margin: 4px 0px;
   font-size: 10px;
   line-height: 13px;
@@ -43,6 +43,20 @@ const PublicMessage = styled.p`
   text-align: center;
   word-break: break-word;
   font-style: italic;
+`;
+/** User-submitted public message */
+const PublicMessage = styled.p`
+  ${publicMessageStyle}
+`;
+
+/** User-submitted public message edit button */
+const PublicMessageEditButton = styled.button`
+  ${publicMessageStyle}
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  outline: 0;
+  background: transparent;
 `;
 
 /** Returns the main role for contributor */
@@ -71,9 +85,13 @@ const getMainContributorRole = contributor => {
  * A single contributor card, exported as a PureComponent to improve performances.
  * Accept all the props from [StyledCard](/#/Atoms?id=styledcard).
  */
-const ContributorCard = ({ intl, width, height, contributor, currency, ...props }) => {
+const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedUser, collectiveId, ...props }) => {
+  const { collectiveId: fromCollectiveId, publicMessage } = contributor;
+  const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 140 });
+  const [showEditMessagePopup, setShowEditMessagePopup] = useState(false);
+  const mainContainerRef = useRef();
   return (
-    <MainContainer width={width} height={height} {...props}>
+    <MainContainer ref={mainContainerRef} width={width} height={height} {...props}>
       <CollectiveLogoContainer>
         <Box mt={-32}>
           <LinkContributor contributor={contributor}>
@@ -100,12 +118,31 @@ const ContributorCard = ({ intl, width, height, contributor, currency, ...props 
             </P>
           </React.Fragment>
         )}
-        {contributor.publicMessage && (
-          <PublicMessage title={contributor.publicMessage}>
-            “{truncate(contributor.publicMessage, { length: 140 })}”
-          </PublicMessage>
+        {isLoggedUser && !showEditMessagePopup ? (
+          <PublicMessageEditButton
+            data-cy="ContributorCard_EditPublicMessageButton"
+            onClick={() => {
+              setShowEditMessagePopup(true);
+            }}
+          >
+            {truncatedPublicMessage || (
+              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
+            )}
+          </PublicMessageEditButton>
+        ) : (
+          truncatedPublicMessage && <PublicMessage title={publicMessage}>{truncatedPublicMessage}</PublicMessage>
         )}
       </Flex>
+      {showEditMessagePopup && (
+        <EditPublicMessagePopup
+          cardRef={mainContainerRef}
+          message={publicMessage}
+          onClose={() => setShowEditMessagePopup(false)}
+          intl={intl}
+          fromCollectiveId={fromCollectiveId}
+          collectiveId={collectiveId}
+        />
+      )}
     </MainContainer>
   );
 };
@@ -113,6 +150,8 @@ const ContributorCard = ({ intl, width, height, contributor, currency, ...props 
 ContributorCard.propTypes = {
   /** The contributor to display */
   contributor: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    collectiveId: PropTypes.number.isRequired,
     name: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
@@ -132,6 +171,10 @@ ContributorCard.propTypes = {
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** @ignore */
   intl: PropTypes.object,
+  /** It is the logged user */
+  isLoggedUser: PropTypes.bool,
+  /** Collective id */
+  collectiveId: PropTypes.number,
 };
 
 ContributorCard.defaultProps = {

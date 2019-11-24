@@ -36,6 +36,14 @@ const Messages = defineMessages({
     id: 'SearchFor',
     defaultMessage: 'Search for {entity}',
   },
+  searchForType_2: {
+    id: 'SearchFor2',
+    defaultMessage: 'Search for {entity1} or {entity2}',
+  },
+  searchForType_3: {
+    id: 'SearchFor3',
+    defaultMessage: 'Search for {entity1}, {entity2} or {entity3}',
+  },
   search: {
     id: 'Search',
     defaultMessage: 'Search',
@@ -47,12 +55,20 @@ const Messages = defineMessages({
  * Otherwise it just returns `Search`
  */
 const getPlaceholder = (formatMessage, types) => {
-  if (types && types.length === 1) {
-    return formatMessage(Messages.searchForType, {
-      entity: formatCollectiveType(formatMessage, types[0], { count: 100 }),
-    });
-  } else {
+  const nbTypes = types ? types.length : 0;
+  if (nbTypes === 0 || nbTypes > 3) {
     return formatMessage(Messages.search);
+  } else if (nbTypes === 1) {
+    return formatMessage(Messages.searchForType, { entity: formatCollectiveType(formatMessage, types[0], 100) });
+  } else {
+    // Format by passing a map of entities like { entity1: 'Collectives' }
+    return formatMessage(
+      Messages[`searchForType_${nbTypes}`],
+      types.reduce((i18nParams, type, index) => {
+        i18nParams[`entity${index + 1}`] = formatCollectiveType(formatMessage, type, 100);
+        return i18nParams;
+      }, {}),
+    );
   }
 };
 
@@ -70,7 +86,7 @@ const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filte
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (term || preload) {
-      throttledSearch(searchCollectives, { term, types, limit, hostCollectiveIds });
+      throttledSearch(searchCollectives, { term: term || '', types, limit, hostCollectiveIds });
     }
   }, [types, limit, hostCollectiveIds, term]);
 
@@ -83,6 +99,7 @@ const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filte
       sortFunc={collectives => collectives /** Already sorted by the API */}
       placeholder={placeholder}
       types={types}
+      useSearchIcon={true}
       onInputChange={newTerm => {
         setTerm(newTerm.trim());
       }}

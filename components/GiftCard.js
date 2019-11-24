@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { Clock } from 'styled-icons/feather/Clock';
+
 import Container from './Container';
-import { Span } from './Text';
+import { Span, P } from './Text';
 import Currency from './Currency';
 import Link from './Link';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 import { width, height, fontSize } from 'styled-system';
 
 const WhiteLink = styled(Link)`
@@ -46,6 +48,7 @@ const Text = styled.p`
 const Title = styled(Text)`
   font-size: 24px;
   font-weight: bold;
+  margin-bottom: 2px;
   ${fontSize};
 `;
 
@@ -60,17 +63,13 @@ class GiftCard extends React.Component {
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
     }),
+    expiryDate: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
-    const { amount, currency, collective, emitter } = this.props;
-
+    const { amount, currency, collective, emitter, expiryDate } = this.props;
     return (
-      <ShadowCard width={['300px', '400px']} height={['168px', '224px']}>
+      <ShadowCard width={['300px', '400px']} height={['168px', '224px']} m="0 auto">
         <Container position="absolute" left={['12px', '24px']} top={['12px', '24px']}>
           <Title fontSize={['18px', '24px']}>
             <FormattedMessage
@@ -89,6 +88,26 @@ class GiftCard extends React.Component {
             />
           </Text>
         </Container>
+        {expiryDate && (
+          <Container position="absolute" left={['6px', '12px']} bottom={['3px', '5px']}>
+            <P mt={2} fontSize="Caption" color="black.700">
+              <Clock size="1.2em" />
+              <Span ml={1} css={{ verticalAlign: 'middle' }}>
+                <FormattedMessage
+                  id="ContributePayment.expiresOn"
+                  defaultMessage="Expires on {expiryDate}"
+                  values={{
+                    expiryDate: (
+                      <strong>
+                        <FormattedDate value={expiryDate} />
+                      </strong>
+                    ),
+                  }}
+                />
+              </Span>
+            </P>
+          </Container>
+        )}
         <Container position="absolute" right={['12px', '24px']} bottom={['12px', '24px']}>
           <Flex alignItems="top" className="AmountCurrency">
             <Span fontWeight="bold" fontSize="4rem" lineHeight="4rem" color="#313233">
