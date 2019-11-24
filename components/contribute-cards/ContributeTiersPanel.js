@@ -45,6 +45,7 @@ const ContributeTiersPanel = ({
   contributorsStats,
   handleSettingsUpdate,
   CONTRIBUTE_CARD_PADDING_X,
+  createContributionTierRoute,
   financialContributorsWithoutTier,
 }) => {
   const CONTRIBUTE_CARD_HEIGHT = 341;
@@ -92,7 +93,7 @@ const ContributeTiersPanel = ({
     return (
       <Fragment>
         <Box px={CONTRIBUTE_CARD_PADDING_X}>
-          <CreateNew data-cy="create-contribute-tier" route={`/${collective.slug}/edit/tiers`}>
+          <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
             <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
           </CreateNew>
         </Box>
