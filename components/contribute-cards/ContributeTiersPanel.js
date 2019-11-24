@@ -9,6 +9,7 @@ import { Move } from 'styled-icons/boxicons-regular/Move';
 import { Close } from 'styled-icons/material/Close';
 import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
+import { get, concat, set } from 'lodash';
 
 import CreateNew from './CreateNew';
 import ContributeTier from './ContributeTier';
@@ -57,29 +58,16 @@ const ContributeTiersPanel = ({
     dynamicOptions,
   );
 
-  const getTiersOrder = memoizeOne(({ collective }) => {
-    const { settings = {} } = collective;
-    const { collectivePage = {} } = settings;
-    const { tiersOrder } = collectivePage;
-
-    if (!tiersOrder) return [];
-    if (!tiersOrder[0]) return [];
-    return tiersOrder.filter(i => i !== 'custom');
+  const getTiersOrder = memoizeOne(() => {
+    return get(collective, 'settings.collectivePage.tiersOrder', []).filter(i => i !== 'custom');
   });
 
   const handleShuffle = newTiersOrder => {
-    const { settings = {} } = collective;
-    const { collectivePage = {} } = settings;
+    const settings = get(collective, 'settings', {});
 
-    const tiersOrder = ['custom'].concat(newTiersOrder);
+    set(settings, 'collectivePage.tiersOrder', concat(['custom'], newTiersOrder));
 
-    handleSettingsUpdate({
-      ...settings,
-      collectivePage: {
-        ...collectivePage,
-        tiersOrder,
-      },
-    });
+    handleSettingsUpdate(settings);
   };
 
   if (!isAdmin) {
@@ -122,7 +110,7 @@ const ContributeTiersPanel = ({
           items={sortedTiers}
           direction="horizontal"
           onShuffle={handleShuffle}
-          itemsOrder={getTiersOrder({ collective })}
+          itemsOrder={getTiersOrder()}
         >
           {({ item, cssHelper, handleProps: { wrapper, dragProps, hideDuringDrag } }) => (
             <Fragment>

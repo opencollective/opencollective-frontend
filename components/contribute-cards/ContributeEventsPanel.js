@@ -9,6 +9,7 @@ import { Move } from 'styled-icons/boxicons-regular/Move';
 import { Close } from 'styled-icons/material/Close';
 import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
+import { get, set } from 'lodash';
 
 import CreateNew from './CreateNew';
 import ContributeEvent from './ContributeEvent';
@@ -55,27 +56,16 @@ const ContributeEventsPanel = ({
     dynamicOptions,
   );
 
-  const getOtherWaysToContributeOrder = memoizeOne(({ collective }) => {
-    const { settings = {} } = collective;
-    const { collectivePage = {} } = settings;
-    const { otherWaysToContributeOrder } = collectivePage;
-
-    if (!otherWaysToContributeOrder) return [];
-    if (!otherWaysToContributeOrder[0]) return [];
-    return otherWaysToContributeOrder.filter(i => i !== 'custom');
+  const getOtherWaysToContributeOrder = memoizeOne(() => {
+    return get(collective, 'settings.collectivePage.otherWaysToContributeOrder', []).filter(i => i !== 'custom');
   });
 
   const handleShuffle = otherWaysToContributeOrder => {
-    const { settings = {} } = collective;
-    const { collectivePage = {} } = settings;
+    const settings = get(collective, 'settings', {});
 
-    handleSettingsUpdate({
-      ...settings,
-      collectivePage: {
-        ...collectivePage,
-        otherWaysToContributeOrder,
-      },
-    });
+    set(settings, 'collectivePage.otherWaysToContributeOrder', otherWaysToContributeOrder);
+
+    handleSettingsUpdate(settings);
   };
 
   const identifier = memoizeOne(item => {
@@ -119,7 +109,7 @@ const ContributeEventsPanel = ({
           direction="horizontal"
           onShuffle={handleShuffle}
           identifier={identifier}
-          itemsOrder={getOtherWaysToContributeOrder({ collective })}
+          itemsOrder={getOtherWaysToContributeOrder()}
         >
           {({ item, cssHelper, handleProps: { wrapper, dragProps, hideDuringDrag } }) => (
             <Fragment>

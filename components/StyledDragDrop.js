@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import { union } from 'lodash';
+import { union, throttle } from 'lodash';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
 import colors from '../lib/constants/colors';
@@ -27,9 +27,7 @@ const DragMenu = styled.div`
   align-items: center;
   position: absolute;
   outline: none;
-  /* height: 35%; */
   z-index: 1;
-  /* width: 10%; */
   right: 0;
   top: 0;
 `;
@@ -135,6 +133,8 @@ const StyledDragDrop = ({
   const [confirmedItemsOrder, setConfirmedItemsOrder] = useState([]);
   const [sortedItems, setSortedItems] = useState([]);
 
+  const throttled = throttle(onShuffle, 2000);
+
   useEffect(() => {
     setConfirmedItemsOrder(getAllItemsOrder(items, itemsOrder, identifier));
     setSortedItems(orderByItemsOrder(items, confirmedItemsOrder, identifier));
@@ -152,7 +152,8 @@ const StyledDragDrop = ({
 
     const _sortedItemsId = _sortedItems.map(identifier);
     setConfirmedItemsOrder(_sortedItemsId);
-    onShuffle(_sortedItemsId);
+
+    throttled(_sortedItemsId);
   });
 
   return (
