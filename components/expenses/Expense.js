@@ -276,20 +276,19 @@ class Expense extends React.Component {
               text-transform: uppercase;
             }
 
-            .actions > div {
+            .actions {
               align-items: flex-end;
               display: flex;
               flex-wrap: wrap;
-              margin: 0.5rem 0;
             }
 
-            .actions .leftColumn {
-              width: 72px;
-              margin-right: 1rem;
-              float: left;
+            .manageExpense {
+              display: flex;
+              flex-direction: column;
             }
             .expenseActions {
               display: flex;
+              margin-right: 0.5rem;
             }
             .expenseActions :global(> div) {
               margin-right: 0.5rem;
@@ -461,7 +460,11 @@ class Expense extends React.Component {
                       />
                     )}
                     {canPay && (
-                      <StyledButton mr={2} onClick={() => this.setState({ showUnapproveModal: true })}>
+                      <StyledButton
+                        mr={2}
+                        buttonStyle="standard"
+                        onClick={() => this.setState({ showUnapproveModal: true })}
+                      >
                         <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
                       </StyledButton>
                     )}

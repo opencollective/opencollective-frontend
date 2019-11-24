@@ -7,7 +7,7 @@ import { get } from 'lodash';
 
 import { isValidEmail } from '../../lib/utils';
 
-import SmallButton from '../SmallButton';
+import StyledButton from '../StyledButton';
 
 class PayExpenseBtn extends React.Component {
   static propTypes = {
@@ -127,18 +127,24 @@ class PayExpenseBtn extends React.Component {
             }
           `}
         </style>
-        <SmallButton className="pay" onClick={this.onClick} disabled={this.props.disabled || disabled} title={title}>
+        <StyledButton
+          className="pay"
+          buttonStyle="success"
+          onClick={this.onClick}
+          disabled={this.props.disabled || disabled}
+          title={title}
+        >
           {selectedPayoutMethod === 'other' && (
-            <FormattedMessage id="expense.pay.manual.btn" defaultMessage="record as paid" />
+            <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
           )}
           {selectedPayoutMethod !== 'other' && (
             <FormattedMessage
               id="expense.pay.btn"
-              defaultMessage="pay with {paymentMethod}"
+              defaultMessage="Pay with {paymentMethod}"
               values={{ paymentMethod: expense.payoutMethod }}
             />
           )}
-        </SmallButton>
+        </StyledButton>
         <div className="error">{error}</div>
       </div>
     );
