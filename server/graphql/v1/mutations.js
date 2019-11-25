@@ -26,7 +26,7 @@ import {
   markPendingOrderAsExpired,
 } from './mutations/orders';
 
-import { createMember, removeMember, editMembership, editPublicMessage } from './mutations/members';
+import { editPublicMessage } from './mutations/members';
 import { editTiers, editTier } from './mutations/tiers';
 import { editConnectedAccount } from './mutations/connectedAccounts';
 import { createWebhook, deleteNotification, editWebhooks } from './mutations/notifications';
@@ -70,7 +70,6 @@ import { ApplicationType, ApplicationInputType } from './Application';
 
 import {
   CollectiveInputType,
-  CollectiveAttributesInputType,
   OrderInputType,
   ConfirmOrderInputType,
   TierInputType,
@@ -454,40 +453,6 @@ const mutations = {
         });
         return collective;
       }
-    },
-  },
-  createMember: {
-    type: MemberType,
-    args: {
-      member: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
-      collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
-      role: { type: new GraphQLNonNull(GraphQLString) },
-    },
-    resolve(_, args, req) {
-      return createMember(_, args, req);
-    },
-  },
-  removeMember: {
-    type: MemberType,
-    args: {
-      member: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
-      collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },
-      role: { type: new GraphQLNonNull(GraphQLString) },
-    },
-    resolve(_, args, req) {
-      return removeMember(_, args, req);
-    },
-  },
-  editMembership: {
-    type: MemberType,
-    description: 'A mutation to edit membership. Dedicated to the user, not the collective admin.',
-    deprecationReason: '2019-10-12: Please use editPublicMessage',
-    args: {
-      id: { type: GraphQLNonNull(GraphQLInt) },
-      publicMessage: { type: GraphQLString },
-    },
-    resolve(_, args, req) {
-      return editMembership(_, args, req);
     },
   },
   editPublicMessage: {
