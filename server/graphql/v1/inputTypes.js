@@ -322,11 +322,6 @@ export const OrderInputType = new GraphQLInputObjectType({
     publicMessage: { type: GraphQLString },
     privateMessage: { type: GraphQLString },
     paymentMethod: { type: PaymentMethodInputType },
-    referral: {
-      type: CollectiveAttributesInputType,
-      description: 'The referral collective',
-      deprecationReason: '2019-08-22: Referals are not supported anymore',
-    },
     user: { type: UserInputType },
     fromCollective: { type: CollectiveAttributesInputType },
     collective: { type: new GraphQLNonNull(CollectiveAttributesInputType) },

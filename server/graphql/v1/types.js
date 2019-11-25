@@ -1566,14 +1566,6 @@ export const OrderType = new GraphQLObjectType({
           return req.loaders.collective.findById.load(order.CollectiveId);
         },
       },
-      referral: {
-        description: 'Referral user collective',
-        deprecationReason: '2019-08-22: Referals are not supported anymore',
-        type: CollectiveInterfaceType,
-        resolve() {
-          return null;
-        },
-      },
       tier: {
         type: TierType,
         resolve(order) {
