@@ -11,6 +11,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 
 import InputField from '../InputField';
 import SignInOrJoinFree from '../SignInOrJoinFree';
+import StyledTooltip from '../StyledTooltip';
 import Button from '../Button';
 import Container from '../Container';
 import { P } from '../Text';
@@ -513,13 +514,24 @@ class CreateExpenseForm extends React.Component {
 
             <div className="row">
               <div>
-                <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
-                  {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-                  {!this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />}
-                </Button>
+                {this.state.error ? (
+                  <StyledTooltip place="right" type="error" delayHide={800} content={() => <p>{this.state.error}</p>}>
+                    <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
+                      {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+                      {!this.state.loading && (
+                        <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />
+                      )}
+                    </Button>
+                  </StyledTooltip>
+                ) : (
+                  <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
+                    {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+                    {!this.state.loading && (
+                      <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />
+                    )}
+                  </Button>
+                )}
               </div>
-
-              {this.state.error && <div className="error">{this.state.error}</div>}
             </div>
           </div>
         </Container>

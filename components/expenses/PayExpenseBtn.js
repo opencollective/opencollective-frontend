@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import { isValidEmail } from '../../lib/utils';
 
 import StyledButton from '../StyledButton';
+import StyledTooltip from '../StyledTooltip';
 
 class PayExpenseBtn extends React.Component {
   static propTypes = {
@@ -133,32 +134,47 @@ class PayExpenseBtn extends React.Component {
             }
           `}
         </style>
-        <StyledButton
-          className="pay"
-          buttonStyle="success"
-          onClick={() => this.handleOnClickPay(expense.payoutMethod === 'paypal')}
-          disabled={this.props.disabled || disabled}
-          title={title}
-          mr={2}
-        >
-          <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
-        </StyledButton>
-        {selectedPayoutMethod !== 'other' && (
+        {error ? (
+          <StyledTooltip place="left" type="error" delayHide={800} content={() => <p>{error}</p>}>
+            <StyledButton
+              className="pay"
+              buttonStyle="success"
+              onClick={this.onClick}
+              disabled={this.props.disabled || disabled}
+              title={title}
+            >
+              {selectedPayoutMethod === 'other' && (
+                <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
+              )}
+              {selectedPayoutMethod !== 'other' && (
+                <FormattedMessage
+                  id="expense.pay.btn"
+                  defaultMessage="Pay with {paymentMethod}"
+                  values={{ paymentMethod: expense.payoutMethod }}
+                />
+              )}
+            </StyledButton>
+          </StyledTooltip>
+        ) : (
           <StyledButton
             className="pay"
             buttonStyle="success"
-            onClick={() => this.handleOnClickPay()}
+            onClick={this.onClick}
             disabled={this.props.disabled || disabled}
             title={title}
           >
-            <FormattedMessage
-              id="expense.pay.btn"
-              defaultMessage="Pay with {paymentMethod}"
-              values={{ paymentMethod: expense.payoutMethod }}
-            />
+            {selectedPayoutMethod === 'other' && (
+              <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
+            )}
+            {selectedPayoutMethod !== 'other' && (
+              <FormattedMessage
+                id="expense.pay.btn"
+                defaultMessage="Pay with {paymentMethod}"
+                values={{ paymentMethod: expense.payoutMethod }}
+              />
+            )}
           </StyledButton>
         )}
-        <div className="error">{error}</div>
       </div>
     );
   }
