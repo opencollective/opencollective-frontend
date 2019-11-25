@@ -1541,6 +1541,10 @@ const CollectiveFields = () => {
         // Filter only "saved" stripe Payment Methods
         // In the future we should only return the "saved" whatever the service
         paymentMethods = paymentMethods.filter(pm => pm.service !== 'stripe' || pm.saved);
+
+        // Filter out prepaid method created for backyourstack.
+        paymentMethods = paymentMethods.filter(pm => pm.data && pm.data.created_for !== 'backyourstack');
+
         if (args.service) {
           paymentMethods = paymentMethods.filter(pm => pm.service === args.service);
         }
