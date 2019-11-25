@@ -215,43 +215,26 @@ const i18nSection = defineMessages({
   },
 });
 
-/**
- * Returns a list of all sections not accessible to this collective type.
- */
-const getCollectiveTypeBlacklistedSections = collectiveType => {
-  switch (collectiveType) {
-    case CollectiveType.USER:
-      return [
-        Sections.CONTRIBUTORS,
-        Sections.CONTRIBUTE,
-        Sections.UPDATES,
-        Sections.BUDGET,
-        Sections.TICKETS,
-        Sections.LOCATION,
-        Sections.PARTICIPANTS,
-      ];
-    case CollectiveType.ORGANIZATION:
-      return [
-        Sections.CONTRIBUTE,
-        Sections.UPDATES,
-        Sections.BUDGET,
-        Sections.TICKETS,
-        Sections.LOCATION,
-        Sections.PARTICIPANTS,
-      ];
-    case CollectiveType.COLLECTIVE:
-      return [
-        Sections.CONTRIBUTIONS,
-        Sections.TRANSACTIONS,
-        Sections.TICKETS,
-        Sections.LOCATION,
-        Sections.PARTICIPANTS,
-      ];
-    case CollectiveType.EVENT:
-      return [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.CONTRIBUTORS];
-    default:
-      return [];
-  }
+// Define default sections based on collective type
+const DEFAULT_SECTIONS = {
+  [CollectiveType.ORGANIZATION]: [Sections.CONTRIBUTIONS, Sections.CONTRIBUTORS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.COLLECTIVE]: [
+    Sections.GOALS,
+    Sections.CONTRIBUTE,
+    Sections.UPDATES,
+    Sections.BUDGET,
+    Sections.CONTRIBUTORS,
+    Sections.ABOUT,
+  ],
+  [CollectiveType.EVENT]: [
+    Sections.ABOUT,
+    Sections.TICKETS,
+    Sections.CONTRIBUTE,
+    Sections.PARTICIPANTS,
+    Sections.LOCATION,
+    Sections.BUDGET,
+  ],
 };
 
 /**
@@ -266,9 +249,9 @@ const getCollectiveTypeBlacklistedSections = collectiveType => {
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
 export const getSectionsForCollective = (collective, isAdmin) => {
-  const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
+  const sections = get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[collective.type] || [];
   const showGoals = get(collective, 'settings.collectivePage.showGoals', false);
-  const toRemove = new Set(getCollectiveTypeBlacklistedSections(collective.type));
+  const toRemove = new Set();
 
   // Can't contribute anymore if the collective is archived or has no host
   if (collective.isArchived || !collective.host) {
@@ -307,17 +290,6 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     if (!(collective.location && collective.location.name)) {
       toRemove.add(Sections.LOCATION);
     }
-
-    // Put about section first for events
-    sections.sort((a, b) => {
-      if (a === Sections.ABOUT) {
-        return -1;
-      } else if (b === Sections.ABOUT) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
   }
 
   return sections.filter(section => !toRemove.has(section));
