@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
-import { Flex, Box } from '@rebass/grid';
+import { get } from 'lodash';
+import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { P } from '../../Text';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
@@ -15,7 +16,6 @@ const TotalCollectiveContributionsQuery = gql`
       stats {
         id
         totalAmountSpent
-        totalAmountRaised
       }
     }
   }
@@ -32,42 +32,18 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
     variables: { id: collective.id },
   });
 
-  if (error || loading) {
+  if (error || loading || !get(data, 'Collective.stats.totalAmountSpent')) {
     return null;
   }
 
-  const { totalAmountSpent, totalAmountRaised } = data.Collective.stats;
-  if (!totalAmountSpent && !totalAmountRaised) {
-    return null;
-  }
-
+  const { stats, currency } = data.Collective;
   return (
-    <Flex flexWrap="wrap" my={2}>
-      {data.Collective.stats.totalAmountSpent > 0 && (
-        <Box my={1}>
-          <P fontSize="Tiny" textTransform="uppercase">
-            <FormattedMessage id="collective.stats.totalAmountSpent.label" defaultMessage="Total amount contributed" />
-          </P>
-          <FormattedMoneyAmount
-            amount={data.Collective.stats.totalAmountSpent}
-            currency={data.Collective.currency}
-            amountStyles={amountStyles}
-          />
-        </Box>
-      )}
-      {data.Collective.stats.totalAmountRaised > 0 && (
-        <Box mx={4} my={1}>
-          <P fontSize="Tiny" textTransform="uppercase">
-            <FormattedMessage id="collective.stats.totalAmountRaised.label" defaultMessage="Total amount raised" />
-          </P>
-          <FormattedMoneyAmount
-            amount={data.Collective.stats.totalAmountRaised}
-            currency={data.Collective.currency}
-            amountStyles={amountStyles}
-          />
-        </Box>
-      )}
-    </Flex>
+    <Box my={2}>
+      <P fontSize="Tiny" textTransform="uppercase">
+        <FormattedMessage id="collective.stats.totalAmountSpent.label" defaultMessage="Total amount contributed" />
+      </P>
+      <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountStyles={amountStyles} />
+    </Box>
   );
 };
 
