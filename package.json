@@ -157,7 +157,7 @@
     "test:update": "npm run test:jest -- --updateSnapshot"
   },
   "devDependencies": {
-    "@babel/cli": "7.6.4",
+    "@babel/cli": "7.7.4",
     "@babel/core": "7.6.4",
     "@babel/node": "7.6.3",
     "babel-eslint": "^10.0.3",
