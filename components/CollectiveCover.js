@@ -251,7 +251,7 @@ ${description}`;
 
     if (!isEvent && useNewCollectiveNavbar && collective && collective.slug) {
       return (
-        <Container borderTop="1px solid #E6E8EB" mb={4}>
+        <Container mb={4}>
           <CollectiveNavbar
             collective={collective}
             isAdmin={canEdit}

@@ -189,7 +189,7 @@ class CreateOrderPage extends React.Component {
       return (
         <Page {...this.getPageMetadata()}>
           {data.loading ? (
-            <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+            <Container py={[5, 6]}>
               <Loading />
             </Container>
           ) : (
