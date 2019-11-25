@@ -338,6 +338,11 @@ async function HostReport(year, month, hostId) {
         summary.numberDonations += data.stats.numberDonations;
         summary.numberPaidExpenses += data.stats.numberPaidExpenses;
         summary.totalAmountPaidExpenses += data.stats.totalAmountPaidExpenses;
+
+        // Don't send transactions in email if there is more than 1000
+        if (data.transactions.length > 1000) {
+          delete data.transactions;
+        }
       })
       .then(() => getHostAdminsEmails(host))
       .then(admins => sendEmail(admins, data, attachments))

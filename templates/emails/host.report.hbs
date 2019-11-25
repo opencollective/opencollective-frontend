@@ -255,7 +255,7 @@ Subject: {{{host.name}}} Host {{reportName}}
     </tr>
   </table>
 
-
+  {{#if transactions}}
   <h2>🗒 {{transactions.length}} transactions</h2>
   <table width="100%" border=0 class="small-table">
     <tr>
@@ -281,6 +281,7 @@ Subject: {{{host.name}}} Host {{reportName}}
     No expense submitted.
     {{/each}}
   </table>
+  {{/if}}
 
   <p class="muted">
     * Net amount in {{host.currency}} after payment processor fees, host fees, and platform fees.
