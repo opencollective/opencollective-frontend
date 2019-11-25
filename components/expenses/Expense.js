@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import styled from 'styled-components';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { Flex } from '@rebass/grid';
@@ -24,23 +23,6 @@ import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
-
-const DeleteButton = styled(StyledButton)`
-  border-color: #f51d57;
-  background: #f51d57;
-
-  &:visited {
-    background: #d60940;
-  }
-
-  &:focus {
-    background: #f51d57;
-  }
-
-  &:hover {
-    background: #ff4778;
-  }
-`;
 
 class Expense extends React.Component {
   static propTypes = {
@@ -529,12 +511,12 @@ class Expense extends React.Component {
                     {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canDelete && (
-                      <DeleteButton
-                        buttonStyle="standard"
+                      <StyledButton
+                        buttonStyle="danger"
                         onClick={() => this.setState({ showDeleteExpenseModal: true })}
                       >
                         <FormattedMessage id="expense.delete.btn" defaultMessage="Delete" />
-                      </DeleteButton>
+                      </StyledButton>
                     )}
                   </Flex>
                 </Flex>
