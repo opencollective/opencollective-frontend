@@ -505,10 +505,14 @@ class CreateOrderPage extends React.Component {
     );
   }
 
-  /** Returns tier presets, defaults presets, or null if using a tier with fixed amount */
+  /** If not a fixed amount, returns tier presets or defaults presets */
   getAmountsPresets() {
     const tier = this.props.tier || {};
-    return tier.presets || (isNil(tier.amount) ? [500, 1000, 2000, 5000] : null);
+    if (tier.amountType !== AmountTypes.FIXED) {
+      return tier.presets || [500, 1000, 2000, 5000];
+    } else {
+      return null;
+    }
   }
 
   /** Get the min authorized amount for order, in cents */
@@ -570,7 +574,7 @@ class CreateOrderPage extends React.Component {
   isFixedContribution() {
     const tier = this.props.tier;
     const forceInterval = Boolean(tier) || Boolean(this.props.fixedInterval);
-    const forceAmount = !get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.fixedAmount);
+    const forceAmount = (tier && tier.amountType === AmountTypes.FIXED) || this.props.fixedAmount;
     const isFlexible = tier && tier.amountType === AmountTypes.FLEXIBLE;
     return !isFlexible && forceInterval && forceAmount;
   }
