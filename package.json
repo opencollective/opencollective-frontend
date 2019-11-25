@@ -159,7 +159,7 @@
   "devDependencies": {
     "@babel/cli": "7.6.4",
     "@babel/core": "7.6.4",
-    "@babel/node": "7.6.3",
+    "@babel/node": "7.7.4",
     "babel-eslint": "^10.0.3",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-react-intl": "^5.1.4",
