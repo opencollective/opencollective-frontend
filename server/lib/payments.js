@@ -22,7 +22,7 @@ const debug = debugLib('payments');
 /** Check if paymentMethod has a given fully qualified name
  *
  * Payment Provider names are composed by service and type joined with
- * a dot. E.g.: `opencollective.giftcard`, `stripe.creditcard`,
+ * a dot. E.g.: `opencollective.virtualcard`, `stripe.creditcard`,
  * etc. This function returns true if a *paymentMethod* instance has a
  * given *fqn*.
  *
@@ -33,7 +33,7 @@ const debug = debugLib('payments');
  * @returns {Boolean} true if *paymentMethod* has a fully qualified
  *  name that equals *fqn*.
  * @example
- * > isProvider('opencollective.giftcard', { service: 'foo', type: 'bar' })
+ * > isProvider('opencollective.virtualcard', { service: 'foo', type: 'bar' })
  * false
  * > isProvider('stripe.creditcard', { service: 'stripe', type: 'creditcard' })
  * true
@@ -223,11 +223,7 @@ export const sendEmailNotifications = (order, transaction) => {
   // for gift cards and manual payment methods
   if (!transaction) {
     sendOrderProcessingEmail(order);
-    if (isProvider('opencollective.giftcard', order.paymentMethod)) {
-      sendSupportEmailForManualIntervention(order); // async
-    } else {
-      sendManualPendingOrderEmail(order);
-    }
+    sendManualPendingOrderEmail(order);
   } else {
     order.transaction = transaction;
     sendOrderConfirmedEmail(order); // async
@@ -384,13 +380,6 @@ const sendOrderConfirmedEmail = async order => {
 
     return emailLib.send('thankyou', user.email, data, emailOptions);
   }
-};
-
-const sendSupportEmailForManualIntervention = order => {
-  const user = order.createdByUser;
-  return emailLib.sendMessage('support@opencollective.com', 'Gift card order needs manual attention', null, {
-    text: `Order Id: ${order.id} by userId: ${user.id}`,
-  });
 };
 
 // Assumes one-time payments,

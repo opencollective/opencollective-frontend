@@ -393,11 +393,6 @@ export default function(Sequelize, DataTypes) {
       return getBalance(this);
     }
 
-    // needed because giftcard payment method can be accessed without logged in
-    if (libpayments.isProvider('opencollective.giftcard', this)) {
-      return getBalance(this);
-    }
-
     if (this.monthlyLimitPerMember && !user) {
       console.error(
         '>>> this payment method has a monthly limit. Please provide a user to be able to compute their balance.',
@@ -507,20 +502,6 @@ export default function(Sequelize, DataTypes) {
       };
       debug('PaymentMethod.create', paymentMethodData);
       return models.PaymentMethod.create(paymentMethodData);
-    } else if (paymentMethod.uuid && libpayments.isProvider('opencollective.giftcard', paymentMethod)) {
-      return PaymentMethod.findOne({
-        where: {
-          uuid: paymentMethod.uuid,
-          token: paymentMethod.token.toUpperCase(),
-          archivedAt: null,
-        },
-      }).then(pm => {
-        if (!pm) {
-          throw new Error("Your gift card code doesn't exist");
-        } else {
-          return pm;
-        }
-      });
     } else {
       return PaymentMethod.findOne({
         where: { uuid: paymentMethod.uuid },
