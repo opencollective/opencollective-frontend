@@ -173,8 +173,8 @@ export default function(Sequelize, DataTypes) {
         message: 'You must be the author or an admin of this collective to edit this comment',
       });
     }
-    const editableAttributes = ['FromCollectiveId', 'markdown', 'html'];
-    sanitizeObject(newCommentData, ['markdown', 'html']);
+    const editableAttributes = ['markdown', 'html'];
+    sanitizeObject(newCommentData, editableAttributes);
     return await this.update({
       ...pick(newCommentData, editableAttributes),
     });

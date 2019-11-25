@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLInt, GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
+import { GraphQLString, GraphQLInt, GraphQLInputObjectType } from 'graphql';
 
 /**
  * Input type to use as the type for the comment input in createComment mutation.
@@ -8,7 +8,6 @@ const CommentCreate = new GraphQLInputObjectType({
   fields: () => ({
     markdown: { type: GraphQLString },
     html: { type: GraphQLString },
-    CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
     ExpenseId: { type: GraphQLInt },
     UpdateId: { type: GraphQLInt },
   }),

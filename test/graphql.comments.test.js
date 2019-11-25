@@ -86,7 +86,6 @@ describe('graphql.comments.test', () => {
     comment = {
       markdown: 'This is the **comment**',
       ExpenseId: expense1.id,
-      CollectiveId: collective1.id,
     };
     comments = [
       { markdown: 'comment 1', createdAt: new Date('2018-01-01'), FromCollectiveId: collectiveAdmin.CollectiveId },
@@ -133,8 +132,6 @@ describe('graphql.comments.test', () => {
   }
 
   describe('create a comment', () => {
-    let newComment;
-    beforeEach(() => (newComment = { ...comment, FromCollectiveId: user1.CollectiveId }));
     const createCommentQuery = `
     mutation createComment($comment: CommentInputType!) {
       createComment(comment: $comment) {
@@ -149,15 +146,13 @@ describe('graphql.comments.test', () => {
     `;
 
     it('fails if not authenticated', async () => {
-      const result = await utils.graphqlQuery(createCommentQuery, {
-        comment: newComment,
-      });
+      const result = await utils.graphqlQuery(createCommentQuery, { comment });
       expect(result.errors).to.have.length(1);
       expect(result.errors[0].message).to.equal('You must be logged in to create a comment');
     });
 
     it('creates a comment', async () => {
-      const result = await utils.graphqlQuery(createCommentQuery, { comment: newComment }, user1);
+      const result = await utils.graphqlQuery(createCommentQuery, { comment }, user1);
       utils.expectNoErrorsFromResult(result);
       const createdComment = result.data.createComment;
       expect(createdComment.html).to.equal('<p>This is the <strong>comment</strong></p>');

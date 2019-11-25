@@ -35,28 +35,33 @@ async function deleteComment(id, remoteUser) {
   return await comment.delete(remoteUser);
 }
 
-function createCommentResolver(_, { comment }, { remoteUser }) {
-  // Validate required fields and permissions
+async function createCommentResolver(_, { comment }, { remoteUser }) {
+  mustBeLoggedInTo(remoteUser, 'create a comment');
+
+  // Validate required fields
   if (!comment.markdown && !comment.html) {
     throw new errors.ValidationFailed({
       message: 'comment.markdown or comment.html required',
     });
   }
-  mustBeLoggedInTo(remoteUser, 'create a comment');
 
-  const { CollectiveId, ExpenseId, UpdateId } = comment;
+  const { ExpenseId, UpdateId, markdown, html } = comment;
+
+  const expense = await models.Expense.findByPk(ExpenseId);
+  if (!expense) throw new errors.NotFound({ message: `Expense with id ${ExpenseId} not found` });
+
   const commentData = {
-    CollectiveId,
     ExpenseId,
     UpdateId,
+    CollectiveId: expense.CollectiveId,
     CreatedByUserId: remoteUser.id,
     FromCollectiveId: remoteUser.CollectiveId,
   };
-  if (comment.markdown) {
-    commentData.markdown = strip_tags(comment.markdown);
+  if (markdown) {
+    commentData.markdown = strip_tags(markdown);
   }
-  if (comment.html) {
-    commentData.html = strip_tags(comment.html);
+  if (html) {
+    commentData.html = strip_tags(html);
   }
 
   return models.Comment.create(commentData);
