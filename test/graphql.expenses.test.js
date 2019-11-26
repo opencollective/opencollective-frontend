@@ -1107,7 +1107,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       expense.status = 'REJECTED';
-      expense.save();
+      await expense.save();
       // When the above user tries to delete the expense
       const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, user);
       result.errors && console.log(result.errors);
