@@ -242,7 +242,7 @@ class SectionContribute extends React.PureComponent {
             </StyledButton>
           </Link>
         </ContainerSectionContent>
-        {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
+        {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors
             organizations={topOrganizations}
             individuals={topIndividuals}
