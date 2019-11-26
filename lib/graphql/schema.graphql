@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Nov 19 2019 13:59:31 GMT+0100 (GMT+01:00)
+# timestamp: Mon Nov 25 2019 15:10:44 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -1585,22 +1585,6 @@ type Mutation {
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
-  createMember(
-    member: CollectiveAttributesInputType!
-    collective: CollectiveAttributesInputType!
-    role: String!
-  ): Member
-  removeMember(
-    member: CollectiveAttributesInputType!
-    collective: CollectiveAttributesInputType!
-    role: String!
-  ): Member
-
-  """
-  A mutation to edit membership. Dedicated to the user, not the collective admin.
-  """
-  editMembership(id: Int!, publicMessage: String): Member
-    @deprecated(reason: "2019-10-12: Please use editPublicMessage")
 
   """
   A mutation to edit the public message of all matching members.
@@ -2566,6 +2550,11 @@ type Query {
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
+    Fetch collectives with a list of collective slug
+    """
+    slugs: [String]
+
+    """
     Fetch all collectives that match at least one of the tags
     """
     tags: [String]
@@ -2614,12 +2603,6 @@ type Query {
     Fetch all collectives that are a child of `ParentCollectiveId`. Used for "SuperCollectives"
     """
     ParentCollectiveId: Int
-
-    """
-    Fetch all collectives with slug within slugs
-    """
-    slugs: [String]
-
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
     limit: Int = 10
