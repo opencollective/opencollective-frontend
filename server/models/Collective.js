@@ -1612,6 +1612,13 @@ export default function(Sequelize, DataTypes) {
     if (members.filter(m => m.role === roles.ADMIN).length === 0) {
       throw new Error('There must always be at least one collective admin');
     }
+
+    const checkAuthorizedRole = role => {
+      if (![roles.ADMIN, roles.MEMBER].includes(role)) {
+        throw new Error(`Cant edit or create membership with role ${role}`);
+      }
+    };
+
     return this.getMembers({
       where: { role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
     })
@@ -1635,6 +1642,8 @@ export default function(Sequelize, DataTypes) {
       })
       .then(() => {
         return Promise.map(members, member => {
+          checkAuthorizedRole(member.role);
+
           if (member.id) {
             // Edit an existing membership (edit the role/description)
             const editableAttributes = pick(member, ['role', 'description', 'since']);
