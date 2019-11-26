@@ -12,6 +12,7 @@ import * as auth from '../lib/auth';
 import userLib from '../lib/userlib';
 import roles from '../constants/roles';
 import { isValidEmail } from '../lib/utils';
+import emailLib from '../lib/email';
 
 const debug = debugLib('user');
 
@@ -50,7 +51,7 @@ export default (Sequelize, DataTypes) => {
             msg: 'Email must be valid',
           },
           isBurnerEmail: function(val) {
-            if (isEmailBurner(val.toLowerCase())) {
+            if (isEmailBurner(val.toLowerCase()) && !emailLib.isWhitelistedDomain(val.toLowerCase())) {
               throw new Error(
                 'This email provider is not allowed on Open Collective. If you think that it should be, please email us at support@opencollective.com.',
               );
