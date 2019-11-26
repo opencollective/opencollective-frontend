@@ -182,7 +182,7 @@
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^2.3.0",
-    "file-loader": "^4.3.0",
+    "file-loader": "^5.0.2",
     "html-loader": "^0.5.5",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
