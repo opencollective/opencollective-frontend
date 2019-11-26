@@ -1,4 +1,4 @@
-import { omit, pick } from 'lodash';
+import { pick } from 'lodash';
 import {
   claimCollective,
   createCollective,
@@ -351,9 +351,10 @@ const mutations = {
       paymentProcessorFeeInCollectiveCurrency: { type: GraphQLInt },
       hostFeeInCollectiveCurrency: { type: GraphQLInt },
       platformFeeInCollectiveCurrency: { type: GraphQLInt },
+      manuallyPayPaypalMethod: { type: GraphQLBoolean },
     },
     resolve(_, args, req) {
-      return payExpense(req.remoteUser, args.id, omit(args, ['id']));
+      return payExpense(req.remoteUser, args);
     },
   },
   markOrderAsPaid: {

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import errors from '../../../lib/errors';
 import roles from '../../../constants/roles';
 import statuses from '../../../constants/expense_status';
@@ -267,7 +267,10 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
  * @PRE: fees { id, paymentProcessorFeeInCollectiveCurrency, hostFeeInCollectiveCurrency, platformFeeInCollectiveCurrency }
  * Note: some payout methods like PayPal will automatically define `paymentProcessorFeeInCollectiveCurrency`
  */
-export async function payExpense(remoteUser, expenseId, fees = {}) {
+export async function payExpense(remoteUser, args) {
+  const expenseId = args.id;
+  const fees = omit(args, ['id', 'manuallyPayPaypalMethod']);
+
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to pay an expense');
   }
@@ -293,7 +296,6 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
   }
 
   const balance = await expense.collective.getBalance();
-  const processorFeeInputed = fees.paymentProcessorFeeInCollectiveCurrency;
 
   if (expense.amount > balance) {
     throw new errors.Unauthorized(
@@ -340,8 +342,7 @@ export async function payExpense(remoteUser, expenseId, fees = {}) {
     if (expense.paypalEmail === paymentMethod.name) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
       await createTransactions(host, expense, feesInHostCurrency);
-    } else if (processorFeeInputed && processorFeeInputed > 0) {
-      // For paypal method manually recorded as paid.
+    } else if (args.manuallyPayPaypalMethod) {
       await createTransactions(host, expense, feesInHostCurrency);
     } else {
       await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);
