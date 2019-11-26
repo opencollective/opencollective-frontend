@@ -1575,6 +1575,7 @@ type Mutation {
     paymentProcessorFeeInCollectiveCurrency: Int
     hostFeeInCollectiveCurrency: Int
     platformFeeInCollectiveCurrency: Int
+    manuallyPayPaypalMethod: Boolean
   ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
   markPendingOrderAsExpired(id: Int!): OrderType
