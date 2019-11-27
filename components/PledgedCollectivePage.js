@@ -52,13 +52,13 @@ const PledgedCollectivePage = ({ collective }) => {
 
   if (loading) {
     return (
-      <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+      <Container py={[5, 6]}>
         <Loading />
       </Container>
     );
   } else if (error) {
     return (
-      <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+      <Container py={[5, 6]}>
         <MessageBox type="error" withIcon>
           {error.toString()}
         </MessageBox>

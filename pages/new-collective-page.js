@@ -127,7 +127,7 @@ class NewCollectivePage extends React.Component {
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         {data.loading ? (
-          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+          <Container py={[5, 6]}>
             <Loading />
           </Container>
         ) : (
