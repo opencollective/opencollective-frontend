@@ -915,6 +915,7 @@
   "Pagination.Count": "Page {current} of {total}",
   "Pagination.Next": "Prossimo",
   "Pagination.Prev": "Precedente",
+  "ParticipantsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} participating",
   "paymentMethod.activeSubscriptions": "{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}",
   "paymentMethod.add": "Nuova carta di credito",
   "paymentMethod.cancel": "Annulla",
