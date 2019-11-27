@@ -70,7 +70,6 @@ class CollectiveCover extends React.Component {
       description: PropTypes.string,
       stats: PropTypes.shape({
         totalAmountSpent: PropTypes.number,
-        totalAmountRaised: PropTypes.number,
       }),
       host: PropTypes.shape({
         slug: PropTypes.string,
@@ -613,17 +612,6 @@ ${description}`;
                     defaultMessage="Total amount contributed"
                   />
                 </div>
-                {stats.totalAmountRaised > 0 && (
-                  <div className="stat">
-                    <div className="totalAmountRaised value">
-                      <Currency value={stats.totalAmountRaised} currency={collective.currency} />
-                    </div>
-                    <FormattedMessage
-                      id="collective.stats.totalAmountRaised.label"
-                      defaultMessage="Total amount raised"
-                    />
-                  </div>
-                )}
               </div>
             )}
 
