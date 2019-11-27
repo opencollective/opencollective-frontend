@@ -518,7 +518,7 @@ export const InvoiceType = new GraphQLObjectType({
         description:
           'Title for the invoice. Depending on the type of legal entity, a host should issue an Invoice or a Receipt.',
         resolve(invoice) {
-          return invoice.title || 'Donation Receipt';
+          return invoice.title;
         },
       },
       dateFrom: {
