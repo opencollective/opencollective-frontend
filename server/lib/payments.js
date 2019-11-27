@@ -225,6 +225,8 @@ export const sendEmailNotifications = (order, transaction) => {
     sendOrderProcessingEmail(order);
     if (isProvider('opencollective.giftcard', order.paymentMethod)) {
       sendSupportEmailForManualIntervention(order); // async
+    } else {
+      sendManualPendingOrderEmail(order);
     }
   } else {
     order.transaction = transaction;
@@ -422,6 +424,43 @@ const sendOrderProcessingEmail = async order => {
     });
   }
   return emailLib.send('order.processing', user.email, data, {
+    from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
+  });
+};
+
+const sendManualPendingOrderEmail = async order => {
+  const { collective, fromCollective } = order;
+  const user = order.createdByUser;
+  const host = await collective.getHostCollective();
+  const data = {
+    order: order.info,
+    user: user.info,
+    collective: collective.info,
+    host: host.info,
+    fromCollective: fromCollective.activity,
+    pendingOrderLink: `${config.host.website}/${collective.slug}/orders/${order.id}`,
+  };
+
+  return emailLib.send('order.new.pendingFinancialContribution', user.email, data, {
+    from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
+  });
+};
+
+export const sendReminderPendingOrderEmail = async order => {
+  const { collective, fromCollective } = order;
+  const user = order.createdByUser;
+  const host = await collective.getHostCollective();
+  const data = {
+    order: order.info,
+    user: user.info,
+    collective: collective.info,
+    host: host.info,
+    fromCollective: fromCollective.activity,
+    markAsPaidLink: `${config.host.website}/orders/${order.id}/mark-as-paid`,
+    viewDetailsLink: `${config.host.website}/${collective.slug}/orders/${order.id}`,
+  };
+
+  return emailLib.send('order.reminder.pendingFinancialContribution', user.email, data, {
     from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
   });
 };

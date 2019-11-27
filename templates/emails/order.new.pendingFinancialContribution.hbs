@@ -1,0 +1,28 @@
+Subject: New pending financial contribution of {{{currency order.totalAmount
+currency=order.currency}}} to {{collective.name}}
+
+<style>
+  code {
+    display: inline-block;
+    border: 1px solid #ccc;
+    background: #ddd;
+    padding: 1px 3px;
+    margin: 0px 1px;
+  }
+</style>
+
+{{> header}}
+
+{{> toplogo}}
+
+<p>
+  {{collective.name}} has a pending financial contribution of {{{currency order.totalAmount
+  currency=order.currency}}} from {{fromCollective.name}}. They have been sent bank wire transfer
+  instructions to transmit the funds to {{host.name}}.
+</p>
+
+<p>Pending order details:
+  <a href="{{pendingOrderLink}}">{{pendingOrderLink}}</a>.
+</p>
+
+{{> footer}}
