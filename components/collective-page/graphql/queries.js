@@ -182,6 +182,7 @@ export const getCollectivePageQuery = gql`
           publicMessage
           fromCollective {
             id
+            type
             name
             company
             image

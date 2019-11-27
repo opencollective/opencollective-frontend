@@ -202,16 +202,30 @@ const ContributeCard = ({
                   </Flex>
                   {stats && stats.all > 0 && (
                     <P mt={2} fontSize="Tiny" color="black.600" letterSpacing="-0.6px">
-                      <FormattedMessage
-                        id="ContributorsCount"
-                        defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed"
-                        values={{
-                          userCount: stats.users,
-                          orgCount: stats.organizations,
-                          totalCount: stats.all,
-                          both: Number(stats.users && stats.organizations),
-                        }}
-                      />
+                      {type !== 'TICKET' && (
+                        <FormattedMessage
+                          id="ContributorsCount"
+                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed"
+                          values={{
+                            userCount: stats.users,
+                            orgCount: stats.organizations,
+                            totalCount: stats.all,
+                            both: Number(stats.users && stats.organizations),
+                          }}
+                        />
+                      )}
+                      {type === 'TICKET' && (
+                        <FormattedMessage
+                          id="ParticipantsCount"
+                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} participating"
+                          values={{
+                            userCount: stats.users,
+                            orgCount: stats.organizations,
+                            totalCount: stats.all,
+                            both: Number(stats.users && stats.organizations),
+                          }}
+                        />
+                      )}
                     </P>
                   )}
                 </React.Fragment>
