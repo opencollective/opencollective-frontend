@@ -842,7 +842,7 @@ describe('GraphQL Expenses API', () => {
       it('fails if not enough funds on the paypal preapproved key', async () => {
         // And then add funds to the collective
         const initialBalance = 1500;
-        const paymentProcessorFeeInCollectiveCurrency = 0;
+        const paymentProcessorFeeInCollectiveCurrency = 100;
         await addFunds(user, hostCollective, collective, initialBalance);
         // When the expense is paid by the host admin
         const res = await utils.graphqlQuery(
