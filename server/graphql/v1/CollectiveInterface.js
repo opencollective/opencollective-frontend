@@ -13,6 +13,7 @@ import GraphQLJSON from 'graphql-type-json';
 import { get, has, sortBy } from 'lodash';
 
 import queries from '../../lib/queries';
+import { hostResolver } from '../common/collective';
 
 import {
   LocationType,
@@ -1048,23 +1049,7 @@ const CollectiveFields = () => {
     host: {
       description: 'Get the host collective that is receiving the money on behalf of this collective',
       type: CollectiveInterfaceType,
-      resolve(collective, args, req) {
-        if (collective.HostCollectiveId) {
-          return req.loaders.collective.findById.load(collective.HostCollectiveId);
-        }
-
-        if (collective.ParentCollectiveId) {
-          return req.loaders.collective.findById.load(collective.ParentCollectiveId).then(parentCollective => {
-            if (parentCollective && parentCollective.HostCollectiveId) {
-              return req.loaders.collective.findById.load(parentCollective.HostCollectiveId);
-            } else {
-              return null;
-            }
-          });
-        }
-
-        return null;
-      },
+      resolve: hostResolver,
     },
     hostCollective: {
       description: 'A host might have a collective attached to it',

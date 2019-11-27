@@ -4,7 +4,6 @@
 import _, { pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import activities from '../constants/activities';
-import { mustBeLoggedInTo } from '../lib/auth';
 import Promise from 'bluebird';
 import showdown from 'showdown';
 const markdownConverter = new showdown.Converter();
@@ -169,21 +168,19 @@ export default function(Sequelize, DataTypes) {
 
   // Edit a comment
   Comment.prototype.edit = async function(remoteUser, newCommentData) {
-    mustBeLoggedInTo(remoteUser, 'edit this comment');
     if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
       throw new errors.Unauthorized({
         message: 'You must be the author or an admin of this collective to edit this comment',
       });
     }
-    const editableAttributes = ['FromCollectiveId', 'markdown', 'html'];
-    sanitizeObject(newCommentData, ['markdown', 'html']);
+    const editableAttributes = ['markdown', 'html'];
+    sanitizeObject(newCommentData, editableAttributes);
     return await this.update({
       ...pick(newCommentData, editableAttributes),
     });
   };
 
   Comment.prototype.delete = async function(remoteUser) {
-    mustBeLoggedInTo(remoteUser, 'delete this comment');
     if (remoteUser.id !== this.CreatedByUserId || !remoteUser.isAdmin(this.CollectiveId)) {
       throw new errors.Unauthorized({
         message: 'You need to be logged in as a core contributor or as a host to delete this comment',

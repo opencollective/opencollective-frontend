@@ -572,9 +572,7 @@ const mutations = {
         type: new GraphQLNonNull(CommentInputType),
       },
     },
-    resolve(_, args, req) {
-      return commentMutations.createComment(_, args, req);
-    },
+    resolve: commentMutations.createComment,
   },
   editComment: {
     type: CommentType,
@@ -583,9 +581,7 @@ const mutations = {
         type: new GraphQLNonNull(CommentAttributesInputType),
       },
     },
-    resolve(_, args, req) {
-      return commentMutations.editComment(_, args, req);
-    },
+    resolve: commentMutations.editComment,
   },
   deleteComment: {
     type: CommentType,
@@ -594,9 +590,7 @@ const mutations = {
         type: new GraphQLNonNull(GraphQLInt),
       },
     },
-    resolve(_, args, req) {
-      return commentMutations.deleteComment(_, args, req);
-    },
+    resolve: commentMutations.deleteComment,
   },
   cancelSubscription: {
     type: OrderType,

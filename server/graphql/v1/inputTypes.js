@@ -370,8 +370,16 @@ export const CommentInputType = new GraphQLInputObjectType({
     id: { type: GraphQLInt },
     markdown: { type: GraphQLString },
     html: { type: GraphQLString },
-    FromCollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
-    CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+    /** @deprecated since 2019-11-25: This field is now taken from the logged user. It has no effect. */
+    FromCollectiveId: {
+      type: GraphQLInt,
+      description: 'Deprecated since 2019-11-25: This field is now taken from the logged user. It has no effect.',
+    },
+    /** @deprecated since 2019-11-25: This field is now taken from the expense. It has no effect. */
+    CollectiveId: {
+      type: GraphQLInt,
+      description: 'Deprecated since 2019-11-25: This field is now taken from the expense. It has no effect.',
+    },
     ExpenseId: { type: GraphQLInt },
     UpdateId: { type: GraphQLInt },
   }),
@@ -384,9 +392,20 @@ export const CommentAttributesInputType = new GraphQLInputObjectType({
     id: { type: GraphQLInt },
     markdown: { type: GraphQLString },
     html: { type: GraphQLString },
-    FromCollectiveId: { type: GraphQLInt },
-    CollectiveId: { type: GraphQLInt },
-    ExpenseId: { type: GraphQLInt },
+    /** @deprecated since 2019-11-25: This field is not editable. */
+    FromCollectiveId: {
+      type: GraphQLInt,
+      description: 'Deprecated since 2019-11-25: This field is not editable.',
+    },
+    /** @deprecated since 2019-11-25: This field is not editable. */
+    CollectiveId: {
+      type: GraphQLInt,
+      description: 'Deprecated since 2019-11-25: This field is not editable.',
+    },
+    ExpenseId: {
+      type: GraphQLInt,
+      deprecationReason: '2019-11-25: Not editable.',
+    },
     UpdateId: { type: GraphQLInt },
   }),
 });

@@ -268,3 +268,28 @@ export function expectNoErrorsFromResult(res) {
   res.errors && console.error(res.errors);
   expect(res.errors).to.not.exist;
 }
+
+/**
+ * traverse callback function definition.
+ * This callback will be called for every property of object.
+ * https://jsdoc.app/tags-param.html#callback-functions
+ *
+ * @callback PropertyCallback
+ * @param {string} key - Object key.
+ * @param {*} value - Object value at the given key.
+ */
+
+/**
+ * Traverse an object and call cb for every property.
+ * @param {object} obj - Object to traverse.
+ * @param {PropertyCallback} cb - Callback function to be called for every property of obj.
+ */
+export function traverse(obj, cb) {
+  for (const key in obj) {
+    if (obj[key] && typeof obj[key] === 'object') {
+      traverse(obj[key], cb);
+    } else {
+      cb(key, obj[key]);
+    }
+  }
+}

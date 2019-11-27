@@ -136,6 +136,8 @@ export default app => {
   app.param('paranoidtransactionid', params.paranoidtransactionid);
   app.param('expenseid', params.expenseid);
 
+  const isDevelopment = config.env === 'development';
+
   /**
    * GraphQL v1
    */
@@ -146,8 +148,8 @@ export default app => {
       return formatError(error);
     },
     schema: graphqlSchemaV1,
-    pretty: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
-    graphiql: process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging',
+    pretty: isDevelopment,
+    graphiql: isDevelopment,
   });
 
   app.use('/graphql/v1', graphqlServerV1);
@@ -158,7 +160,7 @@ export default app => {
   const graphqlServerV2 = new ApolloServer({
     schema: graphqlSchemaV2,
     introspection: true,
-    playground: false,
+    playground: isDevelopment,
     // Align with behavior from express-graphql
     context: ({ req }) => {
       return req;

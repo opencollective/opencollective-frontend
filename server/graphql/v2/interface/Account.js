@@ -29,6 +29,120 @@ import { NotFound } from '../../errors';
 
 import models, { Op } from '../../../models';
 
+const accountFieldsDefinition = () => ({
+  // _internal_id: {
+  //   type: GraphQLInt,
+  //   description: 'The internal database identifier (should not be public)',
+  // },
+  id: {
+    type: GraphQLString,
+    description: 'The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)',
+  },
+  slug: {
+    type: GraphQLString,
+    description: 'The slug identifying the account (ie: babel)',
+  },
+  type: {
+    type: AccountType,
+    description: 'The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
+  },
+  name: {
+    type: GraphQLString,
+  },
+  description: {
+    type: GraphQLString,
+  },
+  website: {
+    type: GraphQLString,
+  },
+  twitterHandle: {
+    type: GraphQLString,
+  },
+  githubHandle: {
+    type: GraphQLString,
+  },
+  currency: {
+    type: GraphQLString,
+  },
+  imageUrl: {
+    type: GraphQLString,
+    args: {
+      height: { type: GraphQLInt },
+      format: {
+        type: ImageFormat,
+      },
+    },
+  },
+  createdAt: {
+    type: GraphQLDateTime,
+    description: 'The time of creation',
+  },
+  updatedAt: {
+    type: GraphQLDateTime,
+    description: 'The time of last update',
+  },
+  // stats: {
+  //   type: AccountStats,
+  // },
+  members: {
+    type: MemberCollection,
+    args: {
+      limit: { type: GraphQLInt, defaultValue: 100 },
+      offset: { type: GraphQLInt, defaultValue: 0 },
+      role: { type: new GraphQLList(MemberRole) },
+      accountType: {
+        type: new GraphQLList(AccountType),
+        description: 'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
+      },
+    },
+  },
+  memberOf: {
+    type: MemberOfCollection,
+    args: {
+      limit: { type: GraphQLInt, defaultValue: 100 },
+      offset: { type: GraphQLInt, defaultValue: 0 },
+      role: { type: new GraphQLList(MemberRole) },
+      accountType: {
+        type: new GraphQLList(AccountType),
+        description: 'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
+      },
+    },
+  },
+  transactions: {
+    type: TransactionCollection,
+    args: {
+      limit: { type: GraphQLInt, defaultValue: 100 },
+      offset: { type: GraphQLInt, defaultValue: 0 },
+      type: {
+        type: TransactionType,
+        description: 'Type of transaction (DEBIT/CREDIT)',
+      },
+      orderBy: {
+        type: ChronologicalOrder,
+      },
+    },
+  },
+  orders: {
+    type: OrderCollection,
+    args: {
+      limit: { type: GraphQLInt, defaultValue: 100 },
+      offset: { type: GraphQLInt, defaultValue: 0 },
+      filter: { type: AccountOrdersFilter },
+      status: { type: new GraphQLList(OrderStatus) },
+      tierSlug: { type: GraphQLString },
+      orderBy: {
+        type: ChronologicalOrder,
+      },
+    },
+  },
+});
+
+export const Account = new GraphQLInterfaceType({
+  name: 'Account',
+  description: 'Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)',
+  fields: accountFieldsDefinition,
+});
+
 const accountTransactions = {
   type: TransactionCollection,
   args: {
@@ -113,58 +227,17 @@ const accountOrders = {
 };
 
 export const AccountFields = {
-  // _internal_id: {
-  //   type: GraphQLInt,
-  //   resolve(transaction) {
-  //     return transaction.id;
-  //   },
-  // },
+  ...accountFieldsDefinition(),
   id: {
     type: GraphQLString,
     resolve(collective) {
       return idEncode(collective.id, 'account');
     },
   },
-  slug: {
-    type: GraphQLString,
-    resolve(collective) {
-      return collective.slug;
-    },
-  },
   type: {
     type: AccountType,
     resolve(collective) {
       return invert(AccountTypeToModelMapping)[collective.type];
-    },
-  },
-  name: {
-    type: GraphQLString,
-    resolve(collective) {
-      return collective.name;
-    },
-  },
-  description: {
-    type: GraphQLString,
-    resolve(collective) {
-      return collective.description;
-    },
-  },
-  website: {
-    type: GraphQLString,
-    resolve(collective) {
-      return collective.website;
-    },
-  },
-  twitterHandle: {
-    type: GraphQLString,
-    resolve(collective) {
-      return collective.twitterHandle;
-    },
-  },
-  githubHandle: {
-    type: GraphQLString,
-    resolve(collective) {
-      return collective.githubHandle;
     },
   },
   imageUrl: {
@@ -179,139 +252,16 @@ export const AccountFields = {
       return collective.getImageUrl(args);
     },
   },
-  createdAt: {
-    type: GraphQLDateTime,
-    resolve(collective) {
-      return collective.createdAt;
-    },
-  },
   updatedAt: {
     type: GraphQLDateTime,
     resolve(collective) {
       return collective.updatedAt || collective.createdAt;
     },
   },
-  // stats: {
-  //   type: AccountStats,
-  //   resolve(collective) {
-  //     return collective;
-  //   },
-  // },
   ...HasMembersFields,
   ...IsMemberOfFields,
   transactions: accountTransactions,
   orders: accountOrders,
 };
-
-export const Account = new GraphQLInterfaceType({
-  name: 'Account',
-  description: 'Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)',
-  fields: () => {
-    return {
-      // _internal_id: {
-      //   type: GraphQLInt,
-      //   description: 'The internal database identifier (should not be public)',
-      // },
-      id: {
-        type: GraphQLString,
-        description: 'The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)',
-      },
-      slug: {
-        type: GraphQLString,
-        description: 'The slug identifying the account (ie: babel)',
-      },
-      type: {
-        type: AccountType,
-        description: 'The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
-      },
-      name: {
-        type: GraphQLString,
-      },
-      description: {
-        type: GraphQLString,
-      },
-      website: {
-        type: GraphQLString,
-      },
-      twitterHandle: {
-        type: GraphQLString,
-      },
-      githubHandle: {
-        type: GraphQLString,
-      },
-      imageUrl: {
-        type: GraphQLString,
-        args: {
-          height: { type: GraphQLInt },
-          format: {
-            type: ImageFormat,
-          },
-        },
-      },
-      createdAt: {
-        type: GraphQLDateTime,
-        description: 'The time of creation',
-      },
-      updatedAt: {
-        type: GraphQLDateTime,
-        description: 'The time of last update',
-      },
-      // stats: {
-      //   type: AccountStats,
-      // },
-      members: {
-        type: MemberCollection,
-        args: {
-          limit: { type: GraphQLInt, defaultValue: 100 },
-          offset: { type: GraphQLInt, defaultValue: 0 },
-          role: { type: new GraphQLList(MemberRole) },
-          accountType: {
-            type: new GraphQLList(AccountType),
-            description: 'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
-          },
-        },
-      },
-      memberOf: {
-        type: MemberOfCollection,
-        args: {
-          limit: { type: GraphQLInt, defaultValue: 100 },
-          offset: { type: GraphQLInt, defaultValue: 0 },
-          role: { type: new GraphQLList(MemberRole) },
-          accountType: {
-            type: new GraphQLList(AccountType),
-            description: 'Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)',
-          },
-        },
-      },
-      transactions: {
-        type: TransactionCollection,
-        args: {
-          limit: { type: GraphQLInt, defaultValue: 100 },
-          offset: { type: GraphQLInt, defaultValue: 0 },
-          type: {
-            type: TransactionType,
-            description: 'Type of transaction (DEBIT/CREDIT)',
-          },
-          orderBy: {
-            type: ChronologicalOrder,
-          },
-        },
-      },
-      orders: {
-        type: OrderCollection,
-        args: {
-          limit: { type: GraphQLInt, defaultValue: 100 },
-          offset: { type: GraphQLInt, defaultValue: 0 },
-          filter: { type: AccountOrdersFilter },
-          status: { type: new GraphQLList(OrderStatus) },
-          tierSlug: { type: GraphQLString },
-          orderBy: {
-            type: ChronologicalOrder,
-          },
-        },
-      },
-    };
-  },
-});
 
 export default Account;

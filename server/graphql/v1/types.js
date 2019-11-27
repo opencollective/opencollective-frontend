@@ -32,6 +32,7 @@ import intervals from '../../constants/intervals';
 import roles from '../../constants/roles';
 import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
 import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
+import * as commonComment from '../common/comment';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
@@ -1011,15 +1012,11 @@ export const CommentType = new GraphQLObjectType({
       },
       html: {
         type: GraphQLString,
-        resolve(comment) {
-          return strip_tags(comment.html || '');
-        },
+        resolve: commonComment.getStripTagsResolver('html'),
       },
       markdown: {
         type: GraphQLString,
-        resolve(comment) {
-          return strip_tags(comment.markdown || '');
-        },
+        resolve: commonComment.getStripTagsResolver('markdown'),
       },
       createdByUser: {
         type: UserType,
@@ -1029,15 +1026,11 @@ export const CommentType = new GraphQLObjectType({
       },
       fromCollective: {
         type: CollectiveInterfaceType,
-        resolve(comment, args, req) {
-          return req.loaders.collective.findById.load(comment.FromCollectiveId);
-        },
+        resolve: commonComment.fromCollectiveResolver,
       },
       collective: {
         type: CollectiveInterfaceType,
-        resolve(comment, args, req) {
-          return req.loaders.collective.findById.load(comment.CollectiveId);
-        },
+        resolve: commonComment.collectiveResolver,
       },
       expense: {
         type: ExpenseType,
