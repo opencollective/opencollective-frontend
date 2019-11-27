@@ -65,7 +65,7 @@ async function createPaymentMethod(originalCreditTransaction) {
     uuid: uuidV4(),
     data: {
       HostCollectiveId: originalCreditTransaction.HostCollectiveId,
-      created_for: 'backyourstack',
+      hidden: true,
     },
   });
 }
