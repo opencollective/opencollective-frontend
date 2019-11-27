@@ -1559,14 +1559,6 @@ export const OrderType = new GraphQLObjectType({
           return req.loaders.collective.findById.load(order.CollectiveId);
         },
       },
-      referral: {
-        description: 'Referral user collective',
-        deprecationReason: '2019-08-22: Referals are not supported anymore',
-        type: CollectiveInterfaceType,
-        resolve() {
-          return null;
-        },
-      },
       tier: {
         type: TierType,
         resolve(order) {
@@ -1582,14 +1574,6 @@ export const OrderType = new GraphQLObjectType({
             return null;
           }
           return order.getPaymentMethodForUser(req.remoteUser);
-        },
-      },
-      matchingFund: {
-        description: 'Payment method used if this order was matched by a matching fund.',
-        deprecationReason: '2019-08-19: Matching funds are not supported anymore',
-        type: PaymentMethodType,
-        resolve() {
-          return null;
         },
       },
       transactions: {
@@ -1834,14 +1818,6 @@ export const PaymentMethodType = new GraphQLObjectType({
         type: GraphQLBoolean,
         resolve(paymentMethod) {
           return paymentMethod.primary;
-        },
-      },
-      matching: {
-        type: GraphQLInt,
-        description: 'Matching factor',
-        deprecationReason: '2019-08-19: Matching funds are not supported anymore',
-        resolve() {
-          return 0;
         },
       },
       monthlyLimitPerMember: {
