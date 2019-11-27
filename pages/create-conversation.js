@@ -21,6 +21,8 @@ import CreateConversationForm from '../components/conversations/CreateConversati
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import ContainerOverlay from '../components/ContainerOverlay';
 import { Sections } from '../components/collective-page/_constants';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -84,6 +86,8 @@ class CreateConversationPage extends React.Component {
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
       } else if (data.Collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
+      } else if (!hasFeature(data.Collective, FEATURES.CONVERSATIONS)) {
+        return <PageFeatureNotSupported />;
       }
     }
 

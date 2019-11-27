@@ -20,6 +20,8 @@ class Header extends React.Component {
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
     metas: PropTypes.object,
+    /** If true, a no-robots meta will be added to the page */
+    noRobots: PropTypes.bool,
   };
 
   getTitle() {
@@ -69,7 +71,7 @@ class Header extends React.Component {
       ...this.props.metas,
     };
 
-    if (collective && collective.isIncognito) {
+    if (this.props.noRobots || (collective && collective.isIncognito)) {
       metas.robots = 'none';
     }
 

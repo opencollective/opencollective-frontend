@@ -672,6 +672,8 @@
   "ExportImages.AllFinancial": "Tous les contributeurs financiers",
   "ExportImages.Title": "Vous pouvez exporter des images pour afficher les contributeurs financiers de chaque palier.",
   "FAQ": "FAQ",
+  "FeatureNotSupported.description": "This feature is not activated for this collective. Please contact support@opencollective.com for more details.",
+  "FeatureNotSupported.title": "Feature not supported",
   "Filter.ByName": "Filtrer par nom",
   "Fiscalhost": "Hôte fiscal",
   "Fiscalhost.definition": "Un hôte fiscal est une entité légale qui stocke l'argent et a la responsabilité de l'administration et des taxes pour le collectif.",

@@ -16,6 +16,7 @@ const Page = ({
   loadingLoggedInUser,
   LoggedInUser,
   title,
+  noRobots,
   twitterHandle,
   showSearch,
   menuItems,
@@ -34,6 +35,7 @@ const Page = ({
       <Header
         showSearch={showSearch}
         title={title}
+        noRobots={noRobots}
         twitterHandle={twitterHandle}
         description={description}
         image={image}
@@ -63,6 +65,7 @@ Page.propTypes = {
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
   withoutGlobalStyles: PropTypes.bool,
+  noRobots: PropTypes.bool,
   title: PropTypes.string,
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,

@@ -18,6 +18,7 @@ import Avatar from './Avatar';
 import Link from './Link';
 import StyledRoundButton from './StyledRoundButton';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 /** Main container for the entire component */
 const MainContainer = styled.div`
@@ -251,7 +252,6 @@ const DEFAULT_SECTIONS = {
  */
 export const getSectionsForCollective = (collective, isAdmin) => {
   const sections = get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[collective.type] || [];
-  const showGoals = get(collective, 'settings.collectivePage.showGoals', false);
   const toRemove = new Set();
 
   // Can't contribute anymore if the collective is archived or has no host
@@ -259,9 +259,13 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
-  // Goals are opt-in
-  if (!showGoals) {
+  // Check opt-in features
+  if (!hasFeature(collective, FEATURES.COLLECTIVE_GOALS)) {
     toRemove.add(Sections.GOALS);
+  }
+
+  if (!hasFeature(collective, FEATURES.CONVERSATIONS)) {
+    toRemove.add(Sections.CONVERSATIONS);
   }
 
   // Some sections are hidden for non-admins (usually when there's no data)

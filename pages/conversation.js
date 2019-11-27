@@ -30,6 +30,8 @@ import CommentForm from '../components/conversations/CommentForm';
 import { Sections } from '../components/collective-page/_constants';
 import { CommentFieldsFragment } from '../components/conversations/graphql';
 import Comment from '../components/conversations/Comment';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 
 const conversationPageQuery = gql`
   query Conversation($collectiveSlug: String!, $id: Int!) {
@@ -155,6 +157,8 @@ class ConversationPage extends React.Component {
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
       } else if (data.Collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
+      } else if (!hasFeature(data.Collective, FEATURES.CONVERSATIONS)) {
+        return <PageFeatureNotSupported />;
       }
     }
 

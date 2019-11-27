@@ -672,6 +672,8 @@
   "ExportImages.AllFinancial": "Todos os distintivos de colaboradores financeiros",
   "ExportImages.Title": "Você pode exportar imagens mostrando os colaboradores financeiros de cada categoria.",
   "FAQ": "FAQ",
+  "FeatureNotSupported.description": "This feature is not activated for this collective. Please contact support@opencollective.com for more details.",
+  "FeatureNotSupported.title": "Feature not supported",
   "Filter.ByName": "Filtrar por nome",
   "Fiscalhost": "Administrador Fiscal",
   "Fiscalhost.definition": "Um administrador fiscal é uma entidade legal que detém o dinheiro e é responsável pelos formulários de administração/impostos do coletivo.",

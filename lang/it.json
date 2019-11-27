@@ -672,6 +672,8 @@
   "ExportImages.AllFinancial": "All financial contributors badge",
   "ExportImages.Title": "You can export images showing the financial contributors to each tier.",
   "FAQ": "FAQ",
+  "FeatureNotSupported.description": "This feature is not activated for this collective. Please contact support@opencollective.com for more details.",
+  "FeatureNotSupported.title": "Feature not supported",
   "Filter.ByName": "Filtra per nome",
   "Fiscalhost": "Fiscal Host",
   "Fiscalhost.definition": "A fiscal host is a legal entity holding the money and responsible for the admin/taxes forms for the collective.",

@@ -23,6 +23,8 @@ import Link from '../components/Link';
 import ConversationsList from '../components/conversations/ConversationsList';
 import MessageBox from '../components/MessageBox';
 import { Sections } from '../components/collective-page/_constants';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -80,6 +82,8 @@ class ConversationsPage extends React.Component {
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
       } else if (data.Collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
+      } else if (!hasFeature(data.Collective, FEATURES.CONVERSATIONS)) {
+        return <PageFeatureNotSupported />;
       }
     }
 
