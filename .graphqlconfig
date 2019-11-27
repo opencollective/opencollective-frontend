@@ -8,6 +8,15 @@
           "prod": "https://api.opencollective.com/graphql"
         }
       }
+    },
+    "opencollective_v2": {
+      "schemaPath": "lib/graphql/schemaV2.graphql",
+      "extensions": {
+        "endpoints": {
+          "dev": "http://localhost:3060/graphql/v2",
+          "prod": "https://api.opencollective.com/graphql/v2"
+        }
+      }
     }
   }
 }

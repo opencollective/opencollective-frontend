@@ -1,10 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
 
-import { compose } from '../lib/utils';
-import gql from 'graphql-tag';
 import Avatar from './Avatar';
 import Link from './Link';
 import SmallButton from './SmallButton';
@@ -21,7 +18,6 @@ class Comment extends React.Component {
     intl: PropTypes.object.isRequired,
     editable: PropTypes.bool,
     deleteComment: PropTypes.func,
-    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -74,7 +70,6 @@ class Comment extends React.Component {
   handleDelete = async () => {
     try {
       await this.props.deleteComment(this.state.comment.id);
-      await this.props.refetch();
       this.setState({ showDeleteModal: false });
     } catch (err) {
       console.error(err);
@@ -199,14 +194,18 @@ class Comment extends React.Component {
                   <span>
                     {' '}
                     |{' '}
-                    <a className="toggleEditComment" onClick={this.toggleEdit}>
+                    <a className="toggleEditComment" onClick={this.toggleEdit} data-cy="ToggleEditComment">
                       {intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
                     </a>
                   </span>
                   <span>
                     {' '}
                     |{' '}
-                    <a className="toggleEditComment" onClick={() => this.setState({ showDeleteModal: true })}>
+                    <a
+                      className="toggleEditComment"
+                      onClick={() => this.setState({ showDeleteModal: true })}
+                      data-cy="ToggleDeleteComment"
+                    >
                       {intl.formatMessage(this.messages['delete'])}
                     </a>
                   </span>
@@ -230,7 +229,12 @@ class Comment extends React.Component {
             <div className="actions">
               {this.state.mode === 'edit' && (
                 <div>
-                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}>
+                  <SmallButton
+                    className="primary save"
+                    onClick={this.save}
+                    disabled={!this.state.modified}
+                    data-cy="SaveEditionCommentButton"
+                  >
                     <FormattedMessage id="save" defaultMessage="Save" />
                   </SmallButton>
                 </div>
@@ -255,60 +259,4 @@ class Comment extends React.Component {
   }
 }
 
-const editCommentQuery = gql`
-  mutation editComment($comment: CommentAttributesInputType!) {
-    editComment(comment: $comment) {
-      id
-      html
-      createdAt
-      collective {
-        id
-        slug
-        currency
-        name
-        host {
-          id
-          slug
-        }
-        stats {
-          id
-          balance
-        }
-      }
-      fromCollective {
-        id
-        type
-        name
-        slug
-        imageUrl
-      }
-    }
-  }
-`;
-
-const deleteCommentQuery = gql`
-  mutation deleteComment($id: Int!) {
-    deleteComment(id: $id) {
-      id
-    }
-  }
-`;
-
-const deleteCommentMutation = graphql(deleteCommentQuery, {
-  props: ({ mutate }) => ({
-    deleteComment: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
-});
-
-const editCommentMutation = graphql(editCommentQuery, {
-  props: ({ mutate }) => ({
-    editComment: async comment => {
-      return await mutate({ variables: { comment } });
-    },
-  }),
-});
-
-const addMutation = compose(deleteCommentMutation, editCommentMutation);
-export default injectIntl(addMutation(Comment));
+export default injectIntl(Comment);
