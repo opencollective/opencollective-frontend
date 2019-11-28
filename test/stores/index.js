@@ -153,6 +153,7 @@ export async function newOrganization(orgData, adminUser) {
  *  `hostAdmin`, and `collective`.
  */
 export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee, user = null, data = {}) {
+  name = name || uuidv4();
   const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee, { currency });
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;
