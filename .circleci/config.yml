@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 aliases:
   crowdin_branch: &crowdin_branch /i18n\/crowdin.*/
@@ -17,7 +17,9 @@ aliases:
       paths:
         - ../.npm
 
-  e2e_steps: &e2e_steps
+commands:
+  setup_app:
+    description: 'Steps to setup the app'
     steps:
       - run: sudo apt -y update
 
@@ -44,6 +46,12 @@ aliases:
       # When it is persisted we don't need it
       - run: cd ~/frontend && npm ci --only=prod
 
+      # Loading the opencollective_dvl dump database
+      - run: ./scripts/setup_circleci_db.sh
+
+  e2e:
+    description: 'Steps to setup e2e tests'
+    steps:
       # Cypress installation with cache
       - restore_cache:
           keys:
@@ -53,9 +61,6 @@ aliases:
           key: cypress-cache-{{ checksum "node_modules/cypress/package.json" }}
           paths:
             - ../.cache/Cypress
-
-      # Loading the opencollective_dvl dump database
-      - run: ./scripts/setup_circleci_db.sh
 
       - run: ./scripts/run_e2e_tests.sh
 
@@ -190,6 +195,20 @@ jobs:
             - api/package.json
             - api/package-lock.json
 
+  lighthouse:
+    docker:
+      - image: circleci/node:12.13.0-browsers
+      - image: circleci/postgres:9.6.8-alpine-postgis-ram
+      - image: circleci/redis
+      - image: memcached
+    environment:
+      TZ: UTC
+      NODE_ENV: circleci
+    steps:
+      - setup_app
+
+      - run: ./scripts/lighthouse.sh
+
   test-e2e-0:
     docker:
       - image: circleci/node:12.13.0
@@ -204,7 +223,9 @@ jobs:
       CYPRESS_TEST_FILES: 0*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-    <<: *e2e_steps
+    steps:
+      - setup_app
+      - e2e
 
   test-e2e-1:
     docker:
@@ -220,7 +241,9 @@ jobs:
       CYPRESS_TEST_FILES: 1*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-    <<: *e2e_steps
+    steps:
+      - setup_app
+      - e2e
 
   test-e2e-2:
     docker:
@@ -236,7 +259,9 @@ jobs:
       CYPRESS_TEST_FILES: 2*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-    <<: *e2e_steps
+    steps:
+      - setup_app
+      - e2e
 
   test-e2e-3:
     docker:
@@ -252,7 +277,9 @@ jobs:
       CYPRESS_TEST_FILES: 3*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-    <<: *e2e_steps
+    steps:
+      - setup_app
+      - e2e
 
 workflows:
   version: 2
@@ -267,6 +294,11 @@ workflows:
           filters: { branches: { ignore: [*crowdin_branch] } }
       - build-api:
           filters: { branches: { ignore: [*crowdin_branch] } }
+      - lighthouse:
+          filters: { branches: { ignore: [*crowdin_branch] } }
+          requires:
+            - build
+            - build-api
       - test-e2e-0:
           filters: { branches: { ignore: [*crowdin_branch] } }
           requires:
