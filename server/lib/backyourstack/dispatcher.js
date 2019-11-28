@@ -63,7 +63,10 @@ async function createPaymentMethod(originalCreditTransaction) {
     service: 'opencollective',
     type: 'prepaid',
     uuid: uuidV4(),
-    data: { HostCollectiveId: originalCreditTransaction.HostCollectiveId },
+    data: {
+      HostCollectiveId: originalCreditTransaction.HostCollectiveId,
+      hidden: true,
+    },
   });
 }
 

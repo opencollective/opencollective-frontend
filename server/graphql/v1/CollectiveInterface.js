@@ -1526,6 +1526,9 @@ const CollectiveFields = () => {
         // Filter only "saved" stripe Payment Methods
         // In the future we should only return the "saved" whatever the service
         paymentMethods = paymentMethods.filter(pm => pm.service !== 'stripe' || pm.saved);
+
+        paymentMethods = paymentMethods.filter(pm => !(pm.data && pm.data.hidden));
+
         if (args.service) {
           paymentMethods = paymentMethods.filter(pm => pm.service === args.service);
         }
