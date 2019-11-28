@@ -88,11 +88,13 @@ export async function createFromPaidExpense(
 
       case 'ERROR':
         throw new errors.ServerError(
-          `Error while paying the expense with PayPal: "${executePaymentResponse.payErrorList[0].error.message}"`,
+          `Error while paying the expense with PayPal: "${executePaymentResponse.payErrorList[0].error.message}". Please contact support@opencollective.com`,
         );
 
       default:
-        throw new errors.ServerError(`Error while paying the expense with PayPal`);
+        throw new errors.ServerError(
+          `Error while paying the expense with PayPal. Please contact support@opencollective.com`,
+        );
     }
 
     const senderFees = createPaymentResponse.defaultFundingPlan.senderFees;
