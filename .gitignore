@@ -21,3 +21,6 @@ styleguide/build/
 
 # Git time manager
 .gtm
+
+# Lighthouse audit report files
+.lighthouseci/
