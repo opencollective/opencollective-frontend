@@ -15,7 +15,11 @@ import { randEmail } from './stores';
 let host, admin, user, collective, paypalPaymentMethod;
 
 describe('graphql.paymentMethods.test.js', () => {
-  beforeEach(() => utils.resetTestDB());
+  beforeEach(async () => {
+    await new Promise(res => setTimeout(res, 500));
+    await utils.resetTestDB();
+    return;
+  });
 
   beforeEach(() =>
     models.User.createUserWithCollective({
