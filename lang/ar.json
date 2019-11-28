@@ -68,7 +68,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option.",
   "collective.archive.button": "Archive this {type}",
-  "collective.archive.cancel.btn": "Cancel",
+  "collective.archive.cancel.btn": "إلغاء",
   "collective.archive.confirm.btn": "Archive",
   "collective.archive.description": "Archiving a {type} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.modal.body": "Are you sure you want to archive this {type}?",
