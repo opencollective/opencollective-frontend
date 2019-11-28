@@ -45,7 +45,7 @@ const MenuLink = styled(StyledLink)`
   padding: 0;
 `;
 
-const FlexList = styled.ul([], ...Box.componentStyle.rules, ...Flex.componentStyle.rules);
+const FlexList = styled.div([], ...Box.componentStyle.rules, ...Flex.componentStyle.rules);
 
 const navigation = {
   PLATFORM: {
