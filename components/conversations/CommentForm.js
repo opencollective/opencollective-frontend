@@ -98,6 +98,7 @@ const CommentForm = ({
             autoFocus={isAutoFocused(id)}
             disabled={!LoggedInUser || formState.isSubmitting}
             reset={get(data, 'createComment.id')}
+            fontSize="13px"
             onChange={e => {
               setValue('html', e.target.value);
               triggerValidation();

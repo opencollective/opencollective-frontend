@@ -1343,6 +1343,7 @@
   "virtualCards.returnToEdit": "Volver a la lista de tarjetas de regalo",
   "virtualCards.sentTo": "enviado a {email}",
   "virtualCards.viewDetails": "Ver Detalles",
+  "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
   "WarningUnsavedChanges": "You are trying to leave this page with un-saved changes. Are you sure?",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",

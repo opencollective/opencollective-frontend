@@ -1343,6 +1343,7 @@
   "virtualCards.returnToEdit": "ギフトカードリストに戻る",
   "virtualCards.sentTo": "{email} に送信された",
   "virtualCards.viewDetails": "詳細を表示する",
+  "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
   "WarningUnsavedChanges": "You are trying to leave this page with un-saved changes. Are you sure?",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",

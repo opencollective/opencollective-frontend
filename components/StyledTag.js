@@ -59,7 +59,9 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
     <StyledTagBase {...props}>{children}</StyledTagBase>
   ) : (
     <StyledTagBase py={1} {...props}>
-      <Span mr={2}>{children}</Span>
+      <Span mr={2} letterSpacing="inherit">
+        {children}
+      </Span>
       <CloseButton {...closeButtonProps}>
         <Times size="1em" />
       </CloseButton>

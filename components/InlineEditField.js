@@ -95,14 +95,27 @@ class InlineEditField extends Component {
 
   state = { isEditing: false, draft: '' };
 
+  componentDidUpdate(oldProps) {
+    if (oldProps.isEditing !== this.props.isEditing) {
+      if (this.props.isEditing) {
+        this.setState({ isEditing: true, draft: get(this.props.values, this.props.field) });
+      } else {
+        this.setState({ isEditing: false });
+      }
+    }
+  }
+
   enableEditor = () => {
     this.setState({ isEditing: true, draft: get(this.props.values, this.props.field) });
   };
 
-  disableEditor = () => {
-    const { warnIfUnsavedChanges, intl } = this.props;
-    if (warnIfUnsavedChanges && !confirm(intl.formatMessage(messages.warnDiscardChanges))) {
-      return;
+  disableEditor = noWarning => {
+    const { warnIfUnsavedChanges, intl, values, field } = this.props;
+    if (!noWarning && warnIfUnsavedChanges) {
+      const isDirty = get(values, field) !== this.state.draft;
+      if (isDirty && !confirm(intl.formatMessage(messages.warnDiscardChanges))) {
+        return;
+      }
     }
 
     this.setState({ isEditing: false });
@@ -149,8 +162,7 @@ class InlineEditField extends Component {
       topEdit,
       warnIfUnsavedChanges,
     } = this.props;
-    const { draft } = this.state;
-    const isEditing = typeof this.props.isEditing === 'undefined' ? this.state.isEditing : this.props.isEditing;
+    const { draft, isEditing } = this.state;
     const value = get(values, field);
     const touched = draft !== value;
 
@@ -222,7 +234,7 @@ class InlineEditField extends Component {
                           variables[field] = draft;
                         }
 
-                        updateField({ variables }).then(this.disableEditor);
+                        updateField({ variables }).then(() => this.disableEditor(true));
                       }}
                     >
                       <FormattedMessage id="save" defaultMessage="Save" />

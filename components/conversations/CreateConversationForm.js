@@ -61,6 +61,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
               fontSize="H4"
               border="none"
               name="title"
+              maxLength={255}
               px={0}
               py={0}
               placeholder="Start with a title for your conversation here"

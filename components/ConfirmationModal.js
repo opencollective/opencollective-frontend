@@ -50,7 +50,7 @@ const ConfirmationModal = ({
 
   return (
     <Modal width="570px" show={show} onClose={onClose}>
-      <ModalHeader>{header}</ModalHeader>
+      <ModalHeader onClose={onClose}>{header}</ModalHeader>
       <ModalBody>{children || <P>{body}</P>}</ModalBody>
       <ModalFooter>
         <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">

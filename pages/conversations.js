@@ -3,10 +3,14 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
+import { get } from 'lodash';
+import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
 import { Router } from '../server/pages';
 import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { withUser } from '../components/UserProvider';
 import ErrorPage, { generateError } from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -15,16 +19,13 @@ import Container from '../components/Container';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Page from '../components/Page';
 import { H1, P, H4 } from '../components/Text';
-import { FormattedMessage } from 'react-intl';
 import StyledButton from '../components/StyledButton';
 import StyledTag from '../components/StyledTag';
-import { withRouter } from 'next/router';
 import Link from '../components/Link';
 import ConversationsList from '../components/conversations/ConversationsList';
 import MessageBox from '../components/MessageBox';
 import { Sections } from '../components/collective-page/_constants';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -71,6 +72,33 @@ class ConversationsPage extends React.Component {
     Router.pushRoute('conversations', { collectiveSlug });
   };
 
+  /** Must only be called when dataIsReady */
+  renderConversations() {
+    const { data, collectiveSlug } = this.props;
+    const conversations = get(data, 'Collective.conversations.nodes', []);
+    if (conversations.length > 0) {
+      return <ConversationsList collectiveSlug={collectiveSlug} conversations={conversations} />;
+    } else {
+      return (
+        <div>
+          {this.props.tag && (
+            <MessageBox mb={4} type="info" withIcon>
+              <FormattedMessage
+                id="conversations.noMatch"
+                defaultMessage="No conversation matching the given criterias."
+              />
+            </MessageBox>
+          )}
+          <Link route="create-conversation" params={{ collectiveSlug }}>
+            <StyledButton buttonStyle="primary" buttonSize="large">
+              <FormattedMessage id="conversations.createFirst" defaultMessage="Start a new conversation" />
+            </StyledButton>
+          </Link>
+        </div>
+      );
+    }
+  }
+
   render() {
     const { collectiveSlug, data } = this.props;
 
@@ -88,9 +116,10 @@ class ConversationsPage extends React.Component {
     }
 
     const collective = data && data.Collective;
+    const dataIsReady = collective && collective.conversations;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
-        {data.loading ? (
+        {!dataIsReady && data.loading ? (
           <Container borderTop="1px solid #E8E9EB">
             <Loading />
           </Container>
@@ -123,31 +152,7 @@ class ConversationsPage extends React.Component {
                   </Flex>
                   <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between">
                     <Box mr={[null, null, null, 5]} flex="1 1 73%">
-                      {collective.conversations.nodes.length > 0 ? (
-                        <ConversationsList
-                          collectiveSlug={collectiveSlug}
-                          conversations={collective.conversations.nodes}
-                        />
-                      ) : (
-                        <div>
-                          {this.props.tag && (
-                            <MessageBox mb={4} type="info" withIcon>
-                              <FormattedMessage
-                                id="conversations.noMatch"
-                                defaultMessage="No conversation matching the given criterias."
-                              />
-                            </MessageBox>
-                          )}
-                          <Link route="create-conversation" params={{ collectiveSlug }}>
-                            <StyledButton buttonStyle="primary" buttonSize="large">
-                              <FormattedMessage
-                                id="conversations.createFirst"
-                                defaultMessage="Start a new conversation"
-                              />
-                            </StyledButton>
-                          </Link>
-                        </div>
-                      )}
+                      {this.renderConversations()}
                     </Box>
                     <Box mb={3} flex="1 1 27%">
                       {collective.conversationsTags.length > 0 && (
@@ -184,7 +189,7 @@ class ConversationsPage extends React.Component {
   }
 }
 
-const getCollective = graphql(
+const getData = graphql(
   gql`
     query Conversations($collectiveSlug: String!, $tag: String) {
       Collective(slug: $collectiveSlug, throwIfMissing: false) {
@@ -222,6 +227,13 @@ const getCollective = graphql(
       }
     }
   `,
+  {
+    options: {
+      // Because this list is updated often, using this option ensures that the list gets
+      // properly updated when doing things like redirecting after a conversation delete.
+      fetchPolicy: 'cache-and-network',
+    },
+  },
 );
 
-export default withUser(getCollective(withRouter(ConversationsPage)));
+export default withUser(getData(withRouter(ConversationsPage)));
