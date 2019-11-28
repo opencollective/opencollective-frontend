@@ -72,7 +72,7 @@ class Expenses extends React.Component {
         expense => get(expense.collective || collective, 'stats.balance') >= expense.amount,
       );
       // Don't show expense that requires tax form in "ready to pay" filter
-      filteredExpenses = expenses.filter(expense => !expense.userTaxFormRequiredBeforePayment);
+      filteredExpenses = filteredExpenses.filter(expense => !expense.userTaxFormRequiredBeforePayment);
     } else {
       filteredExpenses = expenses;
     }
