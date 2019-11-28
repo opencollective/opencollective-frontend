@@ -109,6 +109,10 @@ function EditPublicMessagePopup({ fromCollectiveId, collectiveId, cardRef, onClo
 
   /** Determine the position to render the popup relative to the contributor card */
   useLayoutEffect(() => {
+    if (!cardRef.current || !popupRef.current) {
+      return;
+    }
+
     const cardRect = cardRef.current.getBoundingClientRect();
     const popupRect = popupRef.current.getBoundingClientRect();
     /** Check if popup fits to the right */
