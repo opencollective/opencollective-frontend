@@ -70,6 +70,7 @@ export default class SignIn extends React.Component {
               fontSize="Paragraph"
               id="email"
               name="email"
+              minWidth={120}
               onChange={({ target }) => {
                 onEmailChange(target.value);
                 // Feel free to remove the setTimeout when that issue is fixed
