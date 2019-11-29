@@ -12,6 +12,7 @@ import { formatCurrency } from '../../lib/utils';
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
   text-transform: uppercase;
+  text-align: center;
 `;
 
 StepLabel.defaultProps = {

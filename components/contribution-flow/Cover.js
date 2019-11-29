@@ -14,7 +14,7 @@ import Container from '../Container';
 const Cover = ({ collective, tier }) => {
   return (
     <Container pt={[4, 48]} mb={28}>
-      <Flex alignItems="center" flexDirection="column" mx="auto" width={320}>
+      <Flex alignItems="center" flexDirection="column" mx="auto" width="100%" maxWidth={320}>
         <LinkCollective collective={collective}>
           <Logo collective={collective} className="logo" height="10rem" style={{ margin: '0 auto' }} />
           <H2 as="h1" color="black.900" textAlign="center">

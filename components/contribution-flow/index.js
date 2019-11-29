@@ -712,7 +712,7 @@ class CreateOrderPage extends React.Component {
       return (
         <Flex justifyContent="center" width={1}>
           <Box width={[0, null, null, '24em']} />
-          <Container>
+          <Container minWidth={260}>
             <StyledInputField
               htmlFor="contributeAs"
               label={
