@@ -143,7 +143,7 @@ class TiersPage extends React.Component {
 
 const addTiersData = graphql(
   gql`
-    query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+    query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
       Collective(slug: $slug) {
         id
         slug

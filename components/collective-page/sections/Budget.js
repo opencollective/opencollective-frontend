@@ -26,7 +26,7 @@ import BudgetItemsList, {
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`
-  query NewCollectivePage($slug: String!) {
+  query BudgetSection($slug: String!) {
     Collective(slug: $slug) {
       id
       transactions(limit: 3, includeExpenseTransactions: false) {
