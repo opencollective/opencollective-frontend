@@ -35,7 +35,7 @@ async function editComment(commentData, remoteUser) {
   }
 
   // Check permissions
-  if (remoteUser.id !== comment.CreatedByUserId || !remoteUser.isAdmin(comment.CollectiveId)) {
+  if (remoteUser.id !== comment.CreatedByUserId && !remoteUser.isAdmin(comment.CollectiveId)) {
     throw new errors.Unauthorized({
       message: 'You must be the author or an admin of this collective to edit this comment',
     });
@@ -59,7 +59,7 @@ async function deleteComment(id, remoteUser) {
   }
 
   // Check permissions
-  if (remoteUser.id !== comment.CreatedByUserId || !remoteUser.isAdmin(comment.CollectiveId)) {
+  if (remoteUser.id !== comment.CreatedByUserId && !remoteUser.isAdmin(comment.CollectiveId)) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in as a core contributor or as a host to delete this comment',
     });

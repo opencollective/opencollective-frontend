@@ -3,7 +3,7 @@ import { Comment } from '../object/Comment';
 import { CommentEdit } from '../input/CommentEdit';
 import { CommentCreate } from '../input/CommentCreate';
 import { editComment, deleteComment, createCommentResolver } from '../../common/comment';
-import { getDecodedId } from '../identifiers';
+import { getDecodedId, idDecode, IDENTIFIER_TYPES } from '../identifiers';
 
 const commentMutations = {
   editComment: {
@@ -37,7 +37,13 @@ const commentMutations = {
         type: new GraphQLNonNull(CommentCreate),
       },
     },
-    resolve: createCommentResolver,
+    resolve: (entity, args, req) => {
+      if (args.comment.ConversationId) {
+        args.comment.ConversationId = parseInt(idDecode(args.comment.ConversationId, IDENTIFIER_TYPES.CONVERSATION));
+      }
+
+      return createCommentResolver(entity, args, req);
+    },
   },
 };
 

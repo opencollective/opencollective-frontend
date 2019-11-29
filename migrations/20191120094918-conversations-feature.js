@@ -48,17 +48,8 @@ module.exports = {
       onUpdate: 'CASCADE',
       allowNull: true,
     };
-
     await queryInterface.addColumn('Comments', 'ConversationId', commentConversationIdSettings);
     await queryInterface.addColumn('CommentHistories', 'ConversationId', commentConversationIdSettings);
-
-    // Add the constraint on `RootCommentId`
-    await queryInterface.sequelize.query(`
-      ALTER TABLE public."Conversations"
-      ADD CONSTRAINT "Conversations_ConversationId_fkey" FOREIGN KEY (ConversationId)
-      REFERENCES public."Comments" (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
-    `);
   },
 
   down: async (queryInterface, DataTypes) => {

@@ -1,7 +1,7 @@
 import { invert } from 'lodash';
 
 import { GraphQLInt, GraphQLString, GraphQLList, GraphQLInterfaceType } from 'graphql';
-
+import GraphQLJSON from 'graphql-type-json';
 import { GraphQLDateTime } from 'graphql-iso-date';
 
 import { idEncode } from '../identifiers';
@@ -134,6 +134,9 @@ const accountFieldsDefinition = () => ({
         type: ChronologicalOrder,
       },
     },
+  },
+  settings: {
+    type: GraphQLJSON,
   },
 });
 

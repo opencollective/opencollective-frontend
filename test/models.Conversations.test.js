@@ -23,7 +23,7 @@ describe('create', () => {
     it('Must be set', () => {
       expect(models.Conversation.create({ ...validConversationParams, summary: '' })).to.be.rejectedWith(
         SequelizeValidationError,
-        'Conversations.summary cannot be null',
+        'Conversation.summary cannot be null',
       );
     });
 

@@ -6,7 +6,7 @@ import { Collection, CollectionFields } from '../interface/Collection';
 const CommentCollection = new GraphQLObjectType({
   name: 'CommentCollection',
   interfaces: [Collection],
-  description: 'A collection of "Orders"',
+  description: 'A collection of "Comments"',
   fields: () => {
     return {
       ...CollectionFields,

@@ -947,80 +947,6 @@ export const UpdateType = new GraphQLObjectType({
   },
 });
 
-export const ConversationType = new GraphQLObjectType({
-  name: 'Conversation',
-  description: 'A conversation thread',
-  fields: () => {
-    return {
-      id: { type: new GraphQLNonNull(GraphQLInt) },
-      title: { type: new GraphQLNonNull(GraphQLString) },
-      createdAt: { type: new GraphQLNonNull(DateString) },
-      updatedAt: { type: new GraphQLNonNull(DateString) },
-      tags: { type: new GraphQLList(GraphQLString) },
-      summary: { type: new GraphQLNonNull(GraphQLString) },
-      collective: {
-        type: CollectiveInterfaceType,
-        resolve(conversation, args, req) {
-          return req.loaders.collective.findById.load(conversation.CollectiveId);
-        },
-      },
-      fromCollective: {
-        type: CollectiveInterfaceType,
-        resolve(conversation, args, req) {
-          return req.loaders.collective.findById.load(conversation.FromCollectiveId);
-        },
-      },
-      body: {
-        type: CommentType,
-        description: 'The root comment / starter for this conversation',
-        resolve(conversation) {
-          return models.Comment.findByPk(conversation.RootCommentId);
-        },
-      },
-      comments: {
-        type: PaginatedCommentsType,
-        description: '',
-        args: {
-          limit: { type: GraphQLInt },
-          offset: { type: GraphQLInt },
-        },
-        async resolve(conversation, _, { limit, offset }) {
-          const where = { ConversationId: conversation.id, id: { [Op.not]: conversation.RootCommentId } };
-          const order = [['createdAt', 'ASC']];
-          const query = { where, order };
-
-          if (limit) query.limit = limit;
-          if (offset) query.offset = offset;
-
-          const result = await models.Comment.findAndCountAll(query);
-          return { nodes: result.rows, total: result.count, limit, offset };
-        },
-      },
-    };
-  },
-});
-
-export const PaginatedConversationsList = paginatedList(ConversationType, 'Conversation');
-
-export const TagStats = new GraphQLObjectType({
-  name: 'TagStat',
-  description: 'Statistics for a given tag',
-  fields: {
-    id: {
-      type: GraphQLString,
-      description: 'An unique identified for this tag',
-    },
-    tag: {
-      type: GraphQLString,
-      description: 'Name/Label of the tag',
-    },
-    count: {
-      type: GraphQLInt,
-      description: 'Number of entries for this tag',
-    },
-  },
-});
-
 export const CommentListType = new GraphQLObjectType({
   name: 'CommentListType',
   deprecationReason: 'The resolver for comments is not standard. Please use `PaginatedComments`',
@@ -1123,19 +1049,9 @@ export const CommentType = new GraphQLObjectType({
           }
         },
       },
-      conversation: {
-        type: ConversationType,
-        resolve(comment) {
-          if (comment.ConversationId) {
-            return models.Conversation.findByPk(comment.ConversationId);
-          }
-        },
-      },
     };
   },
 });
-
-export const PaginatedCommentsType = paginatedList(CommentType, 'Comment');
 
 export const NotificationType = new GraphQLObjectType({
   name: 'NotificationType',

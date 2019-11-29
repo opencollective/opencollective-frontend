@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-
 import config from 'config';
 import Hashids from 'hashids/cjs';
 
@@ -13,18 +12,44 @@ if (!salt) {
 
 const instances = {};
 
+export const IDENTIFIER_TYPES = {
+  CONVERSATION: 'conversation',
+};
+
+const getDefaultInstance = type => {
+  switch (type) {
+    case IDENTIFIER_TYPES.CONVERSATION:
+      return new Hashids(salt + type, 8, alphabet);
+    default:
+      return new Hashids(salt + type, 32, alphabet);
+  }
+};
+
 const getInstance = type => {
   let instance = instances[type];
   if (!instance) {
-    instance = instances[type] = new Hashids(salt + type, 32, alphabet);
+    instance = instances[type] = getDefaultInstance(type);
   }
+
   return instance;
 };
 
+function chunkStr(str, size) {
+  const chunks = [];
+  for (let i = 0; i < str.length; i += size) {
+    chunks.push(str.substring(i, i + size));
+  }
+
+  return chunks;
+}
+
 export const idEncode = (integer, type) => {
   const string = getInstance(type).encode(integer);
-  const sliced = [string.substring(0, 8), string.substring(8, 16), string.substring(16, 24), string.substring(24, 32)];
-  return sliced.join('-');
+  if (string.length > 8) {
+    return chunkStr(string, 8).join('-');
+  } else {
+    return string;
+  }
 };
 
 export const idDecode = (string, type) => {
