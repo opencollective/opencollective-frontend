@@ -17,6 +17,7 @@ import '../server/env';
 import format from 'pg-format';
 
 import * as libdb from '../server/lib/db';
+import { sequelize } from '../server/models';
 
 /** Create a user in postgres if it doesn't exist.
  *
@@ -44,6 +45,9 @@ async function main() {
   await createUser(client, username, password);
   const destroy = process.env.DB_DESTROY ? true : false;
   const [clientMaint, clientApp] = await libdb.recreateDatabase(destroy);
+  await sequelize.sync({ force: true });
+  await sequelize.close();
+  console.log('schema created or reseted');
   await Promise.all([client.end(), clientMaint.end(), clientApp.end()]);
 }
 

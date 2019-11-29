@@ -46,11 +46,14 @@ export const clearbitStubAfterEach = sandbox => sandbox.restore();
 
 export const resetCaches = () => cache.clear();
 
-export const resetTestDB = () =>
-  sequelize.sync({ force: true }).catch(e => {
+export const resetTestDB = async () => {
+  await sequelize.sync({ force: true }).catch(e => {
     console.error("test/utils.js> Sequelize Error: Couldn't recreate the schema", e);
     process.exit(1);
   });
+  // That could be an alternative but this doesn't work
+  // await sequelize.truncate({ force: true, cascade: true });
+};
 
 export async function loadDB(dbname) {
   await db_restore.main({ force: true, file: dbname });
