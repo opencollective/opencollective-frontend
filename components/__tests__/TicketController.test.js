@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TicketController from '../TicketController';
 
-let ticketCtlr;
-
 const DEBUG = process.env.DEBUG || false;
 
 describe('TicketController', () => {
@@ -14,8 +12,10 @@ describe('TicketController', () => {
       if (DEBUG) console.log('> onChange', value);
       expect(value).toEqual(1);
     };
-    ticketCtlr = ReactDOM.render(<TicketController value={2} onChange={onChange} />, div);
-    ticketCtlr.changeValue(-1);
+    ReactDOM.render(
+      <TicketController ref={ticketCtlr => ticketCtlr.changeValue(-1)} value={2} onChange={onChange} />,
+      div,
+    );
   });
 
   it('increases the value by 1', () => {
@@ -23,8 +23,10 @@ describe('TicketController', () => {
       if (DEBUG) console.log('> onChange', value);
       expect(value).toEqual(3);
     };
-    ticketCtlr = ReactDOM.render(<TicketController value={2} onChange={onChange} />, div);
-    ticketCtlr.changeValue(1);
+    ReactDOM.render(
+      <TicketController ref={ticketCtlr => ticketCtlr.changeValue(1)} value={2} onChange={onChange} />,
+      div,
+    );
   });
 
   it("doesn't go below 1", () => {
@@ -32,7 +34,9 @@ describe('TicketController', () => {
       if (DEBUG) console.log('> onChange', value);
       expect(value).toEqual(1);
     };
-    ticketCtlr = ReactDOM.render(<TicketController value={1} onChange={onChange} />, div);
-    ticketCtlr.changeValue(-1);
+    ReactDOM.render(
+      <TicketController ref={ticketCtlr => ticketCtlr.changeValue(-1)} value={1} onChange={onChange} />,
+      div,
+    );
   });
 });
