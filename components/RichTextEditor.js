@@ -150,6 +150,10 @@ export default class RichTextEditor extends React.Component {
 
   handleUpload = async e => {
     const file = e.attachment && e.attachment.file;
+    if (!file) {
+      return;
+    }
+
     try {
       const fileURL = await uploadImageWithXHR(file, e.attachment.setUploadProgress);
       return e.attachment.setAttributes({ url: fileURL, href: fileURL });
