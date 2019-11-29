@@ -86,11 +86,14 @@ export async function createFromPaidExpense(
           `Please approve this payment manually on ${createPaymentResponse.paymentApprovalUrl}`,
         );
 
+      case 'ERROR':
+        throw new errors.ServerError(
+          `Error while paying the expense with PayPal: "${executePaymentResponse.payErrorList[0].error.message}". Please contact support@opencollective.com`,
+        );
+
       default:
         throw new errors.ServerError(
-          `controllers.expenses.pay: Unknown error while trying to create transaction for expense ${
-            expense.id
-          }. The full response was: ${JSON.stringify(executePaymentResponse)}`,
+          `Error while paying the expense with PayPal. Please contact support@opencollective.com`,
         );
     }
 
