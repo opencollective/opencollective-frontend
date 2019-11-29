@@ -39,10 +39,9 @@ export const signin = (req, res, next) => {
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       loginLink = u.generateLoginLink(redirect || '/', websiteUrl);
-      clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      clientIP = req.ip;
       if (config.env === 'development') {
         logger.info(`Login Link: ${loginLink}`);
-        logger.info(`Client IP: ${clientIP}`);
       }
       return emailLib.send('user.new.token', u.email, { loginLink, clientIP }, { sendEvenIfNotProduction: true });
     })
