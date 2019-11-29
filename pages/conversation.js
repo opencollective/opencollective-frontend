@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from 'react-apollo';
-import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { get, isEmpty, cloneDeep, update } from 'lodash';
 
@@ -10,6 +9,7 @@ import { MessageSquare } from 'styled-icons/feather/MessageSquare';
 import { Router } from '../server/pages';
 import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { withUser } from '../components/UserProvider';
 import ErrorPage, { generateError } from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -32,24 +32,23 @@ import { CommentFieldsFragment } from '../components/conversations/graphql';
 import Comment from '../components/conversations/Comment';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import InlineEditField from '../components/InlineEditField';
 
-const conversationPageQuery = gql`
-  query Conversation($collectiveSlug: String!, $id: Int!) {
-    Collective(slug: $collectiveSlug, throwIfMissing: false) {
+const conversationPageQuery = gqlV2`
+  query Conversation($collectiveSlug: String!, $id: String!) {
+    collective(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
-      path
       name
       type
-      canContact
       description
       settings
       imageUrl
       twitterHandle
-      isIncognito
     }
-    Conversation(id: $id) {
+    conversation(id: $id) {
       id
+      slug
       title
       createdAt
       tags
@@ -66,47 +65,56 @@ const conversationPageQuery = gql`
   ${CommentFieldsFragment}
 `;
 
+const editConversationMutation = gqlV2`
+  mutation EditConversation($id: String!, $title: String!) {
+    editConversation(id: $id, title: $title) {
+      id
+      title
+    }
+  }
+`;
+
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
 class ConversationPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id } }) {
-    return { collectiveSlug, id: parseInt(id) };
+    return { collectiveSlug, id };
   }
 
   static propTypes = {
     /** @ignore from getInitialProps */
     collectiveSlug: PropTypes.string.isRequired,
     /** @ignore from getInitialProps */
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     /** @ignore from withApollo */
     client: PropTypes.object.isRequired,
     /** @ignore from withUser */
-    LoggedInUser: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
     /** @ignore from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      Collective: PropTypes.shape({
+      collective: PropTypes.shape({
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
-        canContact: PropTypes.bool,
       }),
-      Conversation: PropTypes.shape({
-        id: PropTypes.number.isRequired,
+      conversation: PropTypes.shape({
+        id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
         tags: PropTypes.arrayOf(PropTypes.string),
         body: PropTypes.shape({
-          id: PropTypes.number,
+          id: PropTypes.string,
         }),
         comments: PropTypes.shape({
           nodes: PropTypes.arrayOf(
             PropTypes.shape({
-              id: PropTypes.number,
+              id: PropTypes.string,
             }),
           ),
         }),
@@ -132,13 +140,13 @@ class ConversationPage extends React.Component {
 
   onCommentAdded = comment => {
     const [data, query, variables] = this.clonePageQueryCacheData();
-    update(data, 'Conversation.comments.nodes', comments => [...comments, comment]);
+    update(data, 'conversation.comments.nodes', comments => [...comments, comment]);
     this.props.client.writeQuery({ query, variables, data });
   };
 
   onCommentDeleted = comment => {
     const [data, query, variables] = this.clonePageQueryCacheData();
-    update(data, 'Conversation.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
+    update(data, 'conversation.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
     this.props.client.writeQuery({ query, variables, data });
   };
 
@@ -152,18 +160,18 @@ class ConversationPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
+      } else if (!data.collective) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.Collective.type !== CollectiveType.COLLECTIVE) {
+      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.Collective, FEATURES.CONVERSATIONS)) {
+      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.Collective;
-    const conversation = data && data.Conversation;
+    const collective = data && data.collective;
+    const conversation = data && data.conversation;
     const body = conversation && conversation.body;
     const comments = get(conversation, 'comments.nodes', []);
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
@@ -174,9 +182,9 @@ class ConversationPage extends React.Component {
             <Loading />
           </Container>
         ) : (
-          <CollectiveThemeProvider collective={data.Collective}>
+          <CollectiveThemeProvider collective={collective}>
             <Container borderTop="1px solid #E8E9EB">
-              <CollectiveNavbar collective={data.Collective} selected={Sections.CONVERSATIONS} />
+              <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
               <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
                 <StyledLink as={Link} color="black.600" route="conversations" params={{ collectiveSlug }}>
                   &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
@@ -194,7 +202,20 @@ class ConversationPage extends React.Component {
                       <Box flex="1 1 50%" maxWidth={720} mb={5}>
                         <Container borderBottom="1px solid" borderColor="black.300" pb={4}>
                           <H2 fontSize="H4" mb={3}>
-                            {conversation.title}
+                            <InlineEditField
+                              mutation={editConversationMutation}
+                              mutationOptions={{ context: API_V2_CONTEXT }}
+                              canEdit={canEdit}
+                              values={conversation}
+                              field="title"
+                              maxLength={255}
+                              placeholder={
+                                <FormattedMessage
+                                  id="CreateConversation.Title.Placeholder"
+                                  defaultMessage="Start with a title for your conversation here"
+                                />
+                              }
+                            />
                           </H2>
                           <Comment
                             comment={body}
@@ -273,7 +294,8 @@ class ConversationPage extends React.Component {
 
 const getData = graphql(conversationPageQuery, {
   options: {
-    pollInterval: 15000, // Will refresh the data every 15s to get new comments
+    pollInterval: 60000, // Will refresh the data every 60s to get new comments
+    context: API_V2_CONTEXT,
   },
 });
 

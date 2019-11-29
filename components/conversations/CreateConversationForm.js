@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import useForm from 'react-hook-form';
 import { Flex, Box } from '@rebass/grid';
 import { useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
 
+import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import StyledInput from '../StyledInput';
 import RichTextEditor from '../RichTextEditor';
@@ -16,10 +16,11 @@ import { P, H4 } from '../Text';
 import Container from '../Container';
 import StyledInputTags from '../StyledInputTags';
 
-const CreateConversationMutation = gql`
-  mutation CreateConversation($title: String!, $html: String!, $CollectiveId: Int!, $tags: [String]) {
+const CreateConversationMutation = gqlV2`
+  mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
     createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
       id
+      slug
       title
       summary
       tags
@@ -28,11 +29,28 @@ const CreateConversationMutation = gql`
   }
 `;
 
+const mutationOptions = { context: API_V2_CONTEXT };
+
+const messages = defineMessages({
+  titlePlaceholder: {
+    id: 'CreateConversation.Title.Placeholder',
+    defaultMessage: 'Start with a title for your conversation here',
+  },
+  bodyPlaceholder: {
+    id: 'CreateConversation.Body.Placeholder',
+    defaultMessage:
+      'You can add links, lists, code snipets and more using this text editor. Type and start adding content to your conversation here.',
+  },
+});
+
 /**
  * Form to create a new conversation. User must be authenticated.
+ *
+ * /!\ Can only be used with data from API V2.
  */
 const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabled, loading }) => {
-  const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation);
+  const { formatMessage } = useIntl();
+  const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation, mutationOptions);
   const { register, handleSubmit, errors, formState, setValue } = useForm();
 
   // Manually register custom fields
@@ -64,7 +82,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
               maxLength={255}
               px={0}
               py={0}
-              placeholder="Start with a title for your conversation here"
+              placeholder={formatMessage(messages.titlePlaceholder)}
               ref={register({ required: true, minLength: 3, maxLength: 255 })}
             />
           )}
@@ -89,7 +107,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
               <RichTextEditor
                 withStickyToolbar
                 toolbarOffsetY={0}
-                placeholder="You can add links, lists, code snipets and more using this text editor. Type and start adding content to your conversation here."
+                placeholder={formatMessage(messages.bodyPlaceholder)}
                 editorMinHeight={175}
                 inputName="html"
                 fontSize="13px"
@@ -154,7 +172,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
 
 CreateConversationForm.propTypes = {
   /** ID of the collective where the conversation will be created */
-  collectiveId: PropTypes.number.isRequired,
+  collectiveId: PropTypes.string.isRequired,
   /** Called when the conversation gets successfully created. Return a promise if you want to keep the submitting state active. */
   onSuccess: PropTypes.func.isRequired,
   /** Will disable the form */

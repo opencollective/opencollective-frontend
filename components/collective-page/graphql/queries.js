@@ -166,23 +166,6 @@ export const getCollectivePageQuery = gql`
       updates(limit: 3, onlyPublishedUpdates: true) {
         ...UpdatesFieldsFragment
       }
-      conversations(limit: 3) {
-        total
-        nodes {
-          id
-          title
-          summary
-          createdAt
-          tags
-          fromCollective {
-            id
-            name
-            type
-            slug
-            imageUrl
-          }
-        }
-      }
 
       ... on Event {
         timezone

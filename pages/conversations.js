@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { Router } from '../server/pages';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
@@ -45,7 +45,7 @@ class ConversationsPage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      Collective: PropTypes.shape({
+      collective: PropTypes.shape({
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -75,7 +75,7 @@ class ConversationsPage extends React.Component {
   /** Must only be called when dataIsReady */
   renderConversations() {
     const { data, collectiveSlug } = this.props;
-    const conversations = get(data, 'Collective.conversations.nodes', []);
+    const conversations = get(data, 'collective.conversations.nodes', []);
     if (conversations.length > 0) {
       return <ConversationsList collectiveSlug={collectiveSlug} conversations={conversations} />;
     } else {
@@ -105,17 +105,17 @@ class ConversationsPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
+      } else if (!data.collective) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.Collective.type !== CollectiveType.COLLECTIVE) {
+      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.Collective, FEATURES.CONVERSATIONS)) {
+      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.Collective;
+    const collective = data && data.collective;
     const dataIsReady = collective && collective.conversations;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
@@ -124,9 +124,9 @@ class ConversationsPage extends React.Component {
             <Loading />
           </Container>
         ) : (
-          <CollectiveThemeProvider collective={data.Collective}>
+          <CollectiveThemeProvider collective={collective}>
             <Container borderTop="1px solid #E8E9EB">
-              <CollectiveNavbar collective={data.Collective} selected={Sections.CONVERSATIONS} />
+              <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
               <Container py={[4, 5]} px={[2, 3, 4]}>
                 <Container maxWidth={1200} m="0 auto">
                   <H1 fontSize="H2" fontWeight="normal" textAlign="left" mb={2}>
@@ -190,23 +190,21 @@ class ConversationsPage extends React.Component {
 }
 
 const getData = graphql(
-  gql`
-    query Conversations($collectiveSlug: String!, $tag: String) {
-      Collective(slug: $collectiveSlug, throwIfMissing: false) {
+  gqlV2` 
+    query ConversationsPage($collectiveSlug: String!, $tag: String) {
+      collective(slug: $collectiveSlug, throwIfMissing: false) {
         id
         slug
-        path
         name
         type
-        canContact
         description
         settings
         imageUrl
         twitterHandle
-        isIncognito
         conversations(tag: $tag) {
           nodes {
             id
+            slug
             title
             summary
             createdAt
@@ -232,6 +230,7 @@ const getData = graphql(
       // Because this list is updated often, using this option ensures that the list gets
       // properly updated when doing things like redirecting after a conversation delete.
       fetchPolicy: 'cache-and-network',
+      context: API_V2_CONTEXT,
     },
   },
 );

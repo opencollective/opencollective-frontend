@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Sun Nov 24 2019 15:31:32 GMT-0400 (Atlantic Standard Time)
+# timestamp: Mon Dec 02 2019 11:01:37 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -74,6 +74,7 @@ interface Account {
     tierSlug: String
     orderBy: ChronologicalOrder
   ): OrderCollection
+  settings: JSON
 }
 
 """
@@ -147,6 +148,7 @@ type Bot implements Account {
     tierSlug: String
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
+  settings: JSON
 }
 
 """
@@ -217,6 +219,7 @@ type Collective implements Account {
     tierSlug: String
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
+  settings: JSON
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -227,6 +230,20 @@ type Collective implements Account {
   Get the host collective that is receiving the money on behalf of this collective
   """
   host: Account
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
 }
 
 """
@@ -242,7 +259,7 @@ type Comment {
 }
 
 """
-A collection of "Orders"
+A collection of "Comments"
 """
 type CommentCollection implements Collection {
   offset: Int
@@ -254,19 +271,46 @@ type CommentCollection implements Collection {
 input CommentCreate {
   markdown: String
   html: String
-  CollectiveId: Int!
   ExpenseId: Int
   UpdateId: Int
+  ConversationId: String
 }
 
 input CommentEdit {
   id: String!
   markdown: String
   html: String
-  FromCollectiveId: Int
-  CollectiveId: Int
-  ExpenseId: Int
-  UpdateId: Int
+}
+
+"""
+A conversation thread
+"""
+type Conversation {
+  id: String!
+  slug: String!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  tags: [String]
+  summary: String!
+  collective: Account
+  fromCollective: Account
+
+  """
+  The root comment / starter for this conversation
+  """
+  body: Comment
+  comments(limit: Int, offset: Int): CommentCollection
+}
+
+"""
+A collection of "Conversations"
+"""
+type ConversationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Conversation]
 }
 
 """
@@ -428,6 +472,7 @@ type Event implements Account {
     tierSlug: String
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
+  settings: JSON
 }
 
 """
@@ -490,10 +535,16 @@ type Individual implements Account {
     tierSlug: String
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
+  settings: JSON
   firstName: String
   lastName: String
   email: String
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 """
 This represents a Member relationship (ie: Organization backing a Collective)
@@ -570,6 +621,42 @@ type Mutation {
   editComment(comment: CommentEdit!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreate!): Comment
+
+  """
+  Create a conversation
+  """
+  createConversation(
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    The body of the conversation initial comment
+    """
+    html: String!
+
+    """
+    ID of the Collective where the conversation will be created
+    """
+    CollectiveId: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+  editConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Conversation's title
+    """
+    title: String!
+  ): Conversation
 }
 
 """
@@ -673,6 +760,7 @@ type Organization implements Account {
     tierSlug: String
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
+  settings: JSON
   email: String
 }
 
@@ -711,7 +799,18 @@ type Query {
     The githubHandle attached to the collective (ie: babel for https://opencollective.com/babel)
     """
     githubHandle: String
+
+    """
+    If false, will return null instead of an error if collective is not found
+    """
+    throwIfMissing: Boolean = true
   ): Collective
+  conversation(
+    """
+    The id identifying the conversation
+    """
+    id: String!
+  ): Conversation
   expense(
     """
     Public expense identifier
@@ -719,6 +818,26 @@ type Query {
     id: String!
   ): Expense
   loggedInAccount: Account
+}
+
+"""
+Statistics for a given tag
+"""
+type TagStat {
+  """
+  An unique identified for this tag
+  """
+  id: String!
+
+  """
+  Name/Label of the tag
+  """
+  tag: String!
+
+  """
+  Number of entries for this tag
+  """
+  count: Int!
 }
 
 """

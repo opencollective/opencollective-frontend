@@ -5,8 +5,8 @@ import { withRouter } from 'next/router';
 import { get } from 'lodash';
 import useForm from 'react-hook-form';
 import { useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
 
+import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
@@ -18,8 +18,8 @@ import ContainerOverlay from '../ContainerOverlay';
 import MessageBox from '../MessageBox';
 import { CommentFieldsFragment } from './graphql';
 
-const createCommentMutation = gql`
-  mutation CreateComment($comment: CommentInputType!) {
+const createCommentMutation = gqlV2`
+  mutation CreateComment($comment: CommentCreate!) {
     createComment(comment: $comment) {
       ...CommentFields
     }
@@ -47,6 +47,8 @@ const isAutoFocused = id => {
   return id && typeof window !== 'undefined' && get(window, 'location.hash') === `#${id}`;
 };
 
+const mutationOptions = { context: API_V2_CONTEXT };
+
 /**
  * Form for users to post comments on either expenses, conversations or updates.
  * If user is not logged in, the form will default to a sign in/up form.
@@ -61,7 +63,7 @@ const CommentForm = ({
   loadingLoggedInUser,
   LoggedInUser,
 }) => {
-  const [createComment, { error, data }] = useMutation(createCommentMutation);
+  const [createComment, { error, data }] = useMutation(createCommentMutation, mutationOptions);
   const { register, triggerValidation, setValue, formState, handleSubmit } = useForm({ mode: 'onChange' });
   const { formatMessage } = useIntl();
 
@@ -129,7 +131,7 @@ CommentForm.propTypes = {
   /** An optional id for the container, useful for the redirection link */
   id: PropTypes.string,
   /** If commenting on a conversation */
-  ConversationId: PropTypes.number,
+  ConversationId: PropTypes.string,
   /** If commenting on an expense */
   ExpenseId: PropTypes.number,
   /** If commenting on an update */

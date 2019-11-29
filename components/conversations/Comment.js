@@ -4,11 +4,11 @@ import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
 
 import { Edit } from 'styled-icons/feather/Edit';
 import { X } from 'styled-icons/feather/X';
 
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import RichTextEditor from '../RichTextEditor';
 import HTMLContent from '../HTMLContent';
@@ -34,16 +34,16 @@ const CommentBtn = styled(StyledButton)`
   }
 `;
 
-const deleteCommentMutation = gql`
-  mutation deleteComment($id: Int!) {
+const deleteCommentMutation = gqlV2`
+  mutation deleteComment($id: String!) {
     deleteComment(id: $id) {
       id
     }
   }
 `;
 
-const editCommentMutation = gql`
-  mutation editComment($comment: CommentAttributesInputType!) {
+const editCommentMutation = gqlV2`
+  mutation editComment($comment: CommentEdit!) {
     editComment(comment: $comment) {
       ...CommentFields
     }
@@ -51,12 +51,14 @@ const editCommentMutation = gql`
   ${CommentFieldsFragment}
 `;
 
+const mutationOptions = { context: API_V2_CONTEXT };
+
 /**
  * Action buttons for the comment owner. Styles change between mobile and desktop.
  */
 const AdminActionButtons = ({ comment, deleteModalTitle, onDelete, onEdit }) => {
   const [isDeleting, setDeleting] = React.useState(null);
-  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation);
+  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
 
   return (
     <React.Fragment>
@@ -109,7 +111,9 @@ AdminActionButtons.propTypes = {
 };
 
 /**
- * Render a comment
+ * Render a comment.
+ *
+ * /!\ Can only be used with data from API V2.
  */
 const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, deleteModalTitle, onDelete }) => {
   const [isEditing, setEditing] = React.useState(false);
@@ -159,6 +163,7 @@ const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, deleteMod
       <Box position="relative" maxHeight={maxCommentHeight} css={{ overflowY: 'auto' }}>
         <InlineEditField
           mutation={editCommentMutation}
+          mutationOptions={mutationOptions}
           values={comment}
           field="html"
           canEdit={canEdit}
@@ -191,7 +196,7 @@ const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, deleteMod
 
 Comment.propTypes = {
   comment: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
     fromCollective: PropTypes.shape({

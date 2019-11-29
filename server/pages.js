@@ -1,3 +1,9 @@
+/**
+ * Configure the router.
+ *
+ * /!\ You'll have to restart your local dev server after any change to this file.
+ */
+
 const routes = require('next-routes');
 
 const pages = routes()
@@ -73,7 +79,7 @@ pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([
 // ---------------
 pages.add('conversations', '/:collectiveSlug/conversations');
 pages.add('create-conversation', '/:collectiveSlug/conversations/new');
-pages.add('conversation', '/:collectiveSlug/conversations/:id([0-9]+)');
+pages.add('conversation', '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)');
 
 // Contribute Flow
 // ---------------

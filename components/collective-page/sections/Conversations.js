@@ -2,7 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
+
+import { graphql } from 'react-apollo';
+
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { P } from '../../Text';
 import Link from '../../Link';
@@ -11,6 +15,31 @@ import StyledButton from '../../StyledButton';
 import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ConversationsList from '../../conversations/ConversationsList';
+
+const conversationsQuery = gqlV2`
+  query ConversationSection($collectiveSlug: String!) {
+    collective(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      conversations(limit: 3) {
+        totalCount
+        nodes {
+          id
+          title
+          summary
+          createdAt
+          tags
+          fromCollective {
+            id
+            name
+            type
+            slug
+            imageUrl
+          }
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Conversations section.
@@ -24,14 +53,19 @@ class SectionConversations extends React.PureComponent {
     }).isRequired,
 
     /** Conversations */
-    conversations: PropTypes.shape({
-      total: PropTypes.number,
-      nodes: PropTypes.arrayOf(PropTypes.object),
+    data: PropTypes.shape({
+      collective: PropTypes.shape({
+        conversations: PropTypes.shape({
+          totalCount: PropTypes.number,
+          nodes: PropTypes.object,
+        }),
+      }),
     }),
   };
 
   render() {
-    const { collective, conversations } = this.props;
+    const { collective, data } = this.props;
+    const conversations = get(data, 'collective.conversations', {});
 
     return (
       <ContainerSectionContent pt={5}>
@@ -62,7 +96,7 @@ class SectionConversations extends React.PureComponent {
         ) : (
           <Box>
             <ConversationsList collectiveSlug={collective.slug} conversations={conversations.nodes} />
-            {conversations.total > 3 && (
+            {conversations.totalCount > 3 && (
               <Link route="conversations" params={{ collectiveSlug: collective.slug }}>
                 <StyledButton width="100%" mt={4} p="10px">
                   <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all conversations" /> →
@@ -76,4 +110,9 @@ class SectionConversations extends React.PureComponent {
   }
 }
 
-export default SectionConversations;
+export default graphql(conversationsQuery, {
+  options: props => ({
+    variables: { collectiveSlug: props.collective.slug },
+    context: API_V2_CONTEXT,
+  }),
+})(SectionConversations);

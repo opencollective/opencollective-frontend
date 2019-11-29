@@ -20,7 +20,7 @@ const ConversationsList = ({ collectiveSlug, conversations }) => {
 
   return (
     <StyledCard>
-      {conversations.map(({ id, title, summary, createdAt, fromCollective }, idx) => (
+      {conversations.map(({ id, slug, title, summary, createdAt, fromCollective }, idx) => (
         <Container key={id} borderTop={!idx ? undefined : '1px solid'} borderColor="black.300" p={3}>
           <Flex>
             <Box mr={3}>
@@ -29,7 +29,7 @@ const ConversationsList = ({ collectiveSlug, conversations }) => {
               </LinkCollective>
             </Box>
             <div>
-              <Link route="conversation" params={{ collectiveSlug, id }}>
+              <Link route="conversation" params={{ collectiveSlug, slug, id }}>
                 <H5>{title}</H5>
               </Link>
               <P color="black.500" fontSize="Caption">
@@ -55,7 +55,7 @@ ConversationsList.propTypes = {
   collectiveSlug: PropTypes.string.isRequired,
   conversations: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       summary: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,

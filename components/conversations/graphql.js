@@ -1,10 +1,10 @@
 import gql from 'graphql-tag';
 
-export const CommentFieldsFragment = gql`
-  fragment CommentFields on CommentType {
+const gqlV2 = gql;
+export const CommentFieldsFragment = gqlV2`
+  fragment CommentFields on Comment {
     id
     createdAt
-    updatedAt
     html
     fromCollective {
       id

@@ -41,7 +41,7 @@ const Thread = ({ items, onCommentDeleted, LoggedInUser }) => {
     <div>
       {items.map((item, idx) => {
         switch (item.__typename) {
-          case 'CommentType':
+          case 'Comment':
             return (
               <Box key={`comment-${item.id}`}>
                 <Flex>
@@ -74,7 +74,7 @@ Thread.propTypes = {
   /** The list of items to display, sorted by chronoligal order */
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      __typename: PropTypes.oneOf(['CommentType']),
+      __typename: PropTypes.oneOf(['Comment']),
     }),
   ),
   /** Called when a comment get deleted */

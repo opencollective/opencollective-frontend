@@ -424,6 +424,8 @@
   "CP.Contributions.PartOfOrg": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de notre Organisation",
   "create.pledge.stats": "par {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# personne } other {# personnes }}",
   "createAccount.alreadyLoggedIn": "Il semble que vous soyez déjà connecté en tant que « {email} ». Pour créer un nouveau compte, veuillez d'abord vous déconnecter.",
+  "CreateConversation.Body.Placeholder": "You can add links, lists, code snipets and more using this text editor. Type and start adding content to your conversation here.",
+  "CreateConversation.Title.Placeholder": "Start with a title for your conversation here",
   "CreateConversationForm.Submit": "Submit conversation",
   "createOrder.backToTier": "Voir toutes les autres manières de contribuer",
   "createOrder.inactiveCollective": "Ce collectif n'est pas actif et ne peux donc pas recevoir de contributions financières",

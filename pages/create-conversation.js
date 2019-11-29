@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
 import { Router } from '../server/pages';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
@@ -44,14 +44,13 @@ class CreateConversationPage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      Collective: PropTypes.shape({
-        id: PropTypes.number.isRequired,
+      collective: PropTypes.shape({
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
-        canContact: PropTypes.bool,
         conversationsTags: PropTypes.arrayOf(PropTypes.string),
       }),
     }).isRequired, // from withData
@@ -67,7 +66,7 @@ class CreateConversationPage extends React.Component {
 
   onCreateSuccess = async conversation => {
     const { collectiveSlug } = this.props;
-    await Router.pushRoute('conversation', { collectiveSlug, id: conversation.id });
+    await Router.pushRoute('conversation', { collectiveSlug, slug: conversation.slug, id: conversation.id });
   };
 
   getSuggestedTags(collective) {
@@ -81,17 +80,17 @@ class CreateConversationPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
+      } else if (!data.collective) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.Collective.type !== CollectiveType.COLLECTIVE) {
+      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.Collective, FEATURES.CONVERSATIONS)) {
+      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.Collective;
+    const collective = data && data.collective;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         {data.loading ? (
@@ -131,20 +130,17 @@ class CreateConversationPage extends React.Component {
 }
 
 const getCollective = graphql(
-  gql`
+  gqlV2`
     query CreateConversations($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug, throwIfMissing: false) {
+      collective(slug: $collectiveSlug, throwIfMissing: false) {
         id
         slug
-        path
         name
         type
-        canContact
         description
         settings
         imageUrl
         twitterHandle
-        isIncognito
         conversationsTags {
           id
           tag
@@ -152,6 +148,11 @@ const getCollective = graphql(
       }
     }
   `,
+  {
+    options: {
+      context: API_V2_CONTEXT,
+    },
+  },
 );
 
 export default withUser(getCollective(CreateConversationPage));

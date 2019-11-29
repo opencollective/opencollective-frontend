@@ -61,6 +61,8 @@ class InlineEditField extends Component {
     values: PropTypes.object.isRequired,
     /** The GraphQL mutation used to update this value */
     mutation: PropTypes.object.isRequired,
+    /** Passed to Apollo */
+    mutationOptions: PropTypes.object,
     /** Can user edit the description */
     canEdit: PropTypes.bool,
     /** Use this to control the component state */
@@ -160,6 +162,7 @@ class InlineEditField extends Component {
       placeholder,
       children,
       topEdit,
+      mutationOptions,
       warnIfUnsavedChanges,
     } = this.props;
     const { draft, isEditing } = this.state;
@@ -180,7 +183,7 @@ class InlineEditField extends Component {
     } else {
       return (
         <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && touched}>
-          <Mutation mutation={mutation}>
+          <Mutation mutation={mutation} {...mutationOptions}>
             {(updateField, { loading, error }) => (
               <React.Fragment>
                 {children ? (
@@ -212,7 +215,14 @@ class InlineEditField extends Component {
                 )}
                 <Box width={1}>
                   {error && (
-                    <MessageBox type="error" my={2} withIcon>
+                    <MessageBox
+                      type="error"
+                      my={2}
+                      fontSize="Paragraph"
+                      lineHeight="Paragraph"
+                      fontWeight="normal"
+                      withIcon
+                    >
                       {error.message.replace('GraphQL error: ', '')}
                     </MessageBox>
                   )}
