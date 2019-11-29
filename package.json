@@ -200,7 +200,7 @@
     "shx": "^0.3.2",
     "sinon": "^7.5.0",
     "style-loader": "^1.0.0",
-    "url-loader": "^3.0.0",
+    "url-loader": "^2.3.0",
     "webpack-bundle-analyzer": "^3.6.0"
   },
   "jest": {
