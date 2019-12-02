@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 
 import CustomDataTypes from './DataTypes';
 import { maxInteger } from '../constants/math';
-import { capitalize, pluralize, days, formatCurrency, strip_tags } from '../lib/utils';
+import { capitalize, days, formatCurrency, strip_tags } from '../lib/utils';
 import { isSupportedVideoProvider, supportedVideoProviders } from '../lib/validators';
 
 const debug = debugLib('tier');
@@ -37,6 +37,9 @@ export default function(Sequelize, DataTypes) {
       // human readable way to uniquely access a tier for a given collective or collective/event combo
       slug: {
         type: DataTypes.STRING,
+        validate: {
+          len: [1, 255],
+        },
         set(slug) {
           if (slug && slug.toLowerCase) {
             this.setDataValue('slug', slugify(slug));
@@ -48,10 +51,15 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: false,
         set(name) {
-          if (!this.getDataValue('slug')) {
-            this.slug = name;
-          }
           this.setDataValue('name', name);
+
+          if (!this.getDataValue('slug')) {
+            // Try to generate the slug from the name. If it fails, for example if tier
+            // name is '😵️' we gracefully fallback on tier type
+            const slugFromName = slugify(name);
+            const slug = slugFromName || slugify(this.type || 'TIER');
+            this.setDataValue('slug', slug);
+          }
         },
         validate: {
           isValidName(value) {
@@ -248,7 +256,7 @@ export default function(Sequelize, DataTypes) {
         },
 
         title() {
-          return capitalize(pluralize(this.name));
+          return capitalize(this.name);
         },
 
         amountStr() {
