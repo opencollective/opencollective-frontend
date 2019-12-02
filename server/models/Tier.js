@@ -319,6 +319,10 @@ export default function(Sequelize, DataTypes) {
 
   // TODO: Check for maxQuantityPerUser
   Tier.prototype.availableQuantity = function() {
+    if (!this.maxQuantity) {
+      return Promise.resolve(maxInteger);
+    }
+
     return models.Order.sum('quantity', {
       where: {
         TierId: this.id,

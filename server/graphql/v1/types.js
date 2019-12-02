@@ -1214,13 +1214,12 @@ export const TierStatsType = new GraphQLObjectType({
       },
       availableQuantity: {
         type: GraphQLInt,
-        resolve(tier) {
-          return (
-            tier
-              .availableQuantity()
-              // graphql doesn't like infinity value
-              .then(availableQuantity => (availableQuantity === Infinity ? maxInteger : availableQuantity))
-          );
+        resolve(tier, _, req) {
+          if (!tier.maxQuantity) {
+            return maxInteger;
+          } else {
+            return req.loaders.tiers.availableQuantity.load(tier.id);
+          }
         },
       },
     };

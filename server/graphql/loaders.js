@@ -6,6 +6,7 @@ import dataloaderSequelize from 'dataloader-sequelize';
 import { get, groupBy } from 'lodash';
 import debugLib from 'debug';
 import { types as CollectiveType } from '../constants/collectives';
+import { maxInteger } from '../constants/math';
 
 dataloaderSequelize(models.Order);
 dataloaderSequelize(models.Transaction);
@@ -285,6 +286,30 @@ export const loaders = req => {
           .then(results => sortResults(ids, results, 'TierId'))
           .map(result => get(result, 'dataValues.count') || 0),
       ),
+      availableQuantity: new DataLoader(tierIds => {
+        return sequelize
+          .query(
+            `
+              SELECT t.id, (t."maxQuantity" - COALESCE(SUM(o.quantity), 0)) AS "availableQuantity"
+              FROM "Tiers" t
+              LEFT JOIN "Orders" o ON o."TierId" = t.id
+              WHERE t.id IN (?)
+              AND (o.id IS NULL OR o."processedAt" IS NOT NULL)
+              AND t."maxQuantity" IS NOT NULL
+              GROUP BY t.id
+            `,
+            {
+              replacements: [tierIds],
+              type: sequelize.QueryTypes.SELECT,
+            },
+          )
+          .then(results => {
+            return tierIds.map(tierId => {
+              const result = results.find(({ id }) => id === tierId);
+              return result ? result.availableQuantity : maxInteger;
+            });
+          });
+      }),
       totalOrders: new DataLoader(ids =>
         models.Order.findAll({
           attributes: ['TierId', [sequelize.fn('COALESCE', sequelize.fn('COUNT', sequelize.col('id')), 0), 'count']],
