@@ -2,26 +2,29 @@
 
 # Starts maildev, api and frontend servers.
 function start_app {
-  cd ~/api
-
   echo "> Starting maildev server"
   npx maildev &
   MAILDEV_PID=$!
 
   echo "> Starting api server"
+  if [ -z "$API_FOLDER" ]; then
+    cd ~/api
+  else
+    cd $API_FOLDER
+  fi
   PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm start &
   API_PID=$!
   cd -
+
   echo "> Starting frontend server"
-  if [ -d "/home/circleci/frontend" ]; then
+  if [ -z "$FRONTEND_FOLDER" ]; then
     cd ~/frontend
-    npm start &
-    FRONTEND_PID=$!
-    cd -
   else
-    npm start &
-    FRONTEND_PID=$!
+    cd $FRONTEND_FOLDER
   fi
+  npm start &
+  FRONTEND_PID=$!
+  cd -
 }
 
 # Stops maildev, api and frontend servers.
