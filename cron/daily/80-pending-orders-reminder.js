@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import '../../server/env';
 
+import logger from '../../server/lib/logger';
 import models, { Op } from '../../server/models';
 import status from '../../server/constants/order_status';
 import * as libPayments from '../../server/lib/payments';
@@ -36,6 +37,9 @@ const run = async () => {
   orders.forEach(async order => {
     await libPayments.sendReminderPendingOrderEmail(order);
   });
+
+  logger.info('Done.');
+  process.exit();
 };
 
 run();
