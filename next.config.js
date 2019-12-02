@@ -81,6 +81,7 @@ const nextConfig = {
             publicPath: '/_next/static/img/',
             outputPath: 'static/img/',
             name: '[name]-[hash].[ext]',
+            esModule: false,
           },
         },
       },
