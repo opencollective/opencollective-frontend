@@ -39,7 +39,7 @@
     "currency-symbol-map": "4.0.4",
     "debug": "4.1.1",
     "dotenv": "8.2.0",
-    "downshift": "3.4.3",
+    "downshift": "3.4.4",
     "draft-js": "0.10.5",
     "express": "4.17.1",
     "express-http-proxy": "1.6.0",
