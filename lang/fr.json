@@ -646,6 +646,7 @@
   "expense.privateMessage.description": "Les instructions privées sont uniquement visible pour les administrateurs du compte en banque de votre collectif",
   "expense.privateNote": "note privée",
   "expense.reject.btn": "Refuser",
+  "expense.refreshing": "Refreshing",
   "expense.rejected": "refusé",
   "expense.save": "sauvegarder",
   "expense.type": "Type",
