@@ -123,7 +123,7 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-mocha": "6.2.2",
     "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react": "^7.17.0",
     "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
     "maildev": "^1.1.0",
