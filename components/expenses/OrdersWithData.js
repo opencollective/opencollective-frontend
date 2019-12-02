@@ -101,9 +101,40 @@ const getOrdersQuery = gql`
         slug
         imageUrl
         isIncognito
-      },
-      transactions (type: "CREDIT") {
-        ${transactionFields}
+      }
+      transactions(type: "CREDIT") {
+        id
+        type
+        amount
+        currency
+        hostCurrency
+        hostCurrencyFxRate
+        netAmountInCollectiveCurrency
+        platformFeeInHostCurrency
+        paymentProcessorFeeInHostCurrency
+        hostFeeInHostCurrency
+        collective {
+          id
+          slug
+          name
+          type
+          imageUrl
+          isIncognito
+        }
+        host {
+          id
+          slug
+          name
+          currency
+          hostFeePercent
+          type
+        }
+        paymentMethod {
+          service
+          type
+          name
+          data
+        }
       }
     }
   }
