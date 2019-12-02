@@ -5,6 +5,7 @@ import { graphql } from 'react-apollo';
 
 import Error from '../Error';
 import Orders from './Orders';
+import { transactionFields } from '../../lib/graphql/queries';
 
 class OrdersWithData extends React.Component {
   static propTypes = {
@@ -100,6 +101,9 @@ const getOrdersQuery = gql`
         slug
         imageUrl
         isIncognito
+      },
+      transactions (type: "CREDIT") {
+        ${transactionFields}
       }
     }
   }
