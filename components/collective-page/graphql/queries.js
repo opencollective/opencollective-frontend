@@ -46,6 +46,9 @@ export const getCollectivePageQuery = gql`
           users
           organizations
         }
+        transactions {
+          all
+        }
       }
       parentCollective {
         id
