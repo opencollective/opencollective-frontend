@@ -34,14 +34,16 @@ export const exists = async (req, res) => {
 export const signin = (req, res, next) => {
   const { user, redirect, websiteUrl } = req.body;
   let loginLink;
+  let clientIP;
   return models.User.findOne({ where: { email: user.email.toLowerCase() } })
     .then(u => u || models.User.createUserWithCollective(user))
     .then(u => {
       loginLink = u.generateLoginLink(redirect || '/', websiteUrl);
+      clientIP = req.ip;
       if (config.env === 'development') {
         logger.info(`Login Link: ${loginLink}`);
       }
-      return emailLib.send('user.new.token', u.email, { loginLink }, { sendEvenIfNotProduction: true });
+      return emailLib.send('user.new.token', u.email, { loginLink, clientIP }, { sendEvenIfNotProduction: true });
     })
     .then(() => {
       const response = { success: true };
