@@ -902,7 +902,7 @@ const CollectiveFields = () => {
       type: GraphQLString,
       async resolve(collective, args, req) {
         if (collective.type === 'EVENT' && !collective.image) {
-          const parentCollective = await req.loaders.collective.findById.load(collective.ParentCollectiveId);
+          const parentCollective = await req.loaders.Collective.byId.load(collective.ParentCollectiveId);
           if (parentCollective) {
             return parentCollective.image;
           }
@@ -920,7 +920,7 @@ const CollectiveFields = () => {
       },
       async resolve(collective, args, req) {
         if (collective.type === 'EVENT' && !collective.image) {
-          const parentCollective = await req.loaders.collective.findById.load(collective.ParentCollectiveId);
+          const parentCollective = await req.loaders.Collective.byId.load(collective.ParentCollectiveId);
           if (parentCollective) {
             return parentCollective.getImageUrl(args);
           }
