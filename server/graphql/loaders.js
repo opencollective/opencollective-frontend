@@ -248,7 +248,7 @@ export const loaders = req => {
         where: { ExpenseId: { [Op.in]: ExpenseIds } },
         group: ['ExpenseId'],
       })
-        .then(results => sortResults(ExpenseIds, results, 'ExpenseId'))
+        .then(results => sortResults(ExpenseIds, results, 'ExpenseId', { count: 0 }))
         .map(result => result.count),
     ),
   };
