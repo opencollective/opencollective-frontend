@@ -56,7 +56,7 @@ describe('host dashboard', () => {
     cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
     cy.get('[data-cy="expense-approved"]').as('currentExpense');
     cy.get('[data-cy="expense-actions"]')
-      .contains('button', 'record as paid')
+      .contains('button', 'Record as paid')
       .click({ force: true });
     cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-paid');
   });

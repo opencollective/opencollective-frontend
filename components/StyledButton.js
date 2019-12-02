@@ -69,7 +69,7 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
+  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark', 'danger', 'success']),
   /**
    * From styled-system: accepts any css 'display' value
    */
