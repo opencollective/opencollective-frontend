@@ -90,13 +90,13 @@ class Expense extends React.Component {
         defaultMessage: 'Please pick the type of this expense',
       },
       closeDetails: {
-        id: 'expense.closeDetails',
+        id: 'closeDetails',
         defaultMessage: 'Close Details',
       },
       edit: { id: 'expense.edit', defaultMessage: 'edit' },
       cancelEdit: { id: 'expense.cancelEdit', defaultMessage: 'cancel edit' },
       viewDetails: {
-        id: 'expense.viewDetails',
+        id: 'viewDetails',
         defaultMessage: 'View Details',
       },
       'unapprove.modal.header': {
