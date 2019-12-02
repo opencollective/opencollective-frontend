@@ -26,7 +26,7 @@ import { UpdatesFieldsFragment } from '../graphql/fragments';
 
 /** Query to re-fetch updates */
 const UpdatesQuery = gql`
-  query NewCollectivePage($slug: String!, $onlyPublishedUpdates: Boolean) {
+  query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     Collective(slug: $slug) {
       id
       updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
