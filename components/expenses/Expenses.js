@@ -46,6 +46,7 @@ class Expenses extends React.Component {
           editable={editable}
           refetch={this.props.refetch}
           view={view}
+          inFilterTab={this.props.status}
           includeHostedCollectives={includeHostedCollectives}
           LoggedInUser={LoggedInUser}
           allowPayAction={!this.state.isPayActionLocked[(expense.collective || collective).id]}

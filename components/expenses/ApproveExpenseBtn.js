@@ -10,7 +10,7 @@ class ApproveExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     approveExpense: PropTypes.func.isRequired,
-    refetch: PropTypes.func.isRequired,
+    updateExpensesInCurrentTab: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -21,7 +21,7 @@ class ApproveExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     await this.props.approveExpense(id);
-    await this.props.refetch();
+    await this.props.updateExpensesInCurrentTab();
   }
 
   render() {
