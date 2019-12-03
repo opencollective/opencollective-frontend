@@ -92,7 +92,7 @@ describe('createOrder', () => {
     // Given a user
     xdamman = (await store.newUser('xdamman')).user;
     // Create a host
-    const { hostCollective } = await store.newHost('opencollective', 'USD', 5, xdamman)
+    const { hostCollective } = await store.newHost('opencollective', 'USD', 5, xdamman);
     // Given a collective
     const newCollectiveInHost = await store.newCollectiveInHost('backyourstack', 'USD', hostCollective, xdamman);
     backyourstackCollective = newCollectiveInHost.backyourstack;
@@ -186,11 +186,13 @@ describe('createOrder', () => {
   });
 
   it('it dispatch the donation accross dependencies', async () => {
-    const order = await models.Order.findByPk(orderCreated.id); 
+    const order = await models.Order.findByPk(orderCreated.id);
     let subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
     await dispatch(order, subscription);
     subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
-    const nextDispatchDate = moment().add(1, 'month').format('ll')
+    const nextDispatchDate = moment()
+      .add(1, 'month')
+      .format('ll');
     // Expect next dispatch date to equal next month of current date
     expect(moment(subscription.data.nextDispatchDate).format('ll')).equal(nextDispatchDate);
   });
