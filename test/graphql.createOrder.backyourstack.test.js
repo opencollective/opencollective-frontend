@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import nock from 'nock';
+import moment from 'moment';
 import { expect } from 'chai';
 import { cloneDeep } from 'lodash';
 
@@ -8,6 +9,7 @@ import models from '../server/models';
 import * as utils from './utils';
 import * as store from './stores';
 
+import { dispatch } from '../server/lib/backyourstack/dispatcher';
 import initNock from './nocks/graphql.createOrder.backyourstack.nock';
 
 const baseOrder = Object.freeze({
@@ -36,6 +38,7 @@ const createOrderQuery = `
       id
       status
       description
+      data
       createdByUser {
         id
       }
@@ -65,14 +68,6 @@ const createOrderQuery = `
   }
   `;
 
-const backyourstackDispatchOrder = `
-  mutation backyourstackDispatchOrder($id: Int!) {
-    backyourstackDispatchOrder(id: $id) {
-      dispatching
-    }
-  }
-  `;
-
 const constants = Object.freeze({
   paymentMethod: {
     name: 'payment method',
@@ -96,13 +91,13 @@ describe('createOrder', () => {
 
     // Given a user
     xdamman = (await store.newUser('xdamman')).user;
-    // Given a collective (with a host)
-    const newCollectiveWithHost = await store.newCollectiveWithHost('backyourstack', 'USD', 'USD', 5);
-    backyourstackCollective = newCollectiveWithHost.backyourstack;
+    // Create a host
+    const { hostCollective } = await store.newHost('opencollective', 'USD', 5, xdamman)
+    // Given a collective
+    const newCollectiveInHost = await store.newCollectiveInHost('backyourstack', 'USD', hostCollective, xdamman);
+    backyourstackCollective = newCollectiveInHost.backyourstack;
     // And the above collective's host has a stripe account
     await store.stripeConnectedAccount(backyourstackCollective.HostCollectiveId);
-    // And given that the above collective is active
-    await backyourstackCollective.update({ isActive: true });
 
     // This add a new tier and removes the "sponsors" tier
     backyourstackCollective.editTiers([
@@ -130,6 +125,10 @@ describe('createOrder', () => {
     // order struct is patch. It's here and not on each test because
     // the `totalAmount' field doesn't change throught the tests.
     utils.stubStripeBalance(sandbox, baseOrder.totalAmount, 'usd', Math.round(baseOrder.totalAmount * 0.05), 610); // This is the payment processor fee.
+
+    // Create dependencies collectives
+    await store.newCollectiveInHost('test1', 'USD', hostCollective, xdamman);
+    await store.newCollectiveInHost('test2', 'USD', hostCollective, xdamman);
   });
 
   // alance(sandbox, amount, currency, applicationFee = 0, stripeFee = 0)
@@ -152,7 +151,7 @@ describe('createOrder', () => {
     order.interval = 'month';
     // order.totalAmount = 1000;
     order.collective = { id: backyourstackCollective.id };
-    order.customData = { jsonUrl: 'https://backyourstack.com/578a0a70-cef3-11e9-82be-21fd8ed699cb/file/backing.json' };
+    order.customData = { jsonUrl: 'https://backyourstack.com/test/backing.json' };
     order.tier = { id: 1 };
 
     // When the order is created
@@ -187,10 +186,12 @@ describe('createOrder', () => {
   });
 
   it('it dispatch the donation accross dependencies', async () => {
-    // When the order is created
-    const res = await utils.graphqlQuery(backyourstackDispatchOrder, { id: orderCreated.id }, xdamman);
-    // There should be no errors
-    res.errors && console.error(res.errors);
-    expect(res.errors).to.not.exist;
+    const order = await models.Order.findByPk(orderCreated.id); 
+    let subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
+    await dispatch(order, subscription);
+    subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
+    const nextDispatchDate = moment().add(1, 'month').format('ll')
+    // Expect next dispatch date to equal next month of current date
+    expect(moment(subscription.data.nextDispatchDate).format('ll')).equal(nextDispatchDate);
   });
 });
