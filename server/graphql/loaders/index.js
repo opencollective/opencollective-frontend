@@ -1,54 +1,17 @@
-import models, { sequelize, Op } from '../models';
-import { getListOfAccessibleMembers } from '../lib/auth';
-import { TransactionTypes } from '../constants/transactions';
 import DataLoader from 'dataloader';
 import { createContext } from 'dataloader-sequelize';
 import { get, groupBy } from 'lodash';
-import debugLib from 'debug';
-import { types as CollectiveType } from '../constants/collectives';
-import { maxInteger } from '../constants/math';
 
-const debug = debugLib('loaders');
-
-const sortResults = (keys, results, attribute = 'id', defaultValue) => {
-  debug('sortResults', attribute, 'number of results:', results.length);
-  const resultsById = {};
-  results.forEach(r => {
-    let key;
-    const dataValues = r.dataValues || r;
-    if (attribute.indexOf(':') !== -1) {
-      const keyComponents = [];
-      attribute.split(':').forEach(attr => {
-        keyComponents.push(dataValues[attr]);
-      });
-      key = keyComponents.join(':');
-    } else {
-      key = get(dataValues, attribute);
-    }
-    if (!key) {
-      return;
-    }
-    // If the default value is an array
-    // e.g. when we want to return all the paymentMethods for a list of collective ids.
-    if (defaultValue instanceof Array) {
-      resultsById[key] = resultsById[key] || [];
-      resultsById[key].push(r);
-    } else {
-      resultsById[key] = r;
-    }
-  });
-  return keys.map(id => resultsById[id] || defaultValue);
-};
+import { types as CollectiveType } from '../../constants/collectives';
+import { maxInteger } from '../../constants/math';
+import { TransactionTypes } from '../../constants/transactions';
+import { getListOfAccessibleMembers } from '../../lib/auth';
+import models, { Op, sequelize } from '../../models';
+import { sortResults, createDataLoaderWithOptions } from './helpers';
+import generateCommentsLoader from './comments';
 
 export const loaders = req => {
   const cache = {};
-
-  const createDataLoaderWithOptions = (batchFunction, options = {}, cacheKeyPrefix = '') => {
-    const cacheKey = `${cacheKeyPrefix}:${JSON.stringify(options)}`;
-    cache[cacheKey] = cache[cacheKey] || new DataLoader(keys => batchFunction(keys, options));
-    return cache[cacheKey];
-  };
-
   const context = createContext(sequelize);
 
   /** *** Collective *****/
@@ -228,30 +191,7 @@ export const loaders = req => {
   );
 
   /** *** Comment *****/
-  context.loaders.Comment = {
-    findAllByAttribute: attribute =>
-      createDataLoaderWithOptions(
-        (values, attribute) => {
-          return models.Comment.findAll({
-            where: {
-              [attribute]: { [Op.in]: values },
-            },
-            order: [['createdAt', 'DESC']],
-          }).then(results => sortResults(values, results, attribute, []));
-        },
-        attribute,
-        'comments',
-      ),
-    countByExpenseId: new DataLoader(ExpenseIds =>
-      models.Comment.count({
-        attributes: ['ExpenseId'],
-        where: { ExpenseId: { [Op.in]: ExpenseIds } },
-        group: ['ExpenseId'],
-      })
-        .then(results => sortResults(ExpenseIds, results, 'ExpenseId', { count: 0 }))
-        .map(result => result.count),
-    ),
-  };
+  context.loaders.Comment = generateCommentsLoader(req, cache);
 
   /** *** Tier *****/
   // Tier - availableQuantity
@@ -537,6 +477,7 @@ export const loaders = req => {
             order: [['createdAt', 'DESC']],
           }).then(results => sortResults(OrderIds, results, 'OrderId', []));
         },
+        cache,
         options,
         'transactions',
       ),
