@@ -25,6 +25,11 @@ const StyledButtonContent = styled.button`
     cursor: not-allowed;
   }
 
+  /** Align button icons in the middle */
+  svg {
+    vertical-align: middle;
+  }
+
   ${buttonStyle}
   ${buttonSize}
 

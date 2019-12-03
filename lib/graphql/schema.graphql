@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Mon Nov 25 2019 15:10:44 GMT+0100 (GMT+01:00)
+# timestamp: Mon Dec 02 2019 11:01:12 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -688,7 +688,15 @@ input CommentAttributesInputType {
   id: Int
   markdown: String
   html: String
+
+  """
+  Deprecated since 2019-11-25: This field is not editable.
+  """
   FromCollectiveId: Int
+
+  """
+  Deprecated since 2019-11-25: This field is not editable.
+  """
   CollectiveId: Int
   ExpenseId: Int
   UpdateId: Int
@@ -701,10 +709,15 @@ input CommentInputType {
   id: Int
   markdown: String
   html: String
-  FromCollectiveId: Int!
-  CollectiveId: Int!
+
+  """
+  Not supported yet. Defaults to user collective ID.
+  """
+  FromCollectiveId: Int
+  CollectiveId: Int
   ExpenseId: Int
   UpdateId: Int
+  ConversationId: Int
 }
 
 """
@@ -1913,16 +1926,6 @@ input OrderInputType {
   publicMessage: String
   privateMessage: String
   paymentMethod: PaymentMethodInputType
-
-  """
-  The first part of the UUID of the PaymentMethod that can be used to match the donation
-  """
-  matchingFund: String
-
-  """
-  The referral collective
-  """
-  referral: CollectiveAttributesInputType
   user: UserInputType
   fromCollective: CollectiveAttributesInputType
   collective: CollectiveAttributesInputType!
@@ -2013,11 +2016,6 @@ type OrderType {
   Collective that receives the order
   """
   collective: CollectiveInterface
-
-  """
-  Referral user collective
-  """
-  referral: CollectiveInterface @deprecated(reason: "2019-08-22: Referals are not supported anymore")
   tier: Tier
 
   """
@@ -2026,11 +2024,6 @@ type OrderType {
   a subscription.
   """
   paymentMethod: PaymentMethodType
-
-  """
-  Payment method used if this order was matched by a matching fund.
-  """
-  matchingFund: PaymentMethodType @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
 
   """
   transactions for this order ordered by createdAt DESC
@@ -2393,11 +2386,6 @@ type PaymentMethodType {
   name: String
   description: String
   primary: Boolean
-
-  """
-  Matching factor
-  """
-  matching: Int @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
   monthlyLimitPerMember: Int
   initialBalance: Int
 
@@ -2440,12 +2428,6 @@ type Query {
     throwIfMissing: Boolean = true
   ): CollectiveInterface
   Tier(id: Int!): Tier
-
-  """
-  Fetch data about a matching fund from the short version of its UUID (first part)
-  """
-  MatchingFund(uuid: String!, ForCollectiveId: Int): PaymentMethodType
-    @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
   LoggedInUser: UserDetails
   AuthenticatedUser: CollectiveInterface
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]

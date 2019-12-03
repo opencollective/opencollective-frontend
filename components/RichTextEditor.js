@@ -7,26 +7,76 @@ import 'trix/dist/trix.css';
 
 import { uploadImageWithXHR } from '../lib/api';
 import MessageBox from './MessageBox';
+import LoadingPlaceholder from './LoadingPlaceholder';
+import HTMLContent from './HTMLContent';
 
-const TrixEditorContainer = styled.form`
+const TrixEditorContainer = styled.div`
+  ${props =>
+    props.withBorders &&
+    css({
+      border: '1px solid',
+      borderColor: 'black.300',
+      borderRadius: 10,
+      padding: 3,
+    })}
+
   trix-editor {
     border: none;
     padding: 0;
-    margin-top: 16px;
+    margin-top: 8px;
+    padding-top: 8px;
+    outline-offset: 0.5em;
 
-    &:focus {
-      outline: 1px dashed #eaeaea;
-      outline-offset: 10px;
+    // Outline (only when there's no border)
+    ${props =>
+      !props.withBorders &&
+      css({
+        outline: !props.error ? 'none' : `1px dashed ${props.theme.colors.red[300]}`,
+        '&:focus': {
+          outline: `1px dashed ${props.theme.colors.black[200]}`,
+        },
+      })}
+
+    // Placeholder
+    &:empty:not(:focus)::before {
+      color: ${props => props.theme.colors.black[400]};
     }
+
+    ${props => css({ minHeight: props.editorMinHeight })}
   }
 
   trix-toolbar {
-    min-height: 45px;
+    min-height: 40px;
     background: white;
-    padding-top: 10px;
-    box-shadow: 0px 7px 4px -4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
     z-index: 2;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
+
+    .trix-button-group {
+      border-radius: 6px;
+      border-color: #c4c7cc;
+      margin-bottom: 0;
+    }
+
+    .trix-button {
+      border-bottom: none;
+      width: 2.6em;
+      height: 1.8em;
+      padding: 0.75em;
+
+      &:hover {
+        background: ${props => props.theme.colors.blue[100]};
+      }
+
+      &.trix-active {
+        background: ${props => props.theme.colors.blue[200]};
+      }
+
+      &::before,
+      &.trix-active::before {
+        margin: 4px; // Use this to reduce the icons size
+      }
+    }
 
     /** Hide some buttons on mobile */
     @media (max-width: 500px) {
@@ -38,20 +88,28 @@ const TrixEditorContainer = styled.form`
       }
     }
 
-    ${props =>
-      props.toolbarOffsetY &&
-      css({
-        marginTop: props.toolbarOffsetY,
-      })}
-
     /** Sticky mode */
     ${props =>
       props.withStickyToolbar &&
       css({
         position: 'sticky',
-        top: props.toolbarTop,
+        top: props.toolbarTop || 0,
+        marginTop: props.toolbarOffsetY,
+        py: '10px',
       })}
-}
+  }
+
+  /** Disabled mode */
+  ${props =>
+    props.isDisabled &&
+    css({
+      pointerEvents: 'none',
+      cursor: 'not-allowed',
+      background: '#f3f3f3',
+      'trix-toolbar': {
+        background: '#f3f3f3',
+      },
+    })}
 `;
 
 /**
@@ -64,21 +122,38 @@ export default class RichTextEditor extends React.Component {
     id: PropTypes.string,
     defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
+    /** Font size for the text */
+    fontSize: PropTypes.string,
     autoFocus: PropTypes.bool,
     /** Called when text is changed with html content as first param and text content as second param */
     onChange: PropTypes.func,
-    /** Wether the toolbar should stick to the top*/
+    /** A name for the input */
+    inputName: PropTypes.string,
+    /** Change this prop to reset the value */
+    reset: PropTypes.any,
+    /** A ref for the input. Useful to plug react-hook-form */
+    inputRef: PropTypes.func,
+    /** Wether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,
+    /** This component is borderless by default. Set this to `true` to change that. */
+    withBorders: PropTypes.bool,
+    /** Wether the field should be disabled */
+    disabled: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
     toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** Usefull to compensate the height of the toolbar when editing inline */
     toolbarOffsetY: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** Min height for the full component */
+    editorMinHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** If truthy, will display a red outline */
+    error: PropTypes.any,
   };
 
   static defaultProps = {
     withStickyToolbar: false,
     toolbarTop: 0,
     toolbarOffsetY: -62, // Default Trix toolbar height
+    inputName: 'content',
   };
 
   constructor(props) {
@@ -101,9 +176,11 @@ export default class RichTextEditor extends React.Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(oldProps) {
     if (!this.isReady) {
       this.initialize();
+    } else if (oldProps.reset !== this.props.reset) {
+      this.editorRef.current.editor.loadHTML('');
     }
   }
 
@@ -129,7 +206,7 @@ export default class RichTextEditor extends React.Component {
 
   handleChange = e => {
     if (this.props.onChange) {
-      this.props.onChange(e.target.innerHTML, e.target.innerText);
+      this.props.onChange(e);
     }
 
     if (this.state.error) {
@@ -163,12 +240,32 @@ export default class RichTextEditor extends React.Component {
   };
 
   render() {
-    const { defaultValue, withStickyToolbar, toolbarTop, toolbarOffsetY, autoFocus, placeholder } = this.props;
-    return !this.state.id ? null : (
+    const {
+      defaultValue,
+      withStickyToolbar,
+      toolbarTop,
+      toolbarOffsetY,
+      autoFocus,
+      placeholder,
+      editorMinHeight,
+      withBorders,
+      inputName,
+      inputRef,
+      disabled,
+      error,
+      fontSize,
+    } = this.props;
+    return !this.state.id ? (
+      <LoadingPlaceholder height={editorMinHeight ? editorMinHeight + 56 : 200} />
+    ) : (
       <TrixEditorContainer
         withStickyToolbar={withStickyToolbar}
         toolbarTop={toolbarTop}
         toolbarOffsetY={toolbarOffsetY}
+        editorMinHeight={editorMinHeight}
+        withBorders={withBorders}
+        isDisabled={disabled}
+        error={error}
         data-cy="RichTextEditor"
       >
         {this.state.error && (
@@ -176,13 +273,15 @@ export default class RichTextEditor extends React.Component {
             {this.state.error.toString()}
           </MessageBox>
         )}
-        <input id={this.state.id} value={defaultValue} type="hidden" name="content" />
-        <trix-editor
-          ref={this.editorRef}
-          input={this.state.id}
-          autofocus={autoFocus ? true : undefined}
-          placeholder={placeholder}
-        />
+        <input id={this.state.id} value={defaultValue} type="hidden" name={inputName} ref={inputRef} />
+        <HTMLContent fontSize={fontSize}>
+          <trix-editor
+            ref={this.editorRef}
+            input={this.state.id}
+            autofocus={autoFocus ? true : undefined}
+            placeholder={placeholder}
+          />
+        </HTMLContent>
       </TrixEditorContainer>
     );
   }

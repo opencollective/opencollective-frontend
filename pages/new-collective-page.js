@@ -147,6 +147,7 @@ class NewCollectivePage extends React.Component {
                   expenses={collective.expenses}
                   stats={collective.stats}
                   updates={collective.updates}
+                  conversations={collective.conversations}
                   LoggedInUser={LoggedInUser}
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}

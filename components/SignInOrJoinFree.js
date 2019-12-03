@@ -41,6 +41,7 @@ class SignInOrJoinFree extends React.Component {
     submitting: false,
     unknownEmailError: false,
     email: '',
+    useLinkForSignUp: false,
   };
 
   switchForm = form => {

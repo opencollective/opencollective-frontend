@@ -70,45 +70,14 @@ const HTMLContent = styled(({ content, ...props }) => {
     text-align: left;
   }
 
-  ul {
-    padding: 0;
-    padding-left: 0 0 0 0.5em;
-    position: relative;
+  blockquote {
+    font-size: 1em;
+    border-left: 5px solid #e9e9e9;
+    background-color: #f9f9f9;
+  }
 
-    li {
-      list-style: none;
-      position: relative;
-      padding: 0 0 0 1em;
-      margin-bottom: 0.4em;
-
-      & > p:first-child {
-        display: inline;
-      }
-      
-      &::before {
-        content: "◯";
-        margin-right: 0.75em;
-        font-size: 0.9em;
-        vertical-align: top;
-      }
-      
-      /** Nested list, depth: 1 */
-      ul {
-        li {
-          padding: 0 0 0 2em;
-          margin-bottom: 0;
-          &::before {
-            content: "▷";
-          }
-          
-          /** Nested list, depth >= 2 */
-          li::before {
-            content: "■";
-            font-size: 1em;
-          }
-        }
-      }
-    }
+  pre {
+    font-size: 1em;
   }
 
   ${typography}
@@ -137,10 +106,6 @@ const HTMLContent = styled(({ content, ...props }) => {
         &:hover {
           color: ${secondaryColor};
         }
-      }
-
-      ul li::before {
-        color: ${primaryColor};
       }
     `;
   }}

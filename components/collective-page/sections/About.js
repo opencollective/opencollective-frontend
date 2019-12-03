@@ -56,20 +56,22 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           topEdit={-20}
           showEditIcon={!isEmptyDescription}
           formatBeforeSubmit={v => (isEmptyValue(v) ? null : v)}
+          prepareVariables={(collective, longDescription) => ({
+            id: collective.id,
+            longDescription: isEmptyValue(longDescription) ? null : longDescription,
+          })}
         >
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {
               return (
-                <HTMLContent>
-                  <HTMLEditor
-                    defaultValue={collective.longDescription}
-                    onChange={setValue}
-                    placeholder={intl.formatMessage(messages.placeholder)}
-                    toolbarTop={[60, null, 119]}
-                    withStickyToolbar
-                    autoFocus
-                  />
-                </HTMLContent>
+                <HTMLEditor
+                  defaultValue={collective.longDescription}
+                  onChange={e => setValue(e.target.value)}
+                  placeholder={intl.formatMessage(messages.placeholder)}
+                  toolbarTop={[60, null, 119]}
+                  withStickyToolbar
+                  autoFocus
+                />
               );
             } else if (isEmptyDescription) {
               return (
