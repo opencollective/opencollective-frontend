@@ -40,6 +40,9 @@ export const getCollectivePageQuery = gql`
         balance
         yearlyBudget
         updates
+        transactions {
+          all
+        }
         backers {
           id
           all
