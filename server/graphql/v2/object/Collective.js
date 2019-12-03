@@ -15,7 +15,7 @@ export const Collective = new GraphQLObjectType({
         description: 'Amount of money in cents in the currency of the collective currently available to spend',
         type: GraphQLInt,
         resolve(collective, _, req) {
-          return req.loaders.collective.balance.load(collective.id);
+          return req.loaders.Collective.balance.load(collective.id);
         },
       },
       host: {
