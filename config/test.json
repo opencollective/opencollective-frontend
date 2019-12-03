@@ -1,10 +1,6 @@
 {
   "database": {
-    "url": "postgres://opencollective@127.0.0.1:5432/opencollective_test",
-    "options": {
-      "logQueryParameters": true
-    },
-    "logging": true
+    "url": "postgres://opencollective@127.0.0.1:5432/opencollective_test"
   },
   "log": {
     "level": "warn"

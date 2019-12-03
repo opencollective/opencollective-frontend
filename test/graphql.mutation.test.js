@@ -52,7 +52,6 @@ describe('Mutation Tests', () => {
   beforeEach('reset db', async () => {
     await new Promise(res => setTimeout(res, 500));
     await utils.resetTestDB();
-    return;
   });
 
   beforeEach('create user1', () => models.User.createUserWithCollective(utils.data('user1')).tap(u => (user1 = u)));

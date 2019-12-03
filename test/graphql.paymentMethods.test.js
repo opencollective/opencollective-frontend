@@ -18,7 +18,6 @@ describe('graphql.paymentMethods.test.js', () => {
   beforeEach(async () => {
     await new Promise(res => setTimeout(res, 500));
     await utils.resetTestDB();
-    return;
   });
 
   beforeEach(() =>
