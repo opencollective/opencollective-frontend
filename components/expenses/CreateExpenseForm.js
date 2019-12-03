@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-import titleCase from 'title-case';
+import { titleCase } from 'title-case';
 
 import { getCurrencySymbol } from '../../lib/utils';
 import categories from '../../lib/constants/categories';
