@@ -80,7 +80,7 @@ describe('graphql.collective.test.js', () => {
         payoutMethod: 'manual',
         collective: { id: apex.id },
       });
-      await expenses.payExpense(hostAdmin, expense.id, 0);
+      await expenses.payExpense(hostAdmin, { id: expense.id });
     }
 
     // When the following query is executed
