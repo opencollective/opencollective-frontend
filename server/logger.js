@@ -3,7 +3,7 @@ const winston = require('winston');
 function getLogLevel() {
   if (process.env.DEBUG) {
     return 'debug';
-  } else if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'circleci') {
+  } else if (['test', 'ci', 'circleci'].includes(process.env.NODE_ENV)) {
     return 'warn';
   } else {
     return 'info';
