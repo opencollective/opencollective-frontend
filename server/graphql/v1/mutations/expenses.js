@@ -269,7 +269,7 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fe
  */
 export async function payExpense(remoteUser, args) {
   const expenseId = args.id;
-  const fees = omit(args, ['id', 'manuallyPayPaypalMethod']);
+  const fees = omit(args, ['id', 'forceManual']);
 
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to pay an expense');
@@ -342,7 +342,7 @@ export async function payExpense(remoteUser, args) {
     if (expense.paypalEmail === paymentMethod.name) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
       await createTransactions(host, expense, feesInHostCurrency);
-    } else if (args.manuallyPayPaypalMethod) {
+    } else if (args.forceManual) {
       await createTransactions(host, expense, feesInHostCurrency);
     } else {
       await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);

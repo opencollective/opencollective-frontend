@@ -351,7 +351,10 @@ const mutations = {
       paymentProcessorFeeInCollectiveCurrency: { type: GraphQLInt },
       hostFeeInCollectiveCurrency: { type: GraphQLInt },
       platformFeeInCollectiveCurrency: { type: GraphQLInt },
-      manuallyPayPaypalMethod: { type: GraphQLBoolean },
+      forceManual: {
+        type: GraphQLBoolean,
+        description: 'Force expense with paypal method to be paid manually',
+      },
     },
     resolve(_, args, req) {
       return payExpense(req.remoteUser, args);
