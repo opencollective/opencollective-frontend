@@ -11,6 +11,7 @@ class RejectExpenseBtn extends React.Component {
     id: PropTypes.number.isRequired,
     rejectExpense: PropTypes.func.isRequired,
     updateExpensesInCurrentTab: PropTypes.func,
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {
@@ -27,7 +28,7 @@ class RejectExpenseBtn extends React.Component {
   render() {
     return (
       <div className="RejectExpenseBtn" data-cy="reject-expense-btn">
-        <StyledButton className="reject" buttonStyle="danger" onClick={this.onClick}>
+        <StyledButton className="reject" buttonStyle="danger" onClick={this.onClick} disabled={this.props.disabled}>
           <FormattedMessage id="expense.reject.btn" defaultMessage="Reject" />
         </StyledButton>
       </div>

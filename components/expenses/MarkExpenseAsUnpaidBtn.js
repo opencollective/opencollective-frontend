@@ -14,7 +14,7 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, updateExpensesInCurrentTab }) => {
+const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, updateExpensesInCurrentTab, disabled }) => {
   const [state, setState] = useState({
     showProcessorFeeConfirmation: false,
     processorFeeRefunded: false,
@@ -46,7 +46,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, updateExpensesInCurre
           />
           <StyledButton
             mt={2}
-            disabled={state.disableBtn}
+            disabled={state.disableBtn || disabled}
             buttonStyle="primary"
             onClick={() => handleOnClickContinue()}
           >
@@ -66,6 +66,7 @@ MarkExpenseAsUnpaidBtn.propTypes = {
   id: PropTypes.number.isRequired,
   markExpenseAsUnpaid: PropTypes.func.isRequired,
   updateExpensesInCurrentTab: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 const markExpenseAsUnpaidQuery = gql`

@@ -101,6 +101,7 @@ class Expense extends React.Component {
       showDeleteExpenseModal: false,
       error: null,
       refreshing: false,
+      disableActionButtons: false,
     };
 
     this.save = this.save.bind(this);
@@ -179,9 +180,9 @@ class Expense extends React.Component {
   updateExpensesInCurrentTab = async () => {
     // Only refetch in filter tabs i.e pending, approved, ready, paid
     if (this.props.inFilterTab) {
-      this.setState({ refreshing: true, mode: 'summary' });
+      this.setState({ refreshing: true, mode: 'summary', disableActionButtons: true });
       await this.props.refetch();
-      this.setState({ refreshing: false });
+      this.setState({ refreshing: false, disableActionButtons: false });
     }
   };
 

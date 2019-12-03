@@ -11,6 +11,7 @@ class ApproveExpenseBtn extends React.Component {
     id: PropTypes.number.isRequired,
     approveExpense: PropTypes.func.isRequired,
     updateExpensesInCurrentTab: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {
@@ -27,7 +28,7 @@ class ApproveExpenseBtn extends React.Component {
   render() {
     return (
       <div className="ApproveExpenseBtn" data-cy="approve-expense-btn">
-        <StyledButton className="approve" mr={2} buttonStyle="primary" onClick={this.onClick}>
+        <StyledButton className="approve" mr={2} buttonStyle="primary" onClick={this.onClick} disabled={this.props.disabled}>>
           <FormattedMessage id="expense.approve.btn" defaultMessage="Approve" />
         </StyledButton>
       </div>
