@@ -3,7 +3,7 @@ import config from 'config';
 import { get, pick } from 'lodash';
 
 import { memoize } from './cache';
-import currencies from '../constants/currencies';
+import { convertToCurrency } from './currency';
 import models, { sequelize, Op } from '../models';
 
 const twoHoursInSeconds = 2 * 60 * 60;
@@ -11,7 +11,7 @@ const twoHoursInSeconds = 2 * 60 * 60;
 /*
  * Hacky way to do currency conversion
  */
-const generateFXConversionSQL = aggregate => {
+const generateFXConversionSQL = async aggregate => {
   let currencyColumn = 't.currency';
   let amountColumn = 't."netAmountInCollectiveCurrency"';
 
@@ -20,18 +20,16 @@ const generateFXConversionSQL = aggregate => {
     amountColumn = 'SUM("t."netAmountInCollectiveCurrency"")';
   }
 
-  const fxConversion = [];
-  for (const currency in currencies) {
-    fxConversion.push([currency, currencies[currency].fxrate]);
-  }
+  const currencies = ['AUD', 'CAD', 'EUR', 'GBP', 'INR', 'MXN', 'SEK', 'USD', 'UYU'];
 
-  let sql = 'CASE ';
-  sql += fxConversion
-    .map(currency => `WHEN ${currencyColumn} = '${currency[0]}' THEN ${amountColumn} / ${currency[1]}`)
-    .join('\n');
-  sql += 'ELSE 0 END';
+  const result = await Promise.all(
+    currencies.map(async currency => {
+      const amount = await convertToCurrency(1, 'USD', currency);
+      return `WHEN ${currencyColumn} = '${currency}' THEN ${amountColumn} / ${amount}`;
+    }),
+  );
 
-  return sql;
+  return `CASE ${result.join('\n')}ELSE 0 END`;
 };
 
 const getHosts = async args => {
@@ -131,13 +129,15 @@ const getTotalAnnualBudgetForHost = HostCollectiveId => {
     .then(res => Math.round(parseInt(res[0].yearlyIncome, 10)));
 };
 
-const getTotalAnnualBudget = () => {
+const getTotalAnnualBudget = async () => {
+  const fxConversionSQL = await generateFXConversionSQL();
+
   return sequelize
     .query(
       `
   SELECT
     (SELECT
-      COALESCE(SUM(${generateFXConversionSQL()} * 12),0)
+      COALESCE(SUM(${fxConversionSQL} * 12),0)
       FROM "Subscriptions" s
       LEFT JOIN "Orders" d ON s.id = d."SubscriptionId"
       LEFT JOIN "Transactions" t
@@ -150,7 +150,7 @@ const getTotalAnnualBudget = () => {
         AND s."deletedAt" IS NULL)
     +
     (SELECT
-      COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
+      COALESCE(SUM(${fxConversionSQL}),0) FROM "Transactions" t
       LEFT JOIN "Orders" d ON t."OrderId" = d.id
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.type='CREDIT' AND t."CollectiveId" != 1
@@ -159,7 +159,7 @@ const getTotalAnnualBudget = () => {
         AND ((s.interval = 'year' AND s."isActive" IS TRUE AND s."deletedAt" IS NULL) OR s.interval IS NULL))
     +
     (SELECT
-      COALESCE(SUM(${generateFXConversionSQL()}),0) FROM "Transactions" t
+      COALESCE(SUM(${fxConversionSQL}),0) FROM "Transactions" t
       LEFT JOIN "Orders" d on t."OrderId" = d.id
       LEFT JOIN "Subscriptions" s ON d."SubscriptionId" = s.id
       WHERE t.type='CREDIT' AND t."CollectiveId" != 1
