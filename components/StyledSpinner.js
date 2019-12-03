@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { LoaderAlt } from 'styled-icons/boxicons-regular/LoaderAlt';
+import { LoaderAlt } from '@styled-icons/boxicons-regular/LoaderAlt';
 import styled from 'styled-components';
 import { rotating } from './StyledKeyframes';
 

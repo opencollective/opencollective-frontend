@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { Mutation } from 'react-apollo';
 import { get, set, has } from 'lodash';
 
-import { Upload } from 'styled-icons/feather/Upload';
+import { Upload } from '@styled-icons/feather/Upload';
 
 import { upload } from '../../../lib/api';
 import LoadingPlaceholder from '../../LoadingPlaceholder';

@@ -5,8 +5,8 @@ import styled, { css } from 'styled-components';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Mutation } from 'react-apollo';
 
-import { Camera } from 'styled-icons/feather/Camera';
-import { Settings } from 'styled-icons/feather/Settings';
+import { Camera } from '@styled-icons/feather/Camera';
+import { Settings } from '@styled-icons/feather/Settings';
 
 import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/utils';

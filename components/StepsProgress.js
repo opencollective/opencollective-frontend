@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { Flex, Box } from '@rebass/grid';
 import { transparentize } from 'polished';
-import { Check } from 'styled-icons/fa-solid/Check';
+import { Check } from '@styled-icons/fa-solid/Check';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';
 import { FormattedMessage } from 'react-intl';
 

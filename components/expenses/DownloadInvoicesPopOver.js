@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
-import { FileDownload } from 'styled-icons/fa-solid/FileDownload';
+import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 
 import { formatCurrency, getCollectiveImage } from '../../lib/utils';
 

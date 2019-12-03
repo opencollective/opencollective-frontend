@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import { set, get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { Add } from 'styled-icons/material/Add';
+import { Add } from '@styled-icons/material/Add';
 
 import { compose, getErrorFromGraphqlException } from '../lib/utils';
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';

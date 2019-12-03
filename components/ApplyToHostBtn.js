@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 import styled from 'styled-components';
-import { Question } from 'styled-icons/fa-solid/Question';
+import { Question } from '@styled-icons/fa-solid/Question';
 
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
 import StyledTooltip from './StyledTooltip';

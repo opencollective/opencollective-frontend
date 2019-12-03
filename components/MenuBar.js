@@ -6,7 +6,7 @@ import { get, throttle, uniqBy } from 'lodash';
 
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { animateScroll } from 'react-scrollchor/lib/helpers';
-import { Pencil } from 'styled-icons/octicons/Pencil';
+import { Pencil } from '@styled-icons/octicons/Pencil';
 
 import colors from '../lib/constants/colors';
 import { withUser } from './UserProvider';

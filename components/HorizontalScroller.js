@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
-import { ChevronLeft } from 'styled-icons/fa-solid/ChevronLeft';
-import { ChevronRight } from 'styled-icons/fa-solid/ChevronRight';
+import { ChevronLeft } from '@styled-icons/fa-solid/ChevronLeft';
+import { ChevronRight } from '@styled-icons/fa-solid/ChevronRight';
 import { debounceScroll } from '../lib/ui-utils';
 import withViewport from '../lib/withViewport';
 

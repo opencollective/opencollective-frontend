@@ -4,9 +4,9 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 
-import { Clipboard } from 'styled-icons/feather/Clipboard';
-import { CheckCircle } from 'styled-icons/fa-regular/CheckCircle';
-import { Printer } from 'styled-icons/feather/Printer';
+import { Clipboard } from '@styled-icons/feather/Clipboard';
+import { CheckCircle } from '@styled-icons/feather/CheckCircle';
+import { Printer } from '@styled-icons/feather/Printer';
 
 import { P } from './Text';
 import StyledInput from './StyledInput';

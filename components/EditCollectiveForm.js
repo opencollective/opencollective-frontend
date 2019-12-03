@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { withRouter } from 'next/router';
-import { ArrowBack } from 'styled-icons/material/ArrowBack';
+import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
-import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
 import { parseToBoolean } from '../lib/utils';

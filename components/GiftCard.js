@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Clock } from 'styled-icons/feather/Clock';
+import { Clock } from '@styled-icons/feather/Clock';
 
 import Container from './Container';
 import { Span, P } from './Text';

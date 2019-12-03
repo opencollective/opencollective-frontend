@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
-import { Times } from 'styled-icons/fa-solid/Times';
+import { Times } from '@styled-icons/fa-solid/Times';
 
 import Container from './Container';
 

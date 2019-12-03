@@ -8,7 +8,7 @@ import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
 
-import { Add } from 'styled-icons/material/Add';
+import { Add } from '@styled-icons/material/Add';
 
 import { Router } from '../server/pages';
 import StyledSelect from './StyledSelect';

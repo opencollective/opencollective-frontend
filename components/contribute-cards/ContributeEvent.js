@@ -4,8 +4,8 @@ import { FormattedMessage, FormattedDate } from 'react-intl';
 import { truncate } from 'lodash';
 import { Box } from '@rebass/grid';
 
-import { Calendar } from 'styled-icons/feather/Calendar';
-import { Clock } from 'styled-icons/feather/Clock';
+import { Calendar } from '@styled-icons/feather/Calendar';
+import { Clock } from '@styled-icons/feather/Clock';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { canOrderTicketsFromEvent } from '../../lib/events';
