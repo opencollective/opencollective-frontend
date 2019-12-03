@@ -17,7 +17,7 @@
     "@opencollective/taxes": "2.3.0",
     "@rebass/grid": "6.1.0",
     "@sentry/browser": "5.9.1",
-    "@styled-system/css": "5.0.23",
+    "@styled-system/css": "5.1.4",
     "@styled-system/prop-types": "5.1.2",
     "@styled-system/theme-get": "5.1.2",
     "@zeit/next-css": "0.2.1-canary.4",
