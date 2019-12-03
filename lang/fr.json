@@ -1065,6 +1065,8 @@
   "SignIn.SuccessDetails": "Vous serez redirigé·e depuis le lien dans l'email, vous pouvez fermer cet onglet.",
   "signin.unknownEmail": "Il n'y a aucun utilisateur avec cette adresse e-mail.",
   "signin.usingEmail": "Connectez-vous avec votre adresse email :",
+  "StepsProgress.mobile.next": "Next: {stepName}",
+  "StepsProgress.mobile.status": "{from} of {to}",
   "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributeur} other {{prettyCount} contributeurs}}",
   "subscription.amountToDate": "ont contribué jusqu'à présent",
   "subscription.cancel.btn": "oui",
