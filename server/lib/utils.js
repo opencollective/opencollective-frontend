@@ -59,9 +59,12 @@ export function getDomain(url = '') {
   return domain;
 }
 
+/**
+ * @deprecated Please use the functions in `server/lib/sanitize-html.js`
+ */
 export function strip_tags(str, allowedTags) {
   return sanitizeHtml(str, {
-    allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2']),
+    allowedTags: allowedTags || sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'h3']),
     allowedAttributes: {
       a: ['href', 'name', 'target'],
       img: ['src'],

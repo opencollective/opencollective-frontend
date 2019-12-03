@@ -10,6 +10,7 @@ const CommentCreate = new GraphQLInputObjectType({
     html: { type: GraphQLString },
     ExpenseId: { type: GraphQLInt },
     UpdateId: { type: GraphQLInt },
+    ConversationId: { type: GraphQLString },
   }),
 });
 

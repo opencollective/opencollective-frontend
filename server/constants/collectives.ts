@@ -1,12 +1,12 @@
 import config from 'config';
 
-export const types = {
-  COLLECTIVE: 'COLLECTIVE',
-  EVENT: 'EVENT',
-  USER: 'USER',
-  ORGANIZATION: 'ORGANIZATION',
-  BOT: 'BOT',
-};
+export enum types {
+  COLLECTIVE = 'COLLECTIVE',
+  EVENT = 'EVENT',
+  USER = 'USER',
+  ORGANIZATION = 'ORGANIZATION',
+  BOT = 'BOT',
+}
 
 export const CollectiveTypesList = Object.values(types);
 

@@ -42,7 +42,7 @@ import * as commonComment from '../common/comment';
  * @param {object} GraphQL type to paginate
  * @param {string} The name of the type, used to generate name and description.
  */
-export const paginatedList = (type, typeName, valuesKey) => {
+export const paginatedList = (type, typeName, valuesKey = 'nodes') => {
   return new GraphQLObjectType({
     name: `Paginated${typeName}`,
     description: `A list of ${typeName} with pagination info`,
@@ -949,6 +949,7 @@ export const UpdateType = new GraphQLObjectType({
 
 export const CommentListType = new GraphQLObjectType({
   name: 'CommentListType',
+  deprecationReason: 'The resolver for comments is not standard. Please use `PaginatedComments`',
   description: 'List of comments with pagination info',
   fields: () => ({
     comments: {
@@ -1035,13 +1036,17 @@ export const CommentType = new GraphQLObjectType({
       expense: {
         type: ExpenseType,
         resolve(comment) {
-          return models.Expense.findByPk(comment.ExpenseId);
+          if (comment.ExpenseId) {
+            return models.Expense.findByPk(comment.ExpenseId);
+          }
         },
       },
       update: {
         type: UpdateType,
         resolve(comment) {
-          return models.Update.findByPk(comment.UpdateId);
+          if (comment.UpdateId) {
+            return models.Update.findByPk(comment.UpdateId);
+          }
         },
       },
     };
