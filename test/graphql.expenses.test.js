@@ -643,7 +643,9 @@ describe('GraphQL Expenses API', () => {
     }); /* End of "successfully approve expense and send notification email to author of expense" */
   }); /* End of "#approveExpense" */
 
-  describe('#rejectExpense', () => {}); /* End of "#rejectExpense" */
+  describe('#rejectExpense', () => {
+    // not implemented
+  }); /* End of "#rejectExpense" */
 
   describe('#payExpense', () => {
     let sandbox, emailSendMessageSpy;
@@ -1003,7 +1005,9 @@ describe('GraphQL Expenses API', () => {
     });
   }); /* End of #payExpense */
 
-  describe('#editExpense', () => {}); /* End of "#editExpense" */
+  describe('#editExpense', () => {
+    // not implemented
+  }); /* End of "#editExpense" */
 
   describe('#deleteExpense', () => {
     it('fails if not logged in', async () => {
