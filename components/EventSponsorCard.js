@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { get } from 'lodash';
 
+import { getCollectiveImage } from '../lib/utils';
+
 const EventSponsorCard = ({ sponsor }) => (
   <a href={`/${sponsor.slug}`}>
     <div className="EventSponsorCard">
@@ -59,7 +61,7 @@ const EventSponsorCard = ({ sponsor }) => (
           }
         `}
       </style>
-      <img src={sponsor.image} />
+      <img className="logo" src={getCollectiveImage(sponsor, { name: 'logo' })} />
       <p className="name">{sponsor.name}</p>
       <div className="tier border-top border-gray px3 py2">
         <p className="name">{get(sponsor, 'tier.name')}</p>
