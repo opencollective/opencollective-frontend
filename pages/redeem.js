@@ -224,7 +224,7 @@ class RedeemPage extends React.Component {
               </RedeemBackground>
               <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
                 <Container mt={54} zIndex={2}>
-                  <Flex justifyContent="center" flexDirection="column">
+                  <Flex justifyContent="center" alignItems="center" flexDirection="column">
                     <Container background="white" borderRadius="16px" maxWidth="400px">
                       <ShadowBox py="24px" px="32px">
                         {this.state.view === 'form' && (
