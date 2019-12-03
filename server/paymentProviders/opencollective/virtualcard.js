@@ -10,6 +10,7 @@ import * as currency from '../../lib/currency';
 import { formatCurrency, isValidEmail } from '../../lib/utils';
 import emailLib from '../../lib/email';
 import cache from '../../lib/cache';
+import { ValidationFailed } from '../../graphql/errors';
 
 /**
  * Virtual Card Payment method - This payment Method works basically as an alias
@@ -476,7 +477,10 @@ async function claim(args, remoteUser) {
   // it means this virtual card was already claimend
   if (!sourcePaymentMethod || sourcePaymentMethod.CollectiveId !== virtualCardPaymentMethod.CollectiveId) {
     throw Error('Gift Card already redeemed');
+  } else if (virtualCardPaymentMethod.expiryDate < new Date()) {
+    throw new ValidationFailed({ message: `This gift card has expired` });
   }
+
   // find or creating a user with its collective
   // if user is created, this will NOT send a registration email
   const user = remoteUser || (await models.User.findOrCreateByEmail(get(args, 'user.email'), args.user));
