@@ -169,11 +169,9 @@ export default function(Sequelize, DataTypes) {
         afterUpdate(expense) {
           switch (expense.status) {
             case status.PAID:
-              expense._previousDataValues.status === status.APPROVED && expense.addUserIdToHostW9ReceivedList();
-              break;
+              return expense._previousDataValues.status === status.APPROVED && expense.addUserIdToHostW9ReceivedList();
             case status.APPROVED:
-              expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
-              break;
+              return expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
           }
         },
       },
