@@ -55,9 +55,10 @@ class Order extends React.Component {
   }
 
   toggleDetails = () => {
-    this.setState({
-      view: this.state.view === 'details' ? 'summary' : 'details',
-    });
+    this.setState(state => ({
+      ...state,
+      view: state.view === 'details' ? 'summary' : 'details',
+    }));
   };
 
   render() {
@@ -75,6 +76,9 @@ class Order extends React.Component {
     if (!order.collective) {
       console.warn('no collective attached to order', order);
     }
+
+    const isRoot = LoggedInUser && LoggedInUser.isRoot();
+    const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(collective);
 
     const title = order.description;
     const status = order.status.toLowerCase();
@@ -256,7 +260,7 @@ class Order extends React.Component {
           </div>
           <OrderDetails order={order} mode={mode} />
           {this.state.view === 'details' && transactions && transactions.length === 1 && (
-            <TransactionDetails {...transactions[0]} mode="open" /> // Rendering credit transaction details
+            <TransactionDetails {...transactions[0]} mode="open" canRefund={isRoot || isHostAdmin} /> // Rendering credit transaction details
           )}
           {order.status === 'PENDING' && canMarkOrderAsPaid && (
             <Flex>
