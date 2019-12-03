@@ -47,6 +47,7 @@ class PayExpenseBtn extends React.Component {
     }
     lock();
     this.setState({ loading: true });
+
     try {
       await this.props.payExpense(
         expense.id,
@@ -135,14 +136,15 @@ class PayExpenseBtn extends React.Component {
         <StyledButton
           className="pay"
           buttonStyle="success"
-          onClick={() => this.handleOnClickPay(true)}
+          onClick={() => this.handleOnClickPay(expense.payoutMethod === 'paypal')}
           disabled={this.props.disabled || disabled}
           title={title}
+          mr={2}
         >
           <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
         </StyledButton>
         {selectedPayoutMethod !== 'other' && (
-            <StyledButton
+          <StyledButton
             className="pay"
             buttonStyle="success"
             onClick={() => this.handleOnClickPay()}
@@ -168,7 +170,7 @@ const payExpenseQuery = gql`
     $paymentProcessorFeeInCollectiveCurrency: Int
     $hostFeeInCollectiveCurrency: Int
     $platformFeeInCollectiveCurrency: Int
-    $forcedManual: Boolean
+    $forceManual: Boolean
   ) {
     payExpense(
       id: $id
@@ -204,7 +206,7 @@ const addMutation = graphql(payExpenseQuery, {
       paymentProcessorFeeInCollectiveCurrency,
       hostFeeInCollectiveCurrency,
       platformFeeInCollectiveCurrency,
-      manuallyPayPaypalMethod,
+      forceManual,
     ) => {
       return await mutate({
         variables: {
@@ -212,7 +214,7 @@ const addMutation = graphql(payExpenseQuery, {
           paymentProcessorFeeInCollectiveCurrency,
           hostFeeInCollectiveCurrency,
           platformFeeInCollectiveCurrency,
-          manuallyPayPaypalMethod,
+          forceManual,
         },
       });
     },
