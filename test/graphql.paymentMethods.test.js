@@ -102,7 +102,9 @@ describe('graphql.paymentMethods.test.js', () => {
     }),
   );
 
-  describe('oauth flow', () => {});
+  describe('oauth flow', () => {
+    // not implemented
+  });
 
   describe('add funds', () => {
     let paymentMethod, order, sandbox;

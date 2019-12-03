@@ -159,7 +159,9 @@ describe('graphql.createOrder.opencollective', () => {
         );
       }); /* End of "should fail if from collective and collective are from different hosts" */
 
-      it('should fail to place an order if there is not enough balance', () => {}); /* End of "should fail to place an order if there is not enough balance" */
+      it('should fail to place an order if there is not enough balance', () => {
+        // not implemented
+      }); /* End of "should fail to place an order if there is not enough balance" */
     }); /* End of "#processOrder" */
   }); /* End of "prepaid" */
 }); /* End of "grahpql.createOrder.opencollective" */
