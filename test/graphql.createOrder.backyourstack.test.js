@@ -205,10 +205,14 @@ describe('createOrder', () => {
     expect(moment(subscription.data.nextDispatchDate).format('ll')).equal(nextDispatchDate);
   });
 
-  it('returns  error when it is not time for dispatch', async () => {
+  it('returns error when it is not time for dispatch', async () => {
     // When the order is created
+    const subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
+    const nextDispatchDate = moment(subscription.data.nextDispatchDate).format('ll');
     const res = await utils.graphqlQuery(backyourstackDispatchOrder, { id: orderCreated.id }, xdamman);
-    // There should be an error
     expect(res.errors).to.exist;
+    expect(res.errors[0].message).to.equal(
+      `Your BackYourStack order is already complete for this month. The next dispatch of funds will be on ${nextDispatchDate}`,
+    );
   });
 });
