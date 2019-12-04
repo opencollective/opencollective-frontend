@@ -176,6 +176,9 @@ export async function dispatch(order, subscription) {
       },
     });
   } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      throw err;
+    }
     console.log('>>>> Background dispatch failed');
     console.error(err);
   }
