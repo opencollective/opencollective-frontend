@@ -19,6 +19,7 @@ export const templateNames = [
   'collective.approved',
   'collective.rejected',
   'collective.comment.created',
+  'collective.conversation.created',
   'collective.confirm',
   'collective.created',
   'collective.contact',

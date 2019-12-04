@@ -1,6 +1,6 @@
 import { pick } from 'lodash';
 import { Unauthorized, FeatureNotSupportedForCollective, NotFound } from '../errors';
-import models, { sequelize } from '../../models';
+import models from '../../models';
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 
 /** Params given to create a new conversation */
@@ -22,43 +22,17 @@ export const createConversation = async (remoteUser, params: ICreateConversation
     throw new Unauthorized();
   }
 
+  const { CollectiveId, title, html, tags } = params;
+
   // Collective must exist and be of type `COLLECTIVE`
-  const collective = await models.Collective.findByPk(params.CollectiveId);
+  const collective = await models.Collective.findByPk(CollectiveId);
   if (!collective) {
     throw new Error("This Collective doesn't exist or has been deleted");
   } else if (!hasFeature(collective, FEATURES.CONVERSATIONS)) {
     throw new FeatureNotSupportedForCollective();
   }
 
-  // Use a transaction to make sure conversation is not created if comment creation fails
-  return sequelize.transaction(async t => {
-    // Create conversation
-    const conversation = await models.Conversation.create(
-      {
-        CreatedByUserId: remoteUser.id,
-        CollectiveId: collective.id,
-        FromCollectiveId: remoteUser.CollectiveId,
-        title: params.title,
-        tags: params.tags,
-        summary: params.html,
-      },
-      { transaction: t },
-    );
-
-    // Create comment
-    const comment = await models.Comment.create(
-      {
-        CollectiveId: collective.id,
-        ConversationId: conversation.id,
-        CreatedByUserId: remoteUser.id,
-        FromCollectiveId: remoteUser.CollectiveId,
-        html: params.html,
-      },
-      { transaction: t },
-    );
-
-    return conversation.update({ RootCommentId: comment.id }, { transaction: t });
-  });
+  return models.Conversation.createWithComment(remoteUser, collective, title, html, tags);
 };
 
 interface IEditConversationParams {

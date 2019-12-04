@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
-import { get } from 'lodash';
+import { get, remove } from 'lodash';
 
 import activitiesLib from '../lib/activities';
 import slackLib from './slack';
@@ -173,6 +173,23 @@ export async function notifyAdminsOfCollective(CollectiveId, activity, options =
   return notifySubscribers(adminUsers, activity, options);
 }
 
+/**
+ * Notify all the followers of the conversation.
+ */
+export async function notififyConversationFollowers(conversation, activity, options = {}) {
+  // Skip root comment as the notification is covered by the "New conversation" email
+  if (conversation.RootCommentId === activity.data.comment.id) {
+    return;
+  }
+
+  const toNotify = await conversation.getUsersFollowing();
+  if (options.exclude) {
+    remove(toNotify, user => options.exclude.indexOf(user.id) !== -1);
+  }
+
+  return notifySubscribers(toNotify, activity, options);
+}
+
 async function notifyMembersOfCollective(CollectiveId, activity, options) {
   debug('notify members of CollectiveId', CollectiveId);
   const collective = await models.Collective.findByPk(CollectiveId);
@@ -223,6 +240,12 @@ async function notifyByEmail(activity) {
       notifyAdminsOfCollective(activity.data.collective.id, activity, { replyTo: activity.data.user.email });
       break;
 
+    case activityType.COLLECTIVE_CONVERSATION_CREATED:
+      activity.data.collective = await models.Collective.findByPk(activity.data.conversation.CollectiveId);
+      activity.data.fromCollective = await models.Collective.findByPk(activity.data.conversation.FromCollectiveId);
+      activity.data.rootComment = await models.Comment.findByPk(activity.data.conversation.RootCommentId);
+      notifyAdminsOfCollective(activity.data.conversation.CollectiveId, activity, { exclude: [activity.UserId] });
+      break;
     case activityType.COLLECTIVE_COMMENT_CREATED:
       activity.data.collective = await models.Collective.findByPk(activity.CollectiveId);
       activity.data.fromCollective = await models.Collective.findByPk(activity.data.FromCollectiveId);
@@ -237,10 +260,13 @@ async function notifyByEmail(activity) {
       } else if (activity.data.ConversationId) {
         activity.data.conversation = await models.Conversation.findByPk(activity.data.ConversationId);
         activity.data.UserId = get(activity.data.conversation, 'CreatedByUserId');
+        activity.data.path = `/${activity.data.collective.slug}/conversations/${activity.data.conversation.slug}-${activity.data.conversation.hashId}`;
       }
 
-      // if the author of the comment is the one who submitted the expense
-      if (activity.UserId === activity.data.UserId) {
+      if (activity.data.conversation) {
+        notififyConversationFollowers(activity.data.conversation, activity, { excluse: [activity.UserId] });
+      } else if (activity.UserId === activity.data.UserId) {
+        // if the author of the comment is the one who submitted the expense
         const HostCollectiveId = await activity.data.collective.getHostCollectiveId();
         // then, if the expense was already approved, we notify the admins of the host
         if (get(activity, 'data.expense.status') === 'APPROVED') {
