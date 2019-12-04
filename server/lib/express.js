@@ -66,14 +66,10 @@ export default function(app) {
         const timeElapsed = new Date() - req.startAt;
         if (timeElapsed > get(config, 'log.slowRequestThreshold', 1000)) {
           if (req.body && req.body.query) {
-            console.log('Slow Request - executionTime:', `${timeElapsed}ms`);
-            console.log('Slow Request - ip:', req.ip);
-            if (req.body.operationName) {
-              console.log('Slow Request - operationName:', req.body.operationName);
-            }
-            console.log('Slow Request - query:', req.body.query.substr(0, req.body.query.indexOf(')') + 1));
+            const query = req.body.query.substr(0, req.body.query.indexOf(')') + 1);
+            console.log('slow request:', `${query} - ${req.ip} - ${req.get('user-agent')}`);
             if (req.body.variables) {
-              console.log('Slow Request - variables:', sanitizeForLogs(req.body.variables));
+              console.log('-> slow request variables:', sanitizeForLogs(req.body.variables));
             }
           }
         }
