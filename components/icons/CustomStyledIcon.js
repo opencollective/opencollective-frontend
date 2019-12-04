@@ -19,7 +19,7 @@ const StyledSVG = styled.svg`
 /**
  * A simple wrapper to export custom icons as styled icons. It mostly mimics the
  * behaviour of styled-icon library, which is working on making a similar component
- * accessible directly from the library (see https://github.com/jacobwgillespie/styled-icons/issues/477).
+ * accessible directly from the library (see https://github.com/jacobwgillespie/@styled-icons/issues/477).
  * As soon as it is released, we should transition to styled-icons component
  * to ensure consistency with third-party imported icons.
  */

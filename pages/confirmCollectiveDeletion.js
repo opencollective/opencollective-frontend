@@ -8,7 +8,7 @@ import Container from '../components/Container';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 import { H3, P } from '../components/Text';
-import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane';
+import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 
 const Icon = styled(PaperPlane)`
   color: ${themeGet('colors.primary.300')};

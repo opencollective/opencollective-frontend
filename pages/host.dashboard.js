@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { omit } from 'lodash';
 
-import { Receipt as ReceiptIcon } from 'styled-icons/material/Receipt';
-import { Donate as DonateIcon } from 'styled-icons/fa-solid/Donate';
-import { CheckDouble } from 'styled-icons/boxicons-regular/CheckDouble';
+import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
+import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
+import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 
 import styled, { css } from 'styled-components';
 

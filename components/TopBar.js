@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Bars as MenuIcon } from 'styled-icons/fa-solid/Bars';
+import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import SearchIcon from './SearchIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import SearchForm from './SearchForm';

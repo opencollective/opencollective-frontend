@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Lock } from 'styled-icons/fa-solid';
+import { Lock } from '@styled-icons/fa-solid';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';

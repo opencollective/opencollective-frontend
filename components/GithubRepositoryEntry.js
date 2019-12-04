@@ -2,8 +2,8 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import { pick } from 'lodash';
-import { Github } from 'styled-icons/fa-brands/Github';
-import { Star } from 'styled-icons/fa-solid/Star';
+import { Github } from '@styled-icons/fa-brands/Github';
+import { Star } from '@styled-icons/fa-solid/Star';
 
 import Container from './Container';
 import { P, Span } from './Text';

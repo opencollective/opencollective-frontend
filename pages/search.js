@@ -19,7 +19,7 @@ import colors from '../lib/constants/colors';
 
 import { addSearchQueryData } from '../lib/graphql/queries';
 
-import { Search } from 'styled-icons/octicons/Search';
+import { Search } from '@styled-icons/octicons/Search';
 import { FormattedMessage } from 'react-intl';
 import { P } from '../components/Text';
 

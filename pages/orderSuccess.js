@@ -7,8 +7,8 @@ import { get } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 
-import { Facebook } from 'styled-icons/fa-brands/Facebook';
-import { Twitter } from 'styled-icons/fa-brands/Twitter';
+import { Facebook } from '@styled-icons/fa-brands/Facebook';
+import { Twitter } from '@styled-icons/fa-brands/Twitter';
 
 import orderSuccessBackgroundUrl from '../static/images/order-success-background.svg';
 

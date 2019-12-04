@@ -6,8 +6,8 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 
-import { Cog } from 'styled-icons/typicons/Cog';
-import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
+import { Settings } from '@styled-icons/feather/Settings';
+import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 
 import { canOrderTicketsFromEvent } from '../lib/events';
 import { CollectiveType } from '../lib/constants/collectives';
@@ -352,7 +352,7 @@ const CollectiveNavbar = ({
           {isAdmin && showEdit && (
             <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">
               <StyledRoundButton size={24} bg="#F0F2F5" color="#4B4E52">
-                <Cog size={17} />
+                <Settings size={17} />
               </StyledRoundButton>
             </Link>
           )}

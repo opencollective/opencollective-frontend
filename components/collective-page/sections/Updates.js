@@ -7,7 +7,7 @@ import { get, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
-import { Lock } from 'styled-icons/fa-solid';
+import { Lock } from '@styled-icons/fa-solid';
 
 import { formatDate } from '../../../lib/utils';
 import { P, Span } from '../../Text';

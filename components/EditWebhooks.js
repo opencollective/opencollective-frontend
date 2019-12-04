@@ -5,7 +5,7 @@ import { get, pick, difference } from 'lodash';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { isURL } from 'validator';
-import { Close } from 'styled-icons/material/Close';
+import { Close } from '@styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
 
 import events from '../lib/constants/notificationEvents';
@@ -20,7 +20,7 @@ import MessageBox from './MessageBox';
 import { Flex, Box } from '@rebass/grid';
 import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
-import { Add } from 'styled-icons/material/Add';
+import { Add } from '@styled-icons/material/Add';
 import StyledInputGroup from './StyledInputGroup';
 import ExternalLink from './ExternalLink';
 

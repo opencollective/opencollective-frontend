@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
-import { ArrowBack } from 'styled-icons/boxicons-regular';
+import { ArrowBack } from '@styled-icons/boxicons-regular';
 
 import { compose } from '../lib/utils';
 import { addCollectiveCoverData } from '../lib/graphql/queries';

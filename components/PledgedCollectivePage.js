@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { useQuery } from 'react-apollo';
 import { Box, Flex } from '@rebass/grid';
 import gql from 'graphql-tag';
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
+import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
 
 import { Link } from '../server/pages';
 

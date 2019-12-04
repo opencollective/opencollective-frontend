@@ -6,7 +6,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 
-import { Search } from 'styled-icons/octicons/Search';
+import { Search } from '@styled-icons/octicons/Search';
 
 import { escapeInput, reportValidityHTML5 } from '../../lib/utils';
 import Avatar from '../Avatar';

@@ -5,9 +5,9 @@ import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedNumber, FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Facebook } from 'styled-icons/fa-brands/Facebook';
-import { Twitter } from 'styled-icons/fa-brands/Twitter';
-import { Linkedin } from 'styled-icons/fa-brands/Linkedin';
+import { Facebook } from '@styled-icons/fa-brands/Facebook';
+import { Twitter } from '@styled-icons/fa-brands/Twitter';
+import { Linkedin } from '@styled-icons/fa-brands/Linkedin';
 
 import { pickAvatar } from '../lib/collective.lib';
 import { getBaseApiUrl, imagePreview } from '../lib/utils';

@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import { Router } from '../server/pages';
 
-import { Support } from 'styled-icons/boxicons-regular/Support';
-import { Github } from 'styled-icons/fa-brands/Github';
-import { Redo } from 'styled-icons/fa-solid/Redo';
+import { Support } from '@styled-icons/boxicons-regular/Support';
+import { Github } from '@styled-icons/fa-brands/Github';
+import { Redo } from '@styled-icons/fa-solid/Redo';
 
 import { objectToQueryString } from '../lib/url_helpers';
 import Header from './Header';

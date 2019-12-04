@@ -6,7 +6,7 @@ import { Mutation } from 'react-apollo';
 import { get, pick } from 'lodash';
 import styled from 'styled-components';
 
-import { PencilAlt } from 'styled-icons/fa-solid/PencilAlt';
+import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 
 import StyledButton from './StyledButton';
 import Container from './Container';
