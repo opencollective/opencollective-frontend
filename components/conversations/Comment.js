@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { useMutation } from 'react-apollo';
 
-import { Edit } from 'styled-icons/feather/Edit';
-import { X } from 'styled-icons/feather/X';
+import { Edit } from '@styled-icons/feather/Edit';
+import { X } from '@styled-icons/feather/X';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/utils';
