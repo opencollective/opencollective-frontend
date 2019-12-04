@@ -4,7 +4,7 @@ import { graphql, withApollo } from 'react-apollo';
 import { Flex, Box } from '@rebass/grid';
 import { get, isEmpty, cloneDeep, update } from 'lodash';
 
-import { MessageSquare } from 'styled-icons/feather/MessageSquare';
+import { MessageSquare } from '@styled-icons/feather/MessageSquare';
 
 import { Router } from '../server/pages';
 import { CollectiveType } from '../lib/constants/collectives';

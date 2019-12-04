@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled, { css } from 'styled-components';
 
-import { MessageSquare } from 'styled-icons/feather/MessageSquare';
+import { MessageSquare } from '@styled-icons/feather/MessageSquare';
 
 import { withUser } from '../UserProvider';
 import Comment from './Comment';

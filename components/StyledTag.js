@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { background, border, color, space, typography, layout, position } from 'styled-system';
 
-import { Times } from 'styled-icons/fa-solid/Times';
+import { Times } from '@styled-icons/fa-solid/Times';
 
 import { messageType } from '../lib/theme';
 import { Span } from './Text';
