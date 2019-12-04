@@ -122,6 +122,8 @@ class Tier extends React.Component {
   }
 
   handleTicketsChange(quantity) {
+    const { availableQuantity } = this.props.tier.stats;
+    if (availableQuantity && quantity > availableQuantity) return;
     const currentValues = this.calcCurrentValues();
 
     const response = {
