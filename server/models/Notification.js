@@ -20,15 +20,47 @@ export default function(Sequelize, DataTypes) {
   const Notification = Sequelize.define(
     'Notification',
     {
-      channel: { defaultValue: 'email', type: DataTypes.STRING }, // in the future: Slack, iPhone, Android, etc.
+      channel: {
+        defaultValue: 'email',
+        type: DataTypes.STRING,
+        validate: {
+          isIn: {
+            args: [Object.values(channels)],
+            msg: `Must be one of ${Object.values(channels).join(', ')}`,
+          },
+        },
+      },
 
-      type: DataTypes.STRING,
+      type: {
+        type: DataTypes.STRING,
+        // Can't do what's bellow because of the `mailinglist.___` thing
+        // See https://github.com/opencollective/opencollective-api/blob/f8ac13a1b8176a69d4ea380bcfcca1bd789889b0/server/controllers/services/email.js#L155
+        // validate: {
+        //   isIn: {
+        //     args: [Object.values(activities)],
+        //     msg: `Must be one of ${Object.values(activities).join(', ')}`,
+        //   },
+        // },
+      },
 
-      active: { defaultValue: true, type: DataTypes.BOOLEAN },
+      active: {
+        defaultValue: true,
+        type: DataTypes.BOOLEAN,
+      },
 
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: Sequelize.NOW,
+      },
+
+      CollectiveId: {
+        type: DataTypes.INTEGER,
+        references: { key: 'id', model: 'Collectives' },
+      },
+
+      UserId: {
+        type: DataTypes.INTEGER,
+        references: { key: 'id', model: 'Users' },
       },
 
       webhookUrl: {
