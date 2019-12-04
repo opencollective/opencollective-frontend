@@ -44,12 +44,16 @@ describe('host dashboard', () => {
       .click({ force: true });
     cy.get('[data-cy="confirmation-modal-continue"]').click({ force: true });
     cy.wait(500);
-    cy.get('[data-cy="reject-expense-btn"]').within(() => {
-      cy.get('button').click({ force: true });
-    });
-    cy.get('[data-cy="approve-expense-btn"]').within(() => {
-      cy.get('button').click({ force: true });
-    });
+    cy.get('[data-cy="reject-expense-btn"]')
+      .first()
+      .within(() => {
+        cy.get('button').click({ force: true });
+      });
+    cy.get('[data-cy="approve-expense-btn"]')
+      .first()
+      .within(() => {
+        cy.get('button').click({ force: true });
+      });
   });
 
   it('record expense as paid', () => {
