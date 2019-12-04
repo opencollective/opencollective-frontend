@@ -68,6 +68,14 @@ const createOrderQuery = `
   }
   `;
 
+const backyourstackDispatchOrder = `
+  mutation backyourstackDispatchOrder($id: Int!) {
+    backyourstackDispatchOrder(id: $id) {
+      dispatching
+    }
+  }
+  `;
+
 const constants = Object.freeze({
   paymentMethod: {
     name: 'payment method',
@@ -195,5 +203,12 @@ describe('createOrder', () => {
       .format('ll');
     // Expect next dispatch date to equal next month of current date
     expect(moment(subscription.data.nextDispatchDate).format('ll')).equal(nextDispatchDate);
+  });
+
+  it('returns  error when it is not time for dispatch', async () => {
+    // When the order is created
+    const res = await utils.graphqlQuery(backyourstackDispatchOrder, { id: orderCreated.id }, xdamman);
+    // There should be an error
+    expect(res.errors).to.exist;
   });
 });
