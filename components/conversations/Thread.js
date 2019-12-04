@@ -3,17 +3,15 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled, { css } from 'styled-components';
 
-import { MessageSquare } from '@styled-icons/feather/MessageSquare';
-
+import CommentIconLib from '../icons/CommentIcon';
 import { withUser } from '../UserProvider';
 import Comment from './Comment';
 import Container from '../Container';
 
-const CommentIcon = styled(MessageSquare).attrs({
+const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
   color: '#9a9a9a',
 })`
-  transform: scaleX(-1);
   margin-top: 8px;
 `;
 
@@ -32,11 +30,12 @@ const CommentContainer = styled.div`
 /**
  * A thread is meant to display comments and activities in a chronological order.
  */
-const Thread = ({ items, onCommentDeleted, LoggedInUser }) => {
+const Thread = ({ collective, items, onCommentDeleted, LoggedInUser }) => {
   if (!items || items.length === 0) {
     return null;
   }
 
+  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
   return (
     <div>
       {items.map((item, idx) => {
@@ -54,7 +53,7 @@ const Thread = ({ items, onCommentDeleted, LoggedInUser }) => {
                   <CommentContainer isLast={idx + 1 === items.length}>
                     <Comment
                       comment={item}
-                      canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                      canEdit={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       onDelete={onCommentDeleted}
                     />
                   </CommentContainer>
@@ -79,6 +78,10 @@ Thread.propTypes = {
   ),
   /** Called when a comment get deleted */
   onCommentDeleted: PropTypes.func,
+  /** Collective where the thread is created */
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+  }).isRequired,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
 };

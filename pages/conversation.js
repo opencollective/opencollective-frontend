@@ -4,8 +4,6 @@ import { graphql, withApollo } from 'react-apollo';
 import { Flex, Box } from '@rebass/grid';
 import { get, isEmpty, cloneDeep, update } from 'lodash';
 
-import { MessageSquare } from '@styled-icons/feather/MessageSquare';
-
 import { Router } from '../server/pages';
 import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
@@ -33,6 +31,9 @@ import Comment from '../components/conversations/Comment';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import InlineEditField from '../components/InlineEditField';
+import FollowConversationButton from '../components/conversations/FollowConversationButton';
+import CommentIcon from '../components/icons/CommentIcon';
+import FollowersAvatars from '../components/conversations/FollowersAvatars';
 
 const conversationPageQuery = gqlV2`
   query Conversation($collectiveSlug: String!, $id: String!) {
@@ -58,6 +59,16 @@ const conversationPageQuery = gqlV2`
       comments {
         nodes {
           ...CommentFields
+        }
+      }
+      followers(limit: 50) {
+        totalCount
+        nodes {
+          id
+          slug
+          type
+          name
+          imageUrl(height: 64)
         }
       }
     }
@@ -118,9 +129,19 @@ class ConversationPage extends React.Component {
             }),
           ),
         }),
+        followers: PropTypes.shape({
+          totalCount: PropTypes.number,
+          nodes: PropTypes.arrayOf(
+            PropTypes.shape({
+              id: PropTypes.string,
+            }),
+          ),
+        }),
       }),
     }).isRequired, // from withData
   };
+
+  static MAX_NB_FOLLOWERS_AVATARS = 4;
 
   getPageMetaData(collective) {
     if (collective) {
@@ -150,6 +171,29 @@ class ConversationPage extends React.Component {
     this.props.client.writeQuery({ query, variables, data });
   };
 
+  onFollowChange = (isFollowing, account) => {
+    const [data, query, variables] = this.clonePageQueryCacheData();
+    const followersPath = 'conversation.followers.nodes';
+    const followersCountPath = 'conversation.followers.totalCount';
+
+    if (!isFollowing) {
+      // Remove user
+      update(data, followersCountPath, count => count - 1);
+      update(data, followersPath, followers => followers.filter(c => c.id !== account.id));
+    } else if (get(data, followersPath, []).findIndex(c => c.id === account.id) === -1) {
+      // Add user (if not already there)
+      update(data, followersCountPath, count => count + 1);
+      update(data, followersPath, followers => {
+        followers.splice(ConversationPage.MAX_NB_FOLLOWERS_AVATARS - 1, 0, account);
+        return followers;
+      });
+    } else {
+      return;
+    }
+
+    this.props.client.writeQuery({ query, variables, data });
+  };
+
   onConversationDeleted = () => {
     return Router.pushRoute('conversations', { collectiveSlug: this.props.collectiveSlug });
   };
@@ -174,6 +218,8 @@ class ConversationPage extends React.Component {
     const conversation = data && data.conversation;
     const body = conversation && conversation.body;
     const comments = get(conversation, 'comments.nodes', []);
+    const followers = get(conversation, 'followers');
+    const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
@@ -199,7 +245,7 @@ class ConversationPage extends React.Component {
                     </MessageBox>
                   ) : (
                     <Flex flexDirection={['column', null, null, 'row']} justifyContent="space-between">
-                      <Box flex="1 1 50%" maxWidth={720} mb={5}>
+                      <Box flex="1 1 50%" maxWidth={700} mb={5}>
                         <Container borderBottom="1px solid" borderColor="black.300" pb={4}>
                           <H2 fontSize="H4" mb={3}>
                             <InlineEditField
@@ -221,22 +267,17 @@ class ConversationPage extends React.Component {
                             comment={body}
                             canEdit={canEdit}
                             onDelete={this.onConversationDeleted}
-                            deleteModalTitle={
-                              <FormattedMessage
-                                id="conversation.deleteModalTitle"
-                                defaultMessage="Delete this conversation?"
-                              />
-                            }
+                            isConversationRoot
                           />
                         </Container>
                         {comments.length > 0 && (
                           <Box mb={3} pt={3}>
-                            <Thread items={comments} onCommentDeleted={this.onCommentDeleted} />
+                            <Thread collective={collective} items={comments} onCommentDeleted={this.onCommentDeleted} />
                           </Box>
                         )}
                         <Flex mt="40px">
                           <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                            <MessageSquare size={24} color="lightgrey" style={{ transform: 'scaleX(-1)' }} />
+                            <CommentIcon size={24} color="lightgrey" />
                           </Box>
                           <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
                             <CommentForm
@@ -247,7 +288,7 @@ class ConversationPage extends React.Component {
                           </Box>
                         </Flex>
                       </Box>
-                      <Box display={['none', null, null, 'block']} flex="0 0 360px" ml={[null, null, null, 5]} mb={4}>
+                      <Box display={['none', null, 'block']} flex="0 0 330px" ml={[null, null, null, 4, 5]} mb={4}>
                         <Box my={2} mx={2}>
                           <Link route="create-conversation" params={{ collectiveSlug }}>
                             <StyledButton buttonStyle="primary" width="100%" minWidth={170}>
@@ -257,13 +298,28 @@ class ConversationPage extends React.Component {
                         </Box>
 
                         <Box mt={4}>
-                          <H4 px={2} mb={2} fontWeight="normal">
+                          <H4 px={2} mb={3} fontWeight="normal">
                             <FormattedMessage id="Conversation.Followers" defaultMessage="Conversation followers" />
                           </H4>
-                          <Container background="#f3f3f3" width="100%" height="64px" />
-                          <StyledButton mt={2} buttonStyle="secondary" width="100%" minWidth={130} disabled>
-                            <FormattedMessage id="actions.follow" defaultMessage="Follow" />
-                          </StyledButton>
+                          <Flex mb={3} alignItems="center">
+                            {hasFollowers && (
+                              <Box mr={3}>
+                                <FollowersAvatars
+                                  followers={followers.nodes}
+                                  totalCount={followers.totalCount}
+                                  maxNbDisplayed={ConversationPage.MAX_NB_FOLLOWERS_AVATARS}
+                                  avatarRadius={32}
+                                />
+                              </Box>
+                            )}
+                            <Box flex="1">
+                              <FollowConversationButton
+                                conversationId={conversation.id}
+                                onChange={this.onFollowChange}
+                                isCompact={hasFollowers && followers.nodes.length > 2}
+                              />
+                            </Box>
+                          </Flex>
                         </Box>
                         {!isEmpty(conversation.tags) && (
                           <Box mt={4}>

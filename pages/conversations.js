@@ -26,6 +26,7 @@ import ConversationsList from '../components/conversations/ConversationsList';
 import MessageBox from '../components/MessageBox';
 import { Sections } from '../components/collective-page/_constants';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import { ConversationListFragment } from '../components/conversations/graphql';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
@@ -147,9 +148,6 @@ class ConversationsPage extends React.Component {
                       />
                     </P>
                     <Flex flex="0 0 300px" flexWrap="wrap">
-                      <StyledButton buttonStyle="secondary" minWidth={100} m={2} disabled>
-                        <FormattedMessage id="actions.follow" defaultMessage="Follow" />
-                      </StyledButton>
                       <Link route="create-conversation" params={{ collectiveSlug }}>
                         <StyledButton buttonStyle="primary" m={2}>
                           <FormattedMessage id="conversations.create" defaultMessage="Create conversation" />
@@ -209,21 +207,7 @@ const getData = graphql(
         imageUrl
         twitterHandle
         conversations(tag: $tag) {
-          nodes {
-            id
-            slug
-            title
-            summary
-            createdAt
-            tags
-            fromCollective {
-              id
-              name
-              type
-              slug
-              imageUrl
-            }
-          }
+          ...ConversationListFragment
         }
         conversationsTags {
           id
@@ -231,6 +215,7 @@ const getData = graphql(
         }
       }
     }
+    ${ConversationListFragment}
   `,
   {
     options: {

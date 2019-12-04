@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
+import { mapValues } from 'lodash';
 
 import { Router } from '../server/pages';
 
@@ -76,7 +77,16 @@ class SigninPage extends React.Component {
     }
   }
 
-  static routes = { signin: '/signin', join: '/create-account' };
+  getRoutes() {
+    const { next } = this.props;
+    const routes = { signin: '/signin', join: '/create-account' };
+    if (!next) {
+      return routes;
+    } else {
+      const urlParams = `?next=${encodeURIComponent(next)}`;
+      return mapValues(routes, route => `${route}${urlParams}`);
+    }
+  }
 
   renderContent() {
     const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
@@ -114,7 +124,7 @@ class SigninPage extends React.Component {
             />
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={next || '/'} form={form} routes={SigninPage.routes} />
+        <SignInOrJoinFree redirect={next || '/'} form={form} routes={this.getRoutes()} />
       </React.Fragment>
     );
   }
