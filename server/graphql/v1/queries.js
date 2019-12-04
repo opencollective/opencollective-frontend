@@ -535,7 +535,7 @@ const queries = {
       if (!req.remoteUser || !req.remoteUser.isAdmin(args.CollectiveId)) {
         query.where.publishedAt = { [Op.ne]: null };
       }
-      return req.loaders.collective.findById.load(args.CollectiveId).then(collective => {
+      return req.loaders.Collective.byId.load(args.CollectiveId).then(collective => {
         if (!collective) {
           throw new Error('Collective not found');
         }
@@ -642,7 +642,7 @@ const queries = {
       if (args.limit) query.limit = args.limit;
       if (args.offset) query.offset = args.offset;
       query.order = [['createdAt', 'DESC']];
-      return req.loaders.collective.findById.load(args.CollectiveId).then(collective => {
+      return req.loaders.Collective.byId.load(args.CollectiveId).then(collective => {
         if (!collective) {
           throw new Error('Collective not found');
         }

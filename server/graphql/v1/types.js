@@ -106,7 +106,7 @@ export const UserType = new GraphQLObjectType({
           if (!user.CollectiveId) {
             return console.error('>>> user', user.id, 'does not have a CollectiveId', user.CollectiveId);
           }
-          return req.loaders.collective.findById.load(user.CollectiveId);
+          return req.loaders.Collective.byId.load(user.CollectiveId);
         },
       },
       username: {
@@ -191,7 +191,7 @@ export const StatsMemberType = new GraphQLObjectType({
         resolve(member, args, req) {
           return (
             member.directDonations ||
-            req.loaders.transactions.directDonationsFromTo.load({
+            req.loaders.Transaction.directDonationsFromTo.load({
               FromCollectiveId: member.MemberCollectiveId,
               CollectiveId: member.CollectiveId,
             })
@@ -204,7 +204,7 @@ export const StatsMemberType = new GraphQLObjectType({
         resolve(member, args, req) {
           return (
             member.donationsThroughEmittedVirtualCards ||
-            req.loaders.transactions.donationsThroughEmittedVirtualCardsFromTo.load({
+            req.loaders.Transaction.donationsThroughEmittedVirtualCardsFromTo.load({
               FromCollectiveId: member.MemberCollectiveId,
               CollectiveId: member.CollectiveId,
             })
@@ -217,7 +217,7 @@ export const StatsMemberType = new GraphQLObjectType({
         resolve(member, args, req) {
           return (
             member.totalDonations ||
-            req.loaders.transactions.totalAmountDonatedFromTo.load({
+            req.loaders.Transaction.totalAmountDonatedFromTo.load({
               FromCollectiveId: member.MemberCollectiveId,
               CollectiveId: member.CollectiveId,
             })
@@ -260,7 +260,7 @@ export const MemberType = new GraphQLObjectType({
           offset: { type: GraphQLInt },
         },
         resolve(member, args, req) {
-          return req.loaders.orders.findByMembership
+          return req.loaders.Order.findByMembership
             .load(`${member.CollectiveId}:${member.MemberCollectiveId}`)
             .then(orders => {
               const { limit, offset } = args;
@@ -279,7 +279,7 @@ export const MemberType = new GraphQLObjectType({
           offset: { type: GraphQLInt },
         },
         resolve(member, args, req) {
-          return req.loaders.members.transactions
+          return req.loaders.Member.transactions
             .load(`${member.CollectiveId}:${member.MemberCollectiveId}`)
             .then(transactions => {
               /**
@@ -301,14 +301,14 @@ export const MemberType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
-          return member.collective || req.loaders.collective.findById.load(member.CollectiveId);
+          return member.collective || req.loaders.Collective.byId.load(member.CollectiveId);
         },
       },
       member: {
         type: CollectiveInterfaceType,
         resolve(member, args, req) {
           const memberCollective =
-            member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
+            member.memberCollective || req.loaders.Collective.byId.load(member.MemberCollectiveId);
           if (memberCollective) {
             memberCollective.inTheContextOfCollectiveId = member.CollectiveId;
           }
@@ -337,7 +337,7 @@ export const MemberType = new GraphQLObjectType({
       tier: {
         type: TierType,
         resolve(member, args, req) {
-          return member.TierId && req.loaders.tiers.findById.load(member.TierId);
+          return member.TierId && req.loaders.Tier.byId.load(member.TierId);
         },
       },
       stats: {
@@ -569,13 +569,13 @@ export const InvoiceType = new GraphQLObjectType({
       host: {
         type: CollectiveInterfaceType,
         resolve(invoice, args, req) {
-          return req.loaders.collective.findById.load(invoice.HostCollectiveId);
+          return req.loaders.Collective.byId.load(invoice.HostCollectiveId);
         },
       },
       fromCollective: {
         type: CollectiveInterfaceType,
         resolve(invoice, args, req) {
-          return req.loaders.collective.findById.load(invoice.FromCollectiveId);
+          return req.loaders.Collective.byId.load(invoice.FromCollectiveId);
         },
       },
       transactions: {
@@ -683,7 +683,7 @@ export const ExpenseType = new GraphQLObjectType({
           if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.privateMessage;
           }
-          return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
+          return req.loaders.Collective.byId.load(expense.CollectiveId).then(collective => {
             if (req.remoteUser.isAdmin(collective.HostCollectiveId)) {
               return expense.privateMessage;
             } else {
@@ -699,7 +699,7 @@ export const ExpenseType = new GraphQLObjectType({
           if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.attachment;
           }
-          return req.loaders.collective.findById.load(expense.CollectiveId).then(collective => {
+          return req.loaders.Collective.byId.load(expense.CollectiveId).then(collective => {
             if (
               req.remoteUser.isAdmin(collective.HostCollectiveId) ||
               req.remoteUser.isAdmin(collective.ParentCollectiveId)
@@ -760,7 +760,7 @@ export const ExpenseType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(expense, args, req) {
-          return req.loaders.collective.findById.load(expense.CollectiveId);
+          return req.loaders.Collective.byId.load(expense.CollectiveId);
         },
       },
       transaction: {
@@ -914,19 +914,19 @@ export const UpdateType = new GraphQLObjectType({
       fromCollective: {
         type: CollectiveInterfaceType,
         resolve(update, args, req) {
-          return req.loaders.collective.findById.load(update.FromCollectiveId);
+          return req.loaders.Collective.byId.load(update.FromCollectiveId);
         },
       },
       collective: {
         type: CollectiveInterfaceType,
         resolve(update, args, req) {
-          return req.loaders.collective.findById.load(update.CollectiveId);
+          return req.loaders.Collective.byId.load(update.CollectiveId);
         },
       },
       tier: {
         type: TierType,
         resolve(update, args, req) {
-          return req.loaders.tiers.findById.load(update.TierId);
+          return req.loaders.Tier.byId.load(update.TierId);
         },
       },
       comments: {
@@ -957,10 +957,10 @@ export const CommentListType = new GraphQLObjectType({
       async resolve(query, args, req) {
         let rows;
         if (query.where.ExpenseId) {
-          rows = await req.loaders.comments.findAllByAttribute('ExpenseId').load(query.where.ExpenseId);
+          rows = await req.loaders.Comment.findAllByAttribute('ExpenseId').load(query.where.ExpenseId);
         }
         if (query.where.UpdateId) {
-          rows = await req.loaders.comments.findAllByAttribute('UpdateId').load(query.where.UpdateId);
+          rows = await req.loaders.Comment.findAllByAttribute('UpdateId').load(query.where.UpdateId);
         }
         return rows.splice(query.offset, query.limit);
       },
@@ -981,7 +981,7 @@ export const CommentListType = new GraphQLObjectType({
       type: GraphQLInt,
       async resolve(query, args, req) {
         if (query.where.ExpenseId) {
-          return req.loaders.comments.countByExpenseId.load(query.where.ExpenseId);
+          return req.loaders.Comment.countByExpenseId.load(query.where.ExpenseId);
         }
       },
     },
@@ -1100,7 +1100,7 @@ export const NotificationType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(notification, args, req) {
-          return req.loaders.collective.findById.load(notification.CollectiveId);
+          return req.loaders.Collective.byId.load(notification.CollectiveId);
         },
       },
       createdAt: {
@@ -1173,21 +1173,21 @@ export const TierStatsType = new GraphQLObjectType({
         type: ContributorsStatsType,
         description: 'Breakdown of all the contributors that belongs to this tier.',
         resolve(tier, args, req) {
-          return req.loaders.tiers.contributorsStats.load(tier.id);
+          return req.loaders.Tier.contributorsStats.load(tier.id);
         },
       },
       totalOrders: {
         description: 'total number of individual orders',
         type: GraphQLInt,
         resolve(tier, args, req) {
-          return req.loaders.tiers.totalOrders.load(tier.id);
+          return req.loaders.Tier.totalOrders.load(tier.id);
         },
       },
       totalDonated: {
         description: 'Total amount donated for this tier, in cents.',
         type: GraphQLInt,
         resolve(tier, args, req) {
-          return req.loaders.tiers.totalDonated.load(tier.id);
+          return req.loaders.Tier.totalDonated.load(tier.id);
         },
       },
       totalRecurringDonations: {
@@ -1195,9 +1195,9 @@ export const TierStatsType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(tier, args, req) {
           if (tier.interval === intervals.MONTH) {
-            return req.loaders.tiers.totalMonthlyDonations.load(tier.id);
+            return req.loaders.Tier.totalMonthlyDonations.load(tier.id);
           } else if (tier.interval === intervals.YEAR) {
-            return req.loaders.tiers.totalYearlyDonations.load(tier.id);
+            return req.loaders.Tier.totalYearlyDonations.load(tier.id);
           } else {
             return 0;
           }
@@ -1207,14 +1207,14 @@ export const TierStatsType = new GraphQLObjectType({
         description: 'total number of people/organizations in this tier',
         type: GraphQLInt,
         resolve(tier, args, req) {
-          return req.loaders.tiers.totalDistinctOrders.load(tier.id);
+          return req.loaders.Tier.totalDistinctOrders.load(tier.id);
         },
       },
       totalActiveDistinctOrders: {
         description: 'total number of active people/organizations in this tier',
         type: GraphQLInt,
         resolve(tier, args, req) {
-          return req.loaders.tiers.totalActiveDistinctOrders.load(tier.id);
+          return req.loaders.Tier.totalActiveDistinctOrders.load(tier.id);
         },
       },
       availableQuantity: {
@@ -1223,7 +1223,7 @@ export const TierStatsType = new GraphQLObjectType({
           if (!tier.maxQuantity) {
             return maxInteger;
           } else {
-            return req.loaders.tiers.availableQuantity.load(tier.id);
+            return req.loaders.Tier.availableQuantity.load(tier.id);
           }
         },
       },
@@ -1368,13 +1368,13 @@ export const TierType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(tier, args, req) {
-          return req.loaders.collective.findById.load(tier.CollectiveId);
+          return req.loaders.Collective.byId.load(tier.CollectiveId);
         },
       },
       event: {
         type: CollectiveInterfaceType,
         resolve(tier, args, req) {
-          return req.loaders.collective.findById.load(tier.CollectiveId);
+          return req.loaders.Collective.byId.load(tier.CollectiveId);
         },
       },
       orders: {
@@ -1442,14 +1442,14 @@ export const StatsOrderType = new GraphQLObjectType({
         description: 'number of transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
         resolve(order, args, req) {
-          return req.loaders.orders.stats.transactions.load(order.id);
+          return req.loaders.Order.stats.transactions.load(order.id);
         },
       },
       totalTransactions: {
         description: 'total amount of all the transactions for this order (includes past recurring transactions)',
         type: GraphQLInt,
         resolve(order, args, req) {
-          return req.loaders.orders.stats.totalTransactions.load(order.id);
+          return req.loaders.Order.stats.totalTransactions.load(order.id);
         },
       },
     };
@@ -1549,7 +1549,7 @@ export const OrderType = new GraphQLObjectType({
             console.warn('There is no FromCollectiveId for order', order.id);
             return null;
           }
-          const fromCollective = await req.loaders.collective.findById.load(order.FromCollectiveId);
+          const fromCollective = await req.loaders.Collective.byId.load(order.FromCollectiveId);
           if (fromCollective) {
             fromCollective.inTheContextOfCollectiveId = order.CollectiveId;
           }
@@ -1560,7 +1560,7 @@ export const OrderType = new GraphQLObjectType({
         description: 'Collective that receives the order',
         type: CollectiveInterfaceType,
         resolve(order, args, req) {
-          return req.loaders.collective.findById.load(order.CollectiveId);
+          return req.loaders.Collective.byId.load(order.CollectiveId);
         },
       },
       tier: {
@@ -1598,7 +1598,7 @@ export const OrderType = new GraphQLObjectType({
             offset: args.offset || 0,
           };
           if (args.type) query.where.type = args.type;
-          return req.loaders.transactions.findByOrderId(query).load(order.id);
+          return req.loaders.Transaction.findByOrderId(query).load(order.id);
         },
       },
       currency: {
@@ -1847,7 +1847,7 @@ export const PaymentMethodType = new GraphQLObjectType({
       collective: {
         type: CollectiveInterfaceType,
         resolve(paymentMethod, args, req) {
-          return req.loaders.collective.findById.load(paymentMethod.CollectiveId);
+          return req.loaders.Collective.byId.load(paymentMethod.CollectiveId);
         },
       },
       emitter: {
@@ -1857,7 +1857,7 @@ export const PaymentMethodType = new GraphQLObjectType({
           if (paymentMethod.SourcePaymentMethodId) {
             const sourcePaymentMethod = await models.PaymentMethod.findByPk(paymentMethod.SourcePaymentMethodId);
             if (sourcePaymentMethod) {
-              return req.loaders.collective.findById.load(sourcePaymentMethod.CollectiveId);
+              return req.loaders.Collective.byId.load(sourcePaymentMethod.CollectiveId);
             }
           }
         },

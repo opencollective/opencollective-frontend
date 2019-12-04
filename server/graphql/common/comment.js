@@ -106,11 +106,11 @@ async function createCommentResolver(_, { comment }, { remoteUser }) {
 }
 
 function collectiveResolver({ CollectiveId }, _, { loaders }) {
-  return loaders.collective.findById.load(CollectiveId);
+  return loaders.Collective.byId.load(CollectiveId);
 }
 
 function fromCollectiveResolver({ FromCollectiveId }, _, { loaders }) {
-  return loaders.collective.findById.load(FromCollectiveId);
+  return loaders.Collective.byId.load(FromCollectiveId);
 }
 
 /**

@@ -67,7 +67,7 @@ export const Order = new GraphQLObjectType({
             return order.tier;
           }
           if (order.TierId) {
-            return req.loaders.tiers.findById.load(order.TierId);
+            return req.loaders.Tier.byId.load(order.TierId);
           }
         },
       },
@@ -99,7 +99,7 @@ export const Order = new GraphQLObjectType({
         type: Amount,
         description: 'UNSUPPORTED: Total amount donated between collectives',
         async resolve(order, args, req) {
-          const value = await req.loaders.transactions.totalAmountDonatedFromTo.load({
+          const value = await req.loaders.Transaction.totalAmountDonatedFromTo.load({
             FromCollectiveId: order.FromCollectiveId,
             CollectiveId: order.CollectiveId,
           });

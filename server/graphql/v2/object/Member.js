@@ -36,7 +36,7 @@ const MemberFields = {
         return member.tier;
       }
       if (member.TierId) {
-        return req.loaders.tiers.findById.load(member.TierId);
+        return req.loaders.Tier.byId.load(member.TierId);
       }
     },
   },
@@ -65,7 +65,7 @@ const MemberFields = {
       if (member.totalDonations) {
         return { value: member.totalDonations };
       }
-      const value = await req.loaders.transactions.totalAmountDonatedFromTo.load({
+      const value = await req.loaders.Transaction.totalAmountDonatedFromTo.load({
         FromCollectiveId: member.MemberCollectiveId,
         CollectiveId: member.CollectiveId,
       });
@@ -83,7 +83,7 @@ export const Member = new GraphQLObjectType({
       account: {
         type: Account,
         resolve(member, args, req) {
-          return member.memberCollective || req.loaders.collective.findById.load(member.MemberCollectiveId);
+          return member.memberCollective || req.loaders.Collective.byId.load(member.MemberCollectiveId);
         },
       },
     };
@@ -99,7 +99,7 @@ export const MemberOf = new GraphQLObjectType({
       account: {
         type: Account,
         resolve(member, args, req) {
-          return member.collective || req.loaders.collective.findById.load(member.CollectiveId);
+          return member.collective || req.loaders.Collective.byId.load(member.CollectiveId);
         },
       },
     };
