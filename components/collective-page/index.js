@@ -21,7 +21,7 @@ import SectionContributions from './sections/Contributions';
 import SectionConversations from './sections/Conversations';
 import SectionTransactions from './sections/Transactions';
 import SectionTickets from './sections/Tickets';
-import SectionParticipants from './sections/Participants';
+import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionLocation from './sections/Location';
 import SectionContainer from './SectionContainer';
 
