@@ -617,6 +617,7 @@
   "expense.pay.btn": "Pay with {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Saldo insuficiente",
   "expense.pay.manual.btn": "Record as paid",
+  "expense.payExpenseBtn.processing": "Processing...",
   "expense.paymentProcessorFeeInCollectiveCurrency": "payment processor fee",
   "expense.payoutMethod": "método de pago",
   "expense.payoutMethod.donation": "Donación",
