@@ -165,7 +165,7 @@ describe('LegalDocument model', () => {
     await LegalDocument.create(legalDoc);
     expect(LegalDocument.create(legalDoc)).to.be.rejected;
 
-    const user2 = await User.createUserWithCollective({ username: 'piet', email: 'piet@test.com' });
+    const user2 = await User.createUserWithCollective({ username: 'piet', email: 'piet@opencollective.com' });
     const user2Collective = await Collective.findByPk(user2.CollectiveId);
 
     const legalDoc2 = Object.assign({}, documentData, {

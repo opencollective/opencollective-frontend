@@ -11,6 +11,7 @@ import { isArray, pick, get, merge, includes } from 'lodash';
 import models from '../models';
 import logger from './logger';
 import templates from './emailTemplates';
+import whiteListDomains from './whiteListDomains';
 import { md5 } from './utils';
 
 const debug = debugLib('email');
@@ -226,6 +227,11 @@ const getNotificationLabel = (template, recipients) => {
   return notificationTypeLabels[template];
 };
 
+const isWhitelistedDomain = email => {
+  const domain = email.split('@');
+  return whiteListDomains.includes(domain[1].toLowerCase());
+};
+
 /*
  * Given a template, recipient and data, generates email.
  */
@@ -350,6 +356,7 @@ const emailLib = {
   generateUnsubscribeToken,
   generateEmailFromTemplate,
   send: generateEmailFromTemplateAndSend,
+  isWhitelistedDomain,
 };
 
 export default emailLib;
