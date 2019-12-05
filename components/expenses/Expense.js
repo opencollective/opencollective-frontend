@@ -19,6 +19,7 @@ import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import ApproveExpenseBtn from './ApproveExpenseBtn';
 import RejectExpenseBtn from './RejectExpenseBtn';
 import PayExpenseBtn from './PayExpenseBtn';
+import SmallButton from '../SmallButton';
 import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
@@ -37,7 +38,7 @@ const ExpenseWrapper = styled.div`
 const RefreshingText = styled.div`
   position: relative;
   text-align: center;
-  top: 50px;
+  top: 70px;
   text-transform: capitalize;
   font-size: 20px;
   display: flex;
@@ -460,16 +461,16 @@ class Expense extends React.Component {
                       </a>
                     </span>
                   )}
-                {mode !== 'edit' && view === 'summary' && (
+                  {mode !== 'edit' && view === 'summary' && (
                     <span>
                       {' | '}
-                    <a className="toggleDetails" onClick={this.toggleDetails}>
-                      {intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}
-                    </a>
-                </span>
-              )}
-            </div>
-          </div>
+                      <a className="toggleDetails" onClick={this.toggleDetails}>
+                        {intl.formatMessage(this.messages[`${mode === 'details' ? 'closeDetails' : 'viewDetails'}`])}
+                      </a>
+                    </span>
+                  )}
+                </div>
+              </div>
 
               <ExpenseDetails
                 LoggedInUser={LoggedInUser}
@@ -575,16 +576,16 @@ class Expense extends React.Component {
                         )}
                       </Flex>
                     </Flex>
-                    )}
-                  </div>
-                )}
-                {this.state.error && (
-                  <P color="red.500" data-cy="errorMessage">
-                    {this.state.error}
-                  </P>
-                )}
-           </div> 
-           </div>
+                  )}
+                </div>
+              )}
+              {this.state.error && (
+                <P color="red.500" data-cy="errorMessage">
+                  {this.state.error}
+                </P>
+              )}
+            </div>
+          </div>
         </ExpenseWrapper>
       </Fragment>
     );
