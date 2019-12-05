@@ -35,7 +35,6 @@ class ExpensesWithData extends React.Component {
 
   render() {
     const { data, LoggedInUser, collective, host, view, includeHostedCollectives } = this.props;
-    console.log(this.getStatus());
     if (data.error) {
       console.error('graphql error>>>', data.error.message);
       return <Error message="GraphQL error" />;
