@@ -478,6 +478,8 @@
   "currency": "devise",
   "delete.modal.body": "Are you sure you want to delete this comment?",
   "delete.modal.header": "Delete comment",
+  "deleteExpense.modal.body": "Are you sure you want to delete this expense?",
+  "deleteExpense.modal.header": "Delete Expense",
   "discover.allCollectives": "Tous les collectifs",
   "discover.openSourceCollectives": "Collectifs open-source",
   "discover.other": "Autres",

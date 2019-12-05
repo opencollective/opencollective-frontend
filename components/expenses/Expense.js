@@ -65,7 +65,6 @@ class Expense extends React.Component {
     unapproveExpense: PropTypes.func,
     deleteExpense: PropTypes.func,
     refetch: PropTypes.func.isRequired,
-    deleteExpense: PropTypes.func,
     intl: PropTypes.object.isRequired,
   };
 
