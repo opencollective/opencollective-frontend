@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
+import { Flex } from '@rebass/grid';
 
 import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
@@ -438,15 +439,16 @@ class Expense extends React.Component {
                 <Span color="red.500">{intl.formatMessage(this.messages['expenseTypeMissing'])}</Span>
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid) && (
-                <div className="manageExpense">
-                  {canPay && expense.payoutMethod === 'other' && (
+                <Flex flexDirection="column">
+                  {canPay && (
                     <EditPayExpenseFeesForm
                       canEditPlatformFee={LoggedInUser.isRoot()}
                       currency={collective.currency}
                       onChange={fees => this.handleChange({ fees })}
+                      payoutMethod={expense.payoutMethod}
                     />
                   )}
-                  <div className="expenseActions" data-cy="expense-actions">
+                  <Flex data-cy="expense-actions">
                     {canPay && (
                       <PayExpenseBtn
                         expense={expense}
@@ -471,8 +473,8 @@ class Expense extends React.Component {
                     {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn refetch={this.props.refetch} id={expense.id} />}
                     {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
                     {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
-                  </div>
-                </div>
+                  </Flex>
+                </Flex>
               )}
             </div>
           )}

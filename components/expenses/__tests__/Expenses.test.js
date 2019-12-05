@@ -47,6 +47,7 @@ describe('Expenses component', () => {
   ];
 
   const loggedInUser = {
+    isRoot: () => true,
     canPayExpense: () => true,
     canApproveExpense: () => true,
     canEditCollective: () => true,
@@ -72,7 +73,7 @@ describe('Expenses component', () => {
   describe('Paying expenses', () => {
     it('disables all buttons while one expense is being paid', done => {
       // make sure there are two pay buttons on the page
-      expect(component.find('.PayExpenseBtn button').length).toEqual(2);
+      expect(component.find('.PayExpenseBtn button').length).toEqual(4);
 
       // make sure none are disabled
       expect(component.find('.PayExpenseBtn button[disabled]').lenght).toEqual(undefined);
@@ -84,7 +85,7 @@ describe('Expenses component', () => {
         .simulate('click');
 
       // expect two disabled buttons again
-      expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(2);
+      expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(4);
 
       // after timeout, make sure there is only button and it's not disabled.
       setTimeout(() => {
