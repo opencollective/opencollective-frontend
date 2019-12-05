@@ -55,6 +55,11 @@ class ConversationsPage extends React.Component {
         conversations: PropTypes.shape({
           nodes: PropTypes.arrayOf(PropTypes.object),
         }).isRequired,
+        conversationsTags: PropTypes.arrayOf(
+          PropTypes.shape({
+            tag: PropTypes.string.isRequired,
+          }),
+        ).isRequired,
       }),
     }).isRequired, // from withData
   };
@@ -110,13 +115,15 @@ class ConversationsPage extends React.Component {
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
       } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
         return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
-        return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.collective;
+    const collective = data.collective;
     const dataIsReady = collective && collective.conversations;
+    if (collective && !hasFeature(collective, FEATURES.CONVERSATIONS)) {
+      return <PageFeatureNotSupported />;
+    }
+
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         {!dataIsReady && data.loading ? (
