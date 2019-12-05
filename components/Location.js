@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Map from './Map';
 import colors from '../lib/constants/colors';
 import ExternalLink from './ExternalLink';
+import MessageBox from '../components/MessageBox';
+import { get } from 'lodash';
 
 class Location extends React.Component {
   static propTypes = {
@@ -13,6 +15,8 @@ class Location extends React.Component {
   static defaultProps = {
     showTitle: true,
   };
+
+  isGoogleMapsAvailable = () => window && get(window, 'google.maps.places.AutocompleteService');
 
   render() {
     const { name, address, lat, long, country } = this.props.location;
@@ -47,6 +51,13 @@ class Location extends React.Component {
           <div className="map">
             <Map lat={lat} long={long} />
           </div>
+        )}
+
+        {!this.isGoogleMapsAvailable() && (
+          <MessageBox withIcon type="warning" style={{ marginTop: -20 }}>
+            Google Maps and the &quot;Location&quot; input are not properly functioning because Google Maps could not be
+            loaded.
+          </MessageBox>
         )}
       </section>
     );
