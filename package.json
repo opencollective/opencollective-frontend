@@ -61,7 +61,7 @@
     "helmet": "3.21.2",
     "html-pdf": "2.2.0",
     "ics": "2.18.0",
-    "intl-messageformat": "7.7.1",
+    "intl-messageformat": "7.7.2",
     "isomorphic-fetch": "2.2.1",
     "json2csv": "4.5.4",
     "jsonwebtoken": "8.5.1",
