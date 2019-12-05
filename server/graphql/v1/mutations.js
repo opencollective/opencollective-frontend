@@ -727,6 +727,20 @@ const mutations = {
       );
     },
   },
+  replaceCreditCard: {
+    type: PaymentMethodType,
+    description: 'Replace a payment method',
+    args: {
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      CollectiveId: { type: new GraphQLNonNull(GraphQLInt) },
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      token: { type: new GraphQLNonNull(GraphQLString) },
+      data: { type: new GraphQLNonNull(StripeCreditCardDataInputType) },
+    },
+    resolve: async (_, args, req) => {
+      return paymentMethodsMutation.replaceCreditCard(args, req.remoteUser);
+    },
+  },
   createVirtualCards: {
     type: new GraphQLList(PaymentMethodType),
     args: {
