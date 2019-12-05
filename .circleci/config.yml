@@ -70,7 +70,7 @@ jobs:
       - <<: *restore_npm_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - <<: *persist_npm_cache
-      - run: npm run lint
+      - run: npm run lint:quiet
       - run: npm run prettier:check
 
   jest:
