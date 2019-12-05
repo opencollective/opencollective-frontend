@@ -1729,6 +1729,17 @@ type Mutation {
     data: StripeCreditCardDataInputType!
     monthlyLimitPerMember: Int
   ): PaymentMethodType
+
+  """
+  Replace a payment method
+  """
+  replaceCreditCard(
+    id: Int!
+    CollectiveId: Int!
+    name: String!
+    token: String!
+    data: StripeCreditCardDataInputType!
+  ): PaymentMethodType
   createVirtualCards(
     CollectiveId: Int!
     PaymentMethodId: Int

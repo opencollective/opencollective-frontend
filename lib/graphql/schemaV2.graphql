@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Jan 07 2020 18:59:35 GMT+0100 (GMT+01:00)
+# timestamp: Tue Feb 04 2020 17:04:46 GMT+0100 (Central European Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -754,7 +754,7 @@ type Mutation {
     title: String!
 
     """
-    Conversation's tags
+    A list of tags for this conversation
     """
     tags: [String]
   ): Conversation

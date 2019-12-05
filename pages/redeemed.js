@@ -20,7 +20,7 @@ import SearchForm from '../components/SearchForm';
 import withData from '../lib/withData';
 
 import { withUser } from '../components/UserProvider';
-import RedeemBackground from '../components/virtual-cards/RedeemBackground';
+import HappyBackground from '../components/virtual-cards/HappyBackground';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import CollectiveCard from '../components/virtual-cards/CollectiveCard';
@@ -204,9 +204,9 @@ class RedeemedPage extends React.Component {
         <CollectiveThemeProvider collective={emitter}>
           <Body>
             <Flex alignItems="center" flexDirection="column">
-              <RedeemBackground collective={emitter}>
+              <HappyBackground collective={emitter}>
                 <Box mt={5}>{this.renderHeroContent(loading, error)}</Box>
-              </RedeemBackground>
+              </HappyBackground>
 
               {!error && (
                 <Container mt={-125}>
