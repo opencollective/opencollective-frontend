@@ -255,6 +255,11 @@ type Collective implements CollectiveInterface {
     Defines if the host "collective" payment method should be returned
     """
     includeHostCollectivePaymentMethod: Boolean = false
+
+    """
+    Include gift cards that have expired recently (30 days)
+    """
+    includeRecentlyExpiredGiftCards: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -531,6 +536,11 @@ interface CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Include gift cards that have expired recently (30 days)
+    """
+    includeRecentlyExpiredGiftCards: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -1149,6 +1159,11 @@ type Event implements CollectiveInterface {
     Defines if the host "collective" payment method should be returned
     """
     includeHostCollectivePaymentMethod: Boolean = false
+
+    """
+    Include gift cards that have expired recently (30 days)
+    """
+    includeRecentlyExpiredGiftCards: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -1886,21 +1901,6 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
-
-  """
-  Endpoint to accept or reject an invitation to become a member
-  """
-  replyToMemberInvitation(
-    """
-    The ID of the invitation to accept or decline
-    """
-    invitationId: Int!
-
-    """
-    Wether this invitation should be accepted or declined
-    """
-    accept: Boolean!
-  ): Boolean
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """
@@ -2398,6 +2398,11 @@ type Organization implements CollectiveInterface {
     Defines if the host "collective" payment method should be returned
     """
     includeHostCollectivePaymentMethod: Boolean = false
+
+    """
+    Include gift cards that have expired recently (30 days)
+    """
+    includeRecentlyExpiredGiftCards: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -2826,11 +2831,6 @@ type Query {
     limit: Int
     offset: Int
   ): [Member]
-
-  """
-  [AUTHENTICATED] Returns the pending invitations
-  """
-  memberInvitations(CollectiveId: Int, MemberCollectiveId: Int): [MemberInvitation]
   allEvents(
     """
     Slug of the parent collective
@@ -3468,6 +3468,11 @@ type User implements CollectiveInterface {
     Defines if the host "collective" payment method should be returned
     """
     includeHostCollectivePaymentMethod: Boolean = false
+
+    """
+    Include gift cards that have expired recently (30 days)
+    """
+    includeRecentlyExpiredGiftCards: Boolean = false
   ): [PaymentMethodType]
 
   """

@@ -5,7 +5,6 @@ import themeGet from '@styled-system/theme-get';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { uniqBy, get } from 'lodash';
-import moment from 'moment';
 
 import { MoneyCheck } from '@styled-icons/fa-solid/MoneyCheck';
 import { ExchangeAlt } from '@styled-icons/fa-solid/ExchangeAlt';
@@ -124,7 +123,7 @@ const getPaymentMethodMetadata = pm => {
  * Returns true is a payment method is expired
  * @param {string} expiryDate
  */
-const paymentMethodExpired = expiryDate => expiryDate && moment(new Date(expiryDate)).isBefore(moment());
+const paymentMethodExpired = expiryDate => expiryDate && new Date(expiryDate) < new Date();
 
 /**
  * A radio list to select a payment method.
@@ -201,15 +200,18 @@ class StepPayment extends React.Component {
   generatePaymentsOptions() {
     const { collective, defaultValue, withPaypal, manual } = this.props;
     // Add collective payment methods
-    const paymentMethodsOptions = (collective.paymentMethods || []).map(pm => ({
-      key: `pm-${pm.id}`,
-      title: getPaymentMethodName(pm),
-      subtitle: getPaymentMethodMetadata(pm),
-      icon: getPaymentMethodIcon(pm, collective),
-      paymentMethod: pm,
-      isExpired: paymentMethodExpired(pm.expiryDate),
-      disabled: pm.balance < minBalance || paymentMethodExpired(pm.expiryDate),
-    }));
+    const paymentMethodsOptions = (collective.paymentMethods || []).map(pm => {
+      const isExpired = paymentMethodExpired(pm.expiryDate);
+      return {
+        key: `pm-${pm.id}`,
+        title: getPaymentMethodName(pm),
+        subtitle: getPaymentMethodMetadata(pm),
+        icon: getPaymentMethodIcon(pm, collective),
+        paymentMethod: pm,
+        isExpired,
+        disabled: pm.balance < minBalance || isExpired,
+      };
+    });
 
     // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
     if (collective.type !== CollectiveType.COLLECTIVE) {
