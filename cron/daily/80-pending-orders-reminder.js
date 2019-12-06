@@ -34,9 +34,9 @@ const run = async () => {
   reminderDate.setDate(reminderDate.getDate() - REMINDER_DAYS);
 
   const orders = await fetchPendingOrders(reminderDate);
-  orders.forEach(async order => {
+  for (const order of orders) {
     await libPayments.sendReminderPendingOrderEmail(order);
-  });
+  }
 
   logger.info('Done.');
   process.exit();
