@@ -312,7 +312,7 @@ export async function payExpense(remoteUser, args) {
 
   const fxrate = await getFxRate(expense.collective.currency, host.currency);
   const feesInHostCurrency = {};
-  if (paymentProviders[expense.payoutMethod] && !(expense.payoutMethod === 'paypal' && args.forceManual)) {
+  if (expense.payoutMethod === 'paypal' && !args.forceManual) {
     fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
