@@ -146,7 +146,7 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     }
     let sendToBcc = true;
     // Don't send to BCC if sendEvenIfNotProduction and NOT in testing env
-    if (options.sendEvenIfNotProduction === true && config.env !== 'test' && config.env !== 'circleci') {
+    if (options.sendEvenIfNotProduction === true && !['ci', 'circleci', 'test'].includes(config.env)) {
       sendToBcc = false;
     }
     if (sendToBcc) {

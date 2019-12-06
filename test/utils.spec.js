@@ -49,7 +49,7 @@ describe('utils', () => {
       ],
     };
     exportToPDF('expenses', data).then(buffer => {
-      const expectedSize = process.env.NODE_ENV === 'circleci' ? 27750 : 26123;
+      const expectedSize = ['ci', 'circleci'].includes(process.env.NODE_ENV) ? 27750 : 26123;
       // Size varies for some reason...
       logger.info('PDF length is', buffer.length, 'expected length', expectedSize);
       try {

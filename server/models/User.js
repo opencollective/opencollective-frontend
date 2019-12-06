@@ -511,7 +511,7 @@ export default (Sequelize, DataTypes) => {
 
     // It's difficult to predict when the image will be updated by findImageForUser
     // So we skip that in test environment to make it more predictable
-    if (config.env !== 'test' && config.env !== 'circleci') {
+    if (!['ci', 'circleci', 'test'].includes(config.env)) {
       user.collective.findImageForUser(user);
     }
     user.CollectiveId = user.collective.id;
