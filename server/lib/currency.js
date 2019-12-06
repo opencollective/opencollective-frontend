@@ -60,7 +60,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
         } catch (e) {
           const msg = `>>> lib/currency: can't fetch fxrate from ${fromCurrency} to ${toCurrency} for date ${date}`;
           debug(msg, 'json:', json, 'error:', e);
-          if (!process.env.NODE_ENV || ['test', 'development', 'circleci'].includes(process.env.NODE_ENV)) {
+          if (!config.env || ['test', 'development', 'ci', 'circleci'].includes(config.env)) {
             logger.info('lib/currency: development environment -> returning 1.1 instead of throwing the error');
             return resolve(1.1);
           } else {
@@ -71,7 +71,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
       .catch(e => {
         debug('Unable to fetch fxrate', e.message);
         // for testing in airplane mode
-        if (!process.env.NODE_ENV || ['test', 'development'].includes(process.env.NODE_ENV)) {
+        if (!config.env || ['test', 'development'].includes(config.env)) {
           logger.info('lib/currency: development environment -> returning 1.1 instead of throwing the error');
           return resolve(1.1);
         } else {

@@ -15,7 +15,6 @@ import * as connectedAccounts from './controllers/connectedAccounts';
 import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import { createPaymentMethod } from './controllers/paymentMethods';
-import * as test from './controllers/test';
 import * as users from './controllers/users';
 import stripeWebhook from './controllers/webhooks';
 import * as email from './controllers/services/email';
@@ -233,12 +232,6 @@ export default app => {
    * Hello Works API - Helloworks hits this endpoint when a document has been completed.
    */
   app.post('/helloworks/callback', helloworks.callback);
-
-  /**
-   * test-api routes
-   */
-  app.get('/test/loginlink', test.getTestUserLoginUrl);
-  app.get('/test/pdf', test.exportPDF);
 
   /**
    * Override default 404 handler to make sure to obfuscate api_key visible in URL

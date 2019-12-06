@@ -1,0 +1,24 @@
+{
+  "database": {
+    "url": "postgres://opencollective@localhost:5432/opencollective_dvl",
+    "options": {
+      "logging": false,
+      "benchmark": true
+    }
+  },
+  "maintenancedb": {
+    "url": "postgres://postgres@localhost:5432/postgres"
+  },
+  "limits": {
+    "virtualCards": {
+      "maxPerDay": 1000,
+      "maxAmountPerDay": 5000000
+    }
+  },
+  "redis": {
+    "serverUrl": "redis://localhost"
+  },
+  "log": {
+    "level": "warn"
+  }
+}
