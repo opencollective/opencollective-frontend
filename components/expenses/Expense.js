@@ -476,7 +476,7 @@ class Expense extends React.Component {
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid || canDelete) && (
                 <Flex flexDirection="column">
-                  {canPay && expense.payoutMethod === 'other' && (
+                  {canPay && (
                     <EditPayExpenseFeesForm
                       canEditPlatformFee={LoggedInUser.isRoot()}
                       currency={collective.currency}
