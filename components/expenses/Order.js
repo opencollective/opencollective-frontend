@@ -14,10 +14,12 @@ import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
 import OrderDetails from './OrderDetails';
+import TransactionDetails from './TransactionDetails';
 
 class Order extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    transactions: PropTypes.array,
     order: PropTypes.object,
     view: PropTypes.string, // "compact" for homepage (can't edit order, don't show header), "summary" for list view, "details" for details view
     editable: PropTypes.bool,
@@ -33,6 +35,7 @@ class Order extends React.Component {
     this.state = {
       order: {},
       mode: undefined,
+      view: 'summary',
     };
 
     this.messages = defineMessages({
@@ -51,12 +54,31 @@ class Order extends React.Component {
     };
   }
 
+  toggleDetails = () => {
+    this.setState(state => ({
+      ...state,
+      view: state.view === 'details' ? 'summary' : 'details',
+    }));
+  };
+
   render() {
-    const { intl, collective, order, includeHostedCollectives, LoggedInUser, view, editable } = this.props;
+    const {
+      intl,
+      collective,
+      order,
+      includeHostedCollectives,
+      LoggedInUser,
+      view,
+      editable,
+      transactions,
+    } = this.props;
 
     if (!order.collective) {
       console.warn('no collective attached to order', order);
     }
+
+    const isRoot = LoggedInUser && LoggedInUser.isRoot();
+    const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(collective);
 
     const title = order.description;
     const status = order.status.toLowerCase();
@@ -222,9 +244,24 @@ class Order extends React.Component {
                 </span>
               )}
               <span className="status">{intl.formatMessage(this.messages[status])}</span>
+              {transactions && transactions.length === 1 && (
+                <span>
+                  {' | '}
+                  <a className="toggleDetails" onClick={this.toggleDetails}>
+                    {this.state.view === 'details' ? (
+                      <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
+                    ) : (
+                      <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                    )}
+                  </a>
+                </span>
+              )}
             </div>
           </div>
           <OrderDetails order={order} mode={mode} />
+          {this.state.view === 'details' && transactions && transactions.length === 1 && (
+            <TransactionDetails {...transactions[0]} mode="open" canRefund={isRoot || isHostAdmin} /> // Rendering credit transaction details
+          )}
           {order.status === 'PENDING' && canMarkOrderAsPaid && (
             <Flex>
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />

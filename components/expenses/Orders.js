@@ -193,6 +193,7 @@ class Orders extends React.Component {
               <Order
                 collective={order.collective || collective}
                 order={order}
+                transactions={order.transactions}
                 editable={editable}
                 view={view}
                 includeHostedCollectives={includeHostedCollectives}
