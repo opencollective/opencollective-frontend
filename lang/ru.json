@@ -348,6 +348,7 @@
   "ContributePage.Inactive": "This collective can't accept financial contributions at the moment.",
   "ContributePayment.balanceAndExpiry": "{balance} осталось, истекает {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} осталось",
+  "ContributePayment.expiredOn": "Expired on {expiryDate}",
   "ContributePayment.expiresOn": "Истекает {expiryDate}",
   "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "Discover other related collectives to support:",

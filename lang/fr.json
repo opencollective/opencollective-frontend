@@ -348,6 +348,7 @@
   "ContributePage.Inactive": "Ce collectif n'accepte pas les contributions financières actuellement.",
   "ContributePayment.balanceAndExpiry": "{balance} restant, expire le {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} restants",
+  "ContributePayment.expiredOn": "Expired on {expiryDate}",
   "ContributePayment.expiresOn": "Expire le {expiryDate}",
   "ContributePayment.unusableBalance": "{balance} restant, les montants inférieurs à {minBalance} ne peuvent pas être utilisés.",
   "contributeSuccess.discover": "Découvrez d'autres collectifs similaires à soutenir :",

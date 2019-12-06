@@ -348,6 +348,7 @@
   "ContributePage.Inactive": "Este colectivo no puede aceptar donaciones en este momento.",
   "ContributePayment.balanceAndExpiry": "{balance} restante, expira en {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} restante",
+  "ContributePayment.expiredOn": "Expired on {expiryDate}",
   "ContributePayment.expiresOn": "Expira el {expiryDate}",
   "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "Descubre otros colectivos relacionados a los que apoyar:",

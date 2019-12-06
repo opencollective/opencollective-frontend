@@ -5,6 +5,7 @@ import themeGet from '@styled-system/theme-get';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { uniqBy, get } from 'lodash';
+import moment from 'moment';
 
 import { MoneyCheck } from '@styled-icons/fa-solid/MoneyCheck';
 import { ExchangeAlt } from '@styled-icons/fa-solid/ExchangeAlt';
@@ -26,6 +27,7 @@ import PayPal from '../icons/PayPal';
 import CreditCardInactive from '../icons/CreditCardInactive';
 import Avatar from '../Avatar';
 import NewCreditCardForm from '../NewCreditCardForm';
+import StyledTag from '../StyledTag';
 
 const PaymentEntryContainer = styled(Container)`
   display: flex;
@@ -77,7 +79,17 @@ const getPaymentMethodMetadata = pm => {
           }}
         />
       );
-    } else if (pm.expiryDate) {
+    } else if (pm.expiryDate && paymentMethodExpired(pm.expiryDate)) {
+      return (
+        <FormattedMessage
+          id="ContributePayment.expiredOn"
+          defaultMessage="Expired on {expiryDate}"
+          values={{
+            expiryDate: <FormattedDate value={pm.expiryDate} day="numeric" month="long" year="numeric" />,
+          }}
+        />
+      );
+    } else if (pm.expiryDate && !paymentMethodExpired(pm.expiryDate)) {
       return (
         <FormattedMessage
           id="ContributePayment.balanceAndExpiry"
@@ -107,6 +119,12 @@ const getPaymentMethodMetadata = pm => {
     );
   }
 };
+
+/**
+ * Returns true is a payment method is expired
+ * @param {string} expiryDate
+ */
+const paymentMethodExpired = expiryDate => expiryDate && moment(new Date(expiryDate)).isBefore(moment());
 
 /**
  * A radio list to select a payment method.
@@ -189,7 +207,8 @@ class StepPayment extends React.Component {
       subtitle: getPaymentMethodMetadata(pm),
       icon: getPaymentMethodIcon(pm, collective),
       paymentMethod: pm,
-      disabled: pm.balance < minBalance,
+      isExpired: paymentMethodExpired(pm.expiryDate),
+      disabled: pm.balance < minBalance || paymentMethodExpired(pm.expiryDate),
     }));
 
     // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
@@ -292,7 +311,7 @@ class StepPayment extends React.Component {
           defaultValue={selectedOption.key}
           disabled={this.props.disabled}
         >
-          {({ radio, checked, index, value: { key, title, subtitle, icon, data, disabled } }) => (
+          {({ radio, checked, index, value: { key, title, subtitle, icon, data, disabled, isExpired } }) => (
             <PaymentEntryContainer
               px={[3, 24]}
               py={3}
@@ -310,9 +329,12 @@ class StepPayment extends React.Component {
                   {icon}
                 </Flex>
                 <Flex flexDirection="column">
-                  <P fontWeight={subtitle ? 600 : 400} color="black.900">
-                    {title}
-                  </P>
+                  <div>
+                    <P display="inline" fontWeight={subtitle ? 600 : 400} color="black.900" marginRight="10px">
+                      {title}
+                    </P>
+                    {isExpired && <StyledTag display="inline">Expired</StyledTag>}
+                  </div>
                   {subtitle && (
                     <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
                       {subtitle}

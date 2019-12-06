@@ -348,6 +348,7 @@
   "ContributePage.Inactive": "This collective can't accept financial contributions at the moment.",
   "ContributePayment.balanceAndExpiry": "残り {balance} の有効期限が {expiryDate} に切れます",
   "ContributePayment.balanceLeft": "残り {balance}",
+  "ContributePayment.expiredOn": "Expired on {expiryDate}",
   "ContributePayment.expiresOn": "{expiryDate} に期限切れ",
   "ContributePayment.unusableBalance": "{balance} left, balance less than {minBalance} cannot be used.",
   "contributeSuccess.discover": "サポートするほかのコレクティブを見つける:",

@@ -348,6 +348,7 @@
   "ContributePage.Inactive": "Este coletivo não pode aceitar contribuições financeiras no momento.",
   "ContributePayment.balanceAndExpiry": "{balance} sobrando, vence em {expiryDate}",
   "ContributePayment.balanceLeft": "{balance} sobrando",
+  "ContributePayment.expiredOn": "Expired on {expiryDate}",
   "ContributePayment.expiresOn": "Vence em {expiryDate}",
   "ContributePayment.unusableBalance": "{balance} restante, saldo menor que {minBalance} não pode ser usado.",
   "contributeSuccess.discover": "Descubra outros coletivos parecidos para ajudar:",
