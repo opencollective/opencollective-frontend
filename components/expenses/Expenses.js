@@ -197,12 +197,12 @@ class Expenses extends React.Component {
             </div>
           )}
           {filteredExpenses.map(expense => this.renderExpense(expense))}
-          {expenses.length === 0 && (
+          {filteredExpenses.length === 0 && (
             <div className="empty">
               <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
             </div>
           )}
-          {expenses.length >= 10 && expenses.length % 10 === 0 && (
+          {filteredExpenses.length >= 10 && filteredExpenses.length % 10 === 0 && (
             <div className="loadMoreBtn">
               <Button bsStyle="default" onClick={this.props.fetchMore}>
                 {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
