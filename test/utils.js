@@ -96,9 +96,7 @@ export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) =
     }, options.timeout || 10000);
     const isConditionMet = () => {
       hasConditionBeenMet = Boolean(cond());
-      if (options.tag) {
-        console.log(new Date().getTime(), '>>> ', options.tag, 'is condition met?', hasConditionBeenMet);
-      }
+      debug('waitForCondition')(options.tag, `Has condition been met?`, hasConditionBeenMet);
       if (hasConditionBeenMet) {
         return setTimeout(resolve, options.delay || 0);
       } else {

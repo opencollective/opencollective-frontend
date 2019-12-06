@@ -460,6 +460,7 @@ describe('GraphQL Expenses API', () => {
     }); /* End of "fails to create an expense if not logged in" */
 
     it('creates a new expense logged in and send email to collective admin for approval', async () => {
+      emailSendMessageSpy.resetHistory();
       // Given a collective
       const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
       // And given an admin for the above collective
@@ -479,6 +480,9 @@ describe('GraphQL Expenses API', () => {
         incurredAt: new Date(),
         collective: { id: collective.id },
       };
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1, {
+        tag: 'Test Collective would love to be hosted',
+      });
       emailSendMessageSpy.resetHistory();
       const result = await utils.graphqlQuery(createExpenseQuery, { expense: data }, user);
       result.errors && console.log(result.errors);
@@ -502,7 +506,9 @@ describe('GraphQL Expenses API', () => {
       // And then an email should have been sent to the admin. This
       // call to the function `waitForCondition()` is required because
       // notifications are sent asynchronously.
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1, {
+        tag: 'New expense on Test Collective',
+      });
       expect(emailSendMessageSpy.callCount).to.equal(1);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(admin.email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
@@ -555,6 +561,7 @@ describe('GraphQL Expenses API', () => {
     }); /* End of "fails to approve expense if expense.status is PAID" */
 
     it('successfully approve expense and send notification email to author of expense', async () => {
+      emailSendMessageSpy.resetHistory();
       // Given that we have a collective
       const { hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
@@ -574,6 +581,9 @@ describe('GraphQL Expenses API', () => {
         description: 'Pizza',
         ...data,
       });
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1, {
+        tag: 'rollup would love to be hosted',
+      });
       emailSendMessageSpy.resetHistory();
       // When the expense is approved by the admin of host
       const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, hostAdmin);
@@ -586,7 +596,9 @@ describe('GraphQL Expenses API', () => {
       // another one to the user. This call to the function
       // `waitForCondition()` is required because notifications are
       // sent asynchronously.
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 2);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 2, {
+        tag: 'Your expense to rollup for $10.00 has been approved AND New expense approved on rollup',
+      });
       expect(emailSendMessageSpy.callCount).to.equal(2);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('Your expense');
@@ -594,7 +606,9 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.secondCall.args[0]).to.equal(hostAdmin.email);
       expect(emailSendMessageSpy.secondCall.args[1]).to.contain('New expense approved');
     }); /* End of "successfully approve expense and send notification email to author of expense" */
+
     it('successfully approve expense and send notification email to admin of host', async () => {
+      emailSendMessageSpy.resetHistory();
       // Given a user that will file an expense and that is an admin of the collective
       const { user } = await store.newUser('an internet user', {
         paypalEmail: 'testuser@paypal.com',
@@ -618,7 +632,9 @@ describe('GraphQL Expenses API', () => {
         description: 'Pizza',
         ...data,
       });
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount >= 2);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 2, {
+        tag: 'rollup would love to be hosted AND New expense on rollup',
+      });
       emailSendMessageSpy.resetHistory();
       // When the expense is approved by the admin of collective
       const result = await utils.graphqlQuery(approveExpenseQuery, { id: expense.id }, admin);
@@ -631,7 +647,9 @@ describe('GraphQL Expenses API', () => {
       // another one to the user. This call to the function
       // `waitForCondition()` is required because notifications are
       // sent asynchronously.
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount >= 2);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 2, {
+        tag: 'Your expense to rollup AND New expense approved',
+      });
       expect(emailSendMessageSpy.callCount).to.equal(2);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(user.email);
       expect(emailSendMessageSpy.firstCall.args[1]).to.contain('Your expense');
@@ -862,7 +880,7 @@ describe('GraphQL Expenses API', () => {
         expect(updatedExpense.status).to.equal('APPROVED');
         const transactions = await models.Transaction.findAll({ where: { ExpenseId: expense.id } });
         expect(transactions.length).to.equal(0);
-      }); /* End of "pays the expense manually and reduces the balance of the collective" */
+      }); /* End of "fails if not enough funds on the paypal preapproved key" */
     });
 
     describe('success', () => {
@@ -929,9 +947,7 @@ describe('GraphQL Expenses API', () => {
           hostFeeInCollectiveCurrency +
           platformFeeInCollectiveCurrency;
         expect(balance).to.equal(initialBalance - expensePlusFees);
-        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 0, {
-          delay: 500,
-        });
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount === 4);
         const debitTransaction = await models.Transaction.findOne({
           where: {
             type: 'DEBIT',

@@ -32,7 +32,7 @@ aliases:
           - production
 
 jobs:
-  lint:
+  check:
     docker:
       - image: circleci/node:12.13.0
     environment:
@@ -42,19 +42,8 @@ jobs:
       - <<: *restore_cache
       - run: npm ci --ignore-scripts
       - <<: *persist_cache
-      - run: npm run lint
+      - run: npm run lint:check
       - run: npm run prettier:check
-
-  typescript:
-    docker:
-      - image: circleci/node:12.13.0
-    environment:
-      NODE_ENV: circleci
-    steps:
-      - checkout
-      - <<: *restore_cache
-      - run: npm ci --ignore-scripts
-      - <<: *persist_cache
       - run: npm run type:check
 
   test:
@@ -80,9 +69,7 @@ workflows:
   version: 2
   main:
     jobs:
-      - lint:
-          <<: *test_filters
-      - typescript:
+      - check:
           <<: *test_filters
       - test:
           <<: *test_filters
