@@ -5,6 +5,8 @@ import { CommentCollection } from '../collection/CommentCollection';
 import { CollectionArgs } from '../interface/Collection';
 import { getIdEncodeResolver } from '../identifiers';
 
+import { ChronologicalOrder } from '../input/ChronologicalOrder';
+
 const Expense = new GraphQLObjectType({
   name: 'Expense',
   description: 'This represents an Expense',
@@ -18,13 +20,17 @@ const Expense = new GraphQLObjectType({
         type: CommentCollection,
         args: {
           ...CollectionArgs,
+          orderBy: {
+            type: ChronologicalOrder,
+            defaultValue: ChronologicalOrder.defaultValue,
+          },
         },
-        async resolve(expense, { limit, offset }) {
+        async resolve(expense, { limit, offset, orderBy }) {
           const { count, rows } = await models.Comment.findAndCountAll({
             where: {
               ExpenseId: { [Op.eq]: expense.id },
             },
-            order: [['createdAt', 'DESC']],
+            order: [[orderBy.field, orderBy.direction]],
             offset,
             limit,
           });
