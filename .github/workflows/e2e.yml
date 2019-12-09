@@ -49,10 +49,7 @@ jobs:
         uses: actions/checkout@v2-beta
 
       - name: Checkout (api)
-        uses: actions/checkout@v2-beta
-        with:
-          repository: opencollective/opencollective-api
-          path: 'opencollective-api'
+        run: ./scripts/ci_checkout_api.sh
 
       - name: Setup node
         uses: actions/setup-node@v1

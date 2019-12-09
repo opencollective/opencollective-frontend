@@ -2,12 +2,23 @@
 # This script only runs on circleci, just before the e2e tests
 # first version cfr. https://discuss.circleci.com/t/add-ability-to-cache-apt-get-programs/598/6
 
-cd ~
+if [[ ! -z "${CIRCLE_BRANCH}" ]]; then
+  CI_BRANCH="${CIRCLE_BRANCH}"
+fi
 
-API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/";
-if curl -s --head  --request GET "${API_TARBALL_URL}${CIRCLE_BRANCH}" | grep "200" > /dev/null
+if [[ ! -z "${GITHUB_REF}" ]]; then
+  CI_BRANCH="${GITHUB_REF##*/}"
+fi
+
+CI_BRANCH=${CI_BRANCH:=master}
+
+
+
+API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/"
+echo "> Check ${API_TARBALL_URL}${CI_BRANCH}"
+if curl -s --head --request GET "${API_TARBALL_URL}${CI_BRANCH}" | grep "200" > /dev/null
 then
-  BRANCH=$CIRCLE_BRANCH;
+  BRANCH=$CI_BRANCH;
 else
   BRANCH="master";
 fi
@@ -17,11 +28,11 @@ fi
 # If they do, we proceed to start the api server
 # Otherwise we remove the local cache and install latest version of the branch
 
-TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
+TARBALL_SIZE=$(curl -s --head --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
 
 if [ ! $TARBALL_SIZE ]; then
   # First request doesn't always provide the content length for some reason (it's probably added by their caching layer)
-  TARBALL_SIZE=$(curl -s --head  --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
+  TARBALL_SIZE=$(curl -s --head --request GET "${API_TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
 fi
 
 ARCHIVE="${BRANCH//\//-}.tgz"
@@ -38,8 +49,7 @@ then
   curl  "${API_TARBALL_URL}${BRANCH}" -o $ARCHIVE
   echo "> Extracting $ARCHIVE"
   tar -xzf $ARCHIVE
-  if [ -d "api" ]; then
-    rm -rf api
-  fi
-  mv "opencollective-api-${BRANCH//\//-}" api
+  mkdir -p $API_FOLDER
+  rm -rf $API_FOLDER
+  mv "opencollective-api-${BRANCH//\//-}" $API_FOLDER
 fi
