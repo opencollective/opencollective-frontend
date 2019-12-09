@@ -7,12 +7,10 @@ if [[ ! -z "${CIRCLE_BRANCH}" ]]; then
 fi
 
 if [[ ! -z "${GITHUB_REF}" ]]; then
-  CI_BRANCH="${GITHUB_REF##*/}"
+  CI_BRANCH="${GITHUB_REF/refs\/heads\//}"
 fi
 
 CI_BRANCH=${CI_BRANCH:=master}
-
-
 
 API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/"
 echo "> Check ${API_TARBALL_URL}${CI_BRANCH}"
