@@ -228,7 +228,7 @@ export default {
           case TransactionTypes.CREDIT:
             if (userTwitter) {
               tweet = encodeURIComponent(
-                `@${userTwitter} thanks for your ${formatCurrency(currency, recurringAmount)} donation to ${
+                `@${userTwitter} thanks for your ${formatCurrency(currency, recurringAmount)} contribution to ${
                   collectiveTwitter ? `@${collectiveTwitter}` : collectiveName
                 } 👍 ${publicUrl}`,
               );
@@ -262,7 +262,7 @@ export default {
       case activities.SUBSCRIPTION_CONFIRMED:
         if (userTwitter) {
           tweet = encodeURIComponent(
-            `@${userTwitter} thanks for your ${formatCurrency(currency, recurringAmount)} donation to ${
+            `@${userTwitter} thanks for your ${formatCurrency(currency, recurringAmount)} contribution to ${
               collectiveTwitter ? `@${collectiveTwitter}` : collectiveName
             } 👍 ${publicUrl}`,
           );

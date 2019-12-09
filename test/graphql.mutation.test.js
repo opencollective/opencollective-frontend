@@ -695,7 +695,9 @@ describe('Mutation Tests', () => {
           expect(emailSendMessageSpy.secondCall.args[0]).to.equal('user1@opencollective.com');
           expect(emailSendMessageSpy.secondCall.args[1]).to.equal("Google joined Scouts d'Arlon as backer");
           expect(emailSendMessageSpy.secondCall.args[2]).to.contain('Looking forward!'); // publicMessage
-          expect(emailSendMessageSpy.secondCall.args[2]).to.contain('@google thanks for your donation to @scouts');
+          expect(emailSendMessageSpy.secondCall.args[2]).to.contain(
+            '@google thanks for your financial contribution to @scouts',
+          );
         });
 
         it('as an existing organization', async () => {

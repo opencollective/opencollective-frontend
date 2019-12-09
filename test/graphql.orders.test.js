@@ -197,7 +197,7 @@ describe('graphql.orders.test.js', () => {
       await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1);
       expect(emailSendMessageSpy.callCount).to.equal(1);
       expect(emailSendMessageSpy.firstCall.args[0]).to.equal(backers[1].email);
-      expect(emailSendMessageSpy.firstCall.args[1]).to.match(/Thank you for your €\s?150 donation to codenplay/);
+      expect(emailSendMessageSpy.firstCall.args[1]).to.match(/Thank you for your €\s?150 contribution to codenplay/);
     });
 
     it('marks a pending order as expired', async () => {

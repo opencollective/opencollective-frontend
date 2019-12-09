@@ -298,7 +298,10 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
         : data.collective.name;
       const text = `Hi @${
         data.member.memberCollective.twitterHandle
-      } thanks for your donation to ${collectiveMention} ${config.host.website}${get(data, 'collective.urlPath')} 🎉😊`;
+      } thanks for your financial contribution to ${collectiveMention} ${config.host.website}${get(
+        data,
+        'collective.urlPath',
+      )} 🎉😊`;
       data.tweet = {
         text,
         encoded: encodeURIComponent(text),
