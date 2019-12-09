@@ -4,5 +4,10 @@
   },
   "log": {
     "level": "warn"
+  },
+  "aws": {
+    "s3": {
+      "bucket": "opencollective-test"
+    }
   }
 }

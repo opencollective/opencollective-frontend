@@ -248,6 +248,7 @@ describe('Collective model', () => {
     let newHost, newCollective;
 
     before(async () => {
+      sendEmailSpy.resetHistory();
       expect(collective.HostCollectiveId).to.be.null;
       await collective.addHost(hostUser.collective, hostUser);
       expect(collective.HostCollectiveId).to.equal(hostUser.CollectiveId);
@@ -278,6 +279,9 @@ describe('Collective model', () => {
         newCollective.addUserWithRole(user1, 'ADMIN'),
         newCollective.addHost(hostUser.collective, user1),
       ]);
+      await utils.waitForCondition(() => sendEmailSpy.callCount === 2, {
+        tag: 'New collective would love to be hosted AND Thanks for applying',
+      });
     });
 
     it('fails to add another host', async () => {
@@ -303,9 +307,9 @@ describe('Collective model', () => {
         });
         // console.log(`>>> assert that the ${tiers.length} tiers of ${collective.slug} (id: ${collective.id}) are in ${currency}`);
         expect(collective.currency).to.equal(currency);
-        tiers.map(t => {
-          expect(t.currency).to.equal(currency);
-        });
+        for (const tier of tiers) {
+          expect(tier.currency).to.equal(currency);
+        }
       };
       await newCollective.changeHost(newHost.id, user1);
       await assertCollectiveCurrency(newCollective, newHost.currency);
@@ -325,14 +329,18 @@ describe('Collective model', () => {
       await assertCollectiveCurrency(newCollective, hostUser.collective.currency);
       expect(newCollective.HostCollectiveId).to.equal(hostUser.id);
       expect(newCollective.isActive).to.be.false;
-      await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
+      await utils.waitForCondition(() => sendEmailSpy.callCount === 2, {
+        tag: 'New collective would love to be hosted by AND Thanks for applying',
+      });
       expect(sendEmailSpy.firstCall.args[0]).to.equal(hostUser.email);
       expect(sendEmailSpy.firstCall.args[1]).to.equal(
         `New collective would love to be hosted by ${hostUser.collective.name}`,
       );
+      expect(sendEmailSpy.firstCall.args[2]).to.contain(user2.collective.name);
+
       expect(sendEmailSpy.secondCall.args[0]).to.equal(user1.email);
       expect(sendEmailSpy.secondCall.args[1]).to.equal(`Thanks for applying to ${hostUser.collective.name}`);
-      expect(sendEmailSpy.firstCall.args[2]).to.contain(user2.collective.name);
+
       expect(sendEmailSpy.secondCall.args[3].from).to.equal('hello@wwcode.opencollective.com');
     });
   });
@@ -351,14 +359,9 @@ describe('Collective model', () => {
   });
 
   it('creates an organization with an admin user', async () => {
-    models.Collective.createOrganization(
-      {
-        name: 'Coinbase',
-      },
-      user1,
-    );
-    await utils.waitForCondition(() => sendEmailSpy.callCount > 0);
-    // utils.inspectSpy(sendEmailSpy, 3);
+    sendEmailSpy.resetHistory();
+    await models.Collective.createOrganization({ name: 'Coinbase' }, user1);
+    await utils.waitForCondition(() => sendEmailSpy.callCount === 1, { tag: 'Your Organization on Open Collective' });
     expect(sendEmailSpy.firstCall.args[0]).to.equal(user1.email);
     expect(sendEmailSpy.firstCall.args[1]).to.equal('Your Organization on Open Collective');
     expect(sendEmailSpy.firstCall.args[2]).to.contain('Discover');
