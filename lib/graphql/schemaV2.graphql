@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Mon Dec 02 2019 11:01:37 GMT+0100 (GMT+01:00)
+# timestamp: Mon Dec 09 2019 17:30:01 GMT+0100 (Central European Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -480,7 +480,11 @@ This represents an Expense
 """
 type Expense {
   id: String
-  comments(limit: Int, offset: Int): CommentCollection
+  comments(
+    limit: Int
+    offset: Int
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): CommentCollection
 }
 
 enum ImageFormat {
