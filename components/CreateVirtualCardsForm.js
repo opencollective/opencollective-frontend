@@ -10,8 +10,8 @@ import moment from 'moment';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
 
-import { RadioButtonChecked } from 'styled-icons/material/RadioButtonChecked';
-import { RadioButtonUnchecked } from 'styled-icons/material/RadioButtonUnchecked';
+import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
+import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 
 import { reportValidityHTML5 } from '../lib/utils';
 import MessageBox from './MessageBox';

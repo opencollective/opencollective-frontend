@@ -6,8 +6,6 @@ import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
 import { ssrNotFoundError } from '../lib/nextjs_utils';
-import { CollectiveType } from '../lib/constants/collectives';
-import { Router } from '../server/pages';
 import { withUser } from '../components/UserProvider';
 import ErrorPage, { generateError } from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -47,11 +45,14 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
-  static getInitialProps({ req, res, query: { slug, status } }) {
+  static getInitialProps({ req, res, query: { slug, eventSlug, status } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
-    return { slug, status };
+
+    /** If there is a eventSlug parameter, use that one as slug,
+     * remove this and fix routes when feature flag NEW_EVENTS is gone */
+    return { slug: eventSlug ? eventSlug : slug, status };
   }
 
   static propTypes = {
@@ -88,25 +89,6 @@ class NewCollectivePage extends React.Component {
       }),
     }).isRequired, // from withData
   };
-
-  componentDidMount() {
-    this.redirectIfEvent();
-  }
-
-  componentDidUpdate() {
-    this.redirectIfEvent();
-  }
-
-  /** Will replace the route to redirect to an event if required */
-  redirectIfEvent() {
-    const { data, slug } = this.props;
-    if (get(data, 'Collective.type') === CollectiveType.EVENT) {
-      Router.replaceRoute('event', {
-        parentCollectiveSlug: get(data.Collective.parentCollective, 'slug', 'collective'),
-        eventSlug: slug,
-      });
-    }
-  }
 
   getPageMetaData(collective) {
     if (collective) {
@@ -145,7 +127,7 @@ class NewCollectivePage extends React.Component {
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         {data.loading ? (
-          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+          <Container py={[5, 6]}>
             <Loading />
           </Container>
         ) : (
@@ -165,6 +147,7 @@ class NewCollectivePage extends React.Component {
                   expenses={collective.expenses}
                   stats={collective.stats}
                   updates={collective.updates}
+                  conversations={collective.conversations}
                   LoggedInUser={LoggedInUser}
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}

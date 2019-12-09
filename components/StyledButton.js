@@ -25,6 +25,11 @@ const StyledButtonContent = styled.button`
     cursor: not-allowed;
   }
 
+  /** Align button icons in the middle */
+  svg {
+    vertical-align: middle;
+  }
+
   ${buttonStyle}
   ${buttonSize}
 
@@ -69,7 +74,7 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
+  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark', 'danger', 'success']),
   /**
    * From styled-system: accepts any css 'display' value
    */

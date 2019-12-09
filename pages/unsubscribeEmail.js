@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
-import { Email } from 'styled-icons/material/Email';
+import { Email } from '@styled-icons/material/Email';
 import { getBaseApiUrl } from '../lib/utils';
 import Page from '../components/Page';
 import MessageBox from '../components/MessageBox';

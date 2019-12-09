@@ -7,7 +7,7 @@ import { get, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
-import { Lock } from 'styled-icons/fa-solid';
+import { Lock } from '@styled-icons/fa-solid';
 
 import { formatDate } from '../../../lib/utils';
 import { P, Span } from '../../Text';
@@ -26,7 +26,7 @@ import { UpdatesFieldsFragment } from '../graphql/fragments';
 
 /** Query to re-fetch updates */
 const UpdatesQuery = gql`
-  query NewCollectivePage($slug: String!, $onlyPublishedUpdates: Boolean) {
+  query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     Collective(slug: $slug) {
       id
       updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
@@ -53,8 +53,7 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
 `;
 
 /**
- * This section is a temporary replacement for the `Conversations` section that
- * will come later. It follows the design specified for it.
+ * Displays collective's updates.
  */
 class SectionUpdates extends React.PureComponent {
   static propTypes = {

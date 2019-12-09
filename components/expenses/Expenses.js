@@ -65,6 +65,18 @@ class Expenses extends React.Component {
       return <div />;
     }
 
+    let filteredExpenses;
+    if (status === 'READY') {
+      // Don't show expense when collective doesn't have enough fund in "ready to pay" filter
+      filteredExpenses = expenses.filter(
+        expense => get(expense.collective || collective, 'stats.balance') >= expense.amount,
+      );
+      // Don't show expense that requires tax form in "ready to pay" filter
+      filteredExpenses = filteredExpenses.filter(expense => !expense.userTaxFormRequiredBeforePayment);
+    } else {
+      filteredExpenses = expenses;
+    }
+
     return (
       <div className="Expenses">
         <style jsx>
@@ -143,6 +155,14 @@ class Expenses extends React.Component {
                 <FormattedMessage id="expenses.pending" defaultMessage="pending" />
               </Button>
               <Button
+                className="filterBtn pending"
+                bsSize="small"
+                bsStyle={status === 'REJECTED' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'REJECTED' })}
+              >
+                <FormattedMessage id="expenses.rejected" defaultMessage="rejected" />
+              </Button>
+              <Button
                 className="filterBtn approved"
                 bsSize="small"
                 bsStyle={status === 'APPROVED' ? 'primary' : 'default'}
@@ -176,20 +196,13 @@ class Expenses extends React.Component {
               <FormattedMessage id="loading" defaultMessage="loading" />
             </div>
           )}
-          {expenses.map(expense => {
-            if (status !== 'READY' || get(expense.collective || collective, 'stats.balance') > expense.amount) {
-              if (status === 'READY' && expense.userTaxFormRequiredBeforePayment) {
-                return; // Don't show expense that requires tax form in "ready to pay" filter
-              }
-              return this.renderExpense(expense);
-            }
-          })}
-          {expenses.length === 0 && (
+          {filteredExpenses.map(expense => this.renderExpense(expense))}
+          {filteredExpenses.length === 0 && (
             <div className="empty">
               <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
             </div>
           )}
-          {expenses.length >= 10 && expenses.length % 10 === 0 && (
+          {filteredExpenses.length >= 10 && filteredExpenses.length % 10 === 0 && (
             <div className="loadMoreBtn">
               <Button bsStyle="default" onClick={this.props.fetchMore}>
                 {loading && <FormattedMessage id="loading" defaultMessage="loading" />}

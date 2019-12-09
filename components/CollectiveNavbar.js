@@ -6,9 +6,10 @@ import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
 
-import { Cog } from 'styled-icons/typicons/Cog';
-import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
+import { Settings } from '@styled-icons/feather/Settings';
+import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 
+import { canOrderTicketsFromEvent } from '../lib/events';
 import { CollectiveType } from '../lib/constants/collectives';
 import Container from './Container';
 import { Sections, AllSectionsNames, Dimensions } from './collective-page/_constants';
@@ -17,6 +18,7 @@ import Avatar from './Avatar';
 import Link from './Link';
 import StyledRoundButton from './StyledRoundButton';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 /** Main container for the entire component */
 const MainContainer = styled.div`
@@ -200,22 +202,41 @@ const i18nSection = defineMessages({
     id: 'CollectivePage.NavBar.Goals',
     defaultMessage: 'Goals',
   },
+  [Sections.TICKETS]: {
+    id: 'CollectivePage.NavBar.Tickets',
+    defaultMessage: 'Tickets',
+  },
+  [Sections.LOCATION]: {
+    id: 'CollectivePage.NavBar.Location',
+    defaultMessage: 'Location',
+  },
+  [Sections.PARTICIPANTS]: {
+    id: 'CollectivePage.NavBar.Participants',
+    defaultMessage: 'Participants',
+  },
 });
 
-/**
- * Returns a list of all sections not accessible to this collective type.
- */
-const getCollectiveTypeBlacklistedSections = collectiveType => {
-  switch (collectiveType) {
-    case CollectiveType.USER:
-      return [Sections.CONTRIBUTORS, Sections.CONTRIBUTE, Sections.UPDATES, Sections.BUDGET];
-    case CollectiveType.ORGANIZATION:
-      return [Sections.CONTRIBUTE, Sections.UPDATES, Sections.BUDGET];
-    case CollectiveType.COLLECTIVE:
-      return [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS];
-    default:
-      return [];
-  }
+// Define default sections based on collective type
+const DEFAULT_SECTIONS = {
+  [CollectiveType.ORGANIZATION]: [Sections.CONTRIBUTIONS, Sections.CONTRIBUTORS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.COLLECTIVE]: [
+    Sections.GOALS,
+    Sections.CONTRIBUTE,
+    Sections.UPDATES,
+    Sections.CONVERSATIONS,
+    Sections.BUDGET,
+    Sections.CONTRIBUTORS,
+    Sections.ABOUT,
+  ],
+  [CollectiveType.EVENT]: [
+    Sections.ABOUT,
+    Sections.TICKETS,
+    Sections.CONTRIBUTE,
+    Sections.PARTICIPANTS,
+    Sections.LOCATION,
+    Sections.BUDGET,
+  ],
 };
 
 /**
@@ -230,18 +251,21 @@ const getCollectiveTypeBlacklistedSections = collectiveType => {
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
 export const getSectionsForCollective = (collective, isAdmin) => {
-  const sections = get(collective, 'settings.collectivePage.sections', AllSectionsNames);
-  const showGoals = get(collective, 'settings.collectivePage.showGoals', false);
-  const toRemove = new Set(getCollectiveTypeBlacklistedSections(collective.type));
+  const sections = get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[collective.type] || [];
+  const toRemove = new Set();
 
   // Can't contribute anymore if the collective is archived or has no host
   if (collective.isArchived || !collective.host) {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
-  // Goals are opt-in
-  if (!showGoals) {
+  // Check opt-in features
+  if (!hasFeature(collective, FEATURES.COLLECTIVE_GOALS)) {
     toRemove.add(Sections.GOALS);
+  }
+
+  if (!hasFeature(collective, FEATURES.CONVERSATIONS)) {
+    toRemove.add(Sections.CONVERSATIONS);
   }
 
   // Some sections are hidden for non-admins (usually when there's no data)
@@ -258,6 +282,21 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     }
   }
 
+  if (collective.type === CollectiveType.EVENT) {
+    // Should not see tickets section if you can't order them
+    if (!canOrderTicketsFromEvent(collective)) {
+      toRemove.add(Sections.TICKETS);
+    }
+
+    if (!collective.orders || collective.orders.length === 0) {
+      toRemove.add(Sections.PARTICIPANTS);
+    }
+
+    if (!(collective.location && collective.location.name)) {
+      toRemove.add(Sections.LOCATION);
+    }
+  }
+
   return sections.filter(section => !toRemove.has(section));
 };
 
@@ -267,11 +306,12 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
   }
 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
+  const isEvent = collective.type === CollectiveType.EVENT;
   return {
     hasContact: collective.canContact,
-    hasSubmitExpense: isCollective,
+    hasSubmitExpense: isCollective || isEvent,
     hasApply: collective.canApply,
-    hasManageSubscriptions: isAdmin && !isCollective,
+    hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
   };
 };
 
@@ -312,7 +352,7 @@ const CollectiveNavbar = ({
           {isAdmin && showEdit && (
             <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">
               <StyledRoundButton size={24} bg="#F0F2F5" color="#4B4E52">
-                <Cog size={17} />
+                <Settings size={17} />
               </StyledRoundButton>
             </Link>
           )}

@@ -10,7 +10,7 @@ import { capitalize, getCurrencySymbol, imagePreview } from '../../lib/utils';
 import InputField from '../../components/InputField';
 import categories from '../../lib/constants/categories';
 import DefinedTerm, { Terms } from '../DefinedTerm';
-import titlecase from 'title-case';
+import { titleCase } from 'title-case';
 
 import TransactionDetails from './TransactionDetails';
 
@@ -95,7 +95,7 @@ class ExpenseDetails extends React.Component {
       delete expenseTypes['DEFAULT'];
     }
     const expenseTypesOptions = Object.entries(expenseTypes).map(([key, value]) => {
-      return { [key]: titlecase(value) };
+      return { [key]: titleCase(value) };
     });
 
     return (

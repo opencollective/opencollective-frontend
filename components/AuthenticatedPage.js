@@ -40,7 +40,7 @@ class AuthenticatedPage extends React.Component {
   renderContent(loadingLoggedInUser, LoggedInUser) {
     if (!LoggedInUser) {
       return (
-        <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2} borderTop="1px solid #E6E8EB">
+        <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2}>
           {loadingLoggedInUser ? (
             <Loading />
           ) : (

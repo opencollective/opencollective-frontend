@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one';
 import { orderBy } from 'lodash';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { TierTypes } from '../../../lib/constants/tiers-types';
 import { H3 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import HorizontalScroller from '../../HorizontalScroller';
@@ -44,7 +45,11 @@ class SectionContribute extends React.PureComponent {
     ),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
     contributorsStats: PropTypes.object,
     contributors: PropTypes.arrayOf(
@@ -107,6 +112,10 @@ class SectionContribute extends React.PureComponent {
     return orderBy([...tiers], ['endsAt'], ['desc']);
   });
 
+  removeTickets = memoizeOne(tiers => {
+    return tiers.filter(tier => tier.type !== TierTypes.TICKET);
+  });
+
   getContributeCardsScrollDistance(width) {
     const oneCardScrollDistance = CONTRIBUTE_CARD_WIDTH + CONTRIBUTE_CARD_PADDING_X[0] * 2;
     if (width <= oneCardScrollDistance * 2) {
@@ -124,7 +133,12 @@ class SectionContribute extends React.PureComponent {
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-    const sortedTiers = this.sortTiers(tiers);
+    const sortedTiers = this.sortTiers(this.removeTickets(tiers));
+    const isEvent = collective.type === CollectiveType.EVENT;
+
+    const createContributionTierRoute = isEvent
+      ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
+      : `/${collective.slug}/edit/tiers`;
 
     return (
       <Box pt={[4, 5]}>
@@ -165,7 +179,7 @@ class SectionContribute extends React.PureComponent {
                   ))}
                   {isAdmin && (
                     <Box px={CONTRIBUTE_CARD_PADDING_X}>
-                      <CreateNew data-cy="create-contribute-tier" route={`/${collective.slug}/edit/tiers`}>
+                      <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
                         <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
                       </CreateNew>
                     </Box>
@@ -175,7 +189,7 @@ class SectionContribute extends React.PureComponent {
             )}
           </HorizontalScroller>
         </Box>
-        {(isAdmin || events.length > 0 || childCollectives.length > 0) && (
+        {!isEvent && (isAdmin || events.length > 0 || childCollectives.length > 0) && (
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
@@ -228,7 +242,7 @@ class SectionContribute extends React.PureComponent {
             </StyledButton>
           </Link>
         </ContainerSectionContent>
-        {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
+        {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors
             organizations={topOrganizations}
             individuals={topIndividuals}

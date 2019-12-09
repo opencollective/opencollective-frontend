@@ -47,6 +47,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
   const raised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
   const isPassed = tier.endsAt && new Date() > new Date(tier.endsAt);
+  const tierType = getContributionTypeFromTier(tier, isPassed);
 
   let description;
   let isTruncated = false;
@@ -64,12 +65,26 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
     description = tier.description;
   }
 
+  let route, routeParams;
+  if (tierType === ContributionTypes.TICKET) {
+    route = 'orderEventTier';
+    routeParams = {
+      collectiveSlug: collective.parentCollective.slug,
+      verb: 'events',
+      eventSlug: collective.slug,
+      tierId: tier.id,
+    };
+  } else {
+    route = 'orderCollectiveTierNew';
+    routeParams = { collectiveSlug: collective.slug, verb: 'contribute', tierSlug: tier.slug, tierId: tier.id };
+  }
+
   return (
     <Contribute
-      route="orderCollectiveTierNew"
-      routeParams={{ collectiveSlug: collective.slug, verb: 'contribute', tierSlug: tier.slug, tierId: tier.id }}
+      route={route}
+      routeParams={routeParams}
       title={tier.name}
-      type={getContributionTypeFromTier(tier, isPassed)}
+      type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
       stats={tier.stats.contributors}
@@ -119,6 +134,18 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
               </Box>
             </Box>
           )}
+          {tier.maxQuantity > 0 && (
+            <P fontSize="1.1rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px">
+              <FormattedMessage
+                id="tier.limited"
+                values={{
+                  maxQuantity: tier.maxQuantity,
+                  availableQuantity: tier.stats && tier.stats.availableQuantity,
+                }}
+                defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
+              />
+            </P>
+          )}
           <P mb={4}>
             {description}{' '}
             {(isTruncated || tier.hasLongDescription) && (
@@ -164,6 +191,9 @@ ContributeTier.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    parentCollective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+    }),
   }),
   tier: PropTypes.shape({
     id: PropTypes.number.isRequired,
@@ -179,10 +209,12 @@ ContributeTier.propTypes = {
     goal: PropTypes.number,
     minimumAmount: PropTypes.number,
     amount: PropTypes.number,
+    maxQuantity: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
       totalDonated: PropTypes.number,
       contributors: PropTypes.object,
+      availableQuantity: PropTypes.number,
     }).isRequired,
     contributors: PropTypes.arrayOf(PropTypes.object),
   }),

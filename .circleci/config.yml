@@ -70,7 +70,7 @@ jobs:
       - <<: *restore_npm_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - <<: *persist_npm_cache
-      - run: npm run lint
+      - run: npm run lint:quiet
       - run: npm run prettier:check
 
   jest:
@@ -109,22 +109,20 @@ jobs:
       - <<: *persist_npm_cache
 
       - restore_cache:
-          name: Restore next build cache
+          name: Restore next cache
           keys:
-            - next-build-cache-{{ .Revision }}
-            - next-build-cache-
+            - next-cache-{{ .Revision }}
+            - next-cache-
 
-      - run: npm run build:clean
       - run: npm run build:updates
       - run: npm run build:next
       - run: npm run build:server
 
       - save_cache:
-          name: Persist next build cache
-          key: next-build-cache-{{ .Revision }}
+          name: Persist next cache
+          key: next-cache-{{ .Revision }}
           paths:
-            # In Next.js 8 it will be
-            - ./node_modules/.cache/next-minifier
+            - ./.next/cache
 
       # # We prune to save space in node_modules persistence
       # # If we don't persist node_modules, we don't need it

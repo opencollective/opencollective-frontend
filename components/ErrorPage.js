@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import { Router } from '../server/pages';
 
-import { Support } from 'styled-icons/boxicons-regular/Support';
-import { Github } from 'styled-icons/fa-brands/Github';
-import { Redo } from 'styled-icons/fa-solid/Redo';
+import { Support } from '@styled-icons/boxicons-regular/Support';
+import { Github } from '@styled-icons/fa-brands/Github';
+import { Redo } from '@styled-icons/fa-solid/Redo';
 
 import { objectToQueryString } from '../lib/url_helpers';
 import Header from './Header';
@@ -24,6 +24,7 @@ import { withUser } from './UserProvider';
 
 const ErrorTypes = {
   NOT_FOUND: 'NOT_FOUND',
+  BAD_COLLECTIVE_TYPE: 'BAD_COLLECTIVE_TYPE',
 };
 
 /** Error generators to be passed with the `error` prop of `ErrorPage` */
@@ -34,6 +35,9 @@ export const generateError = {
    * */
   notFound: searchTerm => {
     return { type: ErrorTypes.NOT_FOUND, payload: { searchTerm } };
+  },
+  badCollectiveType: () => {
+    return { type: ErrorTypes.BAD_COLLECTIVE_TYPE };
   },
 };
 
@@ -77,8 +81,15 @@ class ErrorPage extends React.Component {
       return <Loading />;
     }
 
-    if (error && error.type === ErrorTypes.NOT_FOUND) {
-      return <NotFound searchTerm={get(error.payload, 'searchTerm')} />;
+    if (error) {
+      switch (error.type) {
+        case ErrorTypes.NOT_FOUND:
+          return <NotFound searchTerm={get(error.payload, 'searchTerm')} />;
+        case ErrorTypes.BAD_COLLECTIVE_TYPE:
+          return this.renderErrorMessage(
+            <FormattedMessage id="Error.BadCollectiveType" defaultMessage="This profile type is not supported" />,
+          );
+      }
     } else if (get(data, 'error.message', '').includes('No collective found')) {
       return <NotFound searchTerm={get(this.props.data, 'variables.slug')} />;
     }
@@ -86,19 +97,23 @@ class ErrorPage extends React.Component {
     // If error message is provided, we display it. This behaviour should be deprecated
     // as we loose the context of the page where the error took place.
     if (this.props.message) {
-      return (
-        <Flex flexDirection="column" alignItems="center" px={2} py={6}>
-          <MessageBox type="error" withIcon mb={5}>
-            {this.props.message}
-          </MessageBox>
-          <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => Router.back()}>
-            &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
-          </StyledButton>
-        </Flex>
-      );
+      return this.renderErrorMessage(this.props.message);
     }
 
     return this.unknownError();
+  }
+
+  renderErrorMessage(message) {
+    return (
+      <Flex flexDirection="column" alignItems="center" px={2} py={6}>
+        <MessageBox type="error" withIcon mb={5}>
+          {message}
+        </MessageBox>
+        <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => Router.back()}>
+          &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to previous page" />
+        </StyledButton>
+      </Flex>
+    );
   }
 
   networkError() {

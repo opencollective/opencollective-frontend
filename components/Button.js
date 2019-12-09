@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import colors from '../lib/constants/colors';
+import defaultColors from '../lib/theme/colors';
 import { Router } from '../server/pages';
 import HashLink from 'react-scrollchor';
 
@@ -43,14 +44,9 @@ class Button extends React.Component {
   }
 
   renderButton() {
+    const { icon, label, children, className, ...rest } = this.props;
     return (
-      <button
-        type={this.props.type}
-        disabled={this.props.disabled}
-        style={this.props.style}
-        className={`Button ${this.props.className}`}
-        onClick={this.onClick}
-      >
+      <button {...rest} className={`Button ${className}`} onClick={this.onClick}>
         <style jsx>
           {`
             .Button {
@@ -124,6 +120,19 @@ class Button extends React.Component {
               background-color: ${colors.blueActive};
               border-color: ${colors.blueActive};
             }
+            .red {
+              color: white;
+              border-color: ${colors.white};
+              background-color: ${defaultColors.red[500]};
+            }
+            .red:hover {
+              background-color: ${defaultColors.red[400]};
+              border-color: ${defaultColors.red[400]};
+            }
+            .red:active {
+              background-color: ${defaultColors.red[600]};
+              border-color: ${defaultColors.red[600]};
+            }
             .gray {
               color: ${colors.darkgray};
               border-color: ${colors.lightgray};
@@ -173,9 +182,9 @@ class Button extends React.Component {
             }
           `}
         </style>
-        {this.props.icon && <img src={icons[this.props.icon]} />}
-        {this.props.label && <span>{this.props.label}</span>}
-        {this.props.children}
+        {icon && <img src={icons[icon]} />}
+        {label && <span>{label}</span>}
+        {children}
       </button>
     );
   }

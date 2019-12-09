@@ -56,7 +56,7 @@ describe('host dashboard', () => {
     cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
     cy.get('[data-cy="expense-approved"]').as('currentExpense');
     cy.get('[data-cy="expense-actions"]')
-      .contains('button', 'record as paid')
+      .contains('button', 'Record as paid')
       .click({ force: true });
     cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-paid');
   });
@@ -72,5 +72,15 @@ describe('host dashboard', () => {
       .contains('button', 'Continue')
       .click({ force: true });
     cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-approved');
+  });
+
+  it('delete rejected expense', () => {
+    cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
+    cy.get('[data-cy="expense-rejected"]').as('currentExpense');
+    cy.get('[data-cy="expense-actions"]')
+      .contains('button', 'Delete')
+      .click({ force: true });
+    cy.get('[data-cy="confirmation-modal-continue"]').click({ force: true });
+    cy.get('[data-cy="errorMessage"]').should('not.exist');
   });
 });

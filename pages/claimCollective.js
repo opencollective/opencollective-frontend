@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { get } from 'lodash';
 import { Flex } from '@rebass/grid';
-import { Github } from 'styled-icons/fa-brands/Github';
+import { Github } from '@styled-icons/fa-brands/Github';
 import { URLSearchParams } from 'universal-url';
 
 import { compose, getBaseApiUrl, getWebsiteUrl } from '../lib/utils';

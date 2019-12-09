@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import styled from 'styled-components';
 import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
 import dynamic from 'next/dynamic';
-import { Github } from 'styled-icons/fa-brands/Github';
-import { Twitter } from 'styled-icons/fa-brands/Twitter';
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
+import { Github } from '@styled-icons/fa-brands/Github';
+import { Twitter } from '@styled-icons/fa-brands/Twitter';
+import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
 import momentTimezone from 'moment-timezone';
 import moment from 'moment';
 import { get } from 'lodash';
@@ -70,7 +70,6 @@ class CollectiveCover extends React.Component {
       description: PropTypes.string,
       stats: PropTypes.shape({
         totalAmountSpent: PropTypes.number,
-        totalAmountRaised: PropTypes.number,
       }),
       host: PropTypes.shape({
         slug: PropTypes.string,
@@ -251,7 +250,7 @@ ${description}`;
 
     if (!isEvent && useNewCollectiveNavbar && collective && collective.slug) {
       return (
-        <Container borderTop="1px solid #E6E8EB" mb={4}>
+        <Container mb={4}>
           <CollectiveNavbar
             collective={collective}
             isAdmin={canEdit}
@@ -613,17 +612,6 @@ ${description}`;
                     defaultMessage="Total amount contributed"
                   />
                 </div>
-                {stats.totalAmountRaised > 0 && (
-                  <div className="stat">
-                    <div className="totalAmountRaised value">
-                      <Currency value={stats.totalAmountRaised} currency={collective.currency} />
-                    </div>
-                    <FormattedMessage
-                      id="collective.stats.totalAmountRaised.label"
-                      defaultMessage="Total amount raised"
-                    />
-                  </div>
-                )}
               </div>
             )}
 

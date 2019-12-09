@@ -4,7 +4,7 @@ import moment from 'moment';
 import { withApollo } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
-import { FileDownload } from 'styled-icons/fa-solid/FileDownload';
+import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 
 import { getTransactionsQuery } from '../../lib/graphql/queries';
 import { exportFile } from '../../lib/export_file';

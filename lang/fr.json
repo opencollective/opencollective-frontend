@@ -609,7 +609,7 @@
   "expense.expensePolicy.add": "Ajouter des règles de dépense",
   "expense.hostFeeInCollectiveCurrency": "commission de l'hôte",
   "expense.incurredAt": "Date",
-  "expense.markAsUnpaid.btn": "Marquer comme impayé",
+  "expense.markAsUnpaid.btn": "Mark as unpaid",
   "expense.markAsUnpaid.continue.btn": "Continuer",
   "expense.new.submit": "Ajouter une dépense",
   "Expense.NotFound": "Cette dépense n'existe pas",

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Oct 30 2019 20:48:06 GMT+0100 (GMT+01:00)
+# timestamp: Wed Dec 04 2019 10:36:41 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -58,6 +58,10 @@ type BackersStatsType {
   Number of collectives that have given money to this collective
   """
   collectives: Int
+}
+
+type BackYourStackDispatchState {
+  dispatching: Boolean
 }
 
 """
@@ -466,7 +470,7 @@ interface CollectiveInterface {
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   stats: CollectiveStatsType
-  transactions(type: String, limit: Int, offset: Int): [Transaction]
+  transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
   role: String
   twitterHandle: String
@@ -684,7 +688,15 @@ input CommentAttributesInputType {
   id: Int
   markdown: String
   html: String
+
+  """
+  Deprecated since 2019-11-25: This field is not editable.
+  """
   FromCollectiveId: Int
+
+  """
+  Deprecated since 2019-11-25: This field is not editable.
+  """
   CollectiveId: Int
   ExpenseId: Int
   UpdateId: Int
@@ -697,10 +709,15 @@ input CommentInputType {
   id: Int
   markdown: String
   html: String
-  FromCollectiveId: Int!
-  CollectiveId: Int!
+
+  """
+  Not supported yet. Defaults to user collective ID.
+  """
+  FromCollectiveId: Int
+  CollectiveId: Int
   ExpenseId: Int
   UpdateId: Int
+  ConversationId: Int
 }
 
 """
@@ -1558,6 +1575,11 @@ type Mutation {
     paymentProcessorFeeInCollectiveCurrency: Int
     hostFeeInCollectiveCurrency: Int
     platformFeeInCollectiveCurrency: Int
+
+    """
+    Force expense with paypal method to be paid manually
+    """
+    forceManual: Boolean
   ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
   markPendingOrderAsExpired(id: Int!): OrderType
@@ -1581,22 +1603,6 @@ type Mutation {
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
-  createMember(
-    member: CollectiveAttributesInputType!
-    collective: CollectiveAttributesInputType!
-    role: String!
-  ): Member
-  removeMember(
-    member: CollectiveAttributesInputType!
-    collective: CollectiveAttributesInputType!
-    role: String!
-  ): Member
-
-  """
-  A mutation to edit membership. Dedicated to the user, not the collective admin.
-  """
-  editMembership(id: Int!, publicMessage: String): Member
-    @deprecated(reason: "2019-10-12: Please use editPublicMessage")
 
   """
   A mutation to edit the public message of all matching members.
@@ -1778,7 +1784,7 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
-  backyourstackDispatchOrder(id: Int!): [OrderType]
+  backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 }
 
 """
@@ -1925,16 +1931,6 @@ input OrderInputType {
   publicMessage: String
   privateMessage: String
   paymentMethod: PaymentMethodInputType
-
-  """
-  The first part of the UUID of the PaymentMethod that can be used to match the donation
-  """
-  matchingFund: String
-
-  """
-  The referral collective
-  """
-  referral: CollectiveAttributesInputType
   user: UserInputType
   fromCollective: CollectiveAttributesInputType
   collective: CollectiveAttributesInputType!
@@ -2025,11 +2021,6 @@ type OrderType {
   Collective that receives the order
   """
   collective: CollectiveInterface
-
-  """
-  Referral user collective
-  """
-  referral: CollectiveInterface @deprecated(reason: "2019-08-22: Referals are not supported anymore")
   tier: Tier
 
   """
@@ -2038,11 +2029,6 @@ type OrderType {
   a subscription.
   """
   paymentMethod: PaymentMethodType
-
-  """
-  Payment method used if this order was matched by a matching fund.
-  """
-  matchingFund: PaymentMethodType @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
 
   """
   transactions for this order ordered by createdAt DESC
@@ -2405,11 +2391,6 @@ type PaymentMethodType {
   name: String
   description: String
   primary: Boolean
-
-  """
-  Matching factor
-  """
-  matching: Int @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
   monthlyLimitPerMember: Int
   initialBalance: Int
 
@@ -2452,12 +2433,6 @@ type Query {
     throwIfMissing: Boolean = true
   ): CollectiveInterface
   Tier(id: Int!): Tier
-
-  """
-  Fetch data about a matching fund from the short version of its UUID (first part)
-  """
-  MatchingFund(uuid: String!, ForCollectiveId: Int): PaymentMethodType
-    @deprecated(reason: "2019-08-19: Matching funds are not supported anymore")
   LoggedInUser: UserDetails
   AuthenticatedUser: CollectiveInterface
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
@@ -2562,6 +2537,11 @@ type Query {
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
+    Fetch collectives with a list of collective slug
+    """
+    slugs: [String]
+
+    """
     Fetch all collectives that match at least one of the tags
     """
     tags: [String]
@@ -2610,12 +2590,6 @@ type Query {
     Fetch all collectives that are a child of `ParentCollectiveId`. Used for "SuperCollectives"
     """
     ParentCollectiveId: Int
-
-    """
-    Fetch all collectives with slug within slugs
-    """
-    slugs: [String]
-
     orderBy: CollectiveOrderField = name
     orderDirection: OrderDirection = ASC
     limit: Int = 10

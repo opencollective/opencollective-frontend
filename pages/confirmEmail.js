@@ -6,7 +6,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Box } from '@rebass/grid';
 
-import { Email } from 'styled-icons/material/Email';
+import { Email } from '@styled-icons/material/Email';
 
 import Page from '../components/Page';
 import MessageBox from '../components/MessageBox';

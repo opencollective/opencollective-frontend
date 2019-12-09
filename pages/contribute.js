@@ -81,7 +81,7 @@ class TiersPage extends React.Component {
             <Loading />
           ) : (
             <CollectiveThemeProvider collective={data.Collective}>
-              <Container borderTop="1px solid #E6E8EB" pb={3}>
+              <Container pb={3}>
                 <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} />
                 <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
                   <H2 fontWeight="normal" my={4}>
@@ -143,7 +143,7 @@ class TiersPage extends React.Component {
 
 const addTiersData = graphql(
   gql`
-    query NewCollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+    query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
       Collective(slug: $slug) {
         id
         slug

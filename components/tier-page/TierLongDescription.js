@@ -17,15 +17,13 @@ const TierLongDescription = ({ tier, editMutation, canEdit }) => {
       {({ isEditing, value, setValue, enableEditor }) => {
         if (isEditing) {
           return (
-            <HTMLContent>
-              <RichTextEditor
-                defaultValue={value}
-                onChange={setValue}
-                withStickyToolbar
-                toolbarTop={[60, null, 119]}
-                toolbarOffsetY={-30}
-              />
-            </HTMLContent>
+            <RichTextEditor
+              defaultValue={value}
+              onChange={e => setValue(e.target.value)}
+              withStickyToolbar
+              toolbarTop={[60, null, 119]}
+              toolbarOffsetY={-30}
+            />
           );
         } else if (isEmptyValue(tier.longDescription)) {
           return !canEdit ? null : (

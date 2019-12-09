@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 
 import { compose } from '../lib/utils';
 
@@ -12,10 +12,18 @@ import Comments from './Comments';
 import CommentForm from './CommentForm';
 import LoginBtn from './LoginBtn';
 
+const gqlV2 = gql; // Needed for lint validation of api v2 schema.
+
 class CommentsWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
-    expense: PropTypes.object,
+    expense: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      status: PropTypes.string,
+      user: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+      }),
+    }),
     UpdateId: PropTypes.number,
     limit: PropTypes.number,
     LoggedInUser: PropTypes.object,
@@ -23,6 +31,8 @@ class CommentsWithData extends React.Component {
     data: PropTypes.object,
     view: PropTypes.object,
     fetchMore: PropTypes.func,
+    deleteComment: PropTypes.func,
+    editComment: PropTypes.func,
   };
 
   constructor(props) {
@@ -31,12 +41,10 @@ class CommentsWithData extends React.Component {
   }
 
   async createComment(comment) {
-    const { LoggedInUser, expense, collective } = this.props;
+    const { expense } = this.props;
 
     const CommentInputType = {
       ...comment,
-      CollectiveId: collective.id,
-      FromCollectiveId: LoggedInUser.collective.id,
       ExpenseId: expense.id,
     };
 
@@ -58,14 +66,19 @@ class CommentsWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, expense, view } = this.props;
-
-    if (data.error) {
+    const { data, LoggedInUser, collective, expense, view, fetchMore, deleteComment, editComment } = this.props;
+    const { expense: expenseComments, error } = data;
+    if (error) {
       console.error('graphql error>>>', data.error.message);
       return <Error message="GraphQL error" />;
     }
 
-    const comments = data.allComments;
+    let comments;
+    let totalComments;
+    if (expenseComments) {
+      comments = expenseComments.comments.nodes;
+      totalComments = expenseComments.comments.totalCount;
+    }
     let notice;
     if (LoggedInUser && LoggedInUser.id !== get(expense, 'user.id')) {
       notice = (
@@ -99,9 +112,12 @@ class CommentsWithData extends React.Component {
         <Comments
           collective={collective}
           comments={comments}
+          totalComments={totalComments}
           editable={view !== 'compact'}
-          fetchMore={this.props.fetchMore}
           LoggedInUser={LoggedInUser}
+          fetchMore={fetchMore}
+          deleteComment={deleteComment}
+          editComment={editComment}
         />
 
         {this.renderUserAction(LoggedInUser, expense, notice)}
@@ -110,52 +126,54 @@ class CommentsWithData extends React.Component {
   }
 }
 
-const getCommentsQuery = gql`
-  query Comments($ExpenseId: Int) {
-    allComments(ExpenseId: $ExpenseId) {
+const getCommentsQuery = gqlV2`
+  query getCommentsQuery($id: String!, $limit: Int, $offset: Int) {
+    expense(id: $id) {
       id
-      html
-      createdAt
-      collective {
-        id
-        slug
-        currency
-        name
-        host {
+      comments(limit: $limit, offset: $offset) {
+        totalCount
+        nodes {
           id
-          slug
+          html
+          createdAt
+          collective {
+            id
+            slug
+            currency
+            name
+            ... on Collective {
+              balance
+              host {
+                id
+                slug
+              }
+            }
+          }
+          fromCollective {
+            id
+            type
+            name
+            slug
+            imageUrl
+          }
         }
-        stats {
-          id
-          balance
-        }
-      }
-      fromCollective {
-        id
-        type
-        name
-        slug
-        imageUrl
       }
     }
   }
 `;
 
-const getCommentsVariables = props => {
-  const vars = {
-    ExpenseId: props.expense.id,
-    UpdateId: props.UpdateId,
-    offset: 0,
-    limit: props.limit || EXPENSES_PER_PAGE * 2,
-  };
-  return vars;
-};
+const getCommentsQueryVariables = ({ expense, limit = COMMENTS_PER_PAGE }) => ({
+  id: `${expense.id}`,
+  offset: 0,
+  limit,
+});
 
-const EXPENSES_PER_PAGE = 10;
-export const addCommentsData = graphql(getCommentsQuery, {
+const COMMENTS_PER_PAGE = 10;
+export const commentsQuery = graphql(getCommentsQuery, {
   options(props) {
     return {
-      variables: getCommentsVariables(props),
+      context: { apiVersion: '2' },
+      variables: getCommentsQueryVariables(props),
     };
   },
   props: ({ data }) => ({
@@ -163,42 +181,42 @@ export const addCommentsData = graphql(getCommentsQuery, {
     fetchMore: () => {
       return data.fetchMore({
         variables: {
-          offset: data.allComments.length,
-          limit: EXPENSES_PER_PAGE,
+          offset: data.expense.comments.nodes.length,
+          limit: COMMENTS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {
             return previousResult;
           }
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            allComments: [...previousResult.allComments, ...fetchMoreResult.allComments],
-          });
+          const newResult = { ...fetchMoreResult };
+          newResult.expense.comments.nodes = [
+            ...previousResult.expense.comments.nodes,
+            ...fetchMoreResult.expense.comments.nodes,
+          ];
+          return newResult;
         },
       });
     },
   }),
 });
 
-const createCommentQuery = gql`
-  mutation createComment($comment: CommentInputType!) {
+const createCommentQuery = gqlV2`
+  mutation createComment($comment: CommentCreate!) {
     createComment(comment: $comment) {
       id
       html
       createdAt
-      updatedAt
       collective {
         id
         slug
         currency
         name
-        host {
-          id
-          slug
-        }
-        stats {
-          id
+        ... on Collective {
           balance
+          host {
+            id
+            slug
+          }
         }
       }
       fromCollective {
@@ -212,28 +230,112 @@ const createCommentQuery = gql`
   }
 `;
 
-const addMutation = graphql(createCommentQuery, {
+const createCommentMutation = graphql(createCommentQuery, {
+  options: {
+    context: { apiVersion: '2' },
+  },
   props: ({ ownProps, mutate }) => ({
     createComment: async comment => {
       return await mutate({
         variables: { comment },
         update: (proxy, { data: { createComment } }) => {
-          const data = proxy.readQuery({
-            query: getCommentsQuery,
-            variables: getCommentsVariables(ownProps),
-          });
-          data.allComments.push(createComment);
-          proxy.writeQuery({
-            query: getCommentsQuery,
-            variables: getCommentsVariables(ownProps),
-            data,
-          });
+          const query = getCommentsQuery;
+          const variables = getCommentsQueryVariables(ownProps);
+          /**
+           * In other to fire a component re-render it is necessary to deep clone the
+           * data before writing it. To learn more about this check this issue:
+           * https://github.com/apollographql/apollo-client/issues/3909#issuecomment-522349064
+           */
+          const data = cloneDeep(proxy.readQuery({ query, variables }));
+          // Increment the total amount of comments by one
+          data.expense.comments.totalCount++;
+          data.expense.comments.nodes.push(createComment);
+          proxy.writeQuery({ query, variables, data });
         },
       });
     },
   }),
 });
 
-const addData = compose(addCommentsData, addMutation);
+const deleteCommentQuery = gqlV2`
+  mutation deleteComment($id: String!) {
+    deleteComment(id: $id) {
+      id
+    }
+  }
+`;
 
-export default addData(CommentsWithData);
+const deleteCommentMutation = graphql(deleteCommentQuery, {
+  options: {
+    context: { apiVersion: '2' },
+  },
+  props: ({ ownProps, mutate }) => ({
+    deleteComment: async id => {
+      return await mutate({
+        variables: { id },
+        update: (proxy, { data: { deleteComment } }) => {
+          const query = getCommentsQuery;
+          const variables = getCommentsQueryVariables(ownProps);
+          /**
+           * In other to fire a component re-render it is necessary to deep clone the
+           * data before writing it. To learn more about this check this issue:
+           * https://github.com/apollographql/apollo-client/issues/3909#issuecomment-522349064
+           */
+          const data = cloneDeep(proxy.readQuery({ query, variables }));
+          // Decrease the total amount of comments by one
+          data.expense.comments.totalCount--;
+          data.expense.comments.nodes = data.expense.comments.nodes.filter(comment => comment.id !== deleteComment.id);
+          proxy.writeQuery({ query, variables, data });
+        },
+      });
+    },
+  }),
+});
+
+const editCommentQuery = gqlV2`
+  mutation editComment($comment: CommentEdit!) {
+    editComment(comment: $comment) {
+      id
+      html
+      createdAt
+      collective {
+        id
+        slug
+        currency
+        name
+        ... on Collective {
+          balance
+          host {
+            id
+            slug
+          }
+        }
+      }
+      fromCollective {
+        id
+        type
+        name
+        slug
+        imageUrl
+      }
+    }
+  }
+`;
+
+const editCommentMutation = graphql(editCommentQuery, {
+  options: {
+    context: { apiVersion: '2' },
+  },
+  props: ({ mutate }) => ({
+    editComment: async comment => {
+      return await mutate({ variables: { comment } });
+    },
+  }),
+});
+
+export default compose(
+  commentsQuery,
+  createCommentMutation,
+  editCommentMutation,
+  deleteCommentMutation,
+)(CommentsWithData);

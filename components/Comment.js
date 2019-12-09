@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+
 import Avatar from './Avatar';
 import Link from './Link';
 import SmallButton from './SmallButton';
 import { pick } from 'lodash';
 import InputField from './InputField';
+import ConfirmationModal from './ConfirmationModal';
 
 class Comment extends React.Component {
   static propTypes = {
@@ -17,6 +17,7 @@ class Comment extends React.Component {
     editComment: PropTypes.func,
     intl: PropTypes.object.isRequired,
     editable: PropTypes.bool,
+    deleteComment: PropTypes.func,
   };
 
   constructor(props) {
@@ -26,14 +27,25 @@ class Comment extends React.Component {
       modified: false,
       comment: props.comment,
       mode: undefined,
+      showDeleteModal: false,
     };
 
     this.save = this.save.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.messages = defineMessages({
-      edit: { id: 'comment.edit', defaultMessage: 'edit' },
-      cancelEdit: { id: 'comment.cancelEdit', defaultMessage: 'cancel edit' },
+      edit: { id: 'comment.edit', defaultMessage: 'Edit' },
+      cancelEdit: { id: 'comment.cancelEdit', defaultMessage: 'Cancel edit' },
+      delete: { id: 'comment.delete', defaultMessage: 'Delete' },
+      'delete.modal.cancel': { id: 'cancel', defaultMessage: 'Cancel' },
+      'delete.modal.header': {
+        id: 'delete.modal.header',
+        defaultMessage: 'Delete comment',
+      },
+      'delete.modal.body': {
+        id: 'delete.modal.body',
+        defaultMessage: 'Are you sure you want to delete this comment?',
+      },
     });
     this.currencyStyle = {
       style: 'currency',
@@ -54,6 +66,16 @@ class Comment extends React.Component {
   toggleEdit() {
     this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
   }
+
+  handleDelete = async () => {
+    try {
+      await this.props.deleteComment(this.state.comment.id);
+      this.setState({ showDeleteModal: false });
+    } catch (err) {
+      console.error(err);
+      this.setState({ showDeleteModal: false });
+    }
+  };
 
   handleChange(attr, value) {
     this.setState({
@@ -77,7 +99,6 @@ class Comment extends React.Component {
 
   render() {
     const { intl, LoggedInUser, editable } = this.props;
-
     const { comment } = this.state;
     if (!comment) return <div />;
 
@@ -169,13 +190,26 @@ class Comment extends React.Component {
                 <Link route={`/${comment.fromCollective.slug}`}>{comment.fromCollective.name}</Link>
               </span>
               {editable && LoggedInUser && LoggedInUser.canEditComment(comment) && (
-                <span>
-                  {' '}
-                  |{' '}
-                  <a className="toggleEditComment" onClick={this.toggleEdit}>
-                    {intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
-                  </a>
-                </span>
+                <Fragment>
+                  <span>
+                    {' '}
+                    |{' '}
+                    <a className="toggleEditComment" onClick={this.toggleEdit} data-cy="ToggleEditComment">
+                      {intl.formatMessage(this.messages[`${this.state.mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                    </a>
+                  </span>
+                  <span>
+                    {' '}
+                    |{' '}
+                    <a
+                      className="toggleEditComment"
+                      onClick={() => this.setState({ showDeleteModal: true })}
+                      data-cy="ToggleDeleteComment"
+                    >
+                      {intl.formatMessage(this.messages['delete'])}
+                    </a>
+                  </span>
+                </Fragment>
               )}
             </div>
             <div className="description">
@@ -195,7 +229,12 @@ class Comment extends React.Component {
             <div className="actions">
               {this.state.mode === 'edit' && (
                 <div>
-                  <SmallButton className="primary save" onClick={this.save} disabled={!this.state.modified}>
+                  <SmallButton
+                    className="primary save"
+                    onClick={this.save}
+                    disabled={!this.state.modified}
+                    data-cy="SaveEditionCommentButton"
+                  >
                     <FormattedMessage id="save" defaultMessage="Save" />
                   </SmallButton>
                 </div>
@@ -203,48 +242,21 @@ class Comment extends React.Component {
             </div>
           )}
         </div>
+        {this.state.showDeleteModal && (
+          <ConfirmationModal
+            show={this.state.showDeleteModal}
+            onClose={() => this.setState({ showDeleteModal: false })}
+            cancelLabel={intl.formatMessage(this.messages['delete.modal.cancel'])}
+            header={intl.formatMessage(this.messages['delete.modal.header'])}
+            body={intl.formatMessage(this.messages['delete.modal.body'])}
+            cancelHandler={() => this.setState({ showDeleteModal: false })}
+            continueLabel={intl.formatMessage(this.messages['delete'])}
+            continueHandler={this.handleDelete}
+          />
+        )}
       </div>
     );
   }
 }
 
-const editCommentQuery = gql`
-  mutation editComment($comment: CommentAttributesInputType!) {
-    editComment(comment: $comment) {
-      id
-      html
-      createdAt
-      collective {
-        id
-        slug
-        currency
-        name
-        host {
-          id
-          slug
-        }
-        stats {
-          id
-          balance
-        }
-      }
-      fromCollective {
-        id
-        type
-        name
-        slug
-        imageUrl
-      }
-    }
-  }
-`;
-
-const addMutation = graphql(editCommentQuery, {
-  props: ({ mutate }) => ({
-    editComment: async comment => {
-      return await mutate({ variables: { comment } });
-    },
-  }),
-});
-
-export default injectIntl(addMutation(Comment));
+export default injectIntl(Comment);

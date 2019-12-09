@@ -6,8 +6,8 @@ import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 
-import { Check } from 'styled-icons/boxicons-regular/Check';
-import { Github } from 'styled-icons/fa-brands/Github';
+import { Check } from '@styled-icons/boxicons-regular/Check';
+import { Github } from '@styled-icons/fa-brands/Github';
 
 import { withUser } from '../UserProvider';
 import Loading from '../Loading';

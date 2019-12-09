@@ -7,7 +7,7 @@ import { set } from 'lodash';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';
 
-import { Check } from 'styled-icons/fa-solid/Check';
+import { Check } from '@styled-icons/fa-solid/Check';
 
 import defaultTheme from '../../../lib/theme';
 import StyledButton from '../../StyledButton';

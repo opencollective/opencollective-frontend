@@ -5,7 +5,13 @@
   "rules": {
     "no-console": "warn",
     "require-atomic-updates": "warn",
-    "graphql/template-strings": ["error", { "env": "apollo" }],
+    // To lint multiple schemas each one needs a different tagName.
+    // https://github.com/apollographql/eslint-plugin-graphql#additional-schemas-or-tags
+    "graphql/template-strings": [
+      "error",
+      { "env": "apollo", "projectName": "opencollective" },
+      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2" }
+    ],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],
     "graphql/no-deprecated-fields": ["warn"],

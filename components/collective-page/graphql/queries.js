@@ -1,5 +1,10 @@
 import gql from 'graphql-tag';
 import * as fragments from './fragments';
+import {
+  BudgetItemExpenseTypeFragment,
+  BudgetItemOrderFragment,
+  BudgetItemExpenseFragment,
+} from '../../BudgetItemsList';
 
 export const getCollectivePageQuery = gql`
   query getCollectivePageQuery($slug: String!, $nbContributorsPerContributeCard: Int) {
@@ -41,9 +46,13 @@ export const getCollectivePageQuery = gql`
           users
           organizations
         }
+        transactions {
+          all
+        }
       }
       parentCollective {
         id
+        name
         slug
         image
         twitterHandle
@@ -76,8 +85,10 @@ export const getCollectivePageQuery = gql`
         amountType
         endsAt
         type
+        maxQuantity
         stats {
           id
+          availableQuantity
           totalDonated
           totalRecurringDonations
           contributors {
@@ -145,14 +156,60 @@ export const getCollectivePageQuery = gql`
           type
         }
       }
-      ...TransactionsAndExpensesFragment
+      transactions(limit: 3, includeExpenseTransactions: false) {
+        ...BudgetItemOrderFragment
+        ...BudgetItemExpenseFragment
+      }
+      expenses(limit: 3) {
+        ...BudgetItemExpenseTypeFragment
+      }
       updates(limit: 3, onlyPublishedUpdates: true) {
         ...UpdatesFieldsFragment
+      }
+
+      ... on Event {
+        timezone
+        startsAt
+        endsAt
+        location {
+          name
+          address
+          country
+          lat
+          long
+        }
+        orders {
+          id
+          createdAt
+          quantity
+          publicMessage
+          fromCollective {
+            id
+            type
+            name
+            company
+            image
+            imageUrl
+            slug
+            twitterHandle
+            description
+            ... on User {
+              email
+            }
+          }
+          tier {
+            id
+            name
+            type
+          }
+        }
       }
     }
   }
 
-  ${fragments.TransactionsAndExpensesFragment}
+  ${BudgetItemExpenseFragment}
+  ${BudgetItemOrderFragment}
+  ${BudgetItemExpenseTypeFragment}
   ${fragments.UpdatesFieldsFragment}
   ${fragments.ContributorsFieldsFragment}
 `;

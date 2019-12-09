@@ -162,10 +162,10 @@ const StepDetails = ({
           >
             {fieldProps => (
               <StyledInputAmount
+                {...fieldProps}
                 type="number"
                 currency={currency}
                 min={minAmount / 100}
-                {...fieldProps}
                 value={amount / 100}
                 width={1}
                 onChange={({ target }) => dispatchChange({ amount: Math.round(parseFloat(target.value) * 100) })}
@@ -184,10 +184,10 @@ const StepDetails = ({
           >
             {fieldProps => (
               <StyledInput
+                {...fieldProps}
                 type="number"
                 min={1}
                 max={maxQuantity}
-                {...fieldProps}
                 value={quantity}
                 width={1}
                 maxWidth={80}
@@ -272,16 +272,17 @@ const StepDetails = ({
               key={customField.name}
               htmlFor={customField.name}
               label={customField.label}
+              inputType={customField.type}
               width="100%"
             >
               {fieldProps => (
                 <StyledInput
-                  type={customField.type}
                   {...fieldProps}
                   value={value}
                   width={1}
                   required={customField.required}
                   onChange={({ target }) => onCustomFieldsChange(customField.name, target.value)}
+                  css={customField.type === 'checkbox' ? { flex: '0 0 1em', margin: 0 } : undefined}
                 />
               )}
             </StyledInputField>

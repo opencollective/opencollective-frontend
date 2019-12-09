@@ -195,7 +195,6 @@ export const webpackCollective = {
     updates: 0,
     events: 0,
     totalAmountSpent: 46426248,
-    totalAmountRaised: 0,
     totalAmountReceived: 55220436,
     __typename: 'CollectiveStatsType',
   },

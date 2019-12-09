@@ -6,7 +6,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Box, Flex } from '@rebass/grid';
 
-import { Search } from 'styled-icons/octicons/Search';
+import { Search } from '@styled-icons/octicons/Search';
 
 import { escapeInput, reportValidityHTML5 } from '../../lib/utils';
 import Avatar from '../Avatar';
@@ -21,10 +21,13 @@ import StyledInput from '../StyledInput';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
+  min-width: 16px;
 `;
 
 const ProfileContainer = styled(Container)`
   cursor: pointer;
+  display: flex;
+  align-items: center;
 `;
 
 const messages = defineMessages({
@@ -167,7 +170,14 @@ const StepProfile = ({
   return (
     <StyledCard maxWidth={500}>
       {showSearch && (
-        <Container display="flex" borderBottom="1px solid" borderColor="black.200" px={4} py={1} alignItems="center">
+        <Container
+          display="flex"
+          borderBottom="1px solid"
+          borderColor="black.200"
+          px={[3, 4]}
+          py={1}
+          alignItems="center"
+        >
           <SearchIcon size="16" />
           <StyledInput
             bare
@@ -176,6 +186,7 @@ const StepProfile = ({
             lineHeight="Paragraph"
             placeholder={intl.formatMessage(messages.filterByName)}
             onChange={onSearch}
+            minWidth={75}
             ml={2}
           />
         </Container>
@@ -189,15 +200,12 @@ const StepProfile = ({
       >
         {({ key, value, radio, checked, index }) => (
           <ProfileContainer
-            display="flex"
-            alignItems="center"
             px={4}
             py={3}
             borderBottom={lastIndex !== index ? '1px solid' : 'none'}
             color={value.isIncognito && checked ? 'white.full' : 'black.900'}
             bg={value.isIncognito && checked ? 'black.900' : 'white.full'}
             borderColor="black.200"
-            flexWrap="wrap"
           >
             <Box as="span" mr={3}>
               {radio}
@@ -210,7 +218,7 @@ const StepProfile = ({
                 {!value.isIncognito && get(value, 'name', intl.formatMessage(messages['incognito']))}
               </P>
               {!value.isIncognito && value.type && (
-                <P fontSize="Caption" lineHeight="Caption" color="black.500">
+                <P fontSize="Caption" lineHeight="Caption" color="black.500" wordBreak="break-word">
                   {value.type === 'USER' && value.name ? (
                     <FormattedMessage
                       id="contributeAs.personal"

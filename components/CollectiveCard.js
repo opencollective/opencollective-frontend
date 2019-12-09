@@ -58,9 +58,7 @@ class CollectiveCard extends React.Component {
       coverStyle.backgroundPosition = 'center center';
     }
 
-    const truncatedDescription =
-      (collective.description && firstSentence(collective.description, 80)) ||
-      (collective.longDescription && firstSentence(collective.longDescription, 80));
+    const truncatedDescription = collective.description && firstSentence(collective.description, 80);
     const description = collective.description;
 
     let route, params;
@@ -166,8 +164,7 @@ class CollectiveCard extends React.Component {
 
               .membership,
               .stats,
-              .totalDonations,
-              .totalRaised {
+              .totalDonations {
                 border-top: 1px solid #f2f2f2;
                 padding: 1rem;
                 color: #303233;
@@ -180,8 +177,7 @@ class CollectiveCard extends React.Component {
                 justify-content: space-around;
               }
 
-              .totalDonationsAmount,
-              .totalRaisedAmount {
+              .totalDonationsAmount {
                 font-size: 2rem;
               }
 
@@ -330,17 +326,6 @@ class CollectiveCard extends React.Component {
                   />
                 </div>
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage={'amount contributed'} />
-              </div>
-            )}
-            {role === 'FUNDRAISER' && get(membership, 'stats.totalRaised') > 0 && (
-              <div className="totalRaised">
-                <div className="totalRaisedAmount">
-                  <Currency
-                    value={get(membership, 'stats.totalRaised')}
-                    currency={get(membership, 'collective.currency')}
-                  />
-                </div>
-                <FormattedMessage id="membership.totalRaised.title" defaultMessage={'amount raised'} />
               </div>
             )}
           </div>
