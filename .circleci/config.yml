@@ -145,6 +145,8 @@ jobs:
     environment:
       NODE_ENV: circleci
       E2E_TEST: 1
+      API_FOLDER: /home/circleci/api
+
     steps:
       - run: sudo apt -y update
 
@@ -153,7 +155,7 @@ jobs:
 
       - checkout
 
-      - run: ./scripts/setup_circleci_checkout_api.sh
+      - run: ./scripts/ci_checkout_api.sh
 
       - restore_cache:
           keys:
