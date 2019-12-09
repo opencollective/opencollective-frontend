@@ -609,7 +609,7 @@
   "expense.expensePolicy.add": "add an expense policy",
   "expense.hostFeeInCollectiveCurrency": "host fee",
   "expense.incurredAt": "Data",
-  "expense.markAsUnpaid.btn": "Mark as unpaid",
+  "expense.markAsUnpaid.btn": "Contrassegna come non pagato",
   "expense.markAsUnpaid.continue.btn": "Continua",
   "expense.new.submit": "Invia una Spesa",
   "Expense.NotFound": "Questa spesa non esiste",
