@@ -406,14 +406,6 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           type: 'textarea',
         },
-        // {
-        //   name: 'location',
-        //   placeholder: 'Search cities',
-        //   type: 'location',
-        //   options: {
-        //     types: ['cities']location
-        //   }
-        // },
         {
           name: 'country',
           type: 'country',

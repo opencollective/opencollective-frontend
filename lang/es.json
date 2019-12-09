@@ -473,7 +473,6 @@
   "createProfile.faq.privacy.title": "What about privacy?",
   "CreateVirtualCardsSuccess.Download": "Descargar tarjetas",
   "CreateVirtualCardsSuccess.RedeemLinks": "Copiar los enlaces",
-  "creditcard.error": "Tarjeta de crédito inválida",
   "creditcard.label": "Tarjeta de crédito",
   "creditcard.save": "Guardar esta tarjeta de crédito en {type, select, user {mi cuenta} other {{type} cuenta}}",
   "currency": "moneda",

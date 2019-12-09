@@ -26,10 +26,6 @@ class EditCollective extends React.Component {
     this.editCollective = this.editCollective.bind(this);
     this.state = { status: null, result: {} };
     this.messages = defineMessages({
-      'creditcard.error': {
-        id: 'creditcard.error',
-        defaultMessage: 'Invalid credit card',
-      },
       'collective.isArchived': {
         id: 'collective.isArchived',
         defaultMessage: '{name} has been archived.',
