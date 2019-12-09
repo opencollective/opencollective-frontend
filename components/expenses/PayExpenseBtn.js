@@ -153,21 +153,18 @@ class PayExpenseBtn extends React.Component {
             disabled={this.props.disabled || disabled}
             title={title}
           >
-            
-            {loading? (
+            {loading ? (
               <Fragment>
-                <StyledSpinner /> 
-                {' '}
+                <StyledSpinner />{' '}
                 <FormattedMessage id="expense.payExpenseBtn.processing" defaultMessage="Processing..." />
               </Fragment>
-            ): (
-                <FormattedMessage
+            ) : (
+              <FormattedMessage
                 id="expense.pay.btn"
                 defaultMessage="Pay with {paymentMethod}"
                 values={{ paymentMethod: expense.payoutMethod }}
               />
-            )
-          }
+            )}
           </StyledButton>
         )}
         <div className="error">{error}</div>
