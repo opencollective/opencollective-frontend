@@ -609,7 +609,7 @@
   "expense.expensePolicy.add": "adicionar uma política de despesas",
   "expense.hostFeeInCollectiveCurrency": "comissão do organizador",
   "expense.incurredAt": "Data",
-  "expense.markAsUnpaid.btn": "Mark as unpaid",
+  "expense.markAsUnpaid.btn": "Marcar como não pago",
   "expense.markAsUnpaid.continue.btn": "Continuar",
   "expense.new.submit": "Enviar despesa",
   "Expense.NotFound": "Esta despesa não existe",
