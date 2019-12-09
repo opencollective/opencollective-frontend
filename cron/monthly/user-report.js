@@ -196,10 +196,7 @@ const processBacker = async FromCollectiveId => {
         SubscriptionId: { [Op.ne]: null },
       },
       status: {
-        [Op.and]: {
-          [Op.ne]: ORDER_STATUS.ERROR,
-          [Op.ne]: ORDER_STATUS.CANCELLED,
-        },
+        [Op.in]: [ORDER_STATUS.PAID, ORDER_STATUS.ACTIVE],
       },
       deletedAt: null,
     },
