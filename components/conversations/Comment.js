@@ -56,7 +56,7 @@ const mutationOptions = { context: API_V2_CONTEXT };
 /**
  * Action buttons for the comment owner. Styles change between mobile and desktop.
  */
-const AdminActionButtons = ({ comment, deleteModalTitle, onDelete, onEdit }) => {
+const AdminActionButtons = ({ comment, isConversationRoot, onDelete, onEdit }) => {
   const [isDeleting, setDeleting] = React.useState(null);
   const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
 
@@ -83,12 +83,22 @@ const AdminActionButtons = ({ comment, deleteModalTitle, onDelete, onEdit }) => 
             await onDelete(comment);
           }}
           header={
-            deleteModalTitle || (
+            isConversationRoot ? (
+              <FormattedMessage id="conversation.deleteModalTitle" defaultMessage="Delete this conversation?" />
+            ) : (
               <FormattedMessage id="Comment.DeleteConfirmTitle" defaultMessage="Delete this comment?" />
             )
           }
         >
           <hr />
+          {isConversationRoot && (
+            <MessageBox type="warning" withIcon mb={3}>
+              <FormattedMessage
+                id="conversation.deleteMessage"
+                defaultMessage="The message and all its replies will be permanently deleted."
+              />
+            </MessageBox>
+          )}
           <Container padding={2} borderRadius={8} border="1px solid #e1e4e6">
             <Comment comment={comment} maxCommentHeight={150} withoutActions />
           </Container>
@@ -107,7 +117,7 @@ AdminActionButtons.propTypes = {
   comment: PropTypes.object.isRequired,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
-  deleteModalTitle: PropTypes.node,
+  isConversationRoot: PropTypes.bool,
 };
 
 /**
@@ -115,7 +125,7 @@ AdminActionButtons.propTypes = {
  *
  * /!\ Can only be used with data from API V2.
  */
-const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, deleteModalTitle, onDelete }) => {
+const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, isConversationRoot, onDelete }) => {
   const [isEditing, setEditing] = React.useState(false);
 
   const actionButtons =
@@ -124,7 +134,7 @@ const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, deleteMod
         {canEdit && (
           <AdminActionButtons
             comment={comment}
-            deleteModalTitle={deleteModalTitle}
+            isConversationRoot={isConversationRoot}
             onDelete={onDelete}
             onEdit={() => setEditing(true)}
           />
@@ -205,12 +215,12 @@ Comment.propTypes = {
   }).isRequired,
   /** Can current user edit/delete this comment? */
   canEdit: PropTypes.bool,
+  /** Set this to true if the comment is the root comment of a conversation */
+  isConversationRoot: PropTypes.bool,
   /** Set this to true to disable actions */
   withoutActions: PropTypes.bool,
   /** If set, comment will be scrollable over this height */
   maxCommentHeight: PropTypes.number,
-  /** Set this if you want to customize the delete modal title */
-  deleteModalTitle: PropTypes.node,
   /** Called when comment gets deleted */
   onDelete: PropTypes.func,
 };

@@ -27,14 +27,14 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link route="collective" params={{ slug }} {...props} title={title} target={target} passHref>
+    <Link route="collective" params={{ slug }} {...props} title={title || name} target={target} passHref>
       {children || name || slug}
     </Link>
   ) : (
     <Link
       route="event"
       params={{ eventSlug: slug, parentCollectiveSlug: getEventParentCollectiveSlug(parentCollective) }}
-      title={title}
+      title={title || name}
       target={target}
       {...props}
       passHref

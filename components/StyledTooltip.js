@@ -23,7 +23,7 @@ const StyledTooltip = styled(ReactTooltip)`
 `;
 
 const InlineDiv = styled.div`
-  display: inline-block;
+  display: ${props => props.display};
   cursor: help;
 `;
 
@@ -45,9 +45,11 @@ class Tooltip extends React.Component {
     delayHide: PropTypes.number,
     /** See react-tooltip */
     delayUpdate: PropTypes.number,
+    /** If using a node children, this defines the parent display type */
+    display: PropTypes.string,
     /** The trigger. Either:
      *  - A render func, that gets passed props to set on the trigger
-     *  - A React node, rendered inside an inline-div
+     *  - A React node, rendered inside an div
      */
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   };
@@ -57,6 +59,7 @@ class Tooltip extends React.Component {
     place: 'top',
     delayHide: 500,
     delayUpdate: 500,
+    display: 'inline-block',
   };
 
   state = { id: null }; // We only set `id` on the client to avoid mismatches with SSR
@@ -78,7 +81,9 @@ class Tooltip extends React.Component {
         {typeof this.props.children === 'function' ? (
           this.props.children(triggerProps)
         ) : (
-          <InlineDiv {...triggerProps}>{this.props.children}</InlineDiv>
+          <InlineDiv display={this.props.display} {...triggerProps}>
+            {this.props.children}
+          </InlineDiv>
         )}
         {isMounted && (
           <StyledTooltip
