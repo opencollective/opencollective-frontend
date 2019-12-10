@@ -130,7 +130,7 @@ const getCommentsQuery = gqlV2`
   query getCommentsQuery($id: String!, $limit: Int, $offset: Int) {
     expense(id: $id) {
       id
-      comments(limit: $limit, offset: $offset) {
+      comments(limit: $limit, offset: $offset, orderBy: {direction: ASC}) {
         totalCount
         nodes {
           id
