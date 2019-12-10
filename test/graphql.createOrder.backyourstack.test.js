@@ -198,9 +198,7 @@ describe('createOrder', () => {
     let subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
     await dispatch(order, subscription);
     subscription = await models.Subscription.findByPk(orderCreated.subscription.id);
-    const nextDispatchDate = moment()
-      .add(1, 'month')
-      .format('ll');
+    const nextDispatchDate = moment(subscription.nextChargeDate).format('ll');
     // Expect next dispatch date to equal next month of current date
     expect(moment(subscription.data.nextDispatchDate).format('ll')).equal(nextDispatchDate);
   });
