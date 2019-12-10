@@ -10,16 +10,6 @@ import status from '../../constants/order_status';
 import activities from '../../constants/activities';
 import * as paymentsLib from '../payments';
 
-export function getNextDispatchingDate(interval, currentDispatchDate) {
-  const nextDispatchDate = moment(currentDispatchDate);
-  if (interval === 'month') {
-    nextDispatchDate.add(1, 'months');
-  } else if (interval === 'year') {
-    nextDispatchDate.add(1, 'years');
-  }
-  return nextDispatchDate.toDate();
-}
-
 export function needsDispatching(nextDispatchDate) {
   const needs = moment(nextDispatchDate).isSameOrBefore();
   return needs;
@@ -158,9 +148,8 @@ export async function dispatch(order, subscription) {
     const dispatchedOrders = await dispatchFunds(order);
     // update subscription next dispatch date
     if (dispatchedOrders) {
-      const currentDispatchDate = (subscription.data && subscription.data.nextDispatchDate) || new Date();
       subscription.data = {
-        nextDispatchDate: getNextDispatchingDate(subscription.interval, currentDispatchDate),
+        nextDispatchDate: subscription.nextChargeDate,
       };
       await subscription.save();
     }
