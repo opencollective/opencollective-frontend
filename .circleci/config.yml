@@ -196,11 +196,10 @@ jobs:
             - api/.babelrc
             - api/package.json
             - api/package-lock.json
-  # Running Lighthouse together with e2e tests to keep to 8 the number of CircleCI jobs.
-  # Read more about this here: https://github.com/opencollective/opencollective-frontend/pull/3062#issuecomment-559757567
-  lighthouse-and-test-e2e-0:
+
+  test-e2e-0:
     docker:
-      - image: circleci/node:12.13.0-browsers
+      - image: circleci/node:12.13.0
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -216,7 +215,6 @@ jobs:
       CYPRESS_VIDEO: false
     steps:
       - setup_app
-      - run: ./scripts/lighthouse.sh
       - e2e
 
   test-e2e-1:
@@ -292,7 +290,7 @@ workflows:
           filters: { branches: { ignore: [*crowdin_branch] } }
       - build-api:
           filters: { branches: { ignore: [*crowdin_branch] } }
-      - lighthouse-and-test-e2e-0:
+      - test-e2e-0:
           filters: { branches: { ignore: [*crowdin_branch] } }
           requires:
             - build

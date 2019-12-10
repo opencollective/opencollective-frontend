@@ -2,17 +2,17 @@
 
 RETURN_CODE=0
 
-if [ "$NODE_ENV" = "circleci" ]; then
-  . ./scripts/setup_functions.sh
-  start_app
-  wait_for_app_services
+. ./scripts/setup_functions.sh
 
-  echo ""
-  echo "> Running lighthouse"
-  npx lhci autorun
-  RETURN_CODE=$?
+start_app
 
-  stop_app
-fi
+wait_for_app_services
+
+echo ""
+echo "> Running lighthouse"
+npx lhci autorun
+RETURN_CODE=$?
+
+stop_app
 
 exit $RETURN_CODE
