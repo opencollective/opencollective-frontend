@@ -479,7 +479,6 @@
   "createProfile.faq.privacy.title": "Qu'en est-il de ma vie privée ?",
   "CreateVirtualCardsSuccess.Download": "Télécharger les cartes",
   "CreateVirtualCardsSuccess.RedeemLinks": "Copier les liens",
-  "creditcard.error": "Carte de crédit non valide",
   "creditcard.label": "Carte de crédit",
   "creditcard.save": "Sauvegarder la carte de crédit dans {type, select, user {mon compte} other {le compte {type}}}",
   "currency": "devise",
