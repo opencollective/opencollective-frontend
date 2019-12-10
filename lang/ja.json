@@ -620,6 +620,7 @@
   "expense.pay.btn": "Pay with {paymentMethod}",
   "expense.pay.error.insufficientBalance": "残高不足",
   "expense.pay.manual.btn": "Record as paid",
+  "expense.payExpenseBtn.processing": "Processing...",
   "expense.paymentProcessorFeeInCollectiveCurrency": "支払い処理手数料",
   "expense.payoutMethod": "支払方法",
   "expense.payoutMethod.donation": "寄付",

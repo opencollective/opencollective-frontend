@@ -620,6 +620,7 @@
   "expense.pay.btn": "Pay with {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Недостаточный остаток",
   "expense.pay.manual.btn": "Record as paid",
+  "expense.payExpenseBtn.processing": "Processing...",
   "expense.paymentProcessorFeeInCollectiveCurrency": "комиссия обработки платежа",
   "expense.payoutMethod": "метод выплат",
   "expense.payoutMethod.donation": "Пожертвование",
