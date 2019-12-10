@@ -1,6 +1,7 @@
 import { GraphQLInt, GraphQLInterfaceType } from 'graphql';
 
-/** Interface intended to be implemented by every type that returns a
+/**
+ * Interface intended to be implemented by every type that returns a
  * collection of types. The implementing type will look like:
  * {
  *  offset: Int,
@@ -31,8 +32,10 @@ const CollectionFields = {
   },
 };
 
-/** Types to use as arguments for fields that return types
- * that implement the Collection interface. */
+/**
+ * Types to use as arguments for fields that return types
+ * that implement the Collection interface.
+ */
 const CollectionArgs = {
   limit: { type: GraphQLInt },
   offset: { type: GraphQLInt },
