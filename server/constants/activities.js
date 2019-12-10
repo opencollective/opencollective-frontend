@@ -33,6 +33,7 @@ export default {
   COLLECTIVE_MONTHLY: 'collective.monthly',
   ORDERS_SUSPICIOUS: 'orders.suspicious',
   BACKYOURSTACK_DISPATCH_CONFIRMED: 'backyourstack.dispatch.confirmed',
+  ADDED_FUND_TO_ORG: 'added.fund.to.org',
 
   // Not used anymore, leaving for historical reference
   COLLECTIVE_TRANSACTION_PAID: 'collective.transaction.paid', // replaced with COLLECTIVE_EXPENSE_PAID
