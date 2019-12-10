@@ -282,13 +282,24 @@ describe('Mutation Tests', () => {
 
         expect(newCollective.isActive).to.be.false;
         expect(newCollective.host.id).to.equal(host.collective.id);
-        await utils.waitForCondition(() => emailSendMessageSpy.callCount > 2);
+        await utils.waitForCondition(() => emailSendMessageSpy.callCount === 3);
         expect(emailSendMessageSpy.callCount).to.equal(3);
-        expect(emailSendMessageSpy.firstCall.args[0]).to.equal(host.email);
-        expect(emailSendMessageSpy.firstCall.args[1]).to.contain('new collective would love to be hosted by WWCode');
-        expect(emailSendMessageSpy.secondCall.args[0]).to.equal(user1.email);
-        expect(emailSendMessageSpy.secondCall.args[1]).to.contain('Thanks for applying to WWCode');
-        expect(emailSendMessageSpy.args[2][1]).to.contain('Welcome to Open Collective!');
+
+        const applyEmailArgs = emailSendMessageSpy.args.find(callArgs => callArgs[1].includes('Thanks for applying'));
+        expect(applyEmailArgs).to.exist;
+        expect(applyEmailArgs[0]).to.equal(user1.email);
+
+        const newCollectiveArgs = emailSendMessageSpy.args.find(callArgs =>
+          callArgs[1].includes('would love to be hosted'),
+        );
+        expect(newCollectiveArgs).to.exist;
+        expect(newCollectiveArgs[0]).to.equal(host.email);
+
+        const welcomeArgs = emailSendMessageSpy.args.find(callArgs =>
+          callArgs[1].includes('Welcome to Open Collective!'),
+        );
+        expect(welcomeArgs).to.exist;
+        expect(welcomeArgs[0]).to.equal(user1.email);
       });
     });
   });
