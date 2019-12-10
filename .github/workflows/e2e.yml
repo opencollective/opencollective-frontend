@@ -1,0 +1,158 @@
+name: E2E
+
+on: [push]
+
+env:
+  CI: true
+  TZ: UTC
+  E2E_TEST: 1
+  NODE_ENV: ci
+  WEBSITE_URL: http://localhost:3000
+  API_URL: http://localhost:3060
+  API_KEY: dvl-1510egmf4a23d80342403fb599qd
+  CYPRESS_RECORD: false
+  CYPRESS_VIDEO: false
+  CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  API_FOLDER: /home/runner/work/opencollective-api/opencollective-api
+  FRONTEND_FOLDER: /home/runner/work/opencollective-api/opencollective-api/opencollective-frontend
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        files: ['0*.js', '1*.js', '2*.js', '3*.js']
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+      postgres:
+        image: mdillon/postgis:9.6
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Install postgresql-client
+        run: sudo apt-get install postgresql-client
+
+      - name: Checkout (api)
+        uses: actions/checkout@v2-beta
+
+      - name: Checkout (frontend)
+        run: ./scripts/ci_checkout_frontend.sh
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      # Restore .npm cache
+
+      - name: Restore .npm cache (api + frontend)
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            - ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+            - ${{ runner.os }}-npm-cache-
+
+      # Setup API
+
+      - name: Restore node_modules (api)
+        uses: actions/cache@v1
+        id: api-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-api-node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies (api)
+        if: steps.api-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      # Build API
+
+      - name: Restore build (api)
+        uses: actions/cache@v1
+        id: api-build
+        with:
+          path: dist
+          key: ${{ runner.os }}-api-build-${{ github.sha }}
+
+      - name: Build (api)
+        if: steps.api-build.outputs.cache-hit != 'true'
+        run: npm run build
+
+      # Setup Frontend
+
+      - name: Restore node_modules (frontend)
+        uses: actions/cache@v1
+        id: frontend-node-modules
+        with:
+          path: opencollective-frontend/node_modules
+          key: ${{ runner.os }}-frontend-node-modules-${{ hashFiles('opencollective-frontend/package-lock.json') }}
+
+      - name: Install dependencies (frontend)
+        if: steps.frontend-node-modules.outputs.cache-hit != 'true'
+        working-directory: opencollective-frontend
+        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+
+      # Build Frontend
+
+      - name: Restore build (frontend)
+        uses: actions/cache@v1
+        id: next-build
+        with:
+          path: opencollective-frontend/dist
+          key: ${{ runner.os }}-next-build-${{ hashFiles('opencollective-frontend/archive.tar.gz') }}
+
+      - name: Restore .next cache (frontend)
+        if: steps.next-build.outputs.cache-hit != 'true'
+        uses: actions/cache@v1
+        with:
+          path: opencollective-frontend/.next/cache
+          key: ${{ runner.os }}-next-cache-${{ hashFiles('opencollective-frontend/archive.tar.gz') }}
+          restore-keys: |
+            ${{ runner.os }}-next-cache-${{ hashFiles('opencollective-frontend/archive.tar.gz') }}
+            ${{ runner.os }}-next-cache-
+
+      - name: Build (frontend)
+        if: steps.next-build.outputs.cache-hit != 'true'
+        working-directory: opencollective-frontend
+        run: npm run build
+
+      # Setup Cypress
+
+      - name: Restore Cypress
+        uses: actions/cache@v1
+        id: cypress
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('opencollective-frontend/node_modules/cypress/package.json') }}
+
+      - name: Install Cypress
+        if: steps.cypress.outputs.cache-hit != 'true'
+        working-directory: opencollective-frontend
+        run: npx cypress install
+
+      # Run E2E
+
+      - name: Setup DB
+        working-directory: opencollective-frontend
+        run: ./scripts/setup_db.sh
+
+      - name: Run E2E with Cypress
+        working-directory: opencollective-frontend
+        run: ./scripts/run_e2e_tests.sh
+        env:
+          CYPRESS_TEST_FILES: ${{ matrix.files }}
