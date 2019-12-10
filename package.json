@@ -81,7 +81,7 @@
     "nodemailer": "6.4.1",
     "p-queue": "6.2.1",
     "p-throttle": "3.1.0",
-    "passport": "0.4.0",
+    "passport": "0.4.1",
     "passport-github": "1.1.0",
     "passport-meetup-oauth2": "0.0.2",
     "passport-twitter": "1.0.4",
