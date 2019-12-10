@@ -7,11 +7,11 @@ import { isNil } from 'lodash';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { addUpdateUserEmailMutation } from '../lib/graphql/mutations';
-import { H2, Span } from './Text';
-import StyledInput from './StyledInput';
-import StyledButton from './StyledButton';
-import MessageBox from './MessageBox';
+import { addUpdateUserEmailMutation } from '../../lib/graphql/mutations';
+import { H2, Span } from '../Text';
+import StyledInput from '../StyledInput';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
 
 class EditUserEmailForm extends React.Component {
   static propTypes = {

@@ -6,17 +6,17 @@ import { Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
-import { getCurrencySymbol } from '../lib/utils';
-import InputField from './InputField';
-import GoalsCover from './GoalsCover';
-import Container from './Container';
-import StyledButton from './StyledButton';
-import { P, H3 } from './Text';
-import StyledCheckbox from './StyledCheckbox';
+import { getCurrencySymbol } from '../../lib/utils';
+import InputField from '../InputField';
+import GoalsCover from '../GoalsCover';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import { P, H3 } from '../Text';
+import StyledCheckbox from '../StyledCheckbox';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import Link from './Link';
-import MessageBox from './MessageBox';
+import Link from '../Link';
+import MessageBox from '../MessageBox';
 
 const BORDER = '1px solid #efefef';
 

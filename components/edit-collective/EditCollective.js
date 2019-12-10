@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
-import SignInOrJoinFree from './SignInOrJoinFree';
+import Header from '../Header';
+import Body from '../Body';
+import Footer from '../Footer';
+import SignInOrJoinFree from '../SignInOrJoinFree';
 import EditCollectiveForm from './EditCollectiveForm';
-import CollectiveNavbar from './CollectiveNavbar';
-import NotificationBar from './NotificationBar';
-import { defaultBackgroundImage } from '../lib/constants/collectives';
-import Loading from './Loading';
+import CollectiveNavbar from '../CollectiveNavbar';
+import NotificationBar from '../NotificationBar';
+import { defaultBackgroundImage } from '../../lib/constants/collectives';
+import Loading from '../Loading';
 
 class EditCollective extends React.Component {
   static propTypes = {
@@ -26,10 +26,6 @@ class EditCollective extends React.Component {
     this.editCollective = this.editCollective.bind(this);
     this.state = { status: null, result: {} };
     this.messages = defineMessages({
-      'creditcard.error': {
-        id: 'creditcard.error',
-        defaultMessage: 'Invalid credit card',
-      },
       'collective.isArchived': {
         id: 'collective.isArchived',
         defaultMessage: '{name} has been archived.',

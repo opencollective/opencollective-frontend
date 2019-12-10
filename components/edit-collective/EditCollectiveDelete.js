@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { withUser } from './UserProvider';
-import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../lib/graphql/mutations';
-import { H2, P } from './Text';
-import Container from './Container';
-import StyledButton from './StyledButton';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
-import { Router } from '../server/pages';
+import { withUser } from '../UserProvider';
+import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../../lib/graphql/mutations';
+import { H2, P } from '../Text';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
+import { Router } from '../../server/pages';
 
 const getCollectiveType = type => {
   switch (type) {

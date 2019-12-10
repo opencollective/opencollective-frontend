@@ -11,12 +11,12 @@ import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
-import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
-import { parseToBoolean } from '../lib/utils';
-import { VAT_OPTIONS } from '../lib/constants/vat';
-import { Router } from '../server/pages';
+import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
+import { parseToBoolean } from '../../lib/utils';
+import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { Router } from '../../server/pages';
 
-import InputField from './InputField';
+import InputField from '../InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
 import EditHost from './EditHost';
@@ -24,19 +24,19 @@ import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
 import EditWebhooks from './EditWebhooks';
-import ExportData from './ExportData';
-import Link from './Link';
-import StyledButton from './StyledButton';
+import ExportData from '../ExportData';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
 import EditVirtualCards from './EditVirtualCards';
-import CreateVirtualCardsForm from './CreateVirtualCardsForm';
+import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 
 import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
-import Container from './Container';
-import ExternalLink from './ExternalLink';
-import EditHostInvoice from './edit-collective/EditHostInvoice';
+import Container from '../Container';
+import ExternalLink from '../ExternalLink';
+import EditHostInvoice from './EditHostInvoice';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -406,14 +406,6 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           type: 'textarea',
         },
-        // {
-        //   name: 'location',
-        //   placeholder: 'Search cities',
-        //   type: 'location',
-        //   options: {
-        //     types: ['cities']location
-        //   }
-        // },
         {
           name: 'country',
           type: 'country',

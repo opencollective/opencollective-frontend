@@ -2,13 +2,13 @@ import React, { Fragment, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../../lib/utils';
 
-import Container from './Container';
-import StyledButton from './StyledButton';
-import SendMoneyToCollectiveBtn from './SendMoneyToCollectiveBtn';
-import { H2, P } from './Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
+import { H2, P } from '../Text';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 
 const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
   const [modal, setModal] = useState({ type: 'Transfer', show: false, isApproved: false });

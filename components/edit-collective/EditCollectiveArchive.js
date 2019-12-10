@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../lib/graphql/mutations';
+import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../lib/graphql/mutations';
 
-import { H2, P } from './Text';
-import Container from './Container';
-import StyledButton from './StyledButton';
-import MessageBox from './MessageBox';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
+import { H2, P } from '../Text';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 
 const getCollectiveType = type => {
   switch (type) {
