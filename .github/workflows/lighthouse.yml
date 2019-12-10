@@ -12,6 +12,7 @@ env:
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
+  LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
 jobs:
   check:
