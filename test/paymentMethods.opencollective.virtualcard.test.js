@@ -14,7 +14,7 @@ import { maxInteger } from '../server/constants/math';
 
 import * as utils from './utils';
 import * as store from './stores';
-import initNock from './paymentMethods.opencollective.virtualcard.nock';
+import initNock from './nocks/paymentMethods.opencollective.virtualcard.nock';
 
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;

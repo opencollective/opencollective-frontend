@@ -6,7 +6,7 @@ import config from 'config';
 import * as utils from '../test/utils';
 import models from '../server/models';
 import ORDER_STATUS from '../server/constants/order_status';
-import initNock from './graphql.updateSubscription.nock';
+import initNock from './nocks/graphql.updateSubscription.nock';
 
 const ordersData = utils.data('orders');
 const updateSubscriptionQuery = `

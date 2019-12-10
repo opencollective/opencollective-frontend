@@ -12,7 +12,7 @@ import webhookBodyApprove from './mocks/mailgun.webhook.approve';
 import * as utils from '../test/utils';
 import config from 'config';
 import nock from 'nock';
-import initNock from './email.routes.test.nock.js';
+import initNock from './nocks/email.routes.test.nock.js';
 
 const generateToken = (email, slug, template) => {
   const uid = `${email}.${slug}.${template}.${config.keys.opencollective.jwtSecret}`;
