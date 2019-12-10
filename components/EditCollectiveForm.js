@@ -36,6 +36,7 @@ import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
 import Container from './Container';
 import ExternalLink from './ExternalLink';
+import EditHostInvoice from './edit-collective/EditHostInvoice';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -651,6 +652,16 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="Core Contributors" />
               </MenuItem>
             )}
+            {collective.isHost && (
+              <MenuItem
+                selected={this.state.section === 'invoices'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'invoices' }}
+                className="MenuItem invoices"
+              >
+                <FormattedMessage id="editCollective.menu.invoicesAndReceipts" defaultMessage="Invoices & Receipts" />
+              </MenuItem>
+            )}
             {this.showEditGoals && (
               <MenuItem
                 selected={this.state.section === 'goals'}
@@ -790,6 +801,7 @@ class EditCollectiveForm extends React.Component {
                   ),
               )}
               {this.state.section === 'members' && <EditMembers collective={collective} LoggedInUser={LoggedInUser} />}
+              {this.state.section === 'invoices' && <EditHostInvoice collective={collective} />}
               {this.state.section === 'webhooks' && (
                 <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
               )}
@@ -862,6 +874,7 @@ class EditCollectiveForm extends React.Component {
               'export',
               'connected-accounts',
               'host',
+              'invoices',
               'gift-cards',
               'gift-cards-create',
               'gift-cards-send',
