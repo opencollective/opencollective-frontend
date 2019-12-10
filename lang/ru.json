@@ -479,7 +479,6 @@
   "createProfile.faq.privacy.title": "What about privacy?",
   "CreateVirtualCardsSuccess.Download": "Загрузить карточки",
   "CreateVirtualCardsSuccess.RedeemLinks": "Скопировать ссылки",
-  "creditcard.error": "Некорректный номер кредитной карты",
   "creditcard.label": "Кредитная карта",
   "creditcard.save": "Сохранить данные кредитной карты в {type, select, user {мой аккаунтt} other {{type} аккаунт}}",
   "currency": "валюта",
