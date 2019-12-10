@@ -11,6 +11,7 @@ export default {
   COLLECTIVE_REJECTED: 'collective.rejected',
   COLLECTIVE_CREATED: 'collective.created',
   COLLECTIVE_COMMENT_CREATED: 'collective.comment.created',
+  COLLECTIVE_CONVERSATION_CREATED: 'collective.conversation.created',
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',
   COLLECTIVE_EXPENSE_UPDATED: 'collective.expense.updated',

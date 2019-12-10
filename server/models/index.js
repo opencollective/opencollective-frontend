@@ -77,6 +77,7 @@ export function setupModels(client) {
     'Collective',
     'Comment',
     'Conversation',
+    'ConversationFollower',
     'Expense',
     'LegalDocument',
     'Member',

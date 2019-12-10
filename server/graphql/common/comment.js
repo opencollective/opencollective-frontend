@@ -68,16 +68,16 @@ async function deleteComment(id, remoteUser) {
   return comment.destroy();
 }
 
-async function createCommentResolver(_, { comment }, { remoteUser }) {
+async function createCommentResolver(_, { comment: commentData }, { remoteUser }) {
   mustBeLoggedInTo(remoteUser, 'create a comment');
 
-  if (!comment.markdown && !comment.html) {
+  if (!commentData.markdown && !commentData.html) {
     throw new errors.ValidationFailed({
       message: 'comment.markdown or comment.html required',
     });
   }
 
-  const { ConversationId, ExpenseId, UpdateId, markdown, html } = comment;
+  const { ConversationId, ExpenseId, UpdateId, markdown, html } = commentData;
 
   // Ensure at least (and only) one entity to comment is specified
   if ([ConversationId, ExpenseId, UpdateId].filter(Boolean).length !== 1) {
@@ -85,7 +85,7 @@ async function createCommentResolver(_, { comment }, { remoteUser }) {
   }
 
   // Load entity and its collective id
-  const CollectiveId = await getCollectiveIdForCommentEntity(comment);
+  const CollectiveId = await getCollectiveIdForCommentEntity(commentData);
   if (!CollectiveId) {
     throw new errors.ValidationFailed({
       message: "The item you're trying to comment doesn't exist or has been deleted.",
@@ -93,7 +93,7 @@ async function createCommentResolver(_, { comment }, { remoteUser }) {
   }
 
   // Create comment
-  return models.Comment.create({
+  const comment = await models.Comment.create({
     CollectiveId,
     ExpenseId,
     UpdateId,
@@ -103,6 +103,12 @@ async function createCommentResolver(_, { comment }, { remoteUser }) {
     CreatedByUserId: remoteUser.id,
     FromCollectiveId: remoteUser.CollectiveId,
   });
+
+  if (ConversationId) {
+    models.ConversationFollower.follow(remoteUser.id, ConversationId);
+  }
+
+  return comment;
 }
 
 function collectiveResolver({ CollectiveId }, _, { loaders }) {

@@ -8,11 +8,17 @@ import { TransactionTypes } from '../../constants/transactions';
 import { getListOfAccessibleMembers } from '../../lib/auth';
 import models, { Op, sequelize } from '../../models';
 import { sortResults, createDataLoaderWithOptions } from './helpers';
+
+// Loaders generators
 import generateCommentsLoader from './comments';
+import generateConversationLoaders from './conversation';
 
 export const loaders = req => {
   const cache = {};
   const context = createContext(sequelize);
+
+  context.loaders.Comment = generateCommentsLoader(req, cache);
+  context.loaders.Conversation = generateConversationLoaders(req, cache);
 
   /** *** Collective *****/
 
@@ -189,9 +195,6 @@ export const loaders = req => {
       })
       .then(results => sortResults(OrgCollectiveIds, results, 'OrgCollectiveId', {})),
   );
-
-  /** *** Comment *****/
-  context.loaders.Comment = generateCommentsLoader(req, cache);
 
   /** *** Tier *****/
   // Tier - availableQuantity

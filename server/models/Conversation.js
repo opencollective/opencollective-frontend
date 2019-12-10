@@ -1,4 +1,10 @@
+import { partition, uniqBy, map, differenceWith } from 'lodash';
+import slugify from 'limax';
+
+import { activities } from '../constants';
 import { stripHTML, generateSummaryForHTML } from '../lib/sanitize-html';
+import models, { sequelize } from '.';
+import { idEncode, IDENTIFIER_TYPES } from '../graphql/v2/identifiers';
 
 export default function(Sequelize, DataTypes) {
   const Conversation = Sequelize.define(
@@ -9,6 +15,12 @@ export default function(Sequelize, DataTypes) {
         primaryKey: true,
         autoIncrement: true,
       },
+      hashId: {
+        type: DataTypes.VIRTUAL(DataTypes.STRING),
+        get() {
+          return idEncode(this.get('id'), IDENTIFIER_TYPES.CONVERSATION);
+        },
+      },
       title: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -17,6 +29,12 @@ export default function(Sequelize, DataTypes) {
           if (title) {
             this.setDataValue('title', title.trim());
           }
+        },
+      },
+      slug: {
+        type: DataTypes.VIRTUAL(DataTypes.STRING),
+        get() {
+          return slugify(this.get('title')) || 'conversation';
         },
       },
       summary: {
@@ -109,8 +127,71 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.INTEGER,
       },
     },
-    { paranoid: true },
+    {
+      paranoid: true,
+    },
   );
+
+  // ---- Static methods ----
+
+  Conversation.createWithComment = async function(user, collective, title, html, tags = null) {
+    // Use a transaction to make sure conversation is not created if comment creation fails
+    const conversation = await sequelize.transaction(async t => {
+      // Create conversation
+      const conversation = await models.Conversation.create(
+        {
+          CreatedByUserId: user.id,
+          CollectiveId: collective.id,
+          FromCollectiveId: user.CollectiveId,
+          title: title,
+          tags: tags,
+          summary: html,
+        },
+        { transaction: t },
+      );
+
+      // Create comment
+      const comment = await models.Comment.create(
+        {
+          CollectiveId: collective.id,
+          ConversationId: conversation.id,
+          CreatedByUserId: user.id,
+          FromCollectiveId: user.CollectiveId,
+          html: html,
+        },
+        { transaction: t },
+      );
+
+      // Need to update the conversation to link a comment
+      return conversation.update({ RootCommentId: comment.id }, { transaction: t });
+    });
+
+    // Create the activity asynchronously. We do it here rather than in a hook because
+    // `afterCreate` doesn't wait the end of the transaction to run, see https://github.com/sequelize/sequelize/issues/8585
+    models.Activity.create({
+      type: activities.COLLECTIVE_CONVERSATION_CREATED,
+      UserId: conversation.CreatedByUserId,
+      CollectiveId: conversation.CollectiveId,
+      data: {
+        conversation: {
+          id: conversation.id,
+          hashId: conversation.hashId,
+          slug: conversation.slug,
+          title: conversation.title,
+          summary: conversation.summary,
+          tags: conversation.tags,
+          FromCollectiveId: conversation.FromCollectiveId,
+          CollectiveId: conversation.CollectiveId,
+          RootCommentId: conversation.RootCommentId,
+          CreatedByUserId: conversation.CreatedByUserId,
+        },
+      },
+    });
+
+    // Add user as a follower of the conversation
+    await models.ConversationFollower.follow(user.id, conversation.id);
+    return conversation;
+  };
 
   Conversation.getMostPopularTagsForCollective = async function(collectiveId, limit = 100) {
     return Sequelize.query(
@@ -128,6 +209,35 @@ export default function(Sequelize, DataTypes) {
       },
     );
   };
+
+  // ---- Instance methods ----
+
+  /**
+   * Get a list of users who should be notified for conversation updates:
+   * - Collective admins who haven't unsubscribed from the conversation
+   * - Conversation followers
+   */
+  Conversation.prototype.getUsersFollowing = async function() {
+    const collective = await models.Collective.findByPk(this.CollectiveId);
+    const [admins, followers] = await Promise.all([
+      collective.getAdminUsers(),
+      models.ConversationFollower.findAll({
+        include: ['user'],
+        where: { ConversationId: this.id },
+      }),
+    ]);
+
+    // Add followers and remove users who have explicitely unsubscribed, including admins
+    const [subscribed, unsubscribed] = partition(followers, 'isActive');
+    const subscribedUsers = map(subscribed, 'user');
+    const filteredAdmins = differenceWith(admins, unsubscribed, (user, follower) => {
+      return user.id === follower.user.id;
+    });
+
+    return uniqBy([...filteredAdmins, ...subscribedUsers], 'id');
+  };
+
+  // ---- Prepare model ----
 
   Conversation.associate = m => {
     Conversation.belongsTo(m.Collective, {
