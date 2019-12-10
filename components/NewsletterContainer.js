@@ -39,6 +39,7 @@ class NewsletterContainer extends React.Component {
                 name="EMAIL"
                 px={3}
                 py={1}
+                minWidth={200}
                 placeholder="Your email address"
                 type="email"
                 width={1}
