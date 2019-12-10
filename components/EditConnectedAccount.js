@@ -5,7 +5,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { connectAccount, disconnectAccount } from '../lib/api';
-import EditTwitterAccount from './EditTwitterAccount';
+import EditTwitterAccount from './edit-collective/EditTwitterAccount';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {

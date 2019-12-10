@@ -7,20 +7,20 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
 
-import { compose, getErrorFromGraphqlException } from '../lib/utils';
-import { addEditCollectiveMutation } from '../lib/graphql/mutations';
-import { paymentMethodLabel } from '../lib/payment_method_label';
-import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
-import { H1, H2, H3, Span, P } from './Text';
-import Link from './Link';
-import Loading from './Loading';
+import { compose, getErrorFromGraphqlException } from '../../lib/utils';
+import { addEditCollectiveMutation } from '../../lib/graphql/mutations';
+import { paymentMethodLabel } from '../../lib/payment_method_label';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { H1, H2, H3, Span, P } from '../Text';
+import Link from '../Link';
+import Loading from '../Loading';
 import EditPaymentMethod from './EditPaymentMethod';
-import StyledButton from './StyledButton';
-import Container from './Container';
-import { withStripeLoader } from './StripeProvider';
-import NewCreditCardForm from './NewCreditCardForm';
-import UpdateBankDetailsForm from './UpdateBankDetailsForm';
-import MessageBox from './MessageBox';
+import StyledButton from '../StyledButton';
+import Container from '../Container';
+import { withStripeLoader } from '../StripeProvider';
+import NewCreditCardForm from '../NewCreditCardForm';
+import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
+import MessageBox from '../MessageBox';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {

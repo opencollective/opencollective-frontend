@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import gql from 'graphql-tag';
-import InputField from './InputField';
-import SmallButton from './SmallButton';
+import InputField from '../InputField';
+import SmallButton from '../SmallButton';
 import { cloneDeep, pick } from 'lodash';
 import { Form, Row, Col } from 'react-bootstrap';
 

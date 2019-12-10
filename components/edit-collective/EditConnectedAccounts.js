@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import EditConnectedAccount from './EditConnectedAccount';
 import { groupBy } from 'lodash';
-import { capitalize } from '../lib/utils';
+import { capitalize } from '../../lib/utils';
+import EditConnectedAccount from '../EditConnectedAccount';
 
 class EditConnectedAccounts extends React.Component {
   static propTypes = {

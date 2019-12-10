@@ -9,18 +9,18 @@ import memoizeOne from 'memoize-one';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { CollectiveType } from '../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../lib/utils';
-import InputField from './InputField';
-import CollectivePickerAsync from './CollectivePickerAsync';
-import StyledButton from './StyledButton';
-import StyledTooltip from './StyledTooltip';
-import Container from './Container';
-import { H3, P } from './Text';
-import MessageBox from './MessageBox';
-import Link from './Link';
-import Loading from './Loading';
-import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
+import { CollectiveType } from '../../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../../lib/utils';
+import InputField from '../InputField';
+import CollectivePickerAsync from '../CollectivePickerAsync';
+import StyledButton from '../StyledButton';
+import StyledTooltip from '../StyledTooltip';
+import Container from '../Container';
+import { H3, P } from '../Text';
+import MessageBox from '../MessageBox';
+import Link from '../Link';
+import Loading from '../Loading';
+import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
 /**
  * This pages sets some global styles that are causing troubles in new components. This

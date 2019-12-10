@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
-import SignInOrJoinFree from './SignInOrJoinFree';
+import Header from '../Header';
+import Body from '../Body';
+import Footer from '../Footer';
+import SignInOrJoinFree from '../SignInOrJoinFree';
 import EditCollectiveForm from './EditCollectiveForm';
-import CollectiveNavbar from './CollectiveNavbar';
-import NotificationBar from './NotificationBar';
-import { defaultBackgroundImage } from '../lib/constants/collectives';
-import Loading from './Loading';
+import CollectiveNavbar from '../CollectiveNavbar';
+import NotificationBar from '../NotificationBar';
+import { defaultBackgroundImage } from '../../lib/constants/collectives';
+import Loading from '../Loading';
 
 class EditCollective extends React.Component {
   static propTypes = {

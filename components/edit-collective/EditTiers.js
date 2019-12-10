@@ -7,11 +7,11 @@ import uuidv4 from 'uuid/v4';
 import { Box, Flex } from '@rebass/grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
-import { getCurrencySymbol, capitalize, parseToBoolean } from '../lib/utils';
-import InputField from './InputField';
-import InputFieldPresets from './InputFieldPresets';
-import { Span } from './Text';
-import MessageBox from './MessageBox';
+import { getCurrencySymbol, capitalize, parseToBoolean } from '../../lib/utils';
+import InputField from '../InputField';
+import InputFieldPresets from '../InputFieldPresets';
+import { Span } from '../Text';
+import MessageBox from '../MessageBox';
 
 class EditTiers extends React.Component {
   static propTypes = {
