@@ -104,7 +104,7 @@ const ParentedCollectivesQuery = gql`
         settings
         parentCollective {
           id
-          backgroundImage
+          backgroundImageUrl
           name
           slug
         }
