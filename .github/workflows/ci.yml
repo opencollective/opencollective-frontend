@@ -148,6 +148,12 @@ jobs:
         if: steps.api-node-modules.outputs.cache-hit != 'true'
         run: npm ci --prefer-offline --no-audit
 
+      - name: Cache build
+        uses: actions/cache@v1
+        with:
+          path: dist
+          key: ${{ runner.os }}-api-build-${{ github.sha }}
+
       - name: Build
         run: npm run build
 
