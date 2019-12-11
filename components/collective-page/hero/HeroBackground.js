@@ -149,15 +149,17 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
           />
           <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
             <Dropzone
-              onDrop={acceptedFiles =>
+              onDrop={acceptedFiles => {
+                onZoomChange(1);
+                onCropChange(DEFAULT_CROP);
                 setUploadedImage(
                   ...acceptedFiles.map(file =>
                     Object.assign(file, {
                       preview: URL.createObjectURL(file),
                     }),
                   ),
-                )
-              }
+                );
+              }}
               multiple={false}
               accept="image/jpeg, image/png"
               style={{}}
