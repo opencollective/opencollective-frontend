@@ -204,9 +204,8 @@ export const loaders = req => {
         `
           SELECT t.id, (t."maxQuantity" - COALESCE(SUM(o.quantity), 0)) AS "availableQuantity"
           FROM "Tiers" t
-          LEFT JOIN "Orders" o ON o."TierId" = t.id
+          LEFT JOIN "Orders" o ON o."TierId" = t.id AND o."processedAt" IS NOT NULL
           WHERE t.id IN (?)
-          AND (o.id IS NULL OR o."processedAt" IS NOT NULL)
           AND t."maxQuantity" IS NOT NULL
           GROUP BY t.id
         `,
