@@ -4,7 +4,7 @@ import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import uuid from 'uuid/v4';
 
-const StyledTooltip = styled(ReactTooltip)`
+const StyledTooltipContainer = styled(ReactTooltip)`
   max-width: 320px;
   z-index: 1000000;
   opacity: 0.96 !important;
@@ -33,7 +33,7 @@ const InlineDiv = styled.div`
  * Relies on [react-tooltip](https://react-tooltip.netlify.com/) and accepts any
  * of its properties.
  */
-class Tooltip extends React.Component {
+class StyledTooltip extends React.Component {
   static propTypes = {
     /** Tooltip type */
     type: PropTypes.oneOf(['success', 'warning', 'error', 'info', 'light', 'dark']),
@@ -86,7 +86,7 @@ class Tooltip extends React.Component {
           </InlineDiv>
         )}
         {isMounted && (
-          <StyledTooltip
+          <StyledTooltipContainer
             id={this.state.id}
             effect="solid"
             delayHide={this.props.delayHide}
@@ -101,4 +101,4 @@ class Tooltip extends React.Component {
   }
 }
 
-export default Tooltip;
+export default StyledTooltip;
