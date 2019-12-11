@@ -16,6 +16,7 @@ export const getCollectivePageQuery = gql`
       description
       longDescription
       backgroundImage
+      backgroundImageUrl
       twitterHandle
       githubHandle
       website
