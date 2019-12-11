@@ -6,18 +6,21 @@ import * as utils from '../../utils';
 import models from '../../../server/models';
 import { randEmail } from '../../stores';
 
-nock('https://data.fixer.io')
-  .get(/.*/)
-  .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD' })
-  .reply(200, { base: 'EUR', date: '2017-09-01', rates: { USD: 1.192 } });
-
 describe('paymentmethod.model.test.js', () => {
   let timer, user, collective, organization, paymentMethod;
+
   before(async () => {
+    nock('https://data.fixer.io')
+      .get(/.*/)
+      .query({ access_key: config.fixer.accessKey, base: 'EUR', symbols: 'USD' })
+      .reply(200, { base: 'EUR', date: '2017-09-01', rates: { USD: 1.192 } });
     await utils.resetTestDB();
     timer = sinon.useFakeTimers(new Date('2017-09-01 00:00:00').getTime());
   });
-  after(() => timer.restore());
+  after(() => {
+    timer.restore();
+    nock.cleanAll();
+  });
 
   describe('validation', () => {
     it('validates the token for Stripe', done => {

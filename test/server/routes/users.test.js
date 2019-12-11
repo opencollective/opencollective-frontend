@@ -21,7 +21,7 @@ const application = utils.data('application');
 /**
  * Tests.
  */
-describe('users.routes.test.js', () => {
+describe('routes/users.test.js', () => {
   let nm;
 
   let sandbox;

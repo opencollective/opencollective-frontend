@@ -7,7 +7,7 @@ import config from 'config';
 
 const emailData = utils.data('emailData');
 
-describe('lib/email', () => {
+describe('server/lib/email', () => {
   let nm;
 
   // create a fake nodemailer transport

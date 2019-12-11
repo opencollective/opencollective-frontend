@@ -11,14 +11,7 @@ const collectiveData = utils.data('collective1');
 describe('homepage.routes.test.js', () => {
   let user, collective, paymentMethod;
 
-  beforeEach(done => {
-    setTimeout(done, 1000);
-  });
   beforeEach(() => utils.resetTestDB());
-  beforeEach(done => {
-    setTimeout(done, 1000);
-  });
-
   beforeEach(() => models.User.createUserWithCollective(userData).tap(u => (user = u)));
   beforeEach(() =>
     models.Collective.create(collectiveData)
