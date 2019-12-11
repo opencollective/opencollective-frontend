@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}}/{{interval}} contribution to {{group.name}}
 {{else}}
-Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} donation to {{group.name}}
+Subject: Thank you for your {{{currency donation.amount currency=donation.currency}}} contribution to {{group.name}}
 {{/if}}
 
 {{> header}}
@@ -17,14 +17,14 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 {{#if interval}}
   {{#if firstPayment }}
     <p>We would like to thank you for your pledge to give {{{currency donation.amount currency=donation.currency}}} per {{interval}}.
-      Your first payment was received on {{{moment donation.createdAt}}}. Your donation helps us continue our activities.</p>
+      Your first payment was received on {{{moment donation.createdAt}}}. Your contribution helps us continue our activities.</p>
       {{> charge_date_notice}}
   {{else}}
-    <p>We would like to thank you for your continued support. Your latest {{interval}}ly donation of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
-      Your donation helps us continue our activities.</p>
+    <p>We would like to thank you for your continued support. Your latest {{interval}}ly contribution of {{{currency donation.amount currency=donation.currency}}} was received on {{{moment transaction.createdAt}}}.
+      Your contribution helps us continue our activities.</p>
   {{/if}}
 {{else}}
-<p>We would like to thank you for your donation of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
+<p>We would like to thank you for your contribution of {{{currency donation.amount currency=donation.currency}}} on {{{moment donation.createdAt}}}.
   Your gift will help us continue our activities.</p>
 {{/if}}
 
@@ -33,7 +33,7 @@ Subject: Thank you for your {{{currency donation.amount currency=donation.curren
 </p>
 
 <p>
-  P.S: You can download a PDF receipt for your donation <a href="{{config.host.invoices}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+  P.S: You can download a PDF receipt for your contribution <a href="{{config.host.invoices}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
 </p>
 
 <p>Warmly,</p>

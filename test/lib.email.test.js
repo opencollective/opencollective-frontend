@@ -110,7 +110,7 @@ describe('lib/email', () => {
       });
       expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
       expect(nm.sendMail.lastCall.args[0].subject).to.contain(
-        `Thank you for your ${amountStr}/month donation to WWCode Austin`,
+        `Thank you for your ${amountStr}/month contribution to WWCode Austin`,
       );
       expect(nm.sendMail.lastCall.args[0].html).to.contain('4218859');
     });
@@ -148,7 +148,7 @@ describe('lib/email', () => {
       expect(nm.sendMail.lastCall.args[0].from).to.equal(from);
       expect(nm.sendMail.lastCall.args[0].to).to.equal('emailbcc+user1-at-opencollective.com@opencollective.com');
       expect(nm.sendMail.lastCall.args[0].subject).to.contain(
-        `Thank you for your ${amountStr}/month donation to #BrusselsTogether`,
+        `Thank you for your ${amountStr}/month contribution to #BrusselsTogether`,
       );
       expect(nm.sendMail.lastCall.args[0].html).to.contain(data.relatedCollectives[0].name);
       expect(nm.sendMail.lastCall.args[0].html).to.contain(

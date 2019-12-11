@@ -1,7 +1,7 @@
 {{#if interval }}
-Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}}/{{interval}} contribution to {{collective.name}}
 {{else}}
-Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} donation to {{collective.name}}
+Subject: Thank you for your {{{currency order.totalAmount currency=order.currency}}} contribution to {{collective.name}}
 {{/if}}
 
 {{> header}}
@@ -17,7 +17,7 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 {{#if interval}}
 	<p>We would like to thank you for your pledge to give {{{currency order.totalAmount currency=order.currency}}} per {{interval}}. Your first payment was received on {{{moment order.createdAt}}}. Your gift will help us continue our activities.</p>
 {{else}}
-	<p>We would like to thank you for your donation of {{{currency order.totalAmount currency=order.currency}}} on {{{moment transaction.createdAt}}}.
+	<p>We would like to thank you for your contribution of {{{currency order.totalAmount currency=order.currency}}} on {{{moment transaction.createdAt}}}.
   Your gift will help us continue our activities.</p>
 {{/if}}
 
@@ -27,7 +27,7 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
   <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.
 
 <p>
-  P.S: You can download a PDF receipt for your donation <a href="{{config.host.invoices}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
+  P.S: You can download a PDF receipt for your contribution <a href="{{config.host.invoices}}/{{collective.slug}}/transactions/{{transaction.uuid}}/invoice.pdf">here</a>{{#if subscriptionsLink}}, and you can manage your subscriptions <a href="{{subscriptionsLink}}">here</a>{{/if}}.
 </p>
 
 <p>Warmly,</p>

@@ -412,10 +412,12 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     const tierNameInfo = tier && tier.name ? ` (${tier.name})` : '';
     let defaultDescription;
     if (order.interval) {
-      defaultDescription = `${capitalize(order.interval)}ly donation to ${collective.name}${tierNameInfo}`;
+      defaultDescription = `${capitalize(order.interval)}ly financial contribution to ${
+        collective.name
+      }${tierNameInfo}`;
     } else {
       defaultDescription = `${
-        order.totalAmount === 0 || collective.type === types.EVENT ? 'Registration' : 'Donation'
+        order.totalAmount === 0 || collective.type === types.EVENT ? 'Registration' : 'Financial contribution'
       } to ${collective.name}${tierNameInfo}`;
     }
     debug('defaultDescription', defaultDescription, 'collective.type', collective.type);
