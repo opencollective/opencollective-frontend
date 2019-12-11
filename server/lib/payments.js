@@ -150,6 +150,7 @@ export async function createRefundTransaction(transaction, refundedPaymentProces
           },
         });
   const userLedgerRefund = pick(collectiveLedger, [
+    'currency',
     'FromCollectiveId',
     'CollectiveId',
     'HostCollectiveId',
