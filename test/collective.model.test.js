@@ -330,18 +330,19 @@ describe('Collective model', () => {
       expect(newCollective.HostCollectiveId).to.equal(hostUser.id);
       expect(newCollective.isActive).to.be.false;
       await utils.waitForCondition(() => sendEmailSpy.callCount === 2, {
-        tag: 'New collective would love to be hosted by AND Thanks for applying',
+        tag: '"would love to be hosted" by AND "Thanks for applying"',
       });
-      expect(sendEmailSpy.firstCall.args[0]).to.equal(hostUser.email);
-      expect(sendEmailSpy.firstCall.args[1]).to.equal(
-        `New collective would love to be hosted by ${hostUser.collective.name}`,
-      );
-      expect(sendEmailSpy.firstCall.args[2]).to.contain(user2.collective.name);
+      expect(sendEmailSpy.callCount).to.equal(2);
 
-      expect(sendEmailSpy.secondCall.args[0]).to.equal(user1.email);
-      expect(sendEmailSpy.secondCall.args[1]).to.equal(`Thanks for applying to ${hostUser.collective.name}`);
+      const hostedArgs = sendEmailSpy.args.find(callArgs => callArgs[1].includes('would love to be hosted'));
+      expect(hostedArgs).to.exist;
+      expect(hostedArgs[0]).to.equal(hostUser.email);
+      expect(hostedArgs[2]).to.contain(user2.collective.name);
 
-      expect(sendEmailSpy.secondCall.args[3].from).to.equal('hello@wwcode.opencollective.com');
+      const applyArgs = sendEmailSpy.args.find(callArgs => callArgs[1].includes('Thanks for applying'));
+      expect(applyArgs).to.exist;
+      expect(applyArgs[0]).to.equal(user1.email);
+      expect(applyArgs[3].from).to.equal('hello@wwcode.opencollective.com');
     });
   });
 
