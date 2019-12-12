@@ -132,7 +132,7 @@ class CreateConversationPage extends React.Component {
 const getCollective = graphql(
   gqlV2`
     query CreateConversations($collectiveSlug: String!) {
-      collective(slug: $collectiveSlug, throwIfMissing: false) {
+      account(slug: $collectiveSlug) {
         id
         slug
         name

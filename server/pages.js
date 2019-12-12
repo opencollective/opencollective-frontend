@@ -77,9 +77,12 @@ pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([
 
 // Conversations
 // ---------------
-pages.add('conversations', '/:collectiveSlug/conversations');
-pages.add('create-conversation', '/:collectiveSlug/conversations/new');
-pages.add('conversation', '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)');
+pages.add('conversations', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/conversations');
+pages.add('create-conversation', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/conversations/new');
+pages.add(
+  'conversation',
+  '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
+);
 
 // Contribute Flow
 // ---------------

@@ -16,6 +16,7 @@ import ConversationsList from '../../conversations/ConversationsList';
 import { ConversationListFragment } from '../../conversations/graphql';
 import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
+import LinkCreateConversation from '../../conversations/LinkCreateConversation';
 
 const conversationsQuery = gqlV2`
   query ConversationSection($collectiveSlug: String!) {
@@ -45,7 +46,7 @@ class SectionConversations extends React.PureComponent {
       collective: PropTypes.shape({
         conversations: PropTypes.shape({
           totalCount: PropTypes.number,
-          nodes: PropTypes.object,
+          nodes: PropTypes.array,
         }),
       }),
     }),
@@ -67,19 +68,19 @@ class SectionConversations extends React.PureComponent {
               defaultMessage="Let’s get the ball rolling! This is where things get planned and sometimes this is where things get done. Ask questions, thank people for their efforts, and contribute your skills to the service of the community."
             />
           </P>
-          <Link route="create-conversation" params={{ collectiveSlug: collective.slug }}>
+          <LinkCreateConversation collective={collective}>
             <StyledButton buttonStyle="primary">
               <FormattedMessage id="conversations.create" defaultMessage="Create conversation" />
             </StyledButton>
-          </Link>
+          </LinkCreateConversation>
         </Flex>
         {isEmpty(conversations.nodes) ? (
           <Box my={5}>
-            <Link route="create-conversation" params={{ collectiveSlug: collective.slug }}>
+            <LinkCreateConversation collective={collective}>
               <StyledButton buttonStyle="primary" buttonSize="large">
                 <FormattedMessage id="conversations.createFirst" defaultMessage="Start a new conversation" />
               </StyledButton>
-            </Link>
+            </LinkCreateConversation>
           </Box>
         ) : (
           <Box>

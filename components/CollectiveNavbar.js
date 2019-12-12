@@ -235,6 +235,7 @@ const DEFAULT_SECTIONS = {
     Sections.CONTRIBUTE,
     Sections.PARTICIPANTS,
     Sections.LOCATION,
+    Sections.CONVERSATIONS,
     Sections.BUDGET,
   ],
 };
