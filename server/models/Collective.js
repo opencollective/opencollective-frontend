@@ -642,7 +642,7 @@ export default function(Sequelize, DataTypes) {
               CollectiveId: instance.id,
               service: 'opencollective',
               type: 'collective',
-              name: `${capitalize(instance.name)} ${capitalize(instance.type.toLowerCase())}`,
+              name: `${instance.name} (${capitalize(instance.type.toLowerCase())})`,
               primary: true,
               currency: instance.currency,
             });
