@@ -207,4 +207,9 @@ jobs:
 
       - run: npm run db:setup
 
-      - run: npm run test
+      - run: npm run test:graphql
+      - run: npm run test:lib
+      - run: npm run test:models
+      - run: npm run test:payment-providers
+      - run: npm run test:routes
+      - run: npm run test:scripts
