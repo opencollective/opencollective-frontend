@@ -47,7 +47,7 @@ const TrixEditorContainer = styled.div`
 
   trix-toolbar {
     min-height: 40px;
-    background: white;
+    background: ${props => props.toolbarBackgroundColor};
     box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
     z-index: 2;
     margin-bottom: 8px;
@@ -56,6 +56,7 @@ const TrixEditorContainer = styled.div`
       border-radius: 6px;
       border-color: #c4c7cc;
       margin-bottom: 0;
+      background: white;
     }
 
     .trix-button {
@@ -128,6 +129,7 @@ export default class RichTextEditor extends React.Component {
     id: PropTypes.string,
     defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
+    toolbarBackgroundColor: PropTypes.string.isRequired,
     /** Font size for the text */
     fontSize: PropTypes.string,
     autoFocus: PropTypes.bool,
@@ -160,6 +162,7 @@ export default class RichTextEditor extends React.Component {
     toolbarTop: 0,
     toolbarOffsetY: -62, // Default Trix toolbar height
     inputName: 'content',
+    toolbarBackgroundColor: 'white',
   };
 
   constructor(props) {
@@ -251,6 +254,7 @@ export default class RichTextEditor extends React.Component {
       withStickyToolbar,
       toolbarTop,
       toolbarOffsetY,
+      toolbarBackgroundColor,
       autoFocus,
       placeholder,
       editorMinHeight,
@@ -268,6 +272,7 @@ export default class RichTextEditor extends React.Component {
         withStickyToolbar={withStickyToolbar}
         toolbarTop={toolbarTop}
         toolbarOffsetY={toolbarOffsetY}
+        toolbarBackgroundColor={toolbarBackgroundColor}
         editorMinHeight={editorMinHeight}
         withBorders={withBorders}
         isDisabled={disabled}
