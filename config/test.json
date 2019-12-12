@@ -9,5 +9,14 @@
     "s3": {
       "bucket": "opencollective-test"
     }
+  },
+  "cache": {
+    "homepage": {
+      "disabled": true
+    }
+  },
+  "mailgun": {
+    "user": "test-mailgun-user",
+    "password": "test-mailgun-password"
   }
 }

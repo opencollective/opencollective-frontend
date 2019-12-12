@@ -188,6 +188,12 @@
     "script": "babel-node --extensions .js,.ts $1",
     "start": "node ./dist/index.js",
     "test": "TZ=UTC nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:graphql": "TZ=UTC nyc mocha test/server/graphql --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:lib": "TZ=UTC nyc mocha test/server/lib --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:models": "TZ=UTC nyc mocha test/server/models --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:payment-providers": "TZ=UTC nyc mocha test/server/paymentProviders --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:routes": "TZ=UTC nyc mocha test/server/routes --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
+    "test:scripts": "TZ=UTC nyc mocha test/scripts --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
     "test:clean": "rm -rf .nyc_output coverage test/output",
     "test:watch": "TZ=UTC nyc mocha --watch",
     "type:check": "tsc"

@@ -4,4 +4,5 @@
 --require ./test/setup-babel.js
 --file ./test/setup.js
 --file ./server/env.js
+--recursive
 --exit
