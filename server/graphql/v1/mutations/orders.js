@@ -21,6 +21,8 @@ import status from '../../../constants/order_status';
 import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
 import { VAT_OPTIONS } from '../../../constants/vat';
+import { canUseFeature } from '../../../lib/user-permissions';
+import FEATURE from '../../../constants/feature';
 
 const oneHourInSeconds = 60 * 60;
 
@@ -118,10 +120,12 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
 }
 
 export async function createOrder(order, loaders, remoteUser, reqIp) {
-  // console.log(order);
   debug('Beginning creation of order', order);
   await checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
+  if (remoteUser && !canUseFeature(remoteUser, FEATURE.ORDER)) {
+    return new errors.FeatureNotAllowedForUser();
+  }
 
   let orderCreated;
   try {
@@ -547,6 +551,8 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
 export async function confirmOrder(order, remoteUser) {
   if (!remoteUser) {
     throw new errors.Unauthorized({ message: 'You need to be logged in to confirm an order' });
+  } else if (!canUseFeature(remoteUser, FEATURE.ORDER)) {
+    return new errors.FeatureNotAllowedForUser();
   }
 
   order = await models.Order.findOne({
@@ -622,6 +628,8 @@ export async function completePledge(remoteUser, order) {
     throw new errors.Unauthorized({ message: "You don't have the permissions to edit this order" });
   } else if (existingOrder.status !== status.PENDING) {
     throw new errors.NotFound({ message: 'This pledge has already been completed' });
+  } else if (!canUseFeature(remoteUser, FEATURE.ORDER)) {
+    return new errors.FeatureNotAllowedForUser();
   }
 
   const paymentRequired = order.totalAmount > 0 && existingOrder.collective.isActive;
@@ -654,6 +662,10 @@ export async function completePledge(remoteUser, order) {
   return existingOrder;
 }
 
+/**
+ * Cancel user's subscription. We don't prevent this event is user is limited (canUseFeature -> false)
+ * because we don't want to prevent users from cancelling their subscriptions.
+ */
 export function cancelSubscription(remoteUser, orderId) {
   if (!remoteUser) {
     throw new errors.Unauthorized({
@@ -720,6 +732,8 @@ export async function updateSubscription(remoteUser, args) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in to update a subscription',
     });
+  } else if (!canUseFeature(remoteUser, FEATURE.ORDER)) {
+    return new errors.FeatureNotAllowedForUser();
   }
 
   const { id, paymentMethod, amount } = args;

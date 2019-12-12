@@ -10,6 +10,9 @@ import { formatCurrency } from '../../../lib/utils';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../../lib/transactions';
 import { getFxRate } from '../../../lib/currency';
 import debugLib from 'debug';
+import { canUseFeature } from '../../../lib/user-permissions';
+import FEATURE from '../../../constants/feature';
+import { FeatureNotAllowedForUser } from '../../errors';
 
 const debug = debugLib('expenses');
 
@@ -50,6 +53,8 @@ function canEditExpense(remoteUser, expense) {
 export async function updateExpenseStatus(remoteUser, expenseId, status) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to update the status of an expense');
+  } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
+    throw new FeatureNotAllowedForUser();
   }
 
   if (Object.keys(statuses).indexOf(status) === -1) {
@@ -91,7 +96,10 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
 export async function createExpense(remoteUser, expenseData) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to create an expense');
+  } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
+    throw new FeatureNotAllowedForUser();
   }
+
   if (!get(expenseData, 'collective.id')) {
     throw new errors.Unauthorized('Missing expense.collective.id');
   }
@@ -146,6 +154,8 @@ export async function createExpense(remoteUser, expenseData) {
 export async function editExpense(remoteUser, expenseData) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to edit an expense');
+  } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
+    throw new FeatureNotAllowedForUser();
   }
 
   const expense = await models.Expense.findByPk(expenseData.id, {
@@ -187,6 +197,8 @@ export async function editExpense(remoteUser, expenseData) {
 export async function deleteExpense(remoteUser, expenseId) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to delete an expense');
+  } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
+    throw new FeatureNotAllowedForUser();
   }
 
   const expense = await models.Expense.findByPk(expenseId, {
@@ -277,6 +289,8 @@ export async function payExpense(remoteUser, args) {
 
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to pay an expense');
+  } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
+    throw new FeatureNotAllowedForUser();
   }
   const expense = await models.Expense.findByPk(expenseId, {
     include: [{ model: models.Collective, as: 'collective' }],
@@ -368,6 +382,8 @@ export async function payExpense(remoteUser, args) {
 export async function markExpenseAsUnpaid(remoteUser, ExpenseId, processorFeeRefunded) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to unpay an expense');
+  } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
+    throw new FeatureNotAllowedForUser();
   }
 
   const expense = await models.Expense.findByPk(ExpenseId, {

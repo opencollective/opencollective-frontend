@@ -1,7 +1,9 @@
 import { pick } from 'lodash';
-import { Unauthorized, FeatureNotSupportedForCollective, NotFound } from '../errors';
+import { Unauthorized, FeatureNotSupportedForCollective, NotFound, FeatureNotAllowedForUser } from '../errors';
 import models from '../../models';
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import hasFeature from '../../lib/allowed-features';
+import { canUseFeature } from '../../lib/user-permissions';
+import FEATURE from '../../constants/feature';
 
 /** Params given to create a new conversation */
 interface ICreateConversationParams {
@@ -20,6 +22,8 @@ export const createConversation = async (remoteUser, params: ICreateConversation
   // For now any authenticated user can create a conversation to any collective
   if (!remoteUser) {
     throw new Unauthorized();
+  } else if (!canUseFeature(remoteUser, FEATURE.CONVERSATIONS)) {
+    throw new FeatureNotAllowedForUser();
   }
 
   const { CollectiveId, title, html, tags } = params;
@@ -28,7 +32,7 @@ export const createConversation = async (remoteUser, params: ICreateConversation
   const collective = await models.Collective.findByPk(CollectiveId);
   if (!collective) {
     throw new Error("This Collective doesn't exist or has been deleted");
-  } else if (!hasFeature(collective, FEATURES.CONVERSATIONS)) {
+  } else if (!hasFeature(collective, FEATURE.CONVERSATIONS)) {
     throw new FeatureNotSupportedForCollective();
   }
 
@@ -48,6 +52,8 @@ interface IEditConversationParams {
 export const editConversation = async (remoteUser, params: IEditConversationParams) => {
   if (!remoteUser) {
     throw new Unauthorized();
+  } else if (!canUseFeature(remoteUser, FEATURE.CONVERSATIONS)) {
+    throw new FeatureNotAllowedForUser();
   }
 
   // Collective must exist and use be author or collective admin
