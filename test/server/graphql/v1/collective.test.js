@@ -735,6 +735,27 @@ describe('graphql.collective.test.js', () => {
       expect(members[0].member.slug).to.equal('piamancini');
       expect(members).to.have.length(1);
     });
+
+    it('gets totalAmountSpent by collective', async () => {
+      const query = `query TotalCollectiveContributions($slug: String) {
+        Collective(slug: $slug) {
+          id
+          currency
+          stats {
+            id
+            totalAmountSpent
+          }
+        }
+      }`;
+
+      const result = await utils.graphqlQuery(query, {
+        slug: 'piamancini',
+      });
+      result.errors && console.error(result.errors);
+      expect(result.errors).to.not.exist;
+      const contributions = result.data.Collective;
+      expect(contributions.stats.totalAmountSpent).to.equal(1000);
+    });
   });
 
   describe('edits', () => {
