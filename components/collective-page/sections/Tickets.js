@@ -70,7 +70,7 @@ class SectionTickets extends React.PureComponent {
     const sortedTiers = this.sortTiers(this.filterTickets(tiers));
 
     return (
-      <Box pt={[4, 5]}>
+      <Box pt={[4, 5]} data-cy="Tickets">
         <ContainerSectionContent>
           <SectionTitle>
             <FormattedMessage id="SectionTickets.Title" defaultMessage="Tickets" />

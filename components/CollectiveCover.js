@@ -243,9 +243,7 @@ ${description}`;
     const { collective, className, LoggedInUser, intl, forceLegacy } = this.props;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
-    const ncpIsDefault = process.env.NCP_IS_DEFAULT === 'true';
-    const collectiveHasV2 = get(collective, 'settings.collectivePage.useV2');
-    const useNewCollectiveNavbar = !forceLegacy && (ncpIsDefault || collectiveHasV2);
+    const useNewCollectiveNavbar = !forceLegacy;
     const isEvent = type === CollectiveType.EVENT;
 
     if (!isEvent && useNewCollectiveNavbar && collective && collective.slug) {

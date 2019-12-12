@@ -144,11 +144,6 @@ class EditEventForm extends React.Component {
         placeholder: '',
       },
       {
-        name: 'longDescription',
-        type: 'textarea',
-        placeholder: '',
-      },
-      {
         name: 'startsAt',
         type: 'datetime',
         placeholder: '',
@@ -180,10 +175,6 @@ class EditEventForm extends React.Component {
         type: 'location',
       },
     ];
-
-    if (process.env.NEW_EVENTS === 'true') {
-      this.fields = this.fields.filter(field => field.name !== 'longDescription');
-    }
 
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {
