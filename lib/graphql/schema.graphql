@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Dec 05 2019 17:41:56 GMT+0100 (GMT+01:00)
+# timestamp: Thu Dec 12 2019 20:59:40 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -3310,6 +3310,11 @@ type UserDetails {
   emailWaitingForValidation: String
   memberOf: [Member]
   paypalEmail: String
+
+  """
+  Returns true if user account is limited (user can't use any feature)
+  """
+  isLimited: Boolean
 }
 
 """

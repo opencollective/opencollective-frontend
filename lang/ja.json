@@ -1360,6 +1360,7 @@
   "virtualCards.sentTo": "{email} に送信された",
   "virtualCards.viewDetails": "詳細を表示する",
   "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
+  "warning.limitedAccount": "Your account is currently limited. If you think this is a mistake, please contact support@opencollective.com.",
   "WarningUnsavedChanges": "You are trying to leave this page with un-saved changes. Are you sure?",
   "webhooks.add": "Add another webhook",
   "webhooks.remove": "Remove webhook",

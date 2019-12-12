@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import TopBar from './TopBar';
 
 import { truncate, getCollectiveImage } from '../lib/utils';
+import UserWarnings from './UserWarnings';
 
 class Header extends React.Component {
   static propTypes = {
@@ -97,6 +98,7 @@ class Header extends React.Component {
         </Head>
         <div id="top" />
         <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+        <UserWarnings />
       </header>
     );
   }
