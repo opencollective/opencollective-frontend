@@ -1,4 +1,3 @@
-import { partition, uniqBy, map, differenceWith } from 'lodash';
 import slugify from 'limax';
 
 import { activities } from '../constants';
@@ -218,23 +217,12 @@ export default function(Sequelize, DataTypes) {
    * - Conversation followers
    */
   Conversation.prototype.getUsersFollowing = async function() {
-    const collective = await models.Collective.findByPk(this.CollectiveId);
-    const [admins, followers] = await Promise.all([
-      collective.getAdminUsers(),
-      models.ConversationFollower.findAll({
-        include: ['user'],
-        where: { ConversationId: this.id },
-      }),
-    ]);
-
-    // Add followers and remove users who have explicitely unsubscribed, including admins
-    const [subscribed, unsubscribed] = partition(followers, 'isActive');
-    const subscribedUsers = map(subscribed, 'user');
-    const filteredAdmins = differenceWith(admins, unsubscribed, (user, follower) => {
-      return user.id === follower.user.id;
+    const followers = await models.ConversationFollower.findAll({
+      include: ['user'],
+      where: { ConversationId: this.id, isActive: true },
     });
 
-    return uniqBy([...filteredAdmins, ...subscribedUsers], 'id');
+    return followers.map(f => f.user);
   };
 
   // ---- Prepare model ----
