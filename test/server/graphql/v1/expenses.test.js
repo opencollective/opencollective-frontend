@@ -444,6 +444,10 @@ describe('GraphQL Expenses API', () => {
       emailSendMessageSpy.resetHistory();
       // Given a collective
       const { collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1, {
+        tag: 'Test Collective would love to be hosted',
+      });
+      emailSendMessageSpy.resetHistory();
       // When it's attempted to create an expense with no user
       const data = {
         currency: 'USD',
@@ -463,6 +467,10 @@ describe('GraphQL Expenses API', () => {
       emailSendMessageSpy.resetHistory();
       // Given a collective
       const { collective } = await store.newCollectiveWithHost('Test Collective', 'USD', 'USD', 10);
+      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1, {
+        tag: 'Test Collective would love to be hosted',
+      });
+      emailSendMessageSpy.resetHistory();
       // And given an admin for the above collective
       const admin = (await store.newUser('collectives-admin')).user;
       await collective.addUserWithRole(admin, 'ADMIN');
@@ -480,10 +488,6 @@ describe('GraphQL Expenses API', () => {
         incurredAt: new Date(),
         collective: { id: collective.id },
       };
-      await utils.waitForCondition(() => emailSendMessageSpy.callCount === 1, {
-        tag: 'Test Collective would love to be hosted',
-      });
-      emailSendMessageSpy.resetHistory();
       const result = await utils.graphqlQuery(createExpenseQuery, { expense: data }, user);
       result.errors && console.log(result.errors);
 
