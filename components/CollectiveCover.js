@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import styled from 'styled-components';
-import { defineMessages, FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import dynamic from 'next/dynamic';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
@@ -16,7 +16,7 @@ import { imagePreview } from '../lib/image-utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
-import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
+import { defaultBackgroundImage } from '../lib/constants/collectives';
 import Link from './Link';
 import UserCompany from './UserCompany';
 import CollectiveNavbar from './CollectiveNavbar';
@@ -116,95 +116,6 @@ class CollectiveCover extends React.Component {
     });
 
     this.description = props.description || props.collective.description;
-
-    if (props.collective.type === 'EVENT') {
-      const eventLocationRoute = props.href ? `${props.href}#location` : '#location';
-      this.description = (
-        <div>
-          {props.collective.description && <div className="eventDescription">{props.collective.description}</div>}
-          <Link route={eventLocationRoute}>
-            {!props.collective.startsAt &&
-              console.warn(
-                `Event: props.collective.startsAt should not be empty. props.collective.id: ${props.collective.id}`,
-              )}
-            {props.collective.startsAt && (
-              <React.Fragment>
-                <FormattedDate
-                  value={props.collective.startsAt}
-                  timeZone={props.collective.timezone}
-                  weekday="short"
-                  day="numeric"
-                  month="long"
-                />
-                , &nbsp;
-                <FormattedTime value={props.collective.startsAt} timeZone={props.collective.timezone} />
-                &nbsp; - &nbsp;
-              </React.Fragment>
-            )}
-            {props.collective.endsAt && (
-              <React.Fragment>
-                <FormattedDate
-                  value={props.collective.endsAt}
-                  timeZone={props.collective.timezone}
-                  weekday="short"
-                  day="numeric"
-                  month="long"
-                  year="numeric"
-                />
-                , &nbsp;
-                <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
-                &nbsp; {moment().tz(props.collective.timezone).zoneAbbr()} (
-                <FormattedMessage id="EventCover.EventTime" defaultMessage="Event Time" />)
-              </React.Fragment>
-            )}
-            <br />
-            {this.checkTimeDiff() && (
-              <em>
-                {props.collective.startsAt && (
-                  <React.Fragment>
-                    <FormattedDate
-                      value={props.collective.startsAt}
-                      timeZone={momentTimezone.tz.guess()}
-                      weekday="short"
-                      day="numeric"
-                      month="long"
-                    />
-                    , &nbsp;
-                    <FormattedTime value={props.collective.startsAt} timeZone={momentTimezone.tz.guess()} />
-                    &nbsp; - &nbsp;
-                  </React.Fragment>
-                )}
-
-                {props.collective.endsAt && (
-                  <React.Fragment>
-                    <FormattedDate
-                      value={props.collective.endsAt}
-                      timeZone={momentTimezone.tz.guess()}
-                      weekday="short"
-                      day="numeric"
-                      month="long"
-                      year="numeric"
-                    />
-                    , &nbsp;
-                    <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
-                    &nbsp; {moment().tz(momentTimezone.tz.guess()).zoneAbbr()} (
-                    <FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
-                  </React.Fragment>
-                )}
-                <br />
-              </em>
-            )}
-            {get(props.collective, 'location.name') && (
-              <FormattedMessage
-                id="EventCover.Location"
-                defaultMessage="Location: {location}"
-                values={{ location: get(props.collective, 'location.name') }}
-              />
-            )}
-          </Link>
-        </div>
-      );
-    }
   }
 
   getMemberTooltip(member) {
@@ -235,9 +146,8 @@ ${description}`;
     const { company, type, website, twitterHandle, githubHandle, stats } = collective;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const useNewCollectiveNavbar = !forceLegacy;
-    const isEvent = type === CollectiveType.EVENT;
 
-    if (!isEvent && useNewCollectiveNavbar && collective && collective.slug) {
+    if (useNewCollectiveNavbar && collective && collective.slug) {
       return (
         <Container mb={4}>
           <CollectiveNavbar
