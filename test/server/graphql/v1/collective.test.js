@@ -559,11 +559,15 @@ describe('graphql.collective.test.js', () => {
     beforeEach(async () => {
       // Given some users
       const currency = 'EUR';
+      const currencyInUSD = 'USD';
+
       const { piamancini } = await store.newUser('piamancini', { currency });
       const { xdamman } = await store.newUser('xdamman', { currency });
       const { user } = await store.newUser('alexandrasaveljeva', { currency });
       const { user0 } = await store.newUser('user0', { currency });
       const { user1 } = await store.newUser('user1', { currency });
+      const { olu } = await store.newUser('olu', { currencyInUSD });
+
       // And given a collective with a host that has stripe enabled
       const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
         'brusselstogether collective',
@@ -573,8 +577,20 @@ describe('graphql.collective.test.js', () => {
         null,
         { isActive: true },
       );
+
+      // And given another host collectives with USD currency
+      const newCollectiveWithHostInUSD = await store.newCollectiveWithHost(
+        'newyork collective',
+        currencyInUSD,
+        currencyInUSD,
+        10,
+        null,
+        { isActive: true },
+      );
+
       brusselsTogetherHostAdmin = hostAdmin;
       await store.stripeConnectedAccount(hostCollective.id);
+      await store.stripeConnectedAccount(newCollectiveWithHostInUSD.hostCollective.id);
       // And given some purchases
       await store.stripeOneTimeDonation({
         remoteUser: user,
@@ -599,6 +615,22 @@ describe('graphql.collective.test.js', () => {
         collective,
         currency,
         amount: 2000,
+      });
+
+      // donations made by olu in EUR
+      await store.stripeOneTimeDonation({
+        remoteUser: olu,
+        collective,
+        currency,
+        amount: 1000,
+      });
+
+      // donations made by olu in USD
+      await store.stripeOneTimeDonation({
+        remoteUser: olu,
+        collective: newCollectiveWithHostInUSD.collective,
+        currency: currencyInUSD,
+        amount: 1000,
       });
 
       // And given some other collectives under the same host and some
@@ -643,7 +675,7 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      expect(members).to.have.length(5);
+      expect(members).to.have.length(6);
       expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('xdamman');
       members.map(m => {
@@ -658,7 +690,7 @@ describe('graphql.collective.test.js', () => {
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       const members = result.data.allMembers;
-      expect(members).to.have.length(4);
+      expect(members).to.have.length(5);
       expect(members[0].collective.slug).to.equal('brusselstogether-collective');
       expect(members[0].member.slug).to.equal('alexandrasaveljeva');
       members.map(m => {
@@ -737,7 +769,7 @@ describe('graphql.collective.test.js', () => {
     });
 
     it('gets totalAmountSpent by collective', async () => {
-      const query = `query TotalCollectiveContributions($slug: String) {
+      const query = `query TotalCollectiveContributions($slug: String, $type: String) {
         Collective(slug: $slug) {
           id
           currency
@@ -745,16 +777,23 @@ describe('graphql.collective.test.js', () => {
             id
             totalAmountSpent
           }
+          transactions(type: $type) {
+            currency
+            netAmountInCollectiveCurrency
+          }
         }
       }`;
 
       const result = await utils.graphqlQuery(query, {
-        slug: 'piamancini',
+        slug: 'olu',
+        type: 'DEBIT',
       });
+
       result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
-      const contributions = result.data.Collective;
-      expect(contributions.stats.totalAmountSpent).to.equal(1000);
+      const collective = result.data.Collective;
+      const totalAmountSpent = 1000 * 1.1 + 1000;
+      expect(collective.stats.totalAmountSpent).to.equal(totalAmountSpent);
     });
   });
 
