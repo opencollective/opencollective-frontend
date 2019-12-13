@@ -7,7 +7,7 @@ import uuidv4 from 'uuid/v4';
 import { Box, Flex } from '@rebass/grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
-import { getCurrencySymbol, capitalize, parseToBoolean } from '../../lib/utils';
+import { getCurrencySymbol, capitalize } from '../../lib/utils';
 import InputField from '../InputField';
 import InputFieldPresets from '../InputFieldPresets';
 import { Span } from '../Text';
@@ -237,30 +237,21 @@ class EditTiers extends React.Component {
         type: 'text',
         label: intl.formatMessage(this.messages['button.label']),
       },
+      {
+        name: 'goal',
+        pre: getCurrencySymbol(props.currency),
+        type: 'currency',
+        options: { step: 1 },
+        label: intl.formatMessage(this.messages['goal.label']),
+        description: intl.formatMessage(this.messages['goal.description']),
+      },
+      {
+        name: '__hasLongDescription',
+        type: 'switch',
+        label: 'Force standalone page',
+        description: intl.formatMessage(this.messages.forceLongDescription),
+      },
     ];
-
-    if (
-      parseToBoolean(process.env.ENABLE_TIER_GOALS) ||
-      parseToBoolean(process.env.NCP_IS_DEFAULT) ||
-      get(props, 'collective.settings.enableTierGoals')
-    ) {
-      this.fields.push(
-        {
-          name: 'goal',
-          pre: getCurrencySymbol(props.currency),
-          type: 'currency',
-          options: { step: 1 },
-          label: intl.formatMessage(this.messages['goal.label']),
-          description: intl.formatMessage(this.messages['goal.description']),
-        },
-        {
-          name: '__hasLongDescription',
-          type: 'switch',
-          label: 'Force standalone page',
-          description: intl.formatMessage(this.messages.forceLongDescription),
-        },
-      );
-    }
   }
 
   editTier(index, fieldname, value) {

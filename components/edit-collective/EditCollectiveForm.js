@@ -12,7 +12,6 @@ import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
-import { parseToBoolean } from '../../lib/utils';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
 
@@ -88,10 +87,9 @@ class EditCollectiveForm extends React.Component {
       tiers: collective.tiers || [{}],
     };
 
-    const isNewCollectivePage = parseToBoolean(process.env.NCP_IS_DEFAULT);
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditImages = !isNewCollectivePage || collective.type === CollectiveType.EVENT;
+    this.showEditImages = collective.type === CollectiveType.EVENT;
     this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';

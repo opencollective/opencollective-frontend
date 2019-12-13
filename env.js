@@ -18,9 +18,7 @@ const defaults = {
   GOOGLE_MAPS_API_KEY: 'AIzaSyCRLIexl7EkMQk_0_yNsjO4Vqb_MccD-RI',
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
   RECAPTCHA_ENABLED: false,
-  NCP_IS_DEFAULT: 'true',
   CLIENT_ANALYTICS_ENABLED: false,
-  NEW_EVENTS: false,
 };
 
 for (const key in defaults) {
