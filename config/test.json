@@ -16,7 +16,7 @@
     }
   },
   "mailgun": {
-    "user": "test-mailgun-user",
-    "password": "test-mailgun-password"
+    "user": "",
+    "password": ""
   }
 }
