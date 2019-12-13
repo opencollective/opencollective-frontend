@@ -16,6 +16,7 @@ const sanitizeOptions = buildSanitizerOptions({
   basicTextFormatting: true,
   multilineTextFormatting: true,
   links: true,
+  images: true,
 });
 
 /**
