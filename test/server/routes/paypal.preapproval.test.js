@@ -13,13 +13,7 @@ import paypalAdaptive from '../../../server/paymentProviders/paypal/adaptiveGate
 const application = utils.data('application');
 
 describe('paypal.preapproval.routes.test.js', () => {
-  let user, user2, sandbox;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  after(() => sandbox.restore());
+  let user, user2;
 
   beforeEach(() => {
     sinon.stub(paypalAdaptive, 'preapproval').callsFake(() => Promise.resolve(paypalMock.adaptive.preapproval));

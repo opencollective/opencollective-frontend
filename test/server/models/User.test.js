@@ -15,14 +15,6 @@ const userData = utils.data('user1');
 const { User } = models;
 
 describe('user.model.test.js', () => {
-  let sandbox;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  after(() => sandbox.restore());
-
   beforeEach(() => utils.resetTestDB());
 
   /**
