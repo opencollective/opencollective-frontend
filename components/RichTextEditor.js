@@ -234,18 +234,17 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
-  handleUpload = async e => {
-    const file = e.attachment && e.attachment.file;
-    if (!file) {
+  handleUpload = e => {
+    const { attachment } = e;
+    if (!attachment.file) {
       return;
     }
 
-    try {
-      const fileURL = await uploadImageWithXHR(file, e.attachment.setUploadProgress);
-      return e.attachment.setAttributes({ url: fileURL, href: fileURL });
-    } catch (e) {
-      this.setState({ error: e });
-    }
+    const onProgress = progress => attachment.setUploadProgress(progress);
+    const onSuccess = fileURL => attachment.setAttributes({ url: fileURL, href: fileURL });
+    const onFailure = () => this.setState({ error: 'File upload failed' });
+    uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
+    return e;
   };
 
   render() {
