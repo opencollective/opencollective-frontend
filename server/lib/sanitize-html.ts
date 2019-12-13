@@ -48,7 +48,7 @@ export const buildSanitizerOptions = (allowedContent: IAllowedContentType = {}):
 
   // Images
   if (allowedContent.images) {
-    allowedTags.push('img');
+    allowedTags.push('img', 'figure', 'figcaption');
     allowedAttributes['img'] = ['src'];
   }
 
