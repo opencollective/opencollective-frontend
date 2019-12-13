@@ -174,6 +174,7 @@ export default class RichTextEditor extends React.Component {
     if (typeof window !== 'undefined') {
       this.Trix = require('trix');
       this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
+      this.Trix.config.attachments.preview.caption = { name: false, size: false };
     }
   }
 
