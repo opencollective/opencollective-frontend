@@ -21,22 +21,12 @@ describe('paypal.preapproval.routes.test.js', () => {
 
   after(() => sandbox.restore());
 
-  // Create a stub for clearbit
-  beforeEach(done => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
-
   beforeEach(() => {
     sinon.stub(paypalAdaptive, 'preapproval').callsFake(() => Promise.resolve(paypalMock.adaptive.preapproval));
   });
 
   afterEach(() => {
     paypalAdaptive.preapproval.restore();
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
   });
 
   beforeEach(done => {

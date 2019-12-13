@@ -72,10 +72,6 @@ describe('graphql.updateSubscription.test.js', () => {
   // Create a paymentMethod.
   beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => (paymentMethod = c)));
 
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
-
   /**
    * Update subscription
    */

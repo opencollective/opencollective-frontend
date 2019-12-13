@@ -109,9 +109,6 @@
   "slack": {
     "webhookUrl": "SLACK_HOOK_URL"
   },
-  "clearbit": {
-    "key": "CLEARBIT_KEY"
-  },
   "github": {
     "clientID": "GITHUB_CLIENT_ID",
     "clientSecret": "GITHUB_CLIENT_SECRET"

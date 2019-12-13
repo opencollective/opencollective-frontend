@@ -23,12 +23,7 @@ describe('user.model.test.js', () => {
 
   after(() => sandbox.restore());
 
-  // Create a stub for clearbit
-  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
-
   beforeEach(() => utils.resetTestDB());
-
-  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Create a user.
