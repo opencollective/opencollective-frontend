@@ -113,7 +113,7 @@ class SectionUpdates extends React.PureComponent {
     }
 
     return (
-      <ContainerSectionContent pt={5}>
+      <ContainerSectionContent pt={5} pb={3}>
         <SectionTitle mb={24}>
           <FormattedMessage
             id="CollectivePage.SectionUpdates.Title"

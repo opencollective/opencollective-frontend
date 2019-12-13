@@ -24,6 +24,7 @@ import SectionTickets from './sections/Tickets';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionLocation from './sections/Location';
 import SectionContainer from './SectionContainer';
+import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -218,7 +219,7 @@ class CollectivePage extends Component {
     const callsToAction = this.getCallsToAction(type, isHost, isAdmin, isRoot, canApply, canContact);
 
     return (
-      <Container position="relative" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined} pb={5}>
+      <Container position="relative" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
         <Hero
           collective={collective}
           host={host}
@@ -249,13 +250,14 @@ class CollectivePage extends Component {
             )}
           />
         </Container>
-        {sections.map(section => (
+        {sections.map((section, idx) => (
           <SectionContainer
             key={section}
             ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
             id={`section-${section}`}
+            withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
           >
-            {this.renderSection(section)}
+            {this.renderSection(section, idx === sections.length - 1)}
           </SectionContainer>
         ))}
       </Container>

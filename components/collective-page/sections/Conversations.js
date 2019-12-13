@@ -56,7 +56,7 @@ class SectionConversations extends React.PureComponent {
     const conversations = get(data, 'collective.conversations', {});
 
     return (
-      <ContainerSectionContent pt={5}>
+      <ContainerSectionContent pt={5} pb={3}>
         <SectionTitle mb={24}>
           <FormattedMessage id="CollectivePage.SectionConversations.Title" defaultMessage="Conversations" />
         </SectionTitle>
