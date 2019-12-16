@@ -913,6 +913,7 @@ export async function addFundsToOrg(args, remoteUser) {
       collective: fromCollective,
       currency: fromCollective.currency,
       currentBalance: paymentMethod.initialBalance,
+      addedBy: hostCollective.name,
     },
   });
 
