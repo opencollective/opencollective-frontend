@@ -518,7 +518,7 @@ describe('GraphQL Expenses API', () => {
       expect(emailSendMessageSpy.firstCall.args[1]).to.equal(
         'New expense on Test Collective: $10.00 for Test expense for pizza',
       );
-      expect(emailSendMessageSpy.firstCall.args[2]).to.contain('/test-collective/expenses/1/approve');
+      expect(emailSendMessageSpy.firstCall.args[2]).to.contain('/test-collective/expenses/1');
 
       // XXX: This was just copied over. I don't know what this is
       // actually testing:

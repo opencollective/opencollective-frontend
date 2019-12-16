@@ -446,7 +446,6 @@ export const sendReminderPendingOrderEmail = async order => {
     collective: collective.info,
     host: host.info,
     fromCollective: fromCollective.activity,
-    markAsPaidLink: `${config.host.website}/orders/${order.id}/mark-as-paid`,
     viewDetailsLink: `${config.host.website}/${collective.slug}/orders/${order.id}`,
   };
 
