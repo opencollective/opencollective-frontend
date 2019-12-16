@@ -4,7 +4,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import Button from './Button';
 import InputField from './InputField';
-import EditTiers from './EditTiers';
+import EditTiers from './edit-collective/EditTiers';
 import TimezonePicker from './TimezonePicker';
 import Container from './Container';
 import { P } from './Text';
@@ -144,11 +144,6 @@ class EditEventForm extends React.Component {
         placeholder: '',
       },
       {
-        name: 'longDescription',
-        type: 'textarea',
-        placeholder: '',
-      },
-      {
         name: 'startsAt',
         type: 'datetime',
         placeholder: '',
@@ -180,10 +175,6 @@ class EditEventForm extends React.Component {
         type: 'location',
       },
     ];
-
-    if (process.env.NEW_EVENTS === 'true') {
-      this.fields = this.fields.filter(field => field.name !== 'longDescription');
-    }
 
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {

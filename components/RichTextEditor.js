@@ -47,7 +47,7 @@ const TrixEditorContainer = styled.div`
 
   trix-toolbar {
     min-height: 40px;
-    background: white;
+    background: ${props => props.toolbarBackgroundColor};
     box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
     z-index: 2;
     margin-bottom: 8px;
@@ -56,6 +56,7 @@ const TrixEditorContainer = styled.div`
       border-radius: 6px;
       border-color: #c4c7cc;
       margin-bottom: 0;
+      background: white;
     }
 
     .trix-button {
@@ -97,7 +98,13 @@ const TrixEditorContainer = styled.div`
         marginTop: props.toolbarOffsetY,
         py: '10px',
       })}
-  }
+
+    /** Custom icons */
+    .trix-button--icon-attach::before {
+      // See https://feathericons.com/?query=image
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E");
+    }
+  } // End of toolbar customization
 
   /** Disabled mode */
   ${props =>
@@ -122,6 +129,7 @@ export default class RichTextEditor extends React.Component {
     id: PropTypes.string,
     defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
+    toolbarBackgroundColor: PropTypes.string.isRequired,
     /** Font size for the text */
     fontSize: PropTypes.string,
     autoFocus: PropTypes.bool,
@@ -154,6 +162,7 @@ export default class RichTextEditor extends React.Component {
     toolbarTop: 0,
     toolbarOffsetY: -62, // Default Trix toolbar height
     inputName: 'content',
+    toolbarBackgroundColor: 'white',
   };
 
   constructor(props) {
@@ -165,6 +174,7 @@ export default class RichTextEditor extends React.Component {
     if (typeof window !== 'undefined') {
       this.Trix = require('trix');
       this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
+      this.Trix.config.attachments.preview.caption = { name: false, size: false };
     }
   }
 
@@ -225,18 +235,17 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
-  handleUpload = async e => {
-    const file = e.attachment && e.attachment.file;
-    if (!file) {
+  handleUpload = e => {
+    const { attachment } = e;
+    if (!attachment.file) {
       return;
     }
 
-    try {
-      const fileURL = await uploadImageWithXHR(file, e.attachment.setUploadProgress);
-      return e.attachment.setAttributes({ url: fileURL, href: fileURL });
-    } catch (e) {
-      this.setState({ error: e });
-    }
+    const onProgress = progress => attachment.setUploadProgress(progress);
+    const onSuccess = fileURL => attachment.setAttributes({ url: fileURL, href: fileURL });
+    const onFailure = () => this.setState({ error: 'File upload failed' });
+    uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
+    return e;
   };
 
   render() {
@@ -245,6 +254,7 @@ export default class RichTextEditor extends React.Component {
       withStickyToolbar,
       toolbarTop,
       toolbarOffsetY,
+      toolbarBackgroundColor,
       autoFocus,
       placeholder,
       editorMinHeight,
@@ -262,6 +272,7 @@ export default class RichTextEditor extends React.Component {
         withStickyToolbar={withStickyToolbar}
         toolbarTop={toolbarTop}
         toolbarOffsetY={toolbarOffsetY}
+        toolbarBackgroundColor={toolbarBackgroundColor}
         editorMinHeight={editorMinHeight}
         withBorders={withBorders}
         isDisabled={disabled}

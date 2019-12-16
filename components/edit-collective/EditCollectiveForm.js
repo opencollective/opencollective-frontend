@@ -11,12 +11,11 @@ import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
-import { defaultBackgroundImage, CollectiveType } from '../lib/constants/collectives';
-import { parseToBoolean } from '../lib/utils';
-import { VAT_OPTIONS } from '../lib/constants/vat';
-import { Router } from '../server/pages';
+import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
+import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { Router } from '../../server/pages';
 
-import InputField from './InputField';
+import InputField from '../InputField';
 import EditTiers from './EditTiers';
 import EditGoals from './EditGoals';
 import EditHost from './EditHost';
@@ -24,18 +23,19 @@ import EditMembers from './EditMembers';
 import EditPaymentMethods from './EditPaymentMethods';
 import EditConnectedAccounts from './EditConnectedAccounts';
 import EditWebhooks from './EditWebhooks';
-import ExportData from './ExportData';
-import Link from './Link';
-import StyledButton from './StyledButton';
+import ExportData from '../ExportData';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
 import EditVirtualCards from './EditVirtualCards';
-import CreateVirtualCardsForm from './CreateVirtualCardsForm';
+import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 
 import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
-import Container from './Container';
-import ExternalLink from './ExternalLink';
+import Container from '../Container';
+import ExternalLink from '../ExternalLink';
+import EditHostInvoice from './EditHostInvoice';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -87,10 +87,9 @@ class EditCollectiveForm extends React.Component {
       tiers: collective.tiers || [{}],
     };
 
-    const isNewCollectivePage = parseToBoolean(process.env.NCP_IS_DEFAULT);
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditImages = !isNewCollectivePage || collective.type === CollectiveType.EVENT;
+    this.showEditImages = collective.type === CollectiveType.EVENT;
     this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
@@ -405,14 +404,6 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           type: 'textarea',
         },
-        // {
-        //   name: 'location',
-        //   placeholder: 'Search cities',
-        //   type: 'location',
-        //   options: {
-        //     types: ['cities']location
-        //   }
-        // },
         {
           name: 'country',
           type: 'country',
@@ -651,6 +642,16 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="Core Contributors" />
               </MenuItem>
             )}
+            {collective.isHost && (
+              <MenuItem
+                selected={this.state.section === 'invoices'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'invoices' }}
+                className="MenuItem invoices"
+              >
+                <FormattedMessage id="editCollective.menu.invoicesAndReceipts" defaultMessage="Invoices & Receipts" />
+              </MenuItem>
+            )}
             {this.showEditGoals && (
               <MenuItem
                 selected={this.state.section === 'goals'}
@@ -790,6 +791,7 @@ class EditCollectiveForm extends React.Component {
                   ),
               )}
               {this.state.section === 'members' && <EditMembers collective={collective} LoggedInUser={LoggedInUser} />}
+              {this.state.section === 'invoices' && <EditHostInvoice collective={collective} />}
               {this.state.section === 'webhooks' && (
                 <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
               )}
@@ -862,6 +864,7 @@ class EditCollectiveForm extends React.Component {
               'export',
               'connected-accounts',
               'host',
+              'invoices',
               'gift-cards',
               'gift-cards-create',
               'gift-cards-send',

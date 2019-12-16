@@ -8,21 +8,21 @@ import { isURL } from 'validator';
 import { Close } from '@styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
 
-import events from '../lib/constants/notificationEvents';
+import events from '../../lib/constants/notificationEvents';
 
-import { compose } from '../lib/utils';
-import { CollectiveType } from '../lib/constants/collectives';
+import { compose } from '../../lib/utils';
+import { CollectiveType } from '../../lib/constants/collectives';
 
-import Loading from './Loading';
-import { Span } from './Text';
-import StyledHr from './StyledHr';
-import MessageBox from './MessageBox';
+import Loading from '../Loading';
+import { Span } from '../Text';
+import StyledHr from '../StyledHr';
+import MessageBox from '../MessageBox';
 import { Flex, Box } from '@rebass/grid';
-import StyledButton from './StyledButton';
-import StyledSelect from './StyledSelect';
+import StyledButton from '../StyledButton';
+import StyledSelect from '../StyledSelect';
 import { Add } from '@styled-icons/material/Add';
-import StyledInputGroup from './StyledInputGroup';
-import ExternalLink from './ExternalLink';
+import StyledInputGroup from '../StyledInputGroup';
+import ExternalLink from '../ExternalLink';
 
 const messages = defineMessages({
   'webhooks.url.label': {

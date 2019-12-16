@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import { isValidEmail } from '../../lib/utils';
 
 import StyledButton from '../StyledButton';
+import StyledSpinner from '../StyledSpinner';
 
 class PayExpenseBtn extends React.Component {
   static propTypes = {
@@ -69,6 +70,7 @@ class PayExpenseBtn extends React.Component {
 
   render() {
     const { collective, expense, intl, host } = this.props;
+    const loading = this.state.loading;
     let disabled = this.state.loading,
       selectedPayoutMethod = expense.payoutMethod,
       title = '',
@@ -151,11 +153,18 @@ class PayExpenseBtn extends React.Component {
             disabled={this.props.disabled || disabled}
             title={title}
           >
-            <FormattedMessage
-              id="expense.pay.btn"
-              defaultMessage="Pay with {paymentMethod}"
-              values={{ paymentMethod: expense.payoutMethod }}
-            />
+            {loading ? (
+              <Fragment>
+                <StyledSpinner />{' '}
+                <FormattedMessage id="expense.payExpenseBtn.processing" defaultMessage="Processing..." />
+              </Fragment>
+            ) : (
+              <FormattedMessage
+                id="expense.pay.btn"
+                defaultMessage="Pay with {paymentMethod}"
+                values={{ paymentMethod: expense.payoutMethod }}
+              />
+            )}
           </StyledButton>
         )}
         <div className="error">{error}</div>

@@ -78,6 +78,11 @@ const HTMLContent = styled(({ content, ...props }) => {
 
   pre {
     font-size: 1em;
+    background: #F7F8FA;
+    color: #76777A;
+    border: none;
+    padding: 8px 16px;
+    font-familly: Courier;
   }
 
   ${typography}

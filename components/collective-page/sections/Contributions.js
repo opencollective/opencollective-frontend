@@ -104,7 +104,9 @@ const ParentedCollectivesQuery = gql`
         settings
         parentCollective {
           id
-          backgroundImage
+          backgroundImageUrl
+          name
+          slug
         }
         host {
           id
@@ -265,7 +267,7 @@ class SectionContributions extends React.PureComponent {
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
-      <Box pt={5}>
+      <Box pt={5} pb={3}>
         {data.Collective.memberOf.length === 0 ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />

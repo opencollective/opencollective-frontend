@@ -12,33 +12,21 @@ import { P } from '../../Text';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 
+import ConversationsList from '../../conversations/ConversationsList';
+import { ConversationListFragment } from '../../conversations/graphql';
 import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
-import ConversationsList from '../../conversations/ConversationsList';
 
 const conversationsQuery = gqlV2`
   query ConversationSection($collectiveSlug: String!) {
     collective(slug: $collectiveSlug, throwIfMissing: false) {
       id
       conversations(limit: 3) {
-        totalCount
-        nodes {
-          id
-          title
-          summary
-          createdAt
-          tags
-          fromCollective {
-            id
-            name
-            type
-            slug
-            imageUrl
-          }
-        }
+        ...ConversationListFragment
       }
     }
   }
+  ${ConversationListFragment}
 `;
 
 /**
@@ -68,7 +56,7 @@ class SectionConversations extends React.PureComponent {
     const conversations = get(data, 'collective.conversations', {});
 
     return (
-      <ContainerSectionContent pt={5}>
+      <ContainerSectionContent pt={5} pb={3}>
         <SectionTitle mb={24}>
           <FormattedMessage id="CollectivePage.SectionConversations.Title" defaultMessage="Conversations" />
         </SectionTitle>

@@ -42,7 +42,7 @@ const MultiValue = ({ children, removeProps }) => {
   }
 
   return (
-    <StyledTag my={2} mr={2} fontSize="Tiny" closeButtonProps={removeProps}>
+    <StyledTag my={2} mr={2} fontSize="8px" closeButtonProps={removeProps}>
       {children}
     </StyledTag>
   );

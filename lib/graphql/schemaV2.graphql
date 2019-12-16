@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Mon Dec 02 2019 11:01:37 GMT+0100 (GMT+01:00)
+# timestamp: Mon Dec 09 2019 17:30:01 GMT+0100 (Central European Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -75,6 +75,16 @@ interface Account {
     orderBy: ChronologicalOrder
   ): OrderCollection
   settings: JSON
+}
+
+"""
+A collection of "Accounts"
+"""
+type AccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
 }
 
 """
@@ -300,7 +310,13 @@ type Conversation {
   The root comment / starter for this conversation
   """
   body: Comment
+
+  """
+  List the comments for this conversation. Not backed by a loader, don't use this in lists.
+  """
   comments(limit: Int, offset: Int): CommentCollection
+  followers(limit: Int = 10, offset: Int = 0): AccountCollection
+  stats: ConversationStats
 }
 
 """
@@ -311,6 +327,15 @@ type ConversationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Conversation]
+}
+
+type ConversationStats {
+  id: String!
+
+  """
+  Total number of comments for this conversation
+  """
+  commentsCount: Int
 }
 
 """
@@ -480,7 +505,11 @@ This represents an Expense
 """
 type Expense {
   id: String
-  comments(limit: Int, offset: Int): CommentCollection
+  comments(
+    limit: Int
+    offset: Int
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): CommentCollection
 }
 
 enum ImageFormat {
@@ -539,6 +568,7 @@ type Individual implements Account {
   firstName: String
   lastName: String
   email: String
+  isFollowingConversation(id: String!): Boolean!
 }
 
 """
@@ -657,6 +687,21 @@ type Mutation {
     """
     title: String!
   ): Conversation
+
+  """
+  Returns true if user is following, false otherwise. Must be authenticated.
+  """
+  followConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Set this to false to unfollow the conversation
+    """
+    isActive: Boolean = true
+  ): Boolean
 }
 
 """

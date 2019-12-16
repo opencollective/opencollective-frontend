@@ -37,6 +37,7 @@ const StyledInput = styled.input`
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
   outline: none;
+  background-color: ${themeGet('colors.white.full')};
 
   ${props => {
     if (props.withOutline) {

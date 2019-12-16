@@ -55,7 +55,7 @@ aliases:
             - ../.cache/Cypress
 
       # Loading the opencollective_dvl dump database
-      - run: ./scripts/setup_circleci_db.sh
+      - run: ./scripts/setup_db.sh
 
       - run: ./scripts/run_e2e_tests.sh
 
@@ -145,6 +145,8 @@ jobs:
     environment:
       NODE_ENV: circleci
       E2E_TEST: 1
+      API_FOLDER: /home/circleci/api
+
     steps:
       - run: sudo apt -y update
 
@@ -153,7 +155,7 @@ jobs:
 
       - checkout
 
-      - run: ./scripts/setup_circleci_checkout_api.sh
+      - run: ./scripts/ci_checkout_api.sh
 
       - restore_cache:
           keys:
@@ -199,6 +201,8 @@ jobs:
     environment:
       TZ: UTC
       NODE_ENV: circleci
+      API_FOLDER: /home/circleci/api
+      FRONTEND_FOLDER: /home/circleci/frontend
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 0*.js
@@ -215,6 +219,8 @@ jobs:
     environment:
       TZ: UTC
       NODE_ENV: circleci
+      API_FOLDER: /home/circleci/api
+      FRONTEND_FOLDER: /home/circleci/frontend
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 1*.js
@@ -231,6 +237,8 @@ jobs:
     environment:
       TZ: UTC
       NODE_ENV: circleci
+      API_FOLDER: /home/circleci/api
+      FRONTEND_FOLDER: /home/circleci/frontend
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 2*.js
@@ -247,6 +255,8 @@ jobs:
     environment:
       TZ: UTC
       NODE_ENV: circleci
+      API_FOLDER: /home/circleci/api
+      FRONTEND_FOLDER: /home/circleci/frontend
       # E2E_TEST will be checked by the API to tweak its behavior in CIRCLECI environment
       E2E_TEST: 1
       CYPRESS_TEST_FILES: 3*.js

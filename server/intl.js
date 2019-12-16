@@ -45,7 +45,6 @@ function getMessages(locale) {
 
 function middleware() {
   return (req, res, next) => {
-    // console.log(`Language Parser in: ${req.originalUrl}`);
     if (req.query.language && languages.includes(req.query.language)) {
       // Detect language as query string in the URL
       req.language = req.query.language;
@@ -54,7 +53,13 @@ function middleware() {
       req.language = req.cookies.language;
     }
 
-    req.locale = req.language || accepts(req).language(languages) || 'en';
+    // No auto-detection in test environments
+    if (['test', 'e2e', 'ci', 'circleci'].includes(process.env.NODE_ENV)) {
+      req.locale = req.language || 'en';
+    } else {
+      req.locale = req.language || accepts(req).language(languages) || 'en';
+    }
+
     logger.debug('url %s locale %s', req.url, req.locale);
     req.localeDataScript = getLocaleDataScript(req.locale);
     req.messages = getMessages(req.locale);

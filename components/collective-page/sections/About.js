@@ -42,7 +42,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Flex flexDirection="column" alignItems="center" px={2} pt={[4, 5]}>
+    <Container display="flex" flexDirection="column" alignItems="center" px={2} py={[4, 5]} background="#f5f7fa">
       <SectionTitle textAlign="center" mb={5}>
         <FormattedMessage id="collective.about.title" defaultMessage="About" />
       </SectionTitle>
@@ -69,6 +69,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   onChange={e => setValue(e.target.value)}
                   placeholder={intl.formatMessage(messages.placeholder)}
                   toolbarTop={[60, null, 119]}
+                  toolbarBackgroundColor="#F7F8FA"
                   withStickyToolbar
                   autoFocus
                 />
@@ -115,7 +116,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           }}
         </InlineEditField>
       </Container>
-    </Flex>
+    </Container>
   );
 };
 

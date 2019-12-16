@@ -6,17 +6,17 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import { Radio } from '@material-ui/core';
-import CreateHostFormWithData from './CreateHostFormWithData';
-import HostsWithData from './HostsWithData';
-import CollectiveCard from './CollectiveCard';
-import Link from './Link';
-import { P } from './Text';
-import InputField from './InputField';
-import { formatCurrency, getQueryParams, formatDate } from '../lib/utils';
+import CreateHostFormWithData from '../CreateHostFormWithData';
+import HostsWithData from '../HostsWithData';
+import CollectiveCard from '../CollectiveCard';
+import Link from '../Link';
+import { P } from '../Text';
+import InputField from '../InputField';
+import { formatCurrency, getQueryParams, formatDate } from '../../lib/utils';
 import { Button } from 'react-bootstrap';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
-import Container from './Container';
-import StyledButton from './StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
 
 const Option = styled.div`
   h2 {

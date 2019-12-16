@@ -62,13 +62,8 @@ const pages = routes()
   .add('discover', '/discover');
 
 // Events using new collective page
-if (process.env.NEW_EVENTS === 'true') {
-  pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
-  pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
-} else {
-  pages.add('event', '/:parentCollectiveSlug/events/:eventSlug');
-  pages.add('new-event', '/:parentCollectiveSlug/events/:eventSlug/new', 'new-collective-page');
-}
+pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
+pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
 
 // Tier page
 // ---------------
@@ -174,11 +169,7 @@ pages.add(
 pages.add('new-collective-page', '/:slug/v2');
 
 // Collective page
-if (process.env.NCP_IS_DEFAULT === 'true') {
-  pages.add('collective', '/:slug', 'new-collective-page');
-  pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
-} else {
-  pages.add('collective', '/:slug');
-}
+pages.add('collective', '/:slug', 'new-collective-page');
+pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
 
 module.exports = pages;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { display, layout, space, typography, shadow, color, flexbox } from 'styled-system';
+import { display, layout, space, typography, shadow, color, flexbox, borders } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
@@ -19,6 +19,7 @@ const Message = styled.div`
   border-radius: 8px;
   padding: ${themeGet('space.3')}px;
 
+  ${borders}
   ${shadow}
   ${display}
   ${layout}

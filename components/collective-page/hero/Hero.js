@@ -273,6 +273,7 @@ Hero.propTypes = {
     isApproved: PropTypes.bool,
     canApply: PropTypes.bool,
     backgroundImage: PropTypes.string,
+    backgroundImageUrl: PropTypes.string,
     twitterHandle: PropTypes.string,
     githubHandle: PropTypes.string,
     website: PropTypes.string,

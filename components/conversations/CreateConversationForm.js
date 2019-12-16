@@ -13,8 +13,8 @@ import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { P, H4 } from '../Text';
-import Container from '../Container';
 import StyledInputTags from '../StyledInputTags';
+import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 
 const CreateConversationMutation = gqlV2`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
@@ -108,7 +108,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
                 withStickyToolbar
                 toolbarOffsetY={0}
                 placeholder={formatMessage(messages.bodyPlaceholder)}
-                editorMinHeight={175}
+                editorMinHeight={225}
                 inputName="html"
                 fontSize="13px"
                 onChange={e => setValue('html', e.target.value)}
@@ -145,9 +145,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
             <H4 fontWeight="normal" mb={2}>
               <FormattedMessage id="FAQ" defaultMessage="FAQ" />
             </H4>
-            <Container borderLeft="1px solid #DCDEE0" p={3} mt={2}>
-              <i>Todo</i>
-            </Container>
+            <CreateConversationFAQ title={null} withBorderLeft />
           </Box>
         </Box>
       </Flex>

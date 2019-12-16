@@ -235,13 +235,15 @@ class SectionContribute extends React.PureComponent {
             )}
           </HorizontalScroller>
         )}
-        <ContainerSectionContent>
-          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-            <StyledButton buttonSize="large" mt={3} width={1} p="10px">
-              <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
-            </StyledButton>
-          </Link>
-        </ContainerSectionContent>
+        {!isEvent && (
+          <ContainerSectionContent>
+            <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+              <StyledButton buttonSize="large" mt={3} width={1} p="10px">
+                <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
+              </StyledButton>
+            </Link>
+          </ContainerSectionContent>
+        )}
         {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors
             organizations={topOrganizations}
