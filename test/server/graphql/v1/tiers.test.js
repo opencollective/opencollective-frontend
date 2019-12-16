@@ -8,7 +8,7 @@ import stripe from '../../../../server/lib/stripe';
 import models from '../../../../server/models';
 import { VAT_OPTIONS } from '../../../../server/constants/vat';
 
-describe('graphql.tiers.test', () => {
+describe('server/graphql/v1/tiers.test.js', () => {
   let user1, user2, host, collective1, collective2, tier1, tierWithCustomFields, tierProduct, paymentMethod1;
   let sandbox;
 
@@ -245,9 +245,7 @@ describe('graphql.tiers.test', () => {
 
         const result = await utils.graphqlQuery(createOrderQuery, { order });
         expect(result.errors).to.exist;
-        expect(result.errors[0].message).to.equal(
-          'You need to be logged in to be able to use a payment method on file',
-        );
+        expect(result.errors[0].message).to.equal('You need to be authenticated to perform this action');
       });
 
       it('fails to use a payment method on file if not logged in as the owner', async () => {

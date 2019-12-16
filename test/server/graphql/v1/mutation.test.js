@@ -508,12 +508,11 @@ describe('Mutation Tests', () => {
             }
           `;
           const order = {
-            user: { email: user1.email },
             collective: { id: 12324 },
             tier: { id: 3 },
             quantity: 1,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].message).to.equal(`No collective found: ${order.collective.id}`);
         });
@@ -536,12 +535,11 @@ describe('Mutation Tests', () => {
           `;
 
           const order = {
-            user: { email: 'user@email.com' },
             collective: { id: event1.id },
             tier: { id: 1002 },
             quantity: 1,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           expect(result.errors.length).to.equal(1);
           expect(result.errors[0].message).to.equal(
             `No tier found with tier id: 1002 for collective slug ${event1.slug}`,
@@ -568,12 +566,11 @@ describe('Mutation Tests', () => {
           `;
 
           const order = {
-            user: { email: 'user@email.com' },
             collective: { id: event1.id },
             tier: { id: 3 },
             quantity: 101,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           expect(result.errors[0].message).to.equal(`No more tickets left for ${ticket1.name}`);
         });
       });
@@ -597,12 +594,11 @@ describe('Mutation Tests', () => {
           `;
 
           const order = {
-            user: { email: 'user@email.com' },
             collective: { id: event1.id },
             tier: { id: 4 },
             quantity: 2,
           };
-          const result = await utils.graphqlQuery(query, { order });
+          const result = await utils.graphqlQuery(query, { order }, user2);
           expect(result.errors[0].message).to.equal('This order requires a payment method');
         });
       });
@@ -1055,7 +1051,7 @@ describe('Mutation Tests', () => {
           const result = await utils.graphqlQuery(query, { order }, loggedInUser);
           // result.errors && console.error(result.errors[0]);
           expect(result.errors).to.exist;
-          expect(result.errors[0].message).to.equal('An account already exists for this email address. Please login.');
+          expect(result.errors[0].message).to.equal('You need to be authenticated to perform this action');
         });
 
         it('from a new user', async () => {
