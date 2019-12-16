@@ -1366,6 +1366,7 @@
   "virtualCards.sentTo": "enviar para {email}",
   "virtualCards.viewDetails": "Ver detalhes",
   "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
+  "warning.limitedAccount": "Your account is currently limited. If you think this is a mistake, please contact support@opencollective.com.",
   "WarningUnsavedChanges": "Você está tentando sair desta página com alterações não salvas. Você tem certeza?",
   "webhooks.add": "Adicionar outro webhook",
   "webhooks.remove": "Remover webhook",
