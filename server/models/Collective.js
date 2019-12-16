@@ -48,7 +48,6 @@ import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
 import expenseStatus from '../constants/expense_status';
 import expenseTypes from '../constants/expense_type';
-import { getFxRate } from '../lib/currency';
 
 const debug = debugLib('collective');
 const debugcollectiveImage = debugLib('collectiveImage');
@@ -1916,12 +1915,11 @@ export default function(Sequelize, DataTypes) {
     endDate = endDate || new Date();
     const createdAt = startDate ? { [Op.lt]: endDate, [Op.gte]: startDate } : { [Op.lt]: endDate };
 
-    return models.Transaction.findAll({
+    return models.Transaction.findOne({
       attributes: [
-        'currency',
         [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('netAmountInCollectiveCurrency')), 0), 'total'],
       ],
-      group: ['currency'],
+
       where: {
         type: 'DEBIT',
         createdAt: createdAt,
@@ -1930,19 +1928,7 @@ export default function(Sequelize, DataTypes) {
           UsingVirtualCardFromCollectiveId: this.id,
         },
       },
-      raw: true,
-    }).then(async result => {
-      let totalAmount = 0;
-      for (const amount of result) {
-        let total = -parseInt(amount.total, 10);
-        if (amount.currency !== this.currency) {
-          const fxRate = await getFxRate(amount.currency, this.currency);
-          total = fxRate * total;
-        }
-        totalAmount = total + totalAmount;
-      }
-      return totalAmount;
-    });
+    }).then(result => Promise.resolve(-parseInt(result.toJSON().total, 10)));
   };
 
   // Get the average monthly spending based on last 90 days
