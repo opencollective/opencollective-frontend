@@ -23,6 +23,9 @@ const HELLO_WORKS_S3_BUCKET = get(config, 'helloworks.aws.s3.bucket');
 const ENCRYPTION_KEY = get(config, 'helloworks.documentEncryptionKey');
 
 async function callback(req, res) {
+  logger.info('Tax Form callback (raw):', req.rawBody);
+  logger.info('Tax Form callback (parsed):', req.body);
+
   const client = new HelloWorks({
     apiKeyId: HELLO_WORKS_KEY,
     apiKeySecret: HELLO_WORKS_SECRET,
