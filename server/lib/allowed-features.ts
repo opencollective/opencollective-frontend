@@ -1,17 +1,14 @@
 import { types } from '../constants/collectives';
-
-export enum FEATURES {
-  CONVERSATIONS,
-}
+import FEATURE from '../constants/feature';
 
 const FeatureAllowedForTypes = {
-  [FEATURES.CONVERSATIONS]: [types.COLLECTIVE],
+  [FEATURE.CONVERSATIONS]: [types.COLLECTIVE],
 };
 
 /**
  * Check if the given feature is activated for collective.
  */
-const hasFeature = (collective, feature: FEATURES): boolean => {
+const hasFeature = (collective, feature: FEATURE): boolean => {
   const allowedTypes = FeatureAllowedForTypes[feature];
   return collective && allowedTypes && allowedTypes.includes(collective.type);
 };

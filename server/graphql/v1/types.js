@@ -169,6 +169,13 @@ export const UserType = new GraphQLObjectType({
           return user.getPersonalDetails && user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
         },
       },
+      isLimited: {
+        type: GraphQLBoolean,
+        description: "Returns true if user account is limited (user can't use any feature)",
+        resolve(user) {
+          return user.data && user.data.features && user.data.features.ALL === false;
+        },
+      },
     };
   },
 });

@@ -27,3 +27,8 @@ export const InvalidToken = createError('InvalidToken', {
 export const FeatureNotSupportedForCollective = createError('FeatureNotSupportedForCollective', {
   message: 'This feature is not supported by the Collective',
 });
+
+/** An error to throw when `canUseFeature` returns false (user is not allowed to use this) */
+export const FeatureNotAllowedForUser = createError('FeatureNotAllowedForUser', {
+  message: "You're not allowed to use this feature",
+});

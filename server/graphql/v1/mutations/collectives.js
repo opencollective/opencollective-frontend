@@ -17,6 +17,8 @@ import roles from '../../../constants/roles';
 import activities from '../../../constants/activities';
 import { types } from '../../../constants/collectives';
 import { purgeCacheForPage } from '../../../lib/cloudflare';
+import { canUseFeature } from '../../../lib/user-permissions';
+import FEATURE from '../../../constants/feature';
 
 const debugClaim = debug('claim');
 const debugGithub = debug('github');
@@ -926,12 +928,8 @@ export async function deleteUserCollective(_, args, req) {
 }
 
 export async function sendMessageToCollective(_, args, req) {
-  if (!req.remoteUser) {
-    throw new errors.Unauthorized({
-      message: 'You need to be logged in to contact a collective',
-    });
-  } else if (get(req.remoteUser.data, 'disableContact', false)) {
-    throw new errors.Unauthorized({
+  if (!canUseFeature(req.remoteUser, FEATURE.CONTACT_COLLECTIVE)) {
+    throw new errors.FeatureNotAllowedForUser({
       message:
         'You are not authorized to contact Collectives. Please contact support@opencollective.com if you think this is an error.',
     });
@@ -944,7 +942,7 @@ export async function sendMessageToCollective(_, args, req) {
     });
   }
 
-  if (get(req.remoteUser.data, 'disableContact', false) || !(await collective.canContact())) {
+  if (!(await collective.canContact())) {
     throw new errors.Unauthorized({
       message: `You can't contact this collective`,
     });
