@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
+import { Box } from '@rebass/grid';
 
 import colors from '../../lib/constants/colors';
 
 import Expense from './Expense';
+import Loading from '../Loading';
 
 class Expenses extends React.Component {
   static propTypes = {
@@ -61,12 +63,8 @@ class Expenses extends React.Component {
   render() {
     const { collective, expenses, filters, status, loading, updateVariables } = this.props;
 
-    if (!expenses) {
-      return <div />;
-    }
-
     let filteredExpenses;
-    if (status === 'READY') {
+    if (expenses && status === 'READY') {
       // Don't show expense when collective doesn't have enough fund in "ready to pay" filter
       filteredExpenses = expenses.filter(
         expense => get(expense.collective || collective, 'stats.balance') >= expense.amount,
@@ -74,26 +72,23 @@ class Expenses extends React.Component {
       // Don't show expense that requires tax form in "ready to pay" filter
       filteredExpenses = filteredExpenses.filter(expense => !expense.userTaxFormRequiredBeforePayment);
     } else {
-      filteredExpenses = expenses;
+      filteredExpenses = expenses || [];
     }
 
     return (
-      <div className="Expenses">
+      <Box className="Expenses" mx="auto" maxWidth="80rem">
         <style jsx>
           {`
-            .Expenses {
-              min-width: 30rem;
-              max-width: 80rem;
-            }
             :global(.loadMoreBtn) {
               margin: 1rem;
               text-align: center;
             }
             .filter {
+              max-width: 500px;
               width: 100%;
-              max-width: 400px;
               margin: 0 auto;
               margin-bottom: 20px;
+              overflow-x: auto;
             }
             :global(.filterBtnGroup) {
               width: 100%;
@@ -113,24 +108,6 @@ class Expenses extends React.Component {
             }
             .itemsList .item {
               border-bottom: 1px solid #e8e9eb;
-            }
-            .loading {
-              color: ${colors.darkgray};
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              background: rgba(255, 255, 255, 0.85);
-              text-transform: uppercase;
-              letter-spacing: 3px;
-              font-weight: bold;
-              z-index: 10;
-              -webkit-backdrop-filter: blur(2px);
-              backdrop-filter: blur(5px);
             }
           `}
         </style>
@@ -191,27 +168,30 @@ class Expenses extends React.Component {
         )}
 
         <div className="itemsList">
-          {loading && (
-            <div className="loading">
-              <FormattedMessage id="loading" defaultMessage="loading" />
-            </div>
-          )}
-          {filteredExpenses.map(expense => this.renderExpense(expense))}
-          {filteredExpenses.length === 0 && (
-            <div className="empty">
-              <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
-            </div>
-          )}
-          {filteredExpenses.length >= 10 && filteredExpenses.length % 10 === 0 && (
-            <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.props.fetchMore}>
-                {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-                {!loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-              </Button>
-            </div>
+          {loading ? (
+            <Box my={5}>
+              <Loading />
+            </Box>
+          ) : (
+            <React.Fragment>
+              {filteredExpenses.map(expense => this.renderExpense(expense))}
+              {filteredExpenses.length === 0 && (
+                <div className="empty">
+                  <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
+                </div>
+              )}
+              {filteredExpenses.length >= 10 && filteredExpenses.length % 10 === 0 && (
+                <div className="loadMoreBtn">
+                  <Button bsStyle="default" onClick={this.props.fetchMore}>
+                    {loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+                    {!loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+                  </Button>
+                </div>
+              )}
+            </React.Fragment>
           )}
         </div>
-      </div>
+      </Box>
     );
   }
 }

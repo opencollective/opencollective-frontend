@@ -100,7 +100,7 @@ class HostPendingApplications extends React.Component {
               </Container>
             </Flex>
             <StyledHr my={3} borderColor="black.200" />
-            <Flex justifyContent="center">
+            <Flex justifyContent="space-evenly" flexWrap="wrap">
               {c.isActive ? (
                 <Box color="green.700" data-cy={`${c.slug}-approved`}>
                   <Check size={39} />
@@ -110,19 +110,21 @@ class HostPendingApplications extends React.Component {
                   <Mutation mutation={ApproveCollectiveMutation}>
                     {(approveCollective, { loading }) => (
                       <StyledButton
-                        mx={4}
+                        m={1}
                         loading={loading}
                         onClick={() => approveCollective({ variables: { id: c.id } })}
                         data-cy={`${c.slug}-approve`}
+                        buttonStyle="success"
+                        minWidth={125}
                       >
                         <FormattedMessage id="host.pending-applications.approve" defaultMessage="Approve" />
                       </StyledButton>
                     )}
                   </Mutation>
                   <StyledButton
-                    color="#fff"
-                    bg="red.500"
-                    mx={4}
+                    buttonStyle="danger"
+                    minWidth={125}
+                    m={1}
                     onClick={() => this.setState({ showRejectionModal: true, collectiveId: c.id })}
                   >
                     <FormattedMessage id="host.pending-applications.reject" defaultMessage="Reject" />
@@ -151,7 +153,7 @@ class HostPendingApplications extends React.Component {
     return (
       <Query query={getHostPendingApplicationsQuery} variables={{ hostCollectiveSlug }}>
         {({ loading, error, data }) =>
-          !data || error ? (
+          error ? (
             <MessageBox type="error" withIcon>
               {error ? error.message : 'Unknown error'}
             </MessageBox>
