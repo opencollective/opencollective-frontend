@@ -11,6 +11,7 @@ import EditEventForm from './EditEventForm';
 import CollectiveNavbar from './CollectiveNavbar';
 
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { getErrorFromGraphqlException } from '../lib/utils';
 
 class CreateEvent extends React.Component {
   static propTypes = {
@@ -60,7 +61,7 @@ class CreateEvent extends React.Component {
       window.location.replace(eventUrl);
     } catch (err) {
       console.error('>>> createEvent error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({
         status: 'idle',
         result: { error: errorMsg },

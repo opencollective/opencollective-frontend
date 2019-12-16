@@ -10,7 +10,7 @@ import memoizeOne from 'memoize-one';
 
 import events from '../../lib/constants/notificationEvents';
 
-import { compose } from '../../lib/utils';
+import { compose, getErrorFromGraphqlException } from '../../lib/utils';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Loading from '../Loading';
@@ -161,14 +161,7 @@ class EditWebhooks extends React.Component {
         this.setState({ status: null });
       }, 3000);
     } catch (e) {
-      let message = '';
-      if (e && e.errors) {
-        message = e.errors[0].message;
-      } else if (e && e.graphQLErrors && e.graphQLErrors.length > 0) {
-        message = e.graphQLErrors[0].message;
-      } else {
-        message = e.message;
-      }
+      const message = getErrorFromGraphqlException(e).message;
       this.setState({ status: 'error', error: message });
     }
   };

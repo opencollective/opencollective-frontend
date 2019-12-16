@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
+import { getErrorFromGraphqlException } from '../lib/utils';
 import SmallButton from './SmallButton';
 
 class CancelSubscriptionBtn extends React.Component {
@@ -27,7 +28,7 @@ class CancelSubscriptionBtn extends React.Component {
     try {
       await this.props.cancelSubscription(id);
     } catch (err) {
-      onError(err.graphQLErrors[0].message);
+      onError(getErrorFromGraphqlException(err).message);
     }
     this.setState({ loading: false });
   }

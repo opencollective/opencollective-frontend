@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { capitalize, compose } from '../lib/utils';
+import { capitalize, compose, getErrorFromGraphqlException } from '../lib/utils';
 
 import Header from '../components/Header';
 import Body from '../components/Body';
@@ -156,7 +156,7 @@ class ActionPage extends React.Component {
         this.setState({ loading: false, result: res.data[mutationName] });
       } catch (error) {
         console.log('>>> error', JSON.stringify(error));
-        this.setState({ loading: false, error: error.graphQLErrors[0] });
+        this.setState({ loading: false, error: getErrorFromGraphqlException(error) });
       }
     }
   }
