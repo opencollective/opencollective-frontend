@@ -96,6 +96,7 @@ export const templateNames = [
   'user.yearlyreport',
   'user.yearlyreport.text',
   'backyourstack.dispatch.confirmed',
+  'added.fund.to.org',
 ];
 
 const templatesPath = `${__dirname}/../../templates`;

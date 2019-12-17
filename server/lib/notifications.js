@@ -365,9 +365,14 @@ async function notifyByEmail(activity) {
       for (const order of activity.data.orders) {
         order.collective = await models.Collective.findByPk(order.CollectiveId);
       }
-
       notifyAdminsOfCollective(activity.data.collective.id, activity, {
         template: 'backyourstack.dispatch.confirmed',
+      });
+      break;
+
+    case activityType.ADDED_FUND_TO_ORG:
+      notifyAdminsOfCollective(activity.data.collective.id, activity, {
+        template: 'added.fund.to.org',
       });
   }
 }

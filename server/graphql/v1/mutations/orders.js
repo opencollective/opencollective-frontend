@@ -920,6 +920,19 @@ export async function addFundsToOrg(args, remoteUser) {
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+
+  models.Activity.create({
+    type: activities.ADDED_FUND_TO_ORG,
+    CollectiveId: args.CollectiveId,
+    data: {
+      totalAmount: args.totalAmount,
+      collective: fromCollective,
+      currency: fromCollective.currency,
+      currentBalance: paymentMethod.initialBalance,
+      addedBy: hostCollective.name,
+    },
+  });
+
   return paymentMethod;
 }
 
