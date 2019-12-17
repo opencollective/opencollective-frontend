@@ -20,7 +20,7 @@ env:
 
 jobs:
   e2e:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -55,7 +55,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '10.17'
 
       - name: Restore node_modules (api)
         uses: actions/cache@v1
