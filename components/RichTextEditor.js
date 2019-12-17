@@ -61,9 +61,8 @@ const TrixEditorContainer = styled.div`
 
     .trix-button {
       border-bottom: none;
-      width: 2.6em;
-      height: 1.8em;
-      padding: 0.75em;
+      display: inline-block;
+      height: auto;
 
       &:hover {
         background: ${props => props.theme.colors.blue[100]};
