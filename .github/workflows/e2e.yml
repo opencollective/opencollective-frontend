@@ -16,7 +16,7 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
-  DEBUG: cypress:cli,cypress:server:*
+  DEBUG: cypress:cli
 
 jobs:
   e2e:
