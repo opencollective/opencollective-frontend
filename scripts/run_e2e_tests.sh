@@ -59,6 +59,7 @@ echo ""
 echo "> Running cypress tests"
 npx cypress run ${CYPRESS_RECORD}
 RETURN_CODE=$?
+echo "RETURN_CODE is ${RETURN_CODE}"
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"
   exit 1;
