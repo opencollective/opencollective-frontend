@@ -42,6 +42,11 @@ const TrixEditorContainer = styled.div`
       color: ${props => props.theme.colors.black[400]};
     }
 
+    // Image captions are disabled
+    figcaption {
+      display: none;
+    }
+
     ${props => css({ minHeight: props.editorMinHeight })}
   }
 
