@@ -208,7 +208,7 @@ jobs:
       CYPRESS_TEST_FILES: 0*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-      DEBUG: cypress:cli
+      DEBUG: cypress:cli,cypress:server:*
     <<: *e2e_steps
 
   test-e2e-1:
@@ -227,7 +227,7 @@ jobs:
       CYPRESS_TEST_FILES: 1*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-      DEBUG: cypress:cli
+      DEBUG: cypress:cli,cypress:server:*
     <<: *e2e_steps
 
   test-e2e-2:
@@ -246,7 +246,7 @@ jobs:
       CYPRESS_TEST_FILES: 2*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-      DEBUG: cypress:cli
+      DEBUG: cypress:cli,cypress:server:*
     <<: *e2e_steps
 
   test-e2e-3:
@@ -265,7 +265,7 @@ jobs:
       CYPRESS_TEST_FILES: 3*.js
       CYPRESS_RECORD: false
       CYPRESS_VIDEO: false
-      DEBUG: cypress:cli
+      DEBUG: cypress:cli,cypress:server:*
     <<: *e2e_steps
 
 workflows:
