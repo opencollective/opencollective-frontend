@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
+import { getErrorFromGraphqlException } from '../lib/utils';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
 import CollectiveCover from './CollectiveCover';
@@ -69,7 +70,7 @@ class CreateOrganization extends React.Component {
       });
     } catch (err) {
       console.error('>>> createOrganization error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);
     }

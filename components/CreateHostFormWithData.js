@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import { Flex } from '@rebass/grid';
 
-import { compose } from '../lib/utils';
+import { compose, getErrorFromGraphqlException } from '../lib/utils';
 
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';
@@ -35,7 +35,7 @@ class CreateHostFormWithData extends React.Component {
       return collective;
     } catch (err) {
       console.error('>>> createOrganization error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);
     }

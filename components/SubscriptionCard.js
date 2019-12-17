@@ -6,7 +6,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
 import Link from './Link';
-import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
+import { firstSentence, getCurrencySymbol, imagePreview, getErrorFromGraphqlException } from '../lib/utils';
 import { getStripe } from '../lib/stripe';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import colors from '../lib/constants/colors';
@@ -89,7 +89,7 @@ class SubscriptionCard extends React.Component {
     } catch (e) {
       this.setState({
         loading: false,
-        result: { error: e.graphQLErrors[0].message },
+        result: { error: getErrorFromGraphqlException(e).message },
       });
     }
   };

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import { getErrorFromGraphqlException } from '../../lib/utils';
 import Header from '../Header';
 import Body from '../Body';
 import Footer from '../Footer';
@@ -89,7 +90,7 @@ class EditCollective extends React.Component {
       }, 3000);
     } catch (err) {
       console.error('>>> editCollective error:', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: null, result: { error: errorMsg } });
     }
   }

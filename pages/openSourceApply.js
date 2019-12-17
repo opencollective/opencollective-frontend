@@ -20,7 +20,7 @@ import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
 import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
-import { getWebsiteUrl } from '../lib/utils';
+import { getWebsiteUrl, getErrorFromGraphqlException } from '../lib/utils';
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../lib/local-storage';
 
 class OpenSourceApplyPage extends Component {
@@ -106,7 +106,7 @@ class OpenSourceApplyPage extends Component {
       });
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err)); // TODO - Remove
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({
         creatingCollective: false,
         result: { type: 'error', mesg: errorMsg },

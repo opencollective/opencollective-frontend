@@ -9,6 +9,7 @@ import Container from '../Container';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
+import { getErrorFromGraphqlException } from '../../lib/utils';
 
 const getCollectiveType = type => {
   switch (type) {
@@ -45,7 +46,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }
   };
@@ -62,7 +63,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
       });
     } catch (err) {
       console.error('>>> archiveCollective error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }
   };
