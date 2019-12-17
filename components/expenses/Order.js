@@ -30,7 +30,7 @@ class Order extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
-    markPendingOrderAsExpired: PropTypes.func,
+    markPendingOrderAsExpired: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -57,7 +57,7 @@ class Order extends React.Component {
       },
       'cancelOrder.modal.body': {
         id: 'cancelOrder.modal.body',
-        defaultMessage: 'Are you sure you want to cancel this expense?',
+        defaultMessage: 'Are you sure you want to cancel this order?',
       },
       no: { id: 'no', defaultMessage: 'No' },
       yes: { id: 'yes', defaultMessage: 'Yes' },
@@ -297,7 +297,7 @@ class Order extends React.Component {
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />
               <StyledButton
                 bg="red.500"
-                color="#fff"
+                buttonStyle="danger"
                 data-cy="cancelOrder"
                 onClick={() => this.setState({ showCancelOrderModal: true })}
               >
@@ -312,9 +312,6 @@ class Order extends React.Component {
             header={intl.formatMessage(this.messages['cancelOrder.modal.header'])}
             body={intl.formatMessage(this.messages['cancelOrder.modal.body'])}
             onClose={() => this.setState({ showCancelOrderModal: false })}
-            cancelLabel={intl.formatMessage(this.messages['no'])}
-            cancelHandler={() => this.setState({ showCancelOrderModal: false })}
-            continueLabel={intl.formatMessage(this.messages['yes'])}
             continueHandler={() => this.handleCancelOrder(order.id)}
           />
         )}
@@ -328,7 +325,7 @@ class Order extends React.Component {
   }
 }
 
-const markPendingOrderAsExpiredQuery = gql`
+const markPendingOrderAsExpiredMutation = gql`
   mutation markPendingOrderAsExpired($id: Int!) {
     markPendingOrderAsExpired(id: $id) {
       id
@@ -344,7 +341,7 @@ const markPendingOrderAsExpiredQuery = gql`
   }
 `;
 
-const addMutation = graphql(markPendingOrderAsExpiredQuery, {
+const addMutation = graphql(markPendingOrderAsExpiredMutation, {
   props: ({ mutate }) => ({
     markPendingOrderAsExpired: async id => {
       return await mutate({ variables: { id } });

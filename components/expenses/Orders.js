@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo';
 import { Box } from '@rebass/grid';
 
 import colors from '../../lib/constants/colors';
@@ -190,29 +189,6 @@ class Orders extends React.Component {
             </div>
           )}
         </div>
-        <Modal show={this.state.showModal} width="570px" onClose={() => this.setState({ showModal: false })}>
-          <ModalHeader>
-            <FormattedMessage id="order.cancel.modal.header" defaultMessage="Cancel Order" />
-          </ModalHeader>
-          <ModalBody>
-            <P>
-              <FormattedMessage
-                id="order.cancel.modal.body"
-                defaultMessage={'Are you sure you want to cancel this order?'}
-              />
-            </P>
-          </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => this.setState({ showModal: false })}>
-                <FormattedMessage id="no" defaultMessage={'No'} />
-              </StyledButton>
-              <StyledButton buttonStyle="primary" onClick={this.cancelPendingOrder}>
-                <FormattedMessage id="yes" defaultMessage={'Yes'} />
-              </StyledButton>
-            </Container>
-          </ModalFooter>
-        </Modal>
       </Box>
     );
   }
