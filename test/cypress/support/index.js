@@ -16,8 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
-// See https://github.com/opencollective/opencollective/issues/2676
-Cypress.on('uncaught:exception', err => {
+cy.on('uncaught:exception', err => {
   if (err.message.includes('Cannot clear timer: timer created with')) {
     // See https://github.com/cypress-io/cypress/issues/3170
     // Ignore this error
