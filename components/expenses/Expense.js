@@ -23,6 +23,7 @@ import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
 import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
+import MarkExpenseAsPaidBtn from './MarkExpenseAsPaidBtn';
 
 class Expense extends React.Component {
   static propTypes = {
@@ -321,7 +322,6 @@ class Expense extends React.Component {
 
             @media (max-width: 600px) {
               .expense {
-                max-height: 50rem;
                 padding: 2rem 0.5rem;
               }
               .expense.detailsView {
@@ -371,15 +371,17 @@ class Expense extends React.Component {
         </div>
         <div className="body">
           <div className="header">
-            <div className="amount pullRight">
-              <AmountCurrency amount={-expense.amount} currency={expense.currency} precision={2} />
-            </div>
-            <div className="description">
-              <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
-                {capitalize(title)}
-                {view !== 'compact' && <span className="ExpenseId">#{expense.id}</span>}
-              </Link>
-            </div>
+            <Flex flexWrap="wrap" justifyContent="space-between">
+              <div className="description">
+                <Link route={`/${collective.slug}/expenses/${expense.id}`} title={capitalize(title)}>
+                  {capitalize(title)}
+                  {view !== 'compact' && <span className="ExpenseId">#{expense.id}</span>}
+                </Link>
+              </div>
+              <div className="amount">
+                <AmountCurrency amount={-expense.amount} currency={expense.currency} precision={2} />
+              </div>
+            </Flex>
             <div className="meta">
               <Moment relative={true} value={expense.incurredAt} />
               {' | '}
@@ -475,7 +477,7 @@ class Expense extends React.Component {
                 <Span color="red.500">{intl.formatMessage(this.messages['expenseTypeMissing'])}</Span>
               )}
               {mode !== 'edit' && (canPay || canApprove || canReject || canMarkExpenseAsUnpaid || canDelete) && (
-                <Flex flexDirection="column">
+                <Flex flexDirection="column" width="100%">
                   {canPay && (
                     <EditPayExpenseFeesForm
                       canEditPlatformFee={LoggedInUser.isRoot()}
@@ -484,27 +486,39 @@ class Expense extends React.Component {
                       payoutMethod={expense.payoutMethod}
                     />
                   )}
-                  <Flex data-cy="expense-actions">
+                  <Flex data-cy="expense-actions" flexDirection={['column', 'row']} flexWrap="wrap" width="100%">
                     {canPay && (
-                      <PayExpenseBtn
-                        expense={expense}
-                        collective={collective}
-                        host={host}
-                        {...this.state.fees}
-                        refetch={this.props.refetch}
-                        disabled={!this.props.allowPayAction}
-                        lock={this.props.lockPayAction}
-                        unlock={this.props.unlockPayAction}
-                      />
-                    )}
-                    {canPay && (
-                      <StyledButton
-                        mr={2}
-                        buttonStyle="standard"
-                        onClick={() => this.setState({ showUnapproveModal: true })}
-                      >
-                        <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
-                      </StyledButton>
+                      <React.Fragment>
+                        <MarkExpenseAsPaidBtn
+                          expense={expense}
+                          collective={collective}
+                          {...this.state.fees}
+                          refetch={this.props.refetch}
+                          disabled={!this.props.allowPayAction}
+                          lock={this.props.lockPayAction}
+                          unlock={this.props.unlockPayAction}
+                        />
+                        {expense.payoutMethod !== 'other' && (
+                          <PayExpenseBtn
+                            expense={expense}
+                            collective={collective}
+                            host={host}
+                            {...this.state.fees}
+                            refetch={this.props.refetch}
+                            disabled={!this.props.allowPayAction}
+                            lock={this.props.lockPayAction}
+                            unlock={this.props.unlockPayAction}
+                          />
+                        )}
+                        <StyledButton
+                          mr={2}
+                          my={1}
+                          buttonStyle="standard"
+                          onClick={() => this.setState({ showUnapproveModal: true })}
+                        >
+                          <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
+                        </StyledButton>
+                      </React.Fragment>
                     )}
                     {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn refetch={this.props.refetch} id={expense.id} />}
                     {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
@@ -513,6 +527,8 @@ class Expense extends React.Component {
                       <StyledButton
                         buttonStyle="danger"
                         onClick={() => this.setState({ showDeleteExpenseModal: true })}
+                        mr={2}
+                        my={1}
                       >
                         <FormattedMessage id="expense.delete.btn" defaultMessage="Delete" />
                       </StyledButton>

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
@@ -7,16 +7,15 @@ import { get } from 'lodash';
 import { isValidEmail, getErrorFromGraphqlException } from '../../lib/utils';
 
 import StyledButton from '../StyledButton';
-import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import StyledTooltip from '../StyledTooltip';
 import { payExpenseMutation } from './graphql/mutations';
+import StyledSpinner from '../StyledSpinner';
 
-class PayExpenseBtn extends React.Component {
+class MarkExpenseAsPaidBtn extends React.Component {
   static propTypes = {
     expense: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
-    host: PropTypes.object,
     disabled: PropTypes.bool,
     paymentProcessorFeeInCollectiveCurrency: PropTypes.number,
     hostFeeInCollectiveCurrency: PropTypes.number,
@@ -31,14 +30,15 @@ class PayExpenseBtn extends React.Component {
   constructor(props) {
     super(props);
     this.state = { loading: false };
+
     this.messages = defineMessages({
-      'paypal.missing': {
-        id: 'expense.payoutMethod.paypal.missing',
-        defaultMessage: 'Please provide a valid paypal email address',
-      },
       insufficientBalance: {
         id: 'expense.pay.error.insufficientBalance',
         defaultMessage: 'Insufficient balance',
+      },
+      paypalMissing: {
+        id: 'expense.payoutMethod.paypal.missing',
+        defaultMessage: 'Please provide a valid paypal email address',
       },
     });
   }
@@ -70,27 +70,16 @@ class PayExpenseBtn extends React.Component {
   }
 
   render() {
-    const { collective, expense, intl, host } = this.props;
+    const { collective, expense, intl } = this.props;
     const { loading, error } = this.state;
-    let disabled = this.state.loading || this.props.disabled,
-      selectedPayoutMethod = expense.payoutMethod,
-      disabledMessage;
+    let disabled = this.state.loading || this.props.disabled;
+    let disabledMessage = '';
 
     if (expense.payoutMethod === 'paypal') {
       if (!isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
         disabled = true;
-        disabledMessage = intl.formatMessage(this.messages['paypal.missing']);
-      } else {
-        const paypalPaymentMethod =
-          get(host, 'paymentMethods') && host.paymentMethods.find(pm => pm.service === 'paypal');
-        if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
-          selectedPayoutMethod = 'other';
-        }
+        disabledMessage = intl.formatMessage(this.messages.paypalMissing);
       }
-    }
-
-    if (selectedPayoutMethod === 'other') {
-      return null;
     }
 
     if (get(collective, 'stats.balance') < expense.amount) {
@@ -101,23 +90,19 @@ class PayExpenseBtn extends React.Component {
     const button = (
       <StyledButton
         className="pay"
-        data-cy="pay-expense-btn"
         buttonStyle="success"
-        onClick={() => this.handleOnClickPay()}
+        data-cy="mark-expense-as-paid-btn"
+        onClick={() => this.handleOnClickPay(expense.payoutMethod === 'paypal')}
         disabled={this.props.disabled || disabled}
         mr={2}
         my={1}
       >
         {loading ? (
-          <Fragment>
+          <React.Fragment>
             <StyledSpinner /> <FormattedMessage id="expense.payExpenseBtn.processing" defaultMessage="Processing..." />
-          </Fragment>
+          </React.Fragment>
         ) : (
-          <FormattedMessage
-            id="expense.pay.btn"
-            defaultMessage="Pay with {paymentMethod}"
-            values={{ paymentMethod: expense.payoutMethod }}
-          />
+          <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
         )}
       </StyledButton>
     );
@@ -142,4 +127,4 @@ class PayExpenseBtn extends React.Component {
 }
 
 const addMutation = graphql(payExpenseMutation);
-export default addMutation(injectIntl(PayExpenseBtn));
+export default addMutation(injectIntl(MarkExpenseAsPaidBtn));

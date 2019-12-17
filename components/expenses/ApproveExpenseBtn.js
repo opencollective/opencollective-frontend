@@ -27,7 +27,7 @@ class ApproveExpenseBtn extends React.Component {
   render() {
     return (
       <div className="ApproveExpenseBtn" data-cy="approve-expense-btn">
-        <StyledButton className="approve" mr={2} buttonStyle="primary" onClick={this.onClick}>
+        <StyledButton className="approve" mr={2} my={1} buttonStyle="primary" onClick={this.onClick}>
           <FormattedMessage id="expense.approve.btn" defaultMessage="Approve" />
         </StyledButton>
       </div>

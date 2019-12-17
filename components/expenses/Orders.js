@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
+import { Box } from '@rebass/grid';
 
 import colors from '../../lib/constants/colors';
 
@@ -78,13 +79,9 @@ class Orders extends React.Component {
     }
 
     return (
-      <div className="Orders">
+      <Box className="Orders" mx="auto" maxWidth="80rem">
         <style jsx>
           {`
-            .Orders {
-              min-width: 30rem;
-              max-width: 80rem;
-            }
             :global(.loadMoreBtn) {
               margin: 1rem;
               text-align: center;
@@ -241,7 +238,7 @@ class Orders extends React.Component {
             </Container>
           </ModalFooter>
         </Modal>
-      </div>
+      </Box>
     );
   }
 }

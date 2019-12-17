@@ -185,7 +185,6 @@ class Order extends React.Component {
 
             @media (max-width: 600px) {
               .order {
-                max-height: 50rem;
                 padding: 2rem 0.5rem;
               }
               .order.detailsView {
