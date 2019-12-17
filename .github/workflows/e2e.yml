@@ -54,7 +54,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '13.x'
 
       - name: Restore node_modules (api)
         uses: actions/cache@v1
