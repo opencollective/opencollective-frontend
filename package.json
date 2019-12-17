@@ -30,7 +30,7 @@
     "@zeit/next-css": "0.2.1-canary.4",
     "@zeit/next-source-maps": "0.0.3",
     "accepts": "1.3.7",
-    "apollo-cache-inmemory": "1.6.3",
+    "apollo-cache-inmemory": "1.6.5",
     "apollo-client": "2.6.4",
     "apollo-link": "1.2.13",
     "apollo-link-context": "1.0.19",
