@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
@@ -15,6 +17,8 @@ import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
 import OrderDetails from './OrderDetails';
 import TransactionDetails from './TransactionDetails';
+import ConfirmationModal from '../ConfirmationModal';
+import Container from '../Container';
 
 class Order extends React.Component {
   static propTypes = {
@@ -26,7 +30,7 @@ class Order extends React.Component {
     includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object.isRequired,
-    onClickCancel: PropTypes.func,
+    markPendingOrderAsExpired: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -36,6 +40,8 @@ class Order extends React.Component {
       order: {},
       mode: undefined,
       view: 'summary',
+      showCancelOrderModal: false,
+      error: '',
     };
 
     this.messages = defineMessages({
@@ -45,6 +51,14 @@ class Order extends React.Component {
       active: { id: 'order.active', defaultMessage: 'active' },
       cancelled: { id: 'order.cancelled', defaultMessage: 'cancelled' },
       expired: { id: 'order.expired', defaultMessage: 'expired' },
+      'cancelOrder.modal.header': {
+        id: 'cancelOrder.modal.header',
+        defaultMessage: 'Cancel Order',
+      },
+      'cancelOrder.modal.body': {
+        id: 'cancelOrder.modal.body',
+        defaultMessage: 'Are you sure you want to cancel this order?',
+      },
     });
     this.currencyStyle = {
       style: 'currency',
@@ -59,6 +73,21 @@ class Order extends React.Component {
       ...state,
       view: state.view === 'details' ? 'summary' : 'details',
     }));
+  };
+
+  handleCancelOrder = async id => {
+    try {
+      await this.props.markPendingOrderAsExpired(id);
+      this.setState({
+        showCancelOrderModal: false,
+      });
+    } catch (err) {
+      this.setState({
+        showCancelOrderModal: false,
+        error: err.message,
+      });
+      console.error(err);
+    }
   };
 
   render() {
@@ -264,15 +293,57 @@ class Order extends React.Component {
           {order.status === 'PENDING' && canMarkOrderAsPaid && (
             <Flex>
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />
-              <StyledButton bg="red.500" color="#fff" onClick={() => this.props.onClickCancel(order.id)}>
+              <StyledButton
+                buttonStyle="danger"
+                data-cy="cancelOrder"
+                onClick={() => this.setState({ showCancelOrderModal: true })}
+              >
                 <FormattedMessage id="order.pending.cancel" defaultMessage="Cancel" />
               </StyledButton>
             </Flex>
           )}
         </div>
+        {this.state.showCancelOrderModal && (
+          <ConfirmationModal
+            show={this.state.showCancelOrderModal}
+            header={intl.formatMessage(this.messages['cancelOrder.modal.header'])}
+            body={intl.formatMessage(this.messages['cancelOrder.modal.body'])}
+            onClose={() => this.setState({ showCancelOrderModal: false })}
+            continueHandler={() => this.handleCancelOrder(order.id)}
+          />
+        )}
+        {this.state.error && (
+          <Container mx={2} data-cy="err-message">
+            {this.state.error}
+          </Container>
+        )}
       </div>
     );
   }
 }
 
-export default injectIntl(Order);
+const markPendingOrderAsExpiredMutation = gql`
+  mutation markPendingOrderAsExpired($id: Int!) {
+    markPendingOrderAsExpired(id: $id) {
+      id
+      status
+      collective {
+        id
+        stats {
+          id
+          balance
+        }
+      }
+    }
+  }
+`;
+
+const addMutation = graphql(markPendingOrderAsExpiredMutation, {
+  props: ({ mutate }) => ({
+    markPendingOrderAsExpired: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+export default addMutation(injectIntl(Order));
