@@ -54,11 +54,9 @@ const updateOrderQuery = `
 describe('updateOrder', () => {
   let sandbox, user, user2, externalUser, collective, paymentMethod, existingOrder;
 
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
+  before(() => (sandbox = sinon.createSandbox()));
 
-  after(() => sandbox.restore());
+  afterEach(() => sandbox.restore());
 
   beforeEach(async () => {
     await utils.resetTestDB();
@@ -97,10 +95,6 @@ describe('updateOrder', () => {
         status: 'succeeded',
       },
     });
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
   });
 
   it('fails if if no authorization provided', async () => {

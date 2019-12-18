@@ -40,15 +40,9 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $
 `;
 
 describe('graphql.updateSubscription.test.js', () => {
-  let collective, user, user2, paymentMethod, sandbox;
+  let collective, user, user2, paymentMethod;
 
   beforeEach(initNock);
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  after(() => sandbox.restore());
 
   beforeEach(() => utils.resetTestDB());
 
@@ -71,10 +65,6 @@ describe('graphql.updateSubscription.test.js', () => {
 
   // Create a paymentMethod.
   beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => (paymentMethod = c)));
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
 
   /**
    * Update subscription

@@ -59,12 +59,6 @@ describe('lib.payments.test.js', () => {
 
   afterEach(() => sandbox.restore());
 
-  // Create a stub for clearbit
-  beforeEach(done => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
-
   beforeEach('create a user', () => models.User.createUserWithCollective(userData).then(u => (user = u)));
   beforeEach('create a user', () =>
     models.User.createUserWithCollective({
@@ -106,10 +100,6 @@ describe('lib.payments.test.js', () => {
     })
       .tap(() => done())
       .catch(done);
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
   });
 
   /**

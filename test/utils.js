@@ -12,7 +12,6 @@ import { execSync } from 'child_process';
 import jsonData from './mocks/data';
 
 /* Server code being used */
-import userlib from '../server/lib/userlib';
 import stripe from '../server/lib/stripe';
 import schemaV1 from '../server/graphql/v1/schema';
 import schemaV2 from '../server/graphql/v2/schema';
@@ -35,14 +34,6 @@ export const data = path => {
   const copy = cloneDeep(get(jsonData, path)); // to avoid changing these data
   return isArray(get(jsonData, path)) ? values(copy) : copy;
 };
-
-export const clearbitStubBeforeEach = sandbox => {
-  sandbox.stub(userlib.clearbit.Enrichment, 'find').callsFake(() => {
-    return Promise.reject(new userlib.clearbit.Enrichment.NotFoundError());
-  });
-};
-
-export const clearbitStubAfterEach = sandbox => sandbox.restore();
 
 export const resetCaches = () => cache.clear();
 

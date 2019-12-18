@@ -9,7 +9,6 @@ import { isEmailBurner } from 'burner-email-providers';
 
 import logger from '../lib/logger';
 import * as auth from '../lib/auth';
-import userLib from '../lib/userlib';
 import roles from '../constants/roles';
 import { isValidEmail } from '../lib/utils';
 import emailLib from '../lib/email';
@@ -246,13 +245,6 @@ export default (Sequelize, DataTypes) => {
             firstName: this.firstName,
             lastName: this.lastName,
           };
-        },
-      },
-
-      hooks: {
-        afterCreate: instance => {
-          userLib.updateUserInfoFromClearbit(instance);
-          return null;
         },
       },
     },

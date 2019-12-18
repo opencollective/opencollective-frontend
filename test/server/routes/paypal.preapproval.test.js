@@ -13,19 +13,7 @@ import paypalAdaptive from '../../../server/paymentProviders/paypal/adaptiveGate
 const application = utils.data('application');
 
 describe('paypal.preapproval.routes.test.js', () => {
-  let user, user2, sandbox;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  after(() => sandbox.restore());
-
-  // Create a stub for clearbit
-  beforeEach(done => {
-    utils.clearbitStubBeforeEach(sandbox);
-    done();
-  });
+  let user, user2;
 
   beforeEach(() => {
     sinon.stub(paypalAdaptive, 'preapproval').callsFake(() => Promise.resolve(paypalMock.adaptive.preapproval));
@@ -33,10 +21,6 @@ describe('paypal.preapproval.routes.test.js', () => {
 
   afterEach(() => {
     paypalAdaptive.preapproval.restore();
-  });
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
   });
 
   beforeEach(done => {

@@ -1,4 +1,3 @@
-import Bluebird from 'bluebird';
 import config from 'config';
 import moment from 'moment';
 import nodemailer from 'nodemailer';
@@ -8,9 +7,7 @@ import { expect } from 'chai';
 
 import app from '../../../server/index';
 import * as utils from '../../utils';
-import userlib from '../../../server/lib/userlib';
 import models from '../../../server/models';
-import mock from '../../mocks/clearbit';
 import * as auth from '../../../server/lib/auth.js';
 
 /**
@@ -23,23 +20,6 @@ const application = utils.data('application');
  */
 describe('routes/users.test.js', () => {
   let nm;
-
-  let sandbox;
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    userlib.memory = {};
-    sandbox.stub(userlib, 'getUserData').callsFake(email => {
-      return new Bluebird(resolve => {
-        if (email === 'xd@noreply.com') {
-          return resolve(mock.person);
-        } else {
-          return resolve(null);
-        }
-      });
-    });
-  });
-
-  afterEach(() => sandbox.restore());
 
   beforeEach(() => utils.resetTestDB());
 

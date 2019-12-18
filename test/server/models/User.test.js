@@ -15,20 +15,7 @@ const userData = utils.data('user1');
 const { User } = models;
 
 describe('user.model.test.js', () => {
-  let sandbox;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  after(() => sandbox.restore());
-
-  // Create a stub for clearbit
-  beforeEach(() => utils.clearbitStubBeforeEach(sandbox));
-
   beforeEach(() => utils.resetTestDB());
-
-  afterEach(() => utils.clearbitStubAfterEach(sandbox));
 
   /**
    * Create a user.

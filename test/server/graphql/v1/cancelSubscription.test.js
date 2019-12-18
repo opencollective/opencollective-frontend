@@ -17,13 +17,7 @@ mutation cancelSubscription($id: Int!) {
 `;
 
 describe('graphql.cancelSubscriptions.test.js', () => {
-  let collective, user, user2, paymentMethod, sandbox;
-
-  before(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  after(() => sandbox.restore());
+  let collective, user, user2, paymentMethod;
 
   beforeEach(() => utils.resetTestDB());
 
@@ -46,10 +40,6 @@ describe('graphql.cancelSubscriptions.test.js', () => {
 
   // Create a paymentMethod.
   beforeEach(() => models.PaymentMethod.create(utils.data('paymentMethod2')).tap(c => (paymentMethod = c)));
-
-  afterEach(() => {
-    utils.clearbitStubAfterEach(sandbox);
-  });
 
   /**
    * Cancel subscription
