@@ -14,7 +14,7 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
+const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, updateExpensesInCurrentTab, disabled }) => {
   const [state, setState] = useState({
     showProcessorFeeConfirmation: false,
     processorFeeRefunded: false,
@@ -27,7 +27,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
     try {
       setState({ ...state, disableBtn: true });
       await markExpenseAsUnpaid(id, state.processorFeeRefunded);
-      await refetch();
+      await updateExpensesInCurrentTab();
     } catch (err) {
       console.log('>>> payExpense error: ', err);
       setState({ ...state, disableBtn: false });
@@ -54,7 +54,11 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
           </StyledButton>
         </Fragment>
       ) : (
-        <StyledButton onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })} mt={2}>
+        <StyledButton
+          onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })}
+          mt={2}
+          disabled={disabled}
+        >
           <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
         </StyledButton>
       )}
@@ -65,7 +69,8 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
 MarkExpenseAsUnpaidBtn.propTypes = {
   id: PropTypes.number.isRequired,
   markExpenseAsUnpaid: PropTypes.func.isRequired,
-  refetch: PropTypes.func,
+  updateExpensesInCurrentTab: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 const markExpenseAsUnpaidQuery = gql`

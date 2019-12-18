@@ -647,6 +647,7 @@
   "expense.privateMessage": "Private instructions",
   "expense.privateMessage.description": "Private instructions for the host to reimburse your expense",
   "expense.privateNote": "private note",
+  "expense.refreshing": "Refreshing",
   "expense.reject.btn": "Reject",
   "expense.rejected": "rejected",
   "expense.save": "save",

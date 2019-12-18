@@ -68,6 +68,7 @@ describe('Expenses component', () => {
         host={host}
         editable={true}
         LoggedInUser={loggedInUser}
+        refetch={() => {}}
         payExpense={() => setTimeout(() => Promise.resolve(), 2000)}
       />,
     ),
@@ -89,7 +90,7 @@ describe('Expenses component', () => {
         .simulate('click');
 
       // expect two disabled buttons again
-      expect(component.find('[data-cy="expense-actions"] button[disabled]').length).toEqual(4);
+      expect(component.find('[data-cy="expense-actions"] button[disabled]').length).toEqual(8);
 
       // after timeout, make sure there is only button and it's not disabled.
       setTimeout(() => {

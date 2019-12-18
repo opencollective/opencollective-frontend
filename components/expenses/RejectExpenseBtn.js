@@ -10,7 +10,8 @@ class RejectExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     rejectExpense: PropTypes.func.isRequired,
-    refetch: PropTypes.func,
+    updateExpensesInCurrentTab: PropTypes.func,
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {
@@ -21,13 +22,21 @@ class RejectExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     await this.props.rejectExpense(id);
-    await this.props.refetch();
+    await this.props.updateExpensesInCurrentTab();
   }
 
   render() {
     return (
       <div className="RejectExpenseBtn" data-cy="reject-expense-btn">
-        <StyledButton mr={2} my={1} width="100%" className="reject" buttonStyle="danger" onClick={this.onClick}>
+        <StyledButton
+          mr={2}
+          my={1}
+          width="100%"
+          className="reject"
+          buttonStyle="danger"
+          onClick={this.onClick}
+          disabled={this.props.disabled}
+        >
           <FormattedMessage id="expense.reject.btn" defaultMessage="Reject" />
         </StyledButton>
       </div>

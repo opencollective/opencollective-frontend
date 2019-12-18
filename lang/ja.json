@@ -647,6 +647,7 @@
   "expense.privateMessage": "私的な指示",
   "expense.privateMessage.description": "ホストが請求を払い戻すための私的な指示",
   "expense.privateNote": "プライベートノート",
+  "expense.refreshing": "Refreshing",
   "expense.reject.btn": "Reject",
   "expense.rejected": "拒否されました",
   "expense.save": "保存",

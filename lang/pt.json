@@ -647,6 +647,7 @@
   "expense.privateMessage": "Instruções privadas",
   "expense.privateMessage.description": "Instruções privadas para o organizador reembolsar sua despesa",
   "expense.privateNote": "nota privada",
+  "expense.refreshing": "Refreshing",
   "expense.reject.btn": "Rejeitar",
   "expense.rejected": "rejeitado",
   "expense.save": "salvar",

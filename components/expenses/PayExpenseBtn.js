@@ -24,7 +24,7 @@ class PayExpenseBtn extends React.Component {
     lock: PropTypes.func,
     unlock: PropTypes.func,
     mutate: PropTypes.func,
-    refetch: PropTypes.func,
+    updateExpensesInCurrentTab: PropTypes.func,
     intl: PropTypes.object.isRequired,
   };
 
@@ -60,7 +60,7 @@ class PayExpenseBtn extends React.Component {
         },
       });
       this.setState({ loading: false });
-      await this.props.refetch();
+      await this.props.updateExpensesInCurrentTab();
       unlock();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;

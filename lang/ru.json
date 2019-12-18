@@ -647,6 +647,7 @@
   "expense.privateMessage": "Личные инструкции",
   "expense.privateMessage.description": "Личные инструкции для представителя для возмещения ваших расходов",
   "expense.privateNote": "личная заметка",
+  "expense.refreshing": "Refreshing",
   "expense.reject.btn": "Reject",
   "expense.rejected": "отказано",
   "expense.save": "сохранить",
