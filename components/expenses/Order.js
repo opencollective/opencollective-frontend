@@ -59,8 +59,6 @@ class Order extends React.Component {
         id: 'cancelOrder.modal.body',
         defaultMessage: 'Are you sure you want to cancel this order?',
       },
-      no: { id: 'no', defaultMessage: 'No' },
-      yes: { id: 'yes', defaultMessage: 'Yes' },
     });
     this.currencyStyle = {
       style: 'currency',
@@ -296,7 +294,6 @@ class Order extends React.Component {
             <Flex>
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />
               <StyledButton
-                bg="red.500"
                 buttonStyle="danger"
                 data-cy="cancelOrder"
                 onClick={() => this.setState({ showCancelOrderModal: true })}
