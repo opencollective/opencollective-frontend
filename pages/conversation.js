@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from 'react-apollo';
 import { Flex, Box } from '@rebass/grid';
-import { get, isEmpty, cloneDeep, update } from 'lodash';
+import { get, isEmpty, cloneDeep, update, uniqBy } from 'lodash';
 
 import { Router } from '../server/pages';
 import { CollectiveType } from '../lib/constants/collectives';
@@ -26,7 +26,7 @@ import StyledTag from '../components/StyledTag';
 import Thread from '../components/conversations/Thread';
 import CommentForm from '../components/conversations/CommentForm';
 import { Sections } from '../components/collective-page/_constants';
-import { CommentFieldsFragment } from '../components/conversations/graphql';
+import { CommentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
 import Comment from '../components/conversations/Comment';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
@@ -160,9 +160,26 @@ class ConversationPage extends React.Component {
   }
 
   onCommentAdded = comment => {
+    // Add comment to cache if not already fetched
     const [data, query, variables] = this.clonePageQueryCacheData();
-    update(data, 'conversation.comments.nodes', comments => [...comments, comment]);
+    update(data, 'conversation.comments.nodes', comments => uniqBy([...comments, comment], 'id'));
     this.props.client.writeQuery({ query, variables, data });
+
+    // Commenting subscribes the user, update Follow button to reflect that
+    this.updateLoggedInUserFollowing(true);
+
+    // Add user to the conversation subscribers
+    this.onFollowChange(true, comment.fromCollective);
+  };
+
+  updateLoggedInUserFollowing = isFollowing => {
+    const query = isUserFollowingConversationQuery;
+    const variables = { id: this.props.id };
+    const userFollowingData = cloneDeep(this.props.client.readQuery({ query, variables }));
+    if (userFollowingData && userFollowingData.loggedInAccount) {
+      userFollowingData.loggedInAccount.isFollowingConversation = isFollowing;
+      this.props.client.writeQuery({ query, variables, data: userFollowingData });
+    }
   };
 
   onCommentDeleted = comment => {

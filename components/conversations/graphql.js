@@ -52,3 +52,18 @@ export const ConversationListFragment = gqlV2`
     }
   }
 `;
+
+export const isUserFollowingConversationQuery = gqlV2`
+  query IsFollowingConversation($id: String!) {
+    loggedInAccount {
+      id
+      slug
+      imageUrl
+      type
+      name
+      ... on Individual {
+        isFollowingConversation(id: $id)
+      }
+    }
+  }
+`;
