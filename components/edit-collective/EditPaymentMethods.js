@@ -345,14 +345,14 @@ class EditPaymentMethods extends React.Component {
                 id="paymentMethod.manual.edit.description.pricing"
                 defaultMessage="There is no platform fee for donations made this way. However, we ask you to kindly subscribe to our special plans for fiscal hosts to be able to maintain and improve this feature over time (the first $1,000 of yearly budget are included in the free plan)"
               />
-              <div>
-                <a href="https://opencollective.com/opencollective">
-                  <FormattedMessage
-                    id="paymentMethods.manual.upgradePlan"
-                    defaultMessage="Subscribe to our special plans for hosts"
-                  />
-                </a>
-              </div>
+              .
+              <br />
+              <a href="https://opencollective.com/opencollective">
+                <FormattedMessage
+                  id="paymentMethods.manual.upgradePlan"
+                  defaultMessage="Subscribe to our special plans for hosts"
+                />
+              </a>
             </P>
 
             <H2>
