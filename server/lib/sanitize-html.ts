@@ -38,7 +38,7 @@ export const buildSanitizerOptions = (allowedContent: IAllowedContentType = {}):
 
   // Multiline text formatting
   if (allowedContent.basicTextFormatting) {
-    allowedTags.push('b', 'i', 'strong', 'em', 'strike');
+    allowedTags.push('b', 'i', 'strong', 'em', 'strike', 'del');
   }
 
   // Basic text formatting
