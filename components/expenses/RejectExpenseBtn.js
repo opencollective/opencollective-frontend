@@ -36,6 +36,7 @@ class RejectExpenseBtn extends React.Component {
           buttonStyle="danger"
           onClick={this.onClick}
           disabled={this.props.disabled}
+          data-cy="rejectBtn"
         >
           <FormattedMessage id="expense.reject.btn" defaultMessage="Reject" />
         </StyledButton>

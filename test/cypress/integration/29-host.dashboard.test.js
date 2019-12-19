@@ -36,20 +36,35 @@ describe('host dashboard', () => {
     cy.wait(1000);
   });
 
-  it('approve expense and reject expense', () => {
+  it('unapprove expense', () => {
     cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
-    cy.get('[data-cy="expense-paid"]').as('currentExpense');
-    cy.get('[data-cy="expense-actions"]')
-      .contains('button', 'Unapprove')
+    cy.get('[data-cy="expense-approved"]').as('currentExpense');
+    cy.get('[data-cy="unapproveBtn"]')
+      .first()
       .click({ force: true });
     cy.get('[data-cy="confirmation-modal-continue"]').click({ force: true });
     cy.wait(500);
-    cy.get('[data-cy="reject-expense-btn"]').within(() => {
-      cy.get('button').click({ force: true });
-    });
-    cy.get('[data-cy="approve-expense-btn"]').within(() => {
-      cy.get('button').click({ force: true });
-    });
+    cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-pending');
+  });
+
+  it('reject expense', () => {
+    cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
+    cy.get('[data-cy="expense-pending"]').as('currentExpense');
+    cy.get('[data-cy="rejectBtn"]')
+      .first()
+      .click({ force: true });
+    cy.wait(200);
+    cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-rejected');
+  });
+
+  it('approves expense', () => {
+    cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
+    cy.get('[data-cy="expense-rejected"]').as('currentExpense');
+    cy.get('[data-cy="approveBtn"]')
+      .first()
+      .click({ force: true });
+    cy.wait(200);
+    cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-approved');
   });
 
   it('record expense as paid', () => {

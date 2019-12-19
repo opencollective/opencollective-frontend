@@ -561,6 +561,7 @@ class Expense extends React.Component {
                               buttonStyle="standard"
                               disabled={this.state.disableActionButtons}
                               onClick={() => this.setState({ showUnapproveModal: true })}
+                              data-cy="unapproveBtn"
                             >
                               <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
                             </StyledButton>

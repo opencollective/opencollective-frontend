@@ -35,6 +35,7 @@ class ApproveExpenseBtn extends React.Component {
           buttonStyle="primary"
           onClick={this.onClick}
           disabled={this.props.disabled}
+          data-cy="approveBtn"
         >
           <FormattedMessage id="expense.approve.btn" defaultMessage="Approve" />
         </StyledButton>
