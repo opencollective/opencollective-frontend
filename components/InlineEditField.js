@@ -30,9 +30,7 @@ const EditIcon = styled(PencilAlt)`
 `;
 
 /** Component used for cancel / submit buttons */
-const FormButton = styled(StyledButton).attrs({
-  buttonSize: 'large',
-})`
+const FormButton = styled(StyledButton)`
   width: 35%;
   font-weight: normal;
   min-width: 225px;
@@ -211,6 +209,7 @@ class InlineEditField extends Component {
                     lineHeight="inherit"
                     maxLength={this.props.maxLength}
                     data-cy={`InlineEditField-Textarea-${field}`}
+                    withOutline
                   />
                 )}
                 <Box width={1}>

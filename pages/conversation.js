@@ -247,7 +247,7 @@ class ConversationPage extends React.Component {
                     <Flex flexDirection={['column', null, null, 'row']} justifyContent="space-between">
                       <Box flex="1 1 50%" maxWidth={700} mb={5}>
                         <Container borderBottom="1px solid" borderColor="black.300" pb={4}>
-                          <H2 fontSize="H4" mb={3}>
+                          <H2 fontSize="H4" lineHeight="H4" mb={4}>
                             <InlineEditField
                               mutation={editConversationMutation}
                               mutationOptions={{ context: API_V2_CONTEXT }}

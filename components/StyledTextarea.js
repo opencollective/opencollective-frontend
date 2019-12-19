@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { space, layout, border, color, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
@@ -23,6 +23,22 @@ const TextArea = styled.textarea`
   ${typography}
 
   outline: none;
+
+  ${props => {
+    if (props.withOutline) {
+      return props.error
+        ? css`
+            outline: 1px dashed ${themeGet('colors.red.300')};
+            outline-offset: 0.25em;
+          `
+        : css`
+            &:focus {
+              outline: 1px dashed ${themeGet('colors.black.200')};
+              outline-offset: 0.25em;
+            }
+          `;
+    }
+  }}
 
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
@@ -56,6 +72,10 @@ export default class StyledTextarea extends React.PureComponent {
     resize: PropTypes.oneOf(['vertical', 'horizontal', 'both', 'none']),
     /** If true, max text length will be displayed at the bottom right */
     showCount: PropTypes.bool,
+    /** if true, a default outline will be displayed when focused */
+    withOutline: PropTypes.bool,
+    /** If truthy, the outline will be red */
+    error: PropTypes.any,
     /** @ignore */
     px: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** @ignore */
