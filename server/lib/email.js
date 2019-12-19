@@ -154,7 +154,6 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     }
   }
 
-  debug(`sending email to ${to}`);
   if (recipients.length === 0) {
     debug('emailLib.sendMessage error: No recipient to send to, only sending to bcc', options.bcc);
   }
@@ -348,6 +347,7 @@ const generateEmailFromTemplateAndSend = async (template, recipient, data, optio
     const attributes = getTemplateAttributes(renderedTemplate.html);
     options.text = renderedTemplate.text;
     options.tag = template;
+    debug(`Sending email to: ${recipient} subject: ${attributes.subject}`);
     return emailLib.sendMessage(recipient, attributes.subject, attributes.body, options);
   });
 };

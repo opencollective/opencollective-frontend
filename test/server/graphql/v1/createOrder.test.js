@@ -273,16 +273,26 @@ describe('createOrder', () => {
       where: { OrderId: res.data.createOrder.id },
     });
     expect(transactionsCount).to.equal(0);
-    await utils.waitForCondition(() => emailSendMessageSpy.callCount > 1);
+    await utils.waitForCondition(() => emailSendMessageSpy.callCount == 3);
     expect(emailSendMessageSpy.callCount).to.equal(3);
-    expect(emailSendMessageSpy.thirdCall.args[0]).to.equal(remoteUser.email);
-    expect(emailSendMessageSpy.thirdCall.args[2]).to.match(/IBAN 1234567890987654321/);
-    expect(emailSendMessageSpy.thirdCall.args[2]).to.match(
+
+    const hostEmailArgs = emailSendMessageSpy.args.find(callArgs => callArgs[1].includes('would love to be hosted'));
+    expect(hostEmailArgs).to.exist;
+
+    const pendingEmailArgs = emailSendMessageSpy.args.find(callArgs =>
+      callArgs[1].includes('New pending financial contribution'),
+    );
+    expect(pendingEmailArgs).to.exist;
+
+    const actionRequiredEmailArgs = emailSendMessageSpy.args.find(callArgs => callArgs[1].includes('ACTION REQUIRED'));
+    expect(actionRequiredEmailArgs).to.exist;
+    expect(actionRequiredEmailArgs).to.exist;
+    expect(actionRequiredEmailArgs[0]).to.equal(remoteUser.email);
+    expect(actionRequiredEmailArgs[2]).to.match(/IBAN 1234567890987654321/);
+    expect(actionRequiredEmailArgs[2]).to.match(
       /for the amount of \$20 with the mention: webpack event backer order: [0-9]+/,
     );
-    expect(emailSendMessageSpy.thirdCall.args[1]).to.equal(
-      'ACTION REQUIRED: your $20 registration to meetup is pending',
-    );
+    expect(actionRequiredEmailArgs[1]).to.equal('ACTION REQUIRED: your $20 registration to meetup is pending');
   });
 
   it('creates an order as new user and sends a tweet', async () => {
