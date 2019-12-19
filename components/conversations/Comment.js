@@ -166,7 +166,7 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
                 {comment.fromCollective.name}
               </P>
             </LinkCollective>
-            <P fontSize="Caption" color="black.600" truncateOverflow>
+            <P fontSize="Caption" color="black.600" truncateOverflow title={comment.createdAt}>
               <FormattedMessage
                 id="Comment.PostedOn"
                 defaultMessage="Posted on {createdAt, date, long}"
