@@ -18,7 +18,6 @@ const Comment = new GraphQLObjectType({
       },
       html: {
         type: GraphQLString,
-        resolve: getStripTagsResolver('html'),
       },
       markdown: {
         type: GraphQLString,
