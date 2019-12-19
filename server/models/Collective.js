@@ -1370,13 +1370,17 @@ export default function(Sequelize, DataTypes) {
     );
   };
 
-  // Used when creating a transactin to add a user to the collective as a backer if needed
+  /**
+   * Used when creating a transactin to add a user to the collective as a backer if needed.
+   * A new membership is registered for each `defaultAttributes.TierId`.
+   */
   Collective.prototype.findOrAddUserWithRole = function(user, role, defaultAttributes, context, transaction) {
     return models.Member.findOne({
       where: {
         role,
         MemberCollectiveId: user.CollectiveId,
         CollectiveId: this.id,
+        TierId: get(defaultAttributes, 'TierId', null),
       },
     }).then(Member => {
       if (!Member) {

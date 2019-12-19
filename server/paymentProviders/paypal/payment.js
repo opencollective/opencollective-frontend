@@ -2,7 +2,6 @@ import config from 'config';
 import { get } from 'lodash';
 
 import models from '../../models';
-import roles from '../../constants/roles';
 
 import * as constants from '../../constants/transactions';
 import * as libpayments from '../../lib/payments';
@@ -135,21 +134,12 @@ export async function createTransaction(order, paymentInfo) {
   return models.Transaction.createFromPayload(payload);
 }
 
-/** Add user that just donated as a backer of the collective */
-export async function addUserToCollective(order) {
-  const userId = order.createdByUser.id;
-  const donorInfo = { id: userId, CollectiveId: order.FromCollectiveId };
-  const tierInfo = { CreatedByUserId: userId, TierId: order.TierId };
-  return order.collective.findOrAddUserWithRole(donorInfo, roles.BACKER, tierInfo, { order });
-}
-
 /** Process order in paypal and create transactions in our db */
 export async function processOrder(order) {
   const paymentInfo = await executePayment(order);
   logger.info('PayPal Payment');
   logger.info(paymentInfo);
   const transaction = await createTransaction(order, paymentInfo);
-  await addUserToCollective(order);
   await order.update({ processedAt: new Date() });
   await order.paymentMethod.update({ confirmedAt: new Date() });
   return transaction;
