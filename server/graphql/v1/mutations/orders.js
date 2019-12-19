@@ -121,6 +121,9 @@ async function checkRecaptcha(order, remoteUser, reqIp) {
 
 export async function createOrder(order, loaders, remoteUser, reqIp) {
   debug('Beginning creation of order', order);
+  if (!remoteUser) {
+    throw new errors.Unauthorized();
+  }
   await checkOrdersLimit(order, remoteUser, reqIp);
   const recaptchaResponse = await checkRecaptcha(order, remoteUser, reqIp);
   if (remoteUser && !canUseFeature(remoteUser, FEATURE.ORDER)) {
@@ -256,40 +259,13 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     // find or create user, check permissions to set `fromCollective`
-    let user;
-    if (order.user && order.user.email) {
-      // Form changes in frontend when trying to create an order with an
-      // existing email, asking user to login. So if user given in `order.user`
-      // already exists, that could mean two things:
-      // 1. Email is registered under another account as Paypal address.
-      // 2. We got a bad payload trying to impersonate another user.
-      const existingUser = await models.User.findByEmailOrPaypalEmail(order.user.email);
-      if (existingUser) {
-        throw new Error('An account already exists for this email address. Please login.');
-      }
-      if (!remoteUser) {
-        throw new Error('You have to be authenticated. Please login.');
-      }
-      user = await models.User.createUserWithCollective({
-        ...order.user,
-        currency: order.currency,
-        CreatedByUserId: remoteUser.id,
-      });
-    } else if (remoteUser) {
-      user = remoteUser;
-    }
-
     let fromCollective;
     if (!order.fromCollective || (!order.fromCollective.id && !order.fromCollective.name)) {
-      fromCollective = await loaders.Collective.byId.load(user.CollectiveId);
+      fromCollective = await loaders.Collective.byId.load(remoteUser.CollectiveId);
     }
 
     // If a `fromCollective` is provided, we check its existence and if the user can create an order on its behalf
     if (order.fromCollective && order.fromCollective.id) {
-      if (!remoteUser) {
-        throw new Error('You need to be logged in to create an order for an existing open collective');
-      }
-
       fromCollective = await loaders.Collective.byId.load(order.fromCollective.id);
       if (!fromCollective) {
         throw new Error(`From collective id ${order.fromCollective.id} not found`);
@@ -314,7 +290,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
 
     if (!fromCollective) {
-      fromCollective = await models.Collective.createOrganization(order.fromCollective, user, remoteUser);
+      fromCollective = await models.Collective.createOrganization(order.fromCollective, remoteUser, remoteUser);
     }
 
     const currency = (tier && tier.currency) || collective.currency;
@@ -427,7 +403,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     debug('defaultDescription', defaultDescription, 'collective.type', collective.type);
 
     const orderData = {
-      CreatedByUserId: remoteUser ? remoteUser.id : user.id,
+      CreatedByUserId: remoteUser.id,
       FromCollectiveId: fromCollective.id,
       CollectiveId: collective.id,
       TierId: tier && tier.id,
@@ -490,7 +466,7 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         await orderCreated.setPaymentMethod(order.paymentMethod);
       }
       // also adds the user as a BACKER of collective
-      await libPayments.executeOrder(remoteUser || user, orderCreated);
+      await libPayments.executeOrder(remoteUser, orderCreated);
     } else if (!paymentRequired && order.interval && collective.type === types.COLLECTIVE) {
       // create inactive subscription to hold the interval info for the pledge
       const subscription = await models.Subscription.create({
@@ -502,13 +478,12 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     } else if (collective.type === types.EVENT) {
       // Free ticket, mark as processed and add user as an ATTENDEE
       await orderCreated.update({ status: 'PAID', processedAt: new Date() });
-      const UserId = remoteUser ? remoteUser.id : user.id;
-      await collective.addUserWithRole(user, roles.ATTENDEE, {}, { order: orderCreated });
+      await collective.addUserWithRole(remoteUser, roles.ATTENDEE, {}, { order: orderCreated });
       await models.Activity.create({
         type: activities.TICKET_CONFIRMED,
         data: {
           EventCollectiveId: collective.id,
-          UserId,
+          UserId: remoteUser.id,
           recipient: { name: fromCollective.name },
           order: orderCreated.info,
           tier: tier && tier.info,

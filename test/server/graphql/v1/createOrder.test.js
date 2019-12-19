@@ -416,11 +416,6 @@ describe('createOrder', () => {
     // Given an order request
     const newOrder = cloneDeep(baseOrder);
     newOrder.collective = { id: fearlesscitiesbrussels.id };
-    newOrder.user = {
-      firstName: '',
-      lastName: '',
-      email: 'jsmith@email.com',
-    };
     newOrder.totalAmount = 0;
     delete newOrder.paymentMethod;
 
@@ -429,7 +424,7 @@ describe('createOrder', () => {
 
     // Then there should be errors
     expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal('You have to be authenticated. Please login.');
+    expect(res.errors[0].message).to.equal('You need to be authenticated to perform this action');
   });
 
   it("doesn't store the payment method for user if order fail", async () => {
@@ -595,20 +590,13 @@ describe('createOrder', () => {
     const order = cloneDeep(baseOrder);
     // Given the following data for the order
     order.collective = { id: fearlesscitiesbrussels.id };
-    order.user = {
-      firstName: 'John',
-      lastName: 'Smith',
-      email: 'jsmith@email.com',
-    };
     order.fromCollective = { name: 'NewCo', website: 'newco.com' };
     order.paymentMethod = {
       ...constants.paymentMethod,
       token: 'tok_3B5j8xDjPFcHOcTm3ogdnq0K',
     };
 
-    const remoteUser = await models.User.create({
-      email: 'test@email.com',
-    });
+    const remoteUser = await models.User.createUserWithCollective({ email: store.randEmail() });
 
     // When the order is created
     const res = await utils.graphqlQuery(createOrderQuery, { order }, remoteUser);
@@ -685,45 +673,6 @@ describe('createOrder', () => {
     expect(transactions[1].type).to.equal('CREDIT');
     expect(transactions[1].FromCollectiveId).to.equal(fromCollective.id);
     expect(transactions[1].CollectiveId).to.equal(collective.id);
-  });
-
-  it('fails if trying to donate using an existing email without being logged in', async () => {
-    const order = cloneDeep(baseOrder);
-    const legitUser = (
-      await store.newUser('legit user', {
-        email: store.randEmail('legit@opencollective.com'),
-      })
-    ).user;
-    const remoteUser = null;
-    order.collective = { id: fearlesscitiesbrussels.id };
-    const res = await utils.graphqlQuery(
-      createOrderQuery,
-      { order: { ...order, user: { email: legitUser.email } } },
-      remoteUser,
-    );
-
-    expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal('An account already exists for this email address. Please login.');
-  });
-
-  it('fails if trying to donate using an existing paypal email without being logged in', async () => {
-    const order = cloneDeep(baseOrder);
-    const legitUser = (
-      await store.newUser('legit user', {
-        email: store.randEmail('legit@opencollective.com'),
-        paypalEmail: store.randEmail('legit-paypal@opencollective.com'),
-      })
-    ).user;
-    const remoteUser = null;
-    order.collective = { id: fearlesscitiesbrussels.id };
-    const res = await utils.graphqlQuery(
-      createOrderQuery,
-      { order: { ...order, user: { email: legitUser.paypalEmail } } },
-      remoteUser,
-    );
-
-    expect(res.errors).to.exist;
-    expect(res.errors[0].message).to.equal('An account already exists for this email address. Please login.');
   });
 
   it("creates an order as a logged in user for an existing collective using the collective's payment method", async () => {
