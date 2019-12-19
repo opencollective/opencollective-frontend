@@ -34,6 +34,7 @@ import ExternalLink from '../ExternalLink';
 import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
+import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
@@ -763,6 +764,9 @@ class EditCollectiveForm extends React.Component {
             {this.state.section === 'advanced' && (
               <Box>
                 {collective.type === 'USER' && <EditUserEmailForm />}
+                {(collective.type === 'USER' || collective.type === 'ORGANIZATION') && (
+                  <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
+                )}
                 {collective.type === 'COLLECTIVE' && (
                   <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
                 )}
