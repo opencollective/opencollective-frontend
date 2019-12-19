@@ -111,7 +111,7 @@ const tweetStatus = (twitterAccount, status, url, options = {}) => {
       logger.info(`Tweet not sent: ${err.message}`);
     });
   } else {
-    logger.warn('Tweet not sent: missing twitter consumerKey or consumerSecret configuration');
+    logger.info('Tweet not sent: missing twitter consumerKey or consumerSecret configuration');
     return Promise.resolve();
   }
 };
@@ -131,7 +131,7 @@ Support them too!`,
       monthlyStats: `In {month}, {totalNewBackers, select,
   0 {we}
   1 {one new backer joined. We}
-  other {{totalNewBackers} {totalNewBackers, plural, one {backer} other {backers}} joined ({newBackersTwitterHandles}) - you are the best! 🙌 
+  other {{totalNewBackers} {totalNewBackers, plural, one {backer} other {backers}} joined ({newBackersTwitterHandles}) - you are the best! 🙌
 
 We}
 } received {totalAmountReceived} from {totalActiveBackers} {totalActiveBackers, plural, one {backer} other {backers}}{totalAmountSpent, plural,
@@ -141,7 +141,7 @@ We}
       other {{totalAmountSpent} on {topExpenseCategories}}}.}} Our current balance is {balance}.
 
 Top backers: {topBackersTwitterHandles}`,
-      monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation. 
+      monthlyStatsNoNewDonation: `In {month}, we haven't received any new donation.
 
 Our current balance is {balance}.
 
