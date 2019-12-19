@@ -47,7 +47,8 @@ export default function generateConversationLoaders(): IConversationLoader {
         `
         SELECT "ConversationId", COUNT(id) as count
         FROM "Comments"
-        WHERE "ConversationId" IN (:conversationsIds) 
+        WHERE "ConversationId" IN (:conversationsIds)
+        AND "deletedAt" IS NULL
         GROUP BY "ConversationId"
       `,
         {
@@ -59,8 +60,14 @@ export default function generateConversationLoaders(): IConversationLoader {
 
       const groupedCounts: { [ConversationId: number]: number } = {};
       counts.forEach(item => (groupedCounts[item.ConversationId] = item.count));
-      // -1 because we don't count the root comment
-      return conversationsIds.map(id => groupedCounts[id] - 1 || 0);
+      return conversationsIds.map(id => {
+        if (groupedCounts[id]) {
+          // -1 because we don't count the root comment
+          return groupedCounts[id] - 1;
+        } else {
+          return 0;
+        }
+      });
     }),
   };
 }
