@@ -56,21 +56,25 @@ const mutationOptions = { context: API_V2_CONTEXT };
 /**
  * Action buttons for the comment owner. Styles change between mobile and desktop.
  */
-const AdminActionButtons = ({ comment, isConversationRoot, onDelete, onEdit }) => {
+const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, onDelete, onEdit }) => {
   const [isDeleting, setDeleting] = React.useState(null);
   const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
 
   return (
     <React.Fragment>
       {/** Buttons */}
-      <CommentBtn onClick={onEdit} ml={2}>
-        <Edit size="1em" />
-        <FormattedMessage tagName="span" id="comment.edit" defaultMessage="Edit" />
-      </CommentBtn>
-      <CommentBtn onClick={() => setDeleting(true)} ml={2}>
-        <X size="1em" />
-        <FormattedMessage tagName="span" id="comment.delete" defaultMessage="Delete" />
-      </CommentBtn>
+      {canEdit && (
+        <CommentBtn onClick={onEdit} ml={2}>
+          <Edit size="1em" />
+          <FormattedMessage tagName="span" id="comment.edit" defaultMessage="Edit" />
+        </CommentBtn>
+      )}
+      {canDelete && (
+        <CommentBtn onClick={() => setDeleting(true)} ml={2}>
+          <X size="1em" />
+          <FormattedMessage tagName="span" id="comment.delete" defaultMessage="Delete" />
+        </CommentBtn>
+      )}
       {/** Confirm Modals */}
       {isDeleting && (
         <ConfirmationModal
@@ -118,6 +122,8 @@ AdminActionButtons.propTypes = {
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   isConversationRoot: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  canDelete: PropTypes.bool,
 };
 
 /**
@@ -125,18 +131,21 @@ AdminActionButtons.propTypes = {
  *
  * /!\ Can only be used with data from API V2.
  */
-const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, isConversationRoot, onDelete }) => {
+const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight, isConversationRoot, onDelete }) => {
   const [isEditing, setEditing] = React.useState(false);
+  const hasActions = !withoutActions && !isEditing && (canEdit || canDelete);
 
   const actionButtons =
     withoutActions || isEditing ? null : (
       <Flex>
-        {canEdit && (
+        {hasActions && (
           <AdminActionButtons
             comment={comment}
             isConversationRoot={isConversationRoot}
             onDelete={onDelete}
             onEdit={() => setEditing(true)}
+            canEdit={canEdit}
+            canDelete={canDelete}
           />
         )}
       </Flex>
@@ -177,6 +186,7 @@ const Comment = ({ comment, canEdit, withoutActions, maxCommentHeight, isConvers
           values={comment}
           field="html"
           canEdit={canEdit}
+          canDelete={canDelete}
           isEditing={isEditing}
           showEditIcon={false}
           prepareVariables={(comment, html) => ({ comment: { id: comment.id, html } })}
@@ -213,8 +223,10 @@ Comment.propTypes = {
       name: PropTypes.string,
     }),
   }).isRequired,
-  /** Can current user edit/delete this comment? */
+  /** Can current user edit this comment? */
   canEdit: PropTypes.bool,
+  /** Can current user delete this comment? */
+  canDelete: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
   /** Set this to true to disable actions */
