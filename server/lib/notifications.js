@@ -245,7 +245,7 @@ async function notifyByEmail(activity) {
       }
 
       if (activity.data.conversation) {
-        notififyConversationFollowers(activity.data.conversation, activity, { excluse: [activity.UserId] });
+        notififyConversationFollowers(activity.data.conversation, activity, { exclude: [activity.UserId] });
       } else if (activity.UserId === activity.data.UserId) {
         // if the author of the comment is the one who submitted the expense
         const HostCollectiveId = await activity.data.collective.getHostCollectiveId();
