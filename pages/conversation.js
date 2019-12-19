@@ -221,6 +221,7 @@ class ConversationPage extends React.Component {
     const followers = get(conversation, 'followers');
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
+    const canDelete = canEdit || (LoggedInUser && LoggedInUser.canEditCollective(collective));
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         {data.loading ? (
@@ -266,6 +267,7 @@ class ConversationPage extends React.Component {
                           <Comment
                             comment={body}
                             canEdit={canEdit}
+                            canDelete={canDelete}
                             onDelete={this.onConversationDeleted}
                             isConversationRoot
                           />

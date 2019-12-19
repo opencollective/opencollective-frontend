@@ -53,7 +53,8 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser }) => {
                   <CommentContainer isLast={idx + 1 === items.length}>
                     <Comment
                       comment={item}
-                      canEdit={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                      canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                      canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       onDelete={onCommentDeleted}
                     />
                   </CommentContainer>
