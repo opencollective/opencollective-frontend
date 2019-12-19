@@ -92,25 +92,6 @@ function publishToSlackPrivateChannel(activity) {
 async function notifySubscribers(users, activity, options = {}) {
   const { data } = activity;
 
-  // Generate Action links
-  switch (activity.type) {
-    case activityType.COLLECTIVE_EXPENSE_CREATED:
-      data.actions = {
-        approve: `${config.host.website}/${data.collective.slug}/expenses/${data.expense.id}/approve`,
-        reject: `${config.host.website}/${data.collective.slug}/expenses/${data.expense.id}/reject`,
-      };
-      break;
-
-    case activityType.COLLECTIVE_CREATED:
-    case activityType.COLLECTIVE_APPLY:
-      if (data.host) {
-        data.actions = {
-          approve: `${config.host.website}/${data.host.slug}/collectives/${data.collective.id}/approve`,
-        };
-      }
-      break;
-  }
-
   if (!users || users.length === 0) {
     debug('notifySubscribers: no user to notify for activity', activity.type);
     return;

@@ -89,8 +89,11 @@ https://opencollective.com/{{user.collective.slug}}
 
 <br /><br />
 <center>
-  <a href="{{actions.approve}}" class="btn blue">
-    <div>APPROVE</div>
+  <a 
+    class="btn blue"
+    href="{{config.host.website}}/{{host.slug}}/dashboard/pending-applications#application-{{collective.id}}"
+  >
+    <div style="font-size: 15px;">View application</div>
   </a>
 </center>
 
