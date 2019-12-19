@@ -1186,7 +1186,7 @@ describe('GraphQL Expenses API', () => {
         ...data,
       });
       expense.status = 'REJECTED';
-      expense.save();
+      await expense.save();
       // When the admin of the collective tries to delete the expense
       const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, admin);
       result.errors && console.log(result.errors);
@@ -1215,7 +1215,7 @@ describe('GraphQL Expenses API', () => {
       });
 
       expense.status = 'REJECTED';
-      expense.save();
+      await expense.save();
       // When the admin of the host collective tries to delete the expense
       const result = await utils.graphqlQuery(deleteExpenseQuery, { id: expense.id }, hostAdmin);
       result.errors && console.log(result.errors);
