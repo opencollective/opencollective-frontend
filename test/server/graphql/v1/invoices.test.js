@@ -32,7 +32,7 @@ async function donate(user, currency, amount, createdAt, collective) {
   }
 }
 
-describe('graphql.invoices.test.js', () => {
+describe('server/graphql/v1/invoices', () => {
   let xdamman;
 
   before(async () => {

@@ -9,7 +9,7 @@ import * as expenses from '../../../../server/graphql/v1/mutations/expenses';
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
 
-describe('graphql.collective.test.js', () => {
+describe('server/graphql/v1/collective', () => {
   beforeEach(async () => {
     await utils.resetTestDB();
   });

@@ -1,7 +1,7 @@
 import { expect, assert } from 'chai';
 import * as identifiers from '../../../../server/graphql/v2/identifiers';
 
-describe('getDecodedId', () => {
+describe('server/graphql/v2/identifiers', () => {
   it('returns same value if number', () => {
     const id = 10;
     expect(identifiers.getDecodedId(id)).to.be.eq(id);

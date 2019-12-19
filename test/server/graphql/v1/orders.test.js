@@ -7,7 +7,7 @@ import emailLib from '../../../../server/lib/email';
 import sinon from 'sinon';
 import { randEmail } from '../../../stores';
 
-describe('graphql.orders.test.js', () => {
+describe('server/graphql/v1/orders', () => {
   const backers = [],
     collectives = [],
     orders = [];

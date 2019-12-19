@@ -4,7 +4,7 @@ import models from '../../../../server/models';
 
 import * as utils from '../../../utils';
 
-describe('graphql.allHosts.test.js', () => {
+describe('server/graphql/v1/allHosts', () => {
   let hostAdmin, publicHost, privateHost, collective1, collective2, user1;
 
   before('reset test db', () => utils.resetTestDB());

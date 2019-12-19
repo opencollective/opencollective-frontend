@@ -9,7 +9,7 @@ import { activities, roles } from '../../../../server/constants';
 import * as utils from '../../../utils';
 import { randUrl } from '../../../stores';
 
-describe('graphql.notifications.test', () => {
+describe('server/graphql/v1/notifications', () => {
   let user1, user2, collective1, notification;
 
   beforeEach(async () => {

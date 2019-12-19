@@ -51,7 +51,7 @@ const updateOrderQuery = `
   }
 `;
 
-describe('updateOrder', () => {
+describe('server/graphql/v1/updateOrder', () => {
   let sandbox, user, user2, externalUser, collective, paymentMethod, existingOrder;
 
   before(() => (sandbox = sinon.createSandbox()));

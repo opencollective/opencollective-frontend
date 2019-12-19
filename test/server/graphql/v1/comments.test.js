@@ -21,7 +21,7 @@ let host,
   comment,
   comments;
 
-describe('graphql.comments.test', () => {
+describe('server/graphql/v1/comments', () => {
   /* SETUP
      - collective1: host, collectiveAdmin as admin
        - event1: collectiveAdmin as admin

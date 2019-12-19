@@ -89,7 +89,7 @@ const addFunds = async (user, hostCollective, collective, amount) => {
   });
 };
 
-describe('GraphQL Expenses API', () => {
+describe('server/graphql/v1/expenses', () => {
   beforeEach(async () => {
     await utils.resetTestDB();
   });

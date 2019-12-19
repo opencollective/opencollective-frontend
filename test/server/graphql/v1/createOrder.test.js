@@ -80,7 +80,7 @@ const constants = Object.freeze({
   },
 });
 
-describe('createOrder', () => {
+describe('server/graphql/v1/createOrder', () => {
   let sandbox, tweetStatusSpy, fearlesscitiesbrussels, emailSendMessageSpy;
 
   before(() => {

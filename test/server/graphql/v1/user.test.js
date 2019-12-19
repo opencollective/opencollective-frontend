@@ -8,7 +8,7 @@ import models from '../../../../server/models';
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
 
-describe('Query Tests', () => {
+describe('server/graphql/v1/user', () => {
   let user1, user2, host, collective1, collective2, tier1, ticket1, sandbox;
 
   before(() => (sandbox = sinon.createSandbox()));

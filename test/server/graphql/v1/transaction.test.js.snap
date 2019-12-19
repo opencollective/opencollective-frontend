@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`graphql.transaction.test.js return collective.transactions when given a collective slug (case insensitive) 1`] = `
+exports[`server/graphql/v1/transaction return collective.transactions when given a collective slug (case insensitive) 1`] = `
 Object {
   "data": Object {
     "Collective": Object {
@@ -193,7 +193,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions \`transactions\` query accepts orderBy argument to order transactions 1`] = `
+exports[`server/graphql/v1/transaction return transactions \`transactions\` query accepts orderBy argument to order transactions 1`] = `
 Object {
   "data": Object {
     "transactions": Object {
@@ -347,7 +347,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions \`transactions\` query accepts pagination arguments: limit & offset 1`] = `
+exports[`server/graphql/v1/transaction return transactions \`transactions\` query accepts pagination arguments: limit & offset 1`] = `
 Object {
   "data": Object {
     "transactions": Object {
@@ -484,7 +484,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions \`transactions\` query accepts type argument to filter transactions by type 1`] = `
+exports[`server/graphql/v1/transaction return transactions \`transactions\` query accepts type argument to filter transactions by type 1`] = `
 Object {
   "data": Object {
     "transactions": Object {
@@ -633,7 +633,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions \`transactions\` query default returns list of transactions with pagination data 1`] = `
+exports[`server/graphql/v1/transaction return transactions \`transactions\` query default returns list of transactions with pagination data 1`] = `
 Object {
   "data": Object {
     "transactions": Object {
@@ -1147,7 +1147,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions returns one transaction  1`] = `
+exports[`server/graphql/v1/transaction return transactions returns one transaction  1`] = `
 Object {
   "data": Object {
     "Transaction": Object {
@@ -1172,7 +1172,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions returns one transaction by id 1`] = `
+exports[`server/graphql/v1/transaction return transactions returns one transaction by id 1`] = `
 Object {
   "data": Object {
     "Transaction": Object {
@@ -1197,7 +1197,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions returns one transaction by uuid 1`] = `
+exports[`server/graphql/v1/transaction return transactions returns one transaction by uuid 1`] = `
 Object {
   "data": Object {
     "Transaction": Object {
@@ -1218,7 +1218,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions with dateFrom 1`] = `
+exports[`server/graphql/v1/transaction return transactions with dateFrom 1`] = `
 Object {
   "data": Object {
     "allTransactions": Array [
@@ -1247,7 +1247,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions with dateTo 1`] = `
+exports[`server/graphql/v1/transaction return transactions with dateTo 1`] = `
 Object {
   "data": Object {
     "allTransactions": Array [
@@ -1276,7 +1276,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions with filter on type 1`] = `
+exports[`server/graphql/v1/transaction return transactions with filter on type 1`] = `
 Object {
   "data": Object {
     "allTransactions": Array [
@@ -1325,7 +1325,7 @@ Object {
 }
 `;
 
-exports[`graphql.transaction.test.js return transactions with pagination 1`] = `
+exports[`server/graphql/v1/transaction return transactions with pagination 1`] = `
 Object {
   "data": Object {
     "allTransactions": Array [

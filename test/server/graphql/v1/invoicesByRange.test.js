@@ -39,7 +39,7 @@ async function donate(user, currency, amount, createdAt, collective) {
   }
 }
 
-describe('graphql.invoicesByRange.test.js', () => {
+describe('server/graphql/v1/invoicesByRange', () => {
   let xdamman;
 
   before(async () => {

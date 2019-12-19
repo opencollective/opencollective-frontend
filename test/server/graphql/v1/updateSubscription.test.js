@@ -39,7 +39,7 @@ mutation updateSubscription($id: Int!, $paymentMethod: PaymentMethodInputType, $
 }
 `;
 
-describe('graphql.updateSubscription.test.js', () => {
+describe('server/graphql/v1/updateSubscription', () => {
   let collective, user, user2, paymentMethod;
 
   beforeEach(initNock);

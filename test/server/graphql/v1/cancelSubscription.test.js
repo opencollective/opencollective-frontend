@@ -16,7 +16,7 @@ mutation cancelSubscription($id: Int!) {
 }
 `;
 
-describe('graphql.cancelSubscriptions.test.js', () => {
+describe('server/graphql/v1/cancelSubscriptions', () => {
   let collective, user, user2, paymentMethod;
 
   beforeEach(() => utils.resetTestDB());
