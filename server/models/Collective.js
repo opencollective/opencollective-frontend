@@ -844,7 +844,7 @@ export default function(Sequelize, DataTypes) {
         CollectiveId: this.id,
         service: 'opencollective',
         type: 'collective',
-        name: `${capitalize(this.name)} Add Funds`,
+        name: `${this.name} (Host)`,
         primary: true,
         currency: this.currency,
       });
@@ -1494,7 +1494,7 @@ export default function(Sequelize, DataTypes) {
           CollectiveId: this.id,
           service: 'opencollective',
           type: 'collective',
-          name: `${capitalize(this.name)} ${capitalize(this.type.toLowerCase())}`,
+          name: `${capitalize(this.name)} (${capitalize(this.type.toLowerCase())})`,
           primary: true,
           currency: hostCollective.currency,
         }),
