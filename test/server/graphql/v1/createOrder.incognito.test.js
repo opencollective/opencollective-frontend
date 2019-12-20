@@ -59,7 +59,7 @@ query Collective($slug: String) {
   }
 }`;
 
-describe('grahpql.createOrder.opencollective', () => {
+describe('server/graphql/v1/createOrder.incognito', () => {
   let adminUser, backerUser, user, incognitoCollective, hostCollective, collective, hostAdmin;
 
   before(async () => {

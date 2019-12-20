@@ -11,7 +11,7 @@ import Index from 'algoliasearch/src/Index';
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
 
-describe('graphql.search.test.js', () => {
+describe('server/graphql/v1/search', () => {
   let sandbox;
   const hits = [
     {

@@ -3,7 +3,7 @@ import models from '../../../../server/models';
 import { expect } from 'chai';
 import { randEmail } from '../../../stores';
 
-describe('graphql.connectedAccounts.test.js', () => {
+describe('server/graphql/v1/connectedAccounts', () => {
   let user, admin, backer, collective, connectedAccount, connectedAccountData;
   const editConnectedAccountQuery = `
     mutation editConnectedAccount($connectedAccount: ConnectedAccountInputType!) {

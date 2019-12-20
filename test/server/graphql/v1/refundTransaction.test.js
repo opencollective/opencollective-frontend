@@ -130,7 +130,7 @@ function initStripeNock({ amount, fee, fee_details, net }) {
     });
 }
 
-describe('Refund Transaction', () => {
+describe('server/graphql/v1/refundTransaction', () => {
   /* All the tests will touch the database, so resetting it is the
    * first thing we do. */
   beforeEach(async () => await utils.resetTestDB());

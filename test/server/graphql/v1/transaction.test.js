@@ -10,7 +10,7 @@ import models from '../../../../server/models';
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
 
-describe('graphql.transaction.test.js', () => {
+describe('server/graphql/v1/transaction', () => {
   before(async () => {
     await utils.resetTestDB();
     // Given a host

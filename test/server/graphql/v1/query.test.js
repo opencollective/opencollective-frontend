@@ -6,7 +6,7 @@ import { graphql } from 'graphql';
 import * as utils from '../../../utils';
 import models from '../../../../server/models';
 
-describe('Query Tests', () => {
+describe('server/graphql/v1/query', () => {
   let user1, user2, user3, collective1, collective2, collective3, event1, event2, ticket1, ticket2;
 
   /* SETUP

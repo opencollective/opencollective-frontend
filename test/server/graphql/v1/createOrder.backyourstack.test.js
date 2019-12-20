@@ -88,7 +88,7 @@ const constants = Object.freeze({
   },
 });
 
-describe('createOrder', () => {
+describe('server/graphql/v1/createOrder.backyourstack', () => {
   let sandbox, backyourstackCollective, xdamman, orderCreated;
 
   before(async () => {

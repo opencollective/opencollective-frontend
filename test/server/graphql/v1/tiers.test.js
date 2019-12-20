@@ -8,7 +8,7 @@ import stripe from '../../../../server/lib/stripe';
 import models from '../../../../server/models';
 import { VAT_OPTIONS } from '../../../../server/constants/vat';
 
-describe('server/graphql/v1/tiers.test.js', () => {
+describe('server/graphql/v1/tiers', () => {
   let user1, user2, host, collective1, collective2, tier1, tierWithCustomFields, tierProduct, paymentMethod1;
   let sandbox;
 

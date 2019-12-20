@@ -11,7 +11,7 @@ import twitterLib from '../../../../server/lib/twitter';
 let host, user1, user2, collective1, event1, update1;
 let sandbox, sendEmailSpy, sendTweetSpy;
 
-describe('graphql.updates.test', () => {
+describe('server/graphql/v1/updates', () => {
   /* SETUP
      - collective1: host, user1 as admin
        - event1: user1 as admin

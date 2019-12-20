@@ -11,7 +11,7 @@ import emailLib from '../../../../server/lib/email';
 let host, user1, user2, user3, collective1, event1, ticket1;
 let sandbox, executeOrderStub, emailSendSpy, emailSendMessageSpy;
 
-describe('Mutation Tests', () => {
+describe('server/graphql/v1/mutation', () => {
   /* SETUP
     collective1: 2 events
       event1: 1 free ticket, 1 paid ticket

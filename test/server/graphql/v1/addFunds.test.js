@@ -15,7 +15,7 @@ const addFundsToOrgQuery = `
   }
 `;
 
-describe('graphql.addFunds', () => {
+describe('server/graphql/v1/addFunds', () => {
   let user, collective, hostCollective;
 
   beforeEach(async () => {
