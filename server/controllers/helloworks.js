@@ -22,6 +22,21 @@ const HELLO_WORKS_WORKFLOW_ID = get(config, 'helloworks.workflowId');
 const HELLO_WORKS_S3_BUCKET = get(config, 'helloworks.aws.s3.bucket');
 const ENCRYPTION_KEY = get(config, 'helloworks.documentEncryptionKey');
 
+function processMetadata(metadata) {
+  // Check if metadata is malformed
+  // ie: {"email,a@example.com":"1","userId,258567":"0","year,2019":"2"}
+  const metadataNeedsFix = Math.max(...Object.values(metadata).map(value => value.length)) === 1;
+  if (!metadataNeedsFix) {
+    return metadata;
+  }
+
+  return Object.keys(metadata).reduce((acc, string) => {
+    const [key, value] = string.split(',');
+    acc[key] = value;
+    return acc;
+  }, {});
+}
+
 async function callback(req, res) {
   logger.info('Tax Form callback (raw):', req.rawBody);
   logger.info('Tax Form callback (parsed):', req.body);
@@ -32,8 +47,10 @@ async function callback(req, res) {
   });
 
   const {
-    body: { status, workflow_id: workflowId, data, id, metadata },
+    body: { status, workflow_id: workflowId, data, id, metadata: metadataReceived },
   } = req;
+
+  const metadata = processMetadata(metadataReceived);
 
   if (status && status === 'completed' && workflowId == HELLO_WORKS_WORKFLOW_ID) {
     const { userId, email, year } = metadata;
