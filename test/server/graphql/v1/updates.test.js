@@ -124,11 +124,33 @@ describe('graphql.updates.test', () => {
       expect(result.errors[0].message).to.equal("You don't have sufficient permissions to publish this update");
     });
 
+    it('unpublishes an update successfully', async () => {
+      sendEmailSpy.resetHistory();
+      await models.Update.update({ publishedAt: new Date() }, { where: { id: update1.id } });
+      const result = await utils.graphqlQuery(
+        publishUpdateQuery.replace(/publish\(/g, 'unpublish('),
+        { id: update1.id },
+        user1,
+      );
+      expect(result.errors).to.not.exist;
+      expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
+      expect(result.data.publishUpdate.publishedAt).to.not.be.null;
+      await models.Update.update({ publishedAt: null }, { where: { id: update1.id } });
+      await utils.waitForCondition(() => sendEmailSpy.callCount === 1, {
+        tag: 'first update & "love"',
+      });
+    });
+
     describe('publishes an update', async () => {
       let result, user3;
 
       before(async () => {
+        sendEmailSpy.resetHistory();
         await collective1.addUserWithRole(user2, roles.BACKER);
+        await utils.waitForCondition(() => sendEmailSpy.callCount === 1, {
+          tag: "Anish Bas joined Scouts d'Arlon as backer",
+        });
+        sendEmailSpy.resetHistory();
         user3 = await models.User.createUserWithCollective(utils.data('user3'));
         const org = await models.Collective.create({
           name: 'facebook',
@@ -149,10 +171,6 @@ describe('graphql.updates.test', () => {
         result = await utils.graphqlQuery(publishUpdateQuery, { id: update1.id }, user1);
       });
 
-      beforeEach(() => {
-        sendEmailSpy.resetHistory();
-      });
-
       it('published the update successfully', async () => {
         expect(result.errors).to.not.exist;
         expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
@@ -160,7 +178,9 @@ describe('graphql.updates.test', () => {
       });
 
       it('sends the update to all users including admins of sponsor org', async () => {
-        await utils.waitForCondition(() => sendEmailSpy.callCount > 1);
+        await utils.waitForCondition(() => sendEmailSpy.callCount === 3, {
+          tag: 'first update & "love"',
+        });
         expect(sendEmailSpy.callCount).to.equal(3);
         expect(sendEmailSpy.args[0][0]).to.equal(user1.email);
         expect(sendEmailSpy.args[0][1]).to.equal('first update & "love"');
@@ -175,19 +195,6 @@ describe('graphql.updates.test', () => {
         expect(sendTweetSpy.firstCall.args[1]).to.equal('Latest update from the collective: first update & "love"');
         expect(sendTweetSpy.firstCall.args[2]).to.contain('/scouts/updates/first-update-and-love');
       });
-    });
-
-    it('unpublishes an update successfully', async () => {
-      await models.Update.update({ publishedAt: new Date() }, { where: { id: update1.id } });
-      const result = await utils.graphqlQuery(
-        publishUpdateQuery.replace(/publish\(/g, 'unpublish('),
-        { id: update1.id },
-        user1,
-      );
-      expect(result.errors).to.not.exist;
-      expect(result.data.publishUpdate.slug).to.equal('first-update-and-love');
-      expect(result.data.publishUpdate.publishedAt).to.not.be.null;
-      await models.Update.update({ publishedAt: null }, { where: { id: update1.id } });
     });
   });
 
