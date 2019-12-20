@@ -1512,6 +1512,12 @@ const CollectiveFields = () => {
           type: GraphQLBoolean,
           defaultValue: false,
           description: 'Defines if the organization "collective" payment method should be returned',
+          deprecationReason: '2019-12-20: Replaced by includeHostCollectivePaymentMethod',
+        },
+        includeHostCollectivePaymentMethod: {
+          type: GraphQLBoolean,
+          defaultValue: false,
+          description: 'Defines if the host "collective" payment method should be returned',
         },
       },
       async resolve(collective, args, req) {
@@ -1519,8 +1525,12 @@ const CollectiveFields = () => {
           return [];
         }
         let paymentMethods = await req.loaders.PaymentMethod.findByCollectiveId.load(collective.id);
-        // Filter Payment Methods used by organizations for "Add Funds"
-        if (!args.includeOrganizationCollectivePaymentMethod && collective.type === 'ORGANIZATION') {
+        // Filter Payment Methods used by Hosts for "Add Funds"
+        if (
+          !args.includeOrganizationCollectivePaymentMethod &&
+          !args.includeHostCollectivePaymentMethod &&
+          (collective.type === 'ORGANIZATION' || collective.type === 'USER')
+        ) {
           paymentMethods = paymentMethods.filter(pm => !(pm.service === 'opencollective' && pm.type === 'collective'));
         }
         // Filter only "saved" stripe Payment Methods
