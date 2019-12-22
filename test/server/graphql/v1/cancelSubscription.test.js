@@ -166,11 +166,11 @@ describe('server/graphql/v1/cancelSubscriptions', () => {
       expect(activity.data.user.id).to.be.equal(user.id);
 
       // confirm that email went out
-      const { subject, html, cc } = nm.sendMail.lastCall.args[0];
+      const { subject, html, bcc } = nm.sendMail.lastCall.args[0];
 
       expect(subject).to.contain('Subscription canceled to Scouts');
       expect(html).to.contain('month has been canceled');
-      expect(cc).to.equal(`info@${collective.slug}.opencollective.com`);
+      expect(bcc).to.equal(`info@${collective.slug}.opencollective.com`);
     });
   });
 });
