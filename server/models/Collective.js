@@ -1366,7 +1366,7 @@ export default function(Sequelize, DataTypes) {
         },
         loginLink: `${config.host.website}/signin?next=/${memberUser.collective.slug}/edit`,
       },
-      { cc: remoteUser.email },
+      { bcc: remoteUser.email },
     );
   };
 

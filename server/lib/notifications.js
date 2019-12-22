@@ -205,7 +205,7 @@ async function notifyByEmail(activity) {
 
     case activityType.SUBSCRIPTION_CANCELED:
       return notifyUserId(activity.UserId, activity, {
-        cc: `info@${activity.data.collective.slug}.opencollective.com`,
+        bcc: `info@${activity.data.collective.slug}.opencollective.com`,
       });
 
     case activityType.COLLECTIVE_MEMBER_CREATED:
