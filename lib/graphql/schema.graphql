@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Dec 12 2019 20:59:40 GMT+0100 (GMT+01:00)
+# timestamp: Mon Dec 23 2019 18:21:12 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -250,6 +250,11 @@ type Collective implements CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -1126,6 +1131,11 @@ type Event implements CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -1488,6 +1498,20 @@ input MemberInputType {
 }
 
 """
+An invitation to join the members of a collective that has not been approved yet
+"""
+type MemberInvitation {
+  id: Int
+  createdAt: DateString
+  collective: CollectiveInterface
+  member: CollectiveInterface
+  role: String
+  description: String
+  tier: Tier
+  since: DateString
+}
+
+"""
 This is the root mutation
 """
 type Mutation {
@@ -1784,6 +1808,21 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
+
+  """
+  Endpoint to accept or reject an invitation to become a member
+  """
+  replyToMemberInvitation(
+    """
+    The ID of the invitation to accept or decline
+    """
+    invitationId: Int!
+
+    """
+    Wether this invitation should be accepted or declined
+    """
+    accept: Boolean!
+  ): Boolean
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 }
 
@@ -2254,6 +2293,11 @@ type Organization implements CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -2636,6 +2680,11 @@ type Query {
     limit: Int
     offset: Int
   ): [Member]
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(CollectiveId: Int, MemberCollectiveId: Int): [MemberInvitation]
   allEvents(
     """
     Slug of the parent collective
@@ -3266,6 +3315,11 @@ type User implements CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """

@@ -58,7 +58,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 <FormattedMessage
                   id="Membership.ContributorSince"
                   defaultMessage="{contributorType} since"
-                  values={{ contributorType: formatMemberRole(intl, role) }}
+                  values={{ contributorType: formatMemberRole(intl.formatMessage, role) }}
                 />
                 <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                   <FormattedDate value={since} month="long" year="numeric" />
