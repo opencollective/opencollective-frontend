@@ -1077,6 +1077,7 @@ const CollectiveFields = () => {
         const query = {
           limit: args.limit,
           offset: args.offset,
+          order: [['id', 'ASC']],
         };
 
         query.where = { CollectiveId: collective.id };

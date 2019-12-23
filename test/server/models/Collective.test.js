@@ -1,8 +1,9 @@
 import { expect } from 'chai';
-import models from '../../../server/models';
+import models, { Op } from '../../../server/models';
 import * as utils from '../../utils';
 import sinon from 'sinon';
 import emailLib from '../../../server/lib/email';
+import { roles } from '../../../server/constants';
 
 const { Transaction, Collective, User } = models;
 
@@ -592,65 +593,91 @@ describe('Collective model', () => {
 
   describe('members', () => {
     it('gets email addresses of admins', async () => {
-      await collective.editMembers([
-        {
-          id: user1.id,
-          MemberCollectiveId: user1.CollectiveId,
-          role: 'ADMIN',
-        },
-        {
-          role: 'ADMIN',
-          member: {
-            name: 'Etienne Dupont',
-            email: 'etiennedupont@email.com',
+      let emails = await collective.getEmails();
+      expect(emails.length).to.equal(0);
+
+      await collective.editMembers(
+        [
+          {
+            role: 'ADMIN',
+            member: {
+              id: user1.CollectiveId,
+            },
           },
-        },
-      ]);
-      const emails = await collective.getEmails();
+          {
+            role: 'ADMIN',
+            member: {
+              id: user2.CollectiveId,
+            },
+          },
+        ],
+        { CreatedByUserId: user1.id },
+      );
+
+      // Invitation needs to be approved before admins can access the email
+      const invitation = await models.MemberInvitation.findOne({
+        where: { CollectiveId: collective.id, MemberCollectiveId: user1.CollectiveId, role: 'ADMIN' },
+      });
+      await invitation.accept();
+
+      emails = await collective.getEmails();
+      expect(emails.length).to.equal(1);
+
+      // Approve user 2
+      const invitation2 = await models.MemberInvitation.findOne({
+        where: { CollectiveId: collective.id, MemberCollectiveId: user2.CollectiveId, role: 'ADMIN' },
+      });
+      await invitation2.accept();
+
+      emails = await collective.getEmails();
       expect(emails.length).to.equal(2);
     });
 
-    it('add/update/remove members', done => {
-      collective
-        .editMembers([
+    it('add/update/remove members', async () => {
+      const loadCoreContributors = () => {
+        return models.Member.findAll({
+          where: { CollectiveId: collective.id, role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
+        });
+      };
+
+      let members = await collective.editMembers(
+        [
           {
-            id: user1.id,
-            MemberCollectiveId: user1.CollectiveId,
             role: 'ADMIN',
+            member: {
+              id: user1.CollectiveId,
+            },
           },
           {
             role: 'MEMBER',
             member: {
-              name: 'Etienne Dupont',
-              email: 'etiennedupont@email.com',
+              id: user2.CollectiveId,
             },
           },
-        ])
-        .then(members => {
-          expect(members.length).to.equal(2);
-          expect(members[0].role).to.equal('ADMIN');
-          expect(members[1].role).to.equal('MEMBER');
-          done();
-        });
-    });
+        ],
+        { CreatedByUserId: user1.id },
+      );
 
-    it('add an existing user to a collective by email address', done => {
-      collective
-        .editMembers([
-          {
-            role: 'ADMIN',
-            member: {
-              name: user1.name,
-              email: user1.email,
-            },
-          },
-        ])
-        .then(members => {
-          expect(members).to.have.length(1);
-          expect(members[0].role).to.equal('ADMIN');
-          expect(members[0].MemberCollectiveId).to.equal(user1.CollectiveId);
-          done();
-        });
+      expect(members.length).to.equal(0);
+
+      const invitation = await models.MemberInvitation.findOne({
+        where: { CollectiveId: collective.id, MemberCollectiveId: user1.CollectiveId, role: 'ADMIN' },
+      });
+      await invitation.accept();
+
+      members = await loadCoreContributors();
+      expect(members.length).to.equal(1);
+      expect(members[0].role).to.equal('ADMIN');
+
+      const invitation2 = await models.MemberInvitation.findOne({
+        where: { CollectiveId: collective.id, MemberCollectiveId: user2.CollectiveId, role: 'MEMBER' },
+      });
+      await invitation2.accept();
+
+      members = await loadCoreContributors();
+      expect(members.length).to.equal(2);
+      expect(members.find(m => m.MemberCollectiveId === user1.CollectiveId).role).to.equal('ADMIN');
+      expect(members.find(m => m.MemberCollectiveId === user2.CollectiveId).role).to.equal('MEMBER');
     });
   });
 

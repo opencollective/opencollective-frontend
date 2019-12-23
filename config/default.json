@@ -53,7 +53,8 @@
     "maxNumberOfAppsPerUser": 15,
     "maxWebhooksPerUserPerCollective": 50,
     "searchEmailPerHour": 150,
-    "collectiveEmailMessagePerHour": 5
+    "collectiveEmailMessagePerHour": 5,
+    "maxMemberInvitationsPerCollective": 20
   },
   "email": {
     "from": "Open Collective <info@opencollective.com>"

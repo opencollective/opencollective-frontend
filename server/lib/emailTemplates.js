@@ -41,6 +41,7 @@ export const templateNames = [
   'host.report',
   'host.report.text',
   'host.report.summary',
+  'member.invitation',
   'onboarding.day2',
   'onboarding.day2.opensource',
   'onboarding.day2.organization',

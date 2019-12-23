@@ -1283,6 +1283,7 @@ export default function(Sequelize, DataTypes) {
 
       case roles.MEMBER:
       case roles.ADMIN:
+        invalidateContributorsCache(this.id);
         await this.sendNewMemberEmail(user, role, member, sequelizeParams);
         break;
     }
@@ -1610,107 +1611,95 @@ export default function(Sequelize, DataTypes) {
 
   // edit the list of members and admins of this collective (create/update/remove)
   // creates a User and a UserCollective if needed
-  Collective.prototype.editMembers = function(members, defaultAttributes = {}) {
+  Collective.prototype.editMembers = async function(members, defaultAttributes = {}) {
     if (!members || members.length === 0) {
-      return Promise.resolve();
+      return null;
     }
+
     if (members.filter(m => m.role === roles.ADMIN).length === 0) {
       throw new Error('There must always be at least one collective admin');
     }
 
-    const checkAuthorizedRole = role => {
-      if (![roles.ADMIN, roles.MEMBER].includes(role)) {
-        throw new Error(`Cant edit or create membership with role ${role}`);
+    // Ensure only ADMIN and MEMBER roles are used here
+    members.forEach(member => {
+      if (![roles.ADMIN, roles.MEMBER].includes(member.role)) {
+        throw new Error(`Cant edit or create membership with role ${member.role}`);
       }
-    };
+    });
 
+    // Load existing data
+    const [oldMembers, oldInvitations] = await Promise.all([
+      this.getMembers({ where: { role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } } }),
+      models.MemberInvitation.findAll({
+        where: { CollectiveId: this.id, role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
+      }),
+    ]);
+
+    // remove the members that are not present anymore
+    const diff = differenceBy(oldMembers, members, 'id');
+    if (diff.length > 0) {
+      debug('editMembers', 'delete', diff);
+      const diffMemberIds = diff.map(m => m.id);
+      const diffMemberCollectiveIds = diff.map(m => m.MemberCollectiveId);
+      const { remoteUserCollectiveId } = defaultAttributes;
+      if (remoteUserCollectiveId && diffMemberCollectiveIds.indexOf(remoteUserCollectiveId) !== -1) {
+        throw new Error(
+          'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
+        );
+      }
+      await models.Member.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diffMemberIds } } });
+    }
+
+    // Remove the invitations that are not present anymore
+    const invitationsDiff = oldInvitations.filter(invitation => {
+      return !members.some(
+        m => !m.id && m.member && m.member.id === invitation.MemberCollectiveId && m.role === invitation.role,
+      );
+    });
+
+    if (invitationsDiff.length > 0) {
+      await models.MemberInvitation.update(
+        { deletedAt: new Date() },
+        {
+          where: {
+            id: { [Op.in]: invitationsDiff.map(i => i.id) },
+            CollectiveId: this.id,
+          },
+        },
+      );
+    }
+
+    // Add new members
+    for (const member of members) {
+      if (member.id) {
+        // Edit an existing membership (edit the role/description)
+        const editableAttributes = pick(member, ['role', 'description', 'since']);
+        debug('editMembers', 'update member', member.id, editableAttributes);
+        await models.Member.update(editableAttributes, {
+          where: {
+            id: member.id,
+            CollectiveId: this.id,
+            role: { [Op.in]: [roles.ADMIN, roles.MEMBER] },
+          },
+        });
+      } else if (member.member && member.member.id) {
+        // Create new membership invitation
+        await models.MemberInvitation.invite(this, {
+          ...defaultAttributes,
+          description: member.description,
+          since: member.since,
+          MemberCollectiveId: member.member.id,
+          role: member.role,
+        });
+      } else {
+        throw new Error('Invited member collective has not been set');
+      }
+    }
+
+    invalidateContributorsCache(this.id);
     return this.getMembers({
       where: { role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
-    })
-      .then(oldMembers => {
-        // remove the members that are not present anymore
-        const diff = differenceBy(oldMembers, members, 'id');
-        if (diff.length === 0) {
-          return null;
-        } else {
-          debug('editMembers', 'delete', diff);
-          const diffMemberIds = diff.map(m => m.id);
-          const diffMemberCollectiveIds = diff.map(m => m.MemberCollectiveId);
-          const { remoteUserCollectiveId } = defaultAttributes;
-          if (remoteUserCollectiveId && diffMemberCollectiveIds.indexOf(remoteUserCollectiveId) !== -1) {
-            throw new Error(
-              'You cannot remove yourself as a Collective admin. If you are the only admin, please add a new one and ask them to remove you.',
-            );
-          }
-          return models.Member.update({ deletedAt: new Date() }, { where: { id: { [Op.in]: diffMemberIds } } });
-        }
-      })
-      .then(() => {
-        return Promise.map(members, member => {
-          checkAuthorizedRole(member.role);
-
-          if (member.id) {
-            // Edit an existing membership (edit the role/description)
-            const editableAttributes = pick(member, ['role', 'description', 'since']);
-            debug('editMembers', 'update member', member.id, editableAttributes);
-            return models.Member.update(editableAttributes, {
-              where: { id: member.id, CollectiveId: this.id },
-            });
-          } else {
-            // Create new membership
-            const memberAttrs = {
-              ...defaultAttributes,
-              description: member.description,
-              since: member.since,
-            };
-
-            member.CollectiveId = this.id;
-            if (member.member && member.member.id) {
-              // Add member from collective ID. Ignore incognito profiles.
-              return models.User.findOne({
-                where: { CollectiveId: member.member.id },
-                include: {
-                  model: models.Collective,
-                  as: 'collective',
-                  attributes: ['id'],
-                  where: { type: types.USER, isIncognito: false },
-                },
-              }).then(user => {
-                if (!user) {
-                  logger.error('[Edit Members] No user found for member', member);
-                  throw new Error(`No profile found for ${member.member.name}. Please contact support`);
-                } else {
-                  return this.addUserWithRole(user, member.role, { TierId: member.TierId, ...memberAttrs });
-                }
-              });
-            } else if (member.CreatedByUserId) {
-              // @deprecated since 2019-10-21 this path doesn't seems to be used anymore
-              const user = {
-                id: member.CreatedByUserId,
-                CollectiveId: member.MemberCollectiveId,
-              };
-              return this.addUserWithRole(user, member.role, {
-                TierId: member.TierId,
-                ...memberAttrs,
-              });
-            } else {
-              // @deprecated since 2019-10-21 we now expect user to create the collective and pass an ID
-              return models.User.findOrCreateByEmail(member.member.email, member.member).then(user => {
-                return this.addUserWithRole(user, member.role, {
-                  TierId: member.TierId,
-                  ...memberAttrs,
-                });
-              });
-            }
-          }
-        });
-      })
-      .then(() => {
-        invalidateContributorsCache(this.id);
-        return this.getMembers({
-          where: { role: { [Op.in]: [roles.ADMIN, roles.MEMBER] } },
-        });
-      });
+    });
   };
 
   Collective.schema('public');

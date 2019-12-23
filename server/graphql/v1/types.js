@@ -250,8 +250,8 @@ export const MemberType = new GraphQLObjectType({
     return {
       id: {
         type: GraphQLInt,
-        resolve(order) {
-          return order.id;
+        resolve(member) {
+          return member.id;
         },
       },
       createdAt: {
@@ -351,6 +351,51 @@ export const MemberType = new GraphQLObjectType({
         type: StatsMemberType,
         resolve(member) {
           return member;
+        },
+      },
+      since: {
+        type: DateString,
+        resolve(member) {
+          return member.since;
+        },
+      },
+    };
+  },
+});
+
+export const MemberInvitationType = new GraphQLObjectType({
+  name: 'MemberInvitation',
+  description: 'An invitation to join the members of a collective',
+  fields: () => {
+    return {
+      id: {
+        type: GraphQLInt,
+      },
+      createdAt: {
+        type: DateString,
+      },
+      collective: {
+        type: CollectiveInterfaceType,
+        resolve(member, args, req) {
+          return req.loaders.Collective.byId.load(member.CollectiveId);
+        },
+      },
+      member: {
+        type: CollectiveInterfaceType,
+        resolve(member, args, req) {
+          return req.loaders.Collective.byId.load(member.MemberCollectiveId);
+        },
+      },
+      role: {
+        type: GraphQLString,
+      },
+      description: {
+        type: GraphQLString,
+      },
+      tier: {
+        type: TierType,
+        resolve(member, args, req) {
+          return member.TierId && req.loaders.Tier.byId.load(member.TierId);
         },
       },
       since: {
