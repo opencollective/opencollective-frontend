@@ -87,7 +87,7 @@ class TransactionsPage extends React.Component {
             key={collective.slug}
             selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
             displayContributeLink={
-              collective.isActive && collective.host && ['USER', 'ORGANIZATION'].indexOf(collective.type) === -1
+              collective.isActive && collective.host && !['USER', 'ORGANIZATION'].includes(collective.type)
             }
           />
 
