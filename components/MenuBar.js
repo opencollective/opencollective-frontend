@@ -253,7 +253,7 @@ class MenuBar extends React.Component {
           `}
         </style>
         {this.state.sticky && stickyCTA && cta}
-        {!collective.isArchived && ['COLLECTIVE', 'EVENT'].indexOf(collective.type) !== -1 && (
+        {!collective.isArchived && ['COLLECTIVE', 'EVENT'].includes(collective.type) && (
           <Button className="submitExpense darkBackground" href={`${collective.path}/expenses/new`}>
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </Button>
@@ -340,7 +340,7 @@ class MenuBar extends React.Component {
         ))}
         {LoggedInUser && LoggedInUser.canEditCollective(collective) && (
           <div className="admin">
-            {['USER', 'ORGANIZATION'].indexOf(collective.type) !== -1 && (
+            {['USER', 'ORGANIZATION'].includes(collective.type) && (
               <div className="item transactions">
                 <Link route={`${collective.path}/transactions`}>
                   <FormattedMessage id="menu.transactions" defaultMessage="transactions" />
