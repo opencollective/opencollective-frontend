@@ -440,6 +440,14 @@ export const sendReminderPendingOrderEmail = async order => {
   const { collective, fromCollective } = order;
   const user = order.createdByUser;
   const host = await collective.getHostCollective();
+
+  // It could be that pending orders are from pledged collective and don't have an host
+  // In this case, we should skip it
+  // TODO: we should be able to more precisely query orders and exclude these
+  if (!host) {
+    return;
+  }
+
   const data = {
     order: order.info,
     user: user.info,
