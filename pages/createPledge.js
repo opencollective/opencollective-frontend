@@ -250,7 +250,7 @@ class CreatePledgePage extends React.Component {
       LoggedInUser &&
       LoggedInUser.memberOf
         .concat({ ...LoggedInUser, role: 'ADMIN' })
-        .filter(({ role }) => ~['ADMIN', 'HOST'].indexOf(role));
+        .filter(({ role }) => ['ADMIN', 'HOST'].includes(role));
 
     const pledgeStats = get(data, 'Collective.pledges', []).reduce(
       (stats, { fromCollective, totalAmount }) => {
