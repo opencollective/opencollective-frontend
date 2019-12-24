@@ -304,7 +304,7 @@ export async function payExpense(remoteUser, args) {
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }
-  if (!canUpdateExpenseStatus(remoteUser, expense)) {
+  if (!remoteUser.isAdmin(expense.collective.HostCollectiveId)) {
     throw new errors.Unauthorized("You don't have permission to pay this expense");
   }
   const host = await expense.collective.getHostCollective();
