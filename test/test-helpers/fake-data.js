@@ -12,8 +12,8 @@ import models from '../../server/models';
 import { types as CollectiveType } from '../../server/constants/collectives';
 import { randEmail, randUrl } from '../stores';
 
-const randStr = (prefix = '') => `${prefix}${uuid().split('-')[0]}`;
-const randAmount = (min = 100, max = 10000000) => Math.floor(Math.random() * max) + min;
+export const randStr = (prefix = '') => `${prefix}${uuid().split('-')[0]}`;
+export const randAmount = (min = 100, max = 10000000) => Math.floor(Math.random() * max) + min;
 
 /**
  * Creates a fake user. All params are optionals.

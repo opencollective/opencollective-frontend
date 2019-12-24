@@ -1,7 +1,9 @@
 import { expect } from 'chai';
+import config from 'config';
 import { CollectiveType } from '../../../server/graphql/v1/CollectiveInterface';
 import { searchCollectivesInDB, searchCollectivesByEmail } from '../../../server/lib/search';
 import { newUser } from '../../stores';
+import { fakeUser } from '../../test-helpers/fake-data';
 
 describe('Search in DB', () => {
   it('By slug', async () => {
@@ -23,6 +25,26 @@ describe('Search in DB', () => {
     const [results, count] = await searchCollectivesInDB(userCollective.slug, 0, 10000, typeFilter);
     expect(results.length).to.eq(0);
     expect(count).to.eq(0);
+  });
+
+  describe('By email', async () => {
+    it('returns exact match', async () => {
+      const user = await fakeUser();
+      const searchedUser = await fakeUser();
+      const [collectives] = await searchCollectivesByEmail(searchedUser.email, user);
+      expect(collectives[0].id).to.equal(searchedUser.CollectiveId);
+    });
+
+    it('is rate limited', async () => {
+      const user = await fakeUser();
+      const searchedUser = await fakeUser();
+      for (let i = 0; i < config.limits.searchEmailPerHour; i++) {
+        await searchCollectivesByEmail(searchedUser.email, user);
+      }
+
+      const searchPromise = searchCollectivesByEmail(searchedUser.email, user);
+      await expect(searchPromise).to.be.eventually.rejectedWith('Rate limit exceeded');
+    });
   });
 });
 

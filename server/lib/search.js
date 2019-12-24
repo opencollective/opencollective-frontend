@@ -10,7 +10,7 @@ import { CollectiveTypesList } from '../constants/collectives';
 import { RateLimitExceeded } from '../graphql/errors';
 import models, { Op, sequelize } from '../models';
 import algolia from './algolia';
-import cache from './cache';
+import RateLimit, { ONE_HOUR_IN_SECONDS } from './rate-limit';
 
 // Returned when there's no result for a search
 const EMPTY_SEARCH_RESULT = [[], 0];
@@ -28,15 +28,14 @@ export const searchCollectivesByEmail = async (email, user, offset = 0, limit = 
   }
 
   // Put some rate limiting to users can't use this endpoint to bruteforce emails
-  const maxChangePerHour = config.limits.searchEmailPerHour;
-  const countCacheKey = `user_email_search_${user.id}`;
-  const existingCount = (await cache.get(countCacheKey)) || 0;
-  if (existingCount > maxChangePerHour) {
+  const rateLimit = new RateLimit(
+    `user_email_search_${user.id}`,
+    config.limits.searchEmailPerHour,
+    ONE_HOUR_IN_SECONDS,
+  );
+
+  if (!(await rateLimit.registerCall())) {
     throw new RateLimitExceeded();
-  } else {
-    // Update the cache
-    const oneHourInSeconds = 60 * 60;
-    cache.set(countCacheKey, existingCount + 1, oneHourInSeconds);
   }
 
   // Emails are uniques, thus there should never be more than one result - this is
