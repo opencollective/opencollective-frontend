@@ -40,7 +40,8 @@ const StyledLink = styled.a`
     props.buttonStyle &&
     css`
       outline: 0;
-      border: 1px solid;
+      border-style: solid;
+      border-width: 1px;
       border-radius: 100px;
 
       &:disabled {
