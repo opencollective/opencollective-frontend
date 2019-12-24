@@ -43,7 +43,9 @@ import {
   OrderType,
   PaginatedExpensesType,
   PaymentMethodType,
+  MemberInvitationType,
 } from './types';
+import { Forbidden, ValidationFailed } from '../errors';
 
 const queries = {
   Collective: {
@@ -1205,6 +1207,35 @@ const queries = {
             }
           });
       }
+    },
+  },
+
+  memberInvitations: {
+    type: new GraphQLList(MemberInvitationType),
+    description: '[AUTHENTICATED] Returns the pending invitations',
+    args: {
+      CollectiveId: { type: GraphQLInt },
+      MemberCollectiveId: { type: GraphQLInt },
+    },
+    resolve(collective, args, { remoteUser }) {
+      if (!remoteUser) {
+        new Forbidden({ message: 'Only collective admins can see pending invitations' });
+      }
+      if (!args.CollectiveId && !args.MemberCollectiveId) {
+        throw new ValidationFailed({ message: 'You must either provide a CollectiveId or a MemberCollectiveId' });
+      }
+
+      // Must be an admin to see pending invitations
+      const isAdminOfCollective = args.CollectiveId && remoteUser.isAdmin(args.CollectiveId);
+      const isAdminOfMemberCollective = args.MemberCollectiveId && remoteUser.isAdmin(args.MemberCollectiveId);
+      if (!isAdminOfCollective && !isAdminOfMemberCollective) {
+        new Forbidden({ message: 'Only collective admins can see pending invitations' });
+      }
+
+      const where = {};
+      if (args.CollectiveId) where.CollectiveId = args.CollectiveId;
+      if (args.MemberCollectiveId) where.MemberCollectiveId = args.MemberCollectiveId;
+      return models.MemberInvitation.findAll({ where });
     },
   },
 

@@ -81,6 +81,7 @@ export function setupModels(client) {
     'Expense',
     'LegalDocument',
     'Member',
+    'MemberInvitation',
     'Notification',
     'Order',
     'PaymentMethod',
@@ -137,6 +138,24 @@ export function setupModels(client) {
     as: 'collective',
   });
   m.Member.belongsTo(m.Tier);
+
+  // Member invitations
+  m.MemberInvitation.belongsTo(m.User, {
+    foreignKey: 'CreatedByUserId',
+    as: 'createdByUser',
+  });
+
+  m.MemberInvitation.belongsTo(m.Collective, {
+    foreignKey: 'MemberCollectiveId',
+    as: 'memberCollective',
+  });
+
+  m.MemberInvitation.belongsTo(m.Collective, {
+    foreignKey: 'CollectiveId',
+    as: 'collective',
+  });
+
+  m.MemberInvitation.belongsTo(m.Tier);
 
   // Activity.
   m.Activity.belongsTo(m.Collective);

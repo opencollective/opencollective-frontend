@@ -91,6 +91,7 @@ import models, { sequelize } from '../../models';
 import emailLib from '../../lib/email';
 import roles from '../../constants/roles';
 import errors from '../../lib/errors';
+import { Unauthorized, ValidationFailed, Forbidden } from '../errors';
 
 const mutations = {
   createCollective: {
@@ -865,6 +866,44 @@ const mutations = {
     },
     resolve(_, args, req) {
       return deleteNotification(args, req.remoteUser);
+    },
+  },
+  replyToMemberInvitation: {
+    type: GraphQLBoolean,
+    description: 'Endpoint to accept or reject an invitation to become a member',
+    args: {
+      invitationId: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The ID of the invitation to accept or decline',
+      },
+      accept: {
+        type: new GraphQLNonNull(GraphQLBoolean),
+        description: 'Wether this invitation should be accepted or declined',
+      },
+    },
+    async resolve(_, args, req) {
+      if (!req.remoteUser) {
+        throw new Unauthorized();
+      }
+
+      const invitation = await models.MemberInvitation.findByPk(args.invitationId);
+      if (!invitation) {
+        return new ValidationFailed({
+          message: "This invitation doesn't exist or a reply has already been given to it",
+        });
+      } else if (!req.remoteUser.isAdmin(invitation.MemberCollectiveId)) {
+        return new Forbidden({
+          message: 'Only admin of the invited collective can reply to the invitation',
+        });
+      }
+
+      if (args.accept) {
+        await invitation.accept();
+      } else {
+        await invitation.decline();
+      }
+
+      return args.accept;
     },
   },
   backyourstackDispatchOrder: {
