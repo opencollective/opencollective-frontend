@@ -53,6 +53,7 @@
     "maxNumberOfAppsPerUser": 15,
     "maxWebhooksPerUserPerCollective": 50,
     "searchEmailPerHour": 150,
+    "searchEmailPerHourPerIp": 50,
     "collectiveEmailMessagePerHour": 5,
     "maxMemberInvitationsPerCollective": 20
   },

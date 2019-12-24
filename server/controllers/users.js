@@ -5,6 +5,7 @@ import emailLib from '../lib/email';
 import models from '../models';
 import logger from '../lib/logger';
 import { isValidEmail } from '../lib/utils';
+import RateLimit, { ONE_HOUR_IN_SECONDS } from '../lib/rate-limit';
 
 /**
  *
@@ -20,6 +21,16 @@ export const exists = async (req, res) => {
   if (!isValidEmail(email)) {
     return res.send({ exists: false });
   } else {
+    const rateLimit = new RateLimit(
+      `user_email_search_ip_${req.ip}`,
+      config.limits.searchEmailPerHourPerIp,
+      ONE_HOUR_IN_SECONDS,
+    );
+    if (!(await rateLimit.registerCall())) {
+      res.send({
+        error: { message: 'Rate limit exceeded' },
+      });
+    }
     const user = await models.User.findOne({
       attributes: ['id'],
       where: { email },
