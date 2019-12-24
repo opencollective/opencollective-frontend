@@ -852,8 +852,16 @@ const CollectiveFields = () => {
     location: {
       type: LocationType,
       description: 'Name, address, lat, long of the location.',
-      resolve(collective) {
-        return collective.location;
+      resolve(collective, _, req) {
+        if (collective.type === types.COLLECTIVE || collective.type === types.EVENT) {
+          return collective.location;
+        } else if (!req.remoteUser) {
+          return null;
+        } else if (req.remoteUser.isAdmin(collective.id)) {
+          return collective.location;
+        } else {
+          return req.loaders.Collective.privateInfos.load(collective).then(c => c.location);
+        }
       },
     },
     createdAt: {

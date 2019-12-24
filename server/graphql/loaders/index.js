@@ -50,6 +50,14 @@ export const loaders = req => {
     }).then(results => sortResults(ids, results, 'CollectiveId', [])),
   );
 
+  /** Returns the collective if remote user has access to private infos or an empty object otherwise */
+  context.loaders.Collective.privateInfos = new DataLoader(async collectives => {
+    const allCollectiveIds = collectives.map(c => c.id);
+    const accessibleCollectiveIdsList = await getListOfAccessibleMembers(req.remoteUser, allCollectiveIds);
+    const accessibleCollectiveIdsSet = new Set(accessibleCollectiveIdsList);
+    return collectives.map(collective => (accessibleCollectiveIdsSet.has(collective.id) ? collective : {}));
+  });
+
   // Collective - Stats
   context.loaders.Collective.stats = {
     collectives: new DataLoader(ids =>
