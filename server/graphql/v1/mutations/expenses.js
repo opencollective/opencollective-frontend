@@ -354,25 +354,31 @@ export async function payExpense(remoteUser, args) {
       } fees: ${formatCurrency(fees.paymentProcessorFeeInCollectiveCurrency, expense.collective.currency)}`,
     );
   }
+
+  // Pay expense based on chosen payout method
   if (expense.payoutMethod === 'paypal') {
+    let paypalPaymentMethod = null;
     expense.paypalEmail = await expense.getPaypalEmail();
-    const paymentMethod = await host.getPaymentMethod({
-      service: expense.payoutMethod,
-    });
+    try {
+      paypalPaymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
+    } catch {
+      // ignore missing paypal payment method
+    }
+
     // If the expense has been filed with the same paypal email than the host paypal
     // then we simply mark the expense as paid
-    if (expense.paypalEmail === paymentMethod.name) {
+    if (paypalPaymentMethod && expense.paypalEmail === paypalPaymentMethod.name) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
       await createTransactions(host, expense, feesInHostCurrency);
     } else if (args.forceManual) {
       await createTransactions(host, expense, feesInHostCurrency);
+    } else if (paypalPaymentMethod) {
+      await payExpenseWithPayPal(remoteUser, expense, host, paypalPaymentMethod, feesInHostCurrency);
     } else {
-      await payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, feesInHostCurrency);
+      throw new Error('No Paypal account linked, please reconnect Paypal or pay manually');
     }
-  }
-
-  // note: we need to check for manual and other for legacy reasons
-  if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
+  } else if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
+    // note: we need to check for manual and other for legacy reasons
     await createTransactions(host, expense, feesInHostCurrency);
   }
 
