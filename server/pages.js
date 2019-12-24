@@ -59,7 +59,8 @@ const pages = routes()
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
   .add('markOrderAsPaid', '/orders/:id([0-9]+)/mark-as-paid')
-  .add('discover', '/discover');
+  .add('discover', '/discover')
+  .add('member-invitations', '/member-invitations');
 
 // Events using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
