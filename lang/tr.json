@@ -1,5 +1,5 @@
 {
-  "Accept": "Accept",
+  "Accept": "Kabul et",
   "action.approveCollective.Error": "{host} için toplu olarak onaylanmadı",
   "action.collective.Approved": "Collective {collective} has been approved to be hosted by {host}",
   "action.expense.approved": "Gider onaylandı",
