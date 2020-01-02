@@ -10,6 +10,7 @@ import Body from './Body';
 import Footer from './Footer';
 import EditEventForm from './EditEventForm';
 import CollectiveNavbar from './CollectiveNavbar';
+import { getErrorFromGraphqlException } from '../lib/utils';
 
 class EditEvent extends React.Component {
   static propTypes = {
@@ -41,7 +42,7 @@ class EditEvent extends React.Component {
       this.setState({ result: { success: 'Event edited successfully' } });
     } catch (err) {
       console.error('>>> editEvent error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
     }
   }
@@ -55,7 +56,7 @@ class EditEvent extends React.Component {
       Router.pushRoute(`/${event.parentCollective.slug}`);
     } catch (err) {
       console.error('>>> deleteEvent error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
     }
   }

@@ -15,21 +15,7 @@ import StyledTooltip from '../StyledTooltip';
 import { withUser } from '../UserProvider';
 import Link from '../Link';
 import { Span } from '../Text';
-
-const isUserFollowingConversationQuery = gqlV2`
-  query IsFollowingConversation($id: String!) {
-    loggedInAccount {
-      id
-      slug
-      imageUrl
-      type
-      name
-      ... on Individual {
-        isFollowingConversation(id: $id)
-      }
-    }
-  }
-`;
+import { isUserFollowingConversationQuery } from './graphql';
 
 const followConversationMutation = gqlV2`
   mutation FollowConversation($id: String!, $isActive: Boolean) {

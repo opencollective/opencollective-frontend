@@ -251,10 +251,11 @@ class CreateOrderPage extends React.Component {
     if (tier) {
       params.tierId = tier.id;
       params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET') {
+      if (tier.type === 'TICKET' && collective.parentCollective) {
         route = 'orderEventTier';
-        params.collectiveSlug = get(collective.parentCollective, 'slug', 'collective');
+        params.collectiveSlug = collective.parentCollective.slug;
         params.eventSlug = collective.slug;
+        params.verb = 'events';
       } else {
         route = 'orderCollectiveTierNew';
         params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers

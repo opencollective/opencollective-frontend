@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get, update } from 'lodash';
+import { get, update, omit } from 'lodash';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
@@ -21,6 +21,7 @@ import MessageBox from '../MessageBox';
 import Link from '../Link';
 import Loading from '../Loading';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
+import StyledTag from '../StyledTag';
 
 /**
  * This pages sets some global styles that are causing troubles in new components. This
@@ -48,6 +49,7 @@ class EditMembers extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
+      refetch: PropTypes.func.isRequired,
       data: PropTypes.object,
     }),
   };
@@ -69,6 +71,10 @@ class EditMembers extends React.Component {
       MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
       descriptionLabel: { id: 'user.description.label', defaultMessage: 'description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
+      memberPendingDetails: {
+        id: 'members.pending.details',
+        defaultMessage: 'This member has not approved the invitation to join the collective yet',
+      },
       cantRemoveYourself: {
         id: 'members.remove.cantRemoveYourself',
         defaultMessage:
@@ -111,14 +117,22 @@ class EditMembers extends React.Component {
   }
 
   componentDidUpdate(oldProps) {
-    const members = this.getMembersFromProps(this.props);
-    if (members !== this.getMembersFromProps(oldProps)) {
-      this.setState({ members });
+    const invitations = get(this.props.data, 'memberInvitations', null);
+    const oldInvitations = get(oldProps.data, 'memberInvitations', null);
+    const members = get(this.props.data, 'Collective.members', null);
+    const oldMembers = get(oldProps.data, 'Collective.members', null);
+
+    if (invitations !== oldInvitations || members !== oldMembers) {
+      this.setState({ members: this.getMembersFromProps(this.props) });
     }
   }
 
   getMembersFromProps(props) {
-    return get(props.data, 'Collective.members', EMPTY_MEMBERS);
+    const pendingInvitations = get(props.data, 'memberInvitations', EMPTY_MEMBERS);
+    const pendingInvitationsMembersData = pendingInvitations.map(i => omit(i, ['id']));
+    const members = get(props.data, 'Collective.members', EMPTY_MEMBERS);
+    const all = [...members, ...pendingInvitationsMembersData];
+    return all.length === 0 ? EMPTY_MEMBERS : all;
   }
 
   getMembersCollectiveIds = memoizeOne(members => {
@@ -186,6 +200,7 @@ class EditMembers extends React.Component {
           })),
         },
       });
+      await this.props.data.refetch();
       this.setState({ isSubmitting: false, isSubmitted: true, isTouched: false });
     } catch (e) {
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
@@ -200,16 +215,19 @@ class EditMembers extends React.Component {
   renderMember = (member, index) => {
     const { intl, LoggedInUser } = this.props;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
+    const isInvitation = member.__typename === 'MemberInvitation';
+    const collectiveId = get(member, 'member.id');
     const memberCollective = member.member;
     const isSelf = memberCollective && memberCollective.id === LoggedInUser.CollectiveId;
+    const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
 
     return (
-      <Container key={`member-${index}-${member.id}`} mt={4} pb={4} borderBottom={BORDER}>
+      <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER}>
         <ResetGlobalStyles>
           <Flex mt={2} flexWrap="wrap">
             <div className="col-sm-2" />
-            <Flex flex="1" justifyContent="space-between" flexWrap="wrap">
-              <Box ml={1}>
+            <Flex flex="1" justifyContent="space-between" alignItems="center" flexWrap="wrap" mb={2}>
+              <Box ml={1} my={1}>
                 <CollectivePickerAsync
                   creatable
                   width="100%"
@@ -222,14 +240,23 @@ class EditMembers extends React.Component {
                   filterResults={collectives => collectives.filter(c => !membersCollectiveIds.includes(c.id))}
                 />
               </Box>
+              {isInvitation && (
+                <Flex alignItems="center" my={1}>
+                  <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
+                    <StyledTag display="block" type="info">
+                      <FormattedMessage id="Pending" defaultMessage="Pending" />
+                    </StyledTag>
+                  </StyledTooltip>
+                </Flex>
+              )}
               {isSelf ? (
                 <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
-                  <StyledButton mb={2} disabled>
+                  <StyledButton my={1} disabled>
                     {intl.formatMessage(this.messages.removeMember)}
                   </StyledButton>
                 </StyledTooltip>
               ) : (
-                <StyledButton onClick={() => this.removeMember(index)} mb={2} disabled={isSelf}>
+                <StyledButton my={1} onClick={() => this.removeMember(index)} disabled={isSelf}>
                   {intl.formatMessage(this.messages.removeMember)}
                 </StyledButton>
               )}
@@ -363,6 +390,23 @@ const addGetCoreContributorsQuery = graphql(
         id
         members(roles: ["ADMIN", "MEMBER"]) {
           ...MemberFieldsFragment
+        }
+      }
+      memberInvitations(CollectiveId: $collectiveId) {
+        id
+        role
+        since
+        createdAt
+        description
+        member {
+          id
+          name
+          slug
+          type
+          imageUrl(height: 64)
+          ... on User {
+            email
+          }
         }
       }
     }

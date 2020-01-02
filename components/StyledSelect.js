@@ -54,11 +54,15 @@ const STYLES_DISPLAY_NONE = { display: 'none' };
  * Override the default "Caret Down" indicator to use a search icon instead
  */
 const DropdownSearchIndicator = props => {
-  return (
+  return props.isDisabled ? null : (
     <components.DropdownIndicator {...props}>
       <SearchIcon size={16} fill="#aaaaaa" />
     </components.DropdownIndicator>
   );
+};
+
+DropdownSearchIndicator.propTypes = {
+  isDisabled: PropTypes.bool,
 };
 
 /**

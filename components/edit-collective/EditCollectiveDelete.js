@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { withUser } from '../UserProvider';
+import { getErrorFromGraphqlException } from '../../lib/utils';
 import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../../lib/graphql/mutations';
 import { H2, P } from '../Text';
 import Container from '../Container';
@@ -41,7 +42,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
       console.error('>>> deleteUserCollective error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       setDeleteStatus({ deleting: false, error: errorMsg });
     }
   };

@@ -69,9 +69,9 @@ class HostDashboard extends React.Component {
 
     return (
       <Fragment>
-        <div id="expenses" className="col first center-block">
+        <div id="expenses">
           <div className="header">
-            <H5 my={3}>
+            <H5 my={3} textAlign="center">
               <FormattedMessage id="host.expenses.title" defaultMessage="Expenses" />
             </H5>
           </div>
@@ -100,7 +100,7 @@ class HostDashboard extends React.Component {
     return (
       <div id="orders" className="col center-block">
         <div className="header">
-          <H5 my={3}>
+          <H5 my={3} textAlign="center">
             <FormattedMessage
               id="collective.orders.title"
               values={{ n: this.totalOrders }}
@@ -200,10 +200,8 @@ class HostDashboard extends React.Component {
           />
         )}
         <div className="content">
-          <div className="columns">
-            {view === 'expenses' && this.renderExpenses(selectedCollective, includeHostedCollectives)}
-            {view === 'donations' && this.renderDonations(selectedCollective, includeHostedCollectives)}
-          </div>
+          {view === 'expenses' && this.renderExpenses(selectedCollective, includeHostedCollectives)}
+          {view === 'donations' && this.renderDonations(selectedCollective, includeHostedCollectives)}
         </div>
       </div>
     );

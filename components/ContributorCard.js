@@ -106,7 +106,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
           </H5>
         </LinkContributor>
         <StyledTag my={2} padding="5px" letterSpacing="0.05em" fontStyle="initial">
-          {formatMemberRole(intl, getMainContributorRole(contributor))}
+          {formatMemberRole(intl.formatMessage, getMainContributorRole(contributor))}
         </StyledTag>
         {contributor.totalAmountDonated > 0 && (
           <React.Fragment>
