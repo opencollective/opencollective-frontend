@@ -11,7 +11,7 @@ import activityType from '../constants/activities';
 import models from '../models';
 import debugLib from 'debug';
 import { channels } from '../constants';
-import { sanitizeActivity } from './webhooks';
+import { sanitizeActivity, enrichActivity } from './webhooks';
 
 const debug = debugLib('notification');
 
@@ -72,7 +72,8 @@ function publishToGitter(activity, notifConfig) {
 
 function publishToWebhook(activity, webhookUrl) {
   const sanitizedActivity = sanitizeActivity(activity);
-  return axios.post(webhookUrl, sanitizedActivity);
+  const enrichedActivity = enrichActivity(sanitizedActivity);
+  return axios.post(webhookUrl, enrichedActivity);
 }
 
 function publishToSlack(activity, webhookUrl, options) {
