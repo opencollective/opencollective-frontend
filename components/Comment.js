@@ -6,8 +6,9 @@ import Avatar from './Avatar';
 import Link from './Link';
 import SmallButton from './SmallButton';
 import { pick } from 'lodash';
-import InputField from './InputField';
 import ConfirmationModal from './ConfirmationModal';
+import HTMLContent from './HTMLContent';
+import RichTextEditor from './RichTextEditor';
 
 class Comment extends React.Component {
   static propTypes = {
@@ -213,13 +214,13 @@ class Comment extends React.Component {
               )}
             </div>
             <div className="description">
-              {this.state.mode !== 'edit' && <div dangerouslySetInnerHTML={{ __html: comment.html }} />}
+              {this.state.mode !== 'edit' && <HTMLContent content={comment.html} fontSize="13px" />}
               {this.state.mode === 'edit' && (
-                <InputField
+                <RichTextEditor
                   name={`comment-${comment.id}`}
-                  type="html"
                   defaultValue={comment.html}
-                  onChange={value => this.handleChange('html', value)}
+                  onChange={e => this.handleChange('html', e.target.value)}
+                  fontSize="13px"
                 />
               )}
             </div>

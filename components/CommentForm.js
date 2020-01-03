@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
-import InputField from './InputField';
 import SmallButton from './SmallButton';
 import Avatar from './Avatar';
 import Link from './Link';
 import MessageBox from './MessageBox';
+import RichTextEditor from './RichTextEditor';
+import { Box } from '@rebass/grid';
 
 /**
  * Component to render for for **new** comments. Comment Edit form is created
@@ -39,7 +40,7 @@ class CommentForm extends React.Component {
       },
     });
 
-    this.state = { comment: {}, error: null };
+    this.state = { comment: {}, postedComment: null, error: null };
   }
 
   async onSubmit() {
@@ -47,8 +48,7 @@ class CommentForm extends React.Component {
     try {
       const comment = await this.props.onSubmit(pick(this.state.comment, ['html']));
       if (comment) {
-        const newEmptyComment = { id: comment.id++ };
-        this.setState({ comment: newEmptyComment });
+        this.setState({ comment, postedComment: comment });
       }
     } catch (e) {
       this.setState({ error: e });
@@ -133,15 +133,15 @@ class CommentForm extends React.Component {
               </span>
             </div>
             <div className="description">
-              <div className="comment">
-                <InputField
+              <Box className="comment" my={2}>
+                <RichTextEditor
                   name="comment-new"
-                  type="html"
-                  value={get(this.state, 'comment.html', '')}
-                  onChange={value => this.handleChange('html', value)}
-                  className="small"
+                  onChange={e => this.handleChange('html', e.target.value)}
+                  editorMinHeight={150}
+                  reset={get(this.state, 'postedComment.id', 0)}
+                  withBorders
                 />
-              </div>
+              </Box>
               {this.state.error && (
                 <MessageBox type="error" withIcon mb={2}>
                   {this.state.error.toString()}

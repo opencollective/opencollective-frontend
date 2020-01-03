@@ -21,9 +21,9 @@ describe('Expense Comments', () => {
 
   function SubmitComment(description) {
     cy.getByDataCy('CommentForm').within(() => {
-      cy.get('.ql-editor')
-        .type(description)
-        .blur();
+      cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
+      cy.get('@editor').type(description);
+      cy.wait(50);
       cy.getByDataCy('SaveCommentButton').click();
     });
   }
@@ -47,9 +47,8 @@ describe('Expense Comments', () => {
     // Edit comment
     cy.get('.Comments .itemsList .comment:first').within(() => {
       cy.getByDataCy('ToggleEditComment').click();
-      cy.get('.ql-editor')
-        .clear()
-        .type('Modifying my first comment');
+      cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
+      cy.get('@editor').type('Modifying my first comment');
       cy.getByDataCy('SaveEditionCommentButton').click();
     });
 
@@ -82,6 +81,7 @@ describe('Expense Comments', () => {
     for (let i = 0; i < TOTAL_COMMENTS; i++) {
       SubmitComment(i);
     }
+    cy.wait(100);
     cy.reload();
 
     const checkCommentCount = count => cy.get('.Comments .itemsList .comment').should('have.length', count);
