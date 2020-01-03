@@ -189,6 +189,7 @@ export default function(Sequelize, DataTypes) {
             currency: this.currency,
             description: this.description,
             publicMessage: this.publicMessage,
+            interval: this.interval,
           };
         },
       },

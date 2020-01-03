@@ -67,6 +67,7 @@ export const sanitizeActivity = activity => {
       'order.totalAmount',
       'order.currency',
       'order.description',
+      'order.interval',
     ]);
     cleanActivity.data.member.memberCollective = getCollectiveInfo(activity.data.member.memberCollective);
   }
