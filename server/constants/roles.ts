@@ -17,4 +17,15 @@ enum MemberRoles {
   FOLLOWER = 'FOLLOWER',
 }
 
+export const MemberRoleLabels = {
+  [MemberRoles.HOST]: 'Host',
+  [MemberRoles.ADMIN]: 'Administrator',
+  [MemberRoles.MEMBER]: 'Core Contributor',
+  [MemberRoles.CONTRIBUTOR]: 'Contributor',
+  [MemberRoles.BACKER]: 'Financial Contributor',
+  [MemberRoles.FUNDRAISER]: 'Fundraiser',
+  [MemberRoles.ATTENDEE]: 'Attendee',
+  [MemberRoles.FOLLOWER]: 'Follower',
+};
+
 export default MemberRoles;
