@@ -90,6 +90,10 @@ class HorizontalScroller extends React.PureComponent {
   }
 
   updateScrollInfo = debounceScroll(() => {
+    if (!this.ref.current) {
+      return;
+    }
+
     const { offsetWidth, scrollLeft, scrollWidth } = this.ref.current;
 
     this.setState({
