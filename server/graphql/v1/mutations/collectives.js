@@ -115,11 +115,7 @@ export async function createCollective(_, args, req) {
     throw new Error(msg);
   }
 
-  const promises = [
-    collective.addUserWithRole(req.remoteUser, roles.ADMIN, {
-      CreatedByUserId: req.remoteUser.id,
-    }),
-  ];
+  const promises = [];
 
   if (collectiveData.tiers) {
     promises.push(collective.editTiers(collectiveData.tiers));
@@ -131,6 +127,7 @@ export async function createCollective(_, args, req) {
 
   // We add the admins of the parent collective as admins
   if (collectiveData.type === types.EVENT) {
+    promises.push(collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }));
     const admins = await models.Member.findAll({ where: { CollectiveId: parentCollective.id, role: roles.ADMIN } });
     admins.forEach(member => {
       if (member.MemberCollectiveId !== req.remoteUser.CollectiveId) {
@@ -144,6 +141,10 @@ export async function createCollective(_, args, req) {
         );
       }
     });
+  } else if (collectiveData.members) {
+    collective.editMembers(collectiveData.members, { CreatedByUserId: req.remoteUser.id });
+  } else {
+    promises.push(collective.addUserWithRole(req.remoteUser, roles.ADMIN, { CreatedByUserId: req.remoteUser.id }));
   }
 
   await Promise.all(promises);

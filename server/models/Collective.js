@@ -1671,6 +1671,13 @@ export default function(Sequelize, DataTypes) {
 
     // Add new members
     for (const member of members) {
+      const memberAttributes = {
+        ...defaultAttributes,
+        description: member.description,
+        since: member.since,
+        role: member.role,
+      };
+
       if (member.id) {
         // Edit an existing membership (edit the role/description)
         const editableAttributes = pick(member, ['role', 'description', 'since']);
@@ -1684,13 +1691,26 @@ export default function(Sequelize, DataTypes) {
         });
       } else if (member.member && member.member.id) {
         // Create new membership invitation
-        await models.MemberInvitation.invite(this, {
-          ...defaultAttributes,
-          description: member.description,
-          since: member.since,
-          MemberCollectiveId: member.member.id,
-          role: member.role,
+        await models.MemberInvitation.invite(this, { ...memberAttributes, MemberCollectiveId: member.member.id });
+      } else if (member.member && member.member.email) {
+        // Add user by email
+        const user = await models.User.findOne({
+          include: { model: models.Collective, as: 'collective', where: { type: types.USER, isIncognito: false } },
+          where: { email: member.member.email },
         });
+
+        if (user) {
+          // If user exists for this email, send an invitation
+          await models.MemberInvitation.invite(this, { ...memberAttributes, MemberCollectiveId: user.collective.id });
+        } else {
+          // Otherwise create and add the user directly
+          const userFields = ['email', 'name', 'company', 'website'];
+          const user = await models.User.createUserWithCollective(pick(member.member, userFields));
+          await this.addUserWithRole(user, member.role, {
+            ...memberAttributes,
+            MemberCollectiveId: user.collective.id,
+          });
+        }
       } else {
         throw new Error('Invited member collective has not been set');
       }
