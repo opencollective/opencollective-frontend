@@ -33,7 +33,7 @@ const client = new HelloWorks({
 
 const callbackUrl = 'https://opencollective/api/taxForm/callback';
 const workflowId = 'scuttlebutt';
-const year = 2019;
+const year = moment().year();
 
 describe('lib.taxForms', () => {
   // globals to be set in the before hooks.
