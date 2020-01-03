@@ -7,7 +7,7 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { withRouter } from 'next/router';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
-import CollectiveCard from '../components/CollectiveCard';
+import NewCollectiveCard from '../components/NewCollectiveCards';
 import PledgedCollectiveCard from '../components/PledgedCollectiveCard';
 import Container from '../components/Container';
 import Page from '../components/Page';
@@ -18,6 +18,23 @@ import MessageBox from '../components/MessageBox';
 import StyledSelect from '../components/StyledSelect';
 import { Link } from '../server/pages';
 import SearchForm from '../components/SearchForm';
+
+const CollectiveCardContainer = styled.div`
+  margin-bottom: 40px;
+
+  @media screen and (min-width: 40em) {
+    margin-right: 5%;
+  }
+
+  @media screen and (min-width: 64em) {
+    margin-right: 2%;
+  }
+
+  @media screen and (min-width: 1250px) {
+    margin-right: 57px;
+    margin-bottom: 50px;
+  }
+`;
 
 const DiscoverPageDataQuery = gql`
   query DiscoverPageDataQuery(
@@ -169,6 +186,7 @@ const DiscoverPage = ({ router, intl }) => {
                 height={328}
                 justifyContent="center"
                 textAlign="center"
+                data-cy="discover-banner"
               >
                 <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']}>
                   <FormattedMessage id="discover.title" defaultMessage="Discover awesome collectives to support" />
@@ -201,6 +219,7 @@ const DiscoverPage = ({ router, intl }) => {
                       <NavLinkContainer>
                         <Link route="discover" params={{ show: 'all', sort: query.sort }}>
                           <NavLink
+                            data-cy="all-collectives-section"
                             className={
                               query.show == 'all' || query.show == '' || query.show == undefined ? 'selected' : ''
                             }
@@ -264,13 +283,15 @@ const DiscoverPage = ({ router, intl }) => {
 
                 {!error && !loading && data && data.allCollectives && (
                   <Fragment>
-                    <Flex flexWrap="wrap" width={1} justifyContent="left">
+                    <Flex flexWrap="wrap" width={1} justifyContent="left" data-cy="container-collectives">
                       {get(data, 'allCollectives.collectives', []).map(c => (
-                        <Flex key={c.id} width={[1, 1 / 2, 1 / 4, 1 / 4, 1 / 5]} mb={3} justifyContent="center">
+                        <Flex key={c.id} width={280} mb={3} justifyContent="center">
                           {c.isPledged ? (
                             <PledgedCollectiveCard collective={c} />
                           ) : (
-                            <CollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                            <CollectiveCardContainer key={c.id}>
+                              <NewCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                            </CollectiveCardContainer>
                           )}
                         </Flex>
                       ))}
