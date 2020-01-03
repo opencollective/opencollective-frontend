@@ -9,6 +9,7 @@ import useForm from 'react-hook-form';
 
 import { getErrorFromGraphqlException } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
+import roles from '../lib/constants/roles';
 import { H5 } from './Text';
 import StyledInputField from './StyledInputField';
 import StyledInput from './StyledInput';
@@ -40,9 +41,21 @@ const msg = defineMessages({
     id: 'EditUserEmailForm.title',
     defaultMessage: 'Email address',
   },
+  adminEmail: {
+    id: 'NewOrganization.Admin.Email',
+    defaultMessage: 'Admin email address',
+  },
+  adminName: {
+    id: 'NewOrganization.Admin.Name',
+    defaultMessage: 'Admin name',
+  },
   name: {
     id: 'Collective.Name',
     defaultMessage: 'Name',
+  },
+  organizationName: {
+    id: 'Organization.Name',
+    defaultMessage: 'Organization name',
   },
   fullName: {
     id: 'User.FullName',
@@ -78,6 +91,9 @@ const msg = defineMessages({
 const prepareMutationVariables = collective => {
   if (collective.type === CollectiveType.USER) {
     return { user: pick(collective, ['name', 'email']) };
+  } else if (collective.type === CollectiveType.ORGANIZATION) {
+    collective.members.forEach(member => (member.role = roles.ADMIN));
+    return { collective: pick(collective, ['name', 'type', 'website', 'members']) };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website']) };
   }
@@ -122,6 +138,7 @@ const CreateUserMutation = gql`
 const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
+  const isOrganization = type === CollectiveType.ORGANIZATION;
   const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
   const { handleSubmit, register, formState, errors } = useForm();
@@ -137,11 +154,11 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
     >
       <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
       <Box mt={3}>
-        {isUser && (
+        {(isUser || isOrganization) && (
           <StyledInputField
-            htmlFor="email"
-            label={formatMessage(msg.emailTitle)}
-            error={errors.email && formatMessage(msg.invalidEmail)}
+            htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
+            label={formatMessage(isOrganization ? msg.adminEmail : msg.emailTitle)}
+            error={(errors.email || errors['members[0].member.email']) && formatMessage(msg.invalidEmail)}
             mt={3}
           >
             {inputProps => (
@@ -155,10 +172,28 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
             )}
           </StyledInputField>
         )}
+        {isOrganization && (
+          <StyledInputField
+            autoFocus
+            htmlFor="members[0].member.name"
+            label={formatMessage(msg.adminName)}
+            error={errors['members[0].member.name'] && formatMessage(msg.invalidName)}
+            mt={3}
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                ref={register({ required: true })}
+                width="100%"
+                placeholder="i.e. John Doe, Frank Zappa"
+              />
+            )}
+          </StyledInputField>
+        )}
         <StyledInputField
           autoFocus
           htmlFor="name"
-          label={formatMessage(isUser ? msg.fullName : msg.name)}
+          label={formatMessage(isUser ? msg.fullName : isOrganization ? msg.organizationName : msg.name)}
           error={errors.name && formatMessage(msg.invalidName)}
           mt={3}
         >
