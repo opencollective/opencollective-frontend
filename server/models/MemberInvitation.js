@@ -2,7 +2,7 @@ import { pick } from 'lodash';
 import config from 'config';
 
 import { types } from '../constants/collectives';
-import roles from '../constants/roles';
+import roles, { MemberRoleLabels } from '../constants/roles';
 import emailLib from '../lib/email';
 import models from '.';
 
@@ -217,7 +217,7 @@ export default function(Sequelize, DataTypes) {
     });
 
     return emailLib.send('member.invitation', memberUser.email, {
-      role: memberParams.role.toLowerCase(),
+      role: MemberRoleLabels[memberParams.role] || memberParams.role.toLowerCase(),
       invitation: pick(invitation, 'id'),
       collective: pick(collective, ['slug', 'name']),
       memberCollective: pick(memberUser, ['collective.slug', 'collective.name']),

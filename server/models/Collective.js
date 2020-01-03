@@ -42,7 +42,7 @@ import {
 import { invalidateContributorsCache } from '../lib/contributors';
 import { capitalize, flattenArray, getDomain, formatCurrency, cleanTags, md5, strip_tags } from '../lib/utils';
 
-import roles from '../constants/roles';
+import roles, { MemberRoleLabels } from '../constants/roles';
 import activities from '../constants/activities';
 import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
@@ -1355,7 +1355,7 @@ export default function(Sequelize, DataTypes) {
           email: remoteUser.email,
           collective: pick(remoteUser.collective, ['slug', 'name', 'image']),
         },
-        role: role.toLowerCase(),
+        role: MemberRoleLabels[role] || role.toLowerCase(),
         isAdmin: role === roles.ADMIN,
         collective: {
           slug: this.slug,
