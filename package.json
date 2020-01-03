@@ -129,7 +129,7 @@
     "maildev": "^1.1.0",
     "mocha": "^6.2.2",
     "mocha-circleci-reporter": "^0.0.3",
-    "nock": "^11.7.0",
+    "nock": "^11.7.1",
     "nodemon": "^2.0.2",
     "nyc": "^15.0.0",
     "prettier": "1.19.1",
