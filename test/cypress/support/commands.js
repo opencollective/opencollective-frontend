@@ -109,7 +109,7 @@ Cypress.Commands.add('clearInbox', () => {
  * Create a collective. Admin will be the user designated by `email`. If not
  * provided, the email used will default to `defaultTestUserEmail`.
  */
-Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defaultTestUserEmail }) => {
+Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defaultTestUserEmail, ...params }) => {
   const user = { email, newsletterOptIn: false };
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
@@ -120,10 +120,16 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
             createCollective(collective: $collective) {
               id
               slug
+              name
+              description
+              longDescription
+              website
+              imageUrl
+              settings
             }
           }
         `,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type } },
+      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
     });
