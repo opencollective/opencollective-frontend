@@ -19,7 +19,7 @@
     "@opencollective/taxes": "2.3.0",
     "algoliasearch": "3.35.1",
     "apollo-errors": "1.9.0",
-    "apollo-server-express": "2.9.14",
+    "apollo-server-express": "2.9.15",
     "argparse": "1.0.10",
     "async": "3.1.0",
     "aws-sdk": "2.597.0",
