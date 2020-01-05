@@ -20,6 +20,7 @@ tempStripe.js
 
 .env
 .env.*
+.envrc
 
 !.env.development
 !.env.test
