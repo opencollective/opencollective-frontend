@@ -3,12 +3,11 @@ import styled from 'styled-components';
 import { display } from 'styled-system';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 
-import { P, H3, Span } from '../../Text';
+import { Link } from '../../../server/pages';
+import { P, H3 } from '../../Text';
 import Illustration from '../HomeIllustration';
 import HomePrimaryLink from '../HomePrimaryLink';
-import StyledLink from '../../StyledLink';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import SectionSubTitle from '../SectionSubtitle';
@@ -53,7 +52,7 @@ const WhatCanYouDo = () => (
       />
     </SectionSubTitle>
     <Flex mb={4} flexDirection={['column', 'row']} justifyContent={['none', 'space-evenly']}>
-      <Flex flexDirection="column" alignItems="center" my={[null, 3]} width={[1, '288px']}>
+      <Flex flexDirection="column" alignItems="center" my={[null, 3]} width={[1, '288px', null, null, '370px']}>
         <Illustration
           src="/static/images/collectmoney-illustration.png"
           display={['block', null, null, null, 'none']}
@@ -79,14 +78,8 @@ const WhatCanYouDo = () => (
             defaultMessage="Collect money online by credit card or directly on your bank account and record it in your transparent budget. Define different ways people can contribute (one time or recurring donations, set up your own tiers)."
           />
         </Description>
-        <StyledLink display="flex" alignItems="center" color="blue.600" fontWeight="500" mt={[3, 5]}>
-          <Span fontSize={'13px'} lineHeight={'16px'} mr={2}>
-            <FormattedMessage id="home.learnmore" defaultMessage="Learn more" />
-          </Span>
-          <ArrowRight size="20" fontWeight="500" />
-        </StyledLink>
       </Flex>
-      <Flex flexDirection="column" alignItems="center" my={3} width={[1, '288px']}>
+      <Flex flexDirection="column" alignItems="center" my={3} width={[1, '288px', null, null, '370px']}>
         <Illustration
           src="/static/images/spendmoney-illustration.png"
           display={['block', null, null, null, 'none']}
@@ -112,14 +105,8 @@ const WhatCanYouDo = () => (
             defaultMessage="Enable anyone in your community to submit their expenses. Once approved, reimburse them in one click with paypal or manually mark them as paid. All transactions are recorded publicly in your transparent budget (attachments are kept private to respect privacy)."
           />
         </Description>
-        <StyledLink display="flex" alignItems="center" color="blue.600" fontWeight="500" mt={[3, 3]}>
-          <Span fontSize={'13px'} lineHeight={'16px'} mr={2}>
-            <FormattedMessage id="home.learnmore" defaultMessage="Learn more" />
-          </Span>
-          <ArrowRight size="20" fontWeight="500" />
-        </StyledLink>
       </Flex>
-      <Flex flexDirection="column" alignItems="center" my={3} width={[1, '288px']}>
+      <Flex flexDirection="column" alignItems="center" my={3} width={[1, '288px', null, null, '370px']}>
         <Illustration
           src="/static/images/managemoney-illustration.png"
           alt="Manage money"
@@ -145,18 +132,14 @@ const WhatCanYouDo = () => (
             defaultMessage="You don’t manage money in a community like you do in a private company. Open Collective lets you manage your finances in a transparent way so that everyone can see and trust that their money is put to good use."
           />
         </Description>
-        <StyledLink display="flex" alignItems="center" color="blue.600" fontWeight="500" mt={[3, 5]}>
-          <Span fontSize={'13px'} lineHeight={'16px'} mr={2}>
-            <FormattedMessage id="home.learnmore" defaultMessage="Learn more" />
-          </Span>
-          <ArrowRight size="20" fontWeight="500" />
-        </StyledLink>
       </Flex>
     </Flex>
     <Container display={['none', 'none', 'flex']} justifyContent="center" width={1}>
-      <HomePrimaryLink href="#">
-        <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-      </HomePrimaryLink>
+      <Link route="/create" passHref>
+        <HomePrimaryLink>
+          <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+        </HomePrimaryLink>
+      </Link>
     </Container>
   </Flex>
 );

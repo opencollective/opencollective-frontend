@@ -5,6 +5,7 @@ import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 
+import { Link } from '../../../server/pages';
 import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
 import HomePrimaryLink from '../HomePrimaryLink';
@@ -23,7 +24,7 @@ const users = [
     name: 'Babel collective',
     type: 'Open Source Projects',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
-    collectiveUrl: '',
+    collectivePath: '/babel',
     picture: '/static/images/oc-users-babel.png',
   },
   {
@@ -31,7 +32,7 @@ const users = [
     name: 'Women Who Code Atlanta',
     type: 'Meetups',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
-    collectiveUrl: '',
+    collectivePath: '/wwcodeatl',
     picture: '/static/images/oc-users-womenwhocode.png',
   },
   {
@@ -39,12 +40,12 @@ const users = [
     name: 'Extinction Rebellion Belgium',
     type: 'Movements',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
-    collectiveUrl: '/',
+    collectivePath: '/xr-belgium',
     picture: '/static/images/oc-users-extinctionrebllion.png',
   },
 ];
 
-const User = ({ name, picture, type }) => (
+const User = ({ name, picture, type, collectivePath }) => (
   <Container
     width={[1, null, '288px', null, '368px']}
     textAlign="center"
@@ -75,21 +76,25 @@ const User = ({ name, picture, type }) => (
         />
       </P>
     </Container>
-    <StyledLink href="#" display={['block', null, 'none']} color="blue.600">
-      <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
-        <FormattedMessage
-          id="home.OCUsersSection.moreOpensourceCollective"
-          defaultMessage="More open source collectives"
-        />
-      </Span>
-      <ArrowRight size="13" />
-    </StyledLink>
-    <StyledLink href="#" display={['none', null, 'block']} color="blue.600">
-      <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
-        <FormattedMessage id="home.OCUsersSection.vistCollective" defaultMessage="Visit collective" />
-      </Span>
-      <ArrowRight size="13" />
-    </StyledLink>
+    <Link route="/discover?show=open source" passHref>
+      <StyledLink display={['block', null, 'none']} color="blue.600">
+        <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
+          <FormattedMessage
+            id="home.OCUsersSection.moreOpensourceCollective"
+            defaultMessage="More open source collectives"
+          />
+        </Span>
+        <ArrowRight size="13" />
+      </StyledLink>
+    </Link>
+    <Link route={collectivePath} passHref>
+      <StyledLink display={['none', null, 'block']} color="blue.600">
+        <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
+          <FormattedMessage id="home.OCUsersSection.vistCollective" defaultMessage="Visit collective" />
+        </Span>
+        <ArrowRight size="13" />
+      </StyledLink>
+    </Link>
   </Container>
 );
 
@@ -97,6 +102,7 @@ User.propTypes = {
   name: PropTypes.string,
   picture: PropTypes.string,
   type: PropTypes.string,
+  collectivePath: PropTypes.string,
 };
 
 const OCUsers = () => {
@@ -119,10 +125,12 @@ const OCUsers = () => {
           />
         </SectionSubTitle>
       </Container>
+      <StyledCarousel options={users} display={[null, null, 'none']} width={1}>
+        {users.map(user => (
+          <User key={user.id} {...user} />
+        ))}
+      </StyledCarousel>
       <Flex>
-        <StyledCarousel options={users} display={[null, null, 'none']}>
-          {user => <User {...user} />}
-        </StyledCarousel>
         <Container display={['none', null, 'flex']}>
           {users.map(user => (
             <Fragment key={user.id}>
@@ -132,12 +140,14 @@ const OCUsers = () => {
         </Container>
       </Flex>
       <Container display={['none', 'none', 'flex']} justifyContent="center" my={5} width={1}>
-        <HomePrimaryLink href="#" width="304px" display="block">
-          <Span mr={2}>
-            <FormattedMessage id="home.discoverBtn" defaultMessage="Discover more collectives" />
-          </Span>
-          <ArrowRight size="15" />
-        </HomePrimaryLink>
+        <Link route="/discover" passHref>
+          <HomePrimaryLink href="#" width="304px" display="block">
+            <Span mr={2}>
+              <FormattedMessage id="home.discoverBtn" defaultMessage="Discover more collectives" />
+            </Span>
+            <ArrowRight size="15" />
+          </HomePrimaryLink>
+        </Link>
       </Container>
     </Flex>
   );

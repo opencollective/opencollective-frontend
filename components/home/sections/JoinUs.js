@@ -64,7 +64,7 @@ const JoinUs = () => (
               lineHeight={['28px', null, 'H3', null, '40px']}
               lineSpacing={['-0.2px', null, '-0.2px', null, '-0.4px']}
             >
-              <FormattedMessage id="home.create" defaultMessage="Create a collective" />
+              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
             </H1>
             <StyledArrowRight size={'20'} />
           </Container>

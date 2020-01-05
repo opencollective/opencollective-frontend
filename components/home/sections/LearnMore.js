@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 import { File } from '@styled-icons/boxicons-regular/File';
 import { Leaf } from '@styled-icons/fa-solid/Leaf';
 import { Slack } from '@styled-icons/fa-brands/Slack';
-import { Github } from '@styled-icons/fa-brands/Github';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 
 import { H3, Span, P } from '../../Text';
@@ -40,11 +39,6 @@ const learningChannels = [
     name: 'Slack channel',
     link: 'https://opencollective.slack.com',
   },
-  {
-    id: 'github',
-    name: 'GitHub',
-    link: 'https://github.com/opencollective',
-  },
 ];
 
 const getChannelIcon = channel => {
@@ -55,8 +49,6 @@ const getChannelIcon = channel => {
       return <Leaf size="32" color="#fff" />;
     case 'slack':
       return <Slack size="32" color="#fff" />;
-    case 'github':
-      return <Github size="32" color="#fff" />;
   }
 };
 
@@ -74,10 +66,19 @@ const getBackgroundColor = channel => {
 };
 
 const messages = defineMessages({
-  'home.learnMoreChannel.description': {
-    id: 'home.learnMoreChannel.description',
+  'home.learnMore.documentation': {
+    id: 'home.learnMore.documentation',
     defaultMessage:
-      'Discover how to create an open collective, how to become a fiscal sponsor to enable communities in your industry or in your region to operate without a legal entity, how to use our software, our API and much more.',
+      'Discover how to create an open collective, how to become a fiscal sponsor, how to use our software, our API and much more.',
+  },
+  'home.learnMore.blog': {
+    id: 'home.learnMore.blog',
+    defaultMessage:
+      'Discover how to create an open collective, how to become a fiscal sponsor, how to use our software, our API and much more.',
+  },
+  'home.learnMore.slack': {
+    id: 'home.learnMore.slack',
+    defaultMessage: 'Come meet us, chat with us and share your stories.',
   },
 });
 
@@ -86,7 +87,7 @@ const LearnMore = () => {
   const intl = useIntl();
 
   return (
-    <Container mx={[3, 4]} mb={5} display={[null, null, 'flex']} flexDirection="column" alignItems="center">
+    <Container mx={[3, 4]} my={5} display={[null, null, 'flex']} flexDirection="column" alignItems="center">
       <SectionTitle>
         <FormattedMessage id="home.learMoreSection.title" defaultMessage="Learn more" />
       </SectionTitle>
@@ -120,7 +121,7 @@ const LearnMore = () => {
               <Container my={3}>
                 <Box mb={3}>
                   <P color="#2E3033" fontSize={['15px']} lineHeight={['25px']} letterSpacing={['-0.012em']}>
-                    {intl.formatMessage(messages['home.learnMoreChannel.description'])}
+                    {intl.formatMessage(messages[`home.learnMore.${channel.id}`])}
                   </P>
                 </Box>
                 <StyledLink href={channel.link} color="blue.600">
@@ -139,30 +140,41 @@ const LearnMore = () => {
           </Container>
         ))}
       </Flex>
-      {/* <Flex>
-        {learningChannels.map((channel) => (
-          <Container key={channel.id} display="flex">
-            <IconWrapper backgroundColor={getBackgroundColor(channel.id)} p={2} mr={[3, null, 3]}>
-              {getChannelIcon(channel.id)}
-            </IconWrapper>
-            <Box>
-              <H3 fontSize={['H5']} lineHeight={['28px']} letterSpacing={['-0.2px']}>{channel.name}</H3>
-              <P color="#2E3033" fontSize={['15px']} lineHeight={['25px']} letterSpacing={['-0.012em']}>
-                {intl.formatMessage(messages['home.learnMoreChannel.description'])}
-              </P>
-              <StyledLink href={channel.link} color="blue.600">
-                <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
-                  <FormattedMessage 
-                    id="home.learnMoreSection.documentation"
-                    defaultMessage="View our documentation"
-                  />
-                </Span> 
-                <ArrowRight size="14" />
-              </StyledLink>
-            </Box>
-          </Container>
+      <Container display={['none', null, 'flex']} flexDirection="column" my={4}>
+        {learningChannels.map(channel => (
+          <Fragment key={channel.id}>
+            <Container display="flex">
+              <IconWrapper
+                backgroundColor={getBackgroundColor(channel.id)}
+                p={2}
+                mr={[3, null, 5]}
+                width={[null, null, '104px']}
+                height={[null, null, '136px']}
+              >
+                {getChannelIcon(channel.id)}
+              </IconWrapper>
+              <Box width="384px">
+                <H3 fontSize={['H5']} lineHeight={['28px']} letterSpacing={['-0.2px']} mb={3}>
+                  {channel.name}
+                </H3>
+                <P color="#2E3033" fontSize={['15px']} lineHeight={['25px']} letterSpacing={['-0.012em']} mb={4}>
+                  {intl.formatMessage(messages[`home.learnMore.${channel.id}`])}
+                </P>
+                <StyledLink href={channel.link} color="blue.600">
+                  <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
+                    <FormattedMessage
+                      id="home.learnMoreSection.documentation"
+                      defaultMessage="View our documentation"
+                    />
+                  </Span>
+                  <ArrowRight size="14" />
+                </StyledLink>
+              </Box>
+            </Container>
+            <br></br>
+          </Fragment>
         ))}
-      </Flex> */}
+      </Container>
     </Container>
   );
 };

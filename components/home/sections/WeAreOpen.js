@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
+import { typography } from 'styled-system';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 
 import { P, Span } from '../../Text';
@@ -15,18 +16,15 @@ import SectionTitle from '../SectionTitle';
 import StyledLink from '../../StyledLink';
 
 const List = styled.li`
-  font-size: 20px;
-  font-weight: 28px;
-  letter-spacing: -0.6px;
   font-weight: 300;
   list-style: none;
+  ${typography}
 
   &::before {
     content: '•';
     color: ${themeGet('colors.blue.600')};
     display: ${props => (props.noListStyle ? 'none' : 'inline-block')};
     width: 1em;
-    margin-left: -1em;
   }
 `;
 
@@ -37,7 +35,7 @@ const openFeatures = [
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     features: ['Submit a bug report', 'Submit a feature request', 'Contribute'],
     linkText: 'View our code base on github',
-    url: '/',
+    url: 'https://github.com/opencollective',
   },
   {
     id: 2,
@@ -50,7 +48,7 @@ const openFeatures = [
 ];
 
 const OpenFeature = ({ id, name, description, features, linkText, url }) => (
-  <Container mr={[null, null, 3]} width={[null, null, null, null, '370px']}>
+  <Container mr={[null, null, 2]} width={[null, null, '288px', null, '370px']}>
     <Box my={3}>
       <P
         fontSize={['H5', null, 'H4', null, 'H3']}
@@ -62,20 +60,26 @@ const OpenFeature = ({ id, name, description, features, linkText, url }) => (
         {name}
       </P>
     </Box>
-    <Box width="289px" mb={3}>
+    <Box mb={3}>
       <P
-        fontSize={['16px', null, 'Paragraph']}
-        lineHeight={['22px', null, 'H4']}
+        fontSize={['16px', null, 'Paragraph', null, '16px']}
+        lineHeight={['22px', null, 'H5', null, '22px']}
         color="black.900"
-        letterSpacing={['-0.008em']}
+        letterSpacing={'-0.008em'}
         fontWeight="bold"
       >
         {description}
       </P>
     </Box>
-    <Box as="ul" listStyle="none" px={[null, null, 2]}>
+    <Box listStyle="none" px={[null, null, 2]} mb={3}>
       {features.map((feature, index) => (
-        <List key={(id + index).toString()} noListStyle={features.length === 1}>
+        <List
+          key={(id + index).toString()}
+          noListStyle={features.length === 1}
+          fontSize={['H5', null, 'LeadParagraph', null, 'H5']}
+          lineHeight={['28px', null, '22px', null, 'H4']}
+          letterSpacing={['-0.6px', null, '-0.016em', null, '-0.8px']}
+        >
           {feature}
         </List>
       ))}
@@ -99,14 +103,7 @@ OpenFeature.propTypes = {
 };
 
 const WeAreOpen = () => (
-  <Container
-    display="flex"
-    flexDirection="column"
-    alignItems="center"
-    mx={[3, 4]}
-    position={[null, null, 'relative']}
-    top={[null, null, '-90px']}
-  >
+  <Container display="flex" flexDirection="column" alignItems="center" mx={[3, 4]}>
     <SectionTitle>
       <FormattedMessage
         id="home.weAreOpenSection.title"
@@ -117,8 +114,12 @@ const WeAreOpen = () => (
     <Hide md lg>
       <Illustration src="/static/images/weareopen-mobile-illustration.png" alt="We are Open in every way" />
     </Hide>
-    <StyledCarousel options={openFeatures} display={[null, null, 'none']}>
-      {openFeature => <OpenFeature {...openFeature} />}
+    <StyledCarousel display={[null, null, 'none']} width={1}>
+      {openFeatures.map(openFeature => (
+        <Fragment key={openFeature.id}>
+          <OpenFeature {...openFeature} />
+        </Fragment>
+      ))}
     </StyledCarousel>
     <Container display={['none', null, 'flex']} justifyContent={[null, null, null, null, 'center']}>
       <Illustration
@@ -130,6 +131,7 @@ const WeAreOpen = () => (
         display={['none', null, null, null, 'block']}
         src="/static/images/weareopen-illustration-2x.png"
         alt="We are Open in every way"
+        mr={3}
       />
       {openFeatures.map(openFeature => (
         <Fragment key={openFeature.id}>

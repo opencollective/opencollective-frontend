@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 
 import { P } from '../../Text';
+import { Link } from '../../../server/pages';
 import Hide from '../../Hide';
 import Illustration from '../HomeIllustration';
 import HomePrimaryLink from '../HomePrimaryLink';
@@ -10,8 +11,8 @@ import SectionTitle from '../SectionTitle';
 import SectionSubtitle from '../SectionSubtitle';
 
 const MakeCommunity = () => (
-  <Flex mx={[3, 4, null, 5, 6]} mt={5} mb={4} flexDirection={['column', 'row-reverse']}>
-    <Flex width={[1, null]}>
+  <Flex mx={[3, 4]} my={5} flexDirection={['column', 'row-reverse']} justifyContent={[null, 'center']}>
+    <Flex width={[null, null, '495px', null, '650px']} justifyContent="center">
       <Illustration
         alt="Make your community sustainable"
         display={['block', 'none', 'none']}
@@ -28,11 +29,11 @@ const MakeCommunity = () => (
         src="/static/images/community-section-illustration-lg.png"
       />
     </Flex>
-    <Flex flexDirection="column" width={[1, null]} alignItems={['center', 'flex-start']}>
+    <Flex flexDirection="column" alignItems={['center', 'flex-start']} width={[null, null, '448px', null, '576px']}>
       <SectionTitle textAlign="left" my={3}>
         <FormattedMessage id="home.makeCommunitySection.title" defaultMessage="Make your community sustainable" />
       </SectionTitle>
-      <SectionSubtitle mb={4} color="black.700">
+      <SectionSubtitle mb={4} color="black.700" textAlign={['center', null, 'left']}>
         <FormattedMessage
           id="home.makeCommunitySection.subTitle"
           defaultMessage="Collect and spend money for your community in a transparent way."
@@ -54,14 +55,11 @@ const MakeCommunity = () => (
           />
         </P>
       </Hide>
-      <HomePrimaryLink href="#">
-        <Hide xs>
+      <Link route="create" passHref>
+        <HomePrimaryLink>
           <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-        </Hide>
-        <Hide sm md lg>
-          <FormattedMessage id="home.create.opencollective" defaultMessage="Create an open collective" />
-        </Hide>
-      </HomePrimaryLink>
+        </HomePrimaryLink>
+      </Link>
     </Flex>
   </Flex>
 );

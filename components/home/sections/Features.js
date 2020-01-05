@@ -25,6 +25,9 @@ const SelectFeatureButton = styled.button`
   font-size: 16px;
   letter-spacing: -0.008em;
   line-height: 22px;
+  border: none;
+  outline: none;
+  background: #fff;
 
   @media screen and (min-width: 64em) {
     color: #4e5052;
@@ -81,6 +84,10 @@ const Feature = styled(Span)`
   @media screen and (min-width: 64em) {
     color: ${props => props.active && '#1869F5'};
   }
+`;
+
+const BoxWrapper = styled(Box)`
+  transition: display 0.5s ease;
 `;
 
 const features = [
@@ -187,7 +194,7 @@ const Features = () => {
         />
       </SectionSubtitle>
       <Flex flexDirection={[null, null, 'row-reverse']} mt={3} justifyContent="center">
-        <FeatureListWrapper as="ul" width={[null, null, '240px', null, '312px']}>
+        <FeatureListWrapper as="ul" width={[1, null, '240px', null, '312px']}>
           {features.map(feature => (
             <FeatureList mr={[null, null, null, null, 2]} as="li" key={feature.id}>
               <SelectFeatureButton
@@ -214,7 +221,7 @@ const Features = () => {
                 </Flex>
               </SelectFeatureButton>
               {activeFeature === feature.id && (
-                <Box width={1} display={[null, null, 'none']} mt={2}>
+                <BoxWrapper width={1} display={[null, null, 'none']} mt={2}>
                   <Hide sm md lg>
                     <Img
                       src={feature.mobileScreenshot}
@@ -227,7 +234,7 @@ const Features = () => {
                       alt={intl.formatMessage(messages[`home.feature.${feature.id}`])}
                     />
                   </Hide>
-                </Box>
+                </BoxWrapper>
               )}
             </FeatureList>
           ))}
@@ -240,7 +247,7 @@ const Features = () => {
         </Box>
       </Flex>
       <Container display={['none', 'none', 'flex']} justifyContent="center" mt={5} mb={4} width={1}>
-        <HomePrimaryLink href="#" width="304px" display="block">
+        <HomePrimaryLink href="https://docs.opencollective.com" width="304px" display="block">
           <FormattedMessage id="home.readPlatformDocumentation" defaultMessage="Read the platform documentation" />
         </HomePrimaryLink>
       </Container>

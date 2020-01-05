@@ -38,6 +38,7 @@ class NewsletterContainer extends React.Component {
                 placeholder="Enter your email address"
                 type="email"
                 width={1}
+                color="black.600"
               />
               <StyledButton name="subscribe" type="submit" color="blue.600" border="none" outline="none">
                 <Envelope size="16" />

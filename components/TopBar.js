@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import SearchIcon from './SearchIcon';
@@ -80,18 +80,14 @@ class TopBar extends React.Component {
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
       >
         <Link route="home" passHref>
-          <Fragment>
+          <Flex as="a" alignItems="center">
             <Hide xs>
-              <Flex as="a" alignItems="center">
-                <Logo />
-              </Flex>
+              <Logo />
             </Hide>
             <Hide sm md lg>
-              <Box>
-                <img src="/static/images/oc-logo-icon-newhomepage.svg" />
-              </Box>
+              <img src="/static/images/oc-logo-icon-newhomepage.svg" />
             </Hide>
-          </Fragment>
+          </Flex>
         </Link>
 
         <Flex alignItems="center">

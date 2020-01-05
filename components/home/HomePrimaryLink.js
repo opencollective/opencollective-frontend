@@ -9,6 +9,12 @@ const HomePrimaryLink = styled(StyledLink)`
   background: linear-gradient(180deg, #1869f5 0%, #1659e1 100%);
   min-width: 184px;
 
+  &:visited {
+    color: #fff;
+    outline: none;
+    border: none;
+  }
+
   @media screen and (min-width: 88em) {
     min-width: 232px;
   }
