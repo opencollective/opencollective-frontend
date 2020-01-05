@@ -20,7 +20,7 @@ Then to enable the CLI tools, follow the steps from: https://postgresapp.com/doc
 
 ### With Docker
 
-If you don't want to run a local instance of PostgreSQL in your computer, you can run one in Docker. Keep in mind that you still need to have the local client tools like `psql`, `dropdb`, `createuser` locally available.
+If you don't want to run a local instance of PostgreSQL in your computer, you can run one in Docker.
 
 Create and run the container:
 
@@ -33,6 +33,13 @@ Set the necessary environment variables:
 ```
 export PGHOST=localhost
 export PGUSER=postgres
+```
+
+You'll also need to have Postgres client tools like `psql`, `dropdb`, `createuser` locally available to run our scripts. In macOS you can install those using Homebrew with:
+
+```
+brew install libpq
+echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.bash_profile
 ```
 
 ## Setup
