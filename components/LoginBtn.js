@@ -49,7 +49,7 @@ class LoginBtn extends React.Component {
         <StyledLink
           border="1px solid #D5DAE0"
           borderRadius="20px"
-          color="#3385FF"
+          color="black.600"
           display="inline-block"
           fontSize="1.4rem"
           px={3}

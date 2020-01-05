@@ -10,7 +10,7 @@ import SearchIcon from './SearchIcon';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
-  border-radius: 20px;
+  border-radius: 10px;
   background-color: white;
 `;
 

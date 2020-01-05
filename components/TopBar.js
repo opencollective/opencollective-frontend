@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import SearchIcon from './SearchIcon';
@@ -16,7 +16,7 @@ import { withUser } from './UserProvider';
 import theme from '../lib/theme';
 
 const Logo = styled.img.attrs({
-  src: '/static/images/opencollective-icon.svg',
+  src: '/static/images/opencollective.svg',
   alt: 'Open Collective logo',
 })`
   ${({ animate }) => (animate ? rotateMixin : null)};
@@ -75,32 +75,36 @@ class TopBar extends React.Component {
         px={3}
         py={showSearch ? 2 : 3}
         alignItems="center"
+        justifyContent="space-between"
         flexDirection="row"
-        justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
       >
         <Link route="home" passHref>
-          <Flex as="a" alignItems="center">
-            <Logo width="24" height="24" />
+          <Fragment>
             <Hide xs>
-              <Box mx={2}>
-                <img height="16px" src="/static/images/logotype.svg" alt="Open collective" />
+              <Flex as="a" alignItems="center">
+                <Logo />
+              </Flex>
+            </Hide>
+            <Hide sm md lg>
+              <Box>
+                <img src="/static/images/oc-logo-icon-newhomepage.svg" />
               </Box>
             </Hide>
-          </Flex>
+          </Fragment>
         </Link>
 
-        {showSearch && (
-          <Flex justifyContent="center" flex="1 1 auto">
-            <Hide xs width={1}>
-              <SearchFormContainer p={2}>
-                <SearchForm />
-              </SearchFormContainer>
-            </Hide>
-          </Flex>
-        )}
+        <Flex alignItems="center">
+          {showSearch && (
+            <Flex justifyContent="center" flex="1 1 auto">
+              <Hide xs width={1}>
+                <SearchFormContainer p={2} width="280px">
+                  <SearchForm />
+                </SearchFormContainer>
+              </Hide>
+            </Flex>
+          )}
 
-        <Flex alignItems="center" justifyContent="flex-end" flex="1 1 auto">
           <Hide sm md lg>
             <Box mx={3}>
               <Link href="/search">
@@ -121,7 +125,7 @@ class TopBar extends React.Component {
             </Box>
           </Hide>
 
-          <Hide xs>
+          <Hide xs sm>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
@@ -157,9 +161,8 @@ class TopBar extends React.Component {
               )}
             </NavList>
           </Hide>
-
-          <TopBarProfileMenu />
         </Flex>
+        <TopBarProfileMenu />
       </Flex>
     );
   }
