@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import useForm from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Flex, Box } from '@rebass/grid';
 import { useMutation } from 'react-apollo';
 

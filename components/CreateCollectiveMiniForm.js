@@ -5,7 +5,7 @@ import { Box } from '@rebass/grid';
 import { pick } from 'lodash';
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
-import useForm from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { getErrorFromGraphqlException } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';

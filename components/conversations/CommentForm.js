@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import { withRouter } from 'next/router';
 import { get } from 'lodash';
-import useForm from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-apollo';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
