@@ -17,6 +17,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   EXPENSES: 'expenses',
   EXPORT: 'export',
   HOST: 'host',
+  HOST_SETTINGS: 'hostSettings',
   IMAGES: 'images',
   INFO: 'info',
   INVOICES: 'invoices',
@@ -55,6 +56,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'editCollective.menu.host',
     defaultMessage: 'Fiscal Host',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: {
+    id: 'editCollective.menu.hostSettings',
+    defaultMessage: 'Host Plans',
   },
   [EDIT_COLLECTIVE_SECTIONS.IMAGES]: {
     id: 'editCollective.menu.images',

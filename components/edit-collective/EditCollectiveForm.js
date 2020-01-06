@@ -36,6 +36,7 @@ import EditCollectiveDelete from './EditCollectiveDelete';
 import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
+import EditHostSettings from './EditHostSettings';
 import EditCollectiveConversations from './EditCollectiveConversations';
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
 
@@ -375,6 +376,8 @@ class EditCollectiveForm extends React.Component {
       return (
         <EditHost collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
       );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS) {
+      return <EditHostSettings collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS) {
       return <EditPaymentMethods collectiveSlug={collective.slug} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS) {
