@@ -61,7 +61,7 @@ class TierCard extends React.Component {
   showLastOrders(fromCollectiveTypeArray, limit) {
     const { tier } = this.props;
     const fromCollectives = uniqBy(
-      tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.indexOf(c.type) !== -1),
+      tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.includes(c.type)),
       c => c.id,
     );
     if (fromCollectives.length === 0) return;
@@ -79,10 +79,10 @@ class TierCard extends React.Component {
           {fromCollectives.slice(0, limit).map(fromCollective => (
             <div className="image" key={`${tier.slug}-fromCollective-${fromCollective.id}`}>
               <LinkCollective collective={fromCollective} title={fromCollective.name} passHref>
-                {fromCollectiveTypeArray.indexOf('USER') !== -1 && (
+                {fromCollectiveTypeArray.includes('USER') && (
                   <Avatar collective={fromCollective} radius={32} ml="-15px" />
                 )}
-                {fromCollectiveTypeArray.indexOf('USER') === -1 && <Logo collective={fromCollective} height={32} />}
+                {!fromCollectiveTypeArray.includes('USER') && <Logo collective={fromCollective} height={32} />}
               </LinkCollective>
             </div>
           ))}

@@ -860,7 +860,7 @@ class EditCollectiveForm extends React.Component {
               {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
-            {[
+            {![
               'export',
               'connected-accounts',
               'host',
@@ -872,7 +872,7 @@ class EditCollectiveForm extends React.Component {
               'webhooks',
               'members',
               'goals',
-            ].indexOf(this.state.section) === -1 && (
+            ].includes(this.state.section) && (
               <div className="actions">
                 <Button
                   bsStyle="primary"
