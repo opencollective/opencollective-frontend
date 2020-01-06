@@ -69,7 +69,7 @@ const CommentForm = ({
 
   // Manually register custom fields
   React.useEffect(() => {
-    register({ name: 'html' }, { required: true });
+    register('html', { required: true });
   }, []);
 
   // Called by react-hook-form when submitting the form
@@ -103,7 +103,7 @@ const CommentForm = ({
             fontSize="13px"
             onChange={e => {
               setValue('html', e.target.value);
-              triggerValidation();
+              triggerValidation('html');
             }}
           />
         )}

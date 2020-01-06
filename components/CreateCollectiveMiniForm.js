@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { useForm } from 'react-hook-form';
@@ -158,7 +158,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
           <StyledInputField
             htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
             label={formatMessage(isOrganization ? msg.adminEmail : msg.emailTitle)}
-            error={(errors.email || errors['members[0].member.email']) && formatMessage(msg.invalidEmail)}
+            error={(errors.email || get(errors, 'members.0.member.email')) && formatMessage(msg.invalidEmail)}
             mt={3}
           >
             {inputProps => (
@@ -177,7 +177,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
             autoFocus
             htmlFor="members[0].member.name"
             label={formatMessage(msg.adminName)}
-            error={errors['members[0].member.name'] && formatMessage(msg.invalidName)}
+            error={get(errors, 'members.0.member.name') && formatMessage(msg.invalidName)}
             mt={3}
           >
             {inputProps => (

@@ -55,8 +55,8 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
 
   // Manually register custom fields
   React.useEffect(() => {
-    register({ name: 'html' }, { required: true });
-    register({ name: 'tags' });
+    register('html', { required: true });
+    register('tags');
   }, []);
 
   return (
