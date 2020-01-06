@@ -37,6 +37,7 @@ import EditUserEmailForm from './EditUserEmailForm';
 import Container from '../Container';
 import ExternalLink from '../ExternalLink';
 import EditHostInvoice from './EditHostInvoice';
+import EditHostSettings from './EditHostSettings';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -739,6 +740,16 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.menu.export" defaultMessage="Export" />
               </MenuItem>
             )}
+            {collective.isHost && (
+              <MenuItem
+                selected={this.state.section === 'hostSettings'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'hostSettings' }}
+                className="MenuItem host"
+              >
+                <FormattedMessage id="editCollective.menu.hostSettings" defaultMessage="Host Settings" />
+              </MenuItem>
+            )}
             <MenuItem
               selected={this.state.section === 'advanced'}
               route="editCollective"
@@ -862,6 +873,8 @@ class EditCollectiveForm extends React.Component {
               )}
 
               {this.state.section === 'export' && <ExportData collective={collective} />}
+
+              {this.state.section === 'hostSettings' && <EditHostSettings collective={collective} />}
             </div>
 
             {![
@@ -876,6 +889,7 @@ class EditCollectiveForm extends React.Component {
               'webhooks',
               'members',
               'goals',
+              'hostSettings',
             ].includes(this.state.section) && (
               <div className="actions">
                 <Button
