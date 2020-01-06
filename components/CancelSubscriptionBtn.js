@@ -36,7 +36,7 @@ class CancelSubscriptionBtn extends React.Component {
   render() {
     return (
       <div className="CancelSubscriptionBtn">
-        <SmallButton className="yes" bsStyle="primary" onClick={this.onClick}>
+        <SmallButton className="yes" onClick={this.onClick}>
           <FormattedMessage id="subscription.cancel.btn" defaultMessage="yes" disabled={this.state.loading} />
         </SmallButton>
         {this.state.loading && <div className="loading">Processing...</div>}

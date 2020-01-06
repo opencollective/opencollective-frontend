@@ -193,7 +193,7 @@ class EditTwitterAccount extends React.Component {
               <Col sm={3} />
               <Col sm={9}>
                 {this.state.isModified && (
-                  <SmallButton className="default" bsStyle="primary" onClick={this.onClick}>
+                  <SmallButton className="default" onClick={this.onClick}>
                     <FormattedMessage id="save" defaultMessage="Save" />
                   </SmallButton>
                 )}
