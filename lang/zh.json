@@ -1,5 +1,5 @@
 {
-  "Accept": "Accept",
+  "Accept": "接受",
   "action.approveCollective.Error": "捐助{host} 失败",
   "action.collective.Approved": "集体{collective} 已被批准由{host} 托管",
   "action.expense.approved": "已捐助",
