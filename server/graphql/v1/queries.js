@@ -247,6 +247,12 @@ const queries = {
     async resolve(_, args, req) {
       const { dateFrom, dateTo, fromCollectiveSlug, collectiveSlug } = args.invoiceInputType;
 
+      if (!dateFrom || !dateTo) {
+        throw new ValidationFailed({ message: 'A valid date range must be provided' });
+      } else if (!fromCollectiveSlug || !collectiveSlug) {
+        throw new ValidationFailed({ message: 'You must provide a collective and a fromCollective' });
+      }
+
       const fromCollective = await models.Collective.findOne({
         where: { slug: fromCollectiveSlug },
       });

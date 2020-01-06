@@ -853,7 +853,8 @@ const CollectiveFields = () => {
       type: LocationType,
       description: 'Name, address, lat, long of the location.',
       resolve(collective, _, req) {
-        if (collective.type === types.COLLECTIVE || collective.type === types.EVENT) {
+        const publicAddressesCollectiveTypes = [types.COLLECTIVE, types.EVENT, types.ORGANIZATION];
+        if (publicAddressesCollectiveTypes.includes(collective.type)) {
           return collective.location;
         } else if (!req.remoteUser) {
           return null;
