@@ -38,7 +38,7 @@
     "apollo-link-http": "1.5.16",
     "bluebird": "3.7.2",
     "bootstrap": "3.4.1",
-    "canvas-confetti": "1.0.2",
+    "canvas-confetti": "1.0.3",
     "classnames": "2.2.6",
     "cloudflare-ip": "0.0.7",
     "cookie-parser": "1.4.4",
