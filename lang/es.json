@@ -1,5 +1,5 @@
 {
-  "Accept": "Accept",
+  "Accept": "Aceptar",
   "action.approveCollective.Error": "No se pudo aprobar el colectivo a {host}",
   "action.collective.Approved": "El colectivo {collective} ha sido aprobado para ser alojado por {host}",
   "action.expense.approved": "Enviar gasto",
@@ -13,7 +13,7 @@
   "actions.follow": "Seguir",
   "actions.processing": "Procesando",
   "actions.rejectExpense.processing": "Rechazar gasto",
-  "actions.unfollow": "Unfollow",
+  "actions.unfollow": "Dejar de seguir",
   "addfunds.amount.label": "cantidad",
   "addfunds.description.label": "descripción",
   "addfunds.details": "Detalles",
