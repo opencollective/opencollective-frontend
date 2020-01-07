@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import useForm from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Flex, Box } from '@rebass/grid';
 import { useMutation } from 'react-apollo';
 
@@ -55,8 +55,8 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
 
   // Manually register custom fields
   React.useEffect(() => {
-    register({ name: 'html' }, { required: true });
-    register({ name: 'tags' });
+    register('html', { required: true });
+    register('tags');
   }, []);
 
   return (

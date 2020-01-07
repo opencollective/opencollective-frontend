@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import { withRouter } from 'next/router';
 import { get } from 'lodash';
-import useForm from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-apollo';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -69,7 +69,7 @@ const CommentForm = ({
 
   // Manually register custom fields
   React.useEffect(() => {
-    register({ name: 'html' }, { required: true });
+    register('html', { required: true });
   }, []);
 
   // Called by react-hook-form when submitting the form
@@ -103,7 +103,7 @@ const CommentForm = ({
             fontSize="13px"
             onChange={e => {
               setValue('html', e.target.value);
-              triggerValidation();
+              triggerValidation('html');
             }}
           />
         )}
