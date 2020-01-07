@@ -23,9 +23,10 @@ describe('Expense Comments', () => {
     cy.getByDataCy('CommentForm').within(() => {
       cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
       cy.get('@editor').type(description);
-      cy.wait(50);
       cy.getByDataCy('SaveCommentButton').click();
     });
+
+    cy.contains('[data-cy="comment-body"]', description);
   }
 
   it('creates, edits and deletes a comment', () => {
@@ -81,7 +82,6 @@ describe('Expense Comments', () => {
     for (let i = 0; i < TOTAL_COMMENTS; i++) {
       SubmitComment(i);
     }
-    cy.wait(100);
     cy.reload();
 
     const checkCommentCount = count => cy.get('.Comments .itemsList .comment').should('have.length', count);

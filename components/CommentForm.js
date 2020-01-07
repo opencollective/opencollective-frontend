@@ -40,18 +40,19 @@ class CommentForm extends React.Component {
       },
     });
 
-    this.state = { comment: {}, postedComment: null, error: null };
+    this.state = { comment: {}, postedComment: null, error: null, loading: false };
   }
 
   async onSubmit() {
     this.setState({ error: null });
     try {
+      this / this.setState({ loading: true });
       const comment = await this.props.onSubmit(pick(this.state.comment, ['html']));
       if (comment) {
-        this.setState({ comment, postedComment: comment });
+        this.setState({ comment, postedComment: comment, loading: false });
       }
     } catch (e) {
-      this.setState({ error: e });
+      this.setState({ error: e, loading: false });
     }
   }
 
@@ -148,7 +149,12 @@ class CommentForm extends React.Component {
                 </MessageBox>
               )}
               <div className="actions">
-                <SmallButton className="primary save" onClick={this.onSubmit} data-cy="SaveCommentButton">
+                <SmallButton
+                  className="primary save"
+                  onClick={this.onSubmit}
+                  data-cy="SaveCommentButton"
+                  disabled={this.state.loading}
+                >
                   <FormattedMessage id="comment.btn" defaultMessage="Comment" />
                 </SmallButton>
                 {notice && <div className="notice">{notice}</div>}
