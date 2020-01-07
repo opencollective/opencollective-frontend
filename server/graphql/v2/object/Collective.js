@@ -38,9 +38,15 @@ export const Collective = new GraphQLObjectType({
         },
         async resolve(collective, { limit, offset, tag }) {
           const query = { where: { CollectiveId: collective.id }, order: [['createdAt', 'DESC']] };
-          if (limit) query.limit = limit;
-          if (offset) query.offset = offset;
-          if (tag) query.where.tags = { [Op.contains]: [tag] };
+          if (limit) {
+            query.limit = limit;
+          }
+          if (offset) {
+            query.offset = offset;
+          }
+          if (tag) {
+            query.where.tags = { [Op.contains]: [tag] };
+          }
           const result = await models.Conversation.findAndCountAll(query);
           return { nodes: result.rows, total: result.count, limit, offset };
         },

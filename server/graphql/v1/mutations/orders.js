@@ -872,7 +872,9 @@ export async function refundTransaction(_, args, req) {
  *  card. Right now only site admins can use this feature.
  */
 export async function addFundsToOrg(args, remoteUser) {
-  if (!remoteUser.isRoot()) throw new Error('Only site admins can perform this operation');
+  if (!remoteUser.isRoot()) {
+    throw new Error('Only site admins can perform this operation');
+  }
   const [fromCollective, hostCollective] = await Promise.all([
     models.Collective.findByPk(args.CollectiveId),
     models.Collective.findByPk(args.HostCollectiveId),

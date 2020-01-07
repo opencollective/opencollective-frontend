@@ -183,11 +183,13 @@ const TransactionFields = () => {
         // This is very suboptimal. We should probably record the CreatedByCollectiveId (or better CreatedByProfileId) instead of the User.
         if (transaction && transaction.getCreatedByUser) {
           const fromCollective = await transaction.getFromCollective();
-          if (fromCollective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.CollectiveId)))
+          if (fromCollective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.CollectiveId))) {
             return {};
+          }
           const collective = await transaction.getCollective();
-          if (collective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.FromCollectiveId)))
+          if (collective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(transaction.FromCollectiveId))) {
             return {};
+          }
           return transaction.getCreatedByUser();
         }
         return null;
@@ -251,7 +253,9 @@ const TransactionFields = () => {
       type: PaymentMethodType,
       resolve(transaction, args, req) {
         const paymentMethodId = transaction.PaymentMethodId || get(transaction, 'paymentMethod.id');
-        if (!paymentMethodId) return null;
+        if (!paymentMethodId) {
+          return null;
+        }
         // TODO: put behind a login check
         return req.loaders.PaymentMethod.byId.load(paymentMethodId);
       },

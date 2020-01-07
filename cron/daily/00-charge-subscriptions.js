@@ -80,7 +80,9 @@ async function run(options) {
     }
   } else {
     vprint(options, 'Not generating CSV file');
-    if (!options.dryRun) await emailReportNoCharges(start);
+    if (!options.dryRun) {
+      await emailReportNoCharges(start);
+    }
   }
 }
 
@@ -123,7 +125,9 @@ async function emailReport(start, orders, data, attachments) {
 
   // Iterate over grouped orders to populate the result list with
   // details of each group
-  for (const group of data) printGroup(group);
+  for (const group of data) {
+    printGroup(group);
+  }
 
   // Time we spent running the whole script
   const now = new Date(),

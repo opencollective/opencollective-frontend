@@ -66,13 +66,15 @@ async function processOrder(order) {
   } = order;
   // Making sure the paymentMethod has the information we need to
   // process a prepaid card
-  if (!get(data, 'HostCollectiveId'))
+  if (!get(data, 'HostCollectiveId')) {
     throw new Error('Prepaid payment method must have a value for `data.HostCollectiveId`');
+  }
 
   // Check that target Collective's Host is same as gift card issuer
   const hostCollective = await order.collective.getHostCollective();
-  if (hostCollective.id !== data.HostCollectiveId)
+  if (hostCollective.id !== data.HostCollectiveId) {
     throw new Error('Prepaid method can only be used in collectives from the same host');
+  }
 
   // Checking if balance is ok or will still be after completing the order
   const balance = await getBalance(order.paymentMethod);

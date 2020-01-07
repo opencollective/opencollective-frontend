@@ -177,7 +177,9 @@ const processBacker = async FromCollectiveId => {
             }
           })
           .then(blob => {
-            if (!blob) return;
+            if (!blob) {
+              return;
+            }
             attachments.push({
               filename,
               content: blob,
@@ -299,7 +301,9 @@ const processEvents = events => {
  */
 const collectivesData = {};
 const processCollective = async CollectiveId => {
-  if (collectivesData[CollectiveId]) return collectivesData[CollectiveId];
+  if (collectivesData[CollectiveId]) {
+    return collectivesData[CollectiveId];
+  }
 
   const collective = await models.Collective.findByPk(CollectiveId);
   const promises = [
@@ -390,8 +394,11 @@ const getTopKeysFromObject = (obj, valueAttr, limit = 3) => {
     });
   });
   values.sort((a, b) => {
-    if (a.occurences > b.occurences) return -1;
-    else return 1;
+    if (a.occurences > b.occurences) {
+      return -1;
+    } else {
+      return 1;
+    }
   });
   const topValues = [];
   for (let i = 0; i < Math.min(values.length, limit); i++) {
@@ -481,7 +488,9 @@ const computeStats = async (collectives, currency = 'USD') => {
 };
 
 const sendEmail = (recipient, data, options = {}) => {
-  if (recipient.length === 0) return;
+  if (recipient.length === 0) {
+    return;
+  }
   data.recipient = recipient;
   if (process.env.ONLY && recipient.email !== process.env.ONLY) {
     debug('Skipping ', recipient.email);

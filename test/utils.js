@@ -80,7 +80,9 @@ export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) =
   new Promise(resolve => {
     let hasConditionBeenMet = false;
     setTimeout(() => {
-      if (hasConditionBeenMet) return;
+      if (hasConditionBeenMet) {
+        return;
+      }
       console.log('>>> waitForCondition Timeout Error');
       console.trace();
       throw new Error('Timeout waiting for condition', cond);
@@ -239,8 +241,12 @@ export function stubStripeCreate(sandbox, overloadDefaults) {
 export function stubStripeBalance(sandbox, amount, currency, applicationFee = 0, stripeFee = 0) {
   const fee_details = [];
   const fee = applicationFee + stripeFee;
-  if (applicationFee && applicationFee > 0) fee_details.push({ type: 'application_fee', amount: applicationFee });
-  if (stripeFee && stripeFee > 0) fee_details.push({ type: 'stripe_fee', amount: stripeFee });
+  if (applicationFee && applicationFee > 0) {
+    fee_details.push({ type: 'application_fee', amount: applicationFee });
+  }
+  if (stripeFee && stripeFee > 0) {
+    fee_details.push({ type: 'stripe_fee', amount: stripeFee });
+  }
 
   const balanceTransaction = {
     id: 'txn_1Bs9EEBYycQg1OMfTR33Y5Xr',

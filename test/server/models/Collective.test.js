@@ -394,7 +394,9 @@ describe('Collective model', () => {
     collective.getBalance(until).then(balance => {
       let sum = 0;
       transactions.map(t => {
-        if (t.createdAt < until) sum += t.netAmountInCollectiveCurrency;
+        if (t.createdAt < until) {
+          sum += t.netAmountInCollectiveCurrency;
+        }
       });
       expect(balance).to.equal(sum);
       done();
@@ -411,7 +413,9 @@ describe('Collective model', () => {
     collective.getBackersCount({ until }).then(count => {
       const backers = {};
       transactions.map(t => {
-        if (t.amount > 0 && t.createdAt < until) backers[t.CreatedByUserId] = t.amount;
+        if (t.amount > 0 && t.createdAt < until) {
+          backers[t.CreatedByUserId] = t.amount;
+        }
       });
       expect(count).to.equal(Object.keys(backers).length);
       done();
@@ -421,7 +425,9 @@ describe('Collective model', () => {
   it('gets all the expenses', done => {
     let totalExpenses = 0;
     transactions.map(t => {
-      if (t.netAmountInCollectiveCurrency < 0) totalExpenses++;
+      if (t.netAmountInCollectiveCurrency < 0) {
+        totalExpenses++;
+      }
     });
 
     collective
@@ -443,7 +449,9 @@ describe('Collective model', () => {
     let totalExpenses = 0;
 
     transactions.map(t => {
-      if (t.netAmountInCollectiveCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate) totalExpenses++;
+      if (t.netAmountInCollectiveCurrency < 0 && t.createdAt > startDate && t.createdAt < endDate) {
+        totalExpenses++;
+      }
     });
 
     collective

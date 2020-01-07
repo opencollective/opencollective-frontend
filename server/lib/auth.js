@@ -40,8 +40,12 @@ export function verifyJwt(token) {
  * Returns the subset of [User|Organization]CollectiveIds that the remoteUser has access to
  */
 export function getListOfAccessibleMembers(remoteUser, CollectiveIds) {
-  if (!remoteUser) return Promise.resolve([]);
-  if (!remoteUser.rolesByCollectiveId) return Promise.resolve([]);
+  if (!remoteUser) {
+    return Promise.resolve([]);
+  }
+  if (!remoteUser.rolesByCollectiveId) {
+    return Promise.resolve([]);
+  }
   // all the CollectiveIds that the remoteUser is admin of.
   const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId =>
     remoteUser.isAdmin(CollectiveId),

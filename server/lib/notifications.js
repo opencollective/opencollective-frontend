@@ -112,7 +112,9 @@ async function notifySubscribers(users, activity, options = {}) {
     return emailLib.send(options.template || activity.type, process.env.ONLY, data, options);
   }
   return users.map(u => {
-    if (!u) return;
+    if (!u) {
+      return;
+    }
     // skip users that have unsubscribed
     if (unsubscribedUserIds.indexOf(u.id) === -1) {
       debug('sendMessageFromActivity', activity.type, 'UserId', u.id);

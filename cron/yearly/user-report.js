@@ -74,7 +74,9 @@ const buildTweet = (fromCollective, collectives, totalDonations) => {
       totalDonations,
     )} across ${totalCollectives} collectives`;
     const listCollectives = formatArrayToString(collectivesNames);
-    if (`${tweet}: ${listCollectives}`.length < 120) tweet = `${tweet}: ${listCollectives}`;
+    if (`${tweet}: ${listCollectives}`.length < 120) {
+      tweet = `${tweet}: ${listCollectives}`;
+    }
   } else if (totalCollectives === 1) {
     tweet = `🎁 In ${year}, ${pronoun} have contributed ${collectivesDonationsNames[0].replace(
       ' to ',
@@ -146,7 +148,9 @@ const processCollective = collective => {
 
         hosts[row.hostSlug].collectivesBySlug[row.slug] = collectivesBySlug[row.slug];
 
-        if (typeof totalDonations[row.hostCurrency] === 'undefined') totalDonations[row.hostCurrency] = 0;
+        if (typeof totalDonations[row.hostCurrency] === 'undefined') {
+          totalDonations[row.hostCurrency] = 0;
+        }
 
         _.set(hosts, [row.hostSlug, 'totalFees', row.hostCurrency], 0);
         _.set(hosts, ['stripe', 'totalFees', row.hostCurrency], 0);
@@ -159,14 +163,19 @@ const processCollective = collective => {
       });
 
       for (const hostSlug in hosts) {
-        if (!hosts[hostSlug].collectivesBySlug) continue;
+        if (!hosts[hostSlug].collectivesBySlug) {
+          continue;
+        }
         for (const collectiveSlug in hosts[hostSlug].collectivesBySlug) {
           hosts[hostSlug].collectives = hosts[hostSlug].collectives || [];
           hosts[hostSlug].collectives.push(hosts[hostSlug].collectivesBySlug[collectiveSlug]);
         }
         hosts[hostSlug].collectives.sort((a, b) => {
-          if (a.totalDonations > b.totalDonations) return -1;
-          else return 1;
+          if (a.totalDonations > b.totalDonations) {
+            return -1;
+          } else {
+            return 1;
+          }
         });
       }
 

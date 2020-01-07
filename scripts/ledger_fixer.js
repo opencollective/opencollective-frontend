@@ -71,9 +71,15 @@ export class Migration {
 
   /** Saves what type of change was made to a given field in a transaction */
   saveTransactionChange = (tr, field, oldValue, newValue) => {
-    if (!tr.data) tr.data = {};
-    if (!tr.data.migration) tr.data.migration = {};
-    if (!tr.data.migration[this.date]) tr.data.migration[this.date] = {};
+    if (!tr.data) {
+      tr.data = {};
+    }
+    if (!tr.data.migration) {
+      tr.data.migration = {};
+    }
+    if (!tr.data.migration[this.date]) {
+      tr.data.migration[this.date] = {};
+    }
     tr.data.migration[this.date][field] = { oldValue, newValue };
 
     // Sequelize isn't really that great detecting changes in JSON
@@ -109,7 +115,9 @@ export class Migration {
           newHostFeeInHostCurrency,
         );
         credit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-        if (!changed.includes(credit)) changed.push(credit);
+        if (!changed.includes(credit)) {
+          changed.push(credit);
+        }
       }
       if (newHostFeeInHostCurrency !== debit.hostFeeInHostCurrency) {
         this.saveTransactionChange(
@@ -119,7 +127,9 @@ export class Migration {
           newHostFeeInHostCurrency,
         );
         debit.hostFeeInHostCurrency = newHostFeeInHostCurrency;
-        if (!changed.includes(debit)) changed.push(debit);
+        if (!changed.includes(debit)) {
+          changed.push(debit);
+        }
       }
     }
     // Update platformFeeInHostCurrency
@@ -135,7 +145,9 @@ export class Migration {
           newPlatformFeeInHostCurrency,
         );
         credit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
-        if (!changed.includes(credit)) changed.push(credit);
+        if (!changed.includes(credit)) {
+          changed.push(credit);
+        }
       }
       if (newPlatformFeeInHostCurrency !== debit.platformFeeInHostCurrency) {
         this.saveTransactionChange(
@@ -145,7 +157,9 @@ export class Migration {
           newPlatformFeeInHostCurrency,
         );
         debit.platformFeeInHostCurrency = newPlatformFeeInHostCurrency;
-        if (!changed.includes(debit)) changed.push(debit);
+        if (!changed.includes(debit)) {
+          changed.push(debit);
+        }
       }
     }
     // Update paymentProcessorFeeInHostCurrency
@@ -161,7 +175,9 @@ export class Migration {
           newPaymentProcessorFeeInHostCurrency,
         );
         credit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
-        if (!changed.includes(credit)) changed.push(credit);
+        if (!changed.includes(credit)) {
+          changed.push(credit);
+        }
       }
       if (newPaymentProcessorFeeInHostCurrency !== debit.paymentProcessorFeeInHostCurrency) {
         this.saveTransactionChange(
@@ -171,7 +187,9 @@ export class Migration {
           newPaymentProcessorFeeInHostCurrency,
         );
         debit.paymentProcessorFeeInHostCurrency = newPaymentProcessorFeeInHostCurrency;
-        if (!changed.includes(debit)) changed.push(debit);
+        if (!changed.includes(debit)) {
+          changed.push(debit);
+        }
       }
     }
     return changed;
@@ -524,7 +542,9 @@ export class Migration {
   };
 
   incr = counter => {
-    if (!this.counters[counter]) this.counters[counter] = 0;
+    if (!this.counters[counter]) {
+      this.counters[counter] = 0;
+    }
     this.counters[counter]++;
   };
 
@@ -555,7 +575,9 @@ export class Migration {
   /** Print out a CSV line */
   logChange = tr => {
     const fields = result(tr.data, `migration['${this.date}']`);
-    if (!fields) return;
+    if (!fields) {
+      return;
+    }
     for (const k of Object.keys(fields)) {
       this.log(
         'changes.csv',
@@ -660,4 +682,6 @@ async function entryPoint(options) {
 }
 
 /* Only call entry point if we're arg[0] */
-if (!module.parent) entryPoint(parseCommandLineArguments());
+if (!module.parent) {
+  entryPoint(parseCommandLineArguments());
+}

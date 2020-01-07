@@ -154,7 +154,9 @@ export async function recreateDatabase(destroy = true) {
 
   /* Operations that require connecting to a maintenance database. */
   const client = await getConnectedClient(getDBUrl('maintenancedb'));
-  if (destroy) await dropDatabaseQuery(client, database);
+  if (destroy) {
+    await dropDatabaseQuery(client, database);
+  }
   await createDatabaseQuery(client, database, username);
 
   /* Operations that require connecting to the application

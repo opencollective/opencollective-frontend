@@ -85,7 +85,9 @@ async function PlatformReport(year, month) {
 
   year = year || startDate.getFullYear();
   const computeDelta = (obj1, obj2) => {
-    if (!obj2) return obj1;
+    if (!obj2) {
+      return obj1;
+    }
     const row = {};
     Object.keys(obj1).map(attr => {
       if (!obj2[attr]) {

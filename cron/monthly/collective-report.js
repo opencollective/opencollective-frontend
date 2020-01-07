@@ -81,11 +81,14 @@ const topBackersCache = {};
 const getTopBackers = (startDate, endDate, tags) => {
   tags = tags || [];
   const cacheKey = `${startDate.getTime()}${endDate.getTime()}${tags.join(',')}`;
-  if (topBackersCache[cacheKey]) return Promise.resolve(topBackersCache[cacheKey]);
-  else {
+  if (topBackersCache[cacheKey]) {
+    return Promise.resolve(topBackersCache[cacheKey]);
+  } else {
     return models.Collective.getTopBackers(startDate, endDate, tags, 5)
       .then(backers => {
-        if (!backers) return [];
+        if (!backers) {
+          return [];
+        }
         return Promise.map(backers, backer => processBacker(backer, startDate, endDate, tags));
       })
       .then(backers => {
@@ -147,7 +150,9 @@ const processBacker = (backer, startDate, endDate, tags) => {
       backer.website = backer.slug
         ? `https://opencollective.com/${backer.slug}`
         : backer.website || backer.twitterHandle;
-      if (!donationsString || !backer.website) return null;
+      if (!donationsString || !backer.website) {
+        return null;
+      }
       backer = _.pick(backer, ['name', 'slug', 'image', 'website']);
       backer.donationsString = donationsString;
       return backer;

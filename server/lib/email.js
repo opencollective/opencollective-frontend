@@ -92,7 +92,9 @@ const getTemplateAttributes = str => {
 const sendMessage = (recipients, subject, html, options = {}) => {
   options.bcc = options.bcc || 'emailbcc@opencollective.com';
 
-  if (!isArray(recipients)) recipients = [recipients];
+  if (!isArray(recipients)) {
+    recipients = [recipients];
+  }
 
   recipients = recipients.filter(recipient => {
     if (!recipient || !recipient.match(/.+@.+\..+/)) {
@@ -199,7 +201,9 @@ const sendMessage = (recipients, subject, html, options = {}) => {
  * Shown in the footer of the email following "To unsubscribe from "
  */
 const getNotificationLabel = (template, recipients) => {
-  if (!isArray(recipients)) recipients = [recipients];
+  if (!isArray(recipients)) {
+    recipients = [recipients];
+  }
 
   template = template.replace('.text', '');
 
@@ -251,7 +255,9 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
 
   if (template === 'ticket.confirmed') {
     // if (slug === 'sustainoss') template += '.sustainoss';
-    if (slug === 'fearlesscitiesbrussels') template += '.fearlesscitiesbrussels';
+    if (slug === 'fearlesscitiesbrussels') {
+      template += '.fearlesscitiesbrussels';
+    }
 
     if (slug === 'drupalatx') {
       const eventSlug = get(data, 'event.slug');
@@ -265,7 +271,9 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
     template = 'host.report';
   }
   if (template === 'thankyou') {
-    if (slug.match(/wwcode/)) template += '.wwcode';
+    if (slug.match(/wwcode/)) {
+      template += '.wwcode';
+    }
 
     if (includes(['chsf', 'kendraio', 'brusselstogether', 'sustainoss', 'ispcwa'], slug)) {
       template = `thankyou.${slug}`;

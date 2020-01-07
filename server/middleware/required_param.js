@@ -25,7 +25,9 @@ function _required_options(options, properties) {
     properties.forEach(prop => {
       let value;
       options.include.forEach(source => {
-        if (value || value === false) return;
+        if (value || value === false) {
+          return;
+        }
         value = source ? req[source][prop] : req[prop];
       });
 
@@ -44,8 +46,11 @@ function _required_options(options, properties) {
 
     const missingProps = Object.keys(missing);
     if (missingProps.length) {
-      if (missingProps.indexOf('remoteUser') !== -1) return next(new errors.Unauthorized('User is not authenticated'));
-      else return next(new errors.ValidationFailed('missing_required', missing));
+      if (missingProps.indexOf('remoteUser') !== -1) {
+        return next(new errors.Unauthorized('User is not authenticated'));
+      } else {
+        return next(new errors.ValidationFailed('missing_required', missing));
+      }
     }
 
     next();

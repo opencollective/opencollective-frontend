@@ -69,9 +69,15 @@ export const fakeUpdate = async updateData => {
   let FromCollectiveId = get(updateData, 'FromCollectiveId') || get(updateData, 'fromCollective.id');
   let CollectiveId = get(updateData, 'CollectiveId') || get(updateData, 'collective.id');
   let CreatedByUserId = get(updateData, 'CreatedByUserId') || get(updateData, 'createdByUser.id');
-  if (!FromCollectiveId) FromCollectiveId = (await fakeCollective()).id;
-  if (!CollectiveId) CollectiveId = (await fakeCollective()).id;
-  if (!CreatedByUserId) CreatedByUserId = (await fakeUser()).id;
+  if (!FromCollectiveId) {
+    FromCollectiveId = (await fakeCollective()).id;
+  }
+  if (!CollectiveId) {
+    CollectiveId = (await fakeCollective()).id;
+  }
+  if (!CreatedByUserId) {
+    CreatedByUserId = (await fakeUser()).id;
+  }
 
   return models.Update.create({
     slug: randStr('update-'),
@@ -90,8 +96,12 @@ export const fakeUpdate = async updateData => {
 export const fakeExpense = async updateData => {
   let CollectiveId = get(updateData, 'CollectiveId') || get(updateData, 'collective.id');
   let UserId = get(updateData, 'UserId') || get(updateData, 'user.id');
-  if (!CollectiveId) CollectiveId = (await fakeCollective()).id;
-  if (!UserId) UserId = (await fakeUser()).id;
+  if (!CollectiveId) {
+    CollectiveId = (await fakeCollective()).id;
+  }
+  if (!UserId) {
+    UserId = (await fakeUser()).id;
+  }
 
   return models.Update.create({
     amount: randAmount(),
@@ -115,10 +125,18 @@ export const fakeComment = async commentData => {
   let CreatedByUserId = get(commentData, 'CreatedByUserId') || get(commentData, 'createdByUser.id');
   let ExpenseId = get(commentData, 'ExpenseId') || get(commentData, 'expense.id');
   const ConversationId = get(commentData, 'ConversationId') || get(commentData, 'conversation.id');
-  if (!FromCollectiveId) FromCollectiveId = (await fakeCollective()).id;
-  if (!CollectiveId) CollectiveId = (await fakeCollective()).id;
-  if (!CreatedByUserId) CreatedByUserId = (await fakeUser()).id;
-  if (!ExpenseId && !ConversationId) ExpenseId = (await fakeExpense()).id;
+  if (!FromCollectiveId) {
+    FromCollectiveId = (await fakeCollective()).id;
+  }
+  if (!CollectiveId) {
+    CollectiveId = (await fakeCollective()).id;
+  }
+  if (!CreatedByUserId) {
+    CreatedByUserId = (await fakeUser()).id;
+  }
+  if (!ExpenseId && !ConversationId) {
+    ExpenseId = (await fakeExpense()).id;
+  }
 
   return models.Comment.create({
     html: '<div><strong>Hello</strong> Test comment!</div>',

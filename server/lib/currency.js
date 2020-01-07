@@ -23,15 +23,21 @@ export function formatCurrency(currency, value) {
   const _currency = currency.toUpperCase();
   const currencyStr = currencyFormats[_currency];
 
-  if (!currencyStr) return `${value} ${_currency}`;
+  if (!currencyStr) {
+    return `${value} ${_currency}`;
+  }
   return currencyStr.concat(value);
 }
 
 export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
   debug('>>> getFxRate for ', date, fromCurrency, toCurrency);
 
-  if (fromCurrency === toCurrency) return Promise.resolve(1);
-  if (!fromCurrency || !toCurrency) return Promise.resolve(1);
+  if (fromCurrency === toCurrency) {
+    return Promise.resolve(1);
+  }
+  if (!fromCurrency || !toCurrency) {
+    return Promise.resolve(1);
+  }
 
   date = getDate(date);
 
@@ -40,7 +46,9 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
     dateKey = getDate(new Date());
   }
   const key = `${dateKey}-${fromCurrency}-${toCurrency}`;
-  if (cache[key]) return Promise.resolve(cache[key]);
+  if (cache[key]) {
+    return Promise.resolve(cache[key]);
+  }
   return new Promise((resolve, reject) => {
     const params = {
       access_key: config.fixer.accessKey,
@@ -82,9 +90,15 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
 }
 
 export function convertToCurrency(amount, fromCurrency, toCurrency, date = 'latest') {
-  if (amount === 0) return 0;
-  if (fromCurrency === toCurrency) return Promise.resolve(amount);
-  if (!fromCurrency || !toCurrency) return Promise.resolve(amount);
+  if (amount === 0) {
+    return 0;
+  }
+  if (fromCurrency === toCurrency) {
+    return Promise.resolve(amount);
+  }
+  if (!fromCurrency || !toCurrency) {
+    return Promise.resolve(amount);
+  }
 
   return getFxRate(fromCurrency, toCurrency, date).then(fxrate => {
     return fxrate * amount;

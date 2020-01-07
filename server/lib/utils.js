@@ -90,8 +90,12 @@ export const sanitizeObject = (obj, attributes, sanitizerFn) => {
   const sanitizer = typeof sanitizerFn === 'function' ? sanitizerFn : strip_tags;
 
   attributes.forEach(attr => {
-    if (!obj[attr]) return;
-    if (typeof obj[attr] === 'object') return sanitizeObject(obj[attr], Object.keys(obj[attr]), sanitizerFn);
+    if (!obj[attr]) {
+      return;
+    }
+    if (typeof obj[attr] === 'object') {
+      return sanitizeObject(obj[attr], Object.keys(obj[attr]), sanitizerFn);
+    }
     obj[attr] = sanitizer(obj[attr] || '');
   });
   return obj;
@@ -103,7 +107,9 @@ export const sanitizeObject = (obj, attributes, sanitizerFn) => {
  */
 export const sanitizeForLogs = obj => {
   const sanitizer = value => {
-    if (!value) return;
+    if (!value) {
+      return;
+    }
     if (typeof value === 'string') {
       if (value.indexOf('@') !== -1) {
         return '(email obfuscated)';
@@ -119,7 +125,9 @@ export const sanitizeForLogs = obj => {
 };
 
 String.prototype.trunc = function(n, useWordBoundary) {
-  if (this.length <= n) return this;
+  if (this.length <= n) {
+    return this;
+  }
   const subString = this.substr(0, n - 1);
   return `${useWordBoundary ? subString.substr(0, subString.lastIndexOf(' ')) : subString}&hellip;`;
 };
@@ -183,8 +191,12 @@ export const getTiersStats = (tiers, startDate, endDate) => {
   const stats = { backers: {} };
 
   const rank = user => {
-    if (user.isNew) return 1;
-    if (user.isLost) return 2;
+    if (user.isNew) {
+      return 1;
+    }
+    if (user.isLost) {
+      return 2;
+    }
     return 3;
   };
 
@@ -226,7 +238,9 @@ export const getTiersStats = (tiers, startDate, endDate) => {
         results => {
           backer.activeLastMonth = results[0];
           backer.activePreviousMonth = backer.firstDonation < startDate && results[1];
-          if (tier.name.match(/sponsor/i)) backer.isSponsor = true;
+          if (tier.name.match(/sponsor/i)) {
+            backer.isSponsor = true;
+          }
           if (backer.firstDonation > startDate) {
             backer.isNew = true;
             stats.backers.new++;
@@ -243,7 +257,9 @@ export const getTiersStats = (tiers, startDate, endDate) => {
           debug('active previous month?', backer.activePreviousMonth);
           debug('is new?', backer.isNew === true);
           debug('is lost?', backer.isLost === true);
-          if (backer.activePreviousMonth) stats.backers.previousMonth++;
+          if (backer.activePreviousMonth) {
+            stats.backers.previousMonth++;
+          }
           if (backer.activeLastMonth) {
             stats.backers.lastMonth++;
             return true;
@@ -254,8 +270,12 @@ export const getTiersStats = (tiers, startDate, endDate) => {
       );
     }).then(backers => {
       backers.sort((a, b) => {
-        if (rank(a) > rank(b)) return 1;
-        if (rank(a) < rank(b)) return -1;
+        if (rank(a) > rank(b)) {
+          return 1;
+        }
+        if (rank(a) < rank(b)) {
+          return -1;
+        }
         return a.index - b.index; // make sure we keep the original order within a tier (typically totalDonations DESC)
       });
 
@@ -336,14 +356,18 @@ export function exportToPDF(template, data, options) {
 
   const html = render(data);
 
-  if (options.format === 'html') return Promise.resolve(html);
+  if (options.format === 'html') {
+    return Promise.resolve(html);
+  }
   options.format = options.paper;
 
   options.timeout = 60000;
 
   return new Promise((resolve, reject) => {
     pdf.create(html, options).toBuffer((err, buffer) => {
-      if (err) return reject(err);
+      if (err) {
+        return reject(err);
+      }
       return resolve(buffer);
     });
   });
@@ -373,7 +397,9 @@ export const defaultHostCollective = category => {
 };
 
 export const isValidEmail = email => {
-  if (typeof email !== 'string') return false;
+  if (typeof email !== 'string') {
+    return false;
+  }
   return email.match(
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
   );
@@ -384,7 +410,9 @@ export const isValidEmail = email => {
  * Useful for testing emails in localhost or staging
  */
 export const isEmailInternal = email => {
-  if (!email) return false;
+  if (!email) {
+    return false;
+  }
   if (email.match(/(opencollective\.(com|org))$/i)) {
     return true;
   }
@@ -395,17 +423,23 @@ export const isEmailInternal = email => {
 };
 
 export function capitalize(str) {
-  if (!str) return '';
+  if (!str) {
+    return '';
+  }
   return str[0].toUpperCase() + str.slice(1).toLowerCase();
 }
 
 export function uncapitalize(str) {
-  if (!str) return '';
+  if (!str) {
+    return '';
+  }
   return str[0].toLowerCase() + str.slice(1);
 }
 
 export function pluralize(str, count) {
-  if (count <= 1) return str;
+  if (count <= 1) {
+    return str;
+  }
   return `${str}s`.replace(/s+$/, 's');
 }
 
@@ -418,21 +452,31 @@ export function resizeImage(imageUrl, { width, height, query, defaultImage }) {
     }
   }
 
-  if (imageUrl[0] === '/') imageUrl = `https://opencollective.com${imageUrl}`;
+  if (imageUrl[0] === '/') {
+    imageUrl = `https://opencollective.com${imageUrl}`;
+  }
 
   let queryurl = '';
   if (query) {
     queryurl = `&query=${encodeURIComponent(query)}`;
   } else {
-    if (width) queryurl += `&width=${width}`;
-    if (height) queryurl += `&height=${height}`;
+    if (width) {
+      queryurl += `&width=${width}`;
+    }
+    if (height) {
+      queryurl += `&height=${height}`;
+    }
   }
   return `${config.host.images}/proxy/images/?src=${encodeURIComponent(imageUrl)}${queryurl}`;
 }
 
 export function formatArrayToString(arr, conjonction = 'and') {
-  if (arr.length === 1) return arr[0];
-  if (!arr.slice) return '';
+  if (arr.length === 1) {
+    return arr[0];
+  }
+  if (!arr.slice) {
+    return '';
+  }
   return `${arr.slice(0, arr.length - 1).join(', ')} ${conjonction} ${arr.slice(-1)}`;
 }
 
@@ -472,7 +516,9 @@ export function formatCurrencyObject(currencyObj, options = { precision: 0, conj
       });
     }
   }
-  if (array.length === 1) return array[0].str;
+  if (array.length === 1) {
+    return array[0].str;
+  }
   array.sort((a, b) => b.value - a.value);
   return formatArrayToString(
     array.map(r => r.str),
@@ -488,7 +534,9 @@ export function hashCode(str) {
   let hash = 0,
     i,
     chr;
-  if (str.length === 0) return hash;
+  if (str.length === 0) {
+    return hash;
+  }
   for (i = 0; i < str.length; i++) {
     chr = str.charCodeAt(i);
     hash = (hash << 5) - hash + chr;

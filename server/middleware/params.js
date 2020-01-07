@@ -28,7 +28,9 @@ const parseIdOrUUID = param => {
  */
 function getByKeyValue(model, key, value) {
   return model.findOne({ where: { [key]: value.toLowerCase() } }).tap(result => {
-    if (!result) throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
+    if (!result) {
+      throw new errors.NotFound(`${model.getTableName()} '${value}' not found`);
+    }
   });
 }
 
@@ -37,7 +39,9 @@ export function uuid(req, res, next, uuid) {
     req.params.uuid = uuid;
   } else {
     const id = parseInt(uuid);
-    if (!_.isNaN(id)) req.params.id = id;
+    if (!_.isNaN(id)) {
+      req.params.id = id;
+    }
   }
   next();
 }

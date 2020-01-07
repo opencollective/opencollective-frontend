@@ -20,7 +20,9 @@ export const unsubscribe = (req, res, next) => {
 
   Promise.all([models.Collective.findOne({ where: { slug } }), models.User.findOne({ where: { email } })])
     .then(results => {
-      if (!results[1]) throw new errors.NotFound(`Cannot find a user with email "${email}"`);
+      if (!results[1]) {
+        throw new errors.NotFound(`Cannot find a user with email "${email}"`);
+      }
 
       return results[1].unsubscribe(results[0] && results[0].id, type, 'email');
     })
@@ -37,8 +39,9 @@ const sendEmailToList = (to, email) => {
 
   return models.Notification.getSubscribersUsers(collectiveSlug, mailinglist)
     .tap(subscribers => {
-      if (subscribers.length === 0)
+      if (subscribers.length === 0) {
         throw new errors.NotFound(`No subscribers found in ${collectiveSlug} for email type ${type}`);
+      }
     })
     .then(results => results.map(r => r.email))
     .then(recipients => {
@@ -124,7 +127,9 @@ export const approve = (req, res, next) => {
         to: email.To,
         sender: pick(sender, ['email', 'name', 'image']),
       };
-      if (approver && approver.email !== sender.email) emailData.approver = pick(approver, ['email', 'name', 'image']);
+      if (approver && approver.email !== sender.email) {
+        emailData.approver = pick(approver, ['email', 'name', 'image']);
+      }
 
       return sendEmailToList(email.To, emailData);
     })
@@ -132,9 +137,11 @@ export const approve = (req, res, next) => {
       res.send(`Email from ${email.sender} with subject "${email.Subject}" approved for the ${email.To} mailing list`),
     )
     .catch(e => {
-      if (e.statusCode === 404)
+      if (e.statusCode === 404) {
         return next(new errors.NotFound(`Message ${messageId} not found on the ${mailserver} server`));
-      else return next(e);
+      } else {
+        return next(e);
+      }
     });
 };
 
@@ -146,7 +153,9 @@ export const getNotificationType = email => {
   } else {
     tokens = email.match(/(.+)@(.+)\.opencollective\.com/i);
   }
-  if (!tokens) return {};
+  if (!tokens) {
+    return {};
+  }
   const collectiveSlug = tokens[2];
   let mailinglist = tokens[1];
   if (['info', 'hello', 'members', 'admins', 'admins'].indexOf(mailinglist) !== -1) {
@@ -212,14 +221,18 @@ export const webhook = (req, res, next) => {
   let subscribers;
   models.Collective.findOne({ where: { slug: collectiveSlug } })
     .tap(g => {
-      if (!g) throw new Error('collective_not_found');
+      if (!g) {
+        throw new Error('collective_not_found');
+      }
       collective = g;
     })
     // We fetch all the recipients of that mailing list to give a preview in the approval email
     .then(collective => models.Notification.getSubscribersCollectives(collective.slug, mailinglist))
     .tap(results => {
       debugWebhook('getSubscribers', mailinglist, results);
-      if (results.length === 0) throw new Error('no_subscribers');
+      if (results.length === 0) {
+        throw new Error('no_subscribers');
+      }
       subscribers = results.map(s => {
         if (s.image) {
           s.roundedAvatar = `https://res.cloudinary.com/opencollective/image/fetch/c_thumb,g_face,h_48,r_max,w_48,bo_3px_solid_white/c_thumb,h_48,r_max,w_48,bo_2px_solid_rgb:66C71A/e_trim/f_auto/${encodeURIComponent(
@@ -246,7 +259,9 @@ export const webhook = (req, res, next) => {
       );
     })
     .tap(admins => {
-      if (admins.length === 0) throw new Error('no_admins');
+      if (admins.length === 0) {
+        throw new Error('no_admins');
+      }
     })
     .then(admins => {
       const messageId = email['message-url'].substr(email['message-url'].lastIndexOf('/') + 1);

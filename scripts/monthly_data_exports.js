@@ -96,7 +96,9 @@ const endDate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
 
 console.log('startDate', startDate, 'endDate', endDate);
 let month = startDate.getMonth() + 1;
-if (month < 10) month = `0${month}`;
+if (month < 10) {
+  month = `0${month}`;
+}
 
 const path = `${GoogleDrivePath}/Open Data/${startDate.getFullYear()}-${month}`;
 try {
@@ -122,9 +124,13 @@ async function run() {
     });
 
     const data = res.map(row => {
-      if (row.createdAt) row.createdAt = moment(row.createdAt).format('YYYY-MM-DD HH:mm');
+      if (row.createdAt) {
+        row.createdAt = moment(row.createdAt).format('YYYY-MM-DD HH:mm');
+      }
       Object.keys(row).map(key => {
-        if (row[key] === null) row[key] = '';
+        if (row[key] === null) {
+          row[key] = '';
+        }
       });
       return row;
     });

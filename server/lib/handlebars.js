@@ -31,17 +31,24 @@ handlebars.registerHelper('ifCond', (v1, operator, v2, options) => {
 });
 
 handlebars.registerHelper('sign', value => {
-  if (value >= 0) return '+';
-  else return '';
+  if (value >= 0) {
+    return '+';
+  } else {
+    return '';
+  }
 });
 
 handlebars.registerHelper('toLowerCase', str => {
-  if (!str) return '';
+  if (!str) {
+    return '';
+  }
   return str.toLowerCase();
 });
 
 handlebars.registerHelper('increment', str => {
-  if (isNaN(str)) return '';
+  if (isNaN(str)) {
+    return '';
+  }
   return `${Number(str) + 1}`;
 });
 
@@ -59,30 +66,40 @@ const col = (str, size, trim = true) => {
 };
 
 handlebars.registerHelper('col', (str, props) => {
-  if (!str || !props) return str;
+  if (!str || !props) {
+    return str;
+  }
   const size = props.hash.size;
   return col(str, size);
 });
 
 handlebars.registerHelper('json', obj => {
-  if (!obj) return '';
+  if (!obj) {
+    return '';
+  }
   return JSON.stringify(obj);
 });
 
 handlebars.registerHelper('moment', (value, props) => {
   const format = (props && props.hash.format) || 'MMMM Do YYYY';
   const d = moment(value);
-  if (props && props.hash.timezone) d.tz(props.hash.timezone);
+  if (props && props.hash.timezone) {
+    d.tz(props.hash.timezone);
+  }
   return d.format(format);
 });
 
 handlebars.registerHelper('currency', (value, props) => {
   const { currency, precision, size, sign } = props.hash;
 
-  if (isNaN(value)) return '';
+  if (isNaN(value)) {
+    return '';
+  }
 
   let res = (function() {
-    if (!currency) return value / 100;
+    if (!currency) {
+      return value / 100;
+    }
     value = value / 100; // converting cents
 
     let locale = 'en-US';

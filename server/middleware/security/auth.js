@@ -87,7 +87,9 @@ export function authorizeClientApp(req, res, next) {
   ];
 
   for (const i in exceptions) {
-    if (req.method === exceptions[i].method && req.originalUrl.match(exceptions[i].regex)) return next();
+    if (req.method === exceptions[i].method && req.originalUrl.match(exceptions[i].regex)) {
+      return next();
+    }
   }
 
   const apiKey = req.get('Api-Key') || req.query.apiKey || req.query.api_key || req.body.api_key;
@@ -112,8 +114,13 @@ export function authorizeClientApp(req, res, next) {
  */
 export function mustBeLoggedIn(req, res, next) {
   authenticateUser(req, res, e => {
-    if (e) return next(e);
-    if (!req.remoteUser) return next(new Unauthorized('User is not authenticated'));
-    else return next();
+    if (e) {
+      return next(e);
+    }
+    if (!req.remoteUser) {
+      return next(new Unauthorized('User is not authenticated'));
+    } else {
+      return next();
+    }
   });
 }

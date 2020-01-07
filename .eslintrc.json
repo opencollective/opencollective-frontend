@@ -17,6 +17,8 @@
     // relaxing because we have many errors
     "require-atomic-updates": "off",
 
+    "curly": ["error", "all"],
+
     // typescript
     "node/no-missing-import": ["error", { "tryExtensions": [".js", ".ts"] }]
   },

@@ -61,7 +61,9 @@ const errors = {
     this.code = 409;
     this.type = 'conflict';
     this.message = msg;
-    if (data) this.data = data;
+    if (data) {
+      this.data = data;
+    }
     Error.call(this, msg);
   },
 

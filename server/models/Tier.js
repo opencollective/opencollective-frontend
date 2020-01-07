@@ -297,10 +297,18 @@ export default function(Sequelize, DataTypes) {
         createdAt: { [Op.lte]: until },
       },
     }).then(membership => {
-      if (!membership) return false;
-      if (!this.interval) return true;
-      if (this.interval === 'month' && days(membership.createdAt, until) <= 31) return true;
-      if (this.interval === 'year' && days(membership.createdAt, until) <= 365) return true;
+      if (!membership) {
+        return false;
+      }
+      if (!this.interval) {
+        return true;
+      }
+      if (this.interval === 'month' && days(membership.createdAt, until) <= 31) {
+        return true;
+      }
+      if (this.interval === 'year' && days(membership.createdAt, until) <= 365) {
+        return true;
+      }
       return models.Order.findOne({
         where: {
           CollectiveId: this.CollectiveId,
@@ -308,7 +316,9 @@ export default function(Sequelize, DataTypes) {
           TierId: this.id,
         },
       }).then(order => {
-        if (!order) return false;
+        if (!order) {
+          return false;
+        }
         return models.Transaction.findOne({
           where: { OrderId: order.id, CollectiveId: this.CollectiveId },
           order: [['createdAt', 'DESC']],
@@ -317,8 +327,12 @@ export default function(Sequelize, DataTypes) {
             debug('No transaction found for order', order.dataValues);
             return false;
           }
-          if (this.interval === 'month' && days(transaction.createdAt, until) <= 31) return true;
-          if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) return true;
+          if (this.interval === 'month' && days(transaction.createdAt, until) <= 31) {
+            return true;
+          }
+          if (this.interval === 'year' && days(transaction.createdAt, until) <= 365) {
+            return true;
+          }
           return false;
         });
       });
