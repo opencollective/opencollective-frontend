@@ -1,6 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+const Capitalized = styled.span`
+  text-transform: capitalize;
+`;
 
 class EditHostSettings extends React.Component {
   static propTypes = {
@@ -26,16 +31,18 @@ class EditHostSettings extends React.Component {
 
         <ul>
           <li>
-            <strong>Name</strong>: {collective.plan.name}
+            <strong>Name</strong>: <Capitalized>{collective.plan.name}</Capitalized>
           </li>
           <li>
-            <strong>Collective Limit</strong>: {collective.plan.collectiveLimit}
+            <strong>Collective Limit</strong>: {collective.plan.hostedCollectives} of{' '}
+            {collective.plan.hostedCollectivesLimit}
           </li>
           <li>
-            <strong>Add Funds Limit</strong>: {collective.plan.addFundsLimit / 100}$
+            <strong>Add Funds Limit</strong>: ${collective.plan.addedFunds / 100} of $
+            {collective.plan.addedFundsLimit / 100}
           </li>
           <li>
-            <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'yes' : 'no'}
+            <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'Yes' : 'No'}
           </li>
         </ul>
       </div>

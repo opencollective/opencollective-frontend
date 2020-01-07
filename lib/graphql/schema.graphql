@@ -2492,10 +2492,12 @@ type PaymentMethodType {
 The name of the current plan and its characteristics.
 """
 type PlanType {
-  name: String
-  collectiveLimit: Int
-  addFundsLimit: Int
+  addedFunds: Int
+  addedFundsLimit: Int
   hostDashboard: Boolean
+  hostedCollectives: Int
+  hostedCollectivesLimit: Int
+  name: String
 }
 
 """
