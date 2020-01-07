@@ -213,7 +213,7 @@ class Comment extends React.Component {
                 </Fragment>
               )}
             </div>
-            <div className="description">
+            <div className="description" data-cy="comment-body">
               {this.state.mode !== 'edit' && <HTMLContent content={comment.html} fontSize="13px" />}
               {this.state.mode === 'edit' && (
                 <RichTextEditor
