@@ -152,7 +152,7 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
     );
 
   return (
-    <Container width="100%">
+    <Container width="100%" data-cy="comment">
       <Flex mb={3} justifyContent="space-between">
         <Flex>
           <Box mr={3}>
@@ -195,7 +195,7 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
         >
           {({ isEditing, setValue }) =>
             !isEditing ? (
-              <HTMLContent content={comment.html} fontSize="13px" />
+              <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
             ) : (
               <RichTextEditor
                 defaultValue={comment.html}

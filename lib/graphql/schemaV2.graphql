@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Mon Dec 09 2019 17:30:01 GMT+0100 (Central European Standard Time)
+# timestamp: Tue Jan 07 2020 18:59:35 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -75,6 +75,20 @@ interface Account {
     orderBy: ChronologicalOrder
   ): OrderCollection
   settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
 }
 
 """
@@ -159,6 +173,20 @@ type Bot implements Account {
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
 }
 
 """
@@ -230,16 +258,6 @@ type Collective implements Account {
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
-
-  """
-  Amount of money in cents in the currency of the collective currently available to spend
-  """
-  balance: Int
-
-  """
-  Get the host collective that is receiving the money on behalf of this collective
-  """
-  host: Account
   conversations(
     limit: Int
     offset: Int
@@ -254,6 +272,16 @@ type Collective implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Int
+
+  """
+  Get the host collective that is receiving the money on behalf of this collective
+  """
+  host: Account
 }
 
 """
@@ -498,6 +526,20 @@ type Event implements Account {
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
 }
 
 """
@@ -565,6 +607,20 @@ type Individual implements Account {
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   firstName: String
   lastName: String
   email: String
@@ -806,6 +862,20 @@ type Organization implements Account {
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
   email: String
 }
 
@@ -828,6 +898,11 @@ type Query {
     The githubHandle attached to the account (ie: babel for https://opencollective.com/babel)
     """
     githubHandle: String
+
+    """
+    If false, will return null instead of an error if collective is not found
+    """
+    throwIfMissing: Boolean = true
   ): Account
   collective(
     """

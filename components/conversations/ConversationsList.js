@@ -46,7 +46,13 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
             }}
           />
         </P>
-        <P color="black.700" mt={2} fontSize="13px" dangerouslySetInnerHTML={{ __html: summary }} />
+        <P
+          color="black.700"
+          mt={2}
+          fontSize="13px"
+          dangerouslySetInnerHTML={{ __html: summary }}
+          data-cy="conversation-preview"
+        />
         {(hasFollowers || hasComments) && (
           <Flex mt={3} alignItems="center">
             {hasFollowers && (
@@ -66,6 +72,7 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
                 color="black.500"
                 title={formatMessage(messages.commentsCount, { n: stats.commentsCount })}
                 fontSize="Caption"
+                data-cy="replies-count"
               >
                 <CommentIcon size="1em" color="#9D9FA3" />
                 &nbsp;

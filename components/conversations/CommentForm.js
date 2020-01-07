@@ -88,7 +88,7 @@ const CommentForm = ({
           <SignInOrJoinFree routes={{ join: getRedirectUrl(router, id) }} />
         </ContainerOverlay>
       )}
-      <form onSubmit={handleSubmit(submit)}>
+      <form onSubmit={handleSubmit(submit)} data-cy="comment-form">
         {loadingLoggedInUser ? (
           <LoadingPlaceholder height={232} />
         ) : (
@@ -119,6 +119,7 @@ const CommentForm = ({
           buttonStyle="primary"
           disabled={!LoggedInUser || !formState.isValid}
           loading={formState.isSubmitting}
+          data-cy="submit-comment-btn"
         >
           {formatMessage(messages.postReply)}
         </StyledButton>

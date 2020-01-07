@@ -218,7 +218,13 @@ const i18nSection = defineMessages({
 
 // Define default sections based on collective type
 const DEFAULT_SECTIONS = {
-  [CollectiveType.ORGANIZATION]: [Sections.CONTRIBUTIONS, Sections.CONTRIBUTORS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.ORGANIZATION]: [
+    Sections.CONTRIBUTIONS,
+    Sections.CONTRIBUTORS,
+    Sections.CONVERSATIONS,
+    Sections.TRANSACTIONS,
+    Sections.ABOUT,
+  ],
   [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
   [CollectiveType.COLLECTIVE]: [
     Sections.GOALS,

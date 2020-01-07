@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { Router } from '../server/pages';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
 import ErrorPage, { generateError } from '../components/ErrorPage';
@@ -44,7 +43,7 @@ class CreateConversationPage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      collective: PropTypes.shape({
+      account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
@@ -80,17 +79,15 @@ class CreateConversationPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.collective) {
+      } else if (!data.account) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
-        return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
+      } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.collective;
+    const collective = data && data.account;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         {data.loading ? (
@@ -132,7 +129,7 @@ class CreateConversationPage extends React.Component {
 const getCollective = graphql(
   gqlV2`
     query CreateConversations($collectiveSlug: String!) {
-      collective(slug: $collectiveSlug, throwIfMissing: false) {
+      account(slug: $collectiveSlug, throwIfMissing: false) {
         id
         slug
         name

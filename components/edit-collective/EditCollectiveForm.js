@@ -13,6 +13,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { isFeatureAllowedForCollectiveType, FEATURES } from '../../lib/allowed-features';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
@@ -643,7 +644,7 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="Core Contributors" />
               </MenuItem>
             )}
-            {collective.type === CollectiveType.COLLECTIVE && (
+            {isFeatureAllowedForCollectiveType(collective.type, FEATURES.CONVERSATIONS) && (
               <MenuItem
                 selected={this.state.section === 'conversations'}
                 route="editCollective"

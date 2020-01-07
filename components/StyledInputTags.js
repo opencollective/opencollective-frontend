@@ -24,6 +24,7 @@ const StyledInputTags = ({ suggestedTags, ...props }) => {
   return (
     <StyledSelectCreatable
       isMulti
+      data-cy="styled-input-tags"
       options={options}
       hideDropdownIndicator={!options}
       hideMenu={!options}
