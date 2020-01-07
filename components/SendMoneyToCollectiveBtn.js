@@ -82,7 +82,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
             }
           `}
         </style>
-        <SmallButton className="approve" bsStyle="success" onClick={this.props.confirmTransfer || this.onClick}>
+        <SmallButton className="approve" onClick={this.props.confirmTransfer || this.onClick}>
           {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
           {!this.state.loading && (
             <FormattedMessage

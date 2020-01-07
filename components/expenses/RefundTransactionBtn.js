@@ -114,12 +114,7 @@ class RefundTransactionBtn extends React.Component {
         {this.state.showing.canRefund && (
           <div className="confirmation">
             <div className="confirmation-buttons">
-              <SmallButton
-                className="refund"
-                bsStyle="danger"
-                bsSize="xsmall"
-                onClick={() => this.setShowingState({ confirmRefund: true })}
-              >
+              <SmallButton className="refund" onClick={() => this.setShowingState({ confirmRefund: true })}>
                 <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
               </SmallButton>
             </div>
@@ -130,15 +125,10 @@ class RefundTransactionBtn extends React.Component {
           <div className="confirmation">
             <strong>Do you really want to refund this transaction?</strong>
             <div className="confirmation-buttons">
-              <SmallButton className="refund" bsStyle="danger" bsSize="xsmall" onClick={() => this.onClickRefund()}>
+              <SmallButton className="refund" onClick={() => this.onClickRefund()}>
                 <FormattedMessage id="transaction.refund.yes.btn" defaultMessage="Yes, refund!" />
               </SmallButton>
-              <SmallButton
-                className="no"
-                bsStyle="primary"
-                bsSize="xsmall"
-                onClick={() => this.setShowingState({ canRefund: true })}
-              >
+              <SmallButton className="no" onClick={() => this.setShowingState({ canRefund: true })}>
                 <FormattedMessage id="transaction.refund.no.btn" defaultMessage="no" />
               </SmallButton>
             </div>
