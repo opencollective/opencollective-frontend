@@ -28,6 +28,8 @@ class SignInOrJoinFree extends React.Component {
     createUser: PropTypes.func,
     /** Use this prop to use this as a controlled component */
     form: PropTypes.oneOf(['signin', 'create-account']),
+    /** Set the initial view for the component */
+    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -36,7 +38,7 @@ class SignInOrJoinFree extends React.Component {
   };
 
   state = {
-    form: 'signin',
+    form: this.props.defaultForm || 'signin',
     error: null,
     submitting: false,
     unknownEmailError: false,
