@@ -28,14 +28,15 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import EditVirtualCards from './EditVirtualCards';
 import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
+import Container from '../Container';
+import ExternalLink from '../ExternalLink';
 
 import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
-import Container from '../Container';
-import ExternalLink from '../ExternalLink';
 import EditHostInvoice from './EditHostInvoice';
+import EditCollectiveConversations from './EditCollectiveConversations';
 
 const selectedStyle = css`
   background-color: #eee;
@@ -642,6 +643,16 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.menu.members" defaultMessage="Core Contributors" />
               </MenuItem>
             )}
+            {collective.type === CollectiveType.COLLECTIVE && (
+              <MenuItem
+                selected={this.state.section === 'conversations'}
+                route="editCollective"
+                params={{ slug: collective.slug, section: 'conversations' }}
+                className="MenuItem"
+              >
+                <FormattedMessage id="conversations" defaultMessage="Conversations" />
+              </MenuItem>
+            )}
             {collective.isHost && (
               <MenuItem
                 selected={this.state.section === 'invoices'}
@@ -792,6 +803,7 @@ class EditCollectiveForm extends React.Component {
               )}
               {this.state.section === 'members' && <EditMembers collective={collective} LoggedInUser={LoggedInUser} />}
               {this.state.section === 'invoices' && <EditHostInvoice collective={collective} />}
+              {this.state.section === 'conversations' && <EditCollectiveConversations collective={collective} />}
               {this.state.section === 'webhooks' && (
                 <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
               )}
@@ -863,6 +875,7 @@ class EditCollectiveForm extends React.Component {
             {![
               'export',
               'connected-accounts',
+              'conversations',
               'host',
               'invoices',
               'gift-cards',
