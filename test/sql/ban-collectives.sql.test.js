@@ -128,4 +128,45 @@ describe('sql/ban-collectives', () => {
     await expect(updates.bySomeoneElseOnCollective).to.not.be.softDeleted;
     await expect(updates.byUserOnAnotherCollective).to.be.softDeleted;
   });
+
+  it('marks the users and collectives as banned through the data.isBanned flag', async () => {
+    createCollectiveWithData(); // To create additional data that shouldn't be touched
+    const user1 = await fakeUser();
+    const user2 = await fakeUser({ data: { isBanned: false, existingDataIsPreserved: true } });
+    const collective = await fakeCollective({ data: { hello: 'world' } });
+    createCollectiveWithData(); // To create additional data that shouldn't be touched
+
+    const [result] = await sequelize.query(banCollectivesQuery, {
+      bind: { collectiveSlugs: [user1.collective.slug, user2.collective.slug, collective.slug] },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    expect(result).to.deep.eqInAnyOrder({
+      nb_deleted_profiles: 3,
+      deleted_users: 2,
+      nb_deleted_tiers: 0,
+      nb_deleted_members: 0,
+      nb_deleted_updates: 0,
+      nb_deleted_payment_methods: 1, // collective payment method
+      nb_deleted_connected_accounts: 0,
+      nb_deleted_conversations: 0,
+      nb_deleted_conversation_followers: 0,
+      nb_deleted_comments: 0,
+      nb_deleted_expenses: 0,
+      nb_deleted_applications: 0,
+      nb_deleted_orders: 0,
+      nb_deleted_notifications: 0,
+      nb_deleted_users: 2,
+      deleted_profiles_ids: [user1.collective.id, user2.collective.id, collective.id],
+    });
+
+    const udpatedUser1 = await user1.reload({ paranoid: false });
+    expect(udpatedUser1.data).to.deep.eq({ isBanned: true });
+
+    const udpatedUser2 = await user2.reload({ paranoid: false });
+    expect(udpatedUser2.data).to.deep.eqInAnyOrder({ isBanned: true, existingDataIsPreserved: true });
+
+    const updatedCollective = await collective.reload({ paranoid: false });
+    expect(updatedCollective.data).to.deep.eqInAnyOrder({ isBanned: true, hello: 'world' });
+  });
 });

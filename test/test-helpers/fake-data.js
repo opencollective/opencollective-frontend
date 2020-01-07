@@ -18,8 +18,8 @@ export const randAmount = (min = 100, max = 10000000) => Math.floor(Math.random(
 /**
  * Creates a fake user. All params are optionals.
  */
-export const fakeUser = async () => {
-  return models.User.createUserWithCollective({ email: randEmail(), name: randStr('User Name ') });
+export const fakeUser = async userData => {
+  return models.User.createUserWithCollective({ email: randEmail(), name: randStr('User Name '), ...userData });
 };
 
 /**

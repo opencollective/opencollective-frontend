@@ -12,7 +12,9 @@ WITH banned_collectives AS (
   WHERE   slug = ANY($collectiveSlugs)
 ), deleted_profiles AS (
   -- Delete the actual collectives and their events
-  UPDATE ONLY "Collectives" c SET "deletedAt" = NOW()
+  UPDATE ONLY "Collectives" c
+  SET         "deletedAt" = NOW(),
+              data = (COALESCE(to_jsonb(data), '{}' :: jsonb) || '{"isBanned": true}' :: jsonb)
   FROM        banned_collectives
   WHERE       c."id" = banned_collectives.id
   OR          c."ParentCollectiveId" = banned_collectives.id
@@ -20,7 +22,9 @@ WITH banned_collectives AS (
 ), deleted_users AS (
   -- Delete the users (with their email preserved, they will be banned permanently)
   -- This block has no effect on collectives/orgs
-  UPDATE ONLY "Users" u SET "deletedAt" = NOW()
+  UPDATE ONLY "Users" u
+  SET         "deletedAt" = NOW(),
+              data = (COALESCE(to_jsonb(data), '{}' :: jsonb) || '{"isBanned": true}' :: jsonb)
   FROM        deleted_profiles
   WHERE       u."CollectiveId" = deleted_profiles.id
   RETURNING   u.id
