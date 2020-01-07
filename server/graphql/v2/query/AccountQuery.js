@@ -1,4 +1,4 @@
-import { GraphQLString } from 'graphql';
+import { GraphQLString, GraphQLBoolean } from 'graphql';
 
 import { Account } from '../interface/Account';
 import models from '../../../models';
@@ -20,12 +20,17 @@ const AccountQuery = {
       type: GraphQLString,
       description: 'The githubHandle attached to the account (ie: babel for https://opencollective.com/babel)',
     },
+    throwIfMissing: {
+      type: GraphQLBoolean,
+      defaultValue: true,
+      description: 'If false, will return null instead of an error if collective is not found',
+    },
   },
   async resolve(_, args) {
     let collective;
     if (args.slug) {
       const slug = args.slug.toLowerCase();
-      collective = await models.Collective.findBySlug(slug);
+      collective = await models.Collective.findBySlug(slug, null, args.throwIfMissing);
     } else if (args.id) {
       const id = idDecode(args.id, 'account');
       collective = await models.Collective.findByPk(id);
@@ -40,7 +45,7 @@ const AccountQuery = {
     } else {
       return new Error('Please provide a slug or an id');
     }
-    if (!collective) {
+    if (!collective && args.throwIfMissing) {
       throw new NotFound({ message: 'Account Not Found' });
     }
     return collective;
