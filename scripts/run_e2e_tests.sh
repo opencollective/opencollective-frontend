@@ -57,7 +57,7 @@ wait_for_service Frontend 127.0.0.1 3060
 
 echo ""
 echo "> Running cypress tests"
-npx cypress run ${CYPRESS_RECORD} --browser chrome
+npx cypress run ${CYPRESS_RECORD}
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
   echo "Error with cypress e2e tests, exiting"
