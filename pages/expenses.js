@@ -16,6 +16,8 @@ import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 
 class ExpensesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -39,6 +41,8 @@ class ExpensesPage extends React.Component {
     } else if (!data.Collective) {
       ssrNotFoundError(); // Force 404 when rendered server side
       return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+    } else if (!hasFeature(data.Collective, FEATURES.RECEIVE_EXPENSES)) {
+      return <PageFeatureNotSupported />;
     }
 
     const collective = data.Collective;
