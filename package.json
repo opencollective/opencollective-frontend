@@ -107,7 +107,6 @@
   },
   "devDependencies": {
     "@babel/cli": "7.7.7",
-    "@babel/polyfill": "7.7.0",
     "@babel/register": "7.7.7",
     "@typescript-eslint/eslint-plugin": "^2.15.0",
     "@typescript-eslint/parser": "^2.15.0",
@@ -166,6 +165,7 @@
     "db:sanitize": "babel-node --extensions .js,.ts scripts/sanitize-db",
     "db:seed": "./scripts/sequelize.sh db:seed",
     "db:setup": "babel-node --extensions .js,.ts ./scripts/db_setup.js",
+    "depcheck": "npx depcheck --specials babel,bin,commitizen,eslint,husky,lint-staged,mocha --ignore-dirs dist,dbdumps .",
     "deploy:production": "./scripts/pre-deploy.sh production && bash -x scripts/deploy.sh production",
     "deploy:staging": "./scripts/pre-deploy.sh staging && bash -x scripts/deploy.sh staging",
     "dev": "nodemon server/index.js -x \"babel-node --extensions .js,.ts\" . -e js,hbs,ts",
@@ -185,6 +185,7 @@
     "refund-transactions": "babel-node --extensions .js,.ts ./scripts/add_refund_transactions_from_collective.js",
     "report": "node scripts/send_email_report_cli.js",
     "script": "babel-node --extensions .js,.ts $1",
+    "sequelize": "babel-node --extensions .js,.ts -- ./node_modules/.bin/sequelize --config config/sequelize-cli.js",
     "start": "node ./dist/index.js",
     "test": "TZ=UTC nyc mocha --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",
     "test:graphql": "TZ=UTC nyc mocha test/server/graphql --reporter-options mochaFile=$(bash scripts/test_output_dir.sh junit)/junit.xml",

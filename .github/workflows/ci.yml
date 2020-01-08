@@ -115,6 +115,41 @@ jobs:
 
       - run: npm run type:check
 
+  depcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Restore node_modules
+        uses: actions/cache@v1
+        id: api-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-api-node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore .npm cache
+        if: steps.api-node-modules.outputs.cache-hit != 'true'
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-api-npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            - ${{ runner.os }}-api-npm-cache-${{ hashFiles('package-lock.json') }}
+            - ${{ runner.os }}-api-npm-cache-
+
+      - name: Install dependencies
+        if: steps.api-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - run: npm run depcheck
+
   build:
     runs-on: ubuntu-latest
 
