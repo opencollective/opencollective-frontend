@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import FAQ, { Entry, Title, Content } from './FAQ';
 
-const CreateConversationFAQ = props => (
+const CreateConversationFAQ = ({ defaultOpen, ...props }) => (
   <FAQ {...props}>
-    <Entry>
+    <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage id="CreateConversationFAQ.target" defaultMessage="Who will see this conversation?" />
+        <FormattedMessage id="CreateConversationFAQ.target" defaultMessage="Who can see conversations?" />
       </Title>
       <Content>
         <FormattedMessage
@@ -15,7 +16,7 @@ const CreateConversationFAQ = props => (
         />
       </Content>
     </Entry>
-    <Entry>
+    <Entry open={defaultOpen}>
       <Title>
         <FormattedMessage id="CreateConversationFAQ.moderation" defaultMessage="Who is moderating?" />
       </Title>
@@ -26,7 +27,7 @@ const CreateConversationFAQ = props => (
         />
       </Content>
     </Entry>
-    <Entry>
+    <Entry open={defaultOpen}>
       <Title>
         <FormattedMessage
           id="CreateConversationFAQ.replies"
@@ -42,5 +43,9 @@ const CreateConversationFAQ = props => (
     </Entry>
   </FAQ>
 );
+
+CreateConversationFAQ.propTypes = {
+  defaultOpen: PropTypes.bool,
+};
 
 export default CreateConversationFAQ;
