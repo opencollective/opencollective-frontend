@@ -160,13 +160,27 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
       )*/}
 
       {isHostAccount && (
-        <StyledButton onClick={() => setModal({ type: 'Deactivate', show: true })} loading={processing}>
+        <StyledButton
+          onClick={() => setModal({ type: 'Deactivate', show: true })}
+          loading={processing}
+          disabled={collective.plan.hostedCollectives > 0}
+        >
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.deactivate.button"
             defaultMessage={'Desactivate as Host'}
           />
         </StyledButton>
+      )}
+
+      {collective.plan.hostedCollectives > 0 && (
+        <P color="rgb(224, 183, 0)">
+          <FormattedMessage
+            values={{ hostedCollectives: collective.plan.hostedCollectives }}
+            id="collective.hostAccount.deactivate.isHost"
+            defaultMessage={'You cannot deactivate hosting while still hosting {hostedCollectives} other collectives.'}
+          />
+        </P>
       )}
 
       <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
