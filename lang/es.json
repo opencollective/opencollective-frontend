@@ -395,6 +395,8 @@
   "contribution.subscription.today": "Hoy",
   "contribution.total": "TOTAL",
   "contribution.your": "Tus contribuciones",
+  "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
+  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionType.ChildCollective": "Member collective",
   "ContributionType.Custom": "Aportación personalizada",
   "ContributionType.Event": "Evento",

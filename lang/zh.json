@@ -395,6 +395,8 @@
   "contribution.subscription.today": "今天",
   "contribution.total": "总计",
   "contribution.your": "您的贡献",
+  "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
+  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionType.ChildCollective": "Member collective",
   "ContributionType.Custom": "Custom contribution",
   "ContributionType.Event": "Event",

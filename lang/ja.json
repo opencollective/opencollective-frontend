@@ -395,6 +395,8 @@
   "contribution.subscription.today": "今日",
   "contribution.total": "合計",
   "contribution.your": "あなたのコントリビュート",
+  "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
+  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionType.ChildCollective": "Member collective",
   "ContributionType.Custom": "Custom contribution",
   "ContributionType.Event": "Event",

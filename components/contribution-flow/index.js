@@ -83,6 +83,14 @@ const messages = defineMessages({
     defaultMessage:
       'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
   },
+  createUserLabel: {
+    id: 'ContributionFlow.CreateUserLabel',
+    defaultMessage: 'Contribute as an individual',
+  },
+  createOrgLabel: {
+    id: 'ContributionFlow.CreateOrganizationLabel',
+    defaultMessage: 'Contribute as an organization',
+  },
 });
 
 /**
@@ -918,10 +926,16 @@ class CreateOrderPage extends React.Component {
   }
 
   renderContent(step, goNext, goBack, isValidating) {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, intl } = this.props;
 
     if (!LoggedInUser) {
-      return <SignInOrJoinFree defaultForm="create-account" />;
+      return (
+        <SignInOrJoinFree
+          defaultForm="create-account"
+          createPersonalProfileLabel={intl.formatMessage(messages.createUserLabel)}
+          createOrganizationProfileLabel={intl.formatMessage(messages.createOrgLabel)}
+        />
+      );
     }
 
     const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';

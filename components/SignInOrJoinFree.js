@@ -35,6 +35,10 @@ class SignInOrJoinFree extends React.Component {
       signin: PropTypes.string,
       join: PropTypes.string,
     }),
+    /** A label to use instead of the default `Create personal profile` */
+    createPersonalProfileLabel: PropTypes.node,
+    /** A label to use instead of the default `Create Organization profile` */
+    createOrganizationProfileLabel: PropTypes.node,
   };
 
   state = {
@@ -145,6 +149,8 @@ class SignInOrJoinFree extends React.Component {
                 onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                 submitting={submitting}
                 mx={[2, 4]}
+                createPersonalProfileLabel={this.props.createPersonalProfileLabel}
+                createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
               />
               <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
             </Flex>

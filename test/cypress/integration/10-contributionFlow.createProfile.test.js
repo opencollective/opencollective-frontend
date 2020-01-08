@@ -34,7 +34,7 @@ describe('Contribution Flow: Create profile', () => {
 
     // Select "Create oganization"
     cy.get('[data-cy="cf-content"]')
-      .contains('Create Organization Profile')
+      .contains('Contribute as an organization')
       .click();
 
     // Test frontend validations

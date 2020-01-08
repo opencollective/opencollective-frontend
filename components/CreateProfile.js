@@ -27,8 +27,8 @@ const Tab = ({ active, children, setActive }) => (
     bg={active ? 'white.full' : 'black.50'}
     color="black.700"
     cursor="pointer"
-    px={4}
-    py={3}
+    px={3}
+    py={20}
     textAlign="center"
     width={0.5}
     tabIndex={0}
@@ -134,6 +134,8 @@ const CreateProfile = ({
   onPersonalSubmit,
   onOrgSubmit,
   onSecondaryAction,
+  createPersonalProfileLabel,
+  createOrganizationProfileLabel,
   ...props
 }) => {
   const [tab, setTab] = useState('personal');
@@ -143,10 +145,14 @@ const CreateProfile = ({
     <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
         <Tab active={tab === 'personal'} setActive={() => setTab('personal')}>
-          <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
+          {createPersonalProfileLabel || (
+            <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
+          )}
         </Tab>
         <Tab active={tab === 'organization'} setActive={() => setTab('organization')}>
-          <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
+          {createOrganizationProfileLabel || (
+            <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
+          )}
         </Tab>
       </Flex>
 
@@ -344,6 +350,10 @@ CreateProfile.propTypes = {
   email: PropTypes.string.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
+  /** A label to use instead of the default `Create personal profile` */
+  createPersonalProfileLabel: PropTypes.node,
+  /** A label to use instead of the default `Create Organization profile` */
+  createOrganizationProfileLabel: PropTypes.node,
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
 };
