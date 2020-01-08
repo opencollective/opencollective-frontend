@@ -96,7 +96,7 @@ class SignInOrJoinFree extends React.Component {
     if (this.state.submitting) {
       return false;
     }
-    const user = pick(data, ['email', 'firstName', 'lastName', 'newsletterOptIn']);
+    const user = pick(data, ['email', 'name', 'newsletterOptIn']);
     const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
     const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
     if (organization) {

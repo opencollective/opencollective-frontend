@@ -162,11 +162,19 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['firstName', 'lastName', 'newsletterOptIn']);
+            const data = pick(state, ['name', 'newsletterOptIn']);
             onPersonalSubmit({ ...data, email });
           }}
           method="POST"
         >
+          <Box mb={3}>
+            <StyledInputField label="Full Name" htmlFor="name" error={getFieldError('name')}>
+              {inputProps => (
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
+              )}
+            </StyledInputField>
+          </Box>
+
           <Box mb={3}>
             <StyledInputField label="Email" htmlFor="email" error={getFieldError('email')}>
               {inputProps => (
@@ -185,18 +193,6 @@ const CreateProfile = ({
                   required
                 />
               )}
-            </StyledInputField>
-          </Box>
-
-          <Box mb={3}>
-            <StyledInputField label="First Name" htmlFor="firstName" error={getFieldError('firstName')}>
-              {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} />}
-            </StyledInputField>
-          </Box>
-
-          <Box mb={4}>
-            <StyledInputField label="Last Name" htmlFor="lastName" error={getFieldError('lastName')}>
-              {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} />}
             </StyledInputField>
           </Box>
 
@@ -224,8 +220,7 @@ const CreateProfile = ({
           onSubmit={event => {
             event.preventDefault();
             const data = pick(state, [
-              'firstName',
-              'lastName',
+              'name',
               'orgName',
               'website',
               'githubHandle',
@@ -239,6 +234,13 @@ const CreateProfile = ({
           <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.600" mb={3} fontWeight="500">
             Your personal information
           </P>
+          <Box mb={3}>
+            <StyledInputField label="Full Name" htmlFor="name" error={getFieldError('name')}>
+              {inputProps => (
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
+              )}
+            </StyledInputField>
+          </Box>
           <Box mb={3}>
             <StyledInputField label="Email" htmlFor="email" error={getFieldError('email')}>
               {inputProps => (
@@ -257,18 +259,6 @@ const CreateProfile = ({
                   required
                 />
               )}
-            </StyledInputField>
-          </Box>
-
-          <Box mb={3}>
-            <StyledInputField label="First Name" htmlFor="firstName" error={getFieldError('firstName')}>
-              {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} />}
-            </StyledInputField>
-          </Box>
-
-          <Box mb={4}>
-            <StyledInputField label="Last Name" htmlFor="lastName" error={getFieldError('lastName')}>
-              {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} />}
             </StyledInputField>
           </Box>
 
