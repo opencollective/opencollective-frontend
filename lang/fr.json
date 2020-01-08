@@ -432,6 +432,7 @@
   "CP.Contribute.Financial": "Contributions financières",
   "CP.Contribute.Title": "Contribuez",
   "CP.Contributions.PartOfOrg": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de notre Organisation",
+  "CP.Contributions.SubCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "create.pledge.stats": "par {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# personne } other {# personnes }}",
   "createAccount.alreadyLoggedIn": "Il semble que vous soyez déjà connecté en tant que « {email} ». Pour créer un nouveau compte, veuillez d'abord vous déconnecter.",
   "CreateConversation.Body.Placeholder": "Vous pouvez ajouter des liens, des listes, des extraits de code et plus en utilisant cet éditeur. Tapez et ajoutez du contenu pour votre conversation ici.",

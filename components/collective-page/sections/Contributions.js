@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { get } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql, Query } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
 
@@ -87,42 +86,6 @@ const MembershipCardContainer = styled.div`
   }
 `;
 
-const ParentedCollectivesQuery = gql`
-  query SuperCollectiveChildren($tags: [String]) {
-    allCollectives(orderBy: balance, orderDirection: DESC, limit: 50, tags: $tags) {
-      collectives {
-        id
-        name
-        slug
-        type
-        currency
-        isIncognito
-        description
-        imageUrl(height: 128)
-        backgroundImageUrl(height: 200)
-        tags
-        settings
-        parentCollective {
-          id
-          backgroundImageUrl
-          name
-          slug
-        }
-        host {
-          id
-        }
-        stats {
-          id
-          backers {
-            id
-            all
-          }
-        }
-      }
-    }
-  }
-`;
-
 class SectionContributions extends React.PureComponent {
   static propTypes = {
     /** Collective */
@@ -146,8 +109,11 @@ class SectionContributions extends React.PureComponent {
             hosted: PropTypes.number,
           }).isRequired,
         }).isRequired,
-        settings: PropTypes.shape({
-          superCollectiveTags: PropTypes.arrayOf(PropTypes.string),
+        subCollectives: PropTypes.arrayOf({
+          id: PropTypes.number,
+          collective: PropTypes.shape({
+            id: PropTypes.number,
+          }),
         }),
         memberOf: PropTypes.arrayOf(
           PropTypes.shape({
@@ -264,8 +230,8 @@ class SectionContributions extends React.PureComponent {
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
     const sortedMemberships = this.sortMemberships(memberships);
+    const subCollectives = data.Collective.subCollectives;
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
-    const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
       <Box pt={5} pb={3}>
         {data.Collective.memberOf.length === 0 ? (
@@ -337,37 +303,35 @@ class SectionContributions extends React.PureComponent {
             )}
           </React.Fragment>
         )}
-        {isOrganization && superCollectiveTags.length > 0 && (
-          <Query query={ParentedCollectivesQuery} variables={{ tags: superCollectiveTags }}>
-            {({ loading, error, data: subCollectivesData }) => {
-              const collectives = get(subCollectivesData, 'allCollectives.collectives', []);
-              if (loading || error || collectives.length === 0) {
-                return null;
-              }
-              return (
-                <React.Fragment>
-                  <ContainerSectionContent>
-                    <SectionTitle textAlign="left" mb={4}>
-                      <FormattedMessage
-                        id="CP.Contributions.PartOfOrg"
-                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
-                        values={{ n: collectives.length }}
-                      />
-                    </SectionTitle>
-                  </ContainerSectionContent>
-                  <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
-                    <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                      {collectives.map(collective => (
-                        <MembershipCardContainer key={collective.id}>
-                          <StyledMembershipCard membership={{ collective }} />
-                        </MembershipCardContainer>
-                      ))}
-                    </Flex>
-                  </Container>
-                </React.Fragment>
-              );
-            }}
-          </Query>
+        {subCollectives.length > 0 && (
+          <Box mt={5}>
+            <ContainerSectionContent>
+              <SectionTitle textAlign="left" mb={4}>
+                {isOrganization ? (
+                  <FormattedMessage
+                    id="CP.Contributions.PartOfOrg"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
+                    values={{ n: subCollectives.length }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="CP.Contributions.SubCollective"
+                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
+                    values={{ n: subCollectives.length }}
+                  />
+                )}
+              </SectionTitle>
+            </ContainerSectionContent>
+            <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
+              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                {subCollectives.map(({ id, collective }) => (
+                  <MembershipCardContainer key={id}>
+                    <StyledMembershipCard membership={{ collective }} />
+                  </MembershipCardContainer>
+                ))}
+              </Flex>
+            </Container>
+          </Box>
         )}
       </Box>
     );
@@ -385,6 +349,38 @@ const withData = graphql(
           collectives {
             id
             hosted
+          }
+        }
+        subCollectives: members(role: "SUB_COLLECTIVE") {
+          id
+          collective: member {
+            id
+            name
+            slug
+            type
+            currency
+            isIncognito
+            description
+            imageUrl(height: 128)
+            backgroundImageUrl(height: 200)
+            tags
+            settings
+            parentCollective {
+              id
+              backgroundImageUrl
+              name
+              slug
+            }
+            host {
+              id
+            }
+            stats {
+              id
+              backers {
+                id
+                all
+              }
+            }
           }
         }
         memberOf(onlyActiveCollectives: true, limit: 1500) {

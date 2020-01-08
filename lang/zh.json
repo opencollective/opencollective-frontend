@@ -432,6 +432,7 @@
   "CP.Contribute.Financial": "Financial contributions",
   "CP.Contribute.Title": "Become a contributor",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",
+  "CP.Contributions.SubCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one {and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
   "createAccount.alreadyLoggedIn": "It seems like you're already signed in as \"{email}\". If you want to create a new account, please log out first.",
   "CreateConversation.Body.Placeholder": "You can add links, lists, code snipets and more using this text editor. Type and start adding content to your conversation here.",
