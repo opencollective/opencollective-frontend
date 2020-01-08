@@ -102,7 +102,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         <StyledButton
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
-          disabled={hasBalance ? true : false}
+          disabled={collective.isHost || hasBalance ? true : false}
         >
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
@@ -119,6 +119,14 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             defaultMessage={
               "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option."
             }
+          />
+        </P>
+      )}
+      {!isArchived && collective.isHost && (
+        <P color="rgb(224, 183, 0)">
+          <FormattedMessage
+            id="collective.archive.isHost"
+            defaultMessage={"You can't archive your collective while being a Host, please Desactivate as Host first."}
           />
         </P>
       )}
