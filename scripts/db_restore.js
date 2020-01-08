@@ -62,4 +62,6 @@ function parseCommandLineArguments() {
   return parser.parseArgs();
 }
 
-if (!module.parent) main(parseCommandLineArguments());
+if (!module.parent) {
+  main(parseCommandLineArguments());
+}

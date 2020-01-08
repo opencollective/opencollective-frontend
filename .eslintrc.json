@@ -16,7 +16,6 @@
     "prefer-rest-params": "off",
     // relaxing because we have many errors
     "require-atomic-updates": "off",
-
     // typescript
     "node/no-missing-import": ["error", { "tryExtensions": [".js", ".ts"] }]
   },

@@ -44,7 +44,9 @@ export const parseJwtNoExpiryCheck = (req, res, next) => {
   let token = req.params.access_token || req.query.access_token || req.body.access_token;
   if (!token) {
     const header = req.headers && req.headers.authorization;
-    if (!header) return next();
+    if (!header) {
+      return next();
+    }
 
     const parts = header.split(' ');
     const scheme = parts[0];
@@ -136,7 +138,9 @@ export const _authenticateUserByJwt = async (req, res, next) => {
  * @ERROR: Will return an error if a JWT token is provided and invalid
  */
 export function authenticateUser(req, res, next) {
-  if (req.remoteUser && req.remoteUser.id) return next();
+  if (req.remoteUser && req.remoteUser.id) {
+    return next();
+  }
 
   parseJwtNoExpiryCheck(req, res, e => {
     // If a token was submitted but is invalid, we continue without authenticating the user

@@ -51,4 +51,6 @@ async function main() {
   await Promise.all([client.end(), clientMaint.end(), clientApp.end()]);
 }
 
-if (!module.parent) main();
+if (!module.parent) {
+  main();
+}

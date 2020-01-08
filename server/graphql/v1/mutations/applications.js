@@ -6,7 +6,9 @@ import config from 'config';
 const { Application } = models;
 
 function requireArgs(args, path) {
-  if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
+  if (!get(args, path)) {
+    throw new errors.ValidationFailed({ message: `${path} required` });
+  }
 }
 
 export async function createApplication(_, args, req) {

@@ -131,10 +131,18 @@ export default function(Sequelize, DataTypes) {
    * @param {*} member { tier: { interval }, lastDonation}
    */
   Member.isActive = member => {
-    if (!member.tier || !member.tier.interval) return true;
-    if (!member.lastDonation) return false;
-    if (member.tier.interval === 'month' && days(new Date(member.lastDonation)) <= 31) return true;
-    if (member.tier.interval === 'year' && days(new Date(member.lastDonation)) <= 365) return true;
+    if (!member.tier || !member.tier.interval) {
+      return true;
+    }
+    if (!member.lastDonation) {
+      return false;
+    }
+    if (member.tier.interval === 'month' && days(new Date(member.lastDonation)) <= 31) {
+      return true;
+    }
+    if (member.tier.interval === 'year' && days(new Date(member.lastDonation)) <= 365) {
+      return true;
+    }
     return false;
   };
 

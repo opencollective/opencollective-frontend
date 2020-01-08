@@ -29,7 +29,9 @@ const getToken = code => () =>
 const getAccountInformation = data => {
   return new Promise((resolve, reject) => {
     return stripe.accounts.retrieve(data.stripe_user_id, (err, account) => {
-      if (err) return reject(err);
+      if (err) {
+        return reject(err);
+      }
       data.account = account;
       return resolve(data);
     });
@@ -119,10 +121,16 @@ export default {
         if (!collective.address && account.legal_entity) {
           const { address } = account.legal_entity;
           const addressLines = [address.line1];
-          if (address.line2) addressLines.push(address.line2);
-          if (address.country === 'US') addressLines.push(`${address.city} ${address.state} ${address.postal_code}`);
-          else if (address.country === 'UK') addressLines.push(`${address.city} ${address.postal_code}`);
-          else addressLines.push(`${address.postal_code} ${address.city}`);
+          if (address.line2) {
+            addressLines.push(address.line2);
+          }
+          if (address.country === 'US') {
+            addressLines.push(`${address.city} ${address.state} ${address.postal_code}`);
+          } else if (address.country === 'UK') {
+            addressLines.push(`${address.city} ${address.postal_code}`);
+          } else {
+            addressLines.push(`${address.postal_code} ${address.city}`);
+          }
 
           addressLines.push(address.country);
           collective.address = addressLines.join('\n');

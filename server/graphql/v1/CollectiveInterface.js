@@ -777,8 +777,9 @@ const CollectiveFields = () => {
         if (
           collective.isIncognito &&
           (!req.remoteUser || !req.remoteUser.isAdmin(collective.inTheContextOfCollectiveId))
-        )
+        ) {
           return {};
+        }
         return models.User.findByPk(collective.CreatedByUserId);
       },
     },
@@ -1090,7 +1091,9 @@ const CollectiveFields = () => {
         };
 
         query.where = { CollectiveId: collective.id };
-        if (args.TierId) query.where.TierId = args.TierId;
+        if (args.TierId) {
+          query.where.TierId = args.TierId;
+        }
         const roles = args.roles || (args.role && [args.role]);
 
         if (roles && roles.length > 0) {
@@ -1387,9 +1390,15 @@ const CollectiveFields = () => {
       },
       resolve(collective, args) {
         const query = { where: {} };
-        if (args.status) query.where.status = args.status;
-        if (args.limit) query.limit = args.limit;
-        if (args.offset) query.offset = args.offset;
+        if (args.status) {
+          query.where.status = args.status;
+        }
+        if (args.limit) {
+          query.limit = args.limit;
+        }
+        if (args.offset) {
+          query.offset = args.offset;
+        }
         query.order = [['createdAt', 'DESC']];
         const getCollectiveIds = () => {
           // if is host, we get all the expenses across all the hosted collectives
@@ -1441,9 +1450,15 @@ const CollectiveFields = () => {
       },
       resolve(collective, args) {
         const query = { where: { CollectiveId: collective.id }, order: [['createdAt', 'DESC']] };
-        if (args.limit) query.limit = args.limit;
-        if (args.offset) query.offset = args.offset;
-        if (args.onlyPublishedUpdates) query.where.publishedAt = { [Op.ne]: null };
+        if (args.limit) {
+          query.limit = args.limit;
+        }
+        if (args.offset) {
+          query.offset = args.offset;
+        }
+        if (args.onlyPublishedUpdates) {
+          query.where.publishedAt = { [Op.ne]: null };
+        }
         return models.Update.findAll(query);
       },
     },
@@ -1472,9 +1487,15 @@ const CollectiveFields = () => {
           ],
         };
 
-        if (args.limit) query.limit = args.limit;
-        if (args.offset) query.offset = args.offset;
-        if (!args.includeInactive) query.where.isActive = true;
+        if (args.limit) {
+          query.limit = args.limit;
+        }
+        if (args.offset) {
+          query.offset = args.offset;
+        }
+        if (!args.includeInactive) {
+          query.where.isActive = true;
+        }
         if (!args.includePastEvents) {
           // Use midnight so we only mark events as passed the day after
           const today = new Date().setHours(0, 0, 0, 0);
@@ -1699,7 +1720,9 @@ export const UserCollectiveType = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         resolve(userCollective, args, req) {
-          if (!req.remoteUser) return null;
+          if (!req.remoteUser) {
+            return null;
+          }
           return (
             userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email)
           );
@@ -1727,7 +1750,9 @@ export const OrganizationCollectiveType = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         async resolve(orgCollective, args, req) {
-          if (!req.remoteUser) return null;
+          if (!req.remoteUser) {
+            return null;
+          }
           return (
             orgCollective && req.loaders.getOrgDetailsByCollectiveId.load(orgCollective.id).then(user => user.email)
           );

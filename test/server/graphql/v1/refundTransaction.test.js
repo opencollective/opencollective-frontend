@@ -188,7 +188,9 @@ describe('server/graphql/v1/refundTransaction', () => {
       const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, anotherUser);
 
       // Then there should be no errors
-      if (result.errors) throw result.errors;
+      if (result.errors) {
+        throw result.errors;
+      }
 
       // And then all the transactions with that same order id are
       // retrieved.
@@ -240,7 +242,9 @@ describe('server/graphql/v1/refundTransaction', () => {
       const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, host);
 
       // Then there should be no errors
-      if (result.errors) throw result.errors;
+      if (result.errors) {
+        throw result.errors;
+      }
 
       // And then all the transactions with that same order id are
       // retrieved.
@@ -333,7 +337,9 @@ describe('server/graphql/v1/refundTransaction', () => {
       const result = await utils.graphqlQuery(refundQuery, { id: transaction.id }, host);
 
       // Then there should be no errors
-      if (result.errors) throw result.errors;
+      if (result.errors) {
+        throw result.errors;
+      }
 
       // And then the returned value should match the transaction
       // passed to the mutation

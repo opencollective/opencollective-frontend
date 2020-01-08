@@ -38,9 +38,12 @@ const onlyCollectivesWithoutTwitterActivated = collective => {
   return models.ConnectedAccount.findOne({
     where: { CollectiveId: collective.id, service: 'twitter' },
   }).then(twitterAccount => {
-    if (!twitterAccount) return true;
-    if (get(twitterAccount, 'settings.monthlyStats.active') && get(twitterAccount, 'settings.newBacker.active'))
+    if (!twitterAccount) {
+      return true;
+    }
+    if (get(twitterAccount, 'settings.monthlyStats.active') && get(twitterAccount, 'settings.newBacker.active')) {
       return false;
+    }
     return true;
   });
 };

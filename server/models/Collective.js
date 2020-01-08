@@ -478,7 +478,9 @@ export default function(Sequelize, DataTypes) {
         },
 
         previewImage() {
-          if (!this.image) return null;
+          if (!this.image) {
+            return null;
+          }
 
           const cloudinaryBaseUrl = 'https://res.cloudinary.com/opencollective/image/fetch';
 
@@ -610,7 +612,9 @@ export default function(Sequelize, DataTypes) {
 
       hooks: {
         beforeValidate: instance => {
-          if (instance.slug) return Promise.resolve();
+          if (instance.slug) {
+            return Promise.resolve();
+          }
           let potentialSlugs,
             useSlugify = true;
           if (instance.isIncognito) {
@@ -665,16 +669,23 @@ export default function(Sequelize, DataTypes) {
    */
   Collective.prototype.getNextGoal = async function(until) {
     const goals = get(this, 'settings.goals');
-    if (!goals) return null;
+    if (!goals) {
+      return null;
+    }
     const stats = {};
     goals.sort((a, b) => {
-      if (a.amount < b.amount) return -1;
-      else return 1;
+      if (a.amount < b.amount) {
+        return -1;
+      } else {
+        return 1;
+      }
     });
 
     let nextGoal;
     await Promise.each(goals, async goal => {
-      if (nextGoal) return;
+      if (nextGoal) {
+        return;
+      }
       if (goal.type === 'balance') {
         if (!stats.balance) {
           stats.balance = await this.getBalance(until);
@@ -708,8 +719,12 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getParentCollective = function() {
-    if (!this.ParentCollectiveId) return Promise.resolve(null);
-    if (this.parentCollective) return Promise.resolve(this.parentCollective);
+    if (!this.ParentCollectiveId) {
+      return Promise.resolve(null);
+    }
+    if (this.parentCollective) {
+      return Promise.resolve(this.parentCollective);
+    }
     return models.Collective.findByPk(this.ParentCollectiveId);
   };
 
@@ -839,7 +854,9 @@ export default function(Sequelize, DataTypes) {
     return models.PaymentMethod.findOne({
       where: { service: 'opencollective', CollectiveId: this.id },
     }).then(pm => {
-      if (pm) return null;
+      if (pm) {
+        return null;
+      }
       return models.PaymentMethod.create({
         CollectiveId: this.id,
         service: 'opencollective',
@@ -1018,8 +1035,11 @@ export default function(Sequelize, DataTypes) {
       include: [{ model: models.Collective, as: 'fromCollective' }, { model: models.Tier }],
     });
     orders.sort((a, b) => {
-      if (a.dataValues.totalAmount > b.dataValues.totalAmount) return -1;
-      else return 1;
+      if (a.dataValues.totalAmount > b.dataValues.totalAmount) {
+        return -1;
+      } else {
+        return 1;
+      }
     });
     return orders;
   };
@@ -1056,8 +1076,11 @@ export default function(Sequelize, DataTypes) {
     });
 
     orders.sort((a, b) => {
-      if (a.dataValues.totalAmount > b.dataValues.totalAmount) return -1;
-      else return 1;
+      if (a.dataValues.totalAmount > b.dataValues.totalAmount) {
+        return -1;
+      } else {
+        return 1;
+      }
     });
 
     return orders;
@@ -1135,7 +1158,9 @@ export default function(Sequelize, DataTypes) {
       } else {
         const result = res.dataValues || res || {};
         debug('getBackersCount', result);
-        if (!result.count) return 0;
+        if (!result.count) {
+          return 0;
+        }
         return Promise.resolve(Number(result.count));
       }
     });
@@ -1164,7 +1189,9 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getRoleForMemberCollective = function(MemberCollectiveId) {
-    if (!MemberCollectiveId) return null;
+    if (!MemberCollectiveId) {
+      return null;
+    }
     return models.Member.findOne({
       where: { MemberCollectiveId, CollectiveId: this.id },
     }).then(member => member.role);
@@ -1237,7 +1264,9 @@ export default function(Sequelize, DataTypes) {
    * @param {*} user
    */
   Collective.prototype.getBackerTier = function(backerCollective) {
-    if (backerCollective.role && backerCollective.role !== 'BACKER') return backerCollective;
+    if (backerCollective.role && backerCollective.role !== 'BACKER') {
+      return backerCollective;
+    }
     return models.Order.findOne({
       where: {
         FromCollectiveId: backerCollective.id,
@@ -1726,7 +1755,9 @@ export default function(Sequelize, DataTypes) {
 
   // edit the tiers of this collective (create/update/remove)
   Collective.prototype.editTiers = function(tiers) {
-    if (!tiers) return this.getTiers();
+    if (!tiers) {
+      return this.getTiers();
+    }
 
     return this.getTiers()
       .then(oldTiers => {
@@ -1762,10 +1793,18 @@ export default function(Sequelize, DataTypes) {
     const where = {
       createdAt: { [Op.lt]: endDate },
     };
-    if (status) where.status = status;
-    if (startDate) where.createdAt[Op.gte] = startDate;
-    if (createdByUserId) where.UserId = createdByUserId;
-    if (excludedTypes) where.type = { [Op.or]: [{ [Op.eq]: null }, { [Op.notIn]: excludedTypes }] };
+    if (status) {
+      where.status = status;
+    }
+    if (startDate) {
+      where.createdAt[Op.gte] = startDate;
+    }
+    if (createdByUserId) {
+      where.UserId = createdByUserId;
+    }
+    if (excludedTypes) {
+      where.type = { [Op.or]: [{ [Op.eq]: null }, { [Op.notIn]: excludedTypes }] };
+    }
 
     return models.Expense.findAll({
       where,
@@ -1785,10 +1824,18 @@ export default function(Sequelize, DataTypes) {
       createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id,
     };
-    if (status) where.status = status;
-    if (startDate) where.createdAt[Op.gte] = startDate;
-    if (createdByUserId) where.UserId = createdByUserId;
-    if (excludedTypes) where.type = { [Op.or]: [{ [Op.eq]: null }, { [Op.notIn]: excludedTypes }] };
+    if (status) {
+      where.status = status;
+    }
+    if (startDate) {
+      where.createdAt[Op.gte] = startDate;
+    }
+    if (createdByUserId) {
+      where.UserId = createdByUserId;
+    }
+    if (excludedTypes) {
+      where.type = { [Op.or]: [{ [Op.eq]: null }, { [Op.notIn]: excludedTypes }] };
+    }
 
     return models.Expense.findAll({
       where,
@@ -1801,8 +1848,12 @@ export default function(Sequelize, DataTypes) {
       createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id,
     };
-    if (startDate) where.createdAt[Op.gte] = startDate;
-    if (status === 'published') where.publishedAt = { [Op.ne]: null };
+    if (startDate) {
+      where.createdAt[Op.gte] = startDate;
+    }
+    if (status === 'published') {
+      where.publishedAt = { [Op.ne]: null };
+    }
 
     return models.Update.findAll({
       where,
@@ -1914,7 +1965,9 @@ export default function(Sequelize, DataTypes) {
       createdAt: { [Op.lt]: endDate },
       CollectiveId: this.id,
     };
-    if (startDate) where.createdAt[Op.gte] = startDate;
+    if (startDate) {
+      where.createdAt[Op.gte] = startDate;
+    }
     return models.Transaction.findOne({
       attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']],
       where,
@@ -2049,14 +2102,22 @@ export default function(Sequelize, DataTypes) {
     }
 
     // Filter on type
-    if (type) query.where.type = type;
+    if (type) {
+      query.where.type = type;
+    }
 
     // Pagination
-    if (limit) query.limit = limit;
-    if (offset) query.offset = offset;
+    if (limit) {
+      query.limit = limit;
+    }
+    if (offset) {
+      query.offset = offset;
+    }
 
     // OrderBy
-    if (order) query.order = order;
+    if (order) {
+      query.order = order;
+    }
 
     return models.Transaction.findAll(query);
   };
@@ -2072,9 +2133,15 @@ export default function(Sequelize, DataTypes) {
       ...this.transactionsWhereQuery(),
       createdAt: { [Op.lt]: endDate },
     };
-    if (startDate) where.createdAt[Op.gte] = startDate;
-    if (type === 'donation') where.amount = { [Op.gt]: 0 };
-    if (type === 'expense') where.amount = { [Op.lt]: 0 };
+    if (startDate) {
+      where.createdAt[Op.gte] = startDate;
+    }
+    if (type === 'donation') {
+      where.amount = { [Op.gt]: 0 };
+    }
+    if (type === 'expense') {
+      where.amount = { [Op.lt]: 0 };
+    }
     return models.Transaction.findOne({
       attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col(attribute)), 0), 'total']],
       where,
@@ -2109,7 +2176,9 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.isHost = function() {
-    if (this.type !== 'ORGANIZATION' && this.type !== 'USER') return Promise.resolve(false);
+    if (this.type !== 'ORGANIZATION' && this.type !== 'USER') {
+      return Promise.resolve(false);
+    }
     return models.Member.findOne({
       where: { MemberCollectiveId: this.id, role: 'HOST' },
     }).then(r => Boolean(r));
@@ -2143,13 +2212,17 @@ export default function(Sequelize, DataTypes) {
       where: { role: roles.HOST, CollectiveId: this.ParentCollectiveId },
       include: [{ model: models.Collective, as: 'memberCollective' }],
     }).then(m => {
-      if (m && m.memberCollective) return m.memberCollective;
+      if (m && m.memberCollective) {
+        return m.memberCollective;
+      }
       return this.isHost().then(isHost => (isHost ? this : null));
     });
   };
 
   Collective.prototype.getHostCollectiveId = function() {
-    if (this.HostCollectiveId) return Promise.resolve(this.HostCollectiveId);
+    if (this.HostCollectiveId) {
+      return Promise.resolve(this.HostCollectiveId);
+    }
     return models.Collective.getHostCollectiveId(this.ParentCollectiveId || this.id).then(HostCollectiveId => {
       this.HostCollectiveId = HostCollectiveId;
       return HostCollectiveId;
@@ -2187,7 +2260,9 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.setStripeAccount = function(stripeAccount) {
-    if (!stripeAccount) return Promise.resolve(null);
+    if (!stripeAccount) {
+      return Promise.resolve(null);
+    }
 
     if (stripeAccount.id) {
       return models.ConnectedAccount.update({ CollectiveId: this.id }, { where: { id: stripeAccount.id }, limit: 1 });

@@ -9,9 +9,13 @@ const debug = libdebug('express');
 const sendErrorByEmail = (req, err) => {
   let errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
 
-  if (req.body.password) req.body.password = '***********';
+  if (req.body.password) {
+    req.body.password = '***********';
+  }
 
-  if (req.body.passwordConfirmation) req.body.passwordConfirmation = '***********';
+  if (req.body.passwordConfirmation) {
+    req.body.passwordConfirmation = '***********';
+  }
 
   errorHTML += curlify(req, req.body);
   errorHTML += '<br />\n<br />\n';
@@ -77,7 +81,9 @@ export default (err, req, res, next) => {
   }
 
   debug('Error Express : ', err);
-  if (err.stack) debug(err.stack);
+  if (err.stack) {
+    debug(err.stack);
+  }
 
   res.status(err.code).send({ error: err });
 };

@@ -3,7 +3,9 @@ import { get } from 'lodash';
 import * as common from '../../common/comment';
 
 function require(args, path) {
-  if (!get(args, path)) throw new errors.ValidationFailed({ message: `${path} required` });
+  if (!get(args, path)) {
+    throw new errors.ValidationFailed({ message: `${path} required` });
+  }
 }
 
 async function editComment(_, { comment }, { remoteUser }) {

@@ -182,7 +182,9 @@ async function create(args, remoteUser) {
  * @param {integer} count
  */
 export async function bulkCreateVirtualCards(args, remoteUser, count) {
-  if (!count) return [];
+  if (!count) {
+    return [];
+  }
 
   // Check rate limit
   const totalAmount = (args.amount || args.monthlyLimitPerMember) * count;

@@ -204,7 +204,9 @@ export default function(Sequelize, DataTypes) {
 
   // total Transactions over time for this order
   Order.prototype.getTotalTransactions = function() {
-    if (!this.SubscriptionId) return this.totalAmount;
+    if (!this.SubscriptionId) {
+      return this.totalAmount;
+    }
     return models.Transaction.sum('amount', {
       where: {
         OrderId: this.id,
@@ -238,13 +240,18 @@ export default function(Sequelize, DataTypes) {
   Order.prototype.validatePaymentMethod = function(paymentMethod) {
     debug('validatePaymentMethod', paymentMethod.dataValues, 'this.user', this.CreatedByUserId);
     return paymentMethod.canBeUsedForOrder(this, this.createdByUser).then(canBeUsedForOrder => {
-      if (canBeUsedForOrder) return paymentMethod;
-      else return null;
+      if (canBeUsedForOrder) {
+        return paymentMethod;
+      } else {
+        return null;
+      }
     });
   };
 
   Order.prototype.getUser = function() {
-    if (this.createdByUser) return Promise.resolve(this.createdByUser);
+    if (this.createdByUser) {
+      return Promise.resolve(this.createdByUser);
+    }
     return models.User.findByPk(this.CreatedByUserId).then(user => {
       this.createdByUser = user;
       debug('getUser', user.dataValues);
@@ -264,8 +271,12 @@ export default function(Sequelize, DataTypes) {
       const attribute = (fk.substr(0, 1).toLowerCase() + fk.substr(1)).replace(/Id$/, '');
       const model = fk.replace(/(from|to|createdby)/i, '').replace(/Id$/, '');
       const promise = () => {
-        if (this[attribute]) return Promise.resolve(this[attribute]);
-        if (!this[fk]) return Promise.resolve(null);
+        if (this[attribute]) {
+          return Promise.resolve(this[attribute]);
+        }
+        if (!this[fk]) {
+          return Promise.resolve(null);
+        }
         return models[model].findByPk(this[fk]);
       };
       return promise().then(obj => {

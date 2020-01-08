@@ -56,9 +56,15 @@ describe('server/graphql/v1/search', () => {
   });
 
   afterEach(() => {
-    if (config.algolia.appId === 'x') delete config.algolia.appId;
-    if (config.algolia.appKey === 'y') delete config.algolia.appKey;
-    if (config.algolia.index === 'z') delete config.algolia.index;
+    if (config.algolia.appId === 'x') {
+      delete config.algolia.appId;
+    }
+    if (config.algolia.appKey === 'y') {
+      delete config.algolia.appKey;
+    }
+    if (config.algolia.index === 'z') {
+      delete config.algolia.index;
+    }
 
     sandbox.restore();
   });

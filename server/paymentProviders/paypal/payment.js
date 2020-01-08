@@ -10,7 +10,9 @@ import { floatAmountToCents } from '../../lib/math';
 
 /** Build an URL for the PayPal API */
 export function paypalUrl(path) {
-  if (path.startsWith('/')) throw new Error("Please don't use absolute paths");
+  if (path.startsWith('/')) {
+    throw new Error("Please don't use absolute paths");
+  }
   const baseUrl =
     config.paypal.payment.environment === 'sandbox'
       ? 'https://api.sandbox.paypal.com/v1/'
@@ -69,7 +71,9 @@ export async function paypalRequest(urlPath, body) {
  */
 export async function createPayment(req, res) {
   const { amount, currency } = req.body;
-  if (!amount || !currency) throw new Error('Amount & Currency are required');
+  if (!amount || !currency) {
+    throw new Error('Amount & Currency are required');
+  }
   const paymentParams = {
     intent: 'sale',
     payer: { payment_method: 'paypal' },

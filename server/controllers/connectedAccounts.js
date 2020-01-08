@@ -174,7 +174,9 @@ export const verify = (req, res, next) => {
     return paymentProviders[service].oauth.verify(req, res, next);
   }
 
-  if (!payload) return next(new errors.Unauthorized());
+  if (!payload) {
+    return next(new errors.Unauthorized());
+  }
   if (payload.scope === 'connected-account' && payload.username) {
     res.send({
       service,

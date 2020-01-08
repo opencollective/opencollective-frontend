@@ -31,7 +31,9 @@ export const Individual = new GraphQLObjectType({
       email: {
         type: GraphQLString,
         resolve(userCollective, args, req) {
-          if (!req.remoteUser) return null;
+          if (!req.remoteUser) {
+            return null;
+          }
           return (
             userCollective && req.loaders.getUserDetailsByCollectiveId.load(userCollective.id).then(user => user.email)
           );

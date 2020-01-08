@@ -20,7 +20,9 @@ let start;
 let issuesFound = false;
 
 const done = err => {
-  if (err) result = result.concat('err', err);
+  if (err) {
+    result = result.concat('err', err);
+  }
   result = result.concat('\n\nTotal time taken: ', new Date() - start, 'ms');
   console.log(result);
   console.log('\ndone!\n');

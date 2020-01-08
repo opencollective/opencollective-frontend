@@ -197,10 +197,14 @@ export default function(Sequelize, DataTypes) {
 
       hooks: {
         beforeValidate: instance => {
-          if (!instance.publishedAt || !instance.slug) return instance.generateSlug();
+          if (!instance.publishedAt || !instance.slug) {
+            return instance.generateSlug();
+          }
         },
         beforeUpdate: instance => {
-          if (!instance.publishedAt || !instance.slug) return instance.generateSlug();
+          if (!instance.publishedAt || !instance.slug) {
+            return instance.generateSlug();
+          }
         },
         afterCreate: instance => {
           models.Activity.create({
@@ -294,7 +298,9 @@ export default function(Sequelize, DataTypes) {
    * Otherwise, we'll suggest something.
    */
   Update.prototype.generateSlug = function() {
-    if (!this.title) return;
+    if (!this.title) {
+      return;
+    }
     const suggestion = slugify(this.title.trim()).toLowerCase(/\./g, '');
 
     /*
@@ -321,7 +327,9 @@ export default function(Sequelize, DataTypes) {
       .then(updateObjectList => updateObjectList.map(update => update.slug))
       .then(slugList => slugSuggestionHelper(suggestion, slugList, 0))
       .then(slug => {
-        if (!slug) return Promise.reject(new Error("We couldn't generate a unique slug for this Update"));
+        if (!slug) {
+          return Promise.reject(new Error("We couldn't generate a unique slug for this Update"));
+        }
         this.slug = slug;
       });
   };

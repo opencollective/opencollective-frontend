@@ -45,8 +45,12 @@ export function getTransactions(collectiveids, startDate = new Date('2015-01-01'
     },
     order: [['createdAt', 'DESC']],
   };
-  if (options.limit) query.limit = options.limit;
-  if (options.include) query.include = options.include;
+  if (options.limit) {
+    query.limit = options.limit;
+  }
+  if (options.include) {
+    query.include = options.include;
+  }
   return models.Transaction.findAll(query);
 }
 
@@ -158,10 +162,18 @@ export function netAmount(tr) {
  * Verify net amount of a transaction
  */
 export function verify(tr) {
-  if (tr.type === 'CREDIT' && tr.amount <= 0) return 'amount <= 0';
-  if (tr.type === 'DEBIT' && tr.amount >= 0) return 'amount >= 0';
-  if (tr.type === 'CREDIT' && tr.netAmountInCollectiveCurrency <= 0) return 'netAmount <= 0';
-  if (tr.type === 'DEBIT' && tr.netAmountInCollectiveCurrency >= 0) return 'netAmount >= 0';
+  if (tr.type === 'CREDIT' && tr.amount <= 0) {
+    return 'amount <= 0';
+  }
+  if (tr.type === 'DEBIT' && tr.amount >= 0) {
+    return 'amount >= 0';
+  }
+  if (tr.type === 'CREDIT' && tr.netAmountInCollectiveCurrency <= 0) {
+    return 'netAmount <= 0';
+  }
+  if (tr.type === 'DEBIT' && tr.netAmountInCollectiveCurrency >= 0) {
+    return 'netAmount >= 0';
+  }
   const diff = Math.abs(netAmount(tr) - tr.netAmountInCollectiveCurrency);
   // if the difference is within one cent, it's most likely a rounding error (because of the number of decimals in the hostCurrencyFxRate)
   if (diff > 0 && diff < 10) {

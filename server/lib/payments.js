@@ -408,7 +408,9 @@ const sendOrderProcessingEmail = async order => {
     data.instructions = instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
       if (p1) {
         const key = p1.toLowerCase();
-        if (formatValues[key]) return formatValues[key];
+        if (formatValues[key]) {
+          return formatValues[key];
+        }
       }
       return match;
     });

@@ -505,10 +505,11 @@ export function deleteEventCollective(_, args, req) {
   }
 
   return models.Collective.findByPk(args.id).then(collective => {
-    if (!collective)
+    if (!collective) {
       throw new errors.NotFound({
         message: `Collective with id ${args.id} not found`,
       });
+    }
     if (!req.remoteUser.isAdmin(collective.id) && !req.remoteUser.isAdmin(collective.ParentCollectiveId)) {
       throw new errors.Unauthorized({
         message: 'You need to be logged in as a core contributor or as a host to delete this collective',

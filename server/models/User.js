@@ -304,8 +304,9 @@ export default (Sequelize, DataTypes) => {
       channel,
     };
     return models.Notification.findOne({ where: notification }).then(result => {
-      if (result) return result.update({ active: false });
-      else {
+      if (result) {
+        return result.update({ active: false });
+      } else {
         notification.active = false;
         return models.Notification.create(notification);
       }
@@ -404,10 +405,14 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.prototype.getPersonalDetails = function(remoteUser) {
-    if (!remoteUser) return Promise.resolve(this.public);
+    if (!remoteUser) {
+      return Promise.resolve(this.public);
+    }
     return this.populateRoles()
       .then(() => {
-        if (this.id === remoteUser.id) return true;
+        if (this.id === remoteUser.id) {
+          return true;
+        }
         // all the CollectiveIds that the remoteUser is admin of.
         const adminOfCollectives = Object.keys(remoteUser.rolesByCollectiveId).filter(CollectiveId =>
           remoteUser.isAdmin(CollectiveId),
@@ -463,7 +468,9 @@ export default (Sequelize, DataTypes) => {
   };
 
   User.createUserWithCollective = async (userData, transaction) => {
-    if (!userData) return Promise.reject(new Error('Cannot create a user: no user data provided'));
+    if (!userData) {
+      return Promise.reject(new Error('Cannot create a user: no user data provided'));
+    }
 
     const sequelizeParams = transaction ? { transaction } : undefined;
     debug('createUserWithCollective', userData);

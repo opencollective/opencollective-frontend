@@ -53,8 +53,12 @@ const Conversation = new GraphQLObjectType({
           const order = [['createdAt', 'ASC']];
           const query = { where, order };
 
-          if (limit) query.limit = limit;
-          if (offset) query.offset = offset;
+          if (limit) {
+            query.limit = limit;
+          }
+          if (offset) {
+            query.offset = offset;
+          }
 
           const result = await models.Comment.findAndCountAll(query);
           return { nodes: result.rows, totalCount: result.count, limit, offset };

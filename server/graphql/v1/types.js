@@ -731,7 +731,9 @@ export const ExpenseType = new GraphQLObjectType({
       privateMessage: {
         type: GraphQLString,
         resolve(expense, args, req) {
-          if (!req.remoteUser) return null;
+          if (!req.remoteUser) {
+            return null;
+          }
           if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.privateMessage;
           }
@@ -747,7 +749,9 @@ export const ExpenseType = new GraphQLObjectType({
       attachment: {
         type: GraphQLString,
         resolve(expense, args, req) {
-          if (!req.remoteUser) return null;
+          if (!req.remoteUser) {
+            return null;
+          }
           if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
             return expense.attachment;
           }
@@ -1566,7 +1570,9 @@ export const OrderType = new GraphQLObjectType({
         type: UserType,
         async resolve(order, args, req) {
           const fromCollective = await order.getFromCollective();
-          if (fromCollective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(order.CollectiveId))) return {};
+          if (fromCollective.isIncognito && (!req.remoteUser || !req.remoteUser.isAdmin(order.CollectiveId))) {
+            return {};
+          }
 
           return order.getCreatedByUser();
         },
@@ -1649,7 +1655,9 @@ export const OrderType = new GraphQLObjectType({
             limit: args.limit || 10,
             offset: args.offset || 0,
           };
-          if (args.type) query.where.type = args.type;
+          if (args.type) {
+            query.where.type = args.type;
+          }
           return req.loaders.Transaction.findByOrderId(query).load(order.id);
         },
       },

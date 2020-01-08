@@ -884,7 +884,9 @@ const getCollectivesWithMinBackersQuery = async ({
   offset = 0,
   where = {},
 }) => {
-  if (where.type) delete where.type;
+  if (where.type) {
+    delete where.type;
+  }
 
   const whereStatement = Object.keys(where).reduce((statement, key) => `${statement} AND c."${key}"=$${key}`, '');
   const params = {
