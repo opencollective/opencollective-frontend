@@ -20,8 +20,6 @@ aliases:
     NODE_ENV: 'circleci'
     POSTGRES_USER: 'postgres'
     POSTGRES_PASSWORD: ''
-    CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
-    CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
 
   test_filters: &test_filters
     filters:
@@ -58,13 +56,10 @@ jobs:
     steps:
       - checkout
       - <<: *restore_cache
-      - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: npm ci
       - run: npm run db:setup
       - <<: *persist_cache
       - run: npm run test
-      - store_test_results:
-          path: /tmp/circleci-test-results
 
 workflows:
   version: 2
