@@ -178,7 +178,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
           <FormattedMessage
             values={{ hostedCollectives: collective.plan.hostedCollectives }}
             id="collective.hostAccount.deactivate.isHost"
-            defaultMessage={'You cannot deactivate hosting while still hosting {hostedCollectives} other collectives.'}
+            defaultMessage={"You can't deactivate hosting while still hosting {hostedCollectives} other collectives."}
           />
         </P>
       )}
