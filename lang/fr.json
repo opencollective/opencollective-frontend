@@ -989,6 +989,7 @@
   "Organization.Name": "Organization name",
   "organization.supercollective.title": "Collectifs {tags}",
   "page.error.collective.is.not.host": "Cette page est uniquement pour les hôtes de collectifs",
+  "page.error.plan.needs.upgrade": "You must upgrade your plan to access this page",
   "page.error.networkError": "Open Collective n'est momentanément pas joignable",
   "page.error.networkError.description": "Pas de panique! Un de nos ingénieurs est probablement déjà occupé de régler ce problème 👩🏻‍💻👨🏿‍💻. Merci de bien vouloir réessayer plus tard. Merci pour votre patience 🙏 ",
   "Pagination.Count": "Page {current} sur {total}",

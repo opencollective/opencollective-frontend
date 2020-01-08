@@ -989,6 +989,7 @@
   "Organization.Name": "Organization name",
   "organization.supercollective.title": "Coletivos {tags}",
   "page.error.collective.is.not.host": "Esta página é somente para organizadores",
+  "page.error.plan.needs.upgrade": "You must upgrade your plan to access this page",
   "page.error.networkError": "O servidor do Open Collective está temporariamente indisponível",
   "page.error.networkError.description": "Não se preocupe! Um de nossos engenheiros provavelmente já está resolvendo isso 👩🏻‍💻 👨🏿‍💻. Por favor, tente novamente mais tarde. Obrigado pela sua paciência 🙏 (e desculpe pela inconveniência!)",
   "Pagination.Count": "Página {current} de {total}",

@@ -414,7 +414,7 @@ const CollectiveNavbar = ({
               </MenuLink>
             </MenuLinkContainer>
           )}
-          {callsToAction.hasDashboard && (
+          {callsToAction.hasDashboard && collective.plan.hostDashboard && (
             <MenuLinkContainer mobileOnly>
               <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
                 <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
@@ -445,6 +445,7 @@ CollectiveNavbar.propTypes = {
     canContact: PropTypes.bool,
     canApply: PropTypes.bool,
     host: PropTypes.object,
+    plan: PropTypes.object,
   }).isRequired,
   /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
   callsToAction: PropTypes.shape({

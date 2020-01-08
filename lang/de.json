@@ -962,6 +962,7 @@
   "organization.isArchived.description": "This Organization has been archived and is no longer active.",
   "organization.supercollective.title": "{tags} Collectives",
   "page.error.collective.is.not.host": "This page is only for hosts",
+  "page.error.plan.needs.upgrade": "You must upgrade your plan to access this page",
   "page.error.networkError": "The Open Collective Server is momentarily unreachable",
   "page.error.networkError.description": "Worry not! One of our engineers is probably already on it  👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)",
   "Pagination.Count": "Page {current} of {total}",
