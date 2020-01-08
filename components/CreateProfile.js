@@ -64,12 +64,12 @@ Tab.propTypes = {
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
     <Link route={onSecondaryAction} passHref>
-      <StyledLink disabled={loading} fontSize="Paragraph" fontWeight="bold">
+      <StyledLink disabled={loading} fontSize="Paragraph">
         {children}
       </StyledLink>
     </Link>
   ) : (
-    <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={loading}>
+    <StyledButton asLink fontSize="Paragraph" onClick={onSecondaryAction} disabled={loading}>
       {children}
     </StyledButton>
   );
@@ -184,7 +184,7 @@ const CreateProfile = ({
           }}
           method="POST"
         >
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
@@ -192,7 +192,7 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField htmlFor="email" label={formatMessage(messages.email)} error={getFieldError('email')}>
               {inputProps => (
                 <StyledInput
@@ -248,17 +248,17 @@ const CreateProfile = ({
           }}
           method="POST"
         >
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.600" mb={3} fontWeight="500">
+          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.PersonalInfo" defaultMessage="Your personal information" />
           </P>
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
               )}
             </StyledInputField>
           </Box>
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField label="Email" htmlFor="email" error={getFieldError('email')}>
               {inputProps => (
                 <StyledInput
@@ -279,10 +279,10 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.600" mb={3} fontWeight="500">
+          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization's information" />
           </P>
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField
               htmlFor="orgName"
               label={formatMessage(messages.orgName)}
@@ -299,7 +299,7 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField
               htmlFor="website"
               label={formatMessage(messages.website)}
@@ -317,7 +317,7 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <Box mb={3}>
+          <Box mb={24}>
             <StyledInputField
               htmlFor="githubHandle"
               label="GitHub"
@@ -335,7 +335,7 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <Box mb={4}>
+          <Box mb={24}>
             <StyledInputField
               htmlFor="twitterHandle"
               label="Twitter"
@@ -363,12 +363,13 @@ const CreateProfile = ({
         </Box>
       )}
 
-      <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
-        <P color="black.700">
+      <Container alignItems="center" bg="black.50" display="flex" justifyContent="center" px={4} py={3}>
+        <P color="black.700" mr={2}>
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </P>
         <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
+          &nbsp;→
         </SecondaryAction>
       </Container>
     </StyledCard>
