@@ -86,6 +86,9 @@ class TransactionsPage extends React.Component {
             LoggedInUser={LoggedInUser}
             key={collective.slug}
             selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
+            callsToAction={{
+              hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
+            }}
             displayContributeLink={
               collective.isActive && collective.host && !['USER', 'ORGANIZATION'].includes(collective.type)
             }

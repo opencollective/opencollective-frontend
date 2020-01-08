@@ -86,6 +86,7 @@ class ExpensePage extends React.Component {
             collective={collective}
             LoggedInUser={LoggedInUser}
             displayContributeLink={collective.isActive && collective.host ? true : false}
+            callsToAction={{ hasSubmitExpense: true }}
           />
 
           <Box maxWidth={1200} m="0 auto" px={[1, 3, 4]} py={[2, 3]}>
