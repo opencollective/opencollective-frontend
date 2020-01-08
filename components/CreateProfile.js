@@ -20,6 +20,22 @@ const messages = defineMessages({
     id: 'newsletter.label',
     defaultMessage: 'Receive our monthly newsletter',
   },
+  nameLabel: {
+    id: 'User.FullName',
+    defaultMessage: 'Full name',
+  },
+  orgName: {
+    id: 'Organization.Name',
+    defaultMessage: 'Organization name',
+  },
+  email: {
+    id: 'Email',
+    defaultMessage: 'Email',
+  },
+  website: {
+    id: 'collective.website.label',
+    defaultMessage: 'Website',
+  },
 });
 
 const Tab = ({ active, children, setActive }) => (
@@ -138,6 +154,7 @@ const CreateProfile = ({
   createOrganizationProfileLabel,
   ...props
 }) => {
+  const { formatMessage } = useIntl();
   const [tab, setTab] = useState('personal');
   const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors });
 
@@ -168,7 +185,7 @@ const CreateProfile = ({
           method="POST"
         >
           <Box mb={3}>
-            <StyledInputField label="Full Name" htmlFor="name" error={getFieldError('name')}>
+            <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
               )}
@@ -176,7 +193,7 @@ const CreateProfile = ({
           </Box>
 
           <Box mb={3}>
-            <StyledInputField label="Email" htmlFor="email" error={getFieldError('email')}>
+            <StyledInputField htmlFor="email" label={formatMessage(messages.email)} error={getFieldError('email')}>
               {inputProps => (
                 <StyledInput
                   {...inputProps}
@@ -232,10 +249,10 @@ const CreateProfile = ({
           method="POST"
         >
           <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.600" mb={3} fontWeight="500">
-            Your personal information
+            <FormattedMessage id="CreateProfile.PersonalInfo" defaultMessage="Your personal information" />
           </P>
           <Box mb={3}>
-            <StyledInputField label="Full Name" htmlFor="name" error={getFieldError('name')}>
+            <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
               )}
@@ -263,10 +280,14 @@ const CreateProfile = ({
           </Box>
 
           <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.600" mb={3} fontWeight="500">
-            Organization&apos;s information
+            <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization's information" />
           </P>
           <Box mb={3}>
-            <StyledInputField label="Org Name" htmlFor="orgName" error={getFieldError('orgName')}>
+            <StyledInputField
+              htmlFor="orgName"
+              label={formatMessage(messages.orgName)}
+              error={getFieldError('orgName')}
+            >
               {inputProps => (
                 <StyledInput
                   {...inputProps}
@@ -279,21 +300,48 @@ const CreateProfile = ({
           </Box>
 
           <Box mb={3}>
-            <StyledInputField label="Website" htmlFor="website" error={getFieldError('website')}>
-              {inputProps => <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} type="url" />}
+            <StyledInputField
+              htmlFor="website"
+              label={formatMessage(messages.website)}
+              error={getFieldError('website')}
+              required={false}
+            >
+              {inputProps => (
+                <StyledInput
+                  {...inputProps}
+                  {...getFieldProps(inputProps.name)}
+                  type="url"
+                  placeholder="https://website.com"
+                />
+              )}
             </StyledInputField>
           </Box>
 
           <Box mb={3}>
-            <StyledInputField label="GitHub (optional)" htmlFor="githubHandle" error={getFieldError('githubHandle')}>
+            <StyledInputField
+              htmlFor="githubHandle"
+              label="GitHub"
+              required={false}
+              error={getFieldError('githubHandle')}
+            >
               {inputProps => (
-                <StyledInputGroup {...inputProps} {...getFieldProps(inputProps.name)} prepend="github.com/" />
+                <StyledInputGroup
+                  {...inputProps}
+                  {...getFieldProps(inputProps.name)}
+                  prepend="github.com/"
+                  placeholder="username"
+                />
               )}
             </StyledInputField>
           </Box>
 
           <Box mb={4}>
-            <StyledInputField label="Twitter (optional)" htmlFor="twitterHandle" error={getFieldError('twitterHandle')}>
+            <StyledInputField
+              htmlFor="twitterHandle"
+              label="Twitter"
+              required={false}
+              error={getFieldError('twitterHandle')}
+            >
               {inputProps => <StyledInputGroup {...inputProps} {...getFieldProps(inputProps.name)} prepend="@" />}
             </StyledInputField>
           </Box>
@@ -316,7 +364,9 @@ const CreateProfile = ({
       )}
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="space-between" px={4} py={3}>
-        <P color="black.700">Already have an account?</P>
+        <P color="black.700">
+          <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
+        </P>
         <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
           <FormattedMessage id="signIn" defaultMessage="Sign In" />
         </SecondaryAction>
