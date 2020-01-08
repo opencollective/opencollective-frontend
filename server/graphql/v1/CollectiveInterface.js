@@ -714,6 +714,7 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
       childCollectives: {
         type: new GraphQLList(CollectiveType),
         description: "Get all child collectives (with type=COLLECTIVE, doesn't return events)",
+        deprecationReason: '2020/01/08 - Sub-collectives are now handled through members',
       },
       paymentMethods: {
         type: new GraphQLList(PaymentMethodType),
@@ -1523,6 +1524,7 @@ const CollectiveFields = () => {
     childCollectives: {
       type: new GraphQLList(CollectiveType),
       description: "Get all child collectives (with type=COLLECTIVE, doesn't return events)",
+      deprecationReason: '2020/01/08 - Sub-collectives are now handled through members',
       resolve(collective, _, req) {
         return req.loaders.Collective.childCollectives.load(collective.id);
       },
