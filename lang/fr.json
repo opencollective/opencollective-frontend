@@ -713,7 +713,7 @@
   "Frequency.OneTime": "Ponctuel",
   "Frequency.Year": "Annuel",
   "GiftCard": "Carte cadeau",
-  "GiftCard.definition": "Les cartes cadeaux permettent à vos employés et aux membres de votre communauté de soutenir les projets qu'ils aiment.",
+  "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love. Learn more about them <learn-more-link>here</learn-more-link>.",
   "Giftcard.learnMore": "En savoir plus sur les cartes cadeaux",
   "giftcard.user.name": "Re-bonjour {name}!",
   "giftcard.user.text": "Vous pouvez désormais soutenir des collectifs avec cette carte cadeau, de la part de {emitter}.",
