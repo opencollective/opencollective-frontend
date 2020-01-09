@@ -713,7 +713,7 @@
   "Frequency.OneTime": "One time",
   "Frequency.Year": "年間",
   "GiftCard": "ギフトカード",
-  "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love.",
+  "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love. Learn more about them <learn-more-link>here</learn-more-link>.",
   "Giftcard.learnMore": "Learn more about Gift Cards",
   "giftcard.user.name": "また会いましたね、{name}!",
   "giftcard.user.text": "You can now support open collectives with this gift card, courtesy of {emitter}.",
