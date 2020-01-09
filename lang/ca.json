@@ -713,7 +713,7 @@
   "Frequency.OneTime": "Puntual",
   "Frequency.Year": "Anualment",
   "GiftCard": "Targeta regal",
-  "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love.",
+  "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love. Learn more about them <learn-more-link>here</learn-more-link>.",
   "Giftcard.learnMore": "Learn more about Gift Cards",
   "giftcard.user.name": "Hello again, {name}!",
   "giftcard.user.text": "You can now support open collectives with this gift card, courtesy of {emitter}.",
