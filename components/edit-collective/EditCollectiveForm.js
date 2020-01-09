@@ -37,6 +37,7 @@ import EditCollectiveDelete from './EditCollectiveDelete';
 import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
+import EditCollectiveConversations from './EditCollectiveConversations';
 import EditHostSettings from './EditHostSettings';
 
 const selectedStyle = css`
