@@ -2,7 +2,7 @@ import { types } from '../constants/collectives';
 import FEATURE from '../constants/feature';
 
 const FeatureAllowedForTypes = {
-  [FEATURE.CONVERSATIONS]: [types.COLLECTIVE],
+  [FEATURE.CONVERSATIONS]: [types.COLLECTIVE, types.ORGANIZATION],
 };
 
 /**
