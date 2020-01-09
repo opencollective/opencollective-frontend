@@ -82,7 +82,7 @@ class NewCollectivePage extends React.Component {
         financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
         events: PropTypes.arrayOf(PropTypes.object),
-        childCollectives: PropTypes.arrayOf(PropTypes.object),
+        subCollectives: PropTypes.arrayOf(PropTypes.object),
         transactions: PropTypes.arrayOf(PropTypes.object),
         expenses: PropTypes.arrayOf(PropTypes.object),
         updates: PropTypes.arrayOf(PropTypes.object),
@@ -142,7 +142,7 @@ class NewCollectivePage extends React.Component {
                   financialContributors={collective.financialContributors}
                   tiers={collective.tiers}
                   events={collective.events}
-                  childCollectives={collective.childCollectives}
+                  subCollectives={collective.subCollectives}
                   transactions={collective.transactions}
                   expenses={collective.expenses}
                   stats={collective.stats}
