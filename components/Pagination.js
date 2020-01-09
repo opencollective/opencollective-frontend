@@ -8,24 +8,33 @@ import { Flex } from '@rebass/grid';
 import StyledLink from './StyledLink';
 import { TextInput } from './StyledInput';
 
-const Pagination = ({ router, limit, offset, total }) => {
+const Pagination = ({ router, limit, offset, total, scrollToTopOnChange }) => {
   const { pathname, query, route } = router;
   const totalPages = Math.ceil(total / limit);
   const currentPage = offset / limit + 1;
 
-  const changePage = ({ target, key }) => {
+  const changePage = async ({ target, key }) => {
     if (key && key !== 'Enter') return;
 
     const { value } = target;
     if (!value) return;
 
-    router.push({ pathname, query: { ...query, offset: (value - 1) * limit } });
+    await router.push({ pathname, query: { ...query, offset: (value - 1) * limit } });
+
+    if (scrollToTopOnChange) {
+      window.scrollTo(0, 0);
+    }
   };
 
   return (
     <Flex alignItems="center">
       {currentPage > 1 && (
-        <Link route={route.slice(1)} scroll={false} params={{ ...query, offset: offset - limit }} passHref>
+        <Link
+          route={route.slice(1)}
+          scroll={scrollToTopOnChange}
+          params={{ ...query, offset: offset - limit }}
+          passHref
+        >
           <StyledLink buttonStyle="standard" buttonSize="small">
             <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
           </StyledLink>
@@ -54,7 +63,12 @@ const Pagination = ({ router, limit, offset, total }) => {
         />
       </Flex>
       {currentPage < totalPages && (
-        <Link route={route.slice(1)} scroll={false} params={{ ...query, offset: offset + limit }} passHref>
+        <Link
+          route={route.slice(1)}
+          scroll={scrollToTopOnChange}
+          params={{ ...query, offset: offset + limit }}
+          passHref
+        >
           <StyledLink buttonStyle="standard" buttonSize="small">
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
           </StyledLink>
@@ -69,6 +83,12 @@ Pagination.propTypes = {
   limit: PropTypes.number,
   offset: PropTypes.number,
   total: PropTypes.number,
+  /** Use this to scroll back on top when pagination changes */
+  scrollToTopOnChange: PropTypes.bool,
+};
+
+Pagination.defaultProps = {
+  scrollToTopOnChange: false,
 };
 
 export default withRouter(Pagination);

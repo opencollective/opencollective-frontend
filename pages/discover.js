@@ -251,7 +251,7 @@ const DiscoverPage = ({ router, intl }) => {
                 </Flex>
 
                 {loading && (
-                  <Box pt={6}>
+                  <Box py={6}>
                     <LoadingGrid />
                   </Box>
                 )}
@@ -281,6 +281,7 @@ const DiscoverPage = ({ router, intl }) => {
                           offset={data.allCollectives.offset}
                           total={data.allCollectives.total}
                           limit={data.allCollectives.limit}
+                          scrollToTopOnChange
                         />
                       </Flex>
                     )}
@@ -305,7 +306,9 @@ const DiscoverPage = ({ router, intl }) => {
 };
 
 DiscoverPage.propTypes = {
+  /** @ignore from withRouter */
   router: PropTypes.object,
+  /** @ignore from injectIntl */
   intl: PropTypes.object,
 };
 
