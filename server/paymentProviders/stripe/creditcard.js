@@ -58,18 +58,28 @@ const getOrCreateCustomerOnHostAccount = async (hostStripeAccount, { paymentMeth
       user,
     });
 
-    // More info about that
-    // - Documentation: https://stripe.com/docs/connect/shared-customers
-    // - API: https://stripe.com/docs/api/tokens/create_card
-    const token = await stripe.tokens.create(
-      { customer: platformStripeCustomer.id },
-      { stripe_account: hostStripeAccount.username },
-    );
+    let customer;
 
-    const customer = await stripe.customers.create(
-      { source: token.id, email: user.email },
-      { stripe_account: hostStripeAccount.username },
-    );
+    // This is a special case where the account is the root account
+    if (hostStripeAccount.username === config.stripe.accountId) {
+      customer = platformStripeCustomer;
+    }
+
+    // This is the normal case where we create a customer on the host connected account
+    if (!customer) {
+      // More info about that
+      // - Documentation: https://stripe.com/docs/connect/shared-customers
+      // - API: https://stripe.com/docs/api/tokens/create_card
+      const token = await stripe.tokens.create(
+        { customer: platformStripeCustomer.id },
+        { stripe_account: hostStripeAccount.username },
+      );
+
+      customer = await stripe.customers.create(
+        { source: token.id, email: user.email },
+        { stripe_account: hostStripeAccount.username },
+      );
+    }
 
     data.customerIdForHost[hostStripeAccount.username] = customer.id;
     paymentMethod.data = data;
@@ -107,7 +117,8 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
         to: `${config.host.website}/${order.collective.slug}`,
       },
     };
-    if (platformFee) {
+    // We don't add a platform fee if the host is the root account
+    if (platformFee && hostStripeAccount.username !== config.stripe.accountId) {
       payload.application_fee_amount = platformFee;
     }
     if (order.interval) {
