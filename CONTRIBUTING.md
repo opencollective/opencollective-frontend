@@ -18,7 +18,7 @@ For the long run, we suggest to integrate these tools in your favorite code edit
 
 ## Commit convention
 
-Your commit messages should conform to the [Angular convention](https://github.com/conventional-changelog/conventional-changelog/blob/master/packages/conventional-changelog-angular/README.md).
+Your commit messages should conform to the [Conventional Commits](https://www.conventionalcommits.org/) specification.
 
 To help you follow this convention, this project is using [commitizen](https://github.com/commitizen/cz-cli). To use it:
 
