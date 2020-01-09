@@ -254,7 +254,6 @@ const generateEmailFromTemplate = (template, recipient, data = {}, options = {})
   }
 
   if (template === 'ticket.confirmed') {
-    // if (slug === 'sustainoss') template += '.sustainoss';
     if (slug === 'fearlesscitiesbrussels') {
       template += '.fearlesscitiesbrussels';
     }

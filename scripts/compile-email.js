@@ -126,7 +126,6 @@ data['ticket.confirmed'] = {
     currency: 'USD',
   },
 };
-data['ticket.confirmed.sustainoss'] = data['ticket.confirmed'];
 data['ticket.confirmed.fearlesscitiesbrussels'] = data['ticket.confirmed'];
 data['ticket.confirmed.drupalatx.texas-camp-2019-19178ev'] = {
   recipient: {
