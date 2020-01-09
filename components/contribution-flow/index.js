@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick, isNil } from 'lodash';
+import { debounce, find, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -151,6 +151,7 @@ class CreateOrderPage extends React.Component {
     createCollective: PropTypes.func.isRequired, // from mutation
     loadStripe: PropTypes.func.isRequired, // from withStripe
     intl: PropTypes.object.isRequired, // from injectIntl
+    contributeAs: PropTypes.string,
   };
 
   static defaultProps = {
@@ -198,6 +199,13 @@ class CreateOrderPage extends React.Component {
     // Set user as default profile when loggin in
     if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
       this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
+    }
+
+    // Skip contributeAs step if contributeAs param matches the current stepProfile
+    if (this.props.contributeAs && this.props.contributeAs === get(this.state, 'stepProfile.slug')) {
+      const steps = this.getSteps();
+      const nextStepIndex = findIndex(steps, { name: 'contributeAs' }) + 1;
+      this.pushStepRoute(steps[nextStepIndex].name);
     }
 
     // Collective was loaded
@@ -483,12 +491,21 @@ class CreateOrderPage extends React.Component {
   }
 
   getLoggedInUserDefaultContibuteProfile() {
+    const { LoggedInUser } = this.props;
+    let profile = null;
+
     if (get(this.state, 'stepProfile')) {
-      return this.state.stepProfile;
+      profile = this.state.stepProfile;
+    } else if (LoggedInUser) {
+      profile = { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
     }
 
-    const { LoggedInUser } = this.props;
-    return !LoggedInUser ? null : { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+    if (this.props.contributeAs) {
+      const [, profiles] = this.getProfiles();
+      profile = find(profiles, { slug: this.props.contributeAs }) || profile;
+    }
+
+    return profile;
   }
 
   /** Returns an array like [personnalProfile, otherProfiles] */
@@ -969,7 +986,6 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { loadingLoggedInUser, LoggedInUser } = this.props;
-
     return (
       <Steps
         steps={this.getSteps()}
