@@ -178,6 +178,7 @@ const ViewMoreLink = styled.span`
   margin: 0 2px;
   padding 1px 2px;
   user-select: none;
+  white-space: nowrap;
 
   &:hover {
     opacity: 0.8;
@@ -320,7 +321,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
           flexWrap="wrap"
           alignItems={['center', 'flex-start']}
         >
-          <Box mr={3} order="1">
+          <Box mr={2} order="1">
             <LinkCollective collective={collective}>
               <Avatar collective={collective} radius={40} />
             </LinkCollective>
@@ -330,7 +331,9 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
             justifyContent="space-between"
             order={[3, 2]}
             width={['100%', 'auto']}
+            flex="1"
             mt={[2, 0]}
+            mx={2}
           >
             <Flex data-cy="transaction-description" alignItems="center" flexWrap="wrap">
               {route ? <Link route={route}>{formattedDescription}</Link> : formattedDescription}
