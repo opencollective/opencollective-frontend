@@ -49,6 +49,11 @@ const PublicMessage = styled.p`
   ${publicMessageStyle}
 `;
 
+const Description = styled.p`
+  ${publicMessageStyle}
+  text-transform: capitalize;
+`;
+
 /** User-submitted public message edit button */
 const PublicMessageEditButton = styled.button`
   ${publicMessageStyle}
@@ -86,8 +91,9 @@ const getMainContributorRole = contributor => {
  * Accept all the props from [StyledCard](/#/Atoms?id=styledcard).
  */
 const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedUser, collectiveId, ...props }) => {
-  const { collectiveId: fromCollectiveId, publicMessage } = contributor;
+  const { collectiveId: fromCollectiveId, publicMessage, description } = contributor;
   const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 140 });
+  const truncatedDescription = description && truncate(description, { length: 140 });
   const [showEditMessagePopup, setShowEditMessagePopup] = useState(false);
   const mainContainerRef = useRef();
   return (
@@ -117,6 +123,9 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
               <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} />
             </P>
           </React.Fragment>
+        )}
+        {!truncatedPublicMessage && truncatedDescription && (
+          <Description title={description}>{truncatedDescription}</Description>
         )}
         {isLoggedUser && !showEditMessagePopup ? (
           <PublicMessageEditButton
@@ -153,6 +162,7 @@ ContributorCard.propTypes = {
     id: PropTypes.string.isRequired,
     collectiveId: PropTypes.number.isRequired,
     name: PropTypes.string,
+    description: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
     type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
