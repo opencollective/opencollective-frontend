@@ -321,7 +321,9 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
           alignItems={['center', 'flex-start']}
         >
           <Box mr={3} order="1">
-            <Avatar collective={collective} radius={40} />
+            <LinkCollective collective={collective}>
+              <Avatar collective={collective} radius={40} />
+            </LinkCollective>
           </Box>
           <Flex
             flexDirection="column"
