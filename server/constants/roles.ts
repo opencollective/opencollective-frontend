@@ -15,6 +15,8 @@ enum MemberRoles {
   ATTENDEE = 'ATTENDEE',
   /** Someone interested to follow the activities of the collective/event */
   FOLLOWER = 'FOLLOWER',
+  /** This memberCollective is a sub-collective of the collective */
+  SUB_COLLECTIVE = 'SUB_COLLECTIVE',
 }
 
 export const MemberRoleLabels = {
@@ -26,6 +28,7 @@ export const MemberRoleLabels = {
   [MemberRoles.FUNDRAISER]: 'Fundraiser',
   [MemberRoles.ATTENDEE]: 'Attendee',
   [MemberRoles.FOLLOWER]: 'Follower',
+  [MemberRoles.SUB_COLLECTIVE]: 'Sub-collective',
 };
 
 export default MemberRoles;

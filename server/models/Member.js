@@ -59,19 +59,8 @@ export default function(Sequelize, DataTypes) {
         defaultValue: 'member',
         validate: {
           isIn: {
-            args: [
-              [
-                roles.HOST,
-                roles.ADMIN,
-                roles.MEMBER,
-                roles.BACKER,
-                roles.CONTRIBUTOR,
-                roles.ATTENDEE,
-                roles.FOLLOWER,
-                roles.FUNDRAISER,
-              ],
-            ],
-            msg: 'Must be host, admin, member, backer, contributor, attendee, fundraiser or follower',
+            args: [Object.values(roles)],
+            msg: `Must be one of ${Object.values(roles)}`,
           },
         },
       },
