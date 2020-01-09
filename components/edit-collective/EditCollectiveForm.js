@@ -36,6 +36,7 @@ import EditCollectiveDelete from './EditCollectiveDelete';
 import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
+import EditCollectiveConversations from './EditCollectiveConversations';
 import EditHostSettings from './EditHostSettings';
 import EditCollectiveConversations from './EditCollectiveConversations';
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
