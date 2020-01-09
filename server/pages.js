@@ -39,6 +39,7 @@ const pages = routes()
     '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|donations)?',
     'host.dashboard',
   )
+  .add('host.terms', '/:hostCollectiveSlug/terms', 'host.terms')
   .add(
     'host.expenses.approve',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)',

@@ -213,7 +213,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledLink
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={collective.settings.tos}
+                      href={`${collective.slug}/terms`}
                       borderBottom="2px dotted #969ba3"
                       color="black.700"
                       textDecoration="none"

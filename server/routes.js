@@ -155,5 +155,16 @@ module.exports = (server, app) => {
     );
   });
 
+  server.get('/:collectiveSlug/terms', (req, res) => {
+    const params = { ...req.params, ...req.query };
+    if (req.query.redirect) {
+      res.redirect(`https://${req.query.redirect}`);
+      return;
+    }
+    app.renderToHTML(req, res, '/host.terms', params).then(html => {
+      return res.send(html);
+    });
+  });
+
   return pages.getRequestHandler(app);
 };

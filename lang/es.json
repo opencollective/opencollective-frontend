@@ -813,6 +813,8 @@
   "host.pending-applications.noPending": "Sin colectivos en espera de aprobación",
   "host.pending-applications.reject": "Reject",
   "host.tos": "Términos de patrocinio fiscal",
+  "host.tos.missing": "This host didn't specify any TOS.",
+  "host.tos.title": "{collective} - Terms of fiscal sponsorship.",
   "host.types.label": "Tipo de entidad anfitriona",
   "host.types.organization.description": "Entidad legal (idealmente una organización sin fines de lucro) que recibirá los fondos y emitirá facturas en nombre del colectivo. Recomendado si planea hospedar más de un colectivo o si su colectivo espera recaudar más de $ 10,000 / año.",
   "host.types.organization.label": "organización",

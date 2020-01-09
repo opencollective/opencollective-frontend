@@ -813,6 +813,8 @@
   "host.pending-applications.noPending": "No collective waiting for approval",
   "host.pending-applications.reject": "Reject",
   "host.tos": "Terms of fiscal sponsorship",
+  "host.tos.missing": "This host didn't specify any TOS.",
+  "host.tos.title": "{collective} - Terms of fiscal sponsorship.",
   "host.types.label": "ホストエンティティの種類",
   "host.types.organization.description": "Legal entity (ideally a non profit organization) that will receive the funds and issue invoices on behalf of the collective. Recommended if you plan to host more than one collective or if your collective expects to collect more than $10,000/year.",
   "host.types.organization.label": "組織",
