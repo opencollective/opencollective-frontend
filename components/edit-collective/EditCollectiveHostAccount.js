@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
@@ -10,6 +10,7 @@ import StyledButton from '../StyledButton';
 // import MessageBox from '../MessageBox';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getErrorFromGraphqlException } from '../../lib/utils';
+import { GraphQLContext } from '../../lib/graphql/context';
 
 const activateCollectiveAsHostQuery = gql`
   mutation activateCollectiveAsHost($id: Int!) {
@@ -58,6 +59,7 @@ const getCollectiveType = type => {
 
 const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deactivateCollectiveAsHost }) => {
   const collectiveType = getCollectiveType(collective.type);
+  const { refetch } = useContext(GraphQLContext);
   const defaultAction = isHostAccount ? 'Activate' : 'Deactivate';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
   const [activationStatus, setaActivationStatus] = useState({
@@ -74,6 +76,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
     try {
       setaActivationStatus({ ...activationStatus, processing: true });
       await activateCollectiveAsHost(id);
+      await refetch();
       setaActivationStatus({
         ...activationStatus,
         processing: false,
@@ -91,6 +94,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
     try {
       setaActivationStatus({ ...activationStatus, processing: true });
       await deactivateCollectiveAsHost(id);
+      await refetch();
       setaActivationStatus({
         ...activationStatus,
         processing: false,
@@ -156,13 +160,27 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
       )*/}
 
       {isHostAccount && (
-        <StyledButton onClick={() => setModal({ type: 'Deactivate', show: true })} loading={processing}>
+        <StyledButton
+          onClick={() => setModal({ type: 'Deactivate', show: true })}
+          loading={processing}
+          disabled={collective.plan.hostedCollectives > 0}
+        >
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.deactivate.button"
             defaultMessage={'Desactivate as Host'}
           />
         </StyledButton>
+      )}
+
+      {collective.plan.hostedCollectives > 0 && (
+        <P color="rgb(224, 183, 0)">
+          <FormattedMessage
+            values={{ hostedCollectives: collective.plan.hostedCollectives }}
+            id="collective.hostAccount.deactivate.isHost"
+            defaultMessage={"You can't deactivate hosting while still hosting {hostedCollectives} other collectives."}
+          />
+        </P>
       )}
 
       <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>

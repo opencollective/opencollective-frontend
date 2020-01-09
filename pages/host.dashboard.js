@@ -87,6 +87,15 @@ class HostDashboardPage extends React.Component {
           <FormattedMessage id="notFound" defaultMessage="Not found" />
         </MessageBox>
       );
+    } else if (!data.Collective.plan.hostDashboard) {
+      return (
+        <MessageBox m={5} type="error" withIcon>
+          <FormattedMessage
+            id="page.error.plan.needs.upgrade"
+            defaultMessage="You must upgrade your plan to access this page"
+          />
+        </MessageBox>
+      );
     } else if (!host.isHost) {
       return (
         <MessageBox m={5} type="error" withIcon>

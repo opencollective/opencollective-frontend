@@ -45,7 +45,7 @@ const CollectiveCallsToAction = ({
           </StyledButton>
         </Link>
       )}
-      {hasDashboard && (
+      {hasDashboard && collective.plan.hostDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
@@ -72,6 +72,7 @@ const CollectiveCallsToAction = ({
 CollectiveCallsToAction.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    plan: PropTypes.object,
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */
