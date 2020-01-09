@@ -713,7 +713,7 @@
   "Frequency.OneTime": "Uma vez",
   "Frequency.Year": "Anualmente",
   "GiftCard": "Vale-Presente",
-  "GiftCard.definition": "Vales-presente empoderam seus funcionários ou membros da comunidade a contribuir com os projetos que eles amam.",
+  "GiftCard.definition": "Gift cards empower your employees or community members to support the projects they love. Learn more about them <learn-more-link>here</learn-more-link>.",
   "Giftcard.learnMore": "Aprenda mais sobre Vales-presente",
   "giftcard.user.name": "Olá novamente, {name}!",
   "giftcard.user.text": "Você agora pode colaborar com coletivos abertos com este vale-presente, cortesia de {emitter}.",
