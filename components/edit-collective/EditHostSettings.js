@@ -20,6 +20,8 @@ const Plan = styled.td`
   font-size: 1.2rem;
   text-align: center;
   width: 20%;
+  vertical-align: top;
+  ${({ disabled }) => (disabled ? 'color: #888;' : '')}
 `;
 
 const PlanFeatures = styled.p`
@@ -41,6 +43,12 @@ const PlanPrice = styled.p`
   font-weight: bold;
 `;
 
+const DisabledMessage = styled.p`
+  font-size: 1.1rem;
+  font-style: italic;
+  text-align: center;
+`;
+
 const EditHostSettings = props => {
   const { collective } = props;
   const { data: opencollective } = useQuery(getCollectiveTiersDescriptionQuery, {
@@ -48,6 +56,7 @@ const EditHostSettings = props => {
   });
 
   const tiers = get(opencollective, 'Collective.tiers') || [];
+  const subscribedTier = tiers.find(tier => tier.slug === collective.plan.name);
   const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/hostSettings`;
 
   return (
@@ -63,8 +72,16 @@ const EditHostSettings = props => {
       <Table>
         <tr>
           {tiers.map(tier => {
+            const isCurrentPlan = collective.plan.name === tier.slug;
+            const isWithinLimits = collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit;
+
+            let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
+            // Rename verb to Upgrade/Downgrade if subscribed to active Tier
+            if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
+            else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
+
             return (
-              <Plan key={tier.id}>
+              <Plan key={tier.id} disabled={!isWithinLimits || isCurrentPlan}>
                 <PlanName>{tier.name}</PlanName>
                 <PlanFeatures
                   dangerouslySetInnerHTML={{
@@ -76,9 +93,12 @@ const EditHostSettings = props => {
                 </PlanPrice>
                 <Button
                   href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
+                  disabled={!isWithinLimits || isCurrentPlan}
                 >
-                  Upgrade
+                  {verb}
                 </Button>
+                {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
+                {!isWithinLimits && !isCurrentPlan && <DisabledMessage>Current usage is above limits.</DisabledMessage>}
               </Plan>
             );
           })}
