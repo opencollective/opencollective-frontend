@@ -16,7 +16,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
   return (
     <StyledCollectiveCard
       collective={collective}
-      width={250}
+      minWidth={250}
       height={360}
       position="relative"
       {...props}

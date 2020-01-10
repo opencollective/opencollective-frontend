@@ -152,7 +152,7 @@ class PledgedCollectiveCard extends React.Component {
     }
 
     return (
-      <StyledCard minWidth={215} maxWidth={215} height={380} borderRadius={8} bg="#ffffff">
+      <StyledCard width={250} height={380} borderRadius={8} bg="#ffffff">
         <CardHeader>
           <LogoBorder></LogoBorder>
           <LogoContainer>
