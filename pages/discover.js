@@ -7,8 +7,8 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { withRouter } from 'next/router';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
-import NewCollectiveCard from '../components/NewCollectiveCards';
-import PledgedCollectiveCard from '../components/PledgedCollectiveCard';
+import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
+import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H1, P } from '../components/Text';
@@ -290,7 +290,7 @@ const DiscoverPage = ({ router, intl }) => {
                             <PledgedCollectiveCard collective={c} />
                           ) : (
                             <CollectiveCardContainer key={c.id}>
-                              <NewCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
+                              <DiscoverCollectiveCard collective={c} LoggedInUser={LoggedInUser} />
                             </CollectiveCardContainer>
                           )}
                         </Flex>

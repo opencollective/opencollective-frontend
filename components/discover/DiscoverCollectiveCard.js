@@ -4,18 +4,18 @@ import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCollectiveMainTag } from '../lib/collective.lib';
-import roles from '../lib/constants/roles';
+import { getCollectiveMainTag } from '../../lib/collective.lib';
+import roles from '../../lib/constants/roles';
 
-import { formatCurrency } from '../lib/utils';
-import StyledCard from './StyledCard';
-import LinkCollective from './LinkCollective';
-import Container from './Container';
-import { P, Span } from './Text';
-import Avatar from './Avatar';
-import I18nCollectiveTags from './I18nCollectiveTags';
-import StyledTag from './StyledTag';
-import Currency from './Currency';
+import { formatCurrency } from '../../lib/utils';
+import StyledCard from '../StyledCard';
+import LinkCollective from '../LinkCollective';
+import Container from '../Container';
+import { P, Span } from '../Text';
+import Avatar from '../Avatar';
+import I18nCollectiveTags from '../I18nCollectiveTags';
+import StyledTag from '../StyledTag';
+import Currency from '../Currency';
 
 const getBackground = collective => {
   const backgroundImage = collective.backgroundImage || get(collective, 'parentCollective.backgroundImageUrl');

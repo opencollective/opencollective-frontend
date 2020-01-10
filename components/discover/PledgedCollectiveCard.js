@@ -5,11 +5,11 @@ import styled from 'styled-components';
 import { Box } from '@rebass/grid';
 import themeGet from '@styled-system/theme-get';
 
-import Currency from './Currency';
-import Link from './Link';
-import Logo from './Logo';
-import StyledButton from './StyledButton';
-import StyledCard from './StyledCard';
+import Currency from '../Currency';
+import Link from '../Link';
+import Logo from '../Logo';
+import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo-card.svg';
 
