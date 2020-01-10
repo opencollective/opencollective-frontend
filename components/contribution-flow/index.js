@@ -733,8 +733,8 @@ class CreateOrderPage extends React.Component {
   renderStep(step) {
     const { collective, tier, host } = this.props;
     const { stepProfile, stepDetails, stepPayment, customData } = this.state;
-    const personal = this.getPersonalProfile();
-    const profiles = this.getOtherProfiles();
+    const personalProfile = this.getPersonalProfile();
+    const otherProfiles = this.getOtherProfiles();
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
@@ -757,8 +757,8 @@ class CreateOrderPage extends React.Component {
                   <StepProfile
                     {...fieldProps}
                     onProfileChange={this.updateProfile}
-                    profiles={profiles}
-                    personal={personal}
+                    otherProfiles={otherProfiles}
+                    personalProfile={personalProfile}
                     defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
                     canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
                   />

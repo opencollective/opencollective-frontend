@@ -9,8 +9,8 @@ initialState = null;
 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
   <StepProfile
     onProfileChange={setState}
-    profiles={profiles}
-    personal={personalProfile}
+    otherProfiles={profiles}
+    personalProfile={personalProfile}
     defaultSelectedProfile={state || personalProfile}
     id="contribute-as"
     name="contribute-as"

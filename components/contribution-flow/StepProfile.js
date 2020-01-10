@@ -133,8 +133,8 @@ const useForm = ({ onProfileChange }) => {
 const StepProfile = ({
   intl,
   onProfileChange,
-  personal,
-  profiles,
+  personalProfile,
+  otherProfiles,
   defaultSelectedProfile,
   canUseIncognito,
   ...fieldProps
@@ -142,10 +142,10 @@ const StepProfile = ({
   const { getFieldError, getFieldProps, onFieldChange, onSearch, onChange, state } = useForm({ onProfileChange });
   if (state.search) {
     const test = new RegExp(escapeInput(state.search), 'i');
-    profiles = profiles.filter(profile => profile.name.match(test));
+    otherProfiles = otherProfiles.filter(profile => profile.name.match(test));
   }
 
-  const options = uniqBy([personal, ...profiles], 'id');
+  const options = uniqBy([personalProfile, ...otherProfiles], 'id');
 
   // if the user doesn't have an incognito profile yet, we offer to create one
   if (canUseIncognito) {
@@ -165,7 +165,7 @@ const StepProfile = ({
   options.push({ id: 'org.new', type: 'ORGANIZATION', name: intl.formatMessage(messages['org.new']) });
 
   const lastIndex = Object.keys(options).length - 1;
-  const showSearch = Object.keys(profiles).length >= 5 || state.search;
+  const showSearch = Object.keys(otherProfiles).length >= 5 || state.search;
 
   return (
     <StyledCard maxWidth={500}>
@@ -320,14 +320,14 @@ StepProfile.propTypes = {
   defaultSelectedProfile: PropTypes.shape({
     id: PropTypes.number,
   }),
-  personal: PropTypes.shape({
+  personalProfile: PropTypes.shape({
     id: PropTypes.number.isRequired,
     email: PropTypes.string,
     image: PropTypes.string,
     name: PropTypes.string,
     type: PropTypes.string,
   }),
-  profiles: PropTypes.arrayOf(
+  otherProfiles: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       email: PropTypes.string,
