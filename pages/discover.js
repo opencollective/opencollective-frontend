@@ -61,11 +61,11 @@ const DiscoverPageDataQuery = gql`
       total
       collectives {
         id
-        backgroundImage
+        backgroundImageUrl(height: 200)
         currency
         description
         longDescription
-        image
+        imageUrl(height: 128)
         name
         settings
         slug
@@ -87,7 +87,8 @@ const DiscoverPageDataQuery = gql`
           id
           slug
           settings
-          backgroundImage
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
         }
         pledges: orders(status: PENDING) {
           id
