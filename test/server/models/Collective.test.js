@@ -7,7 +7,7 @@ import { roles } from '../../../server/constants';
 
 const { Transaction, Collective, User } = models;
 
-describe('Collective model', () => {
+describe('server/models/Collective', () => {
   let collective = {},
     opensourceCollective,
     user1,
@@ -135,6 +135,7 @@ describe('Collective model', () => {
           amount: 1000,
           currency: 'USD',
           UserId: user1.id,
+          FromCollectiveId: user1.CollectiveId,
           lastEditedById: user1.id,
           incurredAt: transactions[0].createdAt,
           createdAt: transactions[0].createdAt,
@@ -147,6 +148,7 @@ describe('Collective model', () => {
           amount: 15000,
           currency: 'USD',
           UserId: user1.id,
+          FromCollectiveId: user1.CollectiveId,
           lastEditedById: user1.id,
           incurredAt: transactions[1].createdAt,
           createdAt: transactions[1].createdAt,
@@ -159,6 +161,7 @@ describe('Collective model', () => {
           amount: 60100,
           currency: 'USD',
           UserId: user2.id,
+          FromCollectiveId: user2.CollectiveId,
           lastEditedById: user2.id,
           incurredAt: transactions[1].createdAt,
           createdAt: transactions[1].createdAt,

@@ -9,7 +9,7 @@ import emailLib from '../../../server/lib/email';
 
 const { User, Collective, Notification, Tier, Order } = models;
 
-describe('notification.model.test.js', () => {
+describe('server/models/Notification', () => {
   let host, collective, hostAdmin, sandbox, emailSendMessageSpy;
 
   beforeEach(() => utils.resetTestDB());
@@ -102,6 +102,7 @@ describe('notification.model.test.js', () => {
         incurredAt: new Date(),
         description: 'pizza',
         UserId: user.id,
+        FromCollectiveId: user.CollectiveId,
         CollectiveId: collective.id,
         amount: 10000,
         currency: 'USD',

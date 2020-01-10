@@ -788,15 +788,8 @@ export const ExpenseType = new GraphQLObjectType({
       },
       fromCollective: {
         type: CollectiveInterfaceType,
-        resolve(expense) {
-          return expense.getUser().then(u => {
-            if (!u) {
-              return console.error(
-                `Cannot fetch the UserId ${expense.UserId} referenced in ExpenseId ${expense.id} -- has the user been deleted?`,
-              );
-            }
-            return models.Collective.findByPk(u.CollectiveId);
-          });
+        resolve(expense, _, req) {
+          return req.loaders.Collective.byId.load(expense.FromCollectiveId);
         },
       },
       comments: {

@@ -93,14 +93,19 @@ export const fakeUpdate = async updateData => {
 /**
  * Creates a fake update. All params are optionals.
  */
-export const fakeExpense = async updateData => {
-  let CollectiveId = get(updateData, 'CollectiveId') || get(updateData, 'collective.id');
-  let UserId = get(updateData, 'UserId') || get(updateData, 'user.id');
+export const fakeExpense = async expenseData => {
+  let CollectiveId = get(expenseData, 'CollectiveId') || get(expenseData, 'collective.id');
+  let UserId = get(expenseData, 'UserId') || get(expenseData, 'user.id');
+  let FromCollectiveId = get(expenseData, 'FromCollectiveId') || get(expenseData, 'fromCollective.id');
   if (!CollectiveId) {
     CollectiveId = (await fakeCollective()).id;
   }
   if (!UserId) {
     UserId = (await fakeUser()).id;
+  }
+
+  if (!FromCollectiveId) {
+    FromCollectiveId = (await models.User.findByPk(UserId)).CollectiveId;
   }
 
   return models.Update.create({
@@ -110,7 +115,8 @@ export const fakeExpense = async updateData => {
     category: 'Engineering',
     description: randStr('Test expense '),
     payoutMethod: 'other',
-    ...updateData,
+    ...expenseData,
+    FromCollectiveId,
     CollectiveId,
     UserId,
   });
