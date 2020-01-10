@@ -107,12 +107,13 @@ export const getCollectivePageQuery = gql`
           type
         }
       }
-      events(includePastEvents: true) {
+      events(includePastEvents: true, includeInactive: true) {
         id
         slug
         name
         description
         image
+        isActive
         startsAt
         endsAt
         backgroundImageUrl(height: 208)
