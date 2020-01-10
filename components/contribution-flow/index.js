@@ -491,22 +491,17 @@ class CreateOrderPage extends React.Component {
   }
 
   getLoggedInUserDefaultContibuteProfile() {
-    const { LoggedInUser } = this.props;
-    let profile = null;
-
-    if (get(this.state, 'stepProfile')) {
-      profile = this.state.stepProfile;
-    } else if (LoggedInUser) {
-      profile = this.getPersonalProfile();
-    }
-
     if (this.props.contributeAs) {
-      const profiles = this.getOtherProfiles();
-      const contributorProfile = profiles.find(profile => profile.slug === this.props.contributeAs);
-      if (contributorProfile) profile = contributorProfile;
+      const otherProfiles = this.getOtherProfiles();
+      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
+      if (contributorProfile) return contributorProfile;
     }
-
-    return profile;
+    if (get(this.state, 'stepProfile')) {
+      return this.state.stepProfile;
+    }
+    if (this.props.LoggedInUser) {
+      return this.getPersonalProfile();
+    }
   }
 
   /** Returns logged-in user profile */
