@@ -1026,8 +1026,17 @@ const CollectiveFields = () => {
     isApproved: {
       description: 'Returns whether this collective is approved',
       type: GraphQLBoolean,
-      resolve(collective) {
-        return Boolean(collective.isActive && collective.approvedAt);
+      async resolve(collective, _, req) {
+        if (!collective.HostCollectiveId) {
+          return false;
+        }
+
+        if (collective.type === CollectiveType.EVENT) {
+          const parentCollective = await req.loaders.Collective.byId.load(collective.ParentCollectiveId);
+          return Boolean(parentCollective.isActive && parentCollective.approvedAt);
+        } else {
+          return Boolean(collective.isActive && collective.approvedAt);
+        }
       },
     },
     isDeletable: {
