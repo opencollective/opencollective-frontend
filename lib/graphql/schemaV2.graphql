@@ -282,6 +282,11 @@ type Collective implements Account {
   Get the host collective that is receiving the money on behalf of this collective
   """
   host: Account
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 }
 
 """
@@ -540,6 +545,11 @@ type Event implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns whether this collective is approved
+  """
+  isApproved: Boolean
 }
 
 """

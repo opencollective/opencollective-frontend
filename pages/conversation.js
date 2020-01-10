@@ -45,6 +45,9 @@ const conversationPageQuery = gqlV2`
       settings
       imageUrl
       twitterHandle
+      ... on Collective {
+        isApproved
+      }
     }
     conversation(id: $id) {
       id
