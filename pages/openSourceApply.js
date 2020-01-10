@@ -182,7 +182,7 @@ class OpenSourceApplyPage extends Component {
             values={{
               osclink: <a href="https://opencollective.com/opensource">Open Source Collective 501c6</a>,
               communityguidelineslink: (
-                <a href="https://docs.opencollective.com/help/the-open-collective-way/community-guidelines">
+                <a href="https://docs.opencollective.com/help/about/community-guidelines">
                   {intl.formatMessage(this.messages['guidelines'])}
                 </a>
               ),
