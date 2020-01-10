@@ -1,9 +1,12 @@
-import React from 'react';
+import { get } from 'lodash';
 import PropTypes from 'prop-types';
+import React from 'react';
+import { useQuery } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Button from '../Button';
+import { getCollectiveQuery } from '../../lib/graphql/queries';
 
 const Capitalized = styled.span`
   text-transform: capitalize;
@@ -38,158 +41,79 @@ const PlanPrice = styled.p`
   font-weight: bold;
 `;
 
-class EditHostSettings extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-  };
+const EditHostSettings = props => {
+  const { collective } = props;
+  const { data: opencollective } = useQuery(getCollectiveQuery, {
+    variables: { slug: 'opencollective' },
+  });
 
-  constructor(props) {
-    super(props);
-  }
+  const tiers = get(opencollective, 'Collective.tiers') || [];
+  const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/hostSettings`;
 
-  render() {
-    const { collective } = this.props;
+  return (
+    <div className="ExportData">
+      <h2>
+        <FormattedMessage id="collective.hostSettings.title" defaultMessage="Host Settings" />
+      </h2>
 
-    const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/hostSettings`;
+      <h3>
+        <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Plans" />
+      </h3>
 
-    return (
-      <div className="ExportData">
-        <h2>
-          <FormattedMessage id="collective.hostSettings.title" defaultMessage="Host Settings" />
-        </h2>
+      <Table>
+        <tr>
+          {tiers.map(tier => {
+            return (
+              <Plan key={tier.id}>
+                <PlanName>{tier.name}</PlanName>
+                <PlanFeatures>{tier.description}</PlanFeatures>
+                <PlanPrice>
+                  ${tier.amount / 100} / {tier.interval}
+                </PlanPrice>
+                <Button
+                  href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
+                >
+                  Upgrade
+                </Button>
+              </Plan>
+            );
+          })}
+        </tr>
+      </Table>
 
-        <h3>
-          <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Plans" />
-        </h3>
+      <h3>
+        <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Current Plan Usage" />
+      </h3>
 
-        <Table>
-          <tr>
-            <Plan>
-              <PlanName>Single Host Plan</PlanName>
-              <PlanFeatures>
-                <ul>
-                  <li>1 hosted collective</li>
-                  <li>Unlimited added funds</li>
-                </ul>
-              </PlanFeatures>
-              <PlanPrice>$10 / month</PlanPrice>
+      <ul>
+        <li>
+          <strong>Current Plan</strong>: <Capitalized>{collective.plan.name}</Capitalized>
+        </li>
+        <li>
+          <strong>Collective Limit</strong>: {collective.plan.hostedCollectives} of{' '}
+          {collective.plan.hostedCollectivesLimit}
+        </li>
+        <li>
+          <strong>Added Funds Limit</strong>:&nbsp;
+          {collective.plan.addedFundsLimit && (
+            <span>
+              ${collective.plan.addedFunds / 100} of ${collective.plan.addedFundsLimit / 100}
+            </span>
+          )}
+          {!collective.plan.addedFundsLimit && (
+            <FormattedMessage id="collective.hostSettings.addedFunds.unlimited" defaultMessage="Unlimited" />
+          )}
+        </li>
+        <li>
+          <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'Yes' : 'No'}
+        </li>
+      </ul>
+    </div>
+  );
+};
 
-              {/* Local
-              <Button href={`/opencollective/contribute/single-host-plan-2808/checkout?redirect=${redirectUrl}`}>
-                Upgrade
-              </Button> */}
-
-              {/* Staging */}
-              <Button href={`/opencollective/contribute/single-host-plan-14966/checkout?redirect=${redirectUrl}`}>
-                Upgrade
-              </Button>
-            </Plan>
-
-            <Plan>
-              <PlanName>Small Host Plan</PlanName>
-              <PlanFeatures>
-                <ul>
-                  <li>Up to 5 hosted collectives</li>
-                  <li>Unlimited added funds</li>
-                  <li>Manual bank transfers</li>
-                  <li>Host dashboard</li>
-                </ul>
-              </PlanFeatures>
-              <PlanPrice>$25 / month</PlanPrice>
-
-              {/* Local
-              <Button href={`/opencollective/contribute/small-host-plan-2809/checkout?redirect=${redirectUrl}`}>
-                Upgrade
-              </Button>*/}
-
-              {/* Staging */}
-              <Button href={`/opencollective/contribute/small-host-plan-14968/checkout?redirect=${redirectUrl}`}>
-                Upgrade
-              </Button>
-            </Plan>
-
-            <Plan>
-              <PlanName>Medium Host Plan</PlanName>
-              <PlanFeatures>
-                <ul>
-                  <li>Up to 10 hosted collectives</li>
-                  <li>Unlimited added funds</li>
-                  <li>Manual bank transfers</li>
-                  <li>Host dashboard</li>
-                </ul>
-              </PlanFeatures>
-              <PlanPrice>$50 / month</PlanPrice>
-
-              {/* Staging */}
-              <Button href={`/opencollective/contribute/medium-host-plan-14969/checkout?redirect=${redirectUrl}`}>
-                Upgrade
-              </Button>
-            </Plan>
-
-            <Plan>
-              <PlanName>Large Host Plan</PlanName>
-              <PlanFeatures>
-                <ul>
-                  <li>Up to 25 hosted collectives</li>
-                  <li>Unlimited added funds</li>
-                  <li>Manual bank transfers</li>
-                  <li>Host dashboard</li>
-                </ul>
-              </PlanFeatures>
-              <PlanPrice>$100 / month</PlanPrice>
-
-              {/* Staging */}
-              <Button href={`/opencollective/contribute/large-host-plan-14967/checkout?redirect=${redirectUrl}`}>
-                Upgrade
-              </Button>
-            </Plan>
-
-            <Plan>
-              <PlanName>Network Host Plan</PlanName>
-              <PlanFeatures>
-                <ul>
-                  <li>Unlimited hosted collectives</li>
-                  <li>Unlimited added funds</li>
-                  <li>Manual bank transfers</li>
-                  <li>Host dashboard</li>
-                </ul>
-              </PlanFeatures>
-              <PlanPrice>$100+ / month</PlanPrice>
-              <Button disabled>Contact Us</Button>
-            </Plan>
-          </tr>
-        </Table>
-
-        <h3>
-          <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Current Plan Usage" />
-        </h3>
-
-        <ul>
-          <li>
-            <strong>Current Plan</strong>: <Capitalized>{collective.plan.name}</Capitalized>
-          </li>
-          <li>
-            <strong>Collective Limit</strong>: {collective.plan.hostedCollectives} of{' '}
-            {collective.plan.hostedCollectivesLimit}
-          </li>
-          <li>
-            <strong>Added Funds Limit</strong>:&nbsp;
-            {collective.plan.addedFundsLimit && (
-              <span>
-                ${collective.plan.addedFunds / 100} of ${collective.plan.addedFundsLimit / 100}
-              </span>
-            )}
-            {!collective.plan.addedFundsLimit && (
-              <FormattedMessage id="collective.hostSettings.addedFunds.unlimited" defaultMessage="Unlimited" />
-            )}
-          </li>
-          <li>
-            <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'Yes' : 'No'}
-          </li>
-        </ul>
-      </div>
-    );
-  }
-}
+EditHostSettings.propTypes = {
+  collective: PropTypes.object.isRequired,
+};
 
 export default EditHostSettings;
