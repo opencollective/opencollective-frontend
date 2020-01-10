@@ -1029,13 +1029,12 @@ const CollectiveFields = () => {
       async resolve(collective, _, req) {
         if (!collective.HostCollectiveId) {
           return false;
-        }
-
-        if (collective.type === CollectiveType.EVENT) {
-          const parentCollective = await req.loaders.Collective.byId.load(collective.ParentCollectiveId);
-          return Boolean(parentCollective.isActive && parentCollective.approvedAt);
+        } else if (collective.type === types.EVENT) {
+          const ParentCollectiveId = collective.ParentCollectiveId;
+          const parentCollective = ParentCollectiveId && (await req.loaders.Collective.byId.load(ParentCollectiveId));
+          return parentCollective && parentCollective.isApproved();
         } else {
-          return Boolean(collective.isActive && collective.approvedAt);
+          return collective.isApproved();
         }
       },
     },

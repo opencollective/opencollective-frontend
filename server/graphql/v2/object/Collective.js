@@ -27,7 +27,7 @@ export const Collective = new GraphQLObjectType({
         description: 'Returns whether this collective is approved',
         type: GraphQLBoolean,
         resolve(collective) {
-          return Boolean(collective.HostCollectiveId && collective.isActive && collective.approvedAt);
+          return collective.isApproved();
         },
       },
     };

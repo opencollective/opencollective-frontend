@@ -16,15 +16,10 @@ export const Event = new GraphQLObjectType({
         async resolve(event, _, req) {
           if (event.ParentCollectiveId) {
             return false;
+          } else {
+            const parentCollective = await req.loaders.Collective.byId.load(event.ParentCollectiveId);
+            return parentCollective && parentCollective.isApproved();
           }
-
-          const parentCollective = await req.loaders.Collective.byId.load(event.ParentCollectiveId);
-          return Boolean(
-            parentCollective &&
-              parentCollective.HostCollectiveId &&
-              parentCollective.isActive &&
-              parentCollective.approvedAt,
-          );
         },
       },
     };
