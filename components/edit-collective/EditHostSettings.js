@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Button from '../Button';
-import { getCollectiveQuery } from '../../lib/graphql/queries';
+import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
 
 const Capitalized = styled.span`
   text-transform: capitalize;
@@ -43,7 +43,7 @@ const PlanPrice = styled.p`
 
 const EditHostSettings = props => {
   const { collective } = props;
-  const { data: opencollective } = useQuery(getCollectiveQuery, {
+  const { data: opencollective } = useQuery(getCollectiveTiersDescriptionQuery, {
     variables: { slug: 'opencollective' },
   });
 
