@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, times } from 'lodash';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
@@ -12,12 +12,22 @@ import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard'
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { H1, P } from '../components/Text';
-import LoadingGrid from '../components/LoadingGrid';
 import Pagination from '../components/Pagination';
 import MessageBox from '../components/MessageBox';
 import StyledSelect from '../components/StyledSelect';
 import { Link } from '../server/pages';
 import SearchForm from '../components/SearchForm';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
+
+const AllCardsContainer = styled(Flex).attrs({
+  flexWrap: 'wrap',
+  width: '100%',
+  maxWidth: 1300,
+  mx: 'auto',
+  my: 3,
+  justifyContent: 'space-evenly',
+  'data-cy': 'container-collectives',
+})``;
 
 const CollectiveCardContainer = styled.div`
   width: 280px;
@@ -255,47 +265,38 @@ const DiscoverPage = ({ router, intl }) => {
                 </Flex>
               </Flex>
 
-              {loading && (
-                <Box py={6}>
-                  <LoadingGrid />
-                </Box>
-              )}
-
-              {error && (
+              {error && !loading ? (
                 <MessageBox type="error" withIcon mt={6}>
                   {error.message}
                 </MessageBox>
-              )}
-
-              {!error && !loading && data && data.allCollectives && (
+              ) : (
                 <Fragment>
-                  <Flex
-                    flexWrap="wrap"
-                    width={1}
-                    maxWidth={1300}
-                    mx="auto"
-                    my={3}
-                    justifyContent="space-evenly"
-                    data-cy="container-collectives"
-                  >
-                    {get(data, 'allCollectives.collectives', []).map(c =>
-                      c.isPledged ? (
-                        <CollectiveCardContainer key={c.id}>
-                          <PledgedCollectiveCard collective={c} />
-                        </CollectiveCardContainer>
-                      ) : (
-                        <CollectiveCardContainer key={c.id}>
-                          <DiscoverCollectiveCard collective={c} />
-                        </CollectiveCardContainer>
-                      ),
-                    )}
-                  </Flex>
-                  {data.allCollectives.total > data.allCollectives.limit && (
+                  <AllCardsContainer>
+                    {loading
+                      ? times(params.limit, idx => (
+                          <CollectiveCardContainer key={idx}>
+                            <LoadingPlaceholder height={360} width={250} />
+                          </CollectiveCardContainer>
+                        ))
+                      : get(data, 'allCollectives.collectives', []).map(c =>
+                          c.isPledged ? (
+                            <CollectiveCardContainer key={c.id}>
+                              <PledgedCollectiveCard collective={c} />
+                            </CollectiveCardContainer>
+                          ) : (
+                            <CollectiveCardContainer key={c.id}>
+                              <DiscoverCollectiveCard collective={c} />
+                            </CollectiveCardContainer>
+                          ),
+                        )}
+                  </AllCardsContainer>
+                  {get(data, 'allCollectives.total') > get(data, 'allCollectives.limit') && (
                     <Flex justifyContent="center" my={3}>
                       <Pagination
-                        offset={data.allCollectives.offset}
-                        total={data.allCollectives.total}
-                        limit={data.allCollectives.limit}
+                        isDisabled={loading}
+                        total={get(data, 'allCollectives.total')}
+                        offset={params.offset}
+                        limit={params.limit}
                         scrollToTopOnChange
                       />
                     </Flex>
