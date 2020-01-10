@@ -66,7 +66,11 @@ const EditHostSettings = props => {
             return (
               <Plan key={tier.id}>
                 <PlanName>{tier.name}</PlanName>
-                <PlanFeatures>{tier.description}</PlanFeatures>
+                <PlanFeatures
+                  dangerouslySetInnerHTML={{
+                    __html: tier.longDescription,
+                  }}
+                />
                 <PlanPrice>
                   ${tier.amount / 100} / {tier.interval}
                 </PlanPrice>
