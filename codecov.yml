@@ -1,5 +1,10 @@
+codecov:
+  require_ci_to_pass: no
+
 coverage:
   status:
     project:
       default:
         threshold: 0.1
+    patch: off
+  
