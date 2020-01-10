@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, find, findIndex, get, pick, isNil } from 'lodash';
+import { debounce, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -497,31 +497,34 @@ class CreateOrderPage extends React.Component {
     if (get(this.state, 'stepProfile')) {
       profile = this.state.stepProfile;
     } else if (LoggedInUser) {
-      profile = { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+      profile = this.getPersonalProfile();
     }
 
     if (this.props.contributeAs) {
-      const [, profiles] = this.getProfiles();
-      profile = find(profiles, { slug: this.props.contributeAs }) || profile;
+      const profiles = this.getOtherProfiles();
+      const contributorProfile = profiles.find(profile => profile.slug === this.props.contributeAs);
+      if (contributorProfile) profile = contributorProfile;
     }
 
     return profile;
   }
 
-  /** Returns an array like [personnalProfile, otherProfiles] */
-  getProfiles() {
-    const { LoggedInUser, collective } = this.props;
+  /** Returns logged-in user profile */
+  getPersonalProfile() {
+    const { LoggedInUser } = this.props;
+    if (!LoggedInUser) return {};
 
-    if (!LoggedInUser) {
-      return [{}, {}];
-    } else {
-      return [
-        { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective },
-        LoggedInUser.memberOf
-          .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
-          .map(({ collective }) => collective),
-      ];
-    }
+    return { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+  }
+
+  /** Return an array of any other associated profile the user might control */
+  getOtherProfiles() {
+    const { LoggedInUser, collective } = this.props;
+    if (!LoggedInUser) return [];
+
+    return LoggedInUser.memberOf
+      .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
+      .map(({ collective }) => collective);
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */
@@ -735,7 +738,8 @@ class CreateOrderPage extends React.Component {
   renderStep(step) {
     const { collective, tier, host } = this.props;
     const { stepProfile, stepDetails, stepPayment, customData } = this.state;
-    const [personal, profiles] = this.getProfiles();
+    const personal = this.getPersonalProfile();
+    const profiles = this.getOtherProfiles();
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
