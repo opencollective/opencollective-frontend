@@ -5,8 +5,8 @@ import { FormattedMessage } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 import { Box } from '@rebass/grid';
 
-import { VideoPlus } from 'styled-icons/boxicons-regular/VideoPlus';
-import { ArrowUpCircle } from 'styled-icons/feather/ArrowUpCircle';
+import { VideoPlus } from '@styled-icons/boxicons-regular/VideoPlus';
+import { ArrowUpCircle } from '@styled-icons/feather/ArrowUpCircle';
 
 import { fadeInUp } from './StyledKeyframes';
 import { P } from './Text';

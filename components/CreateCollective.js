@@ -12,6 +12,7 @@ import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Router } from '../server/pages';
 import { withUser } from './UserProvider';
+import { getErrorFromGraphqlException } from '../lib/utils';
 
 class CreateCollective extends React.Component {
   static propTypes = {
@@ -142,7 +143,7 @@ class CreateCollective extends React.Component {
       }
     } catch (err) {
       console.error('>>> createCollective error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);
     }

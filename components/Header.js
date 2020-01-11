@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import TopBar from './TopBar';
 
 import { truncate, getCollectiveImage } from '../lib/utils';
+import UserWarnings from './UserWarnings';
 
 class Header extends React.Component {
   static propTypes = {
@@ -20,6 +21,8 @@ class Header extends React.Component {
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
     metas: PropTypes.object,
+    /** If true, a no-robots meta will be added to the page */
+    noRobots: PropTypes.bool,
   };
 
   getTitle() {
@@ -69,7 +72,7 @@ class Header extends React.Component {
       ...this.props.metas,
     };
 
-    if (collective && collective.isIncognito) {
+    if (this.props.noRobots || (collective && collective.isIncognito)) {
       metas.robots = 'none';
     }
 
@@ -95,6 +98,7 @@ class Header extends React.Component {
         </Head>
         <div id="top" />
         <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+        <UserWarnings />
       </header>
     );
   }

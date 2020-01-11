@@ -22,7 +22,7 @@ import { P, H1, H5 } from '../components/Text';
 import LinkCollective from '../components/LinkCollective';
 
 import { getLoggedInUserQuery } from '../lib/graphql/queries';
-import { isValidEmail } from '../lib/utils';
+import { isValidEmail, getErrorFromGraphqlException } from '../lib/utils';
 
 import StyledButton from '../components/StyledButton';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -125,7 +125,7 @@ class RedeemPage extends React.Component {
       // TODO: or refuse to create an account automatically and ask to sign in
       this.setState({ loading: false, view: 'success' });
     } catch (e) {
-      const error = e.graphQLErrors && e.graphQLErrors[0].message;
+      const error = getErrorFromGraphqlException(e).message;
       this.setState({ loading: false, error });
       // console.log(">>> error graphql: ", JSON.stringify(error, null, '  '));
       console.log('>>> error graphql: ', error);
@@ -224,7 +224,7 @@ class RedeemPage extends React.Component {
               </RedeemBackground>
               <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
                 <Container mt={54} zIndex={2}>
-                  <Flex justifyContent="center" flexDirection="column">
+                  <Flex justifyContent="center" alignItems="center" flexDirection="column">
                     <Container background="white" borderRadius="16px" maxWidth="400px">
                       <ShadowBox py="24px" px="32px">
                         {this.state.view === 'form' && (

@@ -6,7 +6,7 @@ import ReactTooltip from 'react-tooltip';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
-import { Lock } from 'styled-icons/fa-solid';
+import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 

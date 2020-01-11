@@ -26,7 +26,7 @@ import BudgetItemsList, {
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`
-  query NewCollectivePage($slug: String!) {
+  query BudgetSection($slug: String!) {
     Collective(slug: $slug) {
       id
       transactions(limit: 3, includeExpenseTransactions: false) {
@@ -49,7 +49,7 @@ const TransactionsAndExpensesQuery = gql`
  */
 const SectionBudget = ({ collective, stats }) => {
   return (
-    <ContainerSectionContent pt={[4, 5]}>
+    <ContainerSectionContent pt={[4, 5]} pb={3}>
       <SectionTitle>
         <FormattedMessage id="CollectivePage.SectionBudget.Title" defaultMessage="Budget" />
       </SectionTitle>
@@ -129,12 +129,11 @@ const SectionBudget = ({ collective, stats }) => {
 
         <StyledCard
           display="flex"
-          flex="1"
+          flex={[null, null, '1 1 300px']}
           width="100%"
           flexDirection={['column', 'row', 'column']}
           mb={2}
           mx={[null, null, 3]}
-          minWidth={300}
         >
           <Box data-cy="budgetSection-today-balance" flex="1" py={16} px={4}>
             <P fontSize="Tiny" textTransform="uppercase" color="black.700">

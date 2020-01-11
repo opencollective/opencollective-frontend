@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // eslint-disable-next-line  node/no-unpublished-require
-const fileExistsCaseInsensitive = require('react-styleguidist/lib/scripts/utils/findFileCaseInsensitive');
+const { default: fileExistsCaseInsensitive } = require('react-styleguidist/lib/scripts/utils/findFileCaseInsensitive');
 
 module.exports = {
   assetsDir: 'styleguide',

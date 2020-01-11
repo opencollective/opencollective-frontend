@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import { Github } from 'styled-icons/fa-brands/Github';
-import { Blog } from 'styled-icons/icomoon/Blog';
-import { Slack } from 'styled-icons/fa-brands/Slack';
-import { Twitter } from 'styled-icons/fa-brands/Twitter';
-import { Mail } from 'styled-icons/material/Mail';
-import { InfoCircle } from 'styled-icons/boxicons-regular/InfoCircle';
+import { Github } from '@styled-icons/fa-brands/Github';
+import { Blog } from '@styled-icons/icomoon/Blog';
+import { Slack } from '@styled-icons/fa-brands/Slack';
+import { Twitter } from '@styled-icons/fa-brands/Twitter';
+import { Mail } from '@styled-icons/material/Mail';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { Link } from '../server/pages';
 

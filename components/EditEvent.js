@@ -10,7 +10,7 @@ import Body from './Body';
 import Footer from './Footer';
 import EditEventForm from './EditEventForm';
 import CollectiveNavbar from './CollectiveNavbar';
-import CollectiveCover from './CollectiveCover';
+import { getErrorFromGraphqlException } from '../lib/utils';
 
 class EditEvent extends React.Component {
   static propTypes = {
@@ -42,7 +42,7 @@ class EditEvent extends React.Component {
       this.setState({ result: { success: 'Event edited successfully' } });
     } catch (err) {
       console.error('>>> editEvent error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
     }
   }
@@ -56,7 +56,7 @@ class EditEvent extends React.Component {
       Router.pushRoute(`/${event.parentCollective.slug}`);
     } catch (err) {
       console.error('>>> deleteEvent error: ', JSON.stringify(err));
-      const errorMsg = err.graphQLErrors && err.graphQLErrors[0] ? err.graphQLErrors[0].message : err.message;
+      const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
     }
   }
@@ -94,11 +94,7 @@ class EditEvent extends React.Component {
         <Header collective={parentCollective} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
-          {process.env.NEW_EVENTS === 'true' && <CollectiveNavbar collective={event} />}
-
-          {process.env.NEW_EVENTS !== 'true' && (
-            <CollectiveCover collective={parentCollective} className="small" forceLegacy />
-          )}
+          <CollectiveNavbar collective={event} />
 
           <div className="content">
             {!canEditEvent && (

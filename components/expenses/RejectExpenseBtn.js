@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import SmallButton from '../SmallButton';
+import StyledButton from '../StyledButton';
 
 class RejectExpenseBtn extends React.Component {
   static propTypes = {
@@ -27,9 +27,9 @@ class RejectExpenseBtn extends React.Component {
   render() {
     return (
       <div className="RejectExpenseBtn" data-cy="reject-expense-btn">
-        <SmallButton className="reject" bsStyle="danger" onClick={this.onClick}>
-          <FormattedMessage id="expense.reject.btn" defaultMessage="reject" />
-        </SmallButton>
+        <StyledButton mr={2} my={1} width="100%" className="reject" buttonStyle="danger" onClick={this.onClick}>
+          <FormattedMessage id="expense.reject.btn" defaultMessage="Reject" />
+        </StyledButton>
       </div>
     );
   }

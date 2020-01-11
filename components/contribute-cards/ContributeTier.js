@@ -172,7 +172,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
               </P>
             )}
-            <P color="black.700">
+            <P color="black.700" data-cy="amount">
               <FormattedMoneyAmount
                 amount={minAmount}
                 interval={tier.interval}

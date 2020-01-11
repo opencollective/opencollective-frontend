@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
-import { isEmpty, pick } from 'lodash';
-import { isEmail, isURL } from 'validator';
+import { get, pick } from 'lodash';
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
+import { useForm } from 'react-hook-form';
 
 import { getErrorFromGraphqlException } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
+import roles from '../lib/constants/roles';
 import { H5 } from './Text';
 import StyledInputField from './StyledInputField';
 import StyledInput from './StyledInput';
@@ -40,9 +41,21 @@ const msg = defineMessages({
     id: 'EditUserEmailForm.title',
     defaultMessage: 'Email address',
   },
+  adminEmail: {
+    id: 'NewOrganization.Admin.Email',
+    defaultMessage: 'Admin email address',
+  },
+  adminName: {
+    id: 'NewOrganization.Admin.Name',
+    defaultMessage: 'Admin name',
+  },
   name: {
     id: 'Collective.Name',
     defaultMessage: 'Name',
+  },
+  organizationName: {
+    id: 'Organization.Name',
+    defaultMessage: 'Organization name',
   },
   fullName: {
     id: 'User.FullName',
@@ -74,28 +87,13 @@ const msg = defineMessages({
   },
 });
 
-const getErrors = collective => {
-  const errors = {};
-  if (collective.type === CollectiveType.USER) {
-    if (!collective.email || !isEmail(collective.email)) {
-      errors.email = true;
-    }
-  }
-
-  if (!collective.name || collective.name.length < 2) {
-    errors.name = true;
-  }
-
-  if (collective.website && !isURL(collective.website)) {
-    errors.website = true;
-  }
-
-  return errors;
-};
-
+/** Prepare mutation variables based on collective type */
 const prepareMutationVariables = collective => {
   if (collective.type === CollectiveType.USER) {
     return { user: pick(collective, ['name', 'email']) };
+  } else if (collective.type === CollectiveType.ORGANIZATION) {
+    collective.members.forEach(member => (member.role = roles.ADMIN));
+    return { collective: pick(collective, ['name', 'type', 'website', 'members']) };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website']) };
   }
@@ -140,52 +138,54 @@ const CreateUserMutation = gql`
 const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
-  const [createCollective, { loading, error }] = useMutation(isUser ? CreateUserMutation : CreateCollectiveMutation);
-  const [collective, setCollective] = React.useState({ type });
-  const [showErrors, setShowErrors] = React.useState({});
+  const isOrganization = type === CollectiveType.ORGANIZATION;
+  const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
+  const [createCollective, { error: submitError }] = useMutation(mutation);
+  const { handleSubmit, register, formState, errors } = useForm();
   const { formatMessage } = useIntl();
-  const errors = getErrors(collective);
-  const hasErrors = !isEmpty(errors);
-  const i18nTitle = CreateNewMessages[type];
-
-  // Form helpers
-  const setValue = e => {
-    setCollective({ ...collective, type, [e.target.name]: e.target.value });
-    setShowErrors({ ...showErrors, [e.target.name]: false });
-  };
-
-  const onBlur = e => {
-    setShowErrors({ ...showErrors, [e.target.name]: true });
-  };
-
-  const getError = field => {
-    if (!showErrors[field] || !errors[field]) {
-      return undefined;
-    } else if (field === 'email') {
-      return formatMessage(msg.invalidEmail);
-    } else if (field === 'website') {
-      return formatMessage(msg.invalidWebsite);
-    } else if (field === 'name') {
-      return formatMessage(msg.invalidName);
-    } else {
-      return true;
-    }
-  };
 
   return (
-    <div>
-      <H5 fontWeight={600}>{i18nTitle && formatMessage(i18nTitle)}</H5>
+    <form
+      onSubmit={handleSubmit(formData =>
+        createCollective({ variables: prepareMutationVariables({ ...formData, type }) }).then(({ data }) => {
+          return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
+        }),
+      )}
+    >
+      <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
       <Box mt={3}>
-        {isUser && (
-          <StyledInputField htmlFor="email" error={getError('email')} label={formatMessage(msg.emailTitle)} mt={3}>
+        {(isUser || isOrganization) && (
+          <StyledInputField
+            htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
+            label={formatMessage(isOrganization ? msg.adminEmail : msg.emailTitle)}
+            error={(errors.email || get(errors, 'members.0.member.email')) && formatMessage(msg.invalidEmail)}
+            mt={3}
+          >
             {inputProps => (
               <StyledInput
                 {...inputProps}
                 type="email"
+                width="100%"
                 placeholder="i.e. john-smith@youremail.com"
-                onChange={setValue}
-                onBlur={onBlur}
-                required
+                ref={register({ required: true })}
+              />
+            )}
+          </StyledInputField>
+        )}
+        {isOrganization && (
+          <StyledInputField
+            autoFocus
+            htmlFor="members[0].member.name"
+            label={formatMessage(msg.adminName)}
+            error={get(errors, 'members.0.member.name') && formatMessage(msg.invalidName)}
+            mt={3}
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                ref={register({ required: true })}
+                width="100%"
+                placeholder="i.e. John Doe, Frank Zappa"
               />
             )}
           </StyledInputField>
@@ -193,16 +193,15 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
         <StyledInputField
           autoFocus
           htmlFor="name"
-          error={getError('name')}
-          label={formatMessage(isUser ? msg.fullName : msg.name)}
+          label={formatMessage(isUser ? msg.fullName : isOrganization ? msg.organizationName : msg.name)}
+          error={errors.name && formatMessage(msg.invalidName)}
           mt={3}
         >
           {inputProps => (
             <StyledInput
               {...inputProps}
-              onChange={setValue}
-              onBlur={onBlur}
-              required
+              ref={register({ required: true })}
+              width="100%"
               placeholder={
                 isUser ? 'i.e. John Doe, Frank Zappa' : isCollective ? 'i.e. Webpack, Babel' : 'i.e. AirBnb, TripleByte'
               }
@@ -212,41 +211,30 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
         {!isUser && (
           <StyledInputField
             htmlFor="website"
-            error={getError('website')}
             label={formatMessage(msg.website)}
-            required={false}
+            error={errors.website && formatMessage(msg.invalidWebsite)}
             mt={3}
           >
             {inputProps => (
-              <StyledInput {...inputProps} placeholder="i.e. opencollective.com" onChange={setValue} onBlur={onBlur} />
+              <StyledInput {...inputProps} placeholder="i.e. opencollective.com" width="100%" ref={register} />
             )}
           </StyledInputField>
         )}
       </Box>
-      {error && (
+      {submitError && (
         <MessageBox type="error" withIcon mt={2}>
-          {getErrorFromGraphqlException(error).message}
+          {getErrorFromGraphqlException(submitError).message}
         </MessageBox>
       )}
       <Container display="flex" flexWrap="wrap" justifyContent="flex-end" borderTop="1px solid #D7DBE0" mt={4} pt={3}>
-        <StyledButton mr={2} minWidth={100} onClick={() => onCancel()}>
+        <StyledButton mr={2} minWidth={100} onClick={() => onCancel()} disabled={formState.isSubmitting}>
           {formatMessage(msg.cancel)}
         </StyledButton>
-        <StyledButton
-          buttonStyle="primary"
-          minWidth={100}
-          disabled={hasErrors}
-          loading={loading}
-          onClick={() =>
-            createCollective({ variables: prepareMutationVariables(collective) }).then(({ data }) => {
-              return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
-            })
-          }
-        >
+        <StyledButton type="submit" buttonStyle="primary" minWidth={100} loading={formState.isSubmitting}>
           {formatMessage(msg.save)}
         </StyledButton>
       </Container>
-    </div>
+    </form>
   );
 };
 

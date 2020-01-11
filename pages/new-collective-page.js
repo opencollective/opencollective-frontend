@@ -82,7 +82,7 @@ class NewCollectivePage extends React.Component {
         financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
         events: PropTypes.arrayOf(PropTypes.object),
-        childCollectives: PropTypes.arrayOf(PropTypes.object),
+        subCollectives: PropTypes.arrayOf(PropTypes.object),
         transactions: PropTypes.arrayOf(PropTypes.object),
         expenses: PropTypes.arrayOf(PropTypes.object),
         updates: PropTypes.arrayOf(PropTypes.object),
@@ -127,7 +127,7 @@ class NewCollectivePage extends React.Component {
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles />
         {data.loading ? (
-          <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+          <Container py={[5, 6]}>
             <Loading />
           </Container>
         ) : (
@@ -142,11 +142,12 @@ class NewCollectivePage extends React.Component {
                   financialContributors={collective.financialContributors}
                   tiers={collective.tiers}
                   events={collective.events}
-                  childCollectives={collective.childCollectives}
+                  subCollectives={collective.subCollectives}
                   transactions={collective.transactions}
                   expenses={collective.expenses}
                   stats={collective.stats}
                   updates={collective.updates}
+                  conversations={collective.conversations}
                   LoggedInUser={LoggedInUser}
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}

@@ -20,7 +20,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
     onKeyDown={[Function]}
   >
     <div
-      className=" css-1to61u5-control"
+      className=" css-1lipood-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -28,9 +28,9 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
         className=" css-1hwfws3"
       >
         <div
-          className=" css-1su2i3t-singleValue"
+          className=" css-1wa3eu0-placeholder"
         >
-          Host ()
+          Search for Users or Organizations
         </div>
         <div
           className="css-1g6gooi"
@@ -103,15 +103,20 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
           onTouchEnd={[Function]}
         >
           <svg
-            aria-hidden="true"
-            className="css-19bqh2r"
-            focusable="false"
-            height={20}
-            viewBox="0 0 20 20"
-            width={20}
+            height={16}
+            version="1.1"
+            viewBox="10 10 30 30"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
           >
+            <title>
+              Search
+            </title>
             <path
-              d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+              d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+              fill="#aaaaaa"
+              fillRule="nonzero"
+              id="magnifying-glass"
             />
           </svg>
         </div>
@@ -141,7 +146,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
     onKeyDown={[Function]}
   >
     <div
-      className=" css-1to61u5-control"
+      className=" css-1lipood-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -149,9 +154,9 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
         className=" css-1hwfws3"
       >
         <div
-          className=" css-1su2i3t-singleValue"
+          className=" css-1wa3eu0-placeholder"
         >
-          Host ()
+          Search for Users or Organizations
         </div>
         <div
           className="css-1g6gooi"
@@ -224,15 +229,20 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
           onTouchEnd={[Function]}
         >
           <svg
-            aria-hidden="true"
-            className="css-19bqh2r"
-            focusable="false"
-            height={20}
-            viewBox="0 0 20 20"
-            width={20}
+            height={16}
+            version="1.1"
+            viewBox="10 10 30 30"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
           >
+            <title>
+              Search
+            </title>
             <path
-              d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+              d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+              fill="#aaaaaa"
+              fillRule="nonzero"
+              id="magnifying-glass"
             />
           </svg>
         </div>
@@ -262,7 +272,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
     onKeyDown={[Function]}
   >
     <div
-      className=" css-1to61u5-control"
+      className=" css-1lipood-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -270,9 +280,9 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
         className=" css-1hwfws3"
       >
         <div
-          className=" css-1su2i3t-singleValue"
+          className=" css-1wa3eu0-placeholder"
         >
-          Host (Example Host)
+          Search for Users or Organizations
         </div>
         <div
           className="css-1g6gooi"
@@ -345,15 +355,20 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
           onTouchEnd={[Function]}
         >
           <svg
-            aria-hidden="true"
-            className="css-19bqh2r"
-            focusable="false"
-            height={20}
-            viewBox="0 0 20 20"
-            width={20}
+            height={16}
+            version="1.1"
+            viewBox="10 10 30 30"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
           >
+            <title>
+              Search
+            </title>
             <path
-              d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+              d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+              fill="#aaaaaa"
+              fillRule="nonzero"
+              id="magnifying-glass"
             />
           </svg>
         </div>
@@ -383,7 +398,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
     onKeyDown={[Function]}
   >
     <div
-      className=" css-1to61u5-control"
+      className=" css-1lipood-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -391,9 +406,9 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
         className=" css-1hwfws3"
       >
         <div
-          className=" css-1su2i3t-singleValue"
+          className=" css-1wa3eu0-placeholder"
         >
-          Host ()
+          Search for Users or Organizations
         </div>
         <div
           className="css-1g6gooi"
@@ -456,20 +471,6 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
       <div
         className=" css-1wy0on6"
       >
-        <div
-          aria-hidden="true"
-          className=" css-at12u2-loadingIndicator"
-        >
-          <span
-            className="css-4dz72r"
-          />
-          <span
-            className="css-1f06n0c"
-          />
-          <span
-            className="css-1lqdfpi"
-          />
-        </div>
         <span
           className=" css-1hyfx7x"
         />
@@ -480,15 +481,20 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
           onTouchEnd={[Function]}
         >
           <svg
-            aria-hidden="true"
-            className="css-19bqh2r"
-            focusable="false"
-            height={20}
-            viewBox="0 0 20 20"
-            width={20}
+            height={16}
+            version="1.1"
+            viewBox="10 10 30 30"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
           >
+            <title>
+              Search
+            </title>
             <path
-              d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+              d="M28.5404814,30.1903972 C26.7995948,31.5736628 24.5962981,32.4 22.2,32.4 C16.5666956,32.4 12,27.8333044 12,22.2 C12,16.5666956 16.5666956,12 22.2,12 C27.8333044,12 32.4,16.5666956 32.4,22.2 C32.4,24.5962981 31.5736628,26.7995948 30.1903972,28.5404814 L35.6582912,34.0083754 C36.1139029,34.4639871 36.1139029,35.2026796 35.6582912,35.6582912 C35.2026796,36.1139029 34.4639871,36.1139029 34.0083754,35.6582912 L28.5404814,30.1903972 Z M22.2,30 C26.507821,30 30,26.507821 30,22.2 C30,17.892179 26.507821,14.4 22.2,14.4 C17.892179,14.4 14.4,17.892179 14.4,22.2 C14.4,26.507821 17.892179,30 22.2,30 Z"
+              fill="#aaaaaa"
+              fillRule="nonzero"
+              id="magnifying-glass"
             />
           </svg>
         </div>

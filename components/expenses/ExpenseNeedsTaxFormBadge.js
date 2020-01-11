@@ -4,6 +4,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import MessageBox from '../MessageBox';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
 
 class ExpenseNeedsTaxFormBadge extends React.Component {
   static propTypes = {
@@ -32,8 +33,8 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
 
     return (
       !!isTaxFormRequired && (
-        <span>
-          <span className="taxFormRequired " data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
+        <Span display="inline-block">
+          <span data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
             <MessageBox type="warning" display="inline" css={{ padding: '4px', borderRadius: '5px' }} withIcon={true}>
               <StyledLink
                 css={{ textTransform: 'uppercase' }}
@@ -44,7 +45,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
             </MessageBox>
           </span>
           {' | '}
-        </span>
+        </Span>
       )
     );
   }

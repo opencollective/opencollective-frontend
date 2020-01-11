@@ -7,11 +7,11 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 
 // Icons
-import { Twitter } from 'styled-icons/feather/Twitter';
-import { Github } from 'styled-icons/feather/Github';
-import { Camera } from 'styled-icons/feather/Camera';
-import { Palette } from 'styled-icons/boxicons-regular/Palette';
-import { Globe } from 'styled-icons/feather/Globe';
+import { Twitter } from '@styled-icons/feather/Twitter';
+import { Github } from '@styled-icons/feather/Github';
+import { Camera } from '@styled-icons/feather/Camera';
+import { Palette } from '@styled-icons/boxicons-regular/Palette';
+import { Globe } from '@styled-icons/feather/Globe';
 
 // General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -273,6 +273,7 @@ Hero.propTypes = {
     isApproved: PropTypes.bool,
     canApply: PropTypes.bool,
     backgroundImage: PropTypes.string,
+    backgroundImageUrl: PropTypes.string,
     twitterHandle: PropTypes.string,
     githubHandle: PropTypes.string,
     website: PropTypes.string,

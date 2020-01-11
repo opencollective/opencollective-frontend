@@ -1,0 +1,936 @@
+# source: http://localhost:3060/graphql/v2
+# timestamp: Mon Dec 09 2019 17:30:01 GMT+0100 (Central European Standard Time)
+
+"""
+Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
+"""
+interface Account {
+  """
+  The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
+  """
+  id: String
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+
+  """
+  The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+  """
+  type: AccountType
+  name: String
+  description: String
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+
+    """
+    Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: [AccountType]
+  ): MemberCollection
+  memberOf(
+    limit: Int = 100
+    offset: Int = 0
+    role: [MemberRole]
+
+    """
+    Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: [AccountType]
+  ): MemberOfCollection
+  transactions(
+    limit: Int = 100
+    offset: Int = 0
+
+    """
+    Type of transaction (DEBIT/CREDIT)
+    """
+    type: TransactionType
+    orderBy: ChronologicalOrder
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrder
+  ): OrderCollection
+  settings: JSON
+}
+
+"""
+A collection of "Accounts"
+"""
+type AccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
+}
+
+"""
+Account orders filter (INCOMING or OUTGOING)
+"""
+enum AccountOrdersFilter {
+  INCOMING
+  OUTGOING
+}
+
+"""
+All account types
+"""
+enum AccountType {
+  BOT
+  COLLECTIVE
+  EVENT
+  ORGANIZATION
+  INDIVIDUAL
+}
+
+"""
+A financial amount.
+"""
+type Amount {
+  value: Float
+  currency: Currency
+}
+
+"""
+This represents a Bot account
+"""
+type Bot implements Account {
+  id: String
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+}
+
+"""
+Input to order results chronologically
+"""
+input ChronologicalOrder {
+  """
+  Field to chronologically order by.
+  """
+  field: DateTimeField = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection = DESC
+}
+
+"""
+Collection interface shared by all collection types
+"""
+interface Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+}
+
+"""
+This represents a Collective account
+"""
+type Collective implements Account {
+  id: String
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Int
+
+  """
+  Get the host collective that is receiving the money on behalf of this collective
+  """
+  host: Account
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
+}
+
+"""
+This represents an Comment
+"""
+type Comment {
+  id: String
+  createdAt: DateTime
+  html: String
+  markdown: String
+  fromCollective: Account
+  collective: Account
+}
+
+"""
+A collection of "Comments"
+"""
+type CommentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Comment]
+}
+
+input CommentCreate {
+  markdown: String
+  html: String
+  ExpenseId: Int
+  UpdateId: Int
+  ConversationId: String
+}
+
+input CommentEdit {
+  id: String!
+  markdown: String
+  html: String
+}
+
+"""
+A conversation thread
+"""
+type Conversation {
+  id: String!
+  slug: String!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  tags: [String]
+  summary: String!
+  collective: Account
+  fromCollective: Account
+
+  """
+  The root comment / starter for this conversation
+  """
+  body: Comment
+
+  """
+  List the comments for this conversation. Not backed by a loader, don't use this in lists.
+  """
+  comments(limit: Int, offset: Int): CommentCollection
+  followers(limit: Int = 10, offset: Int = 0): AccountCollection
+  stats: ConversationStats
+}
+
+"""
+A collection of "Conversations"
+"""
+type ConversationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Conversation]
+}
+
+type ConversationStats {
+  id: String!
+
+  """
+  Total number of comments for this conversation
+  """
+  commentsCount: Int
+}
+
+"""
+This represents a Credit transaction
+"""
+type Credit implements Transaction {
+  id: String
+  type: TransactionType
+  description: String
+  amount: Amount
+  netAmount: Amount
+  platformFee: Amount
+  hostFee: Amount
+  paymentProcessorFee: Amount
+  host: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+  fromAccount: Account
+  toAccount: Account
+}
+
+"""
+All supported currencies
+"""
+enum Currency {
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  Euro
+  """
+  EUR
+
+  """
+  British Pound
+  """
+  GBP
+
+  """
+  Mexican Peso
+  """
+  MXN
+
+  """
+  Canadian Dollar
+  """
+  CAD
+
+  """
+  Swiss Franc
+  """
+  CHF
+
+  """
+  Uruguayan Peso
+  """
+  UYU
+
+  """
+  Australian Dollar
+  """
+  AUD
+
+  """
+  Indian Rupee
+  """
+  INR
+
+  """
+  Japanese Yen
+  """
+  JPY
+
+  """
+  New Zealand Dollar
+  """
+  NZD
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
+`date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
+8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
+All possible DateTime fields for a resource
+"""
+enum DateTimeField {
+  """
+  The creation time of a resource
+  """
+  CREATED_AT
+}
+
+"""
+This represents a Debit transaction
+"""
+type Debit implements Transaction {
+  id: String
+  type: TransactionType
+  description: String
+  amount: Amount
+  netAmount: Amount
+  platformFee: Amount
+  hostFee: Amount
+  paymentProcessorFee: Amount
+  host: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+  fromAccount: Account
+  toAccount: Account
+}
+
+"""
+This represents an Event account
+"""
+type Event implements Account {
+  id: String
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+}
+
+"""
+This represents an Expense
+"""
+type Expense {
+  id: String
+  comments(
+    limit: Int
+    offset: Int
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): CommentCollection
+}
+
+enum ImageFormat {
+  txt
+  png
+  jpg
+  gif
+  svg
+}
+
+"""
+This represents an Individual account
+"""
+type Individual implements Account {
+  id: String
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+  firstName: String
+  lastName: String
+  email: String
+  isFollowingConversation(id: String!): Boolean!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+This represents a Member relationship (ie: Organization backing a Collective)
+"""
+type Member {
+  id: String
+  role: MemberRole
+  tier: Tier
+  createdAt: DateTime
+  updatedAt: DateTime
+  since: DateTime
+
+  """
+  Total amount donated
+  """
+  totalDonations: Amount
+  account: Account
+}
+
+"""
+A collection of "Members" (ie: Organization backing a Collective)
+"""
+type MemberCollection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Member]
+}
+
+"""
+This represents a MemberOf relationship (ie: Collective backed by an Organization)
+"""
+type MemberOf {
+  id: String
+  role: MemberRole
+  tier: Tier
+  createdAt: DateTime
+  updatedAt: DateTime
+  since: DateTime
+
+  """
+  Total amount donated
+  """
+  totalDonations: Amount
+  account: Account
+}
+
+"""
+A collection of "MemberOf" (ie: Collective backed by an Organization)
+"""
+type MemberOfCollection {
+  totalCount: Int
+  nodes: [MemberOf]
+}
+
+"""
+All member roles
+"""
+enum MemberRole {
+  BACKER
+  ADMIN
+  CONTRIBUTOR
+  HOST
+  ATTENDEE
+  MEMBER
+  FUNDRAISER
+  FOLLOWER
+}
+
+"""
+This is the root mutation
+"""
+type Mutation {
+  editComment(comment: CommentEdit!): Comment
+  deleteComment(id: String!): Comment
+  createComment(comment: CommentCreate!): Comment
+
+  """
+  Create a conversation
+  """
+  createConversation(
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    The body of the conversation initial comment
+    """
+    html: String!
+
+    """
+    ID of the Collective where the conversation will be created
+    """
+    CollectiveId: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+  editConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Conversation's title
+    """
+    title: String!
+  ): Conversation
+
+  """
+  Returns true if user is following, false otherwise. Must be authenticated.
+  """
+  followConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Set this to false to unfollow the conversation
+    """
+    isActive: Boolean = true
+  ): Boolean
+}
+
+"""
+Order model
+"""
+type Order {
+  id: String
+  description: String
+  amount: Amount
+  status: OrderStatus
+  frequency: OrderFrequency
+  tier: Tier
+  fromAccount: Account
+  toAccount: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  UNSUPPORTED: Total amount donated between collectives
+  """
+  totalDonations: Amount
+}
+
+"""
+A collection of "Orders"
+"""
+type OrderCollection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Order]
+}
+
+"""
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+enum OrderFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
+}
+
+"""
+All order statuses
+"""
+enum OrderStatus {
+  ACTIVE
+  CANCELLED
+  PENDING
+  PAID
+  ERROR
+  EXPIRED
+}
+
+"""
+This represents an Organization account
+"""
+type Organization implements Account {
+  id: String
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+  email: String
+}
+
+"""
+This is the root query
+"""
+type Query {
+  account(
+    """
+    The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The slug identifying the account (ie: babel for https://opencollective.com/babel)
+    """
+    slug: String
+
+    """
+    The githubHandle attached to the account (ie: babel for https://opencollective.com/babel)
+    """
+    githubHandle: String
+  ): Account
+  collective(
+    """
+    The public id identifying the collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The slug identifying the collective (ie: babel for https://opencollective.com/babel)
+    """
+    slug: String
+
+    """
+    The githubHandle attached to the collective (ie: babel for https://opencollective.com/babel)
+    """
+    githubHandle: String
+
+    """
+    If false, will return null instead of an error if collective is not found
+    """
+    throwIfMissing: Boolean = true
+  ): Collective
+  conversation(
+    """
+    The id identifying the conversation
+    """
+    id: String!
+  ): Conversation
+  expense(
+    """
+    Public expense identifier
+    """
+    id: String!
+  ): Expense
+  loggedInAccount: Account
+}
+
+"""
+Statistics for a given tag
+"""
+type TagStat {
+  """
+  An unique identified for this tag
+  """
+  id: String!
+
+  """
+  Name/Label of the tag
+  """
+  tag: String!
+
+  """
+  Number of entries for this tag
+  """
+  count: Int!
+}
+
+"""
+Tier model
+"""
+type Tier {
+  id: String
+  slug: String
+  name: String
+  description: String
+
+  """
+  Get all orders
+  """
+  orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
+}
+
+"""
+Transaction interface shared by all kind of transactions (Debit, Credit)
+"""
+interface Transaction {
+  id: String
+  type: TransactionType
+  description: String
+  amount: Amount
+  netAmount: Amount
+  platformFee: Amount
+  hostFee: Amount
+  paymentProcessorFee: Amount
+  host: Account
+  fromAccount: Account
+  toAccount: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+A collection of Transactions (Debit or Credit)
+"""
+type TransactionCollection {
+  totalCount: Int
+  nodes: [Transaction]
+}
+
+"""
+All transaction types
+"""
+enum TransactionType {
+  DEBIT
+  CREDIT
+}

@@ -49,6 +49,16 @@ const PrevNextButton = styled(StyledButton)`
   animation: ${fadeIn} 0.3s;
 `;
 
+const StepsProgressBox = styled(Box)`
+  min-height: 95px;
+  max-width: 365px;
+
+  @media screen and (max-width: 640px) {
+    width: 100%;
+    max-width: 100%;
+  }
+`;
+
 PrevNextButton.defaultProps = {
   buttonSize: 'large',
   fontWeight: 'bold',
@@ -241,10 +251,11 @@ class CreateOrderPage extends React.Component {
     if (tier) {
       params.tierId = tier.id;
       params.tierSlug = tier.slug;
-      if (tier.type === 'TICKET') {
+      if (tier.type === 'TICKET' && collective.parentCollective) {
         route = 'orderEventTier';
-        params.collectiveSlug = get(collective.parentCollective, 'slug', 'collective');
+        params.collectiveSlug = collective.parentCollective.slug;
         params.eventSlug = collective.slug;
+        params.verb = 'events';
       } else {
         route = 'orderCollectiveTierNew';
         params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
@@ -505,10 +516,14 @@ class CreateOrderPage extends React.Component {
     );
   }
 
-  /** Returns tier presets, defaults presets, or null if using a tier with fixed amount */
+  /** If not a fixed amount, returns tier presets or defaults presets */
   getAmountsPresets() {
     const tier = this.props.tier || {};
-    return tier.presets || (isNil(tier.amount) ? [500, 1000, 2000, 5000] : null);
+    if (tier.amountType !== AmountTypes.FIXED) {
+      return tier.presets || [500, 1000, 2000, 5000];
+    } else {
+      return null;
+    }
   }
 
   /** Get the min authorized amount for order, in cents */
@@ -570,7 +585,7 @@ class CreateOrderPage extends React.Component {
   isFixedContribution() {
     const tier = this.props.tier;
     const forceInterval = Boolean(tier) || Boolean(this.props.fixedInterval);
-    const forceAmount = !get(tier, 'presets') && !isNil(get(tier, 'amount') || this.props.fixedAmount);
+    const forceAmount = (tier && tier.amountType === AmountTypes.FIXED) || this.props.fixedAmount;
     const isFlexible = tier && tier.amountType === AmountTypes.FLEXIBLE;
     return !isFlexible && forceInterval && forceAmount;
   }
@@ -611,6 +626,7 @@ class CreateOrderPage extends React.Component {
     const steps = [
       {
         name: 'contributeAs',
+        labelKey: 'contribute.step.contributeAs',
         isCompleted: Boolean(this.state.stepProfile),
         validate: this.validateStepProfile,
       },
@@ -620,6 +636,7 @@ class CreateOrderPage extends React.Component {
     if (!skipStepDetails && (!isFixedContribution || (tier && tier.type === 'TICKET'))) {
       steps.push({
         name: 'details',
+        labelKey: 'contribute.step.details',
         isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
         validate: () => {
           return stepDetails && reportValidityHTML5(this.activeFormRef.current);
@@ -631,6 +648,7 @@ class CreateOrderPage extends React.Component {
     if (!(minAmount === 0 && isFixedContribution)) {
       steps.push({
         name: 'payment',
+        labelKey: 'contribute.step.payment',
         isCompleted: Boolean(noPaymentRequired || stepPayment),
         validate: this.validateStepPayment,
       });
@@ -640,6 +658,7 @@ class CreateOrderPage extends React.Component {
     if (this.taxesMayApply()) {
       steps.push({
         name: 'summary',
+        labelKey: 'contribute.step.summary',
         isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
       });
     }
@@ -708,7 +727,7 @@ class CreateOrderPage extends React.Component {
       return (
         <Flex justifyContent="center" width={1}>
           <Box width={[0, null, null, '24em']} />
-          <Container>
+          <Container minWidth={260}>
             <StyledInputField
               htmlFor="contributeAs"
               label={
@@ -908,7 +927,7 @@ class CreateOrderPage extends React.Component {
     const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';
     const canGoPrev = !this.state.submitting && !this.state.submitted && !isValidating;
     return (
-      <Flex flexDirection="column" alignItems="center" mx={3} width={0.95}>
+      <Flex flexDirection="column" alignItems="center" mx={3} width={0.95} px={2}>
         {this.renderStep(step)}
         <Flex mt={[4, null, 5]} justifyContent="center" flexWrap="wrap">
           {goBack && (
@@ -960,9 +979,9 @@ class CreateOrderPage extends React.Component {
         onComplete={this.submitOrder}
       >
         {({ steps, currentStep, lastVisitedStep, goNext, goBack, goToStep, isValidating, isValidStep }) => (
-          <Flex data-cy="cf-content" flexDirection="column" alignItems="center" pt={2} pb={[4, 5]} px={2}>
+          <Flex data-cy="cf-content" flexDirection="column" alignItems="center" pt={2} pb={[4, 5]} px={0}>
             {(loadingLoggedInUser || LoggedInUser) && (
-              <Box mb={[3, null, 4]} width={0.8} css={{ maxWidth: 365, minHeight: 95 }}>
+              <StepsProgressBox mb={[3, null, 4]} width={0.8}>
                 <ContributionFlowStepsProgress
                   steps={steps}
                   currentStep={currentStep}
@@ -976,7 +995,7 @@ class CreateOrderPage extends React.Component {
                   currency={this.getCurrency()}
                   isFreeTier={this.getOrderMinAmount() === 0}
                 />
-              </Box>
+              </StepsProgressBox>
             )}
             {this.state.error && (
               <MessageBox type="error" mb={3} mx={2} withIcon>

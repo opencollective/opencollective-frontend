@@ -303,13 +303,12 @@ class PaymentMethodChooser extends React.Component {
 
         {this.props.editMode && (
           <div className="actions">
-            <SmallButton className="no" bsStyle="primary" onClick={this.resetForm}>
+            <SmallButton className="no" onClick={this.resetForm}>
               {intl.formatMessage(this.messages['paymentMethod.cancel'])}
             </SmallButton>
 
             <SmallButton
               className="yes"
-              bsStyle="primary"
               onClick={this.onSubmit}
               disabled={this.state.loading || !this.state.modified}
               style={{ minWidth: '80px' }}

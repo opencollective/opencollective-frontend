@@ -1,6 +1,6 @@
 describe('event.createOrder page', () => {
   it("can't order if the event is over", () => {
-    cy.visit('/opensource/events/webpack-webinar');
+    cy.visit('/opensource/events/webpack-webinar/legacy');
     cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
     cy.get('.cover .cta').should('not.exist');
     cy.get('#tickets').should('not.exist');
@@ -8,7 +8,7 @@ describe('event.createOrder page', () => {
 
   it('makes an order for a free ticket as an existing user', () => {
     cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
-    cy.login({ redirect: '/opensource/events/webpack-webinar' });
+    cy.login({ redirect: '/opensource/events/webpack-webinar/legacy' });
     cy.get('#free.tier .btn.increase').click();
     cy.get('#free.tier .ctabtn').click();
     cy.location({ timeout: 15000 }).should(location => {
@@ -40,7 +40,7 @@ describe('event.createOrder page', () => {
 
   it('makes an order for a paying ticket as an existing user', () => {
     cy.clock(Date.parse('2017/10/01')); // Go back in time when the event was not over yet
-    cy.signup({ redirect: '/opensource/events/webpack-webinar' });
+    cy.signup({ redirect: '/opensource/events/webpack-webinar/legacy' });
     cy.get('#silver-sponsor.tier .btn.increase').click();
     cy.get('#silver-sponsor.tier .ctabtn').click();
     cy.location({ timeout: 15000 }).should(location => {
@@ -85,7 +85,7 @@ describe('event.createOrder page', () => {
       cy.contains('button', 'Create Event').click();
 
       // Go to the contribution flow
-      cy.contains('button', 'get ticket').click();
+      cy.contains('button', 'Get tickets').click();
       cy.contains('button', 'Next step').click();
       cy.get('input[type=number][name=quantity]').type('{selectall}8');
       cy.contains('button', 'Next step').click();

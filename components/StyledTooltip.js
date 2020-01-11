@@ -4,7 +4,7 @@ import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import uuid from 'uuid/v4';
 
-const StyledTooltip = styled(ReactTooltip)`
+const StyledTooltipContainer = styled(ReactTooltip)`
   max-width: 320px;
   z-index: 1000000;
   opacity: 0.96 !important;
@@ -23,7 +23,7 @@ const StyledTooltip = styled(ReactTooltip)`
 `;
 
 const InlineDiv = styled.div`
-  display: inline-block;
+  display: ${props => props.display};
   cursor: help;
 `;
 
@@ -33,7 +33,7 @@ const InlineDiv = styled.div`
  * Relies on [react-tooltip](https://react-tooltip.netlify.com/) and accepts any
  * of its properties.
  */
-class Tooltip extends React.Component {
+class StyledTooltip extends React.Component {
   static propTypes = {
     /** Tooltip type */
     type: PropTypes.oneOf(['success', 'warning', 'error', 'info', 'light', 'dark']),
@@ -45,9 +45,11 @@ class Tooltip extends React.Component {
     delayHide: PropTypes.number,
     /** See react-tooltip */
     delayUpdate: PropTypes.number,
+    /** If using a node children, this defines the parent display type */
+    display: PropTypes.string,
     /** The trigger. Either:
      *  - A render func, that gets passed props to set on the trigger
-     *  - A React node, rendered inside an inline-div
+     *  - A React node, rendered inside an div
      */
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   };
@@ -57,6 +59,7 @@ class Tooltip extends React.Component {
     place: 'top',
     delayHide: 500,
     delayUpdate: 500,
+    display: 'inline-block',
   };
 
   state = { id: null }; // We only set `id` on the client to avoid mismatches with SSR
@@ -78,10 +81,12 @@ class Tooltip extends React.Component {
         {typeof this.props.children === 'function' ? (
           this.props.children(triggerProps)
         ) : (
-          <InlineDiv {...triggerProps}>{this.props.children}</InlineDiv>
+          <InlineDiv display={this.props.display} {...triggerProps}>
+            {this.props.children}
+          </InlineDiv>
         )}
         {isMounted && (
-          <StyledTooltip
+          <StyledTooltipContainer
             id={this.state.id}
             effect="solid"
             delayHide={this.props.delayHide}
@@ -96,4 +101,4 @@ class Tooltip extends React.Component {
   }
 }
 
-export default Tooltip;
+export default StyledTooltip;

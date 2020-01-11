@@ -6,7 +6,7 @@ describe('user profile page', () => {
     cy.get('#admin.organization .CollectiveCard').should('have.length', 2);
     cy.get('#admin.collective [data-cy=subtitle]').contains("I'm a Core Contributor and admin of these 2 Collectives");
     cy.get('#admin.collective .CollectiveCard').should('have.length', 2);
-    cy.get('#backer .CollectiveCard').should('have.length', 3);
+    cy.get('#backer .CollectiveCard').should('have.length', 4);
     cy.get('#backer .CollectiveCard')
       .first()
       .find('.totalDonations')

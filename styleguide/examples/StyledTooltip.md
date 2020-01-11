@@ -2,7 +2,7 @@
 // See https://github.com/styleguidist/react-styleguidist/issues/1278
 import { Box, Flex } from '@rebass/grid';
 import { P } from 'components/Text';
-import { Info } from 'styled-icons/feather/Info';
+import { Info } from '@styled-icons/feather/Info';
 ```
 
 ```js
@@ -17,7 +17,7 @@ const content = () => <P>Hello, I&apos;m a tooltip!</P>;
 
 ```js
 import { P } from 'components/Text';
-import { Info } from 'styled-icons/feather/Info';
+import { Info } from '@styled-icons/feather/Info';
 
 const content = () => (
   <div>

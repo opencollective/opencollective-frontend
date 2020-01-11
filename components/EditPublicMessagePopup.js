@@ -2,7 +2,7 @@ import React, { useRef, useState, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { createPortal } from 'react-dom';
 import { Mutation } from 'react-apollo';
-import { Times } from 'styled-icons/fa-solid/Times';
+import { Times } from '@styled-icons/fa-solid/Times';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import gql from 'graphql-tag';
@@ -109,6 +109,10 @@ function EditPublicMessagePopup({ fromCollectiveId, collectiveId, cardRef, onClo
 
   /** Determine the position to render the popup relative to the contributor card */
   useLayoutEffect(() => {
+    if (!cardRef.current || !popupRef.current) {
+      return;
+    }
+
     const cardRect = cardRef.current.getBoundingClientRect();
     const popupRect = popupRef.current.getBoundingClientRect();
     /** Check if popup fits to the right */

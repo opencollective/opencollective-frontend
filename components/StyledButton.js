@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { border, color, layout, typography, space, flex } from 'styled-system';
+import { border, color, layout, typography, space, flexbox } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
@@ -25,6 +25,11 @@ const StyledButtonContent = styled.button`
     cursor: not-allowed;
   }
 
+  /** Align button icons in the middle */
+  svg {
+    vertical-align: middle;
+  }
+
   ${buttonStyle}
   ${buttonSize}
 
@@ -45,7 +50,7 @@ const StyledButtonContent = styled.button`
 
   ${border}
   ${color}
-  ${flex}
+  ${flexbox}
   ${space}
   ${layout}
   ${typography}
@@ -69,7 +74,7 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
+  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark', 'danger', 'success']),
   /**
    * From styled-system: accepts any css 'display' value
    */

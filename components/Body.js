@@ -1,21 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
+
+const Main = styled.main`
+  ${props =>
+    props.withBorderTop &&
+    css`
+      border-top: 1px solid rgb(232, 233, 235);
+    `}
+`;
 
 export default class Body extends React.Component {
   static propTypes = {
     children: PropTypes.node,
     withoutGlobalStyles: PropTypes.bool,
+    withBorderTop: PropTypes.bool,
   };
 
   static defaultProps = {
     withoutGlobalStyles: false,
+    withBorderTop: true,
   };
 
   render() {
-    return this.props.withoutGlobalStyles ? (
-      <main>{this.props.children}</main>
+    const { children, withBorderTop, withoutGlobalStyles } = this.props;
+    return withoutGlobalStyles ? (
+      <Main withBorderTop={withBorderTop}>{children}</Main>
     ) : (
-      <main>
+      <Main withBorderTop={withBorderTop}>
         <style jsx global>
           {`
             main {
@@ -107,7 +119,7 @@ export default class Body extends React.Component {
           `}
         </style>
         {this.props.children}
-      </main>
+      </Main>
     );
   }
 }

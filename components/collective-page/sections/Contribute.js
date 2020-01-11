@@ -38,9 +38,12 @@ class SectionContribute extends React.PureComponent {
         contributors: PropTypes.arrayOf(PropTypes.object),
       }),
     ),
-    childCollectives: PropTypes.arrayOf(
+    subCollectives: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+        }),
       }),
     ),
     collective: PropTypes.shape({
@@ -128,7 +131,7 @@ class SectionContribute extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, events, childCollectives, contributors, contributorsStats, isAdmin } = this.props;
+    const { collective, tiers, events, subCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
@@ -189,14 +192,14 @@ class SectionContribute extends React.PureComponent {
             )}
           </HorizontalScroller>
         </Box>
-        {!isEvent && (isAdmin || events.length > 0 || childCollectives.length > 0) && (
+        {!isEvent && (isAdmin || events.length > 0 || subCollectives.length > 0) && (
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
                     <H3 fontSize="H5" fontWeight="600" color="black.700">
-                      {childCollectives.length > 0 ? (
+                      {subCollectives.length > 0 ? (
                         <FormattedMessage id="SectionContribute.MoreWays" defaultMessage="More ways to contribute" />
                       ) : (
                         <FormattedMessage id="section.events.title" defaultMessage="Events" />
@@ -209,9 +212,9 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  {childCollectives.map(childCollective => (
-                    <Box key={childCollective.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeCollective collective={childCollective} />
+                  {subCollectives.map(({ id, collective }) => (
+                    <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeCollective collective={collective} />
                     </Box>
                   ))}
                   {events.map(event => (
@@ -235,14 +238,16 @@ class SectionContribute extends React.PureComponent {
             )}
           </HorizontalScroller>
         )}
-        <ContainerSectionContent>
-          <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-            <StyledButton buttonSize="large" mt={3} width={1} p="10px">
-              <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
-            </StyledButton>
-          </Link>
-        </ContainerSectionContent>
-        {(topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
+        {!isEvent && (
+          <ContainerSectionContent>
+            <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
+              <StyledButton buttonSize="large" mt={3} width={1} p="10px">
+                <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
+              </StyledButton>
+            </Link>
+          </ContainerSectionContent>
+        )}
+        {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
           <TopContributors
             organizations={topOrganizations}
             individuals={topIndividuals}

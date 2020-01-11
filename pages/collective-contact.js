@@ -103,12 +103,10 @@ class CollectiveContact extends React.Component {
       <AuthenticatedPage {...this.getPageMetaData(collective)} withoutGlobalStyles>
         {() =>
           data.loading ? (
-            <Container borderTop="1px solid #E8E9EB">
-              <Loading />
-            </Container>
+            <Loading />
           ) : (
             <CollectiveThemeProvider collective={data.Collective}>
-              <Container borderTop="1px solid #E8E9EB">
+              <Container>
                 <CollectiveNavbar collective={data.Collective} />
                 <Container py={[4, 5]} px={[2, 3, 4]}>
                   {this.renderContent()}

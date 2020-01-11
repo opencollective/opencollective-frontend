@@ -1,32 +1,25 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { display, minWidth } from 'styled-system';
+import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { Box } from '@rebass/grid';
 
 import { P } from '../Text';
-
-/** Main FAQ's container */
-const MainContainer = styled(Box)`
-  ${display};
-  ${minWidth};
-`;
-
-/** A simple wrapper to group entries */
-const EntryContainer = styled(Box)``;
+import Container from '../Container';
 
 /** Main entry container */
 export const Entry = styled.details`
   &[open] {
+    border-color: ${themeGet('colors.primary.500')};
+
     summary::after {
       content: '−';
     }
   }
 
   summary {
-    margin-top: ${themeGet('space.2')}px;
-    margin-bottom: ${themeGet('space.2')}px;
+    padding-top: ${themeGet('space.2')}px;
+    padding-bottom: ${themeGet('space.2')}px;
     font-size: 13px;
     font-weight: 500;
     color: ${themeGet('colors.black.800')};
@@ -63,7 +56,7 @@ export const Title = styled.summary``;
 /** Entry content (hidden by default) */
 export const Content = styled(Box)``;
 Content.defaultProps = {
-  mb: 1,
+  py: 2,
   fontSize: '13px',
   color: 'black.600',
 };
@@ -71,6 +64,23 @@ Content.defaultProps = {
 export const Separator = styled.hr`
   background: ${themeGet('colors.black.400')};
   width: 100%;
+`;
+
+/** A simple wrapper to group entries */
+const EntryContainer = styled.div`
+  ${props =>
+    props.withBorderLeft &&
+    css`
+      ${Entry} {
+        border-left: 1px solid #dcdee0;
+        padding-left: 8px;
+
+        &:focus-within,
+        &:hover {
+          border-color: ${themeGet('colors.primary.500')};
+        }
+      }
+    `}
 `;
 
 /**
@@ -81,6 +91,8 @@ export default class FAQ extends Component {
     children: PropTypes.node,
     /** The title to display above entries */
     title: PropTypes.string,
+    /** If true, a border will be displayed on the left  */
+    withBorderLeft: PropTypes.bool,
     /** All properties from `Box` */
     ...Box.propTypes,
   };
@@ -90,14 +102,16 @@ export default class FAQ extends Component {
   };
 
   render() {
-    const { title, children, ...props } = this.props;
+    const { title, children, withBorderLeft, ...props } = this.props;
     return (
-      <MainContainer {...props}>
-        <P fontWeight="bold" mb={1}>
-          {title}
-        </P>
-        <EntryContainer>{children}</EntryContainer>
-      </MainContainer>
+      <Container {...props}>
+        {title && (
+          <P fontWeight="bold" mb={1}>
+            {title}
+          </P>
+        )}
+        <EntryContainer withBorderLeft={withBorderLeft}>{children}</EntryContainer>
+      </Container>
     );
   }
 }

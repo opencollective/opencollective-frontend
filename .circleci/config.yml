@@ -19,14 +19,13 @@ aliases:
 
   e2e_steps: &e2e_steps
     steps:
-      - run: sudo apt -y update
+      - run: apt-get update
+
+      # Used in run_e2e_tests.sh (nc)
+      - run: apt-get install -y netcat
 
       # Used in setup_circleci_db.sh (dropdb, psql and pg_restore)
-      - run: sudo apt -y install postgresql-client
-
-      # Cypress dependencies
-      # See: https://github.com/cypress-io/cypress-docker-images/blob/master/base/ubuntu16/Dockerfile
-      - run: sudo apt -y install libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
+      - run: apt-get install -y postgresql-client
 
       - attach_workspace:
           at: ..
@@ -55,7 +54,7 @@ aliases:
             - ../.cache/Cypress
 
       # Loading the opencollective_dvl dump database
-      - run: ./scripts/setup_circleci_db.sh
+      - run: ./scripts/setup_db.sh
 
       - run: ./scripts/run_e2e_tests.sh
 
@@ -70,7 +69,7 @@ jobs:
       - <<: *restore_npm_cache
       - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - <<: *persist_npm_cache
-      - run: npm run lint
+      - run: npm run lint:quiet
       - run: npm run prettier:check
 
   jest:
@@ -145,6 +144,8 @@ jobs:
     environment:
       NODE_ENV: circleci
       E2E_TEST: 1
+      API_FOLDER: /home/circleci/api
+
     steps:
       - run: sudo apt -y update
 
@@ -153,7 +154,7 @@ jobs:
 
       - checkout
 
-      - run: ./scripts/setup_circleci_checkout_api.sh
+      - run: ./scripts/ci_checkout_api.sh
 
       - restore_cache:
           keys:
@@ -192,7 +193,7 @@ jobs:
 
   test-e2e-0:
     docker:
-      - image: circleci/node:12.13.0
+      - image: cypress/browsers:node12.13.0-chrome78-ff70
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -208,7 +209,7 @@ jobs:
 
   test-e2e-1:
     docker:
-      - image: circleci/node:12.13.0
+      - image: cypress/browsers:node12.13.0-chrome78-ff70
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -224,7 +225,7 @@ jobs:
 
   test-e2e-2:
     docker:
-      - image: circleci/node:12.13.0
+      - image: cypress/browsers:node12.13.0-chrome78-ff70
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached
@@ -240,7 +241,7 @@ jobs:
 
   test-e2e-3:
     docker:
-      - image: circleci/node:12.13.0
+      - image: cypress/browsers:node12.13.0-chrome78-ff70
       - image: circleci/postgres:9.6.8-alpine-postgis-ram
       - image: circleci/redis
       - image: memcached

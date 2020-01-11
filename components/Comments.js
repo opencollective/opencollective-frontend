@@ -9,10 +9,12 @@ class Comments extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     comments: PropTypes.array,
-    fetchMore: PropTypes.func,
     editable: PropTypes.bool,
     LoggedInUser: PropTypes.object,
-    refetch: PropTypes.func,
+    totalComments: PropTypes.number,
+    fetchMore: PropTypes.func,
+    deleteComment: PropTypes.func,
+    editComment: PropTypes.func,
   };
 
   constructor(props) {
@@ -34,7 +36,7 @@ class Comments extends React.Component {
   }
 
   render() {
-    const { collective, comments, LoggedInUser, editable } = this.props;
+    const { collective, comments, LoggedInUser, editable, totalComments, deleteComment, editComment } = this.props;
 
     if (!comments) {
       return <div />;
@@ -94,12 +96,13 @@ class Comments extends React.Component {
               comment={comment}
               editable={editable}
               LoggedInUser={LoggedInUser}
-              refetch={this.props.refetch}
+              deleteComment={deleteComment}
+              editComment={editComment}
             />
           ))}
-          {comments.length >= 10 && comments.length % 10 === 0 && (
+          {totalComments > comments.length && (
             <div className="loadMoreBtn">
-              <Button bsStyle="default" onClick={this.fetchMore}>
+              <Button bsStyle="default" onClick={this.fetchMore} data-cy="LoadMoreButton">
                 {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
                 {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
               </Button>

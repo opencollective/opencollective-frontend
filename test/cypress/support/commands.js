@@ -109,7 +109,7 @@ Cypress.Commands.add('clearInbox', () => {
  * Create a collective. Admin will be the user designated by `email`. If not
  * provided, the email used will default to `defaultTestUserEmail`.
  */
-Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defaultTestUserEmail }) => {
+Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defaultTestUserEmail, ...params }) => {
   const user = { email, newsletterOptIn: false };
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
@@ -120,10 +120,16 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
             createCollective(collective: $collective) {
               id
               slug
+              name
+              description
+              longDescription
+              website
+              imageUrl
+              settings
             }
           }
         `,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type } },
+      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
     });
@@ -131,9 +137,41 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
+ * Create a expense.
+ */
+Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, ...params } = {}) => {
+  const expense = {
+    category: 'Engineering',
+    type: 'INVOICE',
+    payoutMethod: 'paypal',
+    description: 'Expense 1',
+    amount: 10000,
+    attachment: 'https://d.pr/free/i/OlQVIb+',
+    currency: 'USD',
+    ...params,
+  };
+
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQuery(token, {
+      operationName: 'createExpense',
+      query: `
+          mutation createExpense($expense: ExpenseInputType!) {
+            createExpense(expense: $expense) {
+              id
+            }
+          }
+        `,
+      variables: { expense },
+    }).then(({ body }) => {
+      return body.data.createExpense;
+    });
+  });
+});
+
+/**
  * Create a collective hosted by the open source collective.
  */
-Cypress.Commands.add('createHostedCollective', collectiveParams => {
+Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
   const collective = {
     slug: randomSlug(),
     name: 'Test Collective',
@@ -141,7 +179,7 @@ Cypress.Commands.add('createHostedCollective', collectiveParams => {
     ...collectiveParams,
   };
 
-  return signinRequest({ email: defaultTestUserEmail }, null).then(response => {
+  return signinRequest({ email: userEmail }, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollectiveWithHost',
@@ -286,6 +324,13 @@ function signinRequest(user, redirect) {
 function getTokenFromRedirectUrl(url) {
   const regex = /\/signin\/([^?]+)/;
   return regex.exec(url)[1];
+}
+
+/**
+ * @param {object} user - should have `email` and `id` set
+ */
+function signinRequestAndReturnToken(user, redirect) {
+  return signinRequest(user, redirect).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
 function graphqlQuery(token, body) {

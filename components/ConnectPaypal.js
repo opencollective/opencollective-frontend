@@ -145,12 +145,7 @@ class ConnectPaypal extends React.Component {
                 </div>
 
                 <div>
-                  <SmallButton
-                    bsStyle="primary"
-                    bsSize="xsmall"
-                    onClick={this.connectPaypal}
-                    disabled={this.state.connectingPaypal}
-                  >
+                  <SmallButton onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
                     {this.state.connectingPaypal ? (
                       <FormattedMessage id="ConnectPaypal.processing" defaultMessage="Processing..." />
                     ) : (
@@ -164,12 +159,7 @@ class ConnectPaypal extends React.Component {
           )}
           {!paypalPaymentMethod && (
             <div>
-              <SmallButton
-                className="primary"
-                bsStyle="primary"
-                onClick={this.connectPaypal}
-                disabled={this.state.connectingPaypal}
-              >
+              <SmallButton className="primary" onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
                 {this.state.connectingPaypal && 'Connecting...'}
                 {!this.state.connectingPaypal && 'Connect Paypal'}
               </SmallButton>

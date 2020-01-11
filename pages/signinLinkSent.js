@@ -5,7 +5,7 @@ import themeGet from '@styled-system/theme-get';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import { PaperPlane } from 'styled-icons/boxicons-regular/PaperPlane';
+import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 
 import Container from '../components/Container';
 import Page from '../components/Page';

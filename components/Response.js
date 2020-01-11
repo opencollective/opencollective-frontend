@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, injectIntl } from 'react-intl';
+
 import colors from '../lib/constants/colors';
 
-import { defineMessages, injectIntl } from 'react-intl';
-import { pickAvatar } from '../lib/collective.lib';
+import Avatar from './Avatar';
 
 const star = '/static/images/icons/star.svg';
 
@@ -34,7 +35,6 @@ class Response extends React.Component {
 
     if (!name) return <div />;
 
-    const image = user.image || pickAvatar(name);
     const linkTo = `/${user.slug}`;
     const title = intl.formatMessage(this.messages[status], { name });
 
@@ -49,28 +49,22 @@ class Response extends React.Component {
                 width: 100%;
                 margin: 10px;
                 max-width: 300px;
-                min-height: 90px;
                 float: left;
                 position: relative;
-              }
-
-              img {
-                float: left;
-                width: 45px;
-                border-radius: 50%;
-                margin-top: 1rem;
+                height: 90px;
+                overflow: hidden;
               }
 
               .bubble {
-                padding: 1rem;
+                padding: 0.25rem 1rem;
               }
 
               .name {
-                font-size: 1.7rem;
+                font-size: 1.5rem;
               }
 
               .description {
-                font-size: 1.4rem;
+                font-size: 1.2rem;
               }
 
               .star {
@@ -84,7 +78,7 @@ class Response extends React.Component {
           </style>
           <div className="Response">
             {status === 'INTERESTED' && <object title={title} type="image/svg+xml" data={star} className="star" />}
-            <img src={image} />
+            <Avatar collective={user} radius={40} />
             <div className="bubble">
               <div className="name">{name}</div>
               <div className="description" style={{ color: colors.darkgray }}>

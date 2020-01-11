@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 import { omit } from 'lodash';
 
-import { Receipt as ReceiptIcon } from 'styled-icons/material/Receipt';
-import { Donate as DonateIcon } from 'styled-icons/fa-solid/Donate';
-import { CheckDouble } from 'styled-icons/boxicons-regular/CheckDouble';
+import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
+import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
+import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 
 import styled, { css } from 'styled-components';
 
@@ -23,7 +23,7 @@ import { Dashboard, PendingApplications } from '../components/host-dashboard';
 const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
   padding: 4px 20px 0 20px;
   color: #71757a;
-  height: 100%;
+  height: 60px;
   display: flex;
   align-items: center;
   border-bottom: 4px solid rgb(0, 0, 0, 0);
@@ -45,6 +45,7 @@ const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
     css`
       color: #090a0a;
       border-bottom: 4px solid #090a0a;
+      font-weight: 600;
     `}
 `;
 
@@ -136,7 +137,8 @@ class HostDashboardPage extends React.Component {
               background="white"
               borderBottom="#E6E8EB"
               boxShadow="0px 6px 10px 1px #E6E8EB"
-              height={60}
+              minHeight={60}
+              flexWrap="wrap"
               data-cy="host-dashboard-menu-bar"
             >
               <MenuLink

@@ -6,7 +6,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
 import Link from './Link';
-import { firstSentence, getCurrencySymbol, imagePreview } from '../lib/utils';
+import { firstSentence, getCurrencySymbol, imagePreview, getErrorFromGraphqlException } from '../lib/utils';
 import { getStripe } from '../lib/stripe';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import colors from '../lib/constants/colors';
@@ -89,7 +89,7 @@ class SubscriptionCard extends React.Component {
     } catch (e) {
       this.setState({
         loading: false,
-        result: { error: e.graphQLErrors[0].message },
+        result: { error: getErrorFromGraphqlException(e).message },
       });
     }
   };
@@ -524,12 +524,11 @@ class SubscriptionCard extends React.Component {
                   <span className="frequency">{subscription.interval === 'year' ? 'Yearly' : 'Monthly'}</span>
                 </div>
                 <div className="update-buttons">
-                  <SmallButton className="no" bsStyle="primary" onClick={this.resetState}>
+                  <SmallButton className="no" onClick={this.resetState}>
                     <FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="Cancel" />
                   </SmallButton>
                   <SmallButton
                     className="yes"
-                    bsStyle="primary"
                     disabled={
                       !this.state.amountValueInteger || this.state.amountValueInteger == subscription.totalAmount
                     }
@@ -604,7 +603,7 @@ class SubscriptionCard extends React.Component {
             <div className="cancel">
               Cancel this subscription?
               <div className="cancel-buttons">
-                <SmallButton className="no" bsStyle="primary" onClick={this.resetState}>
+                <SmallButton className="no" onClick={this.resetState}>
                   <FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" />
                 </SmallButton>
                 <CancelSubscriptionBtn id={subscription.id} onError={this.onError} />

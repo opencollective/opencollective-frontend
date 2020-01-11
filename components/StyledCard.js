@@ -38,7 +38,8 @@ StyledCard.propTypes = {
 
 StyledCard.defaultProps = {
   bg: 'white.full',
-  border: '1px solid',
+  borderWidth: '1px',
+  borderStyle: 'solid',
   borderColor: 'black.300',
   borderRadius: '8px',
   overflow: 'hidden',

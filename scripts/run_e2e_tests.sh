@@ -1,28 +1,28 @@
 #!/bin/bash
 
-if [ "$NODE_ENV" = "circleci" ]; then
+echo "> Starting maildev server"
+npx maildev &
+MAILDEV_PID=$!
+
+echo "> Starting api server"
+if [ -z "$API_FOLDER" ]; then
   cd ~/api
-
-  echo "> Starting maildev server"
-  npx maildev &
-  MAILDEV_PID=$!
-
-  echo "> Starting api server"
-  PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm start &
-  API_PID=$!
-  cd -
-  echo "> Starting frontend server"
-  if [ -d "/home/circleci/frontend" ]; then
-    cd ~/frontend
-    npm start &
-    FRONTEND_PID=$!
-    cd -
-  else
-    npm start &
-    FRONTEND_PID=$!
-  fi
+else
+  cd $API_FOLDER
 fi
+PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm start &
+API_PID=$!
+cd -
 
+echo "> Starting frontend server"
+if [ -z "$FRONTEND_FOLDER" ]; then
+  cd ~/frontend
+else
+  cd $FRONTEND_FOLDER
+fi
+npm start &
+FRONTEND_PID=$!
+cd -
 
 # Set `$CYPRESS_RECORD` to `true` in ENV to activate records
 if [ "$CYPRESS_RECORD" = "true" ]; then
@@ -65,11 +65,9 @@ if [ $RETURN_CODE -ne 0 ]; then
 fi
 echo ""
 
-if [ "$NODE_ENV" = "circleci" ]; then
-  echo "Killing all node processes"
-  kill $MAILDEV_PID;
-  kill $API_PID;
-  kill $FRONTEND_PID;
-  echo "Exiting with code $RETURN_CODE"
-  exit $RETURN_CODE
-fi
+echo "Killing all node processes"
+kill $MAILDEV_PID;
+kill $API_PID;
+kill $FRONTEND_PID;
+echo "Exiting with code $RETURN_CODE"
+exit $RETURN_CODE

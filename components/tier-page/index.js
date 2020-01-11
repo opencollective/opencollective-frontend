@@ -160,7 +160,7 @@ class TierPage extends Component {
     const isPassed = tier.endsAt && new Date(tier.endsAt) < new Date();
 
     return (
-      <Container borderTop="1px solid #E6E8EB" pb={4}>
+      <Container pb={4}>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
           <CollectiveNavbar collective={collective} selected={Sections.CONTRIBUTE} isAdmin={canEdit} />
@@ -260,7 +260,6 @@ class TierPage extends Component {
               justifyContent="space-between"
               background="white"
               height={[72, null, 82, Dimensions.COVER_HEIGHT]}
-              borderTop={['1px solid #E6E8EB', null, 'none']}
               zIndex={9}
               flex="0 1 385px"
               p={['0 16px', '0 24px', null, '60px 32px']}

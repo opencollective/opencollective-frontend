@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { typography, size } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
+import StyledSpinner from './StyledSpinner';
 
 const IconCheckmark = () => {
   return (
@@ -25,11 +26,17 @@ const CustomCheckbox = styled.span`
   border-radius: 4px;
   background-color: white;
   transition: background-color 0.2s;
+
   svg {
     opacity: 0;
     height: 0.572em;
     width: 0.572em;
     fill: white;
+  }
+
+  ${StyledSpinner} {
+    opacity: 1;
+    fill: #999999;
   }
 `;
 
@@ -39,7 +46,7 @@ const CheckboxContainer = styled.div`
   line-height: 1.4em;
   ${typography}
   align-items: center;
-  width: 100%;
+  width: ${props => props.width};
 
   /* Hide the default checkbox */
   input {
@@ -81,6 +88,9 @@ const CheckboxContainer = styled.div`
     svg {
       opacity: 1;
     }
+    ${StyledSpinner} {
+      fill: #eeeeee;
+    }
   }
 
   /* Focused */
@@ -112,9 +122,9 @@ class StyledCheckbox extends React.Component {
   }
 
   onChange(newValue) {
-    const { name, checked, onChange, disabled } = this.props;
+    const { name, checked, onChange, disabled, isLoading } = this.props;
 
-    if (disabled) {
+    if (disabled || isLoading) {
       return false;
     }
 
@@ -123,19 +133,19 @@ class StyledCheckbox extends React.Component {
     }
 
     if (onChange) {
-      onChange({ name, checked: newValue, type: 'checkbox' });
+      onChange({ name, checked: newValue, type: 'checkbox', target: { value: newValue } });
     }
   }
 
   render() {
-    const { name, checked, label, disabled, size, inputId } = this.props;
+    const { name, checked, label, disabled, size, inputId, width, isLoading } = this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (
-      <CheckboxContainer onClick={() => this.onChange(!realChecked)} fontSize={size} size={size}>
+      <CheckboxContainer onClick={() => this.onChange(!realChecked)} fontSize={size} size={size} width={width}>
         <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
         <CustomCheckbox data-cy="custom-checkbox">
-          <IconCheckmark />
+          {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
         </CustomCheckbox>
         {label && <label htmlFor={inputId}>{label}</label>}
       </CheckboxContainer>
@@ -146,12 +156,13 @@ class StyledCheckbox extends React.Component {
 StyledCheckbox.defaultProps = {
   size: '14px',
   defaultChecked: false,
+  width: 'auto',
 };
 
 StyledCheckbox.propTypes = {
   /** The name of the input */
   name: PropTypes.string.isRequired,
-  /** Called when state change with a bool representing new state */
+  /** Called when state change with an object like { name, checked, type, target: { value } }*/
   onChange: PropTypes.func,
   /** Wether the checkbox is checked. Use it to control the component. If not provided, component will maintain its own state. */
   checked: PropTypes.bool,
@@ -165,6 +176,10 @@ StyledCheckbox.propTypes = {
   label: PropTypes.node,
   /** An optional size */
   size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  /** Set this to 'auto' to not take the full width */
+  width: PropTypes.string,
+  /** If true, the checkbox will be replaced by a spinner */
+  isLoading: PropTypes.bool,
 };
 
 export default StyledCheckbox;

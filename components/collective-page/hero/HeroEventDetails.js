@@ -5,8 +5,8 @@ import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
-import { MapPin } from 'styled-icons/feather/MapPin';
-import { Clock } from 'styled-icons/feather/Clock';
+import { MapPin } from '@styled-icons/feather/MapPin';
+import { Clock } from '@styled-icons/feather/Clock';
 
 import StyledTooltip from '../../StyledTooltip';
 import Link from '../../Link';

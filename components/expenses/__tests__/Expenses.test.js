@@ -39,6 +39,9 @@ describe('Expenses component', () => {
     category: 'Travel',
     collective,
     fromCollective,
+    user: {
+      paypalEmail: 'oc-test@opencollective.com',
+    },
   };
 
   const expenses = [
@@ -47,6 +50,7 @@ describe('Expenses component', () => {
   ];
 
   const loggedInUser = {
+    isRoot: () => true,
     canPayExpense: () => true,
     canApproveExpense: () => true,
     canEditCollective: () => true,
@@ -72,24 +76,25 @@ describe('Expenses component', () => {
   describe('Paying expenses', () => {
     it('disables all buttons while one expense is being paid', done => {
       // make sure there are two pay buttons on the page
-      expect(component.find('.PayExpenseBtn button').length).toEqual(2);
+      expect(component.find('[data-cy="pay-expense-btn"]')).not.toBeFalsy();
+      expect(component.find('[data-cy="mark-expense-as-paid-btn"]')).not.toBeFalsy();
 
       // make sure none are disabled
-      expect(component.find('.PayExpenseBtn button[disabled]').lenght).toEqual(undefined);
+      expect(component.find('[data-cy="expense-actions"] button[disabled]').lenght).toEqual(undefined);
 
       // click on the first one
       component
-        .find('.PayExpenseBtn button')
+        .find('[data-cy="expense-actions"] button')
         .first()
         .simulate('click');
 
       // expect two disabled buttons again
-      expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(2);
+      expect(component.find('[data-cy="expense-actions"] button[disabled]').length).toEqual(4);
 
       // after timeout, make sure there is only button and it's not disabled.
       setTimeout(() => {
-        expect(component.find('.PayExpenseBtn button').length).toEqual(1);
-        expect(component.find('.PayExpenseBtn button[disabled]').length).toEqual(undefined);
+        expect(component.find('[data-cy="expense-actions"] button').length).toEqual(1);
+        expect(component.find('[data-cy="expense-actions"] button[disabled]').length).toEqual(undefined);
       }, 2000);
       done();
     });

@@ -17,25 +17,24 @@ const getEventParentCollectiveSlug = parentCollective => {
  * Create a `Link` to the collective based on collective type.
  * It properly deals with type `EVENT` and `isIncognito`
  */
-const LinkCollective = ({
-  target,
-  title,
-  collective: { type, slug, name, parentCollective, isIncognito },
-  children,
-  ...props
-}) => {
+const LinkCollective = ({ target, title, collective, children, ...props }) => {
+  if (!collective) {
+    return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
+  }
+
+  const { type, slug, name, parentCollective, isIncognito } = collective;
   if (type === 'USER' && (!name || isIncognito || !slug)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
   return type !== 'EVENT' ? (
-    <Link route="collective" params={{ slug }} {...props} title={title} target={target} passHref>
+    <Link route="collective" params={{ slug }} {...props} title={title || name} target={target} passHref>
       {children || name || slug}
     </Link>
   ) : (
     <Link
       route="event"
       params={{ eventSlug: slug, parentCollectiveSlug: getEventParentCollectiveSlug(parentCollective) }}
-      title={title}
+      title={title || name}
       target={target}
       {...props}
       passHref
@@ -55,7 +54,7 @@ LinkCollective.propTypes = {
     parentCollective: PropTypes.shape({
       slug: PropTypes.string,
     }),
-  }).isRequired,
+  }),
   /** If not given, will render the name of the collective */
   children: PropTypes.node,
   title: PropTypes.string,

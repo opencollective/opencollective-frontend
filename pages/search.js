@@ -19,7 +19,9 @@ import colors from '../lib/constants/colors';
 
 import { addSearchQueryData } from '../lib/graphql/queries';
 
-import { Search } from 'styled-icons/octicons/Search';
+import { Search } from '@styled-icons/octicons/Search';
+import { FormattedMessage } from 'react-intl';
+import { P } from '../components/Text';
 
 const SearchInput = styled(FormControl)`
   &&& {
@@ -88,11 +90,13 @@ class SearchPage extends React.Component {
 
     return (
       <Page title="Search" showSearch={false}>
-        <Container mx="auto" px={3} width={[1, 0.85]} maxWidth={1200}>
+        <Container mx="auto" px={3} py={4} width={[1, 0.85]} maxWidth={1200}>
           <Box width={1}>
             <form method="GET" onSubmit={this.refetch}>
               <FormGroup controlId="search" bsSize="large">
-                <ControlLabel className="h1">Search Open Collective</ControlLabel>
+                <ControlLabel className="h1">
+                  <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective" />
+                </ControlLabel>
                 <Flex alignItems="flex-end" my={3}>
                   <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
                   <SearchButton type="submit">
@@ -118,13 +122,15 @@ class SearchPage extends React.Component {
             {/* TODO: add suggested collectives when the result is empty */}
             {showCollectives && collectives.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-                <p>
+                <P my={4}>
                   <em>
-                    No collectives found matching your query: &quot;
-                    {term}
-                    &quot;
+                    <FormattedMessage
+                      id="search.noResult"
+                      defaultMessage='No collectives found matching your query: "{query}"'
+                      params={{ query: term }}
+                    />
                   </em>
-                </p>
+                </P>
                 {
                   <Link route="createPledge" params={{ name: term }} passHref>
                     <StyledLink
@@ -137,7 +143,7 @@ class SearchPage extends React.Component {
                       textAlign="center"
                       buttonStyle="primary"
                     >
-                      Make a pledge
+                      <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
                     </StyledLink>
                   </Link>
                 }
@@ -152,9 +158,14 @@ class SearchPage extends React.Component {
 
           {showCollectives && collectives.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-              <p>
-                <em>If you don&apos;t see the collective you&apos;re searching for:</em>
-              </p>
+              <P pt={3} borderTop="1px solid #E6E6E6">
+                <em>
+                  <FormattedMessage
+                    id="search.ifYouDontSee"
+                    defaultMessage="If you don't see the collective you're looking for:"
+                  />
+                </em>
+              </P>
               {
                 <Link route="createPledge" params={{ name: term }} passHref>
                   <StyledLink
@@ -167,7 +178,7 @@ class SearchPage extends React.Component {
                     textAlign="center"
                     buttonStyle="primary"
                   >
-                    Make a pledge
+                    <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
                   </StyledLink>
                 </Link>
               }

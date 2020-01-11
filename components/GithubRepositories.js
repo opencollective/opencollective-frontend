@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { Search } from 'styled-icons/octicons/Search';
+import { Search } from '@styled-icons/octicons/Search';
 
 import { escapeInput } from '../lib/utils';
 import { H4 } from './Text';

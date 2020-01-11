@@ -16,6 +16,7 @@ export const getCollectivePageQuery = gql`
       description
       longDescription
       backgroundImage
+      backgroundImageUrl
       twitterHandle
       githubHandle
       website
@@ -45,6 +46,9 @@ export const getCollectivePageQuery = gql`
           all
           users
           organizations
+        }
+        transactions {
+          all
         }
       }
       parentCollective {
@@ -129,28 +133,31 @@ export const getCollectivePageQuery = gql`
           }
         }
       }
-      childCollectives {
+      subCollectives: members(role: "SUB_COLLECTIVE") {
         id
-        slug
-        name
-        type
-        description
-        backgroundImageUrl(height: 208)
-        stats {
+        collective: member {
           id
-          backers {
-            id
-            all
-            users
-            organizations
-          }
-        }
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
+          slug
           name
           type
+          description
+          backgroundImageUrl(height: 208)
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            image
+            collectiveSlug
+            name
+            type
+          }
         }
       }
       transactions(limit: 3, includeExpenseTransactions: false) {
@@ -182,6 +189,7 @@ export const getCollectivePageQuery = gql`
           publicMessage
           fromCollective {
             id
+            type
             name
             company
             image

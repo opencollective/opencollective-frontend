@@ -69,8 +69,12 @@ class SectionTickets extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTiers = this.sortTiers(this.filterTickets(tiers));
 
+    if (sortedTiers.length === 0 && !isAdmin) {
+      return null;
+    }
+
     return (
-      <Box pt={[4, 5]}>
+      <Box pt={[4, 5]} data-cy="Tickets">
         <ContainerSectionContent>
           <SectionTitle>
             <FormattedMessage id="SectionTickets.Title" defaultMessage="Tickets" />

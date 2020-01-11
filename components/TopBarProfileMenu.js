@@ -4,7 +4,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
-import { ChevronDown } from 'styled-icons/boxicons-regular/ChevronDown';
+import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 
 import { Link } from '../server/pages';
 import { formatCurrency, capitalize } from '../lib/utils';

@@ -28,9 +28,9 @@ const InputContainer = styled(Container)`
   }
 `;
 
-const getColor = ({ error, focused, success }) => {
-  if (focused) {
-    return 'primary.300';
+const getColor = ({ error, focused, success, blurred }) => {
+  if (focused || blurred) {
+    return 'black.800';
   }
 
   if (error) {
@@ -73,7 +73,7 @@ const getBorderColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  return 'black.300';
+  return 'black.400';
 };
 
 /**
@@ -92,6 +92,7 @@ const StyledInputGroup = ({
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
+  const [blurred, setOnBlur] = useState(false);
 
   return (
     <React.Fragment>
@@ -113,7 +114,7 @@ const StyledInputGroup = ({
             py={2}
             pl={2}
             pr={2}
-            color={getColor({ error, focused, success })}
+            color={getColor({ error, focused, success, blurred })}
             {...prependProps}
             bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
           >
@@ -122,7 +123,7 @@ const StyledInputGroup = ({
         )}
         <StyledInput
           bare
-          color="black.800"
+          color={getColor({ error, focused, success, blurred })}
           type="text"
           overflow="scroll"
           fontSize="Paragraph"
@@ -139,6 +140,7 @@ const StyledInputGroup = ({
           }}
           onBlur={e => {
             setFocus(false);
+            setOnBlur(true);
             if (inputProps && inputProps.onBlur) {
               inputProps.onBlur(e);
             }

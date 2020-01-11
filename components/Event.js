@@ -15,7 +15,6 @@ import Responses from './Responses';
 import { filterCollection, trimObject } from '../lib/utils';
 import { canOrderTicketsFromEvent, moneyCanMoveFromEvent } from '../lib/events';
 import { Router } from '../server/pages';
-import { addEventMutations } from '../lib/graphql/mutations';
 import { exportRSVPs } from '../lib/export_file';
 import ExpensesSection from './expenses/ExpensesSection';
 import Button from './Button';
@@ -26,8 +25,6 @@ class Event extends React.Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
-    removeMember: PropTypes.func,
-    createMember: PropTypes.func,
     intl: PropTypes.object.isRequired,
     /** Should be set to true if event is (re-)fetching. Disables actions. */
     isLoading: PropTypes.bool,
@@ -351,4 +348,4 @@ class Event extends React.Component {
   }
 }
 
-export default injectIntl(addEventMutations(Event));
+export default injectIntl(Event);

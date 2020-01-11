@@ -64,6 +64,38 @@
 </React.Fragment>
 ```
 
+### Danger
+
+```js
+<React.Fragment>
+  <StyledButton mr={3} buttonStyle="danger" buttonSize="large" disabled>
+    Disabled
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="danger" buttonSize="large">
+    Default
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="danger" buttonSize="large" loading>
+    Loading
+  </StyledButton>
+</React.Fragment>
+```
+
+### Success
+
+```js
+<React.Fragment>
+  <StyledButton mr={3} buttonStyle="success" buttonSize="large" disabled>
+    Disabled
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="success" buttonSize="large">
+    Default
+  </StyledButton>
+  <StyledButton mr={3} buttonStyle="success" buttonSize="large" loading>
+    Loading
+  </StyledButton>
+</React.Fragment>
+```
+
 ### Defaults to the `medium` button size
 
 ```js

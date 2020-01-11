@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { Mutation } from 'react-apollo';
 import { get, set, has } from 'lodash';
 
-import { Upload } from 'styled-icons/feather/Upload';
+import { Upload } from '@styled-icons/feather/Upload';
 
 import { upload } from '../../../lib/api';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -110,10 +110,10 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
 
   return !isEditing ? (
     <StyledBackground>
-      {collective.backgroundImage && (
+      {collective.backgroundImageUrl && (
         <ImageContainer>
           <BackgroundImage
-            src={collective.backgroundImage}
+            src={collective.backgroundImageUrl}
             style={
               hasBackgroundSettings
                 ? { transform: `translate(${crop.x}px, ${crop.y}px) scale(${zoom})` }
@@ -128,11 +128,11 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
       {editBackground => (
         <StyledBackground
           data-cy="collective-background-image-styledBackground"
-          backgroundImage={collective.backgroundImage}
+          backgroundImage={collective.backgroundImageUrl}
           isEditing
         >
           <Cropper
-            image={uploadedImage ? uploadedImage.preview : collective.backgroundImage}
+            image={uploadedImage ? uploadedImage.preview : collective.backgroundImageUrl}
             cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}
             crop={crop}
             zoom={zoom}
@@ -149,15 +149,17 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
           />
           <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
             <Dropzone
-              onDrop={acceptedFiles =>
+              onDrop={acceptedFiles => {
+                onZoomChange(1);
+                onCropChange(DEFAULT_CROP);
                 setUploadedImage(
                   ...acceptedFiles.map(file =>
                     Object.assign(file, {
                       preview: URL.createObjectURL(file),
                     }),
                   ),
-                )
-              }
+                );
+              }}
               multiple={false}
               accept="image/jpeg, image/png"
               style={{}}
@@ -188,7 +190,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 </div>
               )}
             </Dropzone>
-            {((collective.backgroundImage && uploadedImage !== KEY_IMG_REMOVE) || uploadedImage !== KEY_IMG_REMOVE) && (
+            {uploadedImage !== KEY_IMG_REMOVE && collective.backgroundImage && (
               <StyledButton
                 minWidth={150}
                 ml={3}
@@ -224,6 +226,9 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 setSubmitting(true); // Need this because `upload` is not a graphql function
 
                 try {
+                  // We intentionally use the raw image URL rather than image service here
+                  // because the `backgroundImage` column is not supposed to store the
+                  // images service address
                   let imgURL = collective.backgroundImage;
 
                   // Upload image if changed or remove it
@@ -278,6 +283,7 @@ HeroBackground.propTypes = {
     id: PropTypes.number,
     /** The background image */
     backgroundImage: PropTypes.string,
+    backgroundImageUrl: PropTypes.string,
     /** Collective settings */
     settings: PropTypes.shape({
       collectivePage: PropTypes.shape({

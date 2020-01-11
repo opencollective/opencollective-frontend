@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { display, layout, space, typography, shadow, color, flexbox } from 'styled-system';
+import { display, layout, space, typography, shadow, color, flexbox, borders } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
-import { InfoCircle } from 'styled-icons/fa-solid/InfoCircle';
-import { CheckCircle } from 'styled-icons/fa-solid/CheckCircle';
-import { ExclamationCircle } from 'styled-icons/fa-solid/ExclamationCircle';
-import { ExclamationTriangle } from 'styled-icons/fa-solid/ExclamationTriangle';
+import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
+import { CheckCircle } from '@styled-icons/fa-solid/CheckCircle';
+import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
+import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 
 import { messageType } from '../lib/theme';
 import { Span } from './Text';
@@ -19,6 +19,7 @@ const Message = styled.div`
   border-radius: 8px;
   padding: ${themeGet('space.3')}px;
 
+  ${borders}
   ${shadow}
   ${display}
   ${layout}

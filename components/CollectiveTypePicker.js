@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box } from '@rebass/grid';
 
-import { User } from 'styled-icons/feather/User';
+import { User } from '@styled-icons/feather/User';
 
 import formatCollectiveType from '../lib/i18n-collective-type';
 import { CollectiveType } from '../lib/constants/collectives';

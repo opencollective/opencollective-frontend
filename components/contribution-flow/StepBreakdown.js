@@ -6,7 +6,7 @@ import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import { checkVATNumberFormat, getVatPercentage, getVatOriginCountry } from '@opencollective/taxes';
 
-import { Close } from 'styled-icons/material/Close';
+import { Close } from '@styled-icons/material/Close';
 
 import tiersTypes from '../../lib/constants/tiers-types';
 import { propTypeCountry } from '../../lib/custom-prop-types';

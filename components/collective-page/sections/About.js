@@ -42,7 +42,15 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
-    <Flex flexDirection="column" alignItems="center" px={2} pt={[4, 5]}>
+    <Container
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      px={2}
+      py={[4, 5]}
+      background="#f5f7fa"
+      boxShadow="0px 11px 15px -5px #bfbfbf2b inset"
+    >
       <SectionTitle textAlign="center" mb={5}>
         <FormattedMessage id="collective.about.title" defaultMessage="About" />
       </SectionTitle>
@@ -56,20 +64,23 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           topEdit={-20}
           showEditIcon={!isEmptyDescription}
           formatBeforeSubmit={v => (isEmptyValue(v) ? null : v)}
+          prepareVariables={(collective, longDescription) => ({
+            id: collective.id,
+            longDescription: isEmptyValue(longDescription) ? null : longDescription,
+          })}
         >
           {({ isEditing, value, setValue, enableEditor }) => {
             if (isEditing) {
               return (
-                <HTMLContent>
-                  <HTMLEditor
-                    defaultValue={collective.longDescription}
-                    onChange={setValue}
-                    placeholder={intl.formatMessage(messages.placeholder)}
-                    toolbarTop={[60, null, 119]}
-                    withStickyToolbar
-                    autoFocus
-                  />
-                </HTMLContent>
+                <HTMLEditor
+                  defaultValue={collective.longDescription}
+                  onChange={e => setValue(e.target.value)}
+                  placeholder={intl.formatMessage(messages.placeholder)}
+                  toolbarTop={[60, null, 119]}
+                  toolbarBackgroundColor="#F7F8FA"
+                  withStickyToolbar
+                  autoFocus
+                />
               );
             } else if (isEmptyDescription) {
               return (
@@ -113,7 +124,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           }}
         </InlineEditField>
       </Container>
-    </Flex>
+    </Container>
   );
 };
 

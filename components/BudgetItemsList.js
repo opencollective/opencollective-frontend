@@ -6,8 +6,8 @@ import gql from 'graphql-tag';
 import styled, { css } from 'styled-components';
 import { round, truncate } from 'lodash';
 
-import { ChevronDown } from 'styled-icons/feather/ChevronDown';
-import { ChevronUp } from 'styled-icons/feather/ChevronUp';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown';
+import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 
 import { i18nPaymentMethodType } from '../lib/i18n-payment-method-type';
 import { TransactionTypes } from '../lib/constants/transactions';
@@ -321,7 +321,9 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
           alignItems={['center', 'flex-start']}
         >
           <Box mr={3} order="1">
-            <Avatar collective={collective} radius={40} />
+            <LinkCollective collective={collective}>
+              <Avatar collective={collective} radius={40} />
+            </LinkCollective>
           </Box>
           <Flex
             flexDirection="column"

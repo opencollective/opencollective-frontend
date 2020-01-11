@@ -1,3 +1,9 @@
+/**
+ * Configure the router.
+ *
+ * /!\ You'll have to restart your local dev server after any change to this file.
+ */
+
 const routes = require('next-routes');
 
 const pages = routes()
@@ -52,21 +58,24 @@ const pages = routes()
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
-  .add('discover', '/discover');
+  .add('markOrderAsPaid', '/orders/:id([0-9]+)/mark-as-paid')
+  .add('discover', '/discover')
+  .add('member-invitations', '/member-invitations');
 
 // Events using new collective page
-if (process.env.NEW_EVENTS === 'true') {
-  pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
-  pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
-} else {
-  pages.add('event', '/:parentCollectiveSlug/events/:eventSlug');
-  pages.add('new-event', '/:parentCollectiveSlug/events/:eventSlug/new', 'new-collective-page');
-}
+pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
+pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
 
 // Tier page
 // ---------------
 pages.add('contribute', '/:collectiveSlug/:verb(tiers|contribute)');
 pages.add('tier', '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)');
+
+// Conversations
+// ---------------
+pages.add('conversations', '/:collectiveSlug/conversations');
+pages.add('create-conversation', '/:collectiveSlug/conversations/new');
+pages.add('conversation', '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)');
 
 // Contribute Flow
 // ---------------
@@ -161,11 +170,7 @@ pages.add(
 pages.add('new-collective-page', '/:slug/v2');
 
 // Collective page
-if (process.env.NCP_IS_DEFAULT === 'true') {
-  pages.add('collective', '/:slug', 'new-collective-page');
-  pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
-} else {
-  pages.add('collective', '/:slug');
-}
+pages.add('collective', '/:slug', 'new-collective-page');
+pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
 
 module.exports = pages;

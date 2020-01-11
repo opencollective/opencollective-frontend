@@ -18,11 +18,13 @@ import SectionContributors from './sections/Contributors';
 import SectionGoals from './sections/Goals';
 import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
+import SectionConversations from './sections/Conversations';
 import SectionTransactions from './sections/Transactions';
 import SectionTickets from './sections/Tickets';
-import SectionParticipants from './sections/Participants';
+import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionLocation from './sections/Location';
 import SectionContainer from './SectionContainer';
+import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
 
 /**
  * This is the collective page main layout, holding different blocks together
@@ -40,10 +42,11 @@ class CollectivePage extends Component {
     topIndividuals: PropTypes.arrayOf(PropTypes.object),
     tiers: PropTypes.arrayOf(PropTypes.object),
     transactions: PropTypes.arrayOf(PropTypes.object),
+    conversations: PropTypes.object,
     expenses: PropTypes.arrayOf(PropTypes.object),
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
-    childCollectives: PropTypes.arrayOf(PropTypes.object),
+    subCollectives: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
@@ -159,7 +162,7 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
-            childCollectives={this.props.childCollectives}
+            subCollectives={this.props.subCollectives}
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
@@ -184,6 +187,8 @@ class CollectivePage extends Component {
         );
       case Sections.CONTRIBUTIONS:
         return <SectionContributions collective={this.props.collective} />;
+      case Sections.CONVERSATIONS:
+        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
       case Sections.TRANSACTIONS:
         return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
       case Sections.GOALS:
@@ -214,12 +219,7 @@ class CollectivePage extends Component {
     const callsToAction = this.getCallsToAction(type, isHost, isAdmin, isRoot, canApply, canContact);
 
     return (
-      <Container
-        position="relative"
-        borderTop="1px solid #E6E8EB"
-        css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
-        pb={5}
-      >
+      <Container position="relative" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
         <Hero
           collective={collective}
           host={host}
@@ -250,13 +250,14 @@ class CollectivePage extends Component {
             )}
           />
         </Container>
-        {sections.map(section => (
+        {sections.map((section, idx) => (
           <SectionContainer
             key={section}
             ref={sectionRef => (this.sectionsRefs[section] = sectionRef)}
             id={`section-${section}`}
+            withPaddingBottom={idx === sections.length - 1 && !sectionsWithoutPaddingBottom[section]}
           >
-            {this.renderSection(section)}
+            {this.renderSection(section, idx === sections.length - 1)}
           </SectionContainer>
         ))}
       </Container>

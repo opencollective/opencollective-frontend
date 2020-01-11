@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
-import { Times } from 'styled-icons/fa-solid/Times';
+import { Times } from '@styled-icons/fa-solid/Times';
 
 import Container from './Container';
 
@@ -19,6 +19,7 @@ const ModalWrapper = styled(Container).attrs(props => ({
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
   padding: 20px;
+  overflow-y: auto;
 `;
 
 const GlobalModalStyle = createGlobalStyle`
@@ -57,10 +58,6 @@ const Divider = styled.div`
   width: 100%;
   height: 1px;
   background-color: #e1e4e6;
-
-  @media (min-width: 52em) {
-    margin: 3rem 0;
-  }
 `;
 
 const CloseIcon = styled(Times)`

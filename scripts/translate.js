@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { sync as globSync } from 'glob';
 import { sync as mkdirpSync } from 'mkdirp';
 import { orderBy, difference, has } from 'lodash';
+import locales from '../lib/constants/locales';
 
 const MESSAGES_PATTERN = './dist/messages/**/*.json';
 const LANG_DIR = './lang/';
@@ -107,16 +108,10 @@ diff.updated.forEach(key => console.info(`📥  [UPDATE] "${key}"`));
 
 // Save translations
 mkdirpSync(LANG_DIR);
-translate('es', defaultMessages, diff.updated);
-translate('fr', defaultMessages, diff.updated);
-translate('it', defaultMessages, diff.updated);
-translate('ja', defaultMessages, diff.updated);
-translate('pt', defaultMessages, diff.updated);
-translate('ru', defaultMessages, diff.updated);
-translate('zh', defaultMessages, diff.updated);
-translate('nl', defaultMessages, diff.updated);
-translate('de', defaultMessages, diff.updated);
-translate('ko', defaultMessages, diff.updated);
-translate('ar', defaultMessages, diff.updated);
+const supportedLocales = Object.keys(locales).filter(locale => locale !== 'en');
+supportedLocales.forEach(locale => {
+  translate(locale, defaultMessages, diff.updated);
+});
 
+// Write root file at the end to only save if translations don't crash
 fs.writeFileSync(DEFAULT_TRANSLATIONS_FILE, convertToJSON(defaultMessages));

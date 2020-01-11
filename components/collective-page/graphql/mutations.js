@@ -35,6 +35,7 @@ export const EditCollectiveBackgroundMutation = gql`
       id
       settings
       backgroundImage
+      backgroundImageUrl
     }
   }
 `;

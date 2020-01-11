@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { useQuery } from 'react-apollo';
 import { Box, Flex } from '@rebass/grid';
 import gql from 'graphql-tag';
-import { ExternalLinkAlt } from 'styled-icons/fa-solid/ExternalLinkAlt';
+import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
 
 import { Link } from '../server/pages';
 
@@ -52,13 +52,13 @@ const PledgedCollectivePage = ({ collective }) => {
 
   if (loading) {
     return (
-      <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+      <Container py={[5, 6]}>
         <Loading />
       </Container>
     );
   } else if (error) {
     return (
-      <Container borderTop="1px solid #E8E9EB" py={[5, 6]}>
+      <Container py={[5, 6]}>
         <MessageBox type="error" withIcon>
           {error.toString()}
         </MessageBox>
