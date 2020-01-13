@@ -27,6 +27,7 @@ const SearchIcon = styled(Search)`
 const ProfileContainer = styled(Container)`
   cursor: pointer;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 `;
 
