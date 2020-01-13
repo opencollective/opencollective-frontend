@@ -85,7 +85,7 @@
     "passport-meetup-oauth2": "0.0.2",
     "passport-twitter": "1.0.4",
     "paypal-adaptive": "0.4.2",
-    "pg": "7.17.0",
+    "pg": "7.17.1",
     "pg-connection-string": "2.1.0",
     "pg-format": "1.0.4",
     "prepend-http": "3.0.1",
