@@ -8,7 +8,6 @@ import { isValidEmail, getErrorFromGraphqlException } from '../../lib/utils';
 
 import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
-import { P } from '../Text';
 import StyledTooltip from '../StyledTooltip';
 import { payExpenseMutation } from './graphql/mutations';
 
@@ -26,6 +25,7 @@ class PayExpenseBtn extends React.Component {
     mutate: PropTypes.func,
     refetch: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    onError: PropTypes.func,
   };
 
   constructor(props) {
@@ -64,14 +64,15 @@ class PayExpenseBtn extends React.Component {
       unlock();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
-      this.setState({ error, loading: false });
+      this.props.onError(error);
+      this.setState({ loading: false });
       unlock();
     }
   }
 
   render() {
     const { collective, expense, intl, host } = this.props;
-    const { loading, error } = this.state;
+    const { loading } = this.state;
     let disabled = this.state.loading || this.props.disabled,
       selectedPayoutMethod = expense.payoutMethod,
       disabledMessage;
@@ -130,11 +131,6 @@ class PayExpenseBtn extends React.Component {
           <StyledTooltip display="grid" content={disabledMessage}>
             {button}
           </StyledTooltip>
-        )}
-        {error && (
-          <P color="red.500" pr={2}>
-            {error}
-          </P>
         )}
       </React.Fragment>
     );

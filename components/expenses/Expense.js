@@ -9,7 +9,7 @@ import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
-import { Span, P } from '../Text';
+import { Span } from '../Text';
 import Link from '../Link';
 import SmallButton from '../SmallButton';
 import Moment from '../Moment';
@@ -24,6 +24,7 @@ import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
 import MarkExpenseAsPaidBtn from './MarkExpenseAsPaidBtn';
+import MessageBox from '../MessageBox';
 
 class Expense extends React.Component {
   static propTypes = {
@@ -85,6 +86,8 @@ class Expense extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.toggleDetails = this.toggleDetails.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    this.handleErrorMessage = this.handleErrorMessage.bind(this);
+
     this.messages = defineMessages({
       pending: { id: 'expense.pending', defaultMessage: 'pending' },
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
@@ -183,6 +186,12 @@ class Expense extends React.Component {
     };
     await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
+  }
+
+  handleErrorMessage(errorMessage) {
+    this.setState({
+      error: errorMessage,
+    });
   }
 
   render() {
@@ -429,7 +438,6 @@ class Expense extends React.Component {
               )}
             </div>
           </div>
-
           <ExpenseDetails
             LoggedInUser={LoggedInUser}
             expense={expense}
@@ -486,6 +494,12 @@ class Expense extends React.Component {
                       payoutMethod={expense.payoutMethod}
                     />
                   )}
+                  {this.state.error && (
+                    <MessageBox type="error" withIcon mb={2}>
+                      {this.state.error}
+                    </MessageBox>
+                  )}
+
                   <Flex data-cy="expense-actions" flexDirection={['column', 'row']} flexWrap="wrap" width="100%">
                     {canPay && (
                       <React.Fragment>
@@ -497,6 +511,7 @@ class Expense extends React.Component {
                           disabled={!this.props.allowPayAction}
                           lock={this.props.lockPayAction}
                           unlock={this.props.unlockPayAction}
+                          onError={this.handleErrorMessage}
                         />
                         {expense.payoutMethod !== 'other' && (
                           <PayExpenseBtn
@@ -508,6 +523,7 @@ class Expense extends React.Component {
                             disabled={!this.props.allowPayAction}
                             lock={this.props.lockPayAction}
                             unlock={this.props.unlockPayAction}
+                            onError={this.handleErrorMessage}
                           />
                         )}
                         <StyledButton
@@ -520,9 +536,27 @@ class Expense extends React.Component {
                         </StyledButton>
                       </React.Fragment>
                     )}
-                    {canMarkExpenseAsUnpaid && <MarkExpenseAsUnpaidBtn refetch={this.props.refetch} id={expense.id} />}
-                    {canApprove && <ApproveExpenseBtn refetch={this.props.refetch} id={expense.id} />}
-                    {canReject && <RejectExpenseBtn refetch={this.props.refetch} id={expense.id} />}
+                    {canMarkExpenseAsUnpaid && (
+                      <MarkExpenseAsUnpaidBtn
+                        refetch={this.props.refetch}
+                        id={expense.id}
+                        onError={this.handleErrorMessage}
+                      />
+                    )}
+                    {canApprove && (
+                      <ApproveExpenseBtn
+                        refetch={this.props.refetch}
+                        id={expense.id}
+                        onError={this.handleErrorMessage}
+                      />
+                    )}
+                    {canReject && (
+                      <RejectExpenseBtn
+                        refetch={this.props.refetch}
+                        id={expense.id}
+                        onError={this.handleErrorMessage}
+                      />
+                    )}
                     {canDelete && (
                       <StyledButton
                         buttonStyle="danger"
@@ -537,11 +571,6 @@ class Expense extends React.Component {
                 </Flex>
               )}
             </div>
-          )}
-          {this.state.error && (
-            <P color="red.500" data-cy="errorMessage">
-              {this.state.error}
-            </P>
           )}
         </div>
       </div>

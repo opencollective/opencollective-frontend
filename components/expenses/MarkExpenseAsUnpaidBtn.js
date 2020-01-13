@@ -4,6 +4,8 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
+import { getErrorFromGraphqlException } from '../../lib/utils';
+
 import StyledButton from '../StyledButton';
 import StyledCheckBox from '../StyledCheckbox';
 
@@ -14,7 +16,7 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
+const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch, onError }) => {
   const [state, setState] = useState({
     showProcessorFeeConfirmation: false,
     processorFeeRefunded: false,
@@ -30,6 +32,8 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
       await refetch();
     } catch (err) {
       console.log('>>> payExpense error: ', err);
+      const error = getErrorFromGraphqlException(err).message;
+      onError(error);
       setState({ ...state, disableBtn: false });
     }
   }
@@ -66,6 +70,7 @@ MarkExpenseAsUnpaidBtn.propTypes = {
   id: PropTypes.number.isRequired,
   markExpenseAsUnpaid: PropTypes.func.isRequired,
   refetch: PropTypes.func,
+  onError: PropTypes.func.isRequired,
 };
 
 const markExpenseAsUnpaidQuery = gql`
