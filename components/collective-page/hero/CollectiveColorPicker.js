@@ -61,7 +61,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
           data-cy="collective-color-picker-card"
           flexDirection="column"
           boxShadow="4px 4px 10px #c7c5c5"
-          width={360}
+          maxWidth={360}
         >
           <Box px={32} py={24}>
             <P fontSize="H5" fontWeight={600} mb={3}>
@@ -132,10 +132,11 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
               </div>
             </Flex>
           </Box>
-          <Container borderTop="1px solid #D7DBE0" p={2}>
-            <Flex justifyContent="space-between">
+          <Container borderTop="1px solid #D7DBE0" px={2}>
+            <Flex justifyContent="space-between" flexWrap="wrap">
               <StyledButton
-                mx={2}
+                m={2}
+                flex="1 1"
                 textTransform="capitalize"
                 onClick={() => {
                   dispatchValue(defaultTheme.colors.primary[500]);
@@ -143,9 +144,10 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
               >
                 <FormattedMessage id="Reset" defaultMessage="Reset" />
               </StyledButton>
-              <Flex>
+              <Flex flex="1 1 50%">
                 <StyledButton
-                  mx={2}
+                  m={2}
+                  flex="1 1 50%"
                   textTransform="capitalize"
                   onClick={() => {
                     onChange(null);
@@ -156,9 +158,10 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                 </StyledButton>
                 <StyledButton
                   data-cy="collective-color-picker-save-btn"
-                  mx={2}
+                  m={2}
                   buttonStyle="primary"
                   textTransform="capitalize"
+                  flex="1 1 50%"
                   loading={loading}
                   disabled={hasError}
                   onClick={() =>
