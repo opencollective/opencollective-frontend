@@ -1,0 +1,8 @@
+{
+  "timeout": 20000,
+  "extension": ["js", "ts"],
+  "require": ["./test/setup-babel.js"],
+  "file": ["./test/setup.js", "./server/env.js"],
+  "recursive": true,
+  "exit": true
+}
