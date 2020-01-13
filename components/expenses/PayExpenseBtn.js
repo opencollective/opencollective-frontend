@@ -64,9 +64,13 @@ class PayExpenseBtn extends React.Component {
       unlock();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
-      this.setState({ error, loading: false });
+      this.setState({ error, loading: false }, this.passErrorMessage);
       unlock();
     }
+  }
+
+  passErrorMessage() {
+    this.props.errorMessage(this.state.error);
   }
 
   render() {
@@ -97,6 +101,8 @@ class PayExpenseBtn extends React.Component {
       disabled = true;
       disabledMessage = intl.formatMessage(this.messages.insufficientBalance);
     }
+
+    if (error) this.passErrorMessage;
 
     const button = (
       <StyledButton
@@ -130,11 +136,6 @@ class PayExpenseBtn extends React.Component {
           <StyledTooltip display="grid" content={disabledMessage}>
             {button}
           </StyledTooltip>
-        )}
-        {error && (
-          <P color="red.500" pr={2}>
-            {error}
-          </P>
         )}
       </React.Fragment>
     );

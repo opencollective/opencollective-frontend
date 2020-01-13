@@ -24,6 +24,7 @@ import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
 import MarkExpenseAsPaidBtn from './MarkExpenseAsPaidBtn';
+import MessageBox from '../MessageBox';
 
 class Expense extends React.Component {
   static propTypes = {
@@ -85,6 +86,8 @@ class Expense extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.toggleDetails = this.toggleDetails.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    this.handleErrorMessage = this.handleErrorMessage.bind(this);
+
     this.messages = defineMessages({
       pending: { id: 'expense.pending', defaultMessage: 'pending' },
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
@@ -161,7 +164,7 @@ class Expense extends React.Component {
       await this.props.refetch();
     } catch (err) {
       console.error(err);
-      this.setState({ showUnapproveModal: false, error: err.message });
+      this.setState({ showUnapproveModal: false, error: err.message }, this.handleErrorMessage(err.message));
     }
   };
 
@@ -172,7 +175,7 @@ class Expense extends React.Component {
       await this.props.refetch();
     } catch (err) {
       console.error(err);
-      this.setState({ showDeleteExpenseModal: false, error: err.message });
+      this.setState({ showDeleteExpenseModal: false, error: err.message }, this.handleErrorMessage(err.message));
     }
   };
 
@@ -183,6 +186,13 @@ class Expense extends React.Component {
     };
     await this.props.editExpense(expense);
     this.setState({ modified: false, mode: 'details' });
+  }
+
+  handleErrorMessage(errorMessage) {
+    console.error(errorMessage);
+    this.setState({
+      error: errorMessage,
+    });
   }
 
   render() {
@@ -429,7 +439,6 @@ class Expense extends React.Component {
               )}
             </div>
           </div>
-
           <ExpenseDetails
             LoggedInUser={LoggedInUser}
             expense={expense}
@@ -486,6 +495,12 @@ class Expense extends React.Component {
                       payoutMethod={expense.payoutMethod}
                     />
                   )}
+                  {this.state.error && (
+                    <MessageBox type="error" withIcon mb={2}>
+                      {this.state.error}
+                    </MessageBox>
+                  )}
+
                   <Flex data-cy="expense-actions" flexDirection={['column', 'row']} flexWrap="wrap" width="100%">
                     {canPay && (
                       <React.Fragment>
@@ -497,6 +512,7 @@ class Expense extends React.Component {
                           disabled={!this.props.allowPayAction}
                           lock={this.props.lockPayAction}
                           unlock={this.props.unlockPayAction}
+                          errorMessage={this.handleErrorMessage}
                         />
                         {expense.payoutMethod !== 'other' && (
                           <PayExpenseBtn
@@ -508,6 +524,7 @@ class Expense extends React.Component {
                             disabled={!this.props.allowPayAction}
                             lock={this.props.lockPayAction}
                             unlock={this.props.unlockPayAction}
+                            errorMessage={this.handleErrorMessage}
                           />
                         )}
                         <StyledButton
@@ -537,11 +554,6 @@ class Expense extends React.Component {
                 </Flex>
               )}
             </div>
-          )}
-          {this.state.error && (
-            <P color="red.500" data-cy="errorMessage">
-              {this.state.error}
-            </P>
           )}
         </div>
       </div>
