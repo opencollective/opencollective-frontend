@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set } from 'lodash';
@@ -13,7 +12,6 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
-import { isFeatureAllowedForCollectiveType, FEATURES } from '../../lib/allowed-features';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
@@ -38,24 +36,7 @@ import EditCollectiveDelete from './EditCollectiveDelete';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
-
-const selectedStyle = css`
-  background-color: #eee;
-  color: black;
-`;
-
-const MenuItem = styled(Link)`
-  display: block;
-  border-radius: 5px;
-  padding: 5px 10px;
-  color: #888;
-  cursor: pointer;
-  &:hover,
-  a:hover {
-    color: black;
-  }
-  ${({ selected }) => selected && selectedStyle};
-`;
+import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -342,8 +323,101 @@ class EditCollectiveForm extends React.Component {
     return this.state.collective[field.name];
   }
 
+  getMenuSelectedSection() {
+    if (['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(this.state.section)) {
+      return EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS;
+    } else {
+      return this.state.section;
+    }
+  }
+
+  renderSection(section) {
+    const { collective, LoggedInUser } = this.props;
+    if (section === EDIT_COLLECTIVE_SECTIONS.ADVANCED) {
+      return (
+        <Box>
+          {collective.type === CollectiveType.USER && <EditUserEmailForm />}
+          {collective.type === CollectiveType.COLLECTIVE && (
+            <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
+          )}
+          <EditCollectiveArchive collective={collective} />
+          {collective.type !== CollectiveType.EVENT && <EditCollectiveDelete collective={collective} />}
+          <hr />
+        </Box>
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.MEMBERS) {
+      return <EditMembers collective={collective} LoggedInUser={LoggedInUser} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.INVOICES) {
+      return <EditHostInvoice collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS) {
+      return <EditCollectiveConversations collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.WEBHOOKS) {
+      return <EditWebhooks collectiveSlug={collective.slug} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.TIERS) {
+      return (
+        <EditTiers
+          title="Tiers"
+          types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
+          tiers={this.state.tiers}
+          collective={collective}
+          currency={collective.currency}
+          onChange={this.handleObjectChange}
+          defaultType={this.defaultTierType}
+        />
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.GOALS) {
+      return <EditGoals collective={collective} currency={collective.currency} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST) {
+      return (
+        <EditHost collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS) {
+      return <EditPaymentMethods collectiveSlug={collective.slug} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS) {
+      return <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS) {
+      return <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.EXPORT) {
+      return <ExportData collective={collective} />;
+    } else if (['gift-cards-create', 'gift-cards-send'].includes(this.state.section)) {
+      return (
+        <Flex mt={3} flexDirection="column">
+          <Container
+            mb={5}
+            pb={4}
+            borderBottom="1px solid #E8E9EB"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            flexWrap="wrap"
+          >
+            <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
+              <StyledButton>
+                <ArrowBack size="1em" />{' '}
+                <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
+              </StyledButton>
+            </Link>
+
+            <ExternalLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
+              <InfoCircle size="1em" />
+              &nbsp;
+              <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
+            </ExternalLink>
+          </Container>
+          <CreateVirtualCardsForm
+            collectiveId={collective.id}
+            collectiveSlug={collective.slug}
+            currency={collective.currency}
+          />
+        </Flex>
+      );
+    } else {
+      return null;
+    }
+  }
+
   render() {
-    const { collective, status, intl, LoggedInUser } = this.props;
+    const { collective, status, intl } = this.props;
     const isNew = !(collective && collective.id);
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
     if (['loading', 'saved'].includes(status)) {
@@ -615,163 +689,9 @@ class EditCollectiveForm extends React.Component {
         </style>
 
         <Flex flexWrap="wrap">
-          <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
-            <MenuItem
-              selected={this.state.section === 'info'}
-              route="editCollective"
-              params={{ slug: collective.slug, section: 'info' }}
-              className="MenuItem info"
-            >
-              <FormattedMessage id="editCollective.menu.info" defaultMessage="Info" />
-            </MenuItem>
-            {this.showEditImages && (
-              <MenuItem
-                selected={this.state.section === 'images'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'images' }}
-                className="MenuItem images"
-              >
-                <FormattedMessage id="editCollective.menu." defaultMessage="Images" />
-              </MenuItem>
-            )}
-            {this.showEditMembers && (
-              <MenuItem
-                selected={this.state.section === 'members'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'members' }}
-                className="MenuItem members"
-              >
-                <FormattedMessage id="editCollective.menu.members" defaultMessage="Core Contributors" />
-              </MenuItem>
-            )}
-            {isFeatureAllowedForCollectiveType(collective.type, FEATURES.CONVERSATIONS) && (
-              <MenuItem
-                selected={this.state.section === 'conversations'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'conversations' }}
-                className="MenuItem"
-              >
-                <FormattedMessage id="conversations" defaultMessage="Conversations" />
-              </MenuItem>
-            )}
-            {collective.isHost && (
-              <MenuItem
-                selected={this.state.section === 'invoices'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'invoices' }}
-                className="MenuItem invoices"
-              >
-                <FormattedMessage id="editCollective.menu.invoicesAndReceipts" defaultMessage="Invoices & Receipts" />
-              </MenuItem>
-            )}
-            {this.showEditGoals && (
-              <MenuItem
-                selected={this.state.section === 'goals'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'goals' }}
-                className="MenuItem goals"
-              >
-                <FormattedMessage id="editCollective.menu.goals" defaultMessage="Collective Goals" />
-              </MenuItem>
-            )}
-            {this.showHost && (
-              <MenuItem
-                selected={this.state.section === 'host'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'host' }}
-                className="MenuItem host"
-              >
-                <FormattedMessage id="editCollective.menu.host" defaultMessage="Fiscal Host" />
-              </MenuItem>
-            )}
-            {this.showEditTiers && (
-              <MenuItem
-                selected={this.state.section === 'tiers'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'tiers' }}
-                className="MenuItem tiers"
-              >
-                <FormattedMessage id="editCollective.menu.tiers" defaultMessage="Tiers" />
-              </MenuItem>
-            )}
-            {this.showExpenses && (
-              <MenuItem
-                selected={this.state.section === 'expenses'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'expenses' }}
-                className="MenuItem expenses"
-              >
-                <FormattedMessage id="editCollective.menu.expenses" defaultMessage="Expenses Policy" />
-              </MenuItem>
-            )}
-            {this.showPaymentMethods && (
-              <MenuItem
-                selected={this.state.section === 'payment-methods'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'payment-methods' }}
-                className="MenuItem paymentMethods"
-              >
-                <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
-              </MenuItem>
-            )}
-            {this.showVirtualCards && (
-              <MenuItem
-                selected={['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(this.state.section)}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'gift-cards' }}
-                className="MenuItem gift-cards"
-              >
-                <FormattedMessage id="editCollective.menu.virtualCards" defaultMessage="Gift Cards" />
-              </MenuItem>
-            )}
-            <MenuItem
-              selected={this.state.section === 'connected-accounts'}
-              route="editCollective"
-              params={{ slug: collective.slug, section: 'connected-accounts' }}
-              className="MenuItem connectedAccounts"
-            >
-              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
-            </MenuItem>
-            <MenuItem
-              selected={this.state.section === 'webhooks'}
-              route="editCollective"
-              params={{ slug: collective.slug, section: 'webhooks' }}
-              className="MenuItem webhooks"
-            >
-              <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
-            </MenuItem>
-            {collective.type === 'COLLECTIVE' && (
-              <MenuItem
-                selected={this.state.section === 'export'}
-                route="editCollective"
-                params={{ slug: collective.slug, section: 'export' }}
-                className="MenuItem export"
-              >
-                <FormattedMessage id="editCollective.menu.export" defaultMessage="Export" />
-              </MenuItem>
-            )}
-            <MenuItem
-              selected={this.state.section === 'advanced'}
-              route="editCollective"
-              params={{ slug: collective.slug, section: 'advanced' }}
-              className="MenuItem advanced"
-            >
-              <FormattedMessage id="editCollective.menu.advanced" defaultMessage="Advanced" />
-            </MenuItem>
-          </Flex>
-
+          <MenuEditCollective collective={collective} selectedSection={this.getMenuSelectedSection()} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
-            {this.state.section === 'advanced' && (
-              <Box>
-                {collective.type === 'USER' && <EditUserEmailForm />}
-                {collective.type === 'COLLECTIVE' && (
-                  <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
-                )}
-                {<EditCollectiveArchive collective={collective} />}
-                {collective.type !== 'EVENT' && <EditCollectiveDelete collective={collective} />}
-                <hr />
-              </Box>
-            )}
+            {this.renderSection(this.state.section)}
             <div className="FormInputs">
               {Object.keys(this.fields).map(
                 section =>
@@ -802,90 +722,14 @@ class EditCollectiveForm extends React.Component {
                     </div>
                   ),
               )}
-              {this.state.section === 'members' && <EditMembers collective={collective} LoggedInUser={LoggedInUser} />}
-              {this.state.section === 'invoices' && <EditHostInvoice collective={collective} />}
-              {this.state.section === 'conversations' && <EditCollectiveConversations collective={collective} />}
-              {this.state.section === 'webhooks' && (
-                <EditWebhooks title="Edit webhooks" collectiveSlug={collective.slug} />
-              )}
-              {this.state.section === 'tiers' && (
-                <EditTiers
-                  title="Tiers"
-                  types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
-                  tiers={this.state.tiers}
-                  collective={collective}
-                  currency={collective.currency}
-                  onChange={this.handleObjectChange}
-                  defaultType={this.defaultTierType}
-                />
-              )}
-              {this.state.section === 'goals' && <EditGoals collective={collective} currency={collective.currency} />}
-              {this.state.section === 'host' && (
-                <EditHost
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  editCollectiveMutation={this.props.onSubmit}
-                />
-              )}
-              {this.state.section === 'payment-methods' && <EditPaymentMethods collectiveSlug={collective.slug} />}
-              {this.state.section === 'gift-cards' && (
-                <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />
-              )}
-              {['gift-cards-create', 'gift-cards-send'].includes(this.state.section) && (
-                <Flex mt={3} flexDirection="column">
-                  <Container
-                    mb={5}
-                    pb={4}
-                    borderBottom="1px solid #E8E9EB"
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    flexWrap="wrap"
-                  >
-                    <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
-                      <StyledButton>
-                        <ArrowBack size="1em" />{' '}
-                        <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
-                      </StyledButton>
-                    </Link>
-
-                    <ExternalLink
-                      href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq"
-                      openInNewTab
-                    >
-                      <InfoCircle size="1em" />
-                      &nbsp;
-                      <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
-                    </ExternalLink>
-                  </Container>
-                  <CreateVirtualCardsForm
-                    collectiveId={collective.id}
-                    collectiveSlug={collective.slug}
-                    currency={collective.currency}
-                  />
-                </Flex>
-              )}
-
-              {this.state.section === 'connected-accounts' && (
-                <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
-              )}
-
-              {this.state.section === 'export' && <ExportData collective={collective} />}
             </div>
 
-            {![
-              'export',
-              'connected-accounts',
-              'conversations',
-              'host',
-              'invoices',
-              'gift-cards',
-              'gift-cards-create',
-              'gift-cards-send',
-              'payment-methods',
-              'webhooks',
-              'members',
-              'goals',
+            {[
+              EDIT_COLLECTIVE_SECTIONS.ADVANCED,
+              EDIT_COLLECTIVE_SECTIONS.EXPENSES,
+              EDIT_COLLECTIVE_SECTIONS.IMAGES,
+              EDIT_COLLECTIVE_SECTIONS.INFO,
+              EDIT_COLLECTIVE_SECTIONS.TIERS,
             ].includes(this.state.section) && (
               <div className="actions">
                 <Button
