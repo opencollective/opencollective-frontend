@@ -13,7 +13,7 @@
     "@babel/node": "7.8.0",
     "@babel/plugin-proposal-class-properties": "7.7.4",
     "@babel/plugin-transform-async-to-generator": "7.7.4",
-    "@babel/preset-env": "7.7.7",
+    "@babel/preset-env": "7.8.2",
     "@babel/preset-typescript": "^7.7.7",
     "@octokit/rest": "16.36.0",
     "@opencollective/taxes": "2.3.0",
