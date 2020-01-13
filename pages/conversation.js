@@ -5,7 +5,6 @@ import { Flex, Box } from '@rebass/grid';
 import { get, isEmpty, cloneDeep, update, uniqBy } from 'lodash';
 
 import { Router } from '../server/pages';
-import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { withUser } from '../components/UserProvider';
@@ -37,7 +36,7 @@ import FollowersAvatars from '../components/conversations/FollowersAvatars';
 
 const conversationPageQuery = gqlV2`
   query Conversation($collectiveSlug: String!, $id: String!) {
-    collective(slug: $collectiveSlug, throwIfMissing: false) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
       name
@@ -107,7 +106,7 @@ class ConversationPage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      collective: PropTypes.shape({
+      account: PropTypes.shape({
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -221,17 +220,15 @@ class ConversationPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.collective) {
+      } else if (!data.account) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
-        return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
+      } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.collective;
+    const collective = data && data.account;
     const conversation = data && data.conversation;
     const body = conversation && conversation.body;
     const comments = get(conversation, 'comments.nodes', []);
@@ -247,7 +244,7 @@ class ConversationPage extends React.Component {
           </Container>
         ) : (
           <CollectiveThemeProvider collective={collective}>
-            <Container borderTop="1px solid #E8E9EB">
+            <Container borderTop="1px solid #E8E9EB" data-cy="conversation-page">
               <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
               <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
                 <StyledLink as={Link} color="black.600" route="conversations" params={{ collectiveSlug }}>

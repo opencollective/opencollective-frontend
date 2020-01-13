@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Mon Dec 23 2019 18:21:12 GMT+0100 (GMT+01:00)
+# timestamp: Tue Jan 07 2020 18:59:03 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -1498,7 +1498,7 @@ input MemberInputType {
 }
 
 """
-An invitation to join the members of a collective that has not been approved yet
+An invitation to join the members of a collective
 """
 type MemberInvitation {
   id: Int

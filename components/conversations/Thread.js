@@ -37,7 +37,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser }) => {
 
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
   return (
-    <div>
+    <div data-cy="thread">
       {items.map((item, idx) => {
         switch (item.__typename) {
           case 'Comment':

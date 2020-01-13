@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { Router } from '../server/pages';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { withUser } from '../components/UserProvider';
@@ -46,7 +45,7 @@ class ConversationsPage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      collective: PropTypes.shape({
+      account: PropTypes.shape({
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -81,7 +80,7 @@ class ConversationsPage extends React.Component {
   /** Must only be called when dataIsReady */
   renderConversations() {
     const { data, collectiveSlug } = this.props;
-    const conversations = get(data, 'collective.conversations.nodes', []);
+    const conversations = get(data, 'account.conversations.nodes', []);
     if (conversations.length > 0) {
       return <ConversationsList collectiveSlug={collectiveSlug} conversations={conversations} />;
     } else {
@@ -111,15 +110,13 @@ class ConversationsPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.collective) {
+      } else if (!data.account) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
-        return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
       }
     }
 
-    const collective = data.collective;
+    const collective = data.account;
     const dataIsReady = collective && collective.conversations;
     if (collective && !hasFeature(collective, FEATURES.CONVERSATIONS)) {
       return <PageFeatureNotSupported />;
@@ -133,7 +130,7 @@ class ConversationsPage extends React.Component {
           </Container>
         ) : (
           <CollectiveThemeProvider collective={collective}>
-            <Container borderTop="1px solid #E8E9EB">
+            <Container borderTop="1px solid #E8E9EB" data-cy="page-conversations">
               <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
               <Container py={[4, 5]} px={[2, 3, 4]}>
                 <Container maxWidth={1200} m="0 auto">
@@ -197,7 +194,7 @@ class ConversationsPage extends React.Component {
 const getData = graphql(
   gqlV2` 
     query ConversationsPage($collectiveSlug: String!, $tag: String) {
-      collective(slug: $collectiveSlug, throwIfMissing: false) {
+      account(slug: $collectiveSlug, throwIfMissing: false) {
         id
         slug
         name
