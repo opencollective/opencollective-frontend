@@ -887,6 +887,19 @@ export default function(Sequelize, DataTypes) {
     }
   };
 
+  /**
+   * Checks if the has been approved by a host.
+   * This function will throw if you try to call it with an event, as you should check the
+   * `isApproved` of the `parentCollective` instead.
+   */
+  Collective.prototype.isApproved = function() {
+    if (this.type === types.EVENT) {
+      throw new Error("isApproved must be called on event's parent collective");
+    } else {
+      return Boolean(this.HostCollectiveId && this.isActive && this.approvedAt);
+    }
+  };
+
   // This is quite ugly, and only needed for events.
   // I'd argue that we should store the event slug as `${parentCollectiveSlug}/events/${eventSlug}`
   Collective.prototype.getUrlPath = function() {

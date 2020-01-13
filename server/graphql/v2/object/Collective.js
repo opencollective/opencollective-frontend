@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
+import { GraphQLObjectType, GraphQLInt, GraphQLBoolean } from 'graphql';
 
 import { Account, AccountFields } from '../interface/Account';
 import { hostResolver } from '../../common/collective';
@@ -22,6 +22,13 @@ export const Collective = new GraphQLObjectType({
         description: 'Get the host collective that is receiving the money on behalf of this collective',
         type: Account,
         resolve: hostResolver,
+      },
+      isApproved: {
+        description: 'Returns whether this collective is approved',
+        type: GraphQLBoolean,
+        resolve(collective) {
+          return collective.isApproved();
+        },
       },
     };
   },
