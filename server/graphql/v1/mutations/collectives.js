@@ -24,6 +24,10 @@ const debugClaim = debug('claim');
 const debugGithub = debug('github');
 const debugDelete = debug('delete');
 
+const DEFAULT_COLLECTIVE_SETTINGS = {
+  features: { conversations: true },
+};
+
 export async function createCollective(_, args, req) {
   if (!req.remoteUser) {
     throw new errors.Unauthorized({
@@ -40,6 +44,7 @@ export async function createCollective(_, args, req) {
   const collectiveData = {
     ...args.collective,
     CreatedByUserId: req.remoteUser.id,
+    settings: { ...DEFAULT_COLLECTIVE_SETTINGS, ...args.collective.settings },
   };
 
   const location = args.collective.location;
@@ -191,9 +196,12 @@ export async function createCollectiveFromGithub(_, args, req) {
   }
 
   let collective;
-  const collectiveData = { ...args.collective };
   const user = req.remoteUser;
-  const githubHandle = collectiveData.githubHandle;
+  const githubHandle = args.collective.githubHandle;
+  const collectiveData = {
+    ...args.collective,
+    settings: { ...DEFAULT_COLLECTIVE_SETTINGS, ...args.collective.settings },
+  };
 
   // For e2e testing, we enable testuser+(admin|member)@opencollective.com to create collective without github validation
   if (process.env.NODE_ENV !== 'production' && user.email.match(/.*test.*@opencollective.com$/)) {
@@ -259,7 +267,7 @@ export async function createCollectiveFromGithub(_, args, req) {
     collectiveData.tags.push('open source');
     collectiveData.description = truncate(repo.description, { length: 255 });
     collectiveData.longDescription = repo.description;
-    collectiveData.settings = { githubRepo: githubHandle };
+    collectiveData.settings.githubRepo = githubHandle;
   } else {
     // An organization GitHub Handle
     const memberships = await github.getOrgMemberships(githubAccount.token);
@@ -278,7 +286,7 @@ export async function createCollectiveFromGithub(_, args, req) {
         message: `The organization need at least one repository with ${config.githubFlow.minNbStars} GitHub stars to be pledged.`,
       });
     }
-    collectiveData.settings = { githubOrg: githubHandle };
+    collectiveData.settings.githubOrg = githubHandle;
     // TODO: we sometime still wants to store the main repository
   }
 
