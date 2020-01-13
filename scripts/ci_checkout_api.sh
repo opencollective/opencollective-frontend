@@ -14,7 +14,7 @@ CI_BRANCH=${CI_BRANCH:=master}
 
 API_TARBALL_URL="https://codeload.github.com/opencollective/opencollective-api/tar.gz/"
 echo "> Check ${API_TARBALL_URL}${CI_BRANCH}"
-if curl -s --head --request GET "${API_TARBALL_URL}${CI_BRANCH}" | grep "200" > /dev/null
+if curl -s --head --request GET "${API_TARBALL_URL}${CI_BRANCH}" | head -n 1 | grep "200" > /dev/null
 then
   BRANCH=$CI_BRANCH;
 else
