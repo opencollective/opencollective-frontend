@@ -36,13 +36,13 @@ export default class SignIn extends React.Component {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
       <Link route={onSecondaryAction} passHref>
-        <StyledLink disabled={loading} fontSize="Paragraph" fontWeight="bold">
-          {message}
+        <StyledLink disabled={loading} fontSize="Paragraph">
+          {message}&nbsp;→
         </StyledLink>
       </Link>
     ) : (
-      <StyledButton asLink fontSize="Paragraph" fontWeight="bold" onClick={onSecondaryAction} disabled={loading}>
-        {message}
+      <StyledButton asLink fontSize="Paragraph" onClick={onSecondaryAction} disabled={loading}>
+        {message}&nbsp;→
       </StyledButton>
     );
   }
@@ -122,8 +122,8 @@ export default class SignIn extends React.Component {
           )}
         </Box>
 
-        <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="space-between">
-          <P color="black.700">
+        <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
+          <P color="black.700" mr={2}>
             <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
           </P>
           {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}

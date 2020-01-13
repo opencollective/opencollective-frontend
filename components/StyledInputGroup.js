@@ -130,6 +130,7 @@ const StyledInputGroup = ({
           flex="1 1 auto"
           disabled={disabled}
           py="0"
+          pl={2}
           error={error}
           {...inputProps}
           onFocus={e => {
