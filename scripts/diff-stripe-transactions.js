@@ -68,7 +68,7 @@ async function main() {
     // Retrieve the list and check all charges
     const charges = await stripe.charges.list(
       { limit: nbToCheckInThisPage, starting_after: lastChargeId },
-      { stripe_account: STRIPE_ACCOUNT },
+      { stripeAccount: STRIPE_ACCOUNT },
     );
     for (let idx = 0; idx < charges.data.length; idx++) {
       await checkCharge(charges.data[idx]);

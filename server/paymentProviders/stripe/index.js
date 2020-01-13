@@ -188,7 +188,7 @@ export default {
      * We check the event on stripe directly to be sure we don't get a fake event from
      * someone else
      */
-    return stripe.events.retrieve(requestBody.id, { stripe_account: requestBody.user_id }).then(event => {
+    return stripe.events.retrieve(requestBody.id, { stripeAccount: requestBody.user_id }).then(event => {
       if (!event || (event && !event.type)) {
         throw new errors.BadRequest('Event not found');
       }
