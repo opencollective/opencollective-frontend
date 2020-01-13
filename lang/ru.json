@@ -580,7 +580,6 @@
   "event.over.sendMoneyToParent.description": "If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}",
   "event.over.sendMoneyToParent.title": "Событие завершилось с положительным балансом",
   "event.over.sendMoneyToParent.transaction.description": "Остаток {event}",
-  "Event.PrintNameTags": "Print name tags",
   "event.responses.title.going": "{n} {n, plural, one {человек собирается} other {люди собираются}}",
   "event.responses.title.interested": "{n} заинтересованы",
   "Event.SendEmail": "Send email",

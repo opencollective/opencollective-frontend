@@ -580,7 +580,6 @@
   "event.over.sendMoneyToParent.description": "If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}",
   "event.over.sendMoneyToParent.title": "Event is over and still has a positive balance",
   "event.over.sendMoneyToParent.transaction.description": "Balance of {event}",
-  "Event.PrintNameTags": "Print name tags",
   "event.responses.title.going": "{n} {n, plural, one {person going} other {people going}}",
   "event.responses.title.interested": "{n} interested",
   "Event.SendEmail": "Invia email",

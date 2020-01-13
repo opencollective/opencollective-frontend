@@ -580,7 +580,6 @@
   "event.over.sendMoneyToParent.description": "Se você ainda tiver despesas relacionadas a este evento, por favor, registre-as. Caso contrário, considere transferir o dinheiro para seu coletivo {collective}",
   "event.over.sendMoneyToParent.title": "O evento acabou e ainda há um saldo positivo",
   "event.over.sendMoneyToParent.transaction.description": "Saldo de {event}",
-  "Event.PrintNameTags": "Imprimir etiquetas de nome",
   "event.responses.title.going": "{n} {n, plural, one {pessoa vai} other {pessoas vão}}",
   "event.responses.title.interested": "{n} interessados",
   "Event.SendEmail": "Enviar email",
