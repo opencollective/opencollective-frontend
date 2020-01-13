@@ -1,4 +1,6 @@
+import config from 'config';
 import { pick } from 'lodash';
+
 import {
   claimCollective,
   createCollective,
@@ -89,6 +91,7 @@ import {
 import { createVirtualCardsForEmails, bulkCreateVirtualCards } from '../../paymentProviders/opencollective/virtualcard';
 import models, { sequelize } from '../../models';
 import emailLib from '../../lib/email';
+import logger from '../../lib/logger';
 import roles from '../../constants/roles';
 import errors from '../../lib/errors';
 import { Unauthorized, ValidationFailed, Forbidden } from '../errors';
@@ -275,6 +278,9 @@ const mutations = {
         // Sent signIn link
         if (args.sendSignInLink) {
           const loginLink = user.generateLoginLink(args.redirect, args.websiteUrl);
+          if (config.env === 'development') {
+            logger.info(`Login Link: ${loginLink}`);
+          }
           emailLib.send('user.new.token', user.email, { loginLink }, { sendEvenIfNotProduction: true });
         }
 
