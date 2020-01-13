@@ -37,7 +37,10 @@ class Location extends React.Component {
           {this.props.showTitle && <h1>Location</h1>}
           <div className="name">{name}</div>
           <div className="address" style={{ color: colors.darkgray }}>
-            <ExternalLink href={`https://maps.apple.com/?q=${lat},${long}`} openInNewTab>
+            <ExternalLink
+              href={`https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`}
+              openInNewTab
+            >
               {address}
               {country ? `, ${country}` : ''}
             </ExternalLink>
