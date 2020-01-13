@@ -82,6 +82,7 @@ class CreateOrderPage extends React.Component {
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
+      contributeAs: query.contributeAs,
     };
   }
 
@@ -99,6 +100,7 @@ class CreateOrderPage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object.isRequired, // from injectIntl
     skipStepDetails: PropTypes.bool,
+    contributeAs: PropTypes.string,
   };
 
   getCanonicalURL(collective, tier) {
@@ -175,6 +177,7 @@ class CreateOrderPage extends React.Component {
           fixedAmount={this.props.totalAmount}
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
+          contributeAs={this.props.contributeAs}
         />
       );
     }
