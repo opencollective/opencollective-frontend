@@ -2919,6 +2919,7 @@ type Tier {
     limit: Int = 3000
   ): [Contributor]
   stats: TierStatsType
+  data: JSON
 }
 
 """
