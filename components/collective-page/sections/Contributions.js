@@ -231,10 +231,12 @@ class SectionContributions extends React.PureComponent {
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
     const sortedMemberships = this.sortMemberships(memberships);
     const subCollectives = data.Collective.subCollectives;
+    const memberOf = data.Collective.memberOf;
+    const hasContributions = memberOf.length || subCollectives.length;
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     return (
       <Box pt={5} pb={3}>
-        {data.Collective.memberOf.length === 0 ? (
+        {!hasContributions ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
             <P color="black.600" fontSize="LeadParagraph" mt={5}>
@@ -247,91 +249,96 @@ class SectionContributions extends React.PureComponent {
           </Flex>
         ) : (
           <React.Fragment>
-            <ContainerSectionContent>
-              <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
-                <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
-              </SectionTitle>
-              {data.Collective.stats.collectives.hosted > 0 && (
-                <H3 fontSize="H5" fontWeight="500" color="black.600">
-                  <FormattedMessage
-                    id="organization.collective.memberOf.collective.host.title"
-                    values={{ n: data.Collective.stats.collectives.hosted }}
-                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
-                  />
-                </H3>
-              )}
-            </ContainerSectionContent>
-            {filters.length > 1 && (
-              <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-                <StyledFilters
-                  filters={filters}
-                  getLabel={key => intl.formatMessage(I18nFilters[key])}
-                  onChange={filter => this.setState({ selectedFilter: filter })}
-                  selected={selectedFilter}
-                  justifyContent="left"
-                  minButtonWidth={175}
-                  px={Dimensions.PADDING_X}
-                />
+            {memberOf.length > 0 && (
+              <React.Fragment>
+                <ContainerSectionContent>
+                  <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
+                    <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
+                  </SectionTitle>
+                  {data.Collective.stats.collectives.hosted > 0 && (
+                    <H3 fontSize="H5" fontWeight="500" color="black.600">
+                      <FormattedMessage
+                        id="organization.collective.memberOf.collective.host.title"
+                        values={{ n: data.Collective.stats.collectives.hosted }}
+                        defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
+                      />
+                    </H3>
+                  )}
+                </ContainerSectionContent>
+                {filters.length > 1 && (
+                  <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+                    <StyledFilters
+                      filters={filters}
+                      getLabel={key => intl.formatMessage(I18nFilters[key])}
+                      onChange={filter => this.setState({ selectedFilter: filter })}
+                      selected={selectedFilter}
+                      justifyContent="left"
+                      minButtonWidth={175}
+                      px={Dimensions.PADDING_X}
+                    />
+                  </Box>
+                )}
+                <Container
+                  data-cy="Contributions"
+                  maxWidth={Dimensions.MAX_SECTION_WIDTH}
+                  pl={Dimensions.PADDING_X}
+                  mt={4}
+                  mx="auto"
+                >
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                    {sortedMemberships.slice(0, nbMemberships).map(membership => (
+                      <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
+                        <StyledMembershipCard membership={membership} />
+                      </MembershipCardContainer>
+                    ))}
+                  </Flex>
+                </Container>
+                {nbMemberships < sortedMemberships.length && (
+                  <Flex mt={3} justifyContent="center">
+                    <StyledButton
+                      data-cy="load-more"
+                      textTransform="capitalize"
+                      minWidth={170}
+                      onClick={this.showMoreMemberships}
+                    >
+                      <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                    </StyledButton>
+                  </Flex>
+                )}
+              </React.Fragment>
+            )}
+
+            {subCollectives.length > 0 && (
+              <Box mt={5}>
+                <ContainerSectionContent>
+                  <SectionTitle textAlign="left" mb={4}>
+                    {isOrganization ? (
+                      <FormattedMessage
+                        id="CP.Contributions.PartOfOrg"
+                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
+                        values={{ n: subCollectives.length }}
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="CP.Contributions.SubCollective"
+                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
+                        values={{ n: subCollectives.length }}
+                      />
+                    )}
+                  </SectionTitle>
+                </ContainerSectionContent>
+                <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                    {subCollectives.map(({ id, collective }) => (
+                      <MembershipCardContainer key={id}>
+                        <StyledMembershipCard membership={{ collective }} />
+                      </MembershipCardContainer>
+                    ))}
+                  </Flex>
+                </Container>
               </Box>
             )}
-            <Container
-              data-cy="Contributions"
-              maxWidth={Dimensions.MAX_SECTION_WIDTH}
-              pl={Dimensions.PADDING_X}
-              mt={4}
-              mx="auto"
-            >
-              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                  <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
-                    <StyledMembershipCard membership={membership} />
-                  </MembershipCardContainer>
-                ))}
-              </Flex>
-            </Container>
-            {nbMemberships < sortedMemberships.length && (
-              <Flex mt={3} justifyContent="center">
-                <StyledButton
-                  data-cy="load-more"
-                  textTransform="capitalize"
-                  minWidth={170}
-                  onClick={this.showMoreMemberships}
-                >
-                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-                </StyledButton>
-              </Flex>
-            )}
           </React.Fragment>
-        )}
-        {subCollectives.length > 0 && (
-          <Box mt={5}>
-            <ContainerSectionContent>
-              <SectionTitle textAlign="left" mb={4}>
-                {isOrganization ? (
-                  <FormattedMessage
-                    id="CP.Contributions.PartOfOrg"
-                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
-                    values={{ n: subCollectives.length }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="CP.Contributions.SubCollective"
-                    defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
-                    values={{ n: subCollectives.length }}
-                  />
-                )}
-              </SectionTitle>
-            </ContainerSectionContent>
-            <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
-              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                {subCollectives.map(({ id, collective }) => (
-                  <MembershipCardContainer key={id}>
-                    <StyledMembershipCard membership={{ collective }} />
-                  </MembershipCardContainer>
-                ))}
-              </Flex>
-            </Container>
-          </Box>
         )}
       </Box>
     );
