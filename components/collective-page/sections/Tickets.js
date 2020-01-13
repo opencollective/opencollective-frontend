@@ -27,6 +27,7 @@ class SectionTickets extends React.PureComponent {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      isActive: PropTypes.bool,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string.isRequired,
       }),
@@ -69,7 +70,7 @@ class SectionTickets extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTiers = this.sortTiers(this.filterTickets(tiers));
 
-    if (sortedTiers.length === 0 && !isAdmin) {
+    if ((sortedTiers.length === 0 || !collective.isActive) && !isAdmin) {
       return null;
     }
 
@@ -96,7 +97,12 @@ class SectionTickets extends React.PureComponent {
                 <ContributeCardsContainer ref={ref}>
                   {sortedTiers.map(tier => (
                     <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
+                      <ContributeTier
+                        collective={collective}
+                        tier={tier}
+                        hideContributors={hasNoContributor}
+                        disableCTA={!collective.isActive}
+                      />
                     </Box>
                   ))}
                   {isAdmin && (

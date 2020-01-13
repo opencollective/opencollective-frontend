@@ -210,6 +210,9 @@ const getData = graphql(
           id
           tag
         }
+        ... on Collective {
+          isApproved
+        }
       }
     }
     ${ConversationListFragment}

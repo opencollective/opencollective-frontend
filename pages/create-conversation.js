@@ -142,6 +142,10 @@ const getCollective = graphql(
           id
           tag
         }
+
+        ... on Collective {
+          isApproved
+        }
       }
     }
   `,
