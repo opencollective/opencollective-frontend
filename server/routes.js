@@ -2,14 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const pdf = require('html-pdf');
-const moment = require('moment');
 const express = require('express');
 const proxy = require('express-http-proxy');
 const { template } = require('lodash');
 
 const intl = require('./intl');
-const logger = require('./logger');
 const pages = require('./pages');
 
 const { URL, URLSearchParams } = url;
@@ -98,33 +95,6 @@ module.exports = (server, app) => {
     res.sendFile(
       path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
     );
-  });
-
-  server.get('/:collectiveSlug/events/:eventSlug/nametags.:format(pdf|html)', (req, res, next) => {
-    const { collectiveSlug, eventSlug, pageFormat, format } = req.params;
-    const params = { ...req.params, ...req.query };
-    app.renderToHTML(req, res, '/nametags', params).then(html => {
-      if (format === 'html') {
-        return res.send(html);
-      }
-
-      const options = {
-        pageFormat: pageFormat === 'A4' ? 'A4' : 'Letter',
-        renderDelay: 3000,
-      };
-      // html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,'');
-      const filename = `${moment().format('YYYYMMDD')}-${collectiveSlug}-${eventSlug}-attendees.pdf`;
-
-      res.setHeader('content-type', 'application/pdf');
-      res.setHeader('content-disposition', `inline; filename="${filename}"`); // or attachment?
-      pdf.create(html, options).toStream((err, stream) => {
-        if (err) {
-          logger.error('>>> Error while generating pdf at %s', req.url, err);
-          return next(err);
-        }
-        stream.pipe(res);
-      });
-    });
   });
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button.js', (req, res) => {

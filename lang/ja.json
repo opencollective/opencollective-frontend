@@ -580,7 +580,6 @@
   "event.over.sendMoneyToParent.description": "If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}",
   "event.over.sendMoneyToParent.title": "Event is over and still has a positive balance",
   "event.over.sendMoneyToParent.transaction.description": "{event} の残高",
-  "Event.PrintNameTags": "Print name tags",
   "event.responses.title.going": "{n} {n, plural, one {人が参加} other {人が参加}}",
   "event.responses.title.interested": "{n} 人が興味あると言っています",
   "Event.SendEmail": "Send email",
