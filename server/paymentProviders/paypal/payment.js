@@ -21,8 +21,7 @@ export function paypalUrl(path) {
 }
 
 /** Exchange clientid and secretid by an auth token with PayPal API */
-export async function retrieveOAuthToken() {
-  const { clientId, clientSecret } = config.paypal.payment;
+export async function retrieveOAuthToken({ clientId, clientSecret }) {
   const url = paypalUrl('oauth2/token');
   const body = 'grant_type=client_credentials';
   /* The OAuth token entrypoint uses Basic HTTP Auth */
@@ -36,9 +35,17 @@ export async function retrieveOAuthToken() {
 }
 
 /** Assemble POST requests for communicating with PayPal API */
-export async function paypalRequest(urlPath, body) {
+export async function paypalRequest(urlPath, body, hostCollective) {
+  const connectedPaypalAccounts = await hostCollective.getConnectedAccounts({
+    where: { service: 'paypal', deletedAt: null },
+    order: [['createdAt', 'DESC']],
+  });
+  const paypal = connectedPaypalAccounts[0];
+  if (!paypal || !paypal.clientId || !paypal.token) {
+    throw new Error("Host doesn't support PayPal payments.");
+  }
   const url = paypalUrl(urlPath);
-  const token = await retrieveOAuthToken();
+  const token = await retrieveOAuthToken({ clientId: paypal.clientId, clientSecret: paypal.token });
   const params = {
     method: 'POST',
     body: JSON.stringify(body),
@@ -70,9 +77,13 @@ export async function paypalRequest(urlPath, body) {
  * https://developer.paypal.com/docs/integration/direct/express-checkout/integration-jsv4/advanced-payments-api/create-express-checkout-payments/
  */
 export async function createPayment(req, res) {
-  const { amount, currency } = req.body;
+  const { amount, currency, hostId } = req.body;
   if (!amount || !currency) {
     throw new Error('Amount & Currency are required');
+  }
+  const hostCollective = await models.Collective.findByPk(hostId);
+  if (!hostCollective) {
+    throw new Error("Couldn't find host collective");
   }
   const paymentParams = {
     intent: 'sale',
@@ -86,7 +97,7 @@ export async function createPayment(req, res) {
       cancel_url: 'https://opencollective.com',
     },
   };
-  const payment = await paypalRequest('payments/payment', paymentParams);
+  const payment = await paypalRequest('payments/payment', paymentParams, hostCollective);
   return res.json({ id: payment.id });
 }
 
@@ -96,10 +107,15 @@ export async function createPayment(req, res) {
  * https://developer.paypal.com/docs/integration/direct/express-checkout/execute-payments/
  */
 export async function executePayment(order) {
+  const hostCollective = await order.collective.getHostCollective();
   const { paymentID, payerID } = order.paymentMethod.data;
-  return paypalRequest(`payments/payment/${paymentID}/execute`, {
-    payer_id: payerID,
-  });
+  return paypalRequest(
+    `payments/payment/${paymentID}/execute`,
+    {
+      payer_id: payerID,
+    },
+    hostCollective,
+  );
 }
 
 /** Create transaction in our database to reflect a PayPal charge */
