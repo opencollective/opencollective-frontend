@@ -867,7 +867,7 @@
   "membership.role.host": "host",
   "membership.since": "since {date}",
   "membership.totalDonations": "Total amount contributed",
-  "membership.totalDonations.title": "amount contributed",
+  "membership.totalDonations.title": "Amount contributed",
   "menu.about": "关于",
   "menu.addFunds": "Add funds",
   "menu.admin": "管理",
