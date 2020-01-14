@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Fri Jan 10 2020 10:50:28 GMT+0100 (GMT+01:00)
+# timestamp: Tue Jan 14 2020 18:10:43 GMT+0100 (Central European Standard Time)
 
 """
 Application model
@@ -2492,12 +2492,13 @@ type PaymentMethodType {
 The name of the current plan and its characteristics.
 """
 type PlanType {
+  name: String
+  hostedCollectives: Int
+  hostedCollectivesLimit: Int
   addedFunds: Int
   addedFundsLimit: Int
   hostDashboard: Boolean
-  hostedCollectives: Int
-  hostedCollectivesLimit: Int
-  name: String
+  manualPayments: Boolean
 }
 
 """

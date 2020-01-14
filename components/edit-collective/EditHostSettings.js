@@ -70,41 +70,45 @@ const EditHostSettings = props => {
       </h3>
 
       <Table>
-        <tr>
-          {tiers.map(tier => {
-            const isCurrentPlan = collective.plan.name === tier.slug;
-            const isWithinLimits = tier.data
-              ? collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit
-              : true;
+        <tbody>
+          <tr>
+            {tiers.map(tier => {
+              const isCurrentPlan = collective.plan.name === tier.slug;
+              const isWithinLimits = tier.data
+                ? collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit
+                : true;
 
-            let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
-            // Rename verb to Upgrade/Downgrade if subscribed to active Tier
-            if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
-            else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
+              let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
+              // Rename verb to Upgrade/Downgrade if subscribed to active Tier
+              if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
+              else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
 
-            return (
-              <Plan key={tier.id} disabled={!isWithinLimits || isCurrentPlan}>
-                <PlanName>{tier.name}</PlanName>
-                <PlanFeatures
-                  dangerouslySetInnerHTML={{
-                    __html: tier.longDescription,
-                  }}
-                />
-                <PlanPrice>
-                  ${tier.amount / 100} / {tier.interval}
-                </PlanPrice>
-                <Button
-                  href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
-                  disabled={!isWithinLimits || isCurrentPlan}
-                >
-                  {verb}
-                </Button>
-                {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
-                {!isWithinLimits && !isCurrentPlan && <DisabledMessage>Current usage is above limits.</DisabledMessage>}
-              </Plan>
-            );
-          })}
-        </tr>
+              return (
+                <Plan key={tier.id} disabled={!isWithinLimits || isCurrentPlan}>
+                  <PlanName>{tier.name}</PlanName>
+                  <PlanFeatures
+                    dangerouslySetInnerHTML={{
+                      __html: tier.longDescription,
+                    }}
+                  />
+                  <PlanPrice>
+                    ${tier.amount / 100} / {tier.interval}
+                  </PlanPrice>
+                  <Button
+                    href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
+                    disabled={!isWithinLimits || isCurrentPlan}
+                  >
+                    {verb}
+                  </Button>
+                  {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
+                  {!isWithinLimits && !isCurrentPlan && (
+                    <DisabledMessage>Current usage is above limits.</DisabledMessage>
+                  )}
+                </Plan>
+              );
+            })}
+          </tr>
+        </tbody>
       </Table>
 
       <h3>
@@ -113,11 +117,18 @@ const EditHostSettings = props => {
 
       <ul>
         <li>
-          <strong>Current Plan</strong>: <Capitalized>{collective.plan.name}</Capitalized>
+          <strong>Current Plan</strong>: {collective.plan.name}
         </li>
         <li>
-          <strong>Collective Limit</strong>: {collective.plan.hostedCollectives} of{' '}
-          {collective.plan.hostedCollectivesLimit}
+          <strong>Collective Limit</strong>:&nbsp;
+          {collective.plan.hostedCollectivesLimit && (
+            <span>
+              ${collective.plan.hostedCollectives} of ${collective.plan.hostedCollectivesLimit}
+            </span>
+          )}
+          {!collective.plan.hostedCollectivesLimit && (
+            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
+          )}
         </li>
         <li>
           <strong>Added Funds Limit</strong>:&nbsp;
@@ -127,11 +138,14 @@ const EditHostSettings = props => {
             </span>
           )}
           {!collective.plan.addedFundsLimit && (
-            <FormattedMessage id="collective.hostSettings.addedFunds.unlimited" defaultMessage="Unlimited" />
+            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
           )}
         </li>
         <li>
           <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'Yes' : 'No'}
+        </li>
+        <li>
+          <strong>Manual Payments</strong>: {collective.plan.manualPayments ? 'Yes' : 'No'}
         </li>
       </ul>
     </div>
