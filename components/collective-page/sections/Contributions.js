@@ -109,12 +109,14 @@ class SectionContributions extends React.PureComponent {
             hosted: PropTypes.number,
           }).isRequired,
         }).isRequired,
-        subCollectives: PropTypes.arrayOf({
-          id: PropTypes.number,
-          collective: PropTypes.shape({
+        subCollectives: PropTypes.arrayOf(
+          PropTypes.shape({
             id: PropTypes.number,
+            collective: PropTypes.shape({
+              id: PropTypes.number,
+            }),
           }),
-        }),
+        ),
         memberOf: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.number.isRequired,
