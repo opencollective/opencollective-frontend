@@ -123,7 +123,7 @@ const EditHostSettings = props => {
           <strong>Collective Limit</strong>:&nbsp;
           {collective.plan.hostedCollectivesLimit && (
             <span>
-              ${collective.plan.hostedCollectives} of ${collective.plan.hostedCollectivesLimit}
+              {collective.plan.hostedCollectives} of {collective.plan.hostedCollectivesLimit}
             </span>
           )}
           {!collective.plan.hostedCollectivesLimit && (
