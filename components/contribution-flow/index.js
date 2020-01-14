@@ -437,7 +437,16 @@ class CreateOrderPage extends React.Component {
         this.handleSuccess(orderCreated);
       }
     } catch (e) {
-      this.setState({ submitting: false, error: e.message });
+      this.setState(state => {
+        const stepPayment = {
+          ...state.stepPayment,
+          paymentMethod: {
+            ...state.stepPayment.paymentMethod,
+            token: null,
+          },
+        };
+        return { submitting: false, error: e.message, stepPayment };
+      });
     }
   };
 
