@@ -73,7 +73,9 @@ const EditHostSettings = props => {
         <tr>
           {tiers.map(tier => {
             const isCurrentPlan = collective.plan.name === tier.slug;
-            const isWithinLimits = collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit;
+            const isWithinLimits = tier.data
+              ? collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit
+              : true;
 
             let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
             // Rename verb to Upgrade/Downgrade if subscribed to active Tier
