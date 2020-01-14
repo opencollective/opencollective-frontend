@@ -868,7 +868,7 @@
   "membership.role.host": "host",
   "membership.since": "dal {date}",
   "membership.totalDonations": "Total amount contributed",
-  "membership.totalDonations.title": "amount contributed",
+  "membership.totalDonations.title": "Amount contributed",
   "menu.about": "about",
   "menu.addFunds": "Add funds",
   "menu.admin": "admin",

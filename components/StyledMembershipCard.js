@@ -59,7 +59,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                   id="Membership.ContributorSince"
                   defaultMessage="{contributorType} since"
                   values={{ contributorType: formatMemberRole(intl.formatMessage, role) }}
-                />
+                />{' '}
                 <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                   <FormattedDate value={since} month="long" year="numeric" />
                 </Span>
@@ -67,13 +67,9 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
             )}
             {role === roles.BACKER ? (
               <P mt={3} data-cy="amount-contributed">
-                <FormattedMessage id="membership.totalDonations.title" defaultMessage="amount contributed">
-                  {msg => (
-                    <Span textTransform="capitalize" fontSize="Caption">
-                      {msg}
-                    </Span>
-                  )}
-                </FormattedMessage>
+                <Span fontSize="Caption">
+                  <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
+                </Span>
                 <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                   {/** Ideally we should breakdown amounts donated per currency, but for now
                       the API only returns the total amount in collective's currency. */

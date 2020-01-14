@@ -868,7 +868,7 @@
   "membership.role.host": "представитель",
   "membership.since": "с {date}",
   "membership.totalDonations": "Total amount contributed",
-  "membership.totalDonations.title": "amount contributed",
+  "membership.totalDonations.title": "Amount contributed",
   "menu.about": "о нас",
   "menu.addFunds": "Добавить средства",
   "menu.admin": "admin",

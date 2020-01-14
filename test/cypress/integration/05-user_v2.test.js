@@ -15,7 +15,7 @@ describe('New users profiles', () => {
         .contains('August 2016');
       cy.get('[data-cy=amount-contributed]')
         .first()
-        .contains('amount contributed');
+        .contains('Amount contributed');
       cy.get('[data-cy=amount-contributed]')
         .first()
         .contains('€267');

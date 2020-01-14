@@ -868,7 +868,7 @@
   "membership.role.host": "organizador",
   "membership.since": "desde {date}",
   "membership.totalDonations": "Quantia total contribuída",
-  "membership.totalDonations.title": "quantia contribuída",
+  "membership.totalDonations.title": "Amount contributed",
   "menu.about": "sobre",
   "menu.addFunds": "Adicionar fundos",
   "menu.admin": "admin",
