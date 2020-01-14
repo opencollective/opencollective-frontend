@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Button from '../Button';
+import Loading from '../Loading';
 import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
 
 const Capitalized = styled.span`
@@ -51,9 +52,17 @@ const DisabledMessage = styled.p`
 
 const EditHostSettings = props => {
   const { collective } = props;
-  const { data: opencollective } = useQuery(getCollectiveTiersDescriptionQuery, {
+  const { data: opencollective, loading } = useQuery(getCollectiveTiersDescriptionQuery, {
     variables: { slug: 'opencollective' },
   });
+
+  if (loading) {
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  }
 
   const tiers = get(opencollective, 'Collective.tiers') || [];
   const subscribedTier = tiers.find(tier => tier.slug === collective.plan.name);
