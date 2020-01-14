@@ -12,7 +12,7 @@
     "@babel/core": "7.8.3",
     "@babel/node": "7.8.3",
     "@babel/plugin-proposal-class-properties": "7.8.3",
-    "@babel/plugin-transform-async-to-generator": "7.8.0",
+    "@babel/plugin-transform-async-to-generator": "7.8.3",
     "@babel/preset-env": "7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@octokit/rest": "16.36.0",
