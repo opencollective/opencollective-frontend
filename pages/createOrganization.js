@@ -10,6 +10,7 @@ class CreateOrganizationPage extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -17,7 +18,7 @@ class CreateOrganizationPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, loadingLoggedInUser } = this.props;
+    const { LoggedInUser, loadingLoggedInUser, refetchLoggedInUser } = this.props;
 
     if (loadingLoggedInUser) {
       return <ErrorPage loading />;
@@ -25,7 +26,7 @@ class CreateOrganizationPage extends React.Component {
 
     return (
       <div>
-        <CreateOrganization LoggedInUser={LoggedInUser} />
+        <CreateOrganization LoggedInUser={LoggedInUser} refetchLoggedInUser={refetchLoggedInUser} />
       </div>
     );
   }
