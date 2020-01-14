@@ -51,7 +51,6 @@ const EMPTY_WEBHOOKS = [];
 
 class EditWebhooks extends React.Component {
   static propTypes = {
-    title: PropTypes.string,
     collectiveSlug: PropTypes.string.isRequired,
     editWebhooks: PropTypes.func,
     /** From graphql query */
@@ -236,7 +235,9 @@ class EditWebhooks extends React.Component {
 
     return (
       <div>
-        <h2>{this.props.title}</h2>
+        <h2>
+          <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
+        </h2>
         <StyledHr />
 
         <MessageBox type="warning" mt={4} boxShadow="0px 5px 10px -5px" fontWeight="500">

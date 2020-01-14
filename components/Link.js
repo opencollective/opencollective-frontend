@@ -14,6 +14,7 @@ class Link extends React.Component {
     title: PropTypes.string,
     onClick: PropTypes.func,
     children: PropTypes.node.isRequired,
+    'data-cy': PropTypes.string,
   };
 
   constructor(props) {
@@ -55,7 +56,7 @@ class Link extends React.Component {
     } else {
       return (
         <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
-          <a className={className} title={title} onClick={onClick}>
+          <a className={className} title={title} onClick={onClick} data-cy={this.props['data-cy']}>
             {children}
           </a>
         </router.Link>

@@ -47,7 +47,7 @@ describe('edit collective', () => {
   });
 
   it('edit tiers', () => {
-    cy.get('.MenuItem.tiers').click();
+    cy.getByDataCy('menu-item-tiers').click();
     cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
     cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
     cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
