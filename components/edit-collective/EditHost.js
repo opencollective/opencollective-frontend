@@ -287,10 +287,10 @@ class EditHost extends React.Component {
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.createHost.title" defaultMessage="Create a fiscal host" />
+                <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Use own fiscal host" />
               </h2>
               <FormattedMessage
-                id="collective.edit.host.createHost.description"
+                id="collective.edit.host.useOwn.description"
                 defaultMessage="Connect your Stripe account and hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes."
               />
               &nbsp;
