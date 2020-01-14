@@ -285,6 +285,7 @@ class EditPaymentMethods extends React.Component {
               <StyledButton
                 buttonStyle="standard"
                 buttonSize="large"
+                disabled={!Collective.plan.manualPayments}
                 onClick={() => this.setState({ showManualPaymentMethodForm: true })}
               >
                 {existingManualPaymentMethod ? (
@@ -299,10 +300,17 @@ class EditPaymentMethods extends React.Component {
               </StyledButton>
               <Box maxWidth={350}>
                 <Container fontSize="Caption" mt={2} color="black.600" textAlign="center">
-                  <FormattedMessage
-                    id="paymentMethods.manual.add.info"
-                    defaultMessage="To receive donations directly on your bank account on behalf of the collectives that you are hosting"
-                  />
+                  {Collective.plan.manualPayments ? (
+                    <FormattedMessage
+                      id="paymentMethods.manual.add.info"
+                      defaultMessage="To receive donations  directly on your bank account on behalf of the collectives that you are hosting"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="paymentMethods.manual.upgradePlan"
+                      defaultMessage="Subscribe to our special plans for hosts"
+                    />
+                  )}
                   <Box mt={1}>
                     <FormattedMessage
                       id="paymentMethods.manual.add.trial"
@@ -449,6 +457,15 @@ const getPaymentMethods = graphql(gql`
       currency
       isHost
       settings
+      plan {
+        addedFunds
+        addedFundsLimit
+        hostDashboard
+        hostedCollectives
+        hostedCollectivesLimit
+        manualPayments
+        name
+      }
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
         id
         uuid
