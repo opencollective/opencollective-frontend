@@ -33,6 +33,7 @@ import InlineEditField from '../components/InlineEditField';
 import FollowConversationButton from '../components/conversations/FollowConversationButton';
 import CommentIcon from '../components/icons/CommentIcon';
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
+import StyledInputTags from '../components/StyledInputTags';
 
 const conversationPageQuery = gqlV2`
   query Conversation($collectiveSlug: String!, $id: String!) {
@@ -79,10 +80,11 @@ const conversationPageQuery = gqlV2`
 `;
 
 const editConversationMutation = gqlV2`
-  mutation EditConversation($id: String!, $title: String!) {
-    editConversation(id: $id, title: $title) {
+  mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
+    editConversation(id: $id, title: $title, tags: $tags) {
       id
       title
+      tags
     }
   }
 `;
@@ -217,6 +219,25 @@ class ConversationPage extends React.Component {
     return Router.pushRoute('conversations', { collectiveSlug: this.props.collectiveSlug });
   };
 
+  renderTags = (isEditing, setValue, conversation) => {
+    return !isEditing ? (
+      <Flex flexWrap="wrap">
+        {conversation.tags.map(tag => (
+          <Box key={tag} m={2}>
+            <StyledTag>{tag}</StyledTag>
+          </Box>
+        ))}
+      </Flex>
+    ) : (
+      <StyledInputTags
+        suggestedTags={conversation.tags}
+        onChange={options => {
+          setValue(options.map(i => i.value));
+        }}
+      />
+    );
+  };
+
   render() {
     const { collectiveSlug, data, LoggedInUser } = this.props;
 
@@ -342,16 +363,28 @@ class ConversationPage extends React.Component {
                         </Box>
                         {!isEmpty(conversation.tags) && (
                           <Box mt={4}>
-                            <H4 px={2} mb={2} fontWeight="normal">
-                              <FormattedMessage id="Tags" defaultMessage="Tags" />
-                            </H4>
-                            <Flex flexWrap="wrap">
-                              {conversation.tags.map(tag => (
-                                <Box key={tag} m={2}>
-                                  <StyledTag>{tag}</StyledTag>
-                                </Box>
-                              ))}
-                            </Flex>
+                            <InlineEditField
+                              topEdit={2}
+                              field="tags"
+                              maxLength={255}
+                              canEdit={canEdit}
+                              values={conversation}
+                              mutation={editConversationMutation}
+                              mutationOptions={{ context: API_V2_CONTEXT }}
+                              prepareVariables={(value, draft) => ({
+                                ...value,
+                                tags: draft,
+                              })}
+                            >
+                              {({ isEditing, setValue }) => (
+                                <React.Fragment>
+                                  <H4 px={2} mb={2} fontWeight="normal">
+                                    <FormattedMessage id="Tags" defaultMessage="Tags" />
+                                  </H4>
+                                  {this.renderTags(isEditing, setValue, conversation)}
+                                </React.Fragment>
+                              )}
+                            </InlineEditField>
                           </Box>
                         )}
                       </Box>
