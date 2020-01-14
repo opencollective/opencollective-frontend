@@ -43,6 +43,10 @@ const conversationMutations = {
         type: new GraphQLNonNull(GraphQLString),
         description: "Conversation's title",
       },
+      tags: {
+        type: new GraphQLList(GraphQLString),
+        description: 'A list of tags for this conversation',
+      },
     },
     resolve(_, args, req) {
       args.id = parseInt(idDecode(args.id, IDENTIFIER_TYPES.CONVERSATION));

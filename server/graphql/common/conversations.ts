@@ -10,7 +10,7 @@ interface ICreateConversationParams {
   title: string;
   html: string;
   CollectiveId: number;
-  tags?: String[] | null;
+  tags?: string[] | null;
 }
 
 /**
@@ -64,5 +64,5 @@ export const editConversation = async (remoteUser, params: IEditConversationPara
     throw new Unauthorized();
   }
 
-  return conversation.update(pick(params, ['title']));
+  return conversation.update(pick(params, ['title', 'tags']));
 };
