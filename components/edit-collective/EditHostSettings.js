@@ -5,10 +5,16 @@ import { useQuery } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
+import StyledTooltip from '../StyledTooltip';
 import Button from '../Button';
 import Loading from '../Loading';
 import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
+
+const LimitsInfoCircle = styled(InfoCircle)`
+  vertical-align: baseline;
+`;
 
 const PlanGrid = styled.div`
   display: grid;
@@ -160,7 +166,18 @@ const EditHostSettings = props => {
           )}
         </li>
         <li>
-          <strong>Added Funds Limit</strong>:&nbsp;
+          <strong>Added Funds Limit</strong>{' '}
+          <StyledTooltip
+            content={() => (
+              <FormattedMessage
+                id="collective.hostSettings.help.fundsLimit"
+                defaultMessage="The maximum amount of fund added, during any timeframe, across all collectives."
+              />
+            )}
+          >
+            <LimitsInfoCircle size={12} />
+          </StyledTooltip>
+          :{' '}
           {collective.plan.addedFundsLimit && (
             <span>
               ${collective.plan.addedFunds / 100} of ${collective.plan.addedFundsLimit / 100}
@@ -174,7 +191,18 @@ const EditHostSettings = props => {
           <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'Yes' : 'No'}
         </li>
         <li>
-          <strong>Manual Payments</strong>: {collective.plan.manualPayments ? 'Yes' : 'No'}
+          <strong>Manual Payments</strong>{' '}
+          <StyledTooltip
+            content={() => (
+              <FormattedMessage
+                id="collective.hostSettings.help.manualPayments"
+                defaultMessage="If you can or not manually track, through the platform, funds transfered outside Open Collective."
+              />
+            )}
+          >
+            <LimitsInfoCircle size={12} />
+          </StyledTooltip>
+          : {collective.plan.manualPayments ? 'Yes' : 'No'}
         </li>
       </ul>
     </div>

@@ -189,6 +189,8 @@
   "collective.hostFeePercent.label": "Comisión del Host",
   "collective.hostSettings.changePlan.title": "Plans",
   "collective.hostSettings.currentPlan.title": "Current Plan Usage",
+  "collective.hostSettings.help.fundsLimit": "The maximum amount of fund added, during any timeframe, across all collectives.",
+  "collective.hostSettings.help.manualPayments": "If you can or not manually track, through the platform, funds transfered outside Open Collective.",
   "collective.hostSettings.title": "Host Settings",
   "collective.hostSettings.unlimited": "Unlimited",
   "collective.image.label": "Avatar",
