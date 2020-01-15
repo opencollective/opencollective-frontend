@@ -4,31 +4,35 @@ import React from 'react';
 import { useQuery } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import themeGet from '@styled-system/theme-get';
 
 import Button from '../Button';
 import Loading from '../Loading';
 import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
 
-const Capitalized = styled.span`
-  text-transform: capitalize;
+const PlanGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  @media (max-width: ${themeGet('breakpoints.0')}) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
 `;
 
-const Table = styled.table`
-  width: 100%;
-`;
-
-const Plan = styled.td`
+const Plan = styled.div`
   font-size: 1.2rem;
   text-align: center;
-  width: 20%;
   vertical-align: top;
+  margin: 20px;
+  padding: 10px;
   ${({ disabled }) => (disabled ? 'color: #888;' : '')}
+  ${({ active }) => (active ? `border: 1px solid rgb(143, 199, 255); border-radius: 16px; margin: 19px;` : '')}
 `;
 
 const PlanFeatures = styled.p`
   font-size: 1.1rem;
   text-align: center;
-  min-height: 13rem;
+  min-height: 11rem;
   padding-top: 1rem;
 `;
 
@@ -78,47 +82,63 @@ const EditHostSettings = props => {
         <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Plans" />
       </h3>
 
-      <Table>
-        <tbody>
-          <tr>
-            {tiers.map(tier => {
-              const isCurrentPlan = collective.plan.name === tier.slug;
-              const isWithinLimits = tier.data
-                ? collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit
-                : true;
+      <PlanGrid>
+        <Plan active={collective.plan.name === 'default'}>
+          <PlanName>Free Host Plan</PlanName>
+          <PlanFeatures>
+            <ul>
+              <li>Unlimeted hosted collectives</li>
+              <li>Up to $1000 added funds across all collectives</li>
+            </ul>
+          </PlanFeatures>
+          <PlanPrice>Free</PlanPrice>
+        </Plan>
+        {tiers.map(tier => {
+          const isCurrentPlan = collective.plan.name === tier.slug;
+          const isWithinLimits = tier.data
+            ? collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit
+            : true;
 
-              let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
-              // Rename verb to Upgrade/Downgrade if subscribed to active Tier
-              if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
-              else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
+          let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
+          // Rename verb to Upgrade/Downgrade if subscribed to active Tier
+          if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
+          else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
 
-              return (
-                <Plan key={tier.id} disabled={!isWithinLimits || isCurrentPlan}>
-                  <PlanName>{tier.name}</PlanName>
-                  <PlanFeatures
-                    dangerouslySetInnerHTML={{
-                      __html: tier.longDescription,
-                    }}
-                  />
-                  <PlanPrice>
-                    ${tier.amount / 100} / {tier.interval}
-                  </PlanPrice>
-                  <Button
-                    href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
-                    disabled={!isWithinLimits || isCurrentPlan}
-                  >
-                    {verb}
-                  </Button>
-                  {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
-                  {!isWithinLimits && !isCurrentPlan && (
-                    <DisabledMessage>Current usage is above limits.</DisabledMessage>
-                  )}
-                </Plan>
-              );
-            })}
-          </tr>
-        </tbody>
-      </Table>
+          return (
+            <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>
+              <PlanName>{tier.name}</PlanName>
+              <PlanFeatures
+                dangerouslySetInnerHTML={{
+                  __html: tier.longDescription,
+                }}
+              />
+              <PlanPrice>
+                ${tier.amount / 100} / {tier.interval}
+              </PlanPrice>
+              <Button
+                href={`/opencollective/contribute/${tier.slug}-${tier.id}/checkout?contributeAs=${collective.slug}&redirect=${redirectUrl}`}
+                disabled={!isWithinLimits || isCurrentPlan}
+              >
+                {verb}
+              </Button>
+              {isCurrentPlan && <DisabledMessage>Current plan.</DisabledMessage>}
+              {!isWithinLimits && !isCurrentPlan && <DisabledMessage>Current usage is above limits.</DisabledMessage>}
+            </Plan>
+          );
+        })}
+        <Plan active={collective.plan.name === 'network-host-plan'}>
+          <PlanName>Network Host Plan</PlanName>
+          <PlanFeatures>
+            <ul>
+              <li>More than 25 collectives</li>
+              <li>Unlimited added funds</li>
+              <li>Manual bank transfers</li>
+            </ul>
+          </PlanFeatures>
+          <PlanPrice>Talk to Us</PlanPrice>
+          <Button href="mailto:support@opencollective.com">Contact</Button>
+        </Plan>
+      </PlanGrid>
 
       <h3>
         <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Current Plan Usage" />
