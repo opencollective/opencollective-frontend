@@ -3,12 +3,16 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import EditConnectedAccount from './EditConnectedAccount';
 import { groupBy } from 'lodash';
-import { capitalize } from '../lib/utils';
 import InputField from './InputField';
 import colors from '../lib/constants/colors';
 import { Flex, Box } from '@rebass/grid';
 import CreateOrganizationForm from './CreateOrganizationForm';
 import { Button } from 'react-bootstrap';
+import styled from 'styled-components';
+
+const ConnectStripeBox = styled(Box)`
+  text-align: right;
+`;
 
 class CreateHostForm extends React.Component {
   static propTypes = {
@@ -237,17 +241,19 @@ class CreateHostForm extends React.Component {
           </div>
         )}
 
-        {hostCollective && !stripeAccount && (
-          <div key={`connect-${'stripe'}`}>
-            <h2>{capitalize('stripe')}</h2>
-            <EditConnectedAccount collective={hostCollective} service="stripe" />
-          </div>
-        )}
-
-        {hostCollective && stripeAccount && (
-          <Button bsStyle="primary" type="submit" onClick={() => this.props.onSubmit(hostCollective)}>
-            <FormattedMessage id="host.link" defaultMessage="Use this host" />
-          </Button>
+        {hostCollective && (
+          <Flex justifyContent="space-between" alignItems="flex-end">
+            <Box>
+              <Button bsStyle="primary" type="submit" onClick={() => this.props.onSubmit(hostCollective)}>
+                <FormattedMessage id="host.link" defaultMessage="Use this host" />
+              </Button>
+            </Box>
+            {!stripeAccount && (
+              <ConnectStripeBox key={`connect-${'stripe'}`}>
+                <EditConnectedAccount collective={hostCollective} service="stripe" />
+              </ConnectStripeBox>
+            )}
+          </Flex>
         )}
       </div>
     );

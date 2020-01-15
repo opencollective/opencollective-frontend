@@ -291,7 +291,7 @@ class EditHost extends React.Component {
               </h2>
               <FormattedMessage
                 id="collective.edit.host.useOwn.description"
-                defaultMessage="Connect your Stripe account and hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes."
+                defaultMessage="Hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes."
               />
               &nbsp;
               <a href="https://docs.opencollective.com/help/hosts/become-host">

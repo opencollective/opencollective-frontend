@@ -153,7 +153,7 @@
   "collective.edit.host.suggestedHosts.description": "Based on the currency of your Collective ({currency}) and the tags ({tags})",
   "collective.edit.host.suggestedHosts.empty": "No suggestions. Please look at all available hosts or consider creating a new host.",
   "collective.edit.host.suggestedHosts.title": "Предлагаемые представители",
-  "collective.edit.host.useOwn.description": "Подключите ваш Stripe-аккаунт и держите средства для одного или нескольких коллективов на вашем банковском счете. Вы несете ответственность за оплату утвержденных расходов, а также за обработку бухгалтерского учета и налогов.",
+  "collective.edit.host.useOwn.description": "Hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes.",
   "collective.edit.host.useOwn.title": "Use own fiscal host",
   "collective.edit.host.viewAllHosts": "Все фискальные хосты",
   "collective.editHost.cancel.btn": "Отмена",

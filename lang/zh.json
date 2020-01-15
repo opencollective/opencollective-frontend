@@ -153,7 +153,7 @@
   "collective.edit.host.suggestedHosts.description": "Based on the currency of your Collective ({currency}) and the tags ({tags})",
   "collective.edit.host.suggestedHosts.empty": "No suggestions. Please look at all available hosts or consider creating a new host.",
   "collective.edit.host.suggestedHosts.title": "Suggested hosts",
-  "collective.edit.host.useOwn.description": "连接您的Stripe帐户，并在您的银行帐户中为一个或多个Collective持有资金。您将负责支付批准的费用并处理会计和税款。",
+  "collective.edit.host.useOwn.description": "Hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes.",
   "collective.edit.host.useOwn.title": "Use own fiscal host",
   "collective.edit.host.viewAllHosts": "View all fiscal hosts",
   "collective.editHost.cancel.btn": "Cancel",
