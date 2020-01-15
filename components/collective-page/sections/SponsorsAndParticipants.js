@@ -90,11 +90,6 @@ const Participants = ({ collective: event, LoggedInUser }) => {
             <StyledAdminActions>
               <ul>
                 <li>
-                  <a href={`/${event.parentCollective.slug}/events/${event.slug}/nametags.pdf`}>
-                    <FormattedMessage id="Event.PrintNameTags" defaultMessage="Print name tags" />
-                  </a>
-                </li>
-                <li>
                   <a href={`mailto:${event.slug}@${event.parentCollective.slug}.opencollective.com`}>
                     <FormattedMessage id="Event.SendEmail" defaultMessage="Send email" />
                   </a>

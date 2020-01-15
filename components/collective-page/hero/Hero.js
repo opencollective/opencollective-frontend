@@ -157,6 +157,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     data-cy="twitterProfileUrl"
                     href={twitterProfileUrl(collective.twitterHandle)}
                     title="Twitter"
+                    aria-label="Twitter link"
                     openInNewTab
                   >
                     <StyledRoundButton size={32} mr={3}>
@@ -170,6 +171,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     href={githubProfileUrl(collective.githubHandle)}
                     title="Github"
                     openInNewTab
+                    aria-label="Github link"
                   >
                     <StyledRoundButton size={32} mr={3}>
                       <Github size={12} />
@@ -181,6 +183,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     data-cy="collectiveWebsite"
                     href={collective.website}
                     title={intl.formatMessage(Translations.website)}
+                    aria-label="Website link"
                     openInNewTab
                   >
                     <StyledRoundButton size={32} mr={3}>
