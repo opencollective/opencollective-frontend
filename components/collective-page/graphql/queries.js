@@ -173,6 +173,8 @@ export const getCollectivePageQuery = gql`
       }
       plan {
         hostDashboard
+        hostedCollectives
+        hostedCollectivesLimit
       }
 
       ... on Event {

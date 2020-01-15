@@ -838,6 +838,7 @@
   "host.expenses.title": "Dépenses",
   "host.HostCollectiveId.label": "Choisir une organisation",
   "host.hostFee.help": "Les frais de l’hôte sont les frais que l’hôte facture à votre collectif pour prendre en charge le fait de payer les frais qui ont été approuvés et de prendre soin d’enregistrer toutes les transactions dans leurs livres pour se conformer aux autorités fiscales locales.",
+  "host.hostLimit.warning": "Host already reached the limit of hosted collectives for its plan.",
   "host.link": "Sélectionner cet hôte",
   "host.paymentMethod.manual.instructions": "Les instructions pour faire le paiement de {amount} seront envoyées à votre adresse {email}. Votre commande sera mise en attente jusqu'à ce que les fonds aient été reçus par l'hôte ({host}).",
   "host.pending-applications.approve": "Approuver",

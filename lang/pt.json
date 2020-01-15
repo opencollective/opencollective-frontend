@@ -838,6 +838,7 @@
   "host.expenses.title": "Despesas",
   "host.HostCollectiveId.label": "Selecione uma organização",
   "host.hostFee.help": "A taxa do administrador é a taxa que o administrador cobra do seu coletivo para pagar as despesas que foram aprovadas e para registrar todas as transações em seus livros, de acordo com as autoridades fiscais locais.",
+  "host.hostLimit.warning": "Host already reached the limit of hosted collectives for its plan.",
   "host.link": "Use este organizador",
   "host.paymentMethod.manual.instructions": "As instruções para efetuar o pagamento de {amount} serão enviadas para o seu endereço de e-mail {email}. Seu pedido ficará pendente até que os fundos sejam recebidos pelo host ({host}).",
   "host.pending-applications.approve": "Aprovar",

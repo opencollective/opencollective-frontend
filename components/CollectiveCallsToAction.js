@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
 import dynamic from 'next/dynamic';
+import { get } from 'lodash';
 
 import Container from './Container';
 import StyledButton from './StyledButton';
+import StyledTooltip from './StyledTooltip';
 import Link from './Link';
+import _ApplyToHostBtn from './ApplyToHostBtn';
 
 // Dynamic imports
-const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn' */ './ApplyToHostBtn'));
 const AddFundsModal = dynamic(() => import('./AddFundsModal'));
 
 /**
@@ -22,6 +24,14 @@ const CollectiveCallsToAction = ({
   ...props
 }) => {
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
+  const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
+  const hostWithinLimit =
+    hostedCollectivesLimit && get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true;
+
+  const ApplyToHostBtn = () => (
+    <_ApplyToHostBtn host={collective} disabled={!hostWithinLimit} showConditions={false} minWidth={buttonsMinWidth} />
+  );
+
   return (
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
@@ -54,7 +64,21 @@ const CollectiveCallsToAction = ({
       )}
       {hasApply && (
         <Box mx={2} my={1}>
-          <ApplyToHostBtn host={collective} showConditions={false} minWidth={buttonsMinWidth} />
+          {hostWithinLimit ? (
+            <ApplyToHostBtn />
+          ) : (
+            <StyledTooltip
+              type="light"
+              content={
+                <FormattedMessage
+                  id="host.hostLimit.warning"
+                  defaultMessage="Host already reached the limit of hosted collectives for its plan."
+                />
+              }
+            >
+              <ApplyToHostBtn />
+            </StyledTooltip>
+          )}
         </Box>
       )}
       {addFunds && (

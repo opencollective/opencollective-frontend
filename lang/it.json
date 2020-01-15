@@ -838,6 +838,7 @@
   "host.expenses.title": "Expenses",
   "host.HostCollectiveId.label": "Seleziona una organizzazione",
   "host.hostFee.help": "The host fee is the fee that the host charges your collective to take care of paying out the expenses that have been approved and to take care of recording all transactions in their books to comply with local fiscal authorities.",
+  "host.hostLimit.warning": "Host already reached the limit of hosted collectives for its plan.",
   "host.link": "Use this host",
   "host.paymentMethod.manual.instructions": "Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).",
   "host.pending-applications.approve": "Approva",
