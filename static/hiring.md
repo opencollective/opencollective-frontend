@@ -41,3 +41,8 @@ We are a fully remote team - with team members in New Zealand (Wellington), Mexi
 ### Want to apply spontaneously?
 
 Please [email us](mailto:info@opencollective.com) about who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, your website, a video, or however you like to communicate.
+
+### Join our community!
+
+We operate as an open community and everything we do is Open Source. There is always opportunities for volunteer work and also even paid work with our [Bounty Program](https://docs.opencollective.com/help/contributing/development/bounties)! Feel free to join our community on Slack](https://slack.opencollective.com) and [GitHub](https://github.com/opencollective).
+
