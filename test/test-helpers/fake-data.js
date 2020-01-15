@@ -13,8 +13,26 @@ import { types as CollectiveType } from '../../server/constants/collectives';
 import { randEmail, randUrl } from '../stores';
 
 export const randStr = (prefix = '') => `${prefix}${uuid().split('-')[0]}`;
-export const randAmount = (min = 100, max = 10000000) => Math.floor(Math.random() * max) + min;
+export const randNumber = (min = 0, max = 10000000) => Math.floor(Math.random() * max) + min;
+export const randAmount = (min = 100, max = 10000000) => randNumber(min, max);
 export const multiple = (fn, n, args) => Promise.all([...Array(n).keys()].map(() => fn(args)));
+
+/** Generate an array containing between min and max item, filled with generateFunc */
+export const randArray = (generateFunc, min = 1, max = 1) => {
+  const arrayLength = randNumber(min, max);
+  return [...Array(arrayLength)].map((_, idx) => generateFunc(idx, arrayLength));
+};
+
+/** A small helper to get a value from the data or generate a default one */
+const getIdFromData = async (data, keys, defaultGenerator, idKey = 'id') => {
+  const existingKey = keys.find(key => typeof get(data, key) !== 'undefined');
+  if (existingKey) {
+    return get(data, existingKey);
+  }
+
+  const newEntity = await defaultGenerator();
+  return newEntity.get(idKey);
+};
 
 /**
  * Creates a fake user. All params are optionals.
@@ -39,6 +57,17 @@ export const fakeUser = async userData => {
   return user;
 };
 
+/** Create a fake host */
+export const fakeHost = async hostData => {
+  return fakeCollective({
+    type: CollectiveType.ORGANIZATION,
+    name: randStr('Test Host '),
+    slug: randStr('host-'),
+    HostCollectiveId: null,
+    ...hostData,
+  });
+};
+
 /**
  * Creates a fake update. All params are optionals.
  */
@@ -57,6 +86,7 @@ export const fakeCollective = async collectiveData => {
     tags: [randStr(), randStr()],
     isActive: true,
     ...collectiveData,
+    HostCollectiveId: await getIdFromData(collectiveData, ['HostCollectiveId', 'host.id'], fakeHost),
   });
 };
 
@@ -75,7 +105,11 @@ export const fakeEvent = async collectiveData => {
     slug: randStr('event-'),
     ...collectiveData,
     type: 'EVENT',
-    ParentCollectiveId,
+    ParentCollectiveId: await getIdFromData(
+      collectiveData,
+      ['ParentCollectiveId', 'parentCollective.id'],
+      fakeCollective,
+    ),
   });
 };
 
@@ -107,36 +141,54 @@ export const fakeUpdate = async updateData => {
   });
 };
 
+export const fakeExpenseAttachment = async attachmentData => {
+  return models.ExpenseAttachment.create(
+    {
+      amount: randAmount(),
+      url: `${randUrl()}.pdf`,
+      description: randStr(),
+      ...attachmentData,
+      ExpenseId: await getIdFromData(attachmentData, ['ExpenseId', 'expense.id'], fakeExpense),
+      CreatedByUserId: await getIdFromData(attachmentData, ['CreatedByUserId', 'createdByUser.id'], fakeUser),
+    },
+    {
+      include: [models.Expense],
+    },
+  );
+};
+
 /**
  * Creates a fake update. All params are optionals.
  */
 export const fakeExpense = async expenseData => {
-  let CollectiveId = get(expenseData, 'CollectiveId') || get(expenseData, 'collective.id');
-  let UserId = get(expenseData, 'UserId') || get(expenseData, 'user.id');
-  let FromCollectiveId = get(expenseData, 'FromCollectiveId') || get(expenseData, 'fromCollective.id');
-  if (!CollectiveId) {
-    CollectiveId = (await fakeCollective()).id;
-  }
-  if (!UserId) {
-    UserId = (await fakeUser()).id;
-  }
-
-  if (!FromCollectiveId) {
-    FromCollectiveId = (await models.User.findByPk(UserId)).CollectiveId;
-  }
-
-  return models.Update.create({
+  const expense = await models.Expense.create({
     amount: randAmount(),
-    attachement: `${randUrl()}/attachment.pdf`,
     currency: 'USD',
     category: 'Engineering',
     description: randStr('Test expense '),
     payoutMethod: 'other',
+    incurredAt: new Date(),
     ...expenseData,
-    FromCollectiveId,
-    CollectiveId,
-    UserId,
+    FromCollectiveId: await getIdFromData(expenseData, ['FromCollectiveId', 'fromCollective.id'], fakeCollective),
+    CollectiveId: await getIdFromData(expenseData, ['CollectiveId', 'collective.id'], fakeCollective),
+    UserId: await getIdFromData(expenseData, ['UserId', 'user.id'], fakeUser),
+    lastEditedById: await getIdFromData(expenseData, ['lastEditedById', 'lastEditedBy.id'], fakeUser),
   });
+
+  if (!expenseData || typeof expenseData.attachments === 'undefined') {
+    // Helper to generate an attachment. Ensures that attachments match expense amount
+    const generateAttachment = (idx, nbItems) => {
+      const baseAmount = Math.floor(expense.amount / nbItems);
+      const remainder = expense.amount % nbItems;
+      const realAmount = idx !== nbItems - 1 ? baseAmount : baseAmount + remainder;
+      return fakeExpenseAttachment({ ExpenseId: expense.id, amount: realAmount });
+    };
+
+    expense.attachments = await Promise.all(randArray(generateAttachment, 1, 5));
+  }
+
+  expense.User = await models.User.findByPk(expense.UserId);
+  return expense;
 };
 
 /**

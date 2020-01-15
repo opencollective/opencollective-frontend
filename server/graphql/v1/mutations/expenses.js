@@ -1,9 +1,9 @@
-import { get, omit } from 'lodash';
+import { get, omit, pick, flatten } from 'lodash';
 import errors from '../../../lib/errors';
 import roles from '../../../constants/roles';
 import statuses from '../../../constants/expense_status';
 import activities from '../../../constants/activities';
-import models from '../../../models';
+import models, { sequelize } from '../../../models';
 import paymentProviders from '../../../paymentProviders';
 import * as libPayments from '../../../lib/payments';
 import { formatCurrency } from '../../../lib/utils';
@@ -12,7 +12,7 @@ import { getFxRate } from '../../../lib/currency';
 import debugLib from 'debug';
 import { canUseFeature } from '../../../lib/user-permissions';
 import FEATURE from '../../../constants/feature';
-import { FeatureNotAllowedForUser } from '../../errors';
+import { FeatureNotAllowedForUser, ValidationFailed } from '../../errors';
 
 const debug = debugLib('expenses');
 
@@ -97,6 +97,26 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   return res;
 }
 
+/** Check expense's attachments values, throw if something's wrong */
+const checkExpenseAttachments = (expenseData, attachments) => {
+  // Check the number of attachments
+  if (!attachments || attachments.length === 0) {
+    throw new ValidationFailed({ message: 'Your expense needs to have at least one attachment' });
+  } else if (attachments.length > 100) {
+    throw new ValidationFailed({ message: 'Expenses cannot have more than 100 attachments' });
+  }
+
+  // Check amounts
+  const sumAttachments = attachments.reduce((total, attachment) => total + attachment.amount, 0);
+  if (sumAttachments !== expenseData.amount) {
+    throw new ValidationFailed({
+      message: `The sum of all attachments must be equal to the total expense's amount. Expense's total is ${expenseData.amount}, but the total of attachments was ${sumAttachments}.`,
+    });
+  }
+};
+
+const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'payoutMethod', 'privateMessage'];
+
 export async function createExpense(remoteUser, expenseData) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to create an expense');
@@ -108,38 +128,50 @@ export async function createExpense(remoteUser, expenseData) {
     throw new errors.Unauthorized('Missing expense.collective.id');
   }
 
+  let attachmentsData = expenseData.attachments;
+  if (expenseData.attachment && expenseData.attachments) {
+    throw new ValidationFailed({ message: 'Fields "attachment" and "attachments" are exclusive, please use only one' });
+  } else if (expenseData.attachment) {
+    // Convert legacy attachment param to new format
+    attachmentsData = [{ amount: expenseData.amount, url: expenseData.attachment }];
+  }
+
+  checkExpenseAttachments(expenseData, attachmentsData);
+
+  const collective = await models.Collective.findByPk(expenseData.collective.id);
+  if (!collective) {
+    throw new errors.ValidationFailed('Collective not found');
+  }
   // Update remoteUser's paypal email if it has changed
   if (get(expenseData, 'user.paypalEmail') !== remoteUser.paypalEmail) {
     remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
     remoteUser.save();
   }
-  expenseData.UserId = remoteUser.id;
 
-  const collective = await models.Collective.findByPk(expenseData.collective.id);
-
-  if (expenseData.currency && expenseData.currency !== collective.currency) {
-    throw new errors.ValidationFailed(
-      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expenseData.collective.currency})`,
+  const expense = await sequelize.transaction(async t => {
+    // Create expense
+    const createdExpense = await models.Expense.create(
+      {
+        ...pick(expenseData, EXPENSE_EDITABLE_FIELDS),
+        currency: collective.currency,
+        status: statuses.PENDING,
+        CollectiveId: collective.id,
+        FromCollectiveId: remoteUser.CollectiveId,
+        lastEditedById: remoteUser.id,
+        UserId: remoteUser.id,
+        incurredAt: expenseData.incurredAt || new Date(),
+      },
+      { transaction: t },
     );
-  }
 
-  if (!collective) {
-    throw new errors.ValidationFailed('Collective not found');
-  }
-
-  if (expenseData.currency && expenseData.currency !== collective.currency) {
-    throw new errors.ValidationFailed(
-      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${collective.currency})`,
+    // Create attachments
+    createdExpense.attachments = await Promise.all(
+      attachmentsData.map(attachmentData => {
+        return models.ExpenseAttachment.createFromData(attachmentData, remoteUser, createdExpense, t);
+      }),
     );
-  }
 
-  const expense = await models.Expense.create({
-    ...expenseData,
-    status: statuses.PENDING,
-    CollectiveId: collective.id,
-    FromCollectiveId: remoteUser.CollectiveId,
-    lastEditedById: expenseData.UserId,
-    incurredAt: expenseData.incurredAt || new Date(),
+    return createdExpense;
   });
 
   collective.addUserWithRole(remoteUser, roles.CONTRIBUTOR).catch(e => {
@@ -156,6 +188,37 @@ export async function createExpense(remoteUser, expenseData) {
   return expense;
 }
 
+/** Returns true if the expense should by put back to PENDING after this update */
+export const changesRequireStatusUpdate = (expense, newExpenseData, hasAttachmentsChanges) => {
+  const updatedValues = { ...expense.dataValues, ...newExpenseData };
+  return (
+    hasAttachmentsChanges ||
+    updatedValues.amount !== expense.amount ||
+    updatedValues.payoutMethod !== expense.payoutMethod
+  );
+};
+
+/** Returns infos about the changes made to attachments */
+export const getAttachmentsChanges = async (expense, expenseData) => {
+  let attachmentsData = expenseData.attachments;
+  let attachmentsDiff = [[], [], []];
+  let hasAttachmentsChanges = false;
+  if (expenseData.attachment && expenseData.attachments) {
+    throw new ValidationFailed({ message: 'Fields "attachment" and "attachments" are exclusive, please use only one' });
+  } else if (expenseData.attachment) {
+    // Convert legacy attachment param to new format
+    attachmentsData = [{ amount: expenseData.amount || expense.amount, url: expenseData.attachment }];
+  }
+
+  if (attachmentsData) {
+    const baseAttachments = await models.ExpenseAttachment.findAll({ where: { ExpenseId: expense.id } });
+    attachmentsDiff = models.ExpenseAttachment.diffDBEntries(baseAttachments, attachmentsData);
+    hasAttachmentsChanges = flatten(attachmentsDiff).length > 0;
+  }
+
+  return [hasAttachmentsChanges, attachmentsData, attachmentsDiff];
+};
+
 export async function editExpense(remoteUser, expenseData) {
   if (!remoteUser) {
     throw new errors.Unauthorized('You need to be logged in to edit an expense');
@@ -169,34 +232,50 @@ export async function editExpense(remoteUser, expenseData) {
 
   if (!expense) {
     throw new errors.Unauthorized('Expense not found');
-  }
-
-  if (!canEditExpense(remoteUser, expense)) {
+  } else if (!canEditExpense(remoteUser, expense)) {
     throw new errors.Unauthorized("You don't have permission to edit this expense");
   }
 
-  if (expenseData.currency && expenseData.currency !== expense.collective.currency) {
-    throw new errors.ValidationFailed(
-      `The currency of the expense (${expenseData.currency}) needs to be the same as the currency of the collective (${expense.collective.currency})`,
+  const cleanExpenseData = pick(expenseData, EXPENSE_EDITABLE_FIELDS);
+  const [hasAttachmentsChanges, attachmentsData, attachmentsDiff] = await getAttachmentsChanges(expense, expenseData);
+
+  const updatedExpense = await sequelize.transaction(async t => {
+    // Update attachments
+    if (hasAttachmentsChanges) {
+      checkExpenseAttachments({ ...expense.dataValues, ...cleanExpenseData }, attachmentsData);
+      const [newAttachmentsData, oldAttachments, attachmentsToUpdate] = attachmentsDiff;
+      await Promise.all([
+        // Delete
+        ...oldAttachments.map(attachment => {
+          return attachment.destroy({ transaction: t });
+        }),
+        // Create
+        ...newAttachmentsData.map(attachmentData => {
+          return models.ExpenseAttachment.createFromData(attachmentData, remoteUser, expense, t);
+        }),
+        // Update
+        ...attachmentsToUpdate.map(data => {
+          return models.ExpenseAttachment.updateFromData(data, t);
+        }),
+      ]);
+    }
+
+    // Update expense
+    // When updating amount, attachment or payoutMethod, we reset its status to PENDING
+    const shouldUpdateStatus = changesRequireStatusUpdate(expense, expenseData, hasAttachmentsChanges);
+    return expense.update(
+      {
+        ...cleanExpenseData,
+        lastEditedById: remoteUser.id,
+        incurredAt: expenseData.incurredAt || new Date(),
+        status: shouldUpdateStatus ? 'PENDING' : expense.status,
+      },
+      { transaction: t },
     );
-  }
+  });
 
-  // When updating amount, attachment or payoutMethod, we reset its status to PENDING
-  if (
-    expenseData.amount !== expense.amount ||
-    expenseData.payoutMethod !== expense.payoutMethod ||
-    expenseData.attachment !== expense.attachment
-  ) {
-    expenseData.status = statuses.PENDING;
-  } else {
-    // make sure that we don't override the status of the expense.
-    delete expenseData.status;
-  }
-
-  expenseData.lastEditedById = remoteUser.id;
-  await expense.update(expenseData);
-  expense.createActivity(activities.COLLECTIVE_EXPENSE_UPDATED);
-  return expense;
+  updatedExpense.createActivity(activities.COLLECTIVE_EXPENSE_UPDATED);
+  return updatedExpense;
 }
 
 export async function deleteExpense(remoteUser, expenseId) {

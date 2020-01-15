@@ -437,6 +437,18 @@ export const UpdateAttributesInputType = new GraphQLInputObjectType({
   }),
 });
 
+export const ExpenseAttachmentInputType = new GraphQLInputObjectType({
+  name: 'ExpenseAttachmentInputType',
+  description: 'Fields for creating or editing an expense attachment',
+  fields: {
+    id: { type: GraphQLInt },
+    url: { type: new GraphQLNonNull(DateString) },
+    amount: { type: new GraphQLNonNull(GraphQLInt) },
+    incurredAt: { type: DateString },
+    description: { type: GraphQLString },
+  },
+});
+
 export const ExpenseInputType = new GraphQLInputObjectType({
   name: 'ExpenseInputType',
   description: 'Input type for ExpenseType',
@@ -444,7 +456,10 @@ export const ExpenseInputType = new GraphQLInputObjectType({
     return {
       id: { type: GraphQLInt },
       amount: { type: GraphQLInt },
-      currency: { type: GraphQLString },
+      currency: {
+        type: GraphQLString,
+        deprecationReason: '2020-01-16: Expense currency is based on collective currency',
+      },
       createdAt: { type: DateString },
       incurredAt: { type: DateString },
       description: { type: GraphQLString },
@@ -456,7 +471,11 @@ export const ExpenseInputType = new GraphQLInputObjectType({
         description: 'Can be: paypal, other. Also deprecated: donation, manual',
       },
       privateMessage: { type: GraphQLString },
-      attachment: { type: GraphQLString },
+      attachment: {
+        type: GraphQLString,
+        deprecationReason: '2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.',
+      },
+      attachments: { type: new GraphQLList(ExpenseAttachmentInputType) },
       user: { type: UserInputType },
       collective: { type: CollectiveAttributesInputType },
     };
