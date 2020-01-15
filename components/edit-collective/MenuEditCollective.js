@@ -9,6 +9,10 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import Link from '../Link';
 import { isFeatureAllowedForCollectiveType, FEATURES } from '../../lib/allowed-features';
 
+const MenuDivider = styled.div`
+  margin-top: 34px;
+`;
+
 export const EDIT_COLLECTIVE_SECTIONS = {
   ADVANCED: 'advanced',
   COLLECTIVE_GOALS: 'goals',
@@ -123,8 +127,9 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: ({ type, isHost }) => type === CollectiveType.COLLECTIVE || isHost,
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
+  // [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: ({ isHost }) => Boolean(isHost),
   [EDIT_COLLECTIVE_SECTIONS.IMAGES]: isType(CollectiveType.EVENT),
-  [EDIT_COLLECTIVE_SECTIONS.INVOICES]: ({ isHost }) => Boolean(isHost),
+  // [EDIT_COLLECTIVE_SECTIONS.INVOICES]: ({ isHost }) => Boolean(isHost),
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isType(CollectiveType.COLLECTIVE),
@@ -142,25 +147,36 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
   const { formatMessage } = useIntl();
   const allSections = Object.values(EDIT_COLLECTIVE_SECTIONS);
   const displayedSections = allSections.filter(section => shouldDisplaySection(collective, section));
-  const displayedSectionsInfos = displayedSections.map(section => ({
+  const getSectionInfo = section => ({
     label: SECTION_LABELS[section] ? formatMessage(SECTION_LABELS[section]) : section,
     isSelected: section === selectedSection,
     section,
-  }));
+  });
+  const displayedSectionsInfos = displayedSections.map(getSectionInfo);
+
+  // eslint-disable-next-line react/prop-types
+  const renderMenuItem = ({ section, label, isSelected, slug }) => (
+    <MenuItem
+      key={section}
+      selected={isSelected}
+      route="editCollective"
+      params={{ slug, section }}
+      data-cy={`menu-item-${section}`}
+    >
+      {label}
+    </MenuItem>
+  );
 
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
-      {sortBy(displayedSectionsInfos, 'label').map(({ section, label, isSelected }) => (
-        <MenuItem
-          key={section}
-          selected={isSelected}
-          route="editCollective"
-          params={{ slug: collective.slug, section }}
-          data-cy={`menu-item-${section}`}
-        >
-          {label}
-        </MenuItem>
-      ))}
+      {sortBy(displayedSectionsInfos, 'label').map(renderMenuItem)}
+      {collective.isHost && (
+        <React.Fragment>
+          <MenuDivider />
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
+        </React.Fragment>
+      )}
     </Flex>
   );
 };
