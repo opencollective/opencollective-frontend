@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
+import styled from 'styled-components';
 
 import Container from '../Container';
 import ConnectPaypal from '../ConnectPaypal';
@@ -14,6 +15,14 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { Span, H2 } from '../Text';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
+
+const Disclaimer = styled.div`
+  display: inline-block;
+  margin: 1rem;
+  font-size: 1.1rem;
+  color: #aaaeb3;
+  font-weight: 400;
+`;
 
 /**
  * An action banner for the host dashboard. Currently holds two features:
@@ -137,6 +146,9 @@ class HostDashboardActionsBanner extends React.Component {
       return null;
     }
 
+    const hostAddedFundsLimit = get(host, 'plan.addedFundsLimit');
+    const hostHasFunds = (hostAddedFundsLimit && get(host, 'plan.addedFunds') < hostAddedFundsLimit) === true;
+
     const allCollectivesLabel = intl.formatMessage(this.messages.allCollectives);
     const customOptions = selectedCollective ? [{ label: allCollectivesLabel, value: null }] : undefined;
     return (
@@ -172,9 +184,20 @@ class HostDashboardActionsBanner extends React.Component {
               </Box>
             )}
             {selectedCollective && !this.state.showAddFunds && this.canEdit() && (
-              <StyledButton onClick={this.toggleAddFunds}>
-                <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
-              </StyledButton>
+              <React.Fragment>
+                <StyledButton onClick={this.toggleAddFunds} disabled={!hostHasFunds}>
+                  <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
+                </StyledButton>
+                {!hostHasFunds && (
+                  <Disclaimer>
+                    <FormattedMessage
+                      id="addFunds.error.planLimitReached"
+                      defaultMessage="You reached your plan's limit, upgrade your plan to add more funds"
+                    />
+                    .
+                  </Disclaimer>
+                )}
+              </React.Fragment>
             )}
           </div>
           <div style={{ maxWidth: 450 }}>
