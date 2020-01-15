@@ -841,6 +841,7 @@
   "login.askAnother": "Vous pouvez demander un nouveau lien en utilisant le formulaire ci-dessous.",
   "login.button": "S'identifier",
   "login.failed": "Connexion échouée : {message}.",
+  "map.viewLarger": "View Larger Map",
   "Member.Role.ADMIN": "Administrateur du collectif",
   "Member.Role.ATTENDEE": "Participant",
   "Member.Role.BACKER": "Contributeur financier",

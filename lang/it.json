@@ -841,6 +841,7 @@
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.button": "Sign In",
   "login.failed": "Sign In failed: {message}.",
+  "map.viewLarger": "View Larger Map",
   "Member.Role.ADMIN": "Amministratore Collettivo",
   "Member.Role.ATTENDEE": "Attendee",
   "Member.Role.BACKER": "Financial Contributor",
