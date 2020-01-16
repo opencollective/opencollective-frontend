@@ -124,12 +124,12 @@ const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveT
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: ({ type, isHost }) => type === CollectiveType.COLLECTIVE || isHost,
+  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
-  // [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: ({ isHost }) => Boolean(isHost),
+  [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.IMAGES]: isType(CollectiveType.EVENT),
-  // [EDIT_COLLECTIVE_SECTIONS.INVOICES]: ({ isHost }) => Boolean(isHost),
+  [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isType(CollectiveType.COLLECTIVE),
@@ -155,12 +155,12 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
   const displayedSectionsInfos = displayedSections.map(getSectionInfo);
 
   // eslint-disable-next-line react/prop-types
-  const renderMenuItem = ({ section, label, isSelected, slug }) => (
+  const renderMenuItem = ({ section, label, isSelected }) => (
     <MenuItem
       key={section}
       selected={isSelected}
       route="editCollective"
-      params={{ slug, section }}
+      params={{ slug: collective.slug, section }}
       data-cy={`menu-item-${section}`}
     >
       {label}
@@ -173,6 +173,8 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
       {collective.isHost && (
         <React.Fragment>
           <MenuDivider />
+          {collective.type === CollectiveType.COLLECTIVE &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
         </React.Fragment>
