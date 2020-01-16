@@ -124,7 +124,7 @@
     "eslint-plugin-mocha": "6.2.2",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-react": "^7.17.0",
-    "husky": "^4.0.7",
+    "husky": "^4.0.10",
     "lint-staged": "^9.5.0",
     "maildev": "^1.1.0",
     "mocha": "^7.0.0",
