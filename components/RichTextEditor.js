@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import css from '@styled-system/css';
 import uuid from 'uuid/v4';
 import { isURL } from 'validator';
-import 'trix/dist/trix.css';
 
 import { uploadImageWithXHR } from '../lib/api';
 import MessageBox from './MessageBox';
