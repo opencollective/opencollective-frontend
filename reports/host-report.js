@@ -11,10 +11,6 @@ import { getHostedCollectives, getBackersStats, sumTransactions } from '../serve
 
 const debug = debugLib('hostreport');
 
-if (process.env.SKIP_PLATFORM_STATS) {
-  console.log('Skipping computing platform stats');
-}
-
 const summary = {
   totalHosts: 0,
   totalActiveHosts: 0,
@@ -74,7 +70,10 @@ async function HostReport(year, month, hostId) {
   if (process.env.SLUGS) {
     const slugs = process.env.SLUGS.split(',');
     previewCondition = `AND c.slug IN ('${slugs.join("','")}')`;
-    process.env.SKIP_PLATFORM_STATS = true;
+  }
+  if (process.env.SKIP_SLUGS) {
+    const slugs = process.env.SKIP_SLUGS.split(',');
+    previewCondition = `AND c.slug NOT IN ('${slugs.join("','")}')`;
   }
 
   const getHostStats = (host, collectiveids) => {
@@ -348,7 +347,7 @@ async function HostReport(year, month, hostId) {
       .then(() => getHostAdminsEmails(host))
       .then(admins => sendEmail(admins, data, attachments))
       .catch(e => {
-        console.error(`Error in processing host ${host.slug}:`, e.message, e);
+        console.error(`Error in processing host ${host.slug}:`, e.message);
         debug(e);
       });
   };
