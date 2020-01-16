@@ -80,21 +80,21 @@ const EditHostSettings = props => {
 
   return (
     <div className="ExportData">
-      <h2>
-        <FormattedMessage id="collective.hostSettings.title" defaultMessage="Host Settings" />
-      </h2>
-
       <h3>
-        <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Plans" />
+        <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Host Plans" />
       </h3>
 
       <PlanGrid>
         <Plan active={collective.plan.name === 'default'}>
-          <PlanName>Free Host Plan</PlanName>
+          <PlanName>Free Plan</PlanName>
           <PlanFeatures>
             <ul>
-              <li>Unlimeted hosted collectives</li>
-              <li>Up to $1000 added funds across all collectives</li>
+              <li>Unlimited hosted collectives</li>
+              <li>
+                Up to $1000 added funds
+                <br />
+                (across all collectives)
+              </li>
             </ul>
           </PlanFeatures>
           <PlanPrice>Free</PlanPrice>
@@ -147,7 +147,7 @@ const EditHostSettings = props => {
       </PlanGrid>
 
       <h3>
-        <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Current Plan Usage" />
+        <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Usage" />
       </h3>
 
       <ul>
@@ -186,9 +186,6 @@ const EditHostSettings = props => {
           {!collective.plan.addedFundsLimit && (
             <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
           )}
-        </li>
-        <li>
-          <strong>Host Dashboard</strong>: {collective.plan.hostDashboard ? 'Yes' : 'No'}
         </li>
         <li>
           <strong>Manual Payments</strong>{' '}
