@@ -8,3 +8,4 @@ coverage:
         threshold: 0.1
     patch: off
   
+comment: false
