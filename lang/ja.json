@@ -840,6 +840,7 @@
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.button": "ログイン",
   "login.failed": "ログインに失敗しました: {message}",
+  "map.viewLarger": "View Larger Map",
   "Member.Role.ADMIN": "Collective Admin",
   "Member.Role.ATTENDEE": "Attendee",
   "Member.Role.BACKER": "Financial Contributor",
