@@ -352,7 +352,7 @@ class CollectiveCard extends React.Component {
                 </div>
               </div>
             )}
-            {roles && (
+            {roles && roles.size > 0 && (
               <div className="membership">
                 <div className="role">
                   <ul className="comma-list">
