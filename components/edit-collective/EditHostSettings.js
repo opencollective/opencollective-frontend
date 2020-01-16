@@ -196,7 +196,7 @@ const EditHostSettings = props => {
             content={() => (
               <FormattedMessage
                 id="collective.hostSettings.help.manualPayments"
-                defaultMessage="If you can or not manually track, through the platform, funds transfered outside Open Collective."
+                defaultMessage="Your contributors create a pending donation and receive email instructions with your bank details. You can reconcile the donation when you receive it."
               />
             )}
           >

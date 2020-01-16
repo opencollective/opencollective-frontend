@@ -190,7 +190,7 @@
   "collective.hostSettings.changePlan.title": "Plans",
   "collective.hostSettings.currentPlan.title": "Current Plan Usage",
   "collective.hostSettings.help.fundsLimit": "The maximum amount of fund added, during any timeframe, across all collectives.",
-  "collective.hostSettings.help.manualPayments": "If you can or not manually track, through the platform, funds transfered outside Open Collective.",
+  "collective.hostSettings.help.manualPayments": "Your contributors create a pending donation and receive email instructions with your bank details. You can reconcile the donation when you receive it.",
   "collective.hostSettings.title": "Host Settings",
   "collective.hostSettings.unlimited": "Unlimited",
   "collective.image.label": "Avatar",
