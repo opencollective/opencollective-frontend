@@ -47,7 +47,6 @@ class CollectiveCard extends React.Component {
     const { intl, collective, membership } = this.props;
     let { memberships } = this.props;
     memberships = memberships || (membership ? [membership] : []);
-    console.log(memberships);
 
     const getTierName = membership => {
       const tierName = get(membership, 'tier.name');
