@@ -291,7 +291,9 @@ Subject: {{{host.name}}} Host {{reportName}}
   <h2>📎 Attachments</h2>
   <ul>
     <li>A CSV export of all the transactions of the {{#if month}}month{{else}}year{{/if}}</li>
-    <li>A PDF with all the receipts</li>
+    {{#if expensesPdf}}
+      <li>A PDF with all the receipts</li>
+    {{/if}}
   </ul>
 
   <h2>🗣 Feedback</h2>
