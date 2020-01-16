@@ -48,7 +48,7 @@ async function HostReport(year, month, hostId) {
     createdAt: { [Op.gte]: startDate, [Op.lt]: endDate },
   };
 
-  const emailTemplate = yearlyReport ? 'host.yearlyreport' : 'host.monthlyreport';
+  const emailTemplate = yearlyReport ? 'host.yearlyreport' : 'host.monthlyreport'; // NOTE: this will be later converted to 'host.report'
   const reportName = yearlyReport ? `${year} Yearly Host Report` : `${year}/${month + 1} Monthly Host Report`;
   const dateFormat = yearlyReport ? 'YYYY' : 'YYYYMM';
   const csv_filename = `${moment(d).format(dateFormat)}-transactions.csv`;
@@ -285,16 +285,23 @@ async function HostReport(year, month, hostId) {
         });
       })
       .then(transactions => (data.transactions = transactions))
-      .then(() =>
-        exportToPDF('expenses', data, {
+      .then(() => {
+        // Don't generate PDF in email if it's the yearly report
+        if (yearlyReport) {
+          return;
+        }
+        return exportToPDF('expenses', data, {
           paper: host.currency === 'USD' ? 'Letter' : 'A4',
-        }),
-      )
-      .then(pdf => {
-        attachments.push({
-          filename: pdf_filename,
-          content: pdf,
         });
+      })
+      .then(pdf => {
+        if (pdf) {
+          attachments.push({
+            filename: pdf_filename,
+            content: pdf,
+          });
+          data.expensesPdf = true;
+        }
       })
       .then(() => getHostStats(host, Object.keys(collectivesById)))
       .then(stats => {
