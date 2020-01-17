@@ -840,7 +840,7 @@
   "login.askAnother": "Você pode pedir um novo link para entrar usando o formulário abaixo.",
   "login.button": "Entrar",
   "login.failed": "Falha no login: {message}.",
-  "map.viewLarger": "View Larger Map",
+  "map.viewLarger": "Visualizar Mapa Maior",
   "Member.Role.ADMIN": "Administrador do Coletivo",
   "Member.Role.ATTENDEE": "Participante",
   "Member.Role.BACKER": "Colaborador financeiro",
