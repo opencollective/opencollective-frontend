@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
+import { FormattedMessage, FormattedDate, injectIntl, defineMessages } from 'react-intl';
 import Currency from './Currency';
 import Link from './Link';
 import Logo from './Logo';
@@ -12,38 +12,71 @@ class CollectiveCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     membership: PropTypes.object,
+    memberships: PropTypes.array,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
+
+    this.messages = defineMessages({
+      'membership.role.host': {
+        id: 'membership.role.host',
+        defaultMessage: 'host',
+      },
+      'roles.admin.label': {
+        id: 'roles.admin.label',
+        defaultMessage: 'Collective Admin',
+      },
+      'roles.member.label': {
+        id: 'roles.member.label',
+        defaultMessage: 'Core Contributor',
+      },
+      'tier.name.sponsor': {
+        id: 'tier.name.sponsor',
+        defaultMessage: 'sponsor',
+      },
+      'tier.name.backer': {
+        id: 'tier.name.backer',
+        defaultMessage: 'backer',
+      },
+    });
   }
 
   render() {
-    const { collective, membership } = this.props;
+    const { intl, collective, membership } = this.props;
+    let { memberships } = this.props;
+    memberships = memberships || (membership ? [membership] : []);
 
-    let tierName = get(membership, 'tier.name');
-    const role = get(membership, 'role');
-    if (!tierName) {
-      switch (role) {
-        case 'HOST':
-          tierName = <FormattedMessage id="membership.role.host" defaultMessage="host" />;
-          break;
-        case 'ADMIN':
-          tierName = <FormattedMessage id="roles.admin.label" defaultMessage="Collective Admin" />;
-          break;
-        case 'MEMBER':
-          tierName = <FormattedMessage id="roles.member.label" defaultMessage="Core Contributor" />;
-          break;
-        default:
-          tierName =
-            collective.type === 'ORGANIZATION' ? (
-              <FormattedMessage id="tier.name.sponsor" defaultMessage="sponsor" />
-            ) : (
-              <FormattedMessage id="tier.name.backer" defaultMessage="backer" />
-            );
-          break;
+    const getTierName = membership => {
+      const tierName = get(membership, 'tier.name');
+      const role = get(membership, 'role');
+      if (!tierName) {
+        switch (role) {
+          case 'HOST':
+            return intl.formatMessage(this.messages['membership.role.host']);
+          case 'ADMIN':
+            return intl.formatMessage(this.messages['roles.admin.label']);
+          case 'MEMBER':
+            return intl.formatMessage(this.messages['roles.member.label']);
+          default:
+            if (collective.type === 'ORGANIZATION') {
+              return intl.formatMessage(this.messages['tier.name.sponsor']);
+            } else {
+              return intl.formatMessage(this.messages['tier.name.backer']);
+            }
+        }
       }
-    }
+      return tierName;
+    };
+
+    const membershipDates = memberships.map(m => m.createdAt);
+    membershipDates.sort((a, b) => {
+      return b - a;
+    });
+
+    const oldestMembershipDate = membershipDates.length ? membershipDates[0] : null;
+    const roles = new Set(memberships.map(m => getTierName(m)));
 
     const coverStyle = {};
     const backgroundImage = imagePreview(
@@ -189,6 +222,24 @@ class CollectiveCard extends React.Component {
                 text-transform: uppercase;
               }
 
+              .comma-list {
+                display: inline;
+                list-style: none;
+                padding: 0px;
+              }
+
+              .comma-list li {
+                display: inline;
+              }
+
+              .comma-list li::after {
+                content: ', ';
+              }
+
+              .comma-list li:last-child::after {
+                content: '';
+              }
+
               .value,
               .label {
                 text-align: center;
@@ -301,32 +352,42 @@ class CollectiveCard extends React.Component {
                 </div>
               </div>
             )}
-            {membership && (
+            {roles && roles.size > 0 && (
               <div className="membership">
-                <div className="role">{tierName}</div>
-                {membership.createdAt && (
+                <div className="role">
+                  <ul className="comma-list">
+                    {Array.from(roles).map(role => (
+                      <li key={role}>{role}</li>
+                    ))}
+                  </ul>
+                </div>
+                {oldestMembershipDate && (
                   <div className="since">
                     <FormattedMessage
                       id="membership.since"
                       defaultMessage={'since {date}'}
                       values={{
-                        date: <FormattedDate value={membership.createdAt} month="long" year="numeric" />,
+                        date: <FormattedDate value={oldestMembershipDate} month="long" year="numeric" />,
                       }}
                     />
                   </div>
                 )}
               </div>
             )}
-            {role === 'BACKER' && get(membership, 'stats.totalDonations') > 0 && (
-              <div className="totalDonations">
-                <div className="totalDonationsAmount">
-                  <Currency
-                    value={get(membership, 'stats.totalDonations')}
-                    currency={get(membership, 'collective.currency')}
-                  />
-                </div>
-                <FormattedMessage id="membership.totalDonations.title" defaultMessage={'Amount contributed'} />
-              </div>
+            {memberships.map(
+              membership =>
+                membership.role === 'BACKER' &&
+                get(membership, 'stats.totalDonations') > 0 && (
+                  <div className="totalDonations">
+                    <div className="totalDonationsAmount">
+                      <Currency
+                        value={get(membership, 'stats.totalDonations')}
+                        currency={get(membership, 'collective.currency')}
+                      />
+                    </div>
+                    <FormattedMessage id="membership.totalDonations.title" defaultMessage={'Amount contributed'} />
+                  </div>
+                ),
             )}
           </div>
         </div>
@@ -335,4 +396,4 @@ class CollectiveCard extends React.Component {
   }
 }
 
-export default CollectiveCard;
+export default injectIntl(CollectiveCard);

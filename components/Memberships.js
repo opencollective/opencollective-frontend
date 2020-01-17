@@ -41,7 +41,7 @@ class Collectives extends React.Component {
         </style>
 
         {memberships.map(membership => (
-          <Membership key={membership.id} membership={membership} LoggedInUser={this.props.LoggedInUser} />
+          <Membership key={membership.id} memberships={[membership]} LoggedInUser={this.props.LoggedInUser} />
         ))}
       </div>
     );
