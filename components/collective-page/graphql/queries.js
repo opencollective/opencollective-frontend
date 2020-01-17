@@ -33,7 +33,7 @@ export const getCollectivePageQuery = gql`
       isIncognito
       hostFeePercent
       image
-      imageUrl
+      imageUrl(height: 256)
       canApply
       canContact
       stats {
