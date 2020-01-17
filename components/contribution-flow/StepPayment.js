@@ -176,7 +176,7 @@ class StepPayment extends React.Component {
         this.dispatchChangeEvent(selectedOption, newCreditCardInfo, save);
       }
 
-      return { ...state, selectedOption, save, errors };
+      return { selectedOption, save, errors };
     });
   }
 

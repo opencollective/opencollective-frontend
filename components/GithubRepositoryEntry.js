@@ -28,7 +28,6 @@ const useForm = () => {
         event.stopPropagation();
         const { target } = event;
         setState(state => ({
-          ...state,
           [target.name]: target.value,
           errors: { ...state.errors, [target.name]: null },
         }));
@@ -37,7 +36,6 @@ const useForm = () => {
         event.persist();
         event.preventDefault();
         setState(state => ({
-          ...state,
           errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
         }));
       },
@@ -112,10 +110,9 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                 options={['repository', 'organization']}
                 defaultValue={'repository'}
                 onChange={({ key }) => {
-                  setState(state => ({
-                    ...state,
+                  setState({
                     useType: key,
-                  }));
+                  });
                 }}
               >
                 {props => {

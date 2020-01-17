@@ -141,7 +141,6 @@ class EditMembers extends React.Component {
 
   editMember = (index, fieldname, value) => {
     this.setState(state => ({
-      ...state,
       isTouched: true,
       members: update([...state.members], index, member => ({ ...member, [fieldname]: value })),
     }));
@@ -149,7 +148,6 @@ class EditMembers extends React.Component {
 
   addMember = () => {
     this.setState(state => ({
-      ...state,
       isTouched: true,
       members: [...state.members, { role: 'ADMIN' }],
     }));
@@ -158,13 +156,12 @@ class EditMembers extends React.Component {
   removeMember = index => {
     return this.setState(state => {
       const memberEntry = state.members[index];
-      if (memberEntry.member && !this.confirmRemoveMember(memberEntry)) {
-        return state;
-      } else {
+      if (!memberEntry.member || this.confirmRemoveMember(memberEntry)) {
         const members = [...state.members];
         members.splice(index, 1);
-        return { ...state, isTouched: true, members };
+        return { isTouched: true, members };
       }
+      return {};
     });
   };
 

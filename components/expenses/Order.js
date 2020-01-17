@@ -70,7 +70,6 @@ class Order extends React.Component {
 
   toggleDetails = () => {
     this.setState(state => ({
-      ...state,
       view: state.view === 'details' ? 'summary' : 'details',
     }));
   };

@@ -100,13 +100,12 @@ class EditGoals extends React.Component {
       const updatedGoal = { ...goal, type: goal.type || this.defaultType, [fieldName]: value };
       const updatedGoals = [...state.goals];
       updatedGoals[index] = updatedGoal;
-      return { ...state, isTouched: true, goals: updatedGoals };
+      return { isTouched: true, goals: updatedGoals };
     });
   };
 
   toggleGoalsOnCollectivePage = ({ checked }) => {
     this.setState(state => ({
-      ...state,
       isTouched: true,
       collectivePage: { ...state.collectivePage, showGoals: checked },
     }));
@@ -114,18 +113,17 @@ class EditGoals extends React.Component {
 
   addGoal = () => {
     const newGoal = { type: this.defaultType, key: uuid() };
-    this.setState(state => ({ ...state, isTouched: true, goals: [...state.goals, newGoal] }));
+    this.setState(state => ({ isTouched: true, goals: [...state.goals, newGoal] }));
   };
 
   removeGoal = index => {
     this.setState(state => {
-      if (index < 0 || index > state.goals.length) {
-        return state;
-      } else {
+      if (index >= 0 && index <= state.goals.length) {
         const updatedGoals = [...state.goals];
         updatedGoals.splice(index, 1);
-        return { ...state, isTouched: true, goals: updatedGoals };
+        return { isTouched: true, goals: updatedGoals };
       }
+      return {};
     });
   };
 

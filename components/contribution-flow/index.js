@@ -235,7 +235,6 @@ class CreateOrderPage extends React.Component {
 
   loadInitialData() {
     this.setState(state => ({
-      ...state,
       stepProfile: state.stepProfile || this.getLoggedInUserDefaultContibuteProfile(),
       stepDetails: get(state.stepDetails, 'totalAmount')
         ? state.stepDetails
@@ -345,7 +344,6 @@ class CreateOrderPage extends React.Component {
         return false;
       }
       this.setState(state => ({
-        ...state,
         stepPayment: {
           ...state.stepPayment,
           data: null,
