@@ -135,7 +135,7 @@
     "sinon": "^8.0.4",
     "supertest": "^4.0.2",
     "supertest-as-promised": "^4.0.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "build": "npm run build:clean && npm run build:updates && npm run build:server",
