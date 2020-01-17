@@ -110,19 +110,16 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
-        <FormattedMessage
-          values={{ type: collectiveType }}
-          id="collective.hostAccount.title"
-          defaultMessage={'Host Status for {type}'}
-        />
+        <FormattedMessage id="collective.hostAccount.title" defaultMessage={'Fiscal Host'} />
       </H2>
 
       {!isHostAccount && (
         <P>
           <FormattedMessage
-            values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.activate.description"
-            defaultMessage={'This will allow you to host collectives with this account. Fees might apply.'}
+            defaultMessage={
+              'A fiscal host is a legal entity who holds a Collective’s funds in their bank account, and can generate invoices and receipts for backers and sponsors.'
+            }
           />
         </P>
       )}
@@ -132,7 +129,9 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.hostAccount.deactivate.description"
-            defaultMessage={'After deactivating the host status, you will not be able to host collectives anymore.'}
+            defaultMessage={
+              "After deactivating your organization as host, you will not be able to host collectives anymore. The profile will remain active as an {type}'s profile."
+            }
           />
         </P>
       )}
@@ -141,11 +140,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
 
       {!isHostAccount && (
         <StyledButton onClick={() => setModal({ type: 'Activate', show: true })} loading={processing} disabled={false}>
-          <FormattedMessage
-            values={{ type: collectiveType.toLowerCase() }}
-            id="collective.hostAccount.activate.button"
-            defaultMessage={'Activate as Host'}
-          />
+          <FormattedMessage id="collective.hostAccount.activate.button" defaultMessage={'Activate as Host'} />
         </StyledButton>
       )}
 
@@ -165,11 +160,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
           loading={processing}
           disabled={collective.plan.hostedCollectives > 0}
         >
-          <FormattedMessage
-            values={{ type: collectiveType.toLowerCase() }}
-            id="collective.hostAccount.deactivate.button"
-            defaultMessage={'Desactivate as Host'}
-          />
+          <FormattedMessage id="collective.hostAccount.deactivate.button" defaultMessage={'Desactivate as Host'} />
         </StyledButton>
       )}
 
@@ -200,14 +191,12 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
             {modal.type === 'Activate' && (
               <FormattedMessage
                 id="collective.hostAccount.modal.activate.body"
-                values={{ type: collectiveType.toLowerCase() }}
                 defaultMessage={'Are you sure you want to activate this account as Host?'}
               />
             )}
             {modal.type === 'Deactivate' && (
               <FormattedMessage
                 id="collective.hostAccount.modal.deactivate.body"
-                values={{ type: collectiveType.toLowerCase() }}
                 defaultMessage={'Are you sure you want to deactivate this account as Host?'}
               />
             )}

@@ -81,7 +81,7 @@ const EditHostSettings = props => {
   return (
     <div className="ExportData">
       <h3>
-        <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Host Plans" />
+        <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Host Plan" />
       </h3>
 
       <PlanGrid>
@@ -147,7 +147,7 @@ const EditHostSettings = props => {
       </PlanGrid>
 
       <h3>
-        <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Usage" />
+        <FormattedMessage id="collective.hostSettings.currentPlan.title" defaultMessage="Limits and Usage" />
       </h3>
 
       <ul>

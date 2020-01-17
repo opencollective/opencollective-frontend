@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
-import { sortBy } from 'lodash';
 import { Flex } from '@rebass/grid';
 import styled, { css } from 'styled-components';
 
@@ -14,22 +13,23 @@ const MenuDivider = styled.div`
 `;
 
 export const EDIT_COLLECTIVE_SECTIONS = {
-  ADVANCED: 'advanced',
+  INFO: 'info', // First on purpose
   COLLECTIVE_GOALS: 'goals',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   CONVERSATIONS: 'conversations',
   EXPENSES: 'expenses',
   EXPORT: 'export',
   HOST: 'host',
-  HOST_SETTINGS: 'hostSettings',
   IMAGES: 'images',
-  INFO: 'info',
-  INVOICES: 'invoices',
   MEMBERS: 'members',
   PAYMENT_METHODS: 'payment-methods',
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
+  ADVANCED: 'advanced', // Last on purpose
+  // Host Specific
+  HOST_SETTINGS: 'hostSettings',
+  INVOICES: 'invoices',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -63,7 +63,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: {
     id: 'editCollective.menu.hostSettings',
-    defaultMessage: 'Host Plans',
+    defaultMessage: 'Host Plan',
   },
   [EDIT_COLLECTIVE_SECTIONS.IMAGES]: {
     id: 'editCollective.menu.images',
@@ -169,7 +169,7 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
 
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
-      {sortBy(displayedSectionsInfos, 'label').map(renderMenuItem)}
+      {displayedSectionsInfos.map(renderMenuItem)}
       {collective.isHost && (
         <React.Fragment>
           <MenuDivider />
