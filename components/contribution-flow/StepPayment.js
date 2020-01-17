@@ -88,7 +88,7 @@ const getPaymentMethodMetadata = pm => {
           }}
         />
       );
-    } else if (pm.expiryDate && !paymentMethodExpired(pm.expiryDate)) {
+    } else if (pm.expiryDate) {
       return (
         <FormattedMessage
           id="ContributePayment.balanceAndExpiry"
@@ -335,7 +335,14 @@ class StepPayment extends React.Component {
                     <P display="inline" fontWeight={subtitle ? 600 : 400} color="black.900" marginRight="10px">
                       {title}
                     </P>
-                    {isExpired && <StyledTag display="inline">Expired</StyledTag>}
+                    {isExpired && (
+                      <StyledTag display="inline">
+                        <FormattedMessage
+                          id="contribute.paymentMethodExpired"
+                          defaultMessage="Expired"
+                        />
+                      </StyledTag>
+                  )}
                   </div>
                   {subtitle && (
                     <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">

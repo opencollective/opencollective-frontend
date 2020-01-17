@@ -324,6 +324,7 @@
   "contribute.ticketType": "Order a \"{name}\" ticket",
   "contribute.tierDetails": "You’ll contribute with the amount of {amount}{interval, select, month { monthly} year { yearly} other {}}.",
   "contribute.vatBadCountry": "The VAT number doesn't match the country",
+  "contribute.paymentMethodExpired": "Expired",
   "contributeAs.org.github": "GitHub (optional)",
   "contributeAs.org.name": "Organization Name",
   "contributeAs.org.new": "A new organization",
