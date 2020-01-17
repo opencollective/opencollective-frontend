@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import 'react-quill/dist/quill.snow.css';
 
 import { upload } from '../lib/api';
 import LoadingPlaceholder from './LoadingPlaceholder';

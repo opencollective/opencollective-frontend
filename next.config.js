@@ -1,6 +1,5 @@
 require('./env');
 
-const withCSS = require('@zeit/next-css');
 const withSourceMaps = require('@zeit/next-source-maps');
 
 const nextConfig = {
@@ -99,4 +98,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withSourceMaps(withCSS(nextConfig));
+module.exports = withSourceMaps(nextConfig);

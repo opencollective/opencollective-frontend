@@ -2,12 +2,8 @@ import { randomEmail } from '../support/faker';
 
 describe('Contribution Flow: Create profile', () => {
   it('Personal profile', () => {
+    // Create account is the default view when unauthenticated
     cy.visit('/apex/donate');
-
-    // Go to CreateProfile
-    cy.get('[data-cy="cf-content"] button')
-      .contains('Join Free')
-      .click();
 
     // Has TOS
     cy.contains('By joining, you agree to our Terms of Service and Privacy Policy.');
@@ -33,16 +29,12 @@ describe('Contribution Flow: Create profile', () => {
   });
 
   it('Organization profile', () => {
+    // Create account is the default view when unauthenticated
     cy.visit('/apex/donate');
-
-    // Go to CreateProfile
-    cy.get('[data-cy="cf-content"] button')
-      .contains('Join Free')
-      .click();
 
     // Select "Create oganization"
     cy.get('[data-cy="cf-content"]')
-      .contains('Create Organization Profile')
+      .contains('Contribute as an organization')
       .click();
 
     // Test frontend validations

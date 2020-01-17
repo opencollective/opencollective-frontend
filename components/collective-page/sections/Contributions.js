@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { get } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql, Query } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
 
@@ -87,42 +86,6 @@ const MembershipCardContainer = styled.div`
   }
 `;
 
-const ParentedCollectivesQuery = gql`
-  query SuperCollectiveChildren($tags: [String]) {
-    allCollectives(orderBy: balance, orderDirection: DESC, limit: 50, tags: $tags) {
-      collectives {
-        id
-        name
-        slug
-        type
-        currency
-        isIncognito
-        description
-        imageUrl(height: 128)
-        backgroundImageUrl(height: 200)
-        tags
-        settings
-        parentCollective {
-          id
-          backgroundImageUrl
-          name
-          slug
-        }
-        host {
-          id
-        }
-        stats {
-          id
-          backers {
-            id
-            all
-          }
-        }
-      }
-    }
-  }
-`;
-
 class SectionContributions extends React.PureComponent {
   static propTypes = {
     /** Collective */
@@ -146,9 +109,14 @@ class SectionContributions extends React.PureComponent {
             hosted: PropTypes.number,
           }).isRequired,
         }).isRequired,
-        settings: PropTypes.shape({
-          superCollectiveTags: PropTypes.arrayOf(PropTypes.string),
-        }),
+        subCollectives: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.number,
+            collective: PropTypes.shape({
+              id: PropTypes.number,
+            }),
+          }),
+        ),
         memberOf: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.number.isRequired,
@@ -264,11 +232,13 @@ class SectionContributions extends React.PureComponent {
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
     const sortedMemberships = this.sortMemberships(memberships);
+    const subCollectives = data.Collective.subCollectives;
+    const memberOf = data.Collective.memberOf;
+    const hasContributions = memberOf.length || subCollectives.length;
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
-    const superCollectiveTags = get(collective, 'settings.superCollectiveTags', []);
     return (
       <Box pt={5} pb={3}>
-        {data.Collective.memberOf.length === 0 ? (
+        {!hasContributions ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
             <P color="black.600" fontSize="LeadParagraph" mt={5}>
@@ -281,93 +251,96 @@ class SectionContributions extends React.PureComponent {
           </Flex>
         ) : (
           <React.Fragment>
-            <ContainerSectionContent>
-              <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
-                <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
-              </SectionTitle>
-              {data.Collective.stats.collectives.hosted > 0 && (
-                <H3 fontSize="H5" fontWeight="500" color="black.600">
-                  <FormattedMessage
-                    id="organization.collective.memberOf.collective.host.title"
-                    values={{ n: data.Collective.stats.collectives.hosted }}
-                    defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
-                  />
-                </H3>
-              )}
-            </ContainerSectionContent>
-            {filters.length > 1 && (
-              <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-                <StyledFilters
-                  filters={filters}
-                  getLabel={key => intl.formatMessage(I18nFilters[key])}
-                  onChange={filter => this.setState({ selectedFilter: filter })}
-                  selected={selectedFilter}
-                  justifyContent="left"
-                  minButtonWidth={175}
-                  px={Dimensions.PADDING_X}
-                />
-              </Box>
-            )}
-            <Container
-              data-cy="Contributions"
-              maxWidth={Dimensions.MAX_SECTION_WIDTH}
-              pl={Dimensions.PADDING_X}
-              mt={4}
-              mx="auto"
-            >
-              <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                {sortedMemberships.slice(0, nbMemberships).map(membership => (
-                  <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
-                    <StyledMembershipCard membership={membership} />
-                  </MembershipCardContainer>
-                ))}
-              </Flex>
-            </Container>
-            {nbMemberships < sortedMemberships.length && (
-              <Flex mt={3} justifyContent="center">
-                <StyledButton
-                  data-cy="load-more"
-                  textTransform="capitalize"
-                  minWidth={170}
-                  onClick={this.showMoreMemberships}
+            {memberOf.length > 0 && (
+              <React.Fragment>
+                <ContainerSectionContent>
+                  <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
+                    <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
+                  </SectionTitle>
+                  {data.Collective.stats.collectives.hosted > 0 && (
+                    <H3 fontSize="H5" fontWeight="500" color="black.600">
+                      <FormattedMessage
+                        id="organization.collective.memberOf.collective.host.title"
+                        values={{ n: data.Collective.stats.collectives.hosted }}
+                        defaultMessage="We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}"
+                      />
+                    </H3>
+                  )}
+                </ContainerSectionContent>
+                {filters.length > 1 && (
+                  <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+                    <StyledFilters
+                      filters={filters}
+                      getLabel={key => intl.formatMessage(I18nFilters[key])}
+                      onChange={filter => this.setState({ selectedFilter: filter })}
+                      selected={selectedFilter}
+                      justifyContent="left"
+                      minButtonWidth={175}
+                      px={Dimensions.PADDING_X}
+                    />
+                  </Box>
+                )}
+                <Container
+                  data-cy="Contributions"
+                  maxWidth={Dimensions.MAX_SECTION_WIDTH}
+                  pl={Dimensions.PADDING_X}
+                  mt={4}
+                  mx="auto"
                 >
-                  <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-                </StyledButton>
-              </Flex>
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                    {sortedMemberships.slice(0, nbMemberships).map(membership => (
+                      <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
+                        <StyledMembershipCard membership={membership} />
+                      </MembershipCardContainer>
+                    ))}
+                  </Flex>
+                </Container>
+                {nbMemberships < sortedMemberships.length && (
+                  <Flex mt={3} justifyContent="center">
+                    <StyledButton
+                      data-cy="load-more"
+                      textTransform="capitalize"
+                      minWidth={170}
+                      onClick={this.showMoreMemberships}
+                    >
+                      <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+                    </StyledButton>
+                  </Flex>
+                )}
+              </React.Fragment>
             )}
-          </React.Fragment>
-        )}
-        {isOrganization && superCollectiveTags.length > 0 && (
-          <Query query={ParentedCollectivesQuery} variables={{ tags: superCollectiveTags }}>
-            {({ loading, error, data: subCollectivesData }) => {
-              const collectives = get(subCollectivesData, 'allCollectives.collectives', []);
-              if (loading || error || collectives.length === 0) {
-                return null;
-              }
-              return (
-                <React.Fragment>
-                  <ContainerSectionContent>
-                    <SectionTitle textAlign="left" mb={4}>
+
+            {subCollectives.length > 0 && (
+              <Box mt={5}>
+                <ContainerSectionContent>
+                  <SectionTitle textAlign="left" mb={4}>
+                    {isOrganization ? (
                       <FormattedMessage
                         id="CP.Contributions.PartOfOrg"
                         defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
-                        values={{ n: collectives.length }}
+                        values={{ n: subCollectives.length }}
                       />
-                    </SectionTitle>
-                  </ContainerSectionContent>
-                  <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
-                    <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                      {collectives.map(collective => (
-                        <MembershipCardContainer key={collective.id}>
-                          <StyledMembershipCard membership={{ collective }} />
-                        </MembershipCardContainer>
-                      ))}
-                    </Flex>
-                  </Container>
-                </React.Fragment>
-              );
-            }}
-          </Query>
+                    ) : (
+                      <FormattedMessage
+                        id="CP.Contributions.SubCollective"
+                        defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
+                        values={{ n: subCollectives.length }}
+                      />
+                    )}
+                  </SectionTitle>
+                </ContainerSectionContent>
+                <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
+                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                    {subCollectives.map(({ id, collective }) => (
+                      <MembershipCardContainer key={id}>
+                        <StyledMembershipCard membership={{ collective }} />
+                      </MembershipCardContainer>
+                    ))}
+                  </Flex>
+                </Container>
+              </Box>
+            )}
+          </React.Fragment>
         )}
       </Box>
     );
@@ -385,6 +358,38 @@ const withData = graphql(
           collectives {
             id
             hosted
+          }
+        }
+        subCollectives: members(role: "SUB_COLLECTIVE") {
+          id
+          collective: member {
+            id
+            name
+            slug
+            type
+            currency
+            isIncognito
+            description
+            imageUrl(height: 128)
+            backgroundImageUrl(height: 200)
+            tags
+            settings
+            parentCollective {
+              id
+              backgroundImageUrl
+              name
+              slug
+            }
+            host {
+              id
+            }
+            stats {
+              id
+              backers {
+                id
+                all
+              }
+            }
           }
         }
         memberOf(onlyActiveCollectives: true, limit: 1500) {

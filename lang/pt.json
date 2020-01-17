@@ -1136,7 +1136,7 @@
   "StepsProgress.mobile.next": "Próximo: {stepName}",
   "StepsProgress.mobile.status": "{from} de {to}",
   "StyledInputTags.Placeholder": "Adicione novas tags apertando Enter",
-  "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} colaborador} other {{prettyCount} colaboradores}}",
+  "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
   "subscription.amountToDate": "contribuído até agora",
   "subscription.cancel.btn": "sim",
   "subscription.cancel.no.btn": "não",

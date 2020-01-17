@@ -21,11 +21,12 @@ describe('Expense Comments', () => {
 
   function SubmitComment(description) {
     cy.getByDataCy('CommentForm').within(() => {
-      cy.get('.ql-editor')
-        .type(description)
-        .blur();
+      cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
+      cy.get('@editor').type(description);
       cy.getByDataCy('SaveCommentButton').click();
     });
+
+    cy.contains('[data-cy="comment-body"]', description);
   }
 
   it('creates, edits and deletes a comment', () => {
@@ -47,9 +48,8 @@ describe('Expense Comments', () => {
     // Edit comment
     cy.get('.Comments .itemsList .comment:first').within(() => {
       cy.getByDataCy('ToggleEditComment').click();
-      cy.get('.ql-editor')
-        .clear()
-        .type('Modifying my first comment');
+      cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
+      cy.get('@editor').type('Modifying my first comment');
       cy.getByDataCy('SaveEditionCommentButton').click();
     });
 

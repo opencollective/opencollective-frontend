@@ -5,9 +5,6 @@ WORKDIR /usr/src/frontend
 # Skip Cypress Install
 ENV CYPRESS_INSTALL_BINARY 0
 
-# Pre-install heavy dependencies
-RUN npm install phantomjs-prebuilt
-
 # Install dependencies first
 COPY package*.json ./
 RUN npm install --unsafe-perm

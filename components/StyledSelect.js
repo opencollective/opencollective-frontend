@@ -32,7 +32,10 @@ const Option = ({ innerProps, ...props }) => (
 
 // eslint-disable-next-line react/prop-types
 const SelectContainer = ({ innerProps, ...props }) => (
-  <components.SelectContainer {...props} innerProps={{ ...innerProps, 'data-cy': 'select' }} />
+  <components.SelectContainer
+    {...props}
+    innerProps={{ ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' }} // eslint-disable-line react/prop-types
+  />
 );
 
 // eslint-disable-next-line react/prop-types

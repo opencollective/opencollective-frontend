@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import css from '@styled-system/css';
 import uuid from 'uuid/v4';
-import 'trix/dist/trix.css';
+import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';
 import MessageBox from './MessageBox';
@@ -206,6 +206,10 @@ export default class RichTextEditor extends React.Component {
     }
   }
 
+  getEditor() {
+    return this.editorRef.current.editor;
+  }
+
   initialize = () => {
     if (this.Trix && this.editorRef.current) {
       // Listen for changes
@@ -218,11 +222,18 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
+  /** ---- Trix handlers ---- */
+
   handleChange = e => {
+    // Trigger content formatters
+    this.autolink();
+
+    // Notify parent function
     if (this.props.onChange) {
       this.props.onChange(e);
     }
 
+    // Reset errors
     if (this.state.error) {
       this.setState({ error: null });
     }
@@ -251,6 +262,39 @@ export default class RichTextEditor extends React.Component {
     uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
     return e;
   };
+
+  /** Automatically create anchors with hrefs for links */
+  autolink() {
+    const linkRegex = new RegExp(`(https?://\\S+\\.\\S+)\\s`, 'ig');
+    const editor = this.getEditor();
+    const content = editor.getDocument().toString();
+    let match;
+    while ((match = linkRegex.exec(content))) {
+      const url = match[1];
+      if (isURL(url)) {
+        const position = match.index;
+        const range = [position, position + url.length];
+        const hrefAtRange = editor.getDocument().getCommonAttributesAtRange(range).href;
+        if (hrefAtRange !== url) {
+          this.updateInRange(editor, range, 0, () => {
+            if (editor.canActivateAttribute('href')) {
+              editor.activateAttribute('href', url);
+            }
+          });
+        }
+      }
+    }
+  }
+
+  /** A trix helper that will apply func in range then restore base range when it's done */
+  updateInRange(editor, range, offset = 0, updateFunc) {
+    const baseRange = editor.getSelectedRange();
+    editor.setSelectedRange(range);
+    updateFunc();
+    editor.setSelectedRange([baseRange[0] + offset, baseRange[1] + offset]);
+  }
+
+  /** ---- Render ---- */
 
   render() {
     const {

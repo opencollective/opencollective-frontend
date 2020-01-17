@@ -8,7 +8,7 @@ describe('widgets', () => {
 
   it('shows the collectives backed by a user', () => {
     cy.visit('/xdamman/widget.html');
-    cy.get('.CollectiveCard').should('have.length', 17);
+    cy.get('.CollectiveCard').should('have.length', 16);
   });
 
   it('shows the latest events', () => {

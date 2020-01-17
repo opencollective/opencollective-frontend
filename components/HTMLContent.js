@@ -92,17 +92,17 @@ const HTMLContent = styled(({ content, ...props }) => {
 
   ${props => {
     let primaryColor = props.theme.colors.primary[500];
-    let secondaryColor = props.theme.colors.primary[100];
+    let secondaryColor = props.theme.colors.primary[400];
     const luminance = getLuminance(primaryColor);
 
     if (luminance < 0 || luminance > 0.9) {
       return null;
-    } else if (luminance < 0.05) {
+    } else if (luminance < 0.06) {
       primaryColor = props.theme.colors.primary[400];
-      secondaryColor = props.theme.colors.primary[100];
-    } else if (luminance > 0.75) {
+      secondaryColor = props.theme.colors.primary[200];
+    } else if (luminance > 0.6) {
       primaryColor = props.theme.colors.primary[900];
-      secondaryColor = props.theme.colors.primary[500];
+      secondaryColor = props.theme.colors.primary[700];
     }
 
     return css`

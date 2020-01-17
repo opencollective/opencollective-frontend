@@ -4,7 +4,7 @@ import CollectiveCard from './CollectiveCard';
 
 class Membership extends React.Component {
   static propTypes = {
-    membership: PropTypes.object.isRequired,
+    memberships: PropTypes.array.isRequired,
     LoggedInUser: PropTypes.object,
   };
 
@@ -13,11 +13,11 @@ class Membership extends React.Component {
   }
 
   render() {
-    const { membership, LoggedInUser } = this.props;
-    const { collective } = membership;
+    const { memberships, LoggedInUser } = this.props;
+    const { collective } = memberships[0];
 
     if (!collective) {
-      console.error('>>> no collective attached to this membership:', membership);
+      console.error('>>> no collective attached to this membership:', memberships[0]);
       return <div />;
     }
 
@@ -37,7 +37,7 @@ class Membership extends React.Component {
         </style>
 
         <div className="Membership">
-          <CollectiveCard membership={membership} collective={collective} LoggedInUser={LoggedInUser} />
+          <CollectiveCard memberships={memberships} collective={collective} LoggedInUser={LoggedInUser} />
         </div>
       </React.Fragment>
     );

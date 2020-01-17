@@ -51,6 +51,7 @@ const SearchForm = ({ fontSize, onSubmit = handleSubmit, placeholder = 'Search O
         pl={3}
         width={width}
         fontSize={fontSize}
+        aria-label="Open collective search input"
       />
       <SearchButton as="button" mr={1} p={1}>
         <SearchIcon size={16} fill="#aaaaaa" />

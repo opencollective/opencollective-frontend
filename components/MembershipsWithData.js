@@ -70,6 +70,16 @@ class MembershipsWithData extends React.Component {
       return <div />;
     }
 
+    const collectiveIds = [];
+
+    const groupedMemberships = memberships.reduce((_memberships, m) => {
+      (_memberships[m.collective.id] = _memberships[m.collective.id] || []).push(m);
+      if (collectiveIds.length == 0 || collectiveIds[collectiveIds.length - 1] != m.collective.id) {
+        collectiveIds.push(m.collective.id);
+      }
+      return _memberships;
+    }, {});
+
     const limit = this.props.limit || MEMBERSHIPS_PER_PAGE * 2;
     return (
       <div className="MembersContainer" ref={node => (this.node = node)}>
@@ -91,8 +101,8 @@ class MembershipsWithData extends React.Component {
         </style>
 
         <div className="Collectives cardsList">
-          {memberships.map(membership => (
-            <Membership key={membership.id} membership={membership} LoggedInUser={LoggedInUser} />
+          {collectiveIds.map(id => (
+            <Membership key={id} memberships={groupedMemberships[id]} LoggedInUser={LoggedInUser} />
           ))}
         </div>
         {memberships.length % 10 === 0 && memberships.length >= limit && (

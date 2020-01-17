@@ -324,6 +324,7 @@ class CreateVirtualCardsForm extends Component {
         minWidth="16em"
         disabled={!submitting && !enable}
         loading={submitting}
+        data-cy="submit-new-virtualcards"
       >
         <FormattedMessage id="virtualCards.generate" defaultMessage="Create {count} gift cards" values={{ count }} />
       </StyledButton>

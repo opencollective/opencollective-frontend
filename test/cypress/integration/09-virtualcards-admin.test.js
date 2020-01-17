@@ -24,7 +24,7 @@ describe('Virtual cards admin', () => {
     cy.get('#virtualcard-amount').type('42');
     cy.get('.deliver-type-selector label[data-name="manual"] .radio-btn').click();
     cy.get('#virtualcard-numberOfVirtualCards').type(`{selectall}${numberOfVirtualCards}`);
-    cy.get('.FormInputs button[type="submit"]').click();
+    cy.getByDataCy('submit-new-virtualcards').click();
 
     // Success page
     cy.contains(`Your ${numberOfVirtualCards} gift cards have been created.`);
@@ -71,13 +71,13 @@ describe('Virtual cards admin', () => {
     );
     cy.get('#virtualcard-amount').type('12');
     checkSubmit(true, 'Create 3 gift cards');
-    cy.get('.FormInputs button[type="submit"]').click();
+    cy.getByDataCy('submit-new-virtualcards').click();
     cy.contains('Your 3 gift cards have been sent!');
   });
 });
 
 function checkSubmit(enabled, message) {
-  cy.get('.FormInputs button[type="submit"]')
+  cy.getByDataCy('submit-new-virtualcards')
     .should(`be.${enabled ? 'enabled' : 'disabled'}`)
     .contains(message);
 }

@@ -28,15 +28,21 @@ class SignInOrJoinFree extends React.Component {
     createUser: PropTypes.func,
     /** Use this prop to use this as a controlled component */
     form: PropTypes.oneOf(['signin', 'create-account']),
+    /** Set the initial view for the component */
+    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
       join: PropTypes.string,
     }),
+    /** A label to use instead of the default `Create personal profile` */
+    createPersonalProfileLabel: PropTypes.node,
+    /** A label to use instead of the default `Create Organization profile` */
+    createOrganizationProfileLabel: PropTypes.node,
   };
 
   state = {
-    form: 'signin',
+    form: this.props.defaultForm || 'signin',
     error: null,
     submitting: false,
     unknownEmailError: false,
@@ -90,7 +96,7 @@ class SignInOrJoinFree extends React.Component {
     if (this.state.submitting) {
       return false;
     }
-    const user = pick(data, ['email', 'firstName', 'lastName', 'newsletterOptIn']);
+    const user = pick(data, ['email', 'name', 'newsletterOptIn']);
     const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
     const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
     if (organization) {
@@ -143,6 +149,8 @@ class SignInOrJoinFree extends React.Component {
                 onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                 submitting={submitting}
                 mx={[2, 4]}
+                createPersonalProfileLabel={this.props.createPersonalProfileLabel}
+                createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
               />
               <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
             </Flex>

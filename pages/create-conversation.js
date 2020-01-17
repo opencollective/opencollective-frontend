@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
+import { withRouter } from 'next/router';
 
 import { Router } from '../server/pages';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { CollectiveType } from '../lib/constants/collectives';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
 import ErrorPage, { generateError } from '../components/ErrorPage';
@@ -40,11 +40,13 @@ class CreateConversationPage extends React.Component {
     LoggedInUser: PropTypes.object,
     /** @ignore from withUser */
     loadingLoggedInUser: PropTypes.bool,
+    /** @ignore from withRouter */
+    router: PropTypes.object,
     /** @ignore from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      collective: PropTypes.shape({
+      account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
@@ -75,22 +77,20 @@ class CreateConversationPage extends React.Component {
   }
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
 
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.collective) {
+      } else if (!data.account) {
         ssrNotFoundError(); // Force 404 when rendered server side
         return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
-      } else if (data.collective.type !== CollectiveType.COLLECTIVE) {
-        return <ErrorPage error={generateError.badCollectiveType()} log={false} />;
-      } else if (!hasFeature(data.collective, FEATURES.CONVERSATIONS)) {
+      } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
     }
 
-    const collective = data && data.collective;
+    const collective = data && data.account;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         {data.loading ? (
@@ -104,7 +104,7 @@ class CreateConversationPage extends React.Component {
               <Container position="relative">
                 {!loadingLoggedInUser && !LoggedInUser && (
                   <ContainerOverlay>
-                    <SignInOrJoinFree />
+                    <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
@@ -132,7 +132,7 @@ class CreateConversationPage extends React.Component {
 const getCollective = graphql(
   gqlV2`
     query CreateConversations($collectiveSlug: String!) {
-      collective(slug: $collectiveSlug, throwIfMissing: false) {
+      account(slug: $collectiveSlug, throwIfMissing: false) {
         id
         slug
         name
@@ -145,6 +145,10 @@ const getCollective = graphql(
           id
           tag
         }
+
+        ... on Collective {
+          isApproved
+        }
       }
     }
   `,
@@ -155,4 +159,4 @@ const getCollective = graphql(
   },
 );
 
-export default withUser(getCollective(CreateConversationPage));
+export default withUser(getCollective(withRouter(CreateConversationPage)));

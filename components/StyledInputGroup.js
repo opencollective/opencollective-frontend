@@ -112,8 +112,7 @@ const StyledInputGroup = ({
             fontSize="Paragraph"
             borderRadius="4px 0 0 4px"
             py={2}
-            pl={2}
-            pr={2}
+            px={2}
             color={getColor({ error, focused, success, blurred })}
             {...prependProps}
             bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
@@ -130,6 +129,7 @@ const StyledInputGroup = ({
           flex="1 1 auto"
           disabled={disabled}
           py="0"
+          px={2}
           error={error}
           {...inputProps}
           onFocus={e => {

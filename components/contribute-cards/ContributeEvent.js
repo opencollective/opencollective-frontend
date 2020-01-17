@@ -13,6 +13,7 @@ import { Span } from '../Text';
 import Link from '../Link';
 import Contribute from './Contribute';
 import Container from '../Container';
+import StyledLink from '../StyledLink';
 
 const ContributeEvent = ({ collective, event, ...props }) => {
   const { startsAt, endsAt } = event;
@@ -20,15 +21,20 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isTruncated = description && description.length < event.description.length;
   const isPassed = !canOrderTicketsFromEvent(event);
   const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
+  const eventRouteParams = { parentCollectiveSlug: collective.slug, eventSlug: event.slug };
   return (
     <Contribute
       route="event"
-      routeParams={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}
+      routeParams={eventRouteParams}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
-      title={event.name}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
+      title={
+        <StyledLink as={Link} color="black.800" route="event" params={eventRouteParams}>
+          {event.name}
+        </StyledLink>
+      }
       {...props}
     >
       {(startsAt || endsAt) && (

@@ -38,14 +38,18 @@ class SectionContribute extends React.PureComponent {
         contributors: PropTypes.arrayOf(PropTypes.object),
       }),
     ),
-    childCollectives: PropTypes.arrayOf(
+    subCollectives: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+        }),
       }),
     ),
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      isActive: PropTypes.bool,
       currency: PropTypes.string,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string.isRequired,
@@ -128,17 +132,23 @@ class SectionContribute extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, events, childCollectives, contributors, contributorsStats, isAdmin } = this.props;
+    const { collective, tiers, events, subCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const sortedTiers = this.sortTiers(this.removeTickets(tiers));
     const isEvent = collective.type === CollectiveType.EVENT;
+    const hasContribute = collective.isActive || isAdmin;
+    const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || subCollectives.length > 0);
 
     const createContributionTierRoute = isEvent
       ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
       : `/${collective.slug}/edit/tiers`;
+
+    if (!hasContribute && !hasOtherWaysToContribute) {
+      return null;
+    }
 
     return (
       <Box pt={[4, 5]}>
@@ -148,55 +158,63 @@ class SectionContribute extends React.PureComponent {
           </SectionTitle>
         </ContainerSectionContent>
 
-        <Box mb={4} data-cy="financial-contributions">
-          <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
-            {(ref, Chevrons) => (
-              <div>
-                <ContainerSectionContent>
-                  <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                    <H3 fontSize="H5" fontWeight="600" color="black.700">
-                      <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
-                    </H3>
-                    <Box m={2} flex="0 0 50px">
-                      <Chevrons />
-                    </Box>
-                  </Flex>
-                </ContainerSectionContent>
+        {hasContribute && (
+          <Box mb={4} data-cy="financial-contributions">
+            <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
+              {(ref, Chevrons) => (
+                <div>
+                  <ContainerSectionContent>
+                    <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                      <H3 fontSize="H5" fontWeight="600" color="black.700">
+                        <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
+                      </H3>
+                      <Box m={2} flex="0 0 50px">
+                        <Chevrons />
+                      </Box>
+                    </Flex>
+                  </ContainerSectionContent>
 
-                <ContributeCardsContainer ref={ref}>
-                  <Box px={CONTRIBUTE_CARD_PADDING_X}>
-                    <ContributeCustom
-                      collective={collective}
-                      contributors={financialContributorsWithoutTier}
-                      stats={contributorsStats}
-                      hideContributors={hasNoContributor}
-                    />
-                  </Box>
-                  {sortedTiers.map(tier => (
-                    <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeTier collective={collective} tier={tier} hideContributors={hasNoContributor} />
-                    </Box>
-                  ))}
-                  {isAdmin && (
+                  <ContributeCardsContainer ref={ref}>
                     <Box px={CONTRIBUTE_CARD_PADDING_X}>
-                      <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
-                        <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
-                      </CreateNew>
+                      <ContributeCustom
+                        collective={collective}
+                        contributors={financialContributorsWithoutTier}
+                        stats={contributorsStats}
+                        hideContributors={hasNoContributor}
+                        disableCTA={!collective.isActive}
+                      />
                     </Box>
-                  )}
-                </ContributeCardsContainer>
-              </div>
-            )}
-          </HorizontalScroller>
-        </Box>
-        {!isEvent && (isAdmin || events.length > 0 || childCollectives.length > 0) && (
+                    {sortedTiers.map(tier => (
+                      <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                        <ContributeTier
+                          collective={collective}
+                          tier={tier}
+                          hideContributors={hasNoContributor}
+                          disableCTA={!collective.isActive}
+                        />
+                      </Box>
+                    ))}
+                    {isAdmin && (
+                      <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                        <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
+                          <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+                        </CreateNew>
+                      </Box>
+                    )}
+                  </ContributeCardsContainer>
+                </div>
+              )}
+            </HorizontalScroller>
+          </Box>
+        )}
+        {hasOtherWaysToContribute && (
           <HorizontalScroller getScrollDistance={this.getContributeCardsScrollDistance}>
             {(ref, Chevrons) => (
               <div>
                 <ContainerSectionContent>
                   <Flex justifyContent="space-between" alignItems="center" mb={3}>
                     <H3 fontSize="H5" fontWeight="600" color="black.700">
-                      {childCollectives.length > 0 ? (
+                      {subCollectives.length > 0 ? (
                         <FormattedMessage id="SectionContribute.MoreWays" defaultMessage="More ways to contribute" />
                       ) : (
                         <FormattedMessage id="section.events.title" defaultMessage="Events" />
@@ -209,9 +227,9 @@ class SectionContribute extends React.PureComponent {
                 </ContainerSectionContent>
 
                 <ContributeCardsContainer ref={ref}>
-                  {childCollectives.map(childCollective => (
-                    <Box key={childCollective.id} px={CONTRIBUTE_CARD_PADDING_X}>
-                      <ContributeCollective collective={childCollective} />
+                  {subCollectives.map(({ id, collective }) => (
+                    <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeCollective collective={collective} />
                     </Box>
                   ))}
                   {events.map(event => (
@@ -220,6 +238,7 @@ class SectionContribute extends React.PureComponent {
                         collective={collective}
                         event={event}
                         hideContributors={hasNoContributorForEvents}
+                        disableCTA={!collective.isActive || !event.isActive}
                       />
                     </Box>
                   ))}

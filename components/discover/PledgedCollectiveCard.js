@@ -5,11 +5,11 @@ import styled from 'styled-components';
 import { Box } from '@rebass/grid';
 import themeGet from '@styled-system/theme-get';
 
-import Currency from './Currency';
-import Link from './Link';
-import Logo from './Logo';
-import StyledButton from './StyledButton';
-import StyledCard from './StyledCard';
+import Currency from '../Currency';
+import Link from '../Link';
+import Logo from '../Logo';
+import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo-card.svg';
 
@@ -152,7 +152,7 @@ class PledgedCollectiveCard extends React.Component {
     }
 
     return (
-      <StyledCard minWidth={215} maxWidth={215} height={380} borderRadius={8} bg="#ffffff">
+      <StyledCard width={250} height={380} borderRadius={8} bg="#ffffff">
         <CardHeader>
           <LogoBorder></LogoBorder>
           <LogoContainer>

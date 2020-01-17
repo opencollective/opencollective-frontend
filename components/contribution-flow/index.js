@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { debounce, get, pick, isNil } from 'lodash';
+import { debounce, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -83,6 +83,14 @@ const messages = defineMessages({
     defaultMessage:
       'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
   },
+  createUserLabel: {
+    id: 'ContributionFlow.CreateUserLabel',
+    defaultMessage: 'Contribute as an individual',
+  },
+  createOrgLabel: {
+    id: 'ContributionFlow.CreateOrganizationLabel',
+    defaultMessage: 'Contribute as an organization',
+  },
 });
 
 /**
@@ -151,6 +159,7 @@ class CreateOrderPage extends React.Component {
     createCollective: PropTypes.func.isRequired, // from mutation
     loadStripe: PropTypes.func.isRequired, // from withStripe
     intl: PropTypes.object.isRequired, // from injectIntl
+    contributeAs: PropTypes.string,
   };
 
   static defaultProps = {
@@ -198,6 +207,13 @@ class CreateOrderPage extends React.Component {
     // Set user as default profile when loggin in
     if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
       this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
+    }
+
+    // Skip contributeAs step if contributeAs param matches the current stepProfile
+    if (this.props.contributeAs && this.props.contributeAs === get(this.state, 'stepProfile.slug')) {
+      const steps = this.getSteps();
+      const nextStepIndex = findIndex(steps, { name: 'contributeAs' }) + 1;
+      this.pushStepRoute(steps[nextStepIndex].name);
     }
 
     // Collective was loaded
@@ -421,7 +437,16 @@ class CreateOrderPage extends React.Component {
         this.handleSuccess(orderCreated);
       }
     } catch (e) {
-      this.setState({ submitting: false, error: e.message });
+      this.setState(state => {
+        const stepPayment = {
+          ...state.stepPayment,
+          paymentMethod: {
+            ...state.stepPayment.paymentMethod,
+            token: null,
+          },
+        };
+        return { submitting: false, error: e.message, stepPayment };
+      });
     }
   };
 
@@ -483,28 +508,35 @@ class CreateOrderPage extends React.Component {
   }
 
   getLoggedInUserDefaultContibuteProfile() {
+    if (this.props.contributeAs) {
+      const otherProfiles = this.getOtherProfiles();
+      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
+      if (contributorProfile) return contributorProfile;
+    }
     if (get(this.state, 'stepProfile')) {
       return this.state.stepProfile;
     }
-
-    const { LoggedInUser } = this.props;
-    return !LoggedInUser ? null : { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+    if (this.props.LoggedInUser) {
+      return this.getPersonalProfile();
+    }
   }
 
-  /** Returns an array like [personnalProfile, otherProfiles] */
-  getProfiles() {
-    const { LoggedInUser, collective } = this.props;
+  /** Returns logged-in user profile */
+  getPersonalProfile() {
+    const { LoggedInUser } = this.props;
+    if (!LoggedInUser) return {};
 
-    if (!LoggedInUser) {
-      return [{}, {}];
-    } else {
-      return [
-        { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective },
-        LoggedInUser.memberOf
-          .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
-          .map(({ collective }) => collective),
-      ];
-    }
+    return { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
+  }
+
+  /** Return an array of any other associated profile the user might control */
+  getOtherProfiles() {
+    const { LoggedInUser, collective } = this.props;
+    if (!LoggedInUser) return [];
+
+    return LoggedInUser.memberOf
+      .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
+      .map(({ collective }) => collective);
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */
@@ -718,7 +750,8 @@ class CreateOrderPage extends React.Component {
   renderStep(step) {
     const { collective, tier, host } = this.props;
     const { stepProfile, stepDetails, stepPayment, customData } = this.state;
-    const [personal, profiles] = this.getProfiles();
+    const personalProfile = this.getPersonalProfile();
+    const otherProfiles = this.getOtherProfiles();
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
@@ -741,8 +774,8 @@ class CreateOrderPage extends React.Component {
                   <StepProfile
                     {...fieldProps}
                     onProfileChange={this.updateProfile}
-                    profiles={profiles}
-                    personal={personal}
+                    otherProfiles={otherProfiles}
+                    personalProfile={personalProfile}
                     defaultSelectedProfile={this.getLoggedInUserDefaultContibuteProfile()}
                     canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
                   />
@@ -918,10 +951,16 @@ class CreateOrderPage extends React.Component {
   }
 
   renderContent(step, goNext, goBack, isValidating) {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, intl } = this.props;
 
     if (!LoggedInUser) {
-      return <SignInOrJoinFree />;
+      return (
+        <SignInOrJoinFree
+          defaultForm="create-account"
+          createPersonalProfileLabel={intl.formatMessage(messages.createUserLabel)}
+          createOrganizationProfileLabel={intl.formatMessage(messages.createOrgLabel)}
+        />
+      );
     }
 
     const isPaypal = get(this.state, 'stepPayment.paymentMethod.service') === 'paypal';
@@ -969,7 +1008,6 @@ class CreateOrderPage extends React.Component {
 
   render() {
     const { loadingLoggedInUser, LoggedInUser } = this.props;
-
     return (
       <Steps
         steps={this.getSteps()}

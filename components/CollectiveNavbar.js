@@ -218,7 +218,13 @@ const i18nSection = defineMessages({
 
 // Define default sections based on collective type
 const DEFAULT_SECTIONS = {
-  [CollectiveType.ORGANIZATION]: [Sections.CONTRIBUTIONS, Sections.CONTRIBUTORS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.ORGANIZATION]: [
+    Sections.CONTRIBUTIONS,
+    Sections.CONTRIBUTORS,
+    Sections.CONVERSATIONS,
+    Sections.TRANSACTIONS,
+    Sections.ABOUT,
+  ],
   [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
   [CollectiveType.COLLECTIVE]: [
     Sections.GOALS,
@@ -255,7 +261,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   const toRemove = new Set();
 
   // Can't contribute anymore if the collective is archived or has no host
-  if (collective.isArchived || !collective.host) {
+  if (!collective.isApproved && !isAdmin) {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
@@ -284,7 +290,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
 
   if (collective.type === CollectiveType.EVENT) {
     // Should not see tickets section if you can't order them
-    if (!canOrderTicketsFromEvent(collective)) {
+    if ((!collective.isApproved && !isAdmin) || !canOrderTicketsFromEvent(collective)) {
       toRemove.add(Sections.TICKETS);
     }
 
@@ -309,7 +315,6 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   return {
     hasContact: collective.canContact,
-    hasSubmitExpense: isCollective || isEvent,
     hasApply: collective.canApply,
     hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
   };

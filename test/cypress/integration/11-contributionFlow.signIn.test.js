@@ -9,6 +9,7 @@ describe('Contribution Flow: Sign In', () => {
 
   it("Doesn't allow to submit if email is invalid", () => {
     cy.visit('/apex/donate');
+    cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
     cy.get('[data-cy="cf-content"] input[name=email]').type('zzzzzzzzzzzzz');
     cy.get('[data-cy="cf-content"] button[type=submit]').should('be.disabled');
     cy.get('[data-cy="cf-content"] input[name=email]').blur();
@@ -17,6 +18,7 @@ describe('Contribution Flow: Sign In', () => {
 
   it("Shows a warning when email doesn't exist", () => {
     cy.visit('/apex/donate');
+    cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
     cy.get('[data-cy="cf-content"] input[name=email]').type(randomEmail());
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains('There is no user with this email address. Join for free!');
@@ -24,6 +26,7 @@ describe('Contribution Flow: Sign In', () => {
 
   it('Works if given a valid email', () => {
     cy.visit('/apex/donate');
+    cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
     cy.get('[data-cy="cf-content"] input[name=email]').type(validUserEmail);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
 

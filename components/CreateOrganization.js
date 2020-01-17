@@ -17,6 +17,7 @@ class CreateOrganization extends React.Component {
     host: PropTypes.object,
     createCollective: PropTypes.func,
     LoggedInUser: PropTypes.object,
+    refetchLoggedInUser: PropTypes.func.isRequired, // props coming from withUser
   };
 
   constructor(props) {
@@ -63,6 +64,7 @@ class CreateOrganization extends React.Component {
           success: `Organization created successfully: ${collectiveUrl}`,
         },
       });
+      await this.props.refetchLoggedInUser();
       Router.pushRoute('collective', {
         CollectiveId: collective.id,
         slug: collective.slug,

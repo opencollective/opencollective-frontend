@@ -33,7 +33,7 @@ export const getCollectivePageQuery = gql`
       isIncognito
       hostFeePercent
       image
-      imageUrl
+      imageUrl(height: 256)
       canApply
       canContact
       stats {
@@ -107,12 +107,13 @@ export const getCollectivePageQuery = gql`
           type
         }
       }
-      events(includePastEvents: true) {
+      events(includePastEvents: true, includeInactive: true) {
         id
         slug
         name
         description
         image
+        isActive
         startsAt
         endsAt
         backgroundImageUrl(height: 208)
@@ -133,28 +134,31 @@ export const getCollectivePageQuery = gql`
           }
         }
       }
-      childCollectives {
+      subCollectives: members(role: "SUB_COLLECTIVE") {
         id
-        slug
-        name
-        type
-        description
-        backgroundImageUrl(height: 208)
-        stats {
+        collective: member {
           id
-          backers {
-            id
-            all
-            users
-            organizations
-          }
-        }
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
+          slug
           name
           type
+          description
+          backgroundImageUrl(height: 208)
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            image
+            collectiveSlug
+            name
+            type
+          }
         }
       }
       transactions(limit: 3, includeExpenseTransactions: false) {

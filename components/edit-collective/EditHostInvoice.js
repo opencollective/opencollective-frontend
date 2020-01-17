@@ -1,5 +1,4 @@
 import { Flex, Box } from '@rebass/grid';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -14,15 +13,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import { H3, P } from '../Text';
-
-const updateSettingsMutation = gql`
-  mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
-    editCollective(collective: { id: $id, settings: $settings }) {
-      id
-      settings
-    }
-  }
-`;
+import { updateSettingsMutation } from './mutations';
 
 const EditHostInvoice = ({ collective }) => {
   const defaultValue = get(collective.settings, 'invoiceTitle');

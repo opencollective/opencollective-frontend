@@ -223,14 +223,14 @@ class EditTiers extends React.Component {
         type: 'select',
         options: getOptions(['onetime', 'month', 'year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: tier => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].indexOf(tier.type) !== -1,
+        when: tier => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].includes(tier.type),
       },
       {
         name: 'maxQuantity',
         type: 'number',
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
-        when: tier => ['TICKET', 'PRODUCT', 'TIER'].indexOf(tier.type) !== -1,
+        when: tier => ['TICKET', 'PRODUCT', 'TIER'].includes(tier.type),
       },
       {
         name: 'button',

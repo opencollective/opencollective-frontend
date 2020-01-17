@@ -7,6 +7,7 @@ import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled_system_custom';
 import StyledTooltip from './StyledTooltip';
+import Link from './Link';
 
 /**
  * All the terms defined here must have a matching translation
@@ -56,7 +57,8 @@ const TranslatedDefinitions = defineMessages({
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',
-    defaultMessage: 'Gift cards empower your employees or community members to support the projects they love.',
+    defaultMessage:
+      'Gift cards empower your employees or community members to support the projects they love. Learn more about them <learn-more-link>here</learn-more-link>.',
   },
   [Terms.ESTIMATED_BUDGET]: {
     id: 'CollectivePage.SectionBudget.Annual.Definition',
@@ -68,6 +70,18 @@ const TranslatedDefinitions = defineMessages({
       "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
   },
 });
+
+const GiftCardLearnMoreLink = msg => (
+  <Link route="marketing" params={{ pageSlug: 'gift-cards' }}>
+    {msg}
+  </Link>
+);
+
+const TranslationParams = {
+  [Terms.GIFT_CARD]: {
+    'learn-more-link': GiftCardLearnMoreLink,
+  },
+};
 
 const UnderlinedTerm = styled.span`
   border-bottom: 2px dotted;
@@ -91,7 +105,7 @@ const UnderlinedTerm = styled.span`
  */
 const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color }) => {
   return (
-    <StyledTooltip content={() => intl.formatMessage(TranslatedDefinitions[term])}>
+    <StyledTooltip content={() => intl.formatMessage(TranslatedDefinitions[term], TranslationParams[term])}>
       {props => (
         <UnderlinedTerm {...props} textTransform={textTransform} color={color} borderColor={color} fontSize={fontSize}>
           {children || intl.formatMessage(TranslatedTerms[term])}

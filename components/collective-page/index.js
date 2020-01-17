@@ -46,7 +46,7 @@ class CollectivePage extends Component {
     expenses: PropTypes.arrayOf(PropTypes.object),
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
-    childCollectives: PropTypes.arrayOf(PropTypes.object),
+    subCollectives: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
@@ -162,7 +162,7 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
-            childCollectives={this.props.childCollectives}
+            subCollectives={this.props.subCollectives}
             contributors={this.props.financialContributors}
             contributorsStats={this.props.stats.backers}
             isAdmin={this.props.isAdmin}
