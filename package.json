@@ -160,6 +160,7 @@
     "db:migrate:undo": "./scripts/sequelize.sh db:migrate:undo",
     "db:migration:create": "./scripts/sequelize.sh migration:create",
     "db:restore": "./scripts/db_restore.sh",
+    "db:restore:e2e": "npm run db:restore -- -d opencollective_e2e",
     "db:sanitize": "babel-node --extensions .js,.ts scripts/sanitize-db",
     "db:seed": "./scripts/sequelize.sh db:seed",
     "db:setup": "babel-node --extensions .js,.ts ./scripts/db_setup.js",
