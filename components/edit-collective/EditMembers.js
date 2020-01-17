@@ -161,7 +161,7 @@ class EditMembers extends React.Component {
         members.splice(index, 1);
         return { isTouched: true, members };
       }
-      return {};
+      return null;
     });
   };
 

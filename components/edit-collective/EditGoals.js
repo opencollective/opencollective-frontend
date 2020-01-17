@@ -123,7 +123,7 @@ class EditGoals extends React.Component {
         updatedGoals.splice(index, 1);
         return { isTouched: true, goals: updatedGoals };
       }
-      return {};
+      return null;
     });
   };
 
