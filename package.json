@@ -98,7 +98,7 @@
     "sequelize-temporal": "1.0.8",
     "showdown": "1.9.1",
     "stripe": "8.3.0",
-    "tweetnacl": "1.0.1",
+    "tweetnacl": "1.0.2",
     "tweetnacl-util": "0.15.0",
     "twitter": "1.7.1",
     "uuid": "3.4.0",
