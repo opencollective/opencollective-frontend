@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
+import { withRouter } from 'next/router';
 
 import { Router } from '../server/pages';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -39,6 +40,8 @@ class CreateConversationPage extends React.Component {
     LoggedInUser: PropTypes.object,
     /** @ignore from withUser */
     loadingLoggedInUser: PropTypes.bool,
+    /** @ignore from withRouter */
+    router: PropTypes.object,
     /** @ignore from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -74,7 +77,7 @@ class CreateConversationPage extends React.Component {
   }
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -101,7 +104,7 @@ class CreateConversationPage extends React.Component {
               <Container position="relative">
                 {!loadingLoggedInUser && !LoggedInUser && (
                   <ContainerOverlay>
-                    <SignInOrJoinFree />
+                    <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
@@ -156,4 +159,4 @@ const getCollective = graphql(
   },
 );
 
-export default withUser(getCollective(CreateConversationPage));
+export default withUser(getCollective(withRouter(CreateConversationPage)));
