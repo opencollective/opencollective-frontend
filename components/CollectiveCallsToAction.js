@@ -70,10 +70,16 @@ const CollectiveCallsToAction = ({
           ) : (
             <StyledTooltip
               type="light"
+              place="left"
               content={
                 <FormattedMessage
                   id="host.hostLimit.warning"
-                  defaultMessage="Host already reached the limit of hosted collectives for its plan."
+                  defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
+                  values={{
+                    collectiveName: collective.name,
+                    // eslint-disable-next-line react/display-name
+                    a: (...chunks) => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
+                  }}
                 />
               }
             >
@@ -96,6 +102,7 @@ const CollectiveCallsToAction = ({
 
 CollectiveCallsToAction.propTypes = {
   collective: PropTypes.shape({
+    name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     plan: PropTypes.object,
   }),

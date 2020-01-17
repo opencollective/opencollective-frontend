@@ -11,6 +11,7 @@ import Container from '../Container';
 import ConnectPaypal from '../ConnectPaypal';
 import AddFundsForm from '../AddFundsForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import Link from '../Link';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { Span, H2 } from '../Text';
 import StyledButton from '../StyledButton';
@@ -35,6 +36,7 @@ class HostDashboardActionsBanner extends React.Component {
     host: PropTypes.shape({
       id: PropTypes.number,
       paymentMethods: PropTypes.array,
+      slug: PropTypes.string.isRequired,
       stats: PropTypes.shape({
         collectives: PropTypes.shape({ hosted: PropTypes.number }).isRequired,
       }).isRequired,
@@ -192,7 +194,10 @@ class HostDashboardActionsBanner extends React.Component {
                   <Disclaimer>
                     <FormattedMessage
                       id="addFunds.error.planLimitReached"
-                      defaultMessage="You reached your plan's limit, upgrade your plan to add more funds"
+                      defaultMessage="You reached your plan's limit, <a>upgrade your plan</a> to add more funds"
+                      values={{
+                        a: (...chunks) => <Link route={`/${host.slug}/edit/hostSettings`}>{chunks}</Link>,
+                      }}
                     />
                     .
                   </Disclaimer>
