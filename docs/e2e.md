@@ -22,7 +22,8 @@ We recommend to run a build and not the development environment.
 
 We also recommend to restore the development dump of the database before you start the tests.
 
-- `npm run db:restore && npm run db:migrate`
+- `npm run db:restore:e2e`
+- `NODE_ENV=e2e npm run db:migrate`
 
 Then start the API:
 
