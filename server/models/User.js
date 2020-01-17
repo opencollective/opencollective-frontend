@@ -3,7 +3,7 @@ import config from 'config';
 import Promise from 'bluebird';
 import slugify from 'limax';
 import debugLib from 'debug';
-import { defaults, intersection } from 'lodash';
+import { defaults, intersection, pick } from 'lodash';
 import { Op } from 'sequelize';
 import { isEmailBurner } from 'burner-email-providers';
 
@@ -474,7 +474,8 @@ export default (Sequelize, DataTypes) => {
 
     const sequelizeParams = transaction ? { transaction } : undefined;
     debug('createUserWithCollective', userData);
-    const user = await User.create(userData, sequelizeParams);
+    const cleanUserData = pick(userData, ['email', 'firstName', 'lastName', 'newsletterOptIn', 'paypalEmail']);
+    const user = await User.create(cleanUserData, sequelizeParams);
     let name = userData.firstName;
     if (name && userData.lastName) {
       name += ` ${userData.lastName}`;
