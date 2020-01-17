@@ -156,12 +156,13 @@ class EditMembers extends React.Component {
   removeMember = index => {
     return this.setState(state => {
       const memberEntry = state.members[index];
-      if (!memberEntry.member || this.confirmRemoveMember(memberEntry)) {
+      if (memberEntry.member && !this.confirmRemoveMember(memberEntry)) {
+        return null;
+      } else {
         const members = [...state.members];
         members.splice(index, 1);
         return { isTouched: true, members };
       }
-      return null;
     });
   };
 
