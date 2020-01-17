@@ -187,6 +187,17 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
           )}
         </ModalHeader>
         <ModalBody>
+          <P mb="1rem">
+            <FormattedMessage
+              id="collective.hostAccount.modal.description"
+              defaultMessage={
+                'A fiscal host is a legal company or individual who holds a Collective’s funds in their bank account, and can generate invoices and receipts for Financial Contributors.{br}You can think of a fiscal host as an umbrella organization for the Collectives in it.'
+              }
+              values={{
+                br: <br />,
+              }}
+            />
+          </P>
           <P>
             {modal.type === 'Activate' && (
               <FormattedMessage
