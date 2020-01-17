@@ -3,7 +3,7 @@ import moment from 'moment-timezone';
 import { resizeImage, capitalize, formatCurrencyObject, pluralize } from './utils';
 
 // from https://stackoverflow.com/questions/8853396/logical-operator-in-a-handlebars-js-if-conditional
-handlebars.registerHelper('ifCond', (v1, operator, v2, options) => {
+handlebars.registerHelper('ifCond', function(v1, operator, v2, options) {
   switch (operator) {
     case '==':
       return v1 == v2 ? options.fn(this) : options.inverse(this);

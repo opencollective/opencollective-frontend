@@ -73,25 +73,6 @@ export default (Sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
 
-      paypalEmail: {
-        type: DataTypes.STRING,
-        unique: true, // need that? http://stackoverflow.com/questions/16356856/sequelize-js-custom-validator-check-for-unique-username-password,
-        set(val) {
-          if (val && val.toLowerCase) {
-            this.setDataValue('paypalEmail', val.toLowerCase());
-          }
-        },
-        validate: {
-          len: {
-            args: [6, 128],
-            msg: 'Email must be between 6 and 128 characters in length',
-          },
-          isEmail: {
-            msg: 'Email must be valid',
-          },
-        },
-      },
-
       _salt: {
         type: DataTypes.STRING,
         defaultValue: bcrypt.genSaltSync(SALT_WORK_FACTOR),
@@ -212,7 +193,6 @@ export default (Sequelize, DataTypes) => {
             emailWaitingForValidation: this.emailWaitingForValidation,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
-            paypalEmail: this.paypalEmail,
           };
         },
 
@@ -234,7 +214,6 @@ export default (Sequelize, DataTypes) => {
             firstName: this.firstName,
             lastName: this.lastName,
             email: this.email,
-            paypalEmail: this.paypalEmail,
           };
         },
 
@@ -451,20 +430,13 @@ export default (Sequelize, DataTypes) => {
       return Promise.reject(new Error('Please provide a valid email address'));
     }
     debug('findOrCreateByEmail', email, 'other attributes: ', otherAttributes);
-    return User.findByEmailOrPaypalEmail(email).then(
+    return User.findByEmail(email).then(
       user => user || models.User.createUserWithCollective(Object.assign({}, { email }, otherAttributes)),
     );
   };
 
-  User.findByEmailOrPaypalEmail = email => {
-    return User.findOne({
-      where: {
-        [Op.or]: {
-          email,
-          paypalEmail: email,
-        },
-      },
-    });
+  User.findByEmail = email => {
+    return User.findOne({ where: { email } });
   };
 
   User.createUserWithCollective = async (userData, transaction) => {
@@ -474,7 +446,7 @@ export default (Sequelize, DataTypes) => {
 
     const sequelizeParams = transaction ? { transaction } : undefined;
     debug('createUserWithCollective', userData);
-    const cleanUserData = pick(userData, ['email', 'firstName', 'lastName', 'newsletterOptIn', 'paypalEmail']);
+    const cleanUserData = pick(userData, ['email', 'firstName', 'lastName', 'newsletterOptIn']);
     const user = await User.create(cleanUserData, sequelizeParams);
     let name = userData.firstName;
     if (name && userData.lastName) {

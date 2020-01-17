@@ -7,7 +7,11 @@ Subject: Expense paid on {{collective.name}}: {{{currency transaction.netAmountI
   <h2>{{{currency transaction.netAmountInCollectiveCurrency currency=transaction.currency precision=2}}}</h2>
   <div>{{transaction.description}}</div>
   <div>To: {{fromCollective.name}}</div>
-  <div>Paypal email: {{user.paypalEmail}}</div>
+  {{#if payoutMethod}}
+    {{#ifCond payoutMethod.type '===' 'PAYPAL'}}
+      <div>Paypal Email: {{payoutMethod.data.email}}</div>
+    {{/ifCond}}
+  {{/if}}
 
   <br /><br />
   <a href="{{config.host.website}}/{{collective.slug}}/expenses" class="btn"><div>View Latest Expenses</div></a>

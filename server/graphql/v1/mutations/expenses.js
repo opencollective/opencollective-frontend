@@ -13,6 +13,7 @@ import debugLib from 'debug';
 import { canUseFeature } from '../../../lib/user-permissions';
 import FEATURE from '../../../constants/feature';
 import { FeatureNotAllowedForUser, ValidationFailed } from '../../errors';
+import { PayoutMethodType } from '../../../models/PayoutMethod';
 
 const debug = debugLib('expenses');
 
@@ -115,7 +116,53 @@ const checkExpenseAttachments = (expenseData, attachments) => {
   }
 };
 
-const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'payoutMethod', 'privateMessage'];
+const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'privateMessage'];
+
+const getPaypalPaymentMethodFromExpenseData = async (expenseData, remoteUser, fromCollective, dbTransaction) => {
+  if (expenseData.PayoutMethod) {
+    if (expenseData.PayoutMethod.id) {
+      const pm = await models.PayoutMethod.findByPk(expenseData.PayoutMethod.id);
+      if (!pm || !remoteUser.isAdmin(pm.CollectiveId)) {
+        throw new Error("This payout method does not exist or you don't have the permission to use it");
+      } else if (pm.CollectiveId !== fromCollective.id) {
+        throw new Error('This payout method cannot be used for this collective');
+      }
+    } else {
+      return models.PayoutMethod.getOrCreateFromData(
+        expenseData.PayoutMethod,
+        remoteUser,
+        fromCollective,
+        dbTransaction,
+      );
+    }
+  } else if (expenseData.payoutMethod === 'paypal') {
+    // @deprecated - Should use `PayoutMethod` argument
+    if (get(expenseData, 'user.paypalEmail')) {
+      return models.PayoutMethod.getOrCreateFromData(
+        { type: PayoutMethodType.PAYPAL, data: { email: get(expenseData, 'user.paypalEmail') } },
+        remoteUser,
+        fromCollective,
+        dbTransaction,
+      );
+    } else {
+      const paypalPms = await models.PayoutMethod.scope('paypal').findAll({
+        where: { CollectiveId: fromCollective.id },
+      });
+      if (paypalPms.length === 0) {
+        throw new ValidationFailed({ message: 'No PayPal payout method configured for this account' });
+      } else if (paypalPms.length > 1) {
+        // Make sure we're not linking to a wrong PayPal account
+        throw new ValidationFailed({
+          message: 'Multiple PayPal payout method found for this account. Please select the one you want to use.',
+        });
+      } else {
+        return paypalPms[0];
+      }
+    }
+  } else {
+    return null;
+  }
+};
 
 export async function createExpense(remoteUser, expenseData) {
   if (!remoteUser) {
@@ -142,13 +189,14 @@ export async function createExpense(remoteUser, expenseData) {
   if (!collective) {
     throw new errors.ValidationFailed('Collective not found');
   }
-  // Update remoteUser's paypal email if it has changed
-  if (get(expenseData, 'user.paypalEmail') !== remoteUser.paypalEmail) {
-    remoteUser.paypalEmail = get(expenseData, 'user.paypalEmail');
-    remoteUser.save();
-  }
+
+  // For now we only add expenses from user's collectives
+  const fromCollective = await remoteUser.getCollective();
 
   const expense = await sequelize.transaction(async t => {
+    // Get or create payout method
+    const payoutMethod = await getPaypalPaymentMethodFromExpenseData(expenseData, remoteUser, fromCollective, t);
+
     // Create expense
     const createdExpense = await models.Expense.create(
       {
@@ -156,10 +204,12 @@ export async function createExpense(remoteUser, expenseData) {
         currency: collective.currency,
         status: statuses.PENDING,
         CollectiveId: collective.id,
-        FromCollectiveId: remoteUser.CollectiveId,
+        FromCollectiveId: fromCollective.id,
         lastEditedById: remoteUser.id,
         UserId: remoteUser.id,
         incurredAt: expenseData.incurredAt || new Date(),
+        PayoutMethodId: payoutMethod && payoutMethod.id,
+        legacyPayoutMethod: models.Expense.getLegacyPayoutMethodTypeFromPayoutMethod(payoutMethod),
       },
       { transaction: t },
     );
@@ -189,13 +239,9 @@ export async function createExpense(remoteUser, expenseData) {
 }
 
 /** Returns true if the expense should by put back to PENDING after this update */
-export const changesRequireStatusUpdate = (expense, newExpenseData, hasAttachmentsChanges) => {
+export const changesRequireStatusUpdate = (expense, newExpenseData, hasAttachmentsChanges, hasPayoutChanges) => {
   const updatedValues = { ...expense.dataValues, ...newExpenseData };
-  return (
-    hasAttachmentsChanges ||
-    updatedValues.amount !== expense.amount ||
-    updatedValues.payoutMethod !== expense.payoutMethod
-  );
+  return hasAttachmentsChanges || updatedValues.amount !== expense.amount || hasPayoutChanges;
 };
 
 /** Returns infos about the changes made to attachments */
@@ -224,10 +270,16 @@ export async function editExpense(remoteUser, expenseData) {
     throw new errors.Unauthorized('You need to be logged in to edit an expense');
   } else if (!canUseFeature(remoteUser, FEATURE.EXPENSES)) {
     throw new FeatureNotAllowedForUser();
+  } else if (expenseData.payoutMethod && expenseData.PayoutMethod) {
+    throw new Error('payoutMethod and PayoutMethod are exclusive, please use only one');
   }
 
   const expense = await models.Expense.findByPk(expenseData.id, {
-    include: [{ model: models.Collective, as: 'collective' }],
+    include: [
+      { model: models.Collective, as: 'collective' },
+      { model: models.Collective, as: 'fromCollective' },
+      { model: models.PayoutMethod },
+    ],
   });
 
   if (!expense) {
@@ -237,10 +289,19 @@ export async function editExpense(remoteUser, expenseData) {
   }
 
   const cleanExpenseData = pick(expenseData, EXPENSE_EDITABLE_FIELDS);
-  const [hasAttachmentsChanges, attachmentsData, attachmentsDiff] = await getAttachmentsChanges(expense, expenseData);
-
+  const fromCollective = expense.fromCollective;
+  let payoutMethod = await expense.getPayoutMethod();
   const updatedExpense = await sequelize.transaction(async t => {
+    // Update payout method if we get new data from one of the param for it
+    if (
+      (expenseData.payoutMethod !== undefined && expenseData.payoutMethod !== expense.legacyPayoutMethod) ||
+      (expenseData.PayoutMethod !== undefined && expenseData.PayoutMethod.id !== expense.PayoutMethodId)
+    ) {
+      payoutMethod = await getPaypalPaymentMethodFromExpenseData(expenseData, remoteUser, fromCollective, t);
+    }
+
     // Update attachments
+    const [hasAttachmentsChanges, attachmentsData, attachmentsDiff] = await getAttachmentsChanges(expense, expenseData);
     if (hasAttachmentsChanges) {
       checkExpenseAttachments({ ...expense.dataValues, ...cleanExpenseData }, attachmentsData);
       const [newAttachmentsData, oldAttachments, attachmentsToUpdate] = attachmentsDiff;
@@ -262,13 +323,22 @@ export async function editExpense(remoteUser, expenseData) {
 
     // Update expense
     // When updating amount, attachment or payoutMethod, we reset its status to PENDING
-    const shouldUpdateStatus = changesRequireStatusUpdate(expense, expenseData, hasAttachmentsChanges);
+    const PayoutMethodId = payoutMethod ? payoutMethod.id : null;
+    const shouldUpdateStatus = changesRequireStatusUpdate(
+      expense,
+      expenseData,
+      hasAttachmentsChanges,
+      PayoutMethodId !== expense.PayoutMethodId,
+    );
+
     return expense.update(
       {
         ...cleanExpenseData,
         lastEditedById: remoteUser.id,
         incurredAt: expenseData.incurredAt || new Date(),
         status: shouldUpdateStatus ? 'PENDING' : expense.status,
+        PayoutMethodId: PayoutMethodId,
+        legacyPayoutMethod: models.Expense.getLegacyPayoutMethodTypeFromPayoutMethod(payoutMethod),
       },
       { transaction: t },
     );
@@ -327,13 +397,13 @@ async function createTransactions(host, expense, fees = {}) {
   );
 }
 
-async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, fees = {}) {
+async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, toPaypalEmail, fees = {}) {
   debug('payExpenseWithPayPal', expense.id);
   try {
-    const paymentResponse = await paymentProviders[expense.payoutMethod].types['adaptive'].pay(
+    const paymentResponse = await paymentProviders.paypal.types['adaptive'].pay(
       expense.collective,
       expense,
-      expense.paypalEmail,
+      toPaypalEmail,
       paymentMethod.token,
     );
     await createTransactionFromPaidExpense(
@@ -393,7 +463,7 @@ export async function payExpense(remoteUser, args) {
   }
   const host = await expense.collective.getHostCollective();
 
-  if (expense.payoutMethod === 'donation') {
+  if (expense.legacyPayoutMethod === 'donation') {
     throw new Error('"In kind" donations are not supported anymore');
   }
 
@@ -410,8 +480,10 @@ export async function payExpense(remoteUser, args) {
 
   const fxrate = await getFxRate(expense.collective.currency, host.currency);
   const feesInHostCurrency = {};
-  if (expense.payoutMethod === 'paypal' && !args.forceManual) {
-    fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders[expense.payoutMethod].types['adaptive'].fees({
+  const payoutMethod = await expense.getPayoutMethod();
+  const payoutMethodType = payoutMethod ? payoutMethod.type : expense.getPayoutMethodTypeFromLegacy();
+  if (payoutMethodType === PayoutMethodType.PAYPAL && !args.forceManual) {
+    fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders.paypal.types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
       host,
@@ -433,35 +505,38 @@ export async function payExpense(remoteUser, args) {
       `You don't have enough funds to cover for the fees of this payment method. Current balance: ${formatCurrency(
         balance,
         expense.collective.currency,
-      )}, Expense amount: ${formatCurrency(expense.amount, expense.collective.currency)}, Estimated ${
-        expense.payoutMethod
-      } fees: ${formatCurrency(fees.paymentProcessorFeeInCollectiveCurrency, expense.collective.currency)}`,
+      )}, Expense amount: ${formatCurrency(
+        expense.amount,
+        expense.collective.currency,
+      )}, Estimated ${payoutMethodType} fees: ${formatCurrency(
+        fees.paymentProcessorFeeInCollectiveCurrency,
+        expense.collective.currency,
+      )}`,
     );
   }
 
   // Pay expense based on chosen payout method
-  if (expense.payoutMethod === 'paypal') {
+  if (payoutMethodType === PayoutMethodType.PAYPAL) {
+    const paypalEmail = payoutMethod.data.email;
     let paypalPaymentMethod = null;
-    expense.paypalEmail = await expense.getPaypalEmail();
     try {
-      paypalPaymentMethod = await host.getPaymentMethod({ service: expense.payoutMethod });
+      paypalPaymentMethod = await host.getPaymentMethod({ service: 'paypal' });
     } catch {
       // ignore missing paypal payment method
     }
-
     // If the expense has been filed with the same paypal email than the host paypal
     // then we simply mark the expense as paid
-    if (paypalPaymentMethod && expense.paypalEmail === paypalPaymentMethod.name) {
+    if (paypalPaymentMethod && paypalEmail === paypalPaymentMethod.name) {
       feesInHostCurrency.paymentProcessorFeeInHostCurrency = 0;
       await createTransactions(host, expense, feesInHostCurrency);
     } else if (args.forceManual) {
       await createTransactions(host, expense, feesInHostCurrency);
     } else if (paypalPaymentMethod) {
-      await payExpenseWithPayPal(remoteUser, expense, host, paypalPaymentMethod, feesInHostCurrency);
+      await payExpenseWithPayPal(remoteUser, expense, host, paypalPaymentMethod, paypalEmail, feesInHostCurrency);
     } else {
       throw new Error('No Paypal account linked, please reconnect Paypal or pay manually');
     }
-  } else if (expense.payoutMethod === 'manual' || expense.payoutMethod === 'other') {
+  } else if (expense.legacyPayoutMethod === 'manual' || expense.legacyPayoutMethod === 'other') {
     // note: we need to check for manual and other for legacy reasons
     await createTransactions(host, expense, feesInHostCurrency);
   }
@@ -480,6 +555,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId, processorFeeRef
     include: [
       { model: models.Collective, as: 'collective' },
       { model: models.User, as: 'User' },
+      { model: models.PayoutMethod },
     ],
   });
 
@@ -495,7 +571,7 @@ export async function markExpenseAsUnpaid(remoteUser, ExpenseId, processorFeeRef
     throw new errors.Unauthorized('Expense has not been paid yet');
   }
 
-  if (expense.payoutMethod !== 'other') {
+  if (expense.legacyPayoutMethod !== 'other') {
     throw new errors.Unauthorized('Only expenses with "other" payout method can be marked as unpaid');
   }
 

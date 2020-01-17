@@ -34,7 +34,6 @@ data['collective.expense.approved'] = {
   },
   collective: { slug: 'wwcodeaustin', name: 'Women Who Code Austin' },
   fromCollective: { slug: 'xdamman', name: 'Xavier Damman' },
-  user: { paypalEmail: 'email@paypal.com' },
   actions: {
     viewLatestExpenses: 'https://opencollective.com/wwcodeaustin/expenses',
   },
@@ -46,7 +45,6 @@ data['collective.expense.paid'] = {
     amount: 1250,
     currency: 'USD',
     privateMessage: 'Private instructions',
-    payoutMethod: 'PayPal (paypal@domain.tld)',
     attachment: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5bdc1850-60d9-11e7-9f4e-6f8999022d4b.JPG',
   },
   collective: {
@@ -57,7 +55,6 @@ data['collective.expense.paid'] = {
     slug: 'xdamman',
     name: 'Xavier Damman',
   },
-  user: { paypalEmail: 'email@paypal.com' },
   actions: {
     viewLatestExpenses: 'https://opencollective.com/wwcodeaustin/expenses',
   },

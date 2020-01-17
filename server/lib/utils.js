@@ -8,7 +8,7 @@ import Promise from 'bluebird';
 import debugLib from 'debug';
 import pdf from 'html-pdf';
 import sanitizeHtml from 'sanitize-html';
-import { get, cloneDeep } from 'lodash';
+import { get, cloneDeep, isEqual } from 'lodash';
 
 import handlebars from './handlebars';
 
@@ -623,4 +623,13 @@ export const filterUntil = (list, filterFunc, conditionFunc) => {
     }
   }
   return result;
+};
+
+/**
+ * @returns boolean: True if `obj` has ony the keys passed in `keys`
+ */
+export const objHasOnlyKeys = (obj, keys) => {
+  const sortedObjKeys = Object.keys(obj).sort();
+  const sortedKeys = [...keys].sort();
+  return isEqual(sortedObjKeys, sortedKeys);
 };

@@ -8,7 +8,7 @@ const banCollectivesQuery = readFileSync(path.join(__dirname, '../../sql/ban-col
 
 const createCollectiveWithData = async () => {
   const user = await fakeUser();
-  const collective = await fakeCollective();
+  const collective = await fakeCollective({ HostCollectiveId: null });
   const collectiveAdminMember = await collective.addUserWithRole(user, 'ADMIN');
   const event = await fakeEvent({ ParentCollectiveId: collective.id });
   const eventAdminMember = await event.addUserWithRole(user, 'ADMIN');
@@ -133,7 +133,7 @@ describe('sql/ban-collectives', () => {
     createCollectiveWithData(); // To create additional data that shouldn't be touched
     const user1 = await fakeUser();
     const user2 = await fakeUser({ data: { isBanned: false, existingDataIsPreserved: true } });
-    const collective = await fakeCollective({ data: { hello: 'world' } });
+    const collective = await fakeCollective({ data: { hello: 'world' }, HostCollectiveId: null });
     createCollectiveWithData(); // To create additional data that shouldn't be touched
 
     const [result] = await sequelize.query(banCollectivesQuery, {

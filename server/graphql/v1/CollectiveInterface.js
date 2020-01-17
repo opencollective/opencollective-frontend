@@ -33,6 +33,7 @@ import {
   UpdateType,
   ContributorRoleEnum,
   PaymentMethodBatchInfo,
+  PayoutMethodType,
 } from './types';
 
 import { OrderDirectionType, TransactionInterfaceType } from './TransactionInterface';
@@ -769,6 +770,10 @@ export const CollectiveInterfaceType = new GraphQLInterfaceType({
             description: 'Defines if the organization "collective" payment method should be returned',
           },
         },
+      },
+      payoutMethods: {
+        type: new GraphQLList(PayoutMethodType),
+        description: 'The list of payout methods that this collective can use to get paid',
       },
       virtualCardsBatches: {
         type: new GraphQLList(PaymentMethodBatchInfo),
@@ -1639,6 +1644,17 @@ const CollectiveFields = () => {
         }
 
         return paymentMethods;
+      },
+    },
+    payoutMethods: {
+      type: new GraphQLList(PayoutMethodType),
+      description: 'The list of payout methods that this collective can use to get paid',
+      async resolve(collective, _, req) {
+        if (!req.remoteUser || !req.remoteUser.isAdmin(collective.id)) {
+          return null;
+        } else {
+          return req.loaders.PayoutMethod.byCollectiveId.load(collective.id);
+        }
       },
     },
     virtualCardsBatches: {

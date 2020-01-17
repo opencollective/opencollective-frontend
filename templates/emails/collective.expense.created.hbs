@@ -6,7 +6,12 @@ Subject: New expense on {{collective.name}}: {{{currency expense.amount currency
   <h1>{{{currency expense.amount currency=expense.currency precision=2}}}</h1>
   <div><a href="{{config.host.website}}/{{collective.slug}}/expenses/{{expense.id}}">{{expense.description}}</a></div>
   <div>Submitted by: {{fromCollective.name}}</div>
-  {{#ifCond expense.payoutMethod '===' 'paypal'}}<div>Paypal Email: {{user.paypalEmail}}</div>{{/ifCond}}
+  {{#if payoutMethod}}
+    {{#ifCond payoutMethod.type '===' 'PAYPAL'}}
+      <div>Paypal Email: {{payoutMethod.data.email}}</div>
+    {{/ifCond}}
+  {{/if}}
+  
   <p><font color="#999">{{expense.notes}}</font></p>
 
   <a href="{{config.host.website}}/{{collective.slug}}/expenses/{{expense.id}}">

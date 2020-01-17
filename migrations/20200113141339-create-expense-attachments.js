@@ -93,7 +93,7 @@ module.exports = {
 
       await queryInterface.dropTable('ExpenseAttachments', { transaction: dbTransaction });
 
-      dbTransaction.commit();
+      await dbTransaction.commit();
     } catch (e) {
       console.error('Transaction failed:', e);
       await dbTransaction.rollback();

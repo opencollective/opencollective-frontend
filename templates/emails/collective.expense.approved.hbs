@@ -15,7 +15,7 @@ Subject: Your expense to {{collective.name}} for {{{currency expense.amount curr
 
 <table>
   <tr><th>Submitted by:</th><td><a href="{{config.host.website}}/{{fromCollective.slug}}">{{fromCollective.name}}</a></td></tr>
-  <tr><th>Payout method:</th><td>{{expense.payoutMethod}}</td></tr>
+  <tr><th>Payout method:</th><td>{{expense.payoutMethodLabel}}</td></tr>
   {{#if expense.privateMessage}}
     <tr><th valign="top">Private instructions:</th><td>{{expense.privateMessage}}</td></tr>
   {{/if}}

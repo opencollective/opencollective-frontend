@@ -41,11 +41,6 @@ const render = (template, data) => {
   delete data.config;
   data.config = { host: config.host };
 
-  // sets paypalEmail for purpose of email templates
-  if (data.user) {
-    data.user.paypalEmail = data.user.paypalEmail || data.user.email;
-  }
-
   if (templates[`${template}.text`]) {
     text = templates[`${template}.text`](data);
   }

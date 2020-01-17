@@ -59,7 +59,7 @@ module.exports = {
       );
 
       // Run the transaction
-      dbTransaction.commit();
+      await dbTransaction.commit();
     } catch (e) {
       console.error('Transaction failed:', e);
       await dbTransaction.rollback();

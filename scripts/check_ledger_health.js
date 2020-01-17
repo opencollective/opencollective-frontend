@@ -323,10 +323,10 @@ const checkTransactions = () => {
         sequelize.query(
           `
     with "invalidExpenses" AS (
-      SELECT MAX(e.id) as "ExpenseId", max(e."payoutMethod") as "payoutMethod", count(*) as "numberOfTransactions",
+      SELECT MAX(e.id) as "ExpenseId", max(e."legacyPayoutMethod") as "legacyPayoutMethod", count(*) as "numberOfTransactions",
         CASE
-        WHEN (MAX(e."payoutMethod") = 'donation' AND COUNT(*) = 4) THEN true
-        WHEN (MAX(e."payoutMethod") != 'donation' AND COUNT(*) != 2) THEN false
+        WHEN (MAX(e."legacyPayoutMethod") = 'donation' AND COUNT(*) = 4) THEN true
+        WHEN (MAX(e."legacyPayoutMethod") != 'donation' AND COUNT(*) != 2) THEN false
         ELSE true
         END as valid
       FROM "Transactions" t LEFT JOIN "Expenses" e ON t."ExpenseId" = e.id
@@ -334,7 +334,7 @@ const checkTransactions = () => {
                 GROUP BY "ExpenseId"
                 HAVING COUNT(*) != 2
       )
-      SELECT ie."ExpenseId", ie."numberOfTransactions", c.slug as collective, e.category, e.amount, e.currency, e.description, e."payoutMethod", u.email as "user email", u."paypalEmail", e."incurredAt", e."createdAt", e."updatedAt" FROM "invalidExpenses" ie LEFT JOIN "Expenses" e ON ie."ExpenseId" = e.id LEFT JOIN "Users" u ON u.id=e."UserId" LEFT JOIN "Collectives" c ON c.id=e."CollectiveId" WHERE e.id IN (select "ExpenseId" FROM "invalidExpenses" WHERE valid is false)
+      SELECT ie."ExpenseId", ie."numberOfTransactions", c.slug as collective, e.category, e.amount, e.currency, e.description, e."legacyPayoutMethod", u.email as "user email", e."incurredAt", e."createdAt", e."updatedAt" FROM "invalidExpenses" ie LEFT JOIN "Expenses" e ON ie."ExpenseId" = e.id LEFT JOIN "Users" u ON u.id=e."UserId" LEFT JOIN "Collectives" c ON c.id=e."CollectiveId" WHERE e.id IN (select "ExpenseId" FROM "invalidExpenses" WHERE valid is false)
     `,
           { type: sequelize.QueryTypes.SELECT },
         ),
