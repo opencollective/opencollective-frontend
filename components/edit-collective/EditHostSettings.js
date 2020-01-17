@@ -101,8 +101,9 @@ const EditHostSettings = props => {
         </Plan>
         {tiers.map(tier => {
           const isCurrentPlan = collective.plan.name === tier.slug;
-          const isWithinLimits = tier.data
-            ? collective.plan.hostedCollectives <= tier.data.hostedCollectivesLimit
+          const hostedCollectivesLimit = get(tier, 'data.hostedCollectivesLimit');
+          const isWithinLimits = hostedCollectivesLimit
+            ? collective.plan.hostedCollectives <= hostedCollectivesLimit
             : true;
 
           let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';

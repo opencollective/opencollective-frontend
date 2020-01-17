@@ -25,8 +25,9 @@ const CollectiveCallsToAction = ({
 }) => {
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
   const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
-  const hostWithinLimit =
-    hostedCollectivesLimit && get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true;
+  const hostWithinLimit = hostedCollectivesLimit
+    ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
+    : true;
 
   const ApplyToHostBtn = () => (
     <_ApplyToHostBtn host={collective} disabled={!hostWithinLimit} showConditions={false} minWidth={buttonsMinWidth} />
