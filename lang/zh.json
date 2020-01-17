@@ -511,6 +511,7 @@
   "discover.sort.Popularity": "最受欢迎",
   "discover.subTitle": "Let's make great things together.",
   "discover.title": "Discover awesome collectives to support",
+  "discoverCard.backers.all": "{count, plural, one {contributor {prettyCount} } other {Financial contributors {prettyCount} }}",
   "DownloadInvoice": "Download invoice",
   "EditCollective.Conversations.checkbox": "Enable conversations",
   "EditCollective.Conversations.description": "Conversations is a way for people to post public messages that anyone can reply to. Once enabled, a new \"Conversations\" section will be added to your Collective page and a dedicated page will be created on {conversationsLink}.",

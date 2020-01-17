@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
-import { Link } from '../server/pages';
 import { FormattedMessage } from 'react-intl';
 
 import { Flex } from '@rebass/grid';
-import StyledLink from './StyledLink';
 import { TextInput } from './StyledInput';
+import StyledButton from './StyledButton';
+import Link from './Link';
 
-const Pagination = ({ router, limit, offset, total, scrollToTopOnChange }) => {
+const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
   const { pathname, query, route } = router;
   const totalPages = Math.ceil(total / limit);
   const currentPage = offset / limit + 1;
@@ -29,15 +29,10 @@ const Pagination = ({ router, limit, offset, total, scrollToTopOnChange }) => {
   return (
     <Flex alignItems="center">
       {currentPage > 1 && (
-        <Link
-          route={route.slice(1)}
-          scroll={scrollToTopOnChange}
-          params={{ ...query, offset: offset - limit }}
-          passHref
-        >
-          <StyledLink buttonStyle="standard" buttonSize="small">
+        <Link route={route.slice(1)} scroll={scrollToTopOnChange} params={{ ...query, offset: offset - limit }}>
+          <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
-          </StyledLink>
+          </StyledButton>
         </Link>
       )}
       <Flex alignItems="center" mx={2}>
@@ -56,6 +51,7 @@ const Pagination = ({ router, limit, offset, total, scrollToTopOnChange }) => {
                 px={1}
                 py={1}
                 width={30}
+                disabled={isDisabled}
               />
             ),
             total: totalPages,
@@ -63,15 +59,10 @@ const Pagination = ({ router, limit, offset, total, scrollToTopOnChange }) => {
         />
       </Flex>
       {currentPage < totalPages && (
-        <Link
-          route={route.slice(1)}
-          scroll={scrollToTopOnChange}
-          params={{ ...query, offset: offset + limit }}
-          passHref
-        >
-          <StyledLink buttonStyle="standard" buttonSize="small">
+        <Link route={route.slice(1)} scroll={scrollToTopOnChange} params={{ ...query, offset: offset + limit }}>
+          <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-          </StyledLink>
+          </StyledButton>
         </Link>
       )}
     </Flex>
@@ -83,6 +74,7 @@ Pagination.propTypes = {
   limit: PropTypes.number,
   offset: PropTypes.number,
   total: PropTypes.number,
+  isDisabled: PropTypes.bool,
   /** Use this to scroll back on top when pagination changes */
   scrollToTopOnChange: PropTypes.bool,
 };
