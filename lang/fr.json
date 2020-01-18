@@ -1136,7 +1136,7 @@
   "StepsProgress.mobile.next": "Suivant : {stepName}",
   "StepsProgress.mobile.status": "{from} sur {to}",
   "StyledInputTags.Placeholder": "Ajoutez des tags avec la touche Entrée",
-  "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}",
+  "StyledMembershipCard.backers.all": "{count, plural, one {{prettyCount} contributeur} other {{prettyCount} contributeurs}}",
   "subscription.amountToDate": "ont contribué jusqu'à présent",
   "subscription.cancel.btn": "oui",
   "subscription.cancel.no.btn": "non",
