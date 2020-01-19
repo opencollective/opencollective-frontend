@@ -511,7 +511,7 @@
   "discover.sort.Popularity": "Mais populares",
   "discover.subTitle": "Vamos fazer grandes coisas juntos.",
   "discover.title": "Descubra outros coletivos incríveis para colaborar",
-  "discoverCard.backers.all": "{count, plural, one {contributor {prettyCount} } other {Financial contributors {prettyCount} }}",
+  "discoverCard.backers.all": "{count, plural, one {colaborador {prettyCount} } other {Colaboradores financeiros {prettyCount} }}",
   "DownloadInvoice": "Baixar fatura",
   "EditCollective.Conversations.checkbox": "Ativar conversas",
   "EditCollective.Conversations.description": "Conversas são uma maneira de as pessoas publicarem mensagens públicas às quais qualquer pessoa possa responder. Uma vez ativada, uma nova seção \"Conversas\" será adicionada à sua página do Coletivo e uma página dedicada será criada em {conversationsLink}.",
