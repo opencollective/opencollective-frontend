@@ -230,6 +230,10 @@ const collectiveFields = `
     id
     name
     settings
+    connectedAccounts {
+      id
+      service
+    }
     location {
       country
     }
