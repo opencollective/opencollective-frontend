@@ -65,3 +65,8 @@ Cypress tests are split in 4 different groups. You can run these groups individu
 To inspect tests, you can open the Cypress application with the following command:
 
 - `npm run cypress:open`
+
+#### Troubleshooting
+
+- To launch with Chrome, use `npm run cypress:open -- --browser chrome` (double check Chrome is selected in the UI before running)
+- On Mac OS, to force Chrome to use the English language: `defaults write com.google.Chrome AppleLanguages '(en, en-US)'`
