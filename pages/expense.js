@@ -86,7 +86,7 @@ class ExpensePage extends React.Component {
             collective={collective}
             LoggedInUser={LoggedInUser}
             displayContributeLink={collective.isActive && collective.host ? true : false}
-            callsToAction={{ hasSubmitExpense: true }}
+            callsToAction={{ hasSubmitExpense: !collective.isArchived }}
           />
 
           <Box maxWidth={1200} m="0 auto" px={[1, 3, 4]} py={[2, 3]}>
@@ -96,11 +96,13 @@ class ExpensePage extends React.Component {
                   ← <FormattedMessage id="expenses.viewAll" defaultMessage="View All Expenses" />
                 </StyledButton>
               </Link>
-              <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
-                  <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
-                </StyledButton>
-              </Link>
+              {!collective.isArchived && (
+                <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                  <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
+                    <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
+                  </StyledButton>
+                </Link>
+              )}
             </Flex>
 
             <hr />
