@@ -113,10 +113,12 @@ const useForm = ({ onEmailChange, errors }) => {
         if (target.name === 'email') {
           onEmailChange(target.value);
           setState({
+            ...state,
             errors: { ...state.errors, [target.name]: null },
           });
         } else {
           setState({
+            ...state,
             [target.name]: target.value,
             errors: { ...state.errors, [target.name]: null },
           });
@@ -126,6 +128,7 @@ const useForm = ({ onEmailChange, errors }) => {
         event.persist();
         event.preventDefault();
         setState({
+          ...state,
           errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
         });
       },
