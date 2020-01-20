@@ -1,9 +1,15 @@
 {
-	"database": {
-		"url": "postgres://opencollective@127.0.0.1:5432/opencollective_e2e"
-	},
-	"maildev": {
-		"client": true,
-		"server": true
-	}
+  "database": {
+    "url": "postgres://opencollective@127.0.0.1:5432/opencollective_e2e"
+  },
+  "maildev": {
+    "client": true,
+    "server": true
+  },
+  "limits": {
+    "virtualCards": {
+      "maxPerDay": 1000,
+      "maxAmountPerDay": 5000000
+    }
+  }
 }
