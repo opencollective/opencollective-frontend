@@ -373,7 +373,7 @@ class ConversationPage extends React.Component {
                             <InlineEditField
                               topEdit={2}
                               field="tags"
-                              maxLength={255}
+                              buttonsMinWidth={145}
                               canEdit={canEdit}
                               values={conversation}
                               mutation={editConversationMutation}
