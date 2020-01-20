@@ -92,7 +92,7 @@
     "redis": "2.8.0",
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.5",
-    "sanitize-html": "1.20.1",
+    "sanitize-html": "1.21.1",
     "sequelize": "5.21.3",
     "sequelize-cli": "5.5.1",
     "sequelize-temporal": "1.0.8",
