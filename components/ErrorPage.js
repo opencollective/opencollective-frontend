@@ -1,15 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, truncate } from 'lodash';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import { Router } from '../server/pages';
 
 import { Support } from '@styled-icons/boxicons-regular/Support';
-import { Github } from '@styled-icons/fa-brands/Github';
 import { Redo } from '@styled-icons/fa-solid/Redo';
 
-import { objectToQueryString } from '../lib/url_helpers';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -138,48 +136,11 @@ class ErrorPage extends React.Component {
     );
   }
 
-  getGithubIssueURL(stackTrace) {
-    const navigatorInfo = typeof navigator === 'undefined' ? {} : navigator;
-    const pageUrl = typeof window === 'undefined' ? '___________' : window.location;
-
-    const title = 'Unexpected error when ___________';
-    const body = `
-# Describe the bug
-
-<!-- A clear and concise description of what the bug is. -->
-<!-- If applicable, add screenshots to help explain your problem. -->
-
-I got an unexpected error on ${pageUrl} while I was trying to __________
-
-# To Reproduce
-
-<!-- Steps to reproduce the behavior -->
-
-1. Go to ________
-2. Click on ________
-3. Scroll down to ________
-4. See error
-
-# Device
-- OS: ${navigatorInfo.platform}
-- Browser: \`${navigatorInfo.appVersion}\`
-
-# Technical details
-
-<!-- PLEASE REMOVE ANY PERSONAL INFORMATION FROM THE LOGS BELOW -->
-
-\`\`\`
-${truncate(stackTrace, { length: 6000 })}
-\`\`\`
-    `;
-    return `https://github.com/opencollective/opencollective/issues/new${objectToQueryString({ title, body })}`;
-  }
-
   unknownError() {
     const message = get(this.props, 'data.error.message');
     const stackTrace = get(this.props, 'data.error.stack');
     const expandError = process.env.NODE_ENV !== 'production';
-    const fontSize = ['circleci', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
+    const fontSize = ['ci', 'circleci', 'e2e', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
 
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
@@ -190,9 +151,6 @@ ${truncate(stackTrace, { length: 6000 })}
         <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
           <StyledLink my={2} href="mailto:support@opencollective.com" mx={2} buttonStyle="standard" buttonSize="large">
             <Support size="1em" /> <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
-          </StyledLink>
-          <StyledLink my={2} href={this.getGithubIssueURL(stackTrace)} mx={2} buttonStyle="standard" buttonSize="large">
-            <Github size="1em" /> <FormattedMessage id="error.addOnGithub" defaultMessage="Add an issue on Github" />
           </StyledLink>
           <StyledButton my={2} mx={2} buttonSize="large" onClick={() => location.reload()}>
             <Redo size="0.8em" /> <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
