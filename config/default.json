@@ -31,8 +31,8 @@
     "api": "http://localhost:3060",
     "webapp": "http://localhost:3000/app",
     "website": "http://localhost:3000",
-    "images": "https://images.opencollective.com",
-    "invoices": "https://invoices.opencollective.com"
+    "images": "https://images-staging.opencollective.com",
+    "invoices": "https://invoices-staging.opencollective.com"
   },
   "limits": {
     "ordersPerHour": {
