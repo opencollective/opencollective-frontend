@@ -554,7 +554,6 @@
   "EditUserEmailForm.title": "邮箱地址",
   "EditWebhooks.ZapierAd": "NEW! You can now use the Beta {zapierLink} app to manage your integrations.",
   "Email": "Email",
-  "error.addOnGithub": "在Github提交issue",
   "Error.BadCollectiveType": "This profile type is not supported",
   "error.code.invalid": "Invalid Gift Card code",
   "error.contactSupport": "联系支持",
