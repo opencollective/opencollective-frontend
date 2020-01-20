@@ -678,6 +678,7 @@
   "expenses.byRecipient": "Расходы по {recipient}",
   "expenses.collectivePicker.subtitle": "для {n} {n, plural, one {коллектива} other {коллективов}}",
   "expenses.collectivePicker.title": "Финансы",
+  "expenses.create.archived": "Cannot submit expenses for an archived collective.",
   "expenses.create.login": "Зарегистрируйтесь или войдите, чтобы учесть расходы.",
   "expenses.empty": "Нет расходов",
   "expenses.paid": "оплачено",

@@ -528,7 +528,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, collective } = this.props;
 
     if (!LoggedInUser) {
       return (
@@ -537,6 +537,17 @@ class CreateExpenseForm extends React.Component {
             <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
           </P>
           <SignInOrJoinFree />
+        </div>
+      );
+    } else if (collective.isArchived) {
+      return (
+        <div className="CreateExpenseForm">
+          <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
+            <FormattedMessage
+              id="expenses.create.archived"
+              defaultMessage="Cannot submit expenses for an archived collective."
+            />
+          </P>
         </div>
       );
     } else {

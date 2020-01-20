@@ -678,6 +678,7 @@
   "expenses.byRecipient": "{recipient} の請求",
   "expenses.collectivePicker.subtitle": "{n} {n, plural, one {件のコレクティブ} other {件のコレクティブ}}",
   "expenses.collectivePicker.title": "ファイナンス",
+  "expenses.create.archived": "Cannot submit expenses for an archived collective.",
   "expenses.create.login": "アカウントを作成するかログインして請求の送信をしてください。",
   "expenses.empty": "請求がありません",
   "expenses.paid": "支払い済み",
