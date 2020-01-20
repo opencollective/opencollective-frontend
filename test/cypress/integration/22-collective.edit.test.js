@@ -79,7 +79,7 @@ describe('edit collective', () => {
     cy.get('.backToProfile a').click(); // back to profile
     const tierCardSelector = '[data-cy="financial-contributions"] [data-cy="contribute-card-tier"]';
     cy.get(tierCardSelector, { timeout: 5000 });
-    cy.screenshot('tierEdited');
+    // cy.screenshot('tierEdited');
     cy.get(tierCardSelector)
       .first()
       .find('[data-cy="contribute-title"]')
@@ -91,7 +91,7 @@ describe('edit collective', () => {
     cy.get(tierCardSelector)
       .first()
       .contains('$5 USD / month');
-    cy.screenshot('tierAdded');
+    // cy.screenshot('tierAdded');
     cy.get(tierCardSelector)
       .should('have.length', 4)
       .last()
