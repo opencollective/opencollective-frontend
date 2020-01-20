@@ -237,7 +237,6 @@ class CreateVirtualCardsForm extends Component {
 
     // Set value
     this.setState(state => ({
-      ...state,
       values: Object.assign(state.values, { [fieldName]: value }),
       errors: Object.assign(state.errors, errors),
     }));
@@ -308,7 +307,7 @@ class CreateVirtualCardsForm extends Component {
       if (state.deliverType === 'email' && deliverType === 'manual' && values.emails.length) {
         values.numberOfVirtualCards = values.emails.length;
       }
-      return { ...state, values, deliverType };
+      return { values, deliverType };
     });
   }
 

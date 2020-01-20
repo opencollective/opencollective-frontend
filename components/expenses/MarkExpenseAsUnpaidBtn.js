@@ -25,12 +25,12 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
 
   async function handleOnClickContinue() {
     try {
-      setState({ ...state, disableBtn: true });
+      setState({ disableBtn: true });
       await markExpenseAsUnpaid(id, state.processorFeeRefunded);
       await refetch();
     } catch (err) {
       console.log('>>> payExpense error: ', err);
-      setState({ ...state, disableBtn: false });
+      setState({ disableBtn: false });
     }
   }
 
@@ -41,7 +41,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
           <StyledCheckBox
             name="processorFeeRefunded"
             checked={state.processorFeeRefunded}
-            onChange={({ checked }) => setState({ ...state, processorFeeRefunded: checked })}
+            onChange={({ checked }) => setState({ processorFeeRefunded: checked })}
             label={intl.formatMessage(messages['processorFeeRefunded.checkbox.label'])}
           />
           <StyledButton
@@ -54,7 +54,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
           </StyledButton>
         </Fragment>
       ) : (
-        <StyledButton onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })} mt={2}>
+        <StyledButton onClick={() => setState({ showProcessorFeeConfirmation: true })} mt={2}>
           <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
         </StyledButton>
       )}
