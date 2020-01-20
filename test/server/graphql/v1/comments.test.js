@@ -60,6 +60,7 @@ describe('server/graphql/v1/comments', () => {
       CollectiveId: collective1.id,
       lastEditedById: user1.id,
       UserId: user1.id,
+      FromCollectiveId: user1.CollectiveId,
       description: 'Plane ticket',
       incurredAt: new Date(),
       amount: 100000,

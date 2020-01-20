@@ -29,6 +29,14 @@ export default function(Sequelize, DataTypes) {
         allowNull: false,
       },
 
+      FromCollectiveId: {
+        type: DataTypes.INTEGER,
+        references: { key: 'id', model: 'Collectives' },
+        onDelete: 'SET NULL', // Collective deletion will fail if it has expenses
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
+
       CollectiveId: {
         type: DataTypes.INTEGER,
         references: {

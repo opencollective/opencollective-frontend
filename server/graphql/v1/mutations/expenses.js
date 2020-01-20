@@ -45,11 +45,13 @@ function canMarkExpenseUnpaid(remoteUser, expense) {
 function canEditExpense(remoteUser, expense) {
   if (expense.status === statuses.PAID) {
     return false;
-  }
-  if (remoteUser.id === expense.UserId) {
+  } else if (remoteUser.id === expense.UserId) {
     return true;
+  } else if (remoteUser.isAdmin(expense.FromCollectiveId)) {
+    return true;
+  } else {
+    return canUpdateExpenseStatus(remoteUser, expense);
   }
-  return canUpdateExpenseStatus(remoteUser, expense);
 }
 
 export async function updateExpenseStatus(remoteUser, expenseId, status) {
@@ -135,6 +137,7 @@ export async function createExpense(remoteUser, expenseData) {
     ...expenseData,
     status: statuses.PENDING,
     CollectiveId: collective.id,
+    FromCollectiveId: remoteUser.CollectiveId,
     lastEditedById: expenseData.UserId,
     incurredAt: expenseData.incurredAt || new Date(),
   });

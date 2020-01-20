@@ -35,7 +35,7 @@ const callbackUrl = 'https://opencollective/api/taxForm/callback';
 const workflowId = 'scuttlebutt';
 const year = moment().year();
 
-describe('lib.taxForms', () => {
+describe('server/lib/tax-forms', () => {
   // globals to be set in the before hooks.
   // need:
   // - some users who are over the threshold for this year _and_ last year
@@ -50,12 +50,13 @@ describe('lib.taxForms', () => {
     year: moment().year(),
   };
 
-  function ExpenseOverThreshold({ incurredAt, UserId, CollectiveId, amount, type }) {
+  function ExpenseOverThreshold({ incurredAt, UserId, CollectiveId, amount, type, FromCollectiveId }) {
     return {
       description: 'pizza',
       amount: amount || US_TAX_FORM_THRESHOLD + 100e2,
       currency: 'USD',
       UserId,
+      FromCollectiveId,
       lastEditedById: UserId,
       incurredAt,
       createdAt: incurredAt,
@@ -155,6 +156,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[0].id,
+        FromCollectiveId: users[0].CollectiveId,
         CollectiveId: organisationCollectives[0].id,
         incurredAt: moment(),
       }),
@@ -163,6 +165,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[2].id,
+        FromCollectiveId: users[2].CollectiveId,
         CollectiveId: organisationCollectives[0].id,
         incurredAt: moment(),
         type: RECEIPT,
@@ -172,6 +175,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[1].id,
+        FromCollectiveId: users[1].CollectiveId,
         CollectiveId: organisationCollectives[0].id,
         incurredAt: moment(),
       }),
@@ -180,6 +184,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[1].id,
+        FromCollectiveId: users[1].CollectiveId,
         CollectiveId: organisationCollectives[0].id,
         incurredAt: moment(),
         amount: US_TAX_FORM_THRESHOLD - 200e2,
@@ -189,6 +194,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[0].id,
+        FromCollectiveId: users[0].CollectiveId,
         CollectiveId: organisationCollectives[1].id,
         incurredAt: moment(),
       }),
@@ -197,6 +203,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[0].id,
+        FromCollectiveId: users[0].CollectiveId,
         CollectiveId: organisationCollectives[0].id,
         incurredAt: moment().set('year', 2016),
       }),
@@ -206,6 +213,7 @@ describe('lib.taxForms', () => {
     await Expense.create(
       ExpenseOverThreshold({
         UserId: users[3].id,
+        FromCollectiveId: users[3].CollectiveId,
         CollectiveId: organisationCollectives[0].id,
         incurredAt: moment(),
       }),
