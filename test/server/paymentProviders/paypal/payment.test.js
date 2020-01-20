@@ -11,6 +11,7 @@ import * as paypalPayment from '../../../../server/paymentProviders/paypal/payme
 
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
+import { fakeCollective } from '../../../test-helpers/fake-data';
 
 const application = utils.data('application');
 
@@ -41,15 +42,14 @@ describe('paypal.payment', () => {
        the PayPal url `/v1/oauth2/token'. Which is pretty much
        everything besides `paypalUrl` and`retrieveOAuthToken`. */
 
-    let configStub;
+    before(utils.resetTestDB);
 
+    let configStub;
     before(() => {
       /* Stub out the configuration with authentication information
          and environment name. */
       configStub = sinon.stub(config.paypal, 'payment').get(() => ({
         environment: 'sandbox',
-        clientId: 'my-client-id',
-        clientSecret: 'my-client-secret',
       }));
       /* Catch the retrieval of auth tokens */
       nock('https://api.sandbox.paypal.com')
@@ -59,6 +59,24 @@ describe('paypal.payment', () => {
         .reply(200, { access_token: 'dat-token' });
     }); /* End of "before()" */
 
+    const secrets = {
+      clientId: 'my-client-id',
+      clientSecret: 'my-client-secret',
+    };
+    let collective, host;
+    beforeEach(async () => {
+      const paypal = await models.ConnectedAccount.create({
+        service: 'paypal',
+        clientId: secrets.clientId,
+        token: secrets.clientSecret,
+      });
+      host = await fakeCollective({});
+      await host.addConnectedAccount(paypal);
+      collective = await fakeCollective({
+        HostCollectiveId: host.id,
+      });
+    });
+
     after(() => {
       configStub.restore();
       nock.cleanAll();
@@ -66,7 +84,7 @@ describe('paypal.payment', () => {
 
     describe('#retrieveOAuthToken', () => {
       it('should retrieve the oauth token from PayPal API', async () => {
-        const token = await paypalPayment.retrieveOAuthToken();
+        const token = await paypalPayment.retrieveOAuthToken(secrets);
         expect(token).to.equal('dat-token');
       }); /* End of "should retrieve the oauth token from PayPal API" */
     }); /* End of "#retrieveOAuthToken" */
@@ -80,7 +98,7 @@ describe('paypal.payment', () => {
       }); /* End of "before()" */
 
       it('should request PayPal API endpoints', async () => {
-        const output = await paypalPayment.paypalRequest('path/we/are/testing');
+        const output = await paypalPayment.paypalRequest('path/we/are/testing', {}, host);
         expect(output).to.deep.equal({ success: 1 });
       }); /* End of "#paypalRequest" */
     }); /* End of "#paypalRequest" */
@@ -96,7 +114,7 @@ describe('paypal.payment', () => {
       it('should call payments/payment endpoint of the PayPal API', async () => {
         const output = await request(app)
           .post(`/services/paypal/create-payment?api_key=${application.api_key}`)
-          .send({ amount: '50', currency: 'USD' })
+          .send({ amount: '50', currency: 'USD', hostId: host.id })
           .expect(200);
         expect(output.body.id).to.equal('a very legit payment id');
       }); /* End of "should call payments/payment endpoint of the PayPal API" */
@@ -110,13 +128,12 @@ describe('paypal.payment', () => {
           .reply(200, { success: 'Reply from payment execution' });
       }); /* End of "before()" */
 
-      beforeEach(utils.resetTestDB);
-
       it('should call payments/payment/<pm-id>/execute endpoint of PayPal API', async () => {
         const order = {
           paymentMethod: {
             data: { paymentID: 'my-payment-id', payerID: 'my-payer-id' },
           },
+          collective,
         };
         const output = await paypalPayment.executePayment(order);
         expect(output.success).to.equal('Reply from payment execution');
