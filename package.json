@@ -138,7 +138,7 @@
     "langs:build": "babel . --only \"components/*,lib/*,pages/*\" --out-dir dist --delete-dir-on-start",
     "langs:translate": "babel-node scripts/translate.js",
     "langs:update": "npm-run-all build:clean langs:build langs:translate",
-    "lint": "eslint .",
+    "lint": "eslint . --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
     "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
