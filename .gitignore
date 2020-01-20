@@ -6,6 +6,8 @@ npm-debug.log.*
 yarn.lock
 .DS_Store
 build
+coverage
+.nyc_output
 test/cypress/screenshots
 test/cypress/videos
 dist
