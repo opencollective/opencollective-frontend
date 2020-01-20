@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Fri Jan 10 2020 10:50:28 GMT+0100 (GMT+01:00)
+# timestamp: Tue Jan 14 2020 18:10:43 GMT+0100 (Central European Standard Time)
 
 """
 Application model
@@ -276,6 +276,7 @@ type Collective implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+  plan: PlanType
   stats: CollectiveStatsType
 }
 
@@ -542,6 +543,7 @@ interface CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+  plan: PlanType
 }
 
 """
@@ -1158,6 +1160,7 @@ type Event implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+  plan: PlanType
   stats: CollectiveStatsType
 }
 
@@ -1825,6 +1828,26 @@ type Mutation {
     accept: Boolean!
   ): Boolean
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
+
+  """
+  Activate a collective as Host.
+  """
+  activateCollectiveAsHost(
+    """
+    ID of the collective (Organization or User)
+    """
+    id: Int!
+  ): CollectiveInterface
+
+  """
+  Deactivate a collective as Host.
+  """
+  deactivateCollectiveAsHost(
+    """
+    ID of the collective (Organization or User)
+    """
+    id: Int!
+  ): CollectiveInterface
 }
 
 """
@@ -2320,6 +2343,7 @@ type Organization implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+  plan: PlanType
   stats: CollectiveStatsType
   email: String
 }
@@ -2462,6 +2486,19 @@ type PaymentMethodType {
   fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
   stripeError: StripeError
+}
+
+"""
+The name of the current plan and its characteristics.
+"""
+type PlanType {
+  name: String
+  hostedCollectives: Int
+  hostedCollectivesLimit: Int
+  addedFunds: Int
+  addedFundsLimit: Int
+  hostDashboard: Boolean
+  manualPayments: Boolean
 }
 
 """
@@ -2884,6 +2921,7 @@ type Tier {
     limit: Int = 3000
   ): [Contributor]
   stats: TierStatsType
+  data: JSON
 }
 
 """
@@ -3342,6 +3380,7 @@ type User implements CollectiveInterface {
     isConfirmed: Boolean
   ): PaginatedPaymentMethod
   connectedAccounts: [ConnectedAccountType]
+  plan: PlanType
   stats: CollectiveStatsType
   firstName: String
   lastName: String

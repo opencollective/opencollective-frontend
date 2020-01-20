@@ -68,13 +68,25 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         />
       </P>
       {error && <P color="#ff5252">{error}</P>}
-      <StyledButton onClick={() => setShowModal(true)} loading={deleting} disabled={!collective.isDeletable}>
+      <StyledButton
+        onClick={() => setShowModal(true)}
+        loading={deleting}
+        disabled={collective.isHost || !collective.isDeletable}
+      >
         <FormattedMessage
           values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.button"
           defaultMessage={'Delete this {type}'}
         />
       </StyledButton>
+      {collective.isHost && (
+        <P color="rgb(224, 183, 0)">
+          <FormattedMessage
+            id="collective.delete.isHost"
+            defaultMessage={"You can't delete your collective while being a Host, please Desactivate as Host first."}
+          />{' '}
+        </P>
+      )}
       {!collective.isDeletable && (
         <P color="rgb(224, 183, 0)">
           <FormattedMessage

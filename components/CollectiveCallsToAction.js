@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
 import dynamic from 'next/dynamic';
+import { get } from 'lodash';
 
 import Container from './Container';
 import StyledButton from './StyledButton';
+import StyledTooltip from './StyledTooltip';
 import Link from './Link';
+import _ApplyToHostBtn from './ApplyToHostBtn';
 
 // Dynamic imports
-const ApplyToHostBtn = dynamic(() => import(/* webpackChunkName: 'ApplyToHostBtn' */ './ApplyToHostBtn'));
 const AddFundsModal = dynamic(() => import('./AddFundsModal'));
 
 /**
@@ -22,6 +24,15 @@ const CollectiveCallsToAction = ({
   ...props
 }) => {
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
+  const hostedCollectivesLimit = get(collective, 'plan.hostedCollectivesLimit');
+  const hostWithinLimit = hostedCollectivesLimit
+    ? get(collective, 'plan.hostedCollectives') < hostedCollectivesLimit === true
+    : true;
+
+  const ApplyToHostBtn = () => (
+    <_ApplyToHostBtn host={collective} disabled={!hostWithinLimit} showConditions={false} minWidth={buttonsMinWidth} />
+  );
+
   return (
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
@@ -45,7 +56,7 @@ const CollectiveCallsToAction = ({
           </StyledButton>
         </Link>
       )}
-      {hasDashboard && (
+      {hasDashboard && collective.plan.hostDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
           <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
@@ -54,7 +65,27 @@ const CollectiveCallsToAction = ({
       )}
       {hasApply && (
         <Box mx={2} my={1}>
-          <ApplyToHostBtn host={collective} showConditions={false} minWidth={buttonsMinWidth} />
+          {hostWithinLimit ? (
+            <ApplyToHostBtn />
+          ) : (
+            <StyledTooltip
+              type="light"
+              place="left"
+              content={
+                <FormattedMessage
+                  id="host.hostLimit.warning"
+                  defaultMessage="Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply."
+                  values={{
+                    collectiveName: collective.name,
+                    // eslint-disable-next-line react/display-name
+                    a: (...chunks) => <Link route={`/${collective.slug}/contact`}>{chunks}</Link>,
+                  }}
+                />
+              }
+            >
+              <ApplyToHostBtn />
+            </StyledTooltip>
+          )}
         </Box>
       )}
       {addFunds && (
@@ -71,7 +102,9 @@ const CollectiveCallsToAction = ({
 
 CollectiveCallsToAction.propTypes = {
   collective: PropTypes.shape({
+    name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
+    plan: PropTypes.object,
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */

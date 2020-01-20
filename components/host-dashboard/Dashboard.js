@@ -233,6 +233,11 @@ const getDataQuery = gql`
           hosted
         }
       }
+      plan {
+        addedFunds
+        addedFundsLimit
+        name
+      }
     }
   }
 `;

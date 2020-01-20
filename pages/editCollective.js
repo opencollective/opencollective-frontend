@@ -13,6 +13,7 @@ import MessageBox from '../components/MessageBox';
 import { compose } from '../lib/utils';
 import { addCollectiveToEditData } from '../lib/graphql/queries';
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
+import { GraphQLContext } from '../lib/graphql/context';
 
 import Loading from '../components/Loading';
 
@@ -88,12 +89,14 @@ class EditCollectivePage extends React.Component {
 
     return (
       <div>
-        <EditCollective
-          collective={collective}
-          LoggedInUser={LoggedInUser}
-          editCollective={editCollective}
-          loggedInEditDataLoaded
-        />
+        <GraphQLContext.Provider value={data}>
+          <EditCollective
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            editCollective={editCollective}
+            loggedInEditDataLoaded
+          />
+        </GraphQLContext.Provider>
       </div>
     );
   }
