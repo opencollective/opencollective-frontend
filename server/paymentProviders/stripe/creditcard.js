@@ -269,8 +269,10 @@ export default {
         hostStripeCustomer,
       });
     } catch (error) {
-      logger.error(`Stripe Payment Error: ${error.message}`);
-      logger.error(error);
+      if (error.message !== 'Payment Intent require action') {
+        logger.error(`Stripe Payment Error: ${error.message}`);
+        logger.error(error);
+      }
       throw error;
     }
 
