@@ -78,7 +78,7 @@ export default class Steps extends React.Component {
   };
 
   markStepAsVisited = step => {
-    this.setState(state => ({ ...state, visited: state.visited.add(step.name) }));
+    this.setState(state => ({ visited: state.visited.add(step.name) }));
   };
 
   /** Build a step to be passed to children */

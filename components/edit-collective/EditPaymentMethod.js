@@ -68,7 +68,6 @@ class EditPaymentMethod extends React.Component {
 
   handleChange(obj) {
     this.setState(state => ({
-      ...state,
       paymentMethod: {
         ...state.paymentMethod,
         ...obj,

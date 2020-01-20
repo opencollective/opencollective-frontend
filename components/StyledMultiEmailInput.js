@@ -85,9 +85,7 @@ export default class StyledMultiEmailInput extends Component {
   }
 
   onChange(editorState) {
-    this.setState(state => {
-      return { ...state, editorState };
-    });
+    this.setState({ editorState });
     if (this.props.onChange) {
       this.onChangeParent(editorState);
     }
