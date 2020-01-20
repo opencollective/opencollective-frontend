@@ -35,7 +35,7 @@ const messages = defineMessages({
   incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
   'org.new': { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
   'org.name': { id: 'contributeAs.org.name', defaultMessage: 'Organization Name' },
-  'org.website': { id: 'contributeAs.org.website', defaultMessage: 'Website' },
+  'org.website': { id: 'Fields.website', defaultMessage: 'Website' },
   'org.twitter': { id: 'contributeAs.org.twitter', defaultMessage: 'Twitter (optional)' },
   'org.github': { id: 'contributeAs.org.github', defaultMessage: 'GitHub (optional)' },
   filterByName: { id: 'Filter.ByName', defaultMessage: 'Filter by name' },

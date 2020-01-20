@@ -31,8 +31,8 @@ class CreateCollectiveForm extends React.Component {
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
-      'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
-      'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
+      'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
+      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
       'company.label': {
         id: 'collective.company.label',
         defaultMessage: 'company',
@@ -42,15 +42,15 @@ class CreateCollectiveForm extends React.Component {
         defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
-        id: 'collective.amount.label',
-        defaultMessage: 'amount',
+        id: 'Fields.amount',
+        defaultMessage: 'Amount',
       },
       'description.label': {
         id: 'collective.description.label',
         defaultMessage: 'Short description',
       },
       'startsAt.label': {
-        id: 'collective.startsAt.label',
+        id: 'startDateAndTime',
         defaultMessage: 'start date and time',
       },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
@@ -59,7 +59,7 @@ class CreateCollectiveForm extends React.Component {
         defaultMessage: 'Cover image',
       },
       'website.label': {
-        id: 'collective.website.label',
+        id: 'Fields.website',
         defaultMessage: 'Website',
       },
       'website.description': {
@@ -78,7 +78,7 @@ class CreateCollectiveForm extends React.Component {
         id: 'collective.members.label',
         defaultMessage: 'Number of members',
       },
-      'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
+      'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tags.description': {
         id: 'collective.tags.description',
         defaultMessage: 'Tags helps people discover your collective',

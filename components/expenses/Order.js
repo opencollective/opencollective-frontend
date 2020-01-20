@@ -297,7 +297,7 @@ class Order extends React.Component {
                 data-cy="cancelOrder"
                 onClick={() => this.setState({ showCancelOrderModal: true })}
               >
-                <FormattedMessage id="order.pending.cancel" defaultMessage="Cancel" />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </StyledButton>
             </Flex>
           )}

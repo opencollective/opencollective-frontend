@@ -147,7 +147,7 @@ class ConnectPaypal extends React.Component {
                 <div>
                   <SmallButton onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
                     {this.state.connectingPaypal ? (
-                      <FormattedMessage id="ConnectPaypal.processing" defaultMessage="Processing..." />
+                      <FormattedMessage id="ProcessingWithDots" defaultMessage="Processing…" />
                     ) : (
                       <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
                     )}

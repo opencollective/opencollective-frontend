@@ -5,11 +5,11 @@ import { CollectiveCategory } from '../lib/constants/collectives';
 
 const TranslatedTags = defineMessages({
   [CollectiveCategory.ASSOCIATION]: {
-    id: 'Tags.ASSOCIATION',
+    id: 'collective.category.association',
     defaultMessage: 'Association',
   },
   [CollectiveCategory.COLLECTIVE]: {
-    id: 'Tags.COLLECTIVE',
+    id: 'Collective',
     defaultMessage: 'Collective',
   },
   [CollectiveCategory.CONFERENCE]: {
@@ -17,7 +17,7 @@ const TranslatedTags = defineMessages({
     defaultMessage: 'Conference',
   },
   [CollectiveCategory.COOPERATIVE]: {
-    id: 'Tags.COOPERATIVE',
+    id: 'collective.category.coop',
     defaultMessage: 'Cooperative',
   },
   [CollectiveCategory.OPEN_SOURCE]: {
@@ -29,11 +29,11 @@ const TranslatedTags = defineMessages({
     defaultMessage: 'Media',
   },
   [CollectiveCategory.MEETUP]: {
-    id: 'Tags.MEETUP',
+    id: 'collective.category.meetup',
     defaultMessage: 'Meetup',
   },
   [CollectiveCategory.MOVEMENT]: {
-    id: 'Tags.MOVEMENT',
+    id: 'collective.category.movement',
     defaultMessage: 'Movement',
   },
   [CollectiveCategory.POLITICS]: {
@@ -49,7 +49,7 @@ const TranslatedTags = defineMessages({
     defaultMessage: 'US nonprofit',
   },
   [CollectiveCategory.EVENT]: {
-    id: 'Tags.EVENT',
+    id: 'ContributionType.Event',
     defaultMessage: 'Event',
   },
   [CollectiveCategory.USER]: {

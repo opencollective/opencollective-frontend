@@ -35,10 +35,10 @@ class Comment extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.messages = defineMessages({
-      edit: { id: 'comment.edit', defaultMessage: 'Edit' },
-      cancelEdit: { id: 'comment.cancelEdit', defaultMessage: 'Cancel edit' },
-      delete: { id: 'comment.delete', defaultMessage: 'Delete' },
-      'delete.modal.cancel': { id: 'cancel', defaultMessage: 'Cancel' },
+      edit: { id: 'Edit', defaultMessage: 'Edit' },
+      cancelEdit: { id: 'CancelEdit', defaultMessage: 'Cancel edit' },
+      delete: { id: 'actions.delete', defaultMessage: 'Delete' },
+      'delete.modal.cancel': { id: 'actions.cancel', defaultMessage: 'Cancel' },
       'delete.modal.header': {
         id: 'delete.modal.header',
         defaultMessage: 'Delete comment',

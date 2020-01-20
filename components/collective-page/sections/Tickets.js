@@ -78,7 +78,7 @@ class SectionTickets extends React.PureComponent {
       <Box pt={[4, 5]} data-cy="Tickets">
         <ContainerSectionContent>
           <SectionTitle>
-            <FormattedMessage id="SectionTickets.Title" defaultMessage="Tickets" />
+            <FormattedMessage id="section.tickets.title" defaultMessage="Tickets" />
           </SectionTitle>
         </ContainerSectionContent>
 

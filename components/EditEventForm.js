@@ -33,12 +33,12 @@ class EditEventForm extends React.Component {
     this.state = { event, tiers: event.tiers || [{}], disabled: false, showDeleteModal: false };
 
     this.messages = defineMessages({
-      'slug.label': { id: 'event.slug.label', defaultMessage: 'url' },
-      'type.label': { id: 'event.type.label', defaultMessage: 'type' },
-      'name.label': { id: 'event.name.label', defaultMessage: 'name' },
-      'amount.label': { id: 'event.amount.label', defaultMessage: 'amount' },
+      'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
+      'type.label': { id: 'event.type.label', defaultMessage: 'Type' },
+      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },
       'description.label': {
-        id: 'event.description.label',
+        id: 'collective.description.label',
         defaultMessage: 'Short description',
       },
       'longDescription.label': {
@@ -46,7 +46,7 @@ class EditEventForm extends React.Component {
         defaultMessage: 'Long description',
       },
       'startsAt.label': {
-        id: 'event.startsAt.label',
+        id: 'startDateAndTime',
         defaultMessage: 'start date and time',
       },
       'endsAt.label': {
@@ -289,7 +289,7 @@ class EditEventForm extends React.Component {
                     <div>
                       <Button
                         className="blue"
-                        label={<FormattedMessage id="collective.delete.cancel.btn" defaultMessage={'Cancel'} />}
+                        label={<FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />}
                         disabled={deleting}
                         onClick={this.handleModal}
                       />

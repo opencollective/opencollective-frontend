@@ -33,7 +33,7 @@ const messages = defineMessages({
     defaultMessage: 'Email',
   },
   website: {
-    id: 'collective.website.label',
+    id: 'Fields.website',
     defaultMessage: 'Website',
   },
 });

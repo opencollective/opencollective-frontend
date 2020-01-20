@@ -45,12 +45,8 @@ class Update extends React.Component {
     this.toggleEdit = this.toggleEdit.bind(this);
     this.deleteUpdate = this.deleteUpdate.bind(this);
     this.messages = defineMessages({
-      pending: { id: 'update.pending', defaultMessage: 'pending' },
-      paid: { id: 'update.paid', defaultMessage: 'paid' },
-      approved: { id: 'update.approved', defaultMessage: 'approved' },
-      rejected: { id: 'update.rejected', defaultMessage: 'rejected' },
-      edit: { id: 'update.edit', defaultMessage: 'edit' },
-      cancelEdit: { id: 'update.cancelEdit', defaultMessage: 'cancel edit' },
+      edit: { id: 'Edit', defaultMessage: 'Edit' },
+      cancelEdit: { id: 'CancelEdit', defaultMessage: 'Cancel edit' },
       viewLatestUpdates: {
         id: 'update.viewLatestUpdates',
         defaultMessage: 'View latest updates',

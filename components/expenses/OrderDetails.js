@@ -73,7 +73,7 @@ class OrderDetails extends React.Component {
             </div>
             <div className="col">
               <label>
-                <FormattedMessage id="tier.amount" defaultMessage="amount" />
+                <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
               </label>
               <div className="amountDetails">
                 <span className="amount">

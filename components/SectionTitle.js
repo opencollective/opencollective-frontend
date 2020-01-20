@@ -51,7 +51,7 @@ class SectionTitle extends React.Component {
         id: 'section.updates.subtitle',
         defaultMessage: 'Stay up to dates with our latest activities and progress.',
       },
-      'events.title': { id: 'section.events.title', defaultMessage: 'Events' },
+      'events.title': { id: 'Events', defaultMessage: 'Events' },
       'events.subtitle': {
         id: 'section.events.subtitle',
         defaultMessage: 'Meet the community!',

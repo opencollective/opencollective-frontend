@@ -50,36 +50,36 @@ class AddFundsForm extends React.Component {
         defaultMessage: "Can't reach the API. Please try again in a few.",
       },
       'totalAmount.label': {
-        id: 'addfunds.amount.label',
-        defaultMessage: 'amount',
+        id: 'Fields.amount',
+        defaultMessage: 'Amount',
       },
       'description.label': {
-        id: 'addfunds.description.label',
-        defaultMessage: 'description',
+        id: 'Fields.description',
+        defaultMessage: 'Description',
       },
       'FromCollectiveId.label': {
         id: 'addfunds.FromCollectiveId.label',
         defaultMessage: 'source',
       },
       'FromCollectiveId.addfundstoorg.label': {
-        id: 'addfundstoorg.FromCollectiveId.label',
-        defaultMessage: 'host',
+        id: 'Member.Role.HOST',
+        defaultMessage: 'Host',
       },
       'hostFeePercent.label': {
-        id: 'addfunds.hostFeePercent.label',
+        id: 'HostFee',
         defaultMessage: 'Host fee',
       },
       'platformFeePercent.label': {
-        id: 'addfunds.platformFeePercent.label',
+        id: 'PlatformFee',
         defaultMessage: 'Platform fee',
       },
-      'name.label': { id: 'user.name.label', defaultMessage: 'name' },
-      'email.label': { id: 'user.email.label', defaultMessage: 'email' },
+      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'email.label': { id: 'Email', defaultMessage: 'Email' },
       'organization.label': {
         id: 'addfunds.organization.label',
         defaultMessage: 'organization',
       },
-      'website.label': { id: 'user.website.label', defaultMessage: 'website' },
+      'website.label': { id: 'Fields.website', defaultMessage: 'Website' },
     });
 
     this.totalAmountField = {

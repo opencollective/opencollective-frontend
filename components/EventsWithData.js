@@ -135,7 +135,7 @@ class EventsWithData extends React.Component {
                 className="btn btn-default"
                 target="_top"
               >
-                <FormattedMessage id="events.widget.createEvent" defaultMessage={'Create an Event'} />
+                <FormattedMessage id="events.create" defaultMessage={'Create an Event'} />
               </a>
             </div>
           )}
@@ -157,7 +157,7 @@ class EventsWithData extends React.Component {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <FormattedMessage id="events.widget.createEvent" defaultMessage={'Create an Event'} />
+                      <FormattedMessage id="events.create" defaultMessage={'Create an Event'} />
                     </a>
                   </div>
                 )}

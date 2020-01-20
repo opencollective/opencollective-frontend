@@ -64,11 +64,11 @@ class EditTiers extends React.Component {
         defaultMessage: 'remove ticket',
       },
       'BACKER.remove': {
-        id: 'tier.type.backer.remove',
+        id: 'tier.type.tier.remove',
         defaultMessage: 'remove tier',
       },
       'SPONSOR.remove': {
-        id: 'tier.type.sponsor.remove',
+        id: 'tier.type.tier.remove',
         defaultMessage: 'remove tier',
       },
       'TIER.add': {
@@ -80,28 +80,28 @@ class EditTiers extends React.Component {
         defaultMessage: 'add another ticket',
       },
       'BACKER.add': {
-        id: 'tier.type.backer.add',
+        id: 'tier.type.tier.add',
         defaultMessage: 'add another tier',
       },
       'SPONSOR.add': {
-        id: 'tier.type.sponsor.add',
+        id: 'tier.type.tier.add',
         defaultMessage: 'add another tier',
       },
       CUSTOM: { id: 'tier.type.custom', defaultMessage: 'custom tier' },
-      'type.label': { id: 'tier.type.label', defaultMessage: 'type' },
-      'name.label': { id: 'tier.name.label', defaultMessage: 'name' },
+      'type.label': { id: 'tier.type.label', defaultMessage: 'Type' },
+      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
       'amountType.label': {
         id: 'tier.amountType.label',
         defaultMessage: 'Amount type',
       },
-      'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
+      'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },
       'minimumAmount.label': { id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' },
       'defaultAmount.label': {
         id: 'tier.defaultAmount.label',
         defaultMessage: 'default amount',
       },
       'goal.label': {
-        id: 'tier.goal.label',
+        id: 'ContributionType.Goal',
         defaultMessage: 'Goal',
       },
       'button.label': {
@@ -129,11 +129,11 @@ class EditTiers extends React.Component {
         defaultMessage: 'suggested amounts',
       },
       'description.label': {
-        id: 'tier.description.label',
-        defaultMessage: 'description',
+        id: 'Fields.description',
+        defaultMessage: 'Description',
       },
       'startsAt.label': {
-        id: 'tier.startsAt.label',
+        id: 'startDateAndTime',
         defaultMessage: 'start date and time',
       },
       'endsAt.label': { id: 'tier.expiration.label', defaultMessage: 'Expiration' },

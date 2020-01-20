@@ -217,7 +217,7 @@ class SectionContribute extends React.PureComponent {
                       {subCollectives.length > 0 ? (
                         <FormattedMessage id="SectionContribute.MoreWays" defaultMessage="More ways to contribute" />
                       ) : (
-                        <FormattedMessage id="section.events.title" defaultMessage="Events" />
+                        <FormattedMessage id="Events" defaultMessage="Events" />
                       )}
                     </H3>
                     <Box m={2} flex="0 0 50px">

@@ -180,9 +180,9 @@ class VirtualCardDetails extends React.Component {
               <Box mx={1}>|</Box>
               <a onClick={() => this.toggleExpended()}>
                 {this.state.expended ? (
-                  <FormattedMessage id="virtualCards.closeDetails" defaultMessage="Close Details" />
+                  <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
                 ) : (
-                  <FormattedMessage id="virtualCards.viewDetails" defaultMessage="View Details" />
+                  <FormattedMessage id="viewDetails" defaultMessage="View Details" />
                 )}
               </a>
             </Flex>

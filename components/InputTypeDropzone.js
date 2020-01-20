@@ -21,7 +21,7 @@ const messages = defineMessages({
     id: 'uploadImage.isDragReject',
     defaultMessage: '🚫 This file type is not accepted',
   },
-  error: { id: 'uploadImage.error', defaultMessage: 'Error: {error}' },
+  error: { id: 'errorMsg', defaultMessage: 'Error: {error}' },
 });
 
 const InputTypeDropzone = props => {

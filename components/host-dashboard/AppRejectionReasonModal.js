@@ -57,7 +57,7 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
       <ModalFooter>
         <Container display="flex" justifyContent="flex-end">
           <StyledButton mx={20} onClick={onClose}>
-            <FormattedMessage id="appRejectionReason.modal.cancel.btn" defaultMessage="Cancel" />
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
           <StyledButton
             buttonStyle="primary"
@@ -73,7 +73,7 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
               onClose();
             }}
           >
-            <FormattedMessage id="appRejectionReason.modal.continue.btn" defaultMessage="Continue" />
+            <FormattedMessage id="actions.continue" defaultMessage="Continue" />
           </StyledButton>
         </Container>
       </ModalFooter>

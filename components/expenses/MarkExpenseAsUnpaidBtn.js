@@ -50,7 +50,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
             buttonStyle="primary"
             onClick={() => handleOnClickContinue()}
           >
-            <FormattedMessage id="expense.markAsUnpaid.continue.btn" defaultMessage="Continue" />
+            <FormattedMessage id="actions.continue" defaultMessage="Continue" />
           </StyledButton>
         </Fragment>
       ) : (

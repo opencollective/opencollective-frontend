@@ -45,8 +45,8 @@ class PaymentMethodChooser extends React.Component {
         defaultMessage: 'New Credit Card',
       },
       'paymentMethod.save': { id: 'save', defaultMessage: 'Save' },
-      'paymentMethod.cancel': {
-        id: 'paymentMethod.cancel',
+      'actions.cancel': {
+        id: 'actions.cancel',
         defaultMessage: 'Cancel',
       },
       'paymentMethod.success': {
@@ -304,7 +304,7 @@ class PaymentMethodChooser extends React.Component {
         {this.props.editMode && (
           <div className="actions">
             <SmallButton className="no" onClick={this.resetForm}>
-              {intl.formatMessage(this.messages['paymentMethod.cancel'])}
+              {intl.formatMessage(this.messages['actions.cancel'])}
             </SmallButton>
 
             <SmallButton

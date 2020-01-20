@@ -472,10 +472,7 @@ class CreateVirtualCardsForm extends Component {
     return (
       <form ref={this.form} onSubmit={this.onSubmit}>
         <Flex flexDirection="column">
-          <InlineField
-            name="amount"
-            label={<FormattedMessage id="virtualCards.create.amount" defaultMessage="Amount" />}
-          >
+          <InlineField name="amount" label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}>
             <StyledInputAmount
               id="virtualcard-amount"
               currency={currency}
@@ -492,7 +489,7 @@ class CreateVirtualCardsForm extends Component {
 
           <InlineField
             name="paymentMethod"
-            label={<FormattedMessage id="virtualCards.create.paymentMethod" defaultMessage="Payment Method" />}
+            label={<FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />}
           >
             <PaymentMethodSelect
               disabled={submitting}

@@ -57,7 +57,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
       {Boolean(platformFee) && (
         <AmountLine>
           <Label color="black.500">
-            <FormattedMessage id="contribution.platformFeePercent" defaultMessage="Platform fee" />
+            <FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />
             {` (-${platformFeePercent}%)`}
           </Label>
           <Span fontSize="LeadParagraph" color="black.500">
@@ -319,7 +319,7 @@ const StepBreakdown = ({
                             dispatchChange({ number }, hasError);
                           }}
                         >
-                          <FormattedMessage id="contribute.taxNumberBtn" defaultMessage="Done" />
+                          <FormattedMessage id="actions.done" defaultMessage="Done" />
                         </StyledButton>
                       </Container>
                       {formState.error === 'invalid' && (

@@ -54,7 +54,7 @@ class ExportData extends React.Component {
         <ExportImages collective={collective} />
 
         <h1>
-          <FormattedMessage id="ExportContributors.Title" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
         </h1>
         <p>
           <FormattedMessage
@@ -70,11 +70,7 @@ class ExportData extends React.Component {
         </div>
 
         <h1>
-          <FormattedMessage
-            id="ExportContributors.Title"
-            defaultMessage="Export {format}"
-            values={{ format: 'JSON' }}
-          />
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
         </h1>
         <p>
           <FormattedMessage

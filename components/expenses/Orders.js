@@ -126,7 +126,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'PENDING' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PENDING')}
               >
-                <FormattedMessage id="orders.pending" defaultMessage="pending" />
+                <FormattedMessage id="order.pending" defaultMessage="pending" />
               </Button>
               <Button
                 className="filterBtn paid"
@@ -134,7 +134,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'PAID' ? 'primary' : 'default'}
                 onClick={() => this.refetch('PAID')}
               >
-                <FormattedMessage id="orders.paid" defaultMessage="paid" />
+                <FormattedMessage id="order.paid" defaultMessage="paid" />
               </Button>
               <Button
                 className="filterBtn cancelled"
@@ -142,7 +142,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'CANCELLED' ? 'primary' : 'default'}
                 onClick={() => this.refetch('CANCELLED')}
               >
-                <FormattedMessage id="orders.cancelled" defaultMessage="cancelled" />
+                <FormattedMessage id="order.cancelled" defaultMessage="cancelled" />
               </Button>
               <Button
                 className="filterBtn error"
@@ -150,7 +150,7 @@ class Orders extends React.Component {
                 bsStyle={this.state.status === 'ERROR' ? 'primary' : 'default'}
                 onClick={() => this.refetch('ERROR')}
               >
-                <FormattedMessage id="orders.error" defaultMessage="error" />
+                <FormattedMessage id="order.error" defaultMessage="error" />
               </Button>
             </ButtonGroup>
           </div>

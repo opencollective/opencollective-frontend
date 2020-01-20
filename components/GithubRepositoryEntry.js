@@ -155,7 +155,7 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
 
             <Box mb={3}>
               <StyledInputField
-                label={<FormattedMessage id="GithubFlow.CollectiveURL" defaultMessage="Collective URL" />}
+                label={<FormattedMessage id="Collective.URL" defaultMessage="Collective URL" />}
                 htmlFor="slug"
                 error={getFieldError('slug')}
               >

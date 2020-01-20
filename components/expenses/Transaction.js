@@ -183,9 +183,9 @@ class Transaction extends React.Component {
                 {' | '}
                 <a onClick={() => this.setState({ viewDetails: !this.state.viewDetails })}>
                   {this.state.viewDetails ? (
-                    <FormattedMessage id="transaction.closeDetails" defaultMessage="Close Details" />
+                    <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
                   ) : (
-                    <FormattedMessage id="transaction.viewDetails" defaultMessage="View Details" />
+                    <FormattedMessage id="viewDetails" defaultMessage="View Details" />
                   )}
                 </a>
               </Fragment>

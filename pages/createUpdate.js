@@ -127,7 +127,7 @@ class CreateUpdatePage extends React.Component {
                   </p>
                   <p>
                     <Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}>
-                      <FormattedMessage id="login.button" defaultMessage="Sign In" />
+                      <FormattedMessage id="signIn" defaultMessage="Sign In" />
                     </Button>
                   </p>
                 </div>

@@ -99,7 +99,7 @@ class MarkExpenseAsPaidBtn extends React.Component {
       >
         {loading ? (
           <React.Fragment>
-            <StyledSpinner /> <FormattedMessage id="expense.payExpenseBtn.processing" defaultMessage="Processing..." />
+            <StyledSpinner /> <FormattedMessage id="ProcessingWithDots" defaultMessage="Processing…" />
           </React.Fragment>
         ) : (
           <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />

@@ -21,15 +21,15 @@ class CollectiveCard extends React.Component {
 
     this.messages = defineMessages({
       'membership.role.host': {
-        id: 'membership.role.host',
-        defaultMessage: 'host',
+        id: 'Member.Role.HOST',
+        defaultMessage: 'Host',
       },
       'roles.admin.label': {
-        id: 'roles.admin.label',
+        id: 'Member.Role.ADMIN',
         defaultMessage: 'Collective Admin',
       },
       'roles.member.label': {
-        id: 'roles.member.label',
+        id: 'Member.Role.MEMBER',
         defaultMessage: 'Core Contributor',
       },
       'tier.name.sponsor': {
@@ -325,7 +325,7 @@ class CollectiveCard extends React.Component {
                     <Currency value={collective.stats.totalAmountSpent} currency={collective.currency} />
                   </div>
                   <div className="label">
-                    <FormattedMessage id="collective.card.stats.totalAmountSpent" defaultMessage="contributed" />
+                    <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />
                   </div>
                 </div>
               </div>

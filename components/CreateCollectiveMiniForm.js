@@ -50,7 +50,7 @@ const msg = defineMessages({
     defaultMessage: 'Admin name',
   },
   name: {
-    id: 'Collective.Name',
+    id: 'Fields.name',
     defaultMessage: 'Name',
   },
   organizationName: {
@@ -62,11 +62,11 @@ const msg = defineMessages({
     defaultMessage: 'Full name',
   },
   website: {
-    id: 'collective.website.label',
+    id: 'Fields.website',
     defaultMessage: 'Website',
   },
   cancel: {
-    id: 'cancel',
+    id: 'actions.cancel',
     defaultMessage: 'Cancel',
   },
   save: {
