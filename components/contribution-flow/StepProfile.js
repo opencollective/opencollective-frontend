@@ -56,7 +56,7 @@ const useForm = ({ onProfileChange }) => {
 
       if (selected.key === 'incognito') {
         const userData = { name: 'incognito', type: 'USER', isIncognito: true };
-        setState({ ...userData, ...omit(state, ['errors']) });
+        setState({ ...state, ...userData, ...omit(state, ['errors']) });
         return onProfileChange(userData);
       }
 
@@ -68,11 +68,12 @@ const useForm = ({ onProfileChange }) => {
       const { target } = event;
       if (!target.validity.valid) {
         onProfileChange(null);
-        setState({ [target.name]: undefined });
+        setState({ ...state, [target.name]: undefined });
         return;
       }
 
       const newState = {
+        ...state,
         [target.name]: target.value,
       };
       setState({
@@ -82,9 +83,10 @@ const useForm = ({ onProfileChange }) => {
       onProfileChange(omit(newState, ['errors']));
     },
     onSearch: ({ target }) => {
-      setState({
+      setState(state => ({
+        ...state,
         search: target.value,
-      });
+      }));
     },
     getFieldProps: name => ({
       defaultValue: state[name] || '',
@@ -114,6 +116,7 @@ const useForm = ({ onProfileChange }) => {
 
         setState(state => {
           return {
+            ...state,
             errors: { ...state.errors, [target.name]: error },
           };
         });
