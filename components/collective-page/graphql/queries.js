@@ -171,6 +171,11 @@ export const getCollectivePageQuery = gql`
       updates(limit: 3, onlyPublishedUpdates: true) {
         ...UpdatesFieldsFragment
       }
+      plan {
+        hostDashboard
+        hostedCollectives
+        hostedCollectivesLimit
+      }
 
       ... on Event {
         timezone

@@ -33,9 +33,12 @@ import ExternalLink from '../ExternalLink';
 import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
+import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
+import EditHostSettings from './EditHostSettings';
+
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
 
 class EditCollectiveForm extends React.Component {
@@ -337,6 +340,9 @@ class EditCollectiveForm extends React.Component {
       return (
         <Box>
           {collective.type === CollectiveType.USER && <EditUserEmailForm />}
+          {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
+            <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
+          )}
           {collective.type === CollectiveType.COLLECTIVE && (
             <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
           )}
@@ -371,6 +377,8 @@ class EditCollectiveForm extends React.Component {
       return (
         <EditHost collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
       );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS) {
+      return <EditHostSettings collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS) {
       return <EditPaymentMethods collectiveSlug={collective.slug} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS) {

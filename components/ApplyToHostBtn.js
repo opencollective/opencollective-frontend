@@ -33,6 +33,7 @@ class ApplyToHostBtn extends React.Component {
     showConditions: PropTypes.bool,
     buttonStyle: PropTypes.string,
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    disabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -41,7 +42,7 @@ class ApplyToHostBtn extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, host, showConditions, buttonStyle, minWidth } = this.props;
+    const { LoggedInUser, host, showConditions, buttonStyle, minWidth, disabled } = this.props;
 
     return (
       <div className="ApplyToHostBtn">
@@ -55,7 +56,7 @@ class ApplyToHostBtn extends React.Component {
         </style>
         {!LoggedInUser && (
           <Link route={`/${host.slug}/apply`}>
-            <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} data-cy="host-apply-btn">
+            <StyledButton buttonStyle={buttonStyle} disabled={disabled} minWidth={minWidth} data-cy="host-apply-btn">
               <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
             </StyledButton>
           </Link>
@@ -64,6 +65,7 @@ class ApplyToHostBtn extends React.Component {
           <ApplyToHostBtnLoggedIn
             LoggedInUser={LoggedInUser}
             host={host}
+            disabled={disabled}
             buttonStyle={buttonStyle}
             minWidth={minWidth}
           />
