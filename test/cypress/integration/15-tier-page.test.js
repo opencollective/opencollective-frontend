@@ -32,11 +32,14 @@ describe('Tier page', () => {
   });
 
   it('Can edit long description', () => {
+    // {ctrl}b fails on macos
+    // {ctrl} maps control key & {meta} maps command key
+    const ctrlOrMetaKey = Cypress.platform === 'darwin' ? '{meta}' : '{ctrl}';
     cy.login({ redirect: tierUrl });
     cy.get('[data-cy="Btn-Add-longDescription"]').click();
     cy.get('[data-cy="RichTextEditor"] trix-editor').type('Hello world!');
     cy.get('[data-cy="RichTextEditor"] trix-editor').type('{selectall}');
-    cy.get('[data-cy="RichTextEditor"] trix-editor').type('{ctrl}b');
+    cy.get('[data-cy="RichTextEditor"] trix-editor').type(`${ctrlOrMetaKey}b`);
     cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
     cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
   });
