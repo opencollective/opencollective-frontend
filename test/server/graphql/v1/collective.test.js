@@ -905,7 +905,16 @@ describe('server/graphql/v1/collective', () => {
     });
 
     it('apply to host', async () => {
-      const { hostCollective } = await store.newHost('brusselstogether', 'EUR', 5);
+      const { hostCollective } = await store.newHost(
+        'brusselstogether',
+        'EUR',
+        5,
+        {},
+        {
+          type: 'ORGANIZATION',
+          isHostAccount: true,
+        },
+      );
 
       const collective = {
         id: pubnubCollective.id,

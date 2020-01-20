@@ -1478,6 +1478,12 @@ export const TierType = new GraphQLObjectType({
           return tier;
         },
       },
+      data: {
+        type: GraphQLJSON,
+        resolve(tier) {
+          return tier.data;
+        },
+      },
     };
   },
 });

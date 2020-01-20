@@ -641,14 +641,13 @@ export async function completePledge(remoteUser, order) {
  * Cancel user's subscription. We don't prevent this event is user is limited (canUseFeature -> false)
  * because we don't want to prevent users from cancelling their subscriptions.
  */
-export function cancelSubscription(remoteUser, orderId) {
+export async function cancelSubscription(remoteUser, orderId) {
   if (!remoteUser) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in to cancel a subscription',
     });
   }
 
-  let order = null;
   const query = {
     where: {
       id: orderId,
@@ -659,47 +658,36 @@ export function cancelSubscription(remoteUser, orderId) {
       { model: models.Collective, as: 'fromCollective' },
     ],
   };
-  return (
-    models.Order.findOne(query)
-      .tap(o => (order = o))
-      .tap(order => {
-        if (!order) {
-          throw new Error('Subscription not found');
-        }
-        return Promise.resolve();
-      })
-      .tap(order => {
-        if (!remoteUser.isAdmin(order.FromCollectiveId)) {
-          throw new errors.Unauthorized({
-            message: "You don't have permission to cancel this subscription",
-          });
-        }
-        return Promise.resolve();
-      })
-      .tap(order => {
-        if (!order.Subscription.isActive && order.status === status.CANCELLED) {
-          throw new Error('Subscription already canceled');
-        }
-        return Promise.resolve();
-      })
-      .then(order => Promise.all([order.update({ status: status.CANCELLED }), order.Subscription.deactivate()]))
 
-      // createActivity - that sends out the email
-      .then(() =>
-        models.Activity.create({
-          type: activities.SUBSCRIPTION_CANCELED,
-          CollectiveId: order.CollectiveId,
-          UserId: order.CreatedByUserId,
-          data: {
-            subscription: order.Subscription,
-            collective: order.collective.minimal,
-            user: remoteUser.minimal,
-            fromCollective: order.fromCollective.minimal,
-          },
-        }),
-      )
-      .then(() => models.Order.findOne(query))
-  ); // need to fetch it second time to get updated data.
+  const order = await models.Order.findOne(query);
+
+  if (!order) {
+    throw new Error('Subscription not found');
+  }
+  if (!remoteUser.isAdmin(order.FromCollectiveId)) {
+    throw new errors.Unauthorized({
+      message: "You don't have permission to cancel this subscription",
+    });
+  }
+  if (!order.Subscription.isActive && order.status === status.CANCELLED) {
+    throw new Error('Subscription already canceled');
+  }
+
+  await order.update({ status: status.CANCELLED });
+  await order.Subscription.deactivate();
+  await models.Activity.create({
+    type: activities.SUBSCRIPTION_CANCELED,
+    CollectiveId: order.CollectiveId,
+    UserId: order.CreatedByUserId,
+    data: {
+      subscription: order.Subscription,
+      collective: order.collective.minimal,
+      user: remoteUser.minimal,
+      fromCollective: order.fromCollective.minimal,
+    },
+  });
+
+  return models.Order.findOne(query);
 }
 
 export async function updateSubscription(remoteUser, args) {
@@ -998,9 +986,18 @@ export async function addFundsToCollective(order, remoteUser) {
     throw new Error('Orders cannot be created for a collective by that same collective.');
   }
 
-  const HostCollectiveId = await collective.getHostCollectiveId();
-  if (!remoteUser.isAdmin(HostCollectiveId) && !remoteUser.isRoot()) {
+  const host = await collective.getHostCollective();
+  if (!remoteUser.isAdmin(host.id) && !remoteUser.isRoot()) {
     throw new Error('Only an site admin or collective host admin can add fund');
+  }
+
+  // Check limits
+  const hostPlan = await host.getPlan();
+  if (hostPlan.addedFundsLimit && hostPlan.addedFundsLimit <= hostPlan.addedFunds) {
+    throw new errors.PlanLimit({
+      message:
+        'The limit of "Added Funds" for the host has been reached. Please contact support@opencollective.com if you think this is an error.',
+    });
   }
 
   order.collective = collective;
@@ -1025,7 +1022,7 @@ export async function addFundsToCollective(order, remoteUser) {
       throw new Error(`From collective id ${order.fromCollective.id} not found`);
     } else if ([types.COLLECTIVE, types.EVENT].includes(fromCollective.type)) {
       const isAdminOfFromCollective = remoteUser.isRoot() || remoteUser.isAdmin(fromCollective.id);
-      if (!isAdminOfFromCollective && fromCollective.HostCollectiveId !== HostCollectiveId) {
+      if (!isAdminOfFromCollective && fromCollective.HostCollectiveId !== host.id) {
         const fromCollectiveHostId = await fromCollective.getHostCollectiveId();
         if (!remoteUser.isAdmin(fromCollectiveHostId)) {
           throw new Error("You don't have the permission to add funds from collectives you don't own or host.");

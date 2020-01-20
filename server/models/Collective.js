@@ -48,6 +48,8 @@ import { HOST_FEE_PERCENT } from '../constants/transactions';
 import { types } from '../constants/collectives';
 import expenseStatus from '../constants/expense_status';
 import expenseTypes from '../constants/expense_type';
+import plans, { PLANS_COLLECTIVE_SLUG } from '../constants/plans';
+
 import { getFxRate } from '../lib/currency';
 
 const debug = debugLib('collective');
@@ -460,6 +462,16 @@ export default function(Sequelize, DataTypes) {
         type: DataTypes.DATE,
         allowNull: true,
       },
+
+      isHostAccount: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      plan: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       paranoid: true,
@@ -849,15 +861,18 @@ export default function(Sequelize, DataTypes) {
 
   // run when attaching a Stripe Account to this user/organization collective
   // this Payment Method will be used for "Add Funds"
-  Collective.prototype.becomeHost = function() {
-    this.data = this.data || {};
-    return models.PaymentMethod.findOne({
-      where: { service: 'opencollective', CollectiveId: this.id },
-    }).then(pm => {
-      if (pm) {
-        return null;
-      }
-      return models.PaymentMethod.create({
+  Collective.prototype.becomeHost = async function() {
+    if (this.type !== 'USER' && this.type !== 'ORGANIZATION') {
+      throw new Error('Only USER or ORGANIZATION can become Host.');
+    }
+
+    if (!this.isHostAccount) {
+      await this.update({ isHostAccount: true });
+    }
+
+    const pm = await models.PaymentMethod.findOne({ where: { service: 'opencollective', CollectiveId: this.id } });
+    if (!pm) {
+      await models.PaymentMethod.create({
         CollectiveId: this.id,
         service: 'opencollective',
         type: 'collective',
@@ -865,15 +880,38 @@ export default function(Sequelize, DataTypes) {
         primary: true,
         currency: this.currency,
       });
-    });
+    }
+  };
+
+  /**
+   * If the collective is a host, it needs to remove existing hosted collectives before
+   * deactivating it as a host.
+   */
+  Collective.prototype.deactivateAsHost = async function() {
+    const hostedCollectives = await this.getHostedCollectivesCount();
+    if (hostedCollectives >= 1) {
+      throw new Error(
+        `You can't deactivate hosting while still hosting ${hostedCollectives} other collectives. Please contact support: support@opencollective.com.`,
+      );
+    }
+
+    // TODO unsubscribe from OpenCollective tier plan.
+
+    await this.update({ isHostAccount: false });
   };
 
   /**
    * If the collective is a host, this function return true in case it's open to applications.
    * It does **not** check that the collective is indeed a host.
    */
-  Collective.prototype.canApply = function() {
-    return Boolean(this.settings && this.settings.apply);
+  Collective.prototype.canApply = async function() {
+    const canApplySetting = Boolean(this.settings && this.settings.apply);
+    if (!canApplySetting) {
+      return false;
+    }
+
+    const hostPlan = await this.getPlan();
+    return !hostPlan.hostedCollectivesLimit || hostPlan.hostedCollectivesLimit > hostPlan.hostedCollectives;
   };
 
   /**
@@ -1475,6 +1513,11 @@ export default function(Sequelize, DataTypes) {
       throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
     }
 
+    const hostPlan = await hostCollective.getPlan();
+    if (hostPlan.hostedCollectivesLimit && hostPlan.hostedCollectives >= hostPlan.hostedCollectivesLimit) {
+      throw new Error('Host is already hosting the maximum amount of collectives its plan allows');
+    }
+
     const member = {
       role: roles.HOST,
       CreatedByUserId: creatorUser ? creatorUser.id : hostCollective.CreatedByUserId,
@@ -1643,6 +1686,9 @@ export default function(Sequelize, DataTypes) {
       const newHostCollective = await models.Collective.findByPk(newHostCollectiveId);
       if (!newHostCollective) {
         throw new Error('Host not found');
+      }
+      if (!newHostCollective.isHostAccount) {
+        await newHostCollective.becomeHost();
       }
       return this.addHost(newHostCollective, creatorUser);
     } else {
@@ -2189,12 +2235,15 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.isHost = function() {
+    if (this.isHostAccount) {
+      return Promise.resolve(true);
+    }
+
     if (this.type !== 'ORGANIZATION' && this.type !== 'USER') {
       return Promise.resolve(false);
     }
-    return models.Member.findOne({
-      where: { MemberCollectiveId: this.id, role: 'HOST' },
-    }).then(r => Boolean(r));
+
+    return models.Member.findOne({ where: { MemberCollectiveId: this.id, role: 'HOST' } }).then(r => Boolean(r));
   };
 
   Collective.prototype.isHostOf = function(CollectiveId) {
@@ -2319,6 +2368,50 @@ export default function(Sequelize, DataTypes) {
     }
 
     return `${sections.join('/')}.${args.format || 'png'}`;
+  };
+
+  Collective.prototype.getHostedCollectivesCount = function() {
+    // This method is intended for hosts
+    if (!this.isHostAccount) {
+      return Promise.resolve(null);
+    }
+    return models.Collective.count({
+      where: { HostCollectiveId: this.id, type: types.COLLECTIVE },
+    });
+  };
+
+  Collective.prototype.getTotalAddedFunds = async function() {
+    // This method is intended for hosts
+    if (!this.isHostAccount) {
+      return Promise.resolve(null);
+    }
+    // This method is intended for hosts
+    const result = await models.Transaction.findOne({
+      attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']],
+      where: { type: 'CREDIT', HostCollectiveId: this.id, platformFeeInHostCurrency: 0 },
+      raw: true,
+    });
+
+    return result.total;
+  };
+
+  Collective.prototype.getPlan = async function() {
+    const [hostedCollectives, addedFunds] = await Promise.all([
+      this.getHostedCollectivesCount(),
+      this.getTotalAddedFunds(),
+    ]);
+    if (this.plan) {
+      const tier = await models.Tier.findOne({
+        where: { slug: this.plan, deletedAt: null },
+        include: [{ model: models.Collective, where: { slug: PLANS_COLLECTIVE_SLUG } }],
+      });
+      const plan = (tier && tier.data) || plans[this.plan];
+      if (plan) {
+        const extraPlanData = get(this.data, 'plan', {});
+        return { name: this.plan, hostedCollectives, addedFunds, ...plan, ...extraPlanData };
+      }
+    }
+    return { name: 'default', hostedCollectives, addedFunds, ...plans.default };
   };
 
   /**

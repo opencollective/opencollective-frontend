@@ -4,6 +4,7 @@ import * as utils from '../../utils';
 import sinon from 'sinon';
 import emailLib from '../../../server/lib/email';
 import { roles } from '../../../server/constants';
+import plans from '../../../server/constants/plans';
 
 const { Transaction, Collective, User } = models;
 
@@ -99,6 +100,7 @@ describe('Collective model', () => {
       type: 'CREDIT',
       CreatedByUserId: 2,
       FromCollectiveId: 2,
+      platformFeeInHostCurrency: 0,
     },
   ];
 
@@ -288,6 +290,7 @@ describe('Collective model', () => {
     it('fails to add another host', async () => {
       try {
         await collective.addHost(newHost, user1);
+        throw new Error("Didn't throw expected error!");
       } catch (e) {
         expect(e.message).to.contain('This collective already has a host');
       }
@@ -296,8 +299,18 @@ describe('Collective model', () => {
     it('fails to change host if there is a pending balance', async () => {
       try {
         await collective.changeHost();
+        throw new Error("Didn't throw expected error!");
       } catch (e) {
         expect(e.message).to.contain('Unable to change host: you still have a balance of $965');
+      }
+    });
+
+    it('fails to deactivate as host if it is hosting any collective', async () => {
+      try {
+        await hostUser.collective.deactivateAsHost();
+        throw new Error("Didn't throw expected error!");
+      } catch (e) {
+        expect(e.message).to.contain("You can't deactivate hosting while still hosting");
       }
     });
 
@@ -344,6 +357,17 @@ describe('Collective model', () => {
       expect(applyArgs).to.exist;
       expect(applyArgs[0]).to.equal(user1.email);
       expect(applyArgs[3].from).to.equal('hello@wwcode.opencollective.com');
+    });
+
+    it('returns active plan', async () => {
+      const plan = await hostUser.collective.getPlan();
+
+      expect(plan).to.deep.equal({
+        name: 'default',
+        hostedCollectives: 2,
+        addedFunds: 500,
+        ...plans.default,
+      });
     });
   });
 

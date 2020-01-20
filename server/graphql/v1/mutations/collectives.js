@@ -460,27 +460,36 @@ export async function approveCollective(remoteUser, CollectiveId) {
     });
   }
 
-  const hostCollective = await collective.getHostCollective();
-  if (!hostCollective) {
+  const host = await collective.getHostCollective();
+  if (!host) {
     throw new errors.ValidationFailed({
-      message: 'We could not get the Host data for the Collective. Maybe they cancel their application.',
+      message: 'We could not get the Host data for the Collective. Maybe they cancelled their application.',
     });
   }
 
-  if (!remoteUser.isAdmin(hostCollective.id)) {
+  if (!remoteUser.isAdmin(host.id)) {
     throw new errors.Unauthorized({
       message: 'You need to be logged in as an admin of the host of this collective to approve it',
-      data: { HostCollectiveId: hostCollective.id },
+      data: { HostCollectiveId: host.id },
+    });
+  }
+
+  // Check limits
+  const hostPlan = await host.getPlan();
+  if (hostPlan.hostedCollectivesLimit && hostPlan.hostedCollectivesLimit <= hostPlan.hostedCollectives) {
+    throw new errors.PlanLimit({
+      message:
+        'The limit of collectives for the host has been reached. Please contact support@opencollective.com if you think this is an error.',
     });
   }
 
   models.Activity.create({
     type: activities.COLLECTIVE_APPROVED,
     UserId: remoteUser.id,
-    CollectiveId: hostCollective.id,
+    CollectiveId: host.id,
     data: {
       collective: collective.info,
-      host: hostCollective.info,
+      host: host.info,
       user: {
         email: remoteUser.email,
       },
@@ -491,9 +500,8 @@ export async function approveCollective(remoteUser, CollectiveId) {
   models.Collective.findAll({
     where: {
       type: types.EVENT,
-      HostCollectiveId: hostCollective.id,
+      HostCollectiveId: host.id,
       ParentCollectiveId: collective.id,
-      isActive: false,
     },
   }).then(events => {
     events.map(event => {
@@ -654,6 +662,12 @@ export async function archiveCollective(_, args, req) {
     });
   }
 
+  if (await collective.isHost()) {
+    throw new Error(
+      `You can't archive your collective while being a host. Please, Desactivate your collective as Host and try again.`,
+    );
+  }
+
   const balance = await collective.getBalance();
 
   if (balance > 0) {
@@ -710,6 +724,12 @@ export async function deleteCollective(_, args, req) {
     throw new errors.NotFound({
       message: `Collective with id ${args.id} not found`,
     });
+  }
+
+  if (await collective.isHost()) {
+    throw new Error(
+      `You can't delete your collective while being a host. Please, Desactivate your collective as Host and try again.`,
+    );
   }
 
   if (!req.remoteUser.isAdmin(collective.id)) {
@@ -1056,4 +1076,50 @@ export async function rejectCollective(_, args, req) {
   });
 
   return collective.update({ HostCollectiveId: null });
+}
+
+export async function activateCollectiveAsHost(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to activate a collective as Host.',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(collective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as an Admin.',
+    });
+  }
+
+  return collective.becomeHost();
+}
+
+export async function deactivateCollectiveAsHost(_, args, req) {
+  if (!req.remoteUser) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in to deactivate a collective as Host.',
+    });
+  }
+
+  const collective = await models.Collective.findByPk(args.id);
+  if (!collective) {
+    throw new errors.NotFound({
+      message: `Collective with id ${args.id} not found`,
+    });
+  }
+
+  if (!req.remoteUser.isAdmin(collective.id)) {
+    throw new errors.Unauthorized({
+      message: 'You need to be logged in as an Admin.',
+    });
+  }
+
+  return collective.deactivateAsHost();
 }

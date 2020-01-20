@@ -11,6 +11,7 @@ import status from '../constants/order_status';
 import roles from '../constants/roles';
 import activities from '../constants/activities';
 import paymentProviders from '../paymentProviders';
+import { subscribeOrUpgradePlan, validatePlanRequest } from './plans';
 import * as libsubscription from './subscriptions';
 import * as libtransactions from './transactions';
 import { getRecommendedCollectives } from './data';
@@ -293,6 +294,7 @@ export const executeOrder = async (user, order, options) => {
   }
 
   await order.populate();
+  await validatePlanRequest(order);
 
   const transaction = await processOrder(order, options);
   if (transaction) {
@@ -305,6 +307,9 @@ export const executeOrder = async (user, order, options) => {
       { TierId: get(order, 'tier.id') },
       { order },
     );
+
+    // Update collective plan if subscribing to opencollective's tier plans
+    await subscribeOrUpgradePlan(order);
   }
 
   // If the user asked for it, mark the payment method as saved for future financial contributions

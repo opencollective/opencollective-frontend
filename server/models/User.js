@@ -503,6 +503,7 @@ export default (Sequelize, DataTypes) => {
       currency: userData.currency,
       hostFeePercent: userData.hostFeePercent,
       isActive: true,
+      isHostAccount: Boolean(userData.isHostAccount),
       CreatedByUserId: userData.CreatedByUserId || user.id,
       data: { UserId: user.id },
       settings: userData.settings,

@@ -32,3 +32,8 @@ export const FeatureNotSupportedForCollective = createError('FeatureNotSupported
 export const FeatureNotAllowedForUser = createError('FeatureNotAllowedForUser', {
   message: "You're not allowed to use this feature",
 });
+
+export const PlanLimit = createError('PlanLimit', {
+  message:
+    "You're not allowed to perform this action before of the plan limits. Please contact support@opencollective.com if you think this is an error.",
+});

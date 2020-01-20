@@ -7,13 +7,14 @@
 // to use in loops and repeted tests.
 
 import uuid from 'uuid/v4';
-import { get } from 'lodash';
+import { get, sample } from 'lodash';
 import models from '../../server/models';
 import { types as CollectiveType } from '../../server/constants/collectives';
 import { randEmail, randUrl } from '../stores';
 
 export const randStr = (prefix = '') => `${prefix}${uuid().split('-')[0]}`;
 export const randAmount = (min = 100, max = 10000000) => Math.floor(Math.random() * max) + min;
+export const multiple = (fn, n, args) => Promise.all([...Array(n).keys()].map(() => fn(args)));
 
 /**
  * Creates a fake user. All params are optionals.
@@ -162,5 +163,28 @@ export const fakeComment = async commentData => {
     CreatedByUserId,
     ExpenseId,
     ConversationId,
+  });
+};
+
+/**
+ * Creates a fake tier. All params are optionals.
+ */
+export const fakeTier = async (tierData = {}) => {
+  const name = randStr('tier');
+  const interval = sample(['month', 'year']);
+  const currency = sample(['USD', 'EUR']);
+  const amount = tierData.amount || randAmount(1, 100) * 100;
+  const description = `$${amount / 100}/${interval}`;
+
+  return models.Tier.create({
+    name,
+    type: 'TIER',
+    slug: name,
+    description,
+    amount,
+    interval,
+    currency,
+    maxQuantity: randAmount(),
+    ...tierData,
   });
 };

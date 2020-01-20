@@ -14,6 +14,8 @@ import {
   unarchiveCollective,
   sendMessageToCollective,
   rejectCollective,
+  activateCollectiveAsHost,
+  deactivateCollectiveAsHost,
 } from './mutations/collectives';
 import {
   createOrder,
@@ -926,6 +928,32 @@ const mutations = {
     },
     resolve(_, args) {
       return backyourstackMutations.dispatchOrder(args.id);
+    },
+  },
+  activateCollectiveAsHost: {
+    type: CollectiveInterfaceType,
+    description: 'Activate a collective as Host.',
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the collective (Organization or User)',
+      },
+    },
+    resolve(_, args, req) {
+      return activateCollectiveAsHost(_, args, req);
+    },
+  },
+  deactivateCollectiveAsHost: {
+    type: CollectiveInterfaceType,
+    description: 'Deactivate a collective as Host.',
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'ID of the collective (Organization or User)',
+      },
+    },
+    resolve(_, args, req) {
+      return deactivateCollectiveAsHost(_, args, req);
     },
   },
 };

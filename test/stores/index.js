@@ -102,7 +102,7 @@ export async function newIncognitoProfile(user) {
  * @returns {Object} with references for `hostCollective`,
  *  `hostAdmin`.
  */
-export async function newHost(name, currency, hostFee, userData = {}) {
+export async function newHost(name, currency, hostFee, userData = {}, hostData = {}) {
   // Host Admin
   const slug = slugify(name);
   const hostAdmin = (await newUser(`${name} Admin`, { firstName: 'host', lastName: 'admin', ...userData })).user;
@@ -115,6 +115,7 @@ export async function newHost(name, currency, hostFee, userData = {}) {
     CreatedByUserId: hostAdmin.id,
     isActive: true,
     settings: { apply: true },
+    ...hostData,
   });
   await hostCollective.addUserWithRole(hostAdmin, 'ADMIN');
   return { hostAdmin, hostCollective, [slug]: hostCollective };
