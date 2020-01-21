@@ -75,7 +75,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
       >
         <FormattedMessage
           values={{ type: collectiveType.toLowerCase() }}
-          id="collective.delete.button"
+          id="collective.delete.title"
           defaultMessage={'Delete this {type}'}
         />
       </StyledButton>
@@ -83,7 +83,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         <P color="rgb(224, 183, 0)">
           <FormattedMessage
             id="collective.delete.isHost"
-            defaultMessage={"You can't delete your collective while being a Host, please Desactivate as Host first."}
+            defaultMessage={"You can't delete your collective while being a Host, please deactivate as Host first."}
           />{' '}
         </P>
       )}
@@ -118,7 +118,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
             <StyledButton mx={20} onClick={() => setShowModal(false)}>
-              <FormattedMessage id="collective.delete.cancel.btn" defaultMessage={'Cancel'} />
+              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton
               buttonStyle="primary"
@@ -128,7 +128,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
                 handleDelete();
               }}
             >
-              <FormattedMessage id="collective.delete.confirm.btn" defaultMessage={'Delete'} />
+              <FormattedMessage id="actions.delete" defaultMessage="Delete" />
             </StyledButton>
           </Container>
         </ModalFooter>

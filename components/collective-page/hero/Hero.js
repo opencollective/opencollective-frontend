@@ -43,7 +43,7 @@ const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
 
 const Translations = defineMessages({
   website: {
-    id: 'collective.website.label',
+    id: 'Fields.website',
     defaultMessage: 'Website',
   },
 });

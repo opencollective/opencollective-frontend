@@ -19,16 +19,12 @@ class CreateOrganizationForm extends React.Component {
 
     this.messages = defineMessages({
       'order.organization.name': {
-        id: 'tier.order.organization.name',
-        defaultMessage: 'name',
+        id: 'Fields.name',
+        defaultMessage: 'Name',
       },
       'order.organization.website': {
-        id: 'tier.order.organization.website',
-        defaultMessage: 'website',
-      },
-      'order.organization.twitterHandle': {
-        id: 'tier.order.organization.twitterHandle',
-        defaultMessage: 'Twitter',
+        id: 'Fields.website',
+        defaultMessage: 'Website',
       },
       'order.organization.twitterHandle.description': {
         id: 'tier.order.organization.twitterHandle.description',
@@ -79,7 +75,7 @@ class CreateOrganizationForm extends React.Component {
               type="text"
               name="organization_twitterHandle"
               pre="@"
-              label={intl.formatMessage(this.messages['order.organization.twitterHandle'])}
+              label="Twitter"
               help={intl.formatMessage(this.messages['order.organization.twitterHandle.description'])}
               onChange={value => this.handleChange('twitterHandle', value)}
             />

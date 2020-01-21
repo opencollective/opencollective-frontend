@@ -55,7 +55,7 @@ class TransactionDetails extends React.Component {
     super(props);
     this.messages = defineMessages({
       taxAmount: {
-        id: 'transaction.taxAmount',
+        id: 'tax.vatShort',
         defaultMessage: 'VAT',
       },
       hostFeeInHostCurrency: {
@@ -238,7 +238,7 @@ class TransactionDetails extends React.Component {
         {get(host, 'name') && (
           <div className="col">
             <label>
-              <FormattedMessage id="transaction.host" defaultMessage="host" />
+              <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" />
             </label>
             <Link route={`/${host.slug}`}>{host.name}</Link> ({hostCurrency})
           </div>

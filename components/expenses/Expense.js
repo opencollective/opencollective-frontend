@@ -101,8 +101,8 @@ class Expense extends React.Component {
         id: 'closeDetails',
         defaultMessage: 'Close Details',
       },
-      edit: { id: 'expense.edit', defaultMessage: 'edit' },
-      cancelEdit: { id: 'expense.cancelEdit', defaultMessage: 'cancel edit' },
+      edit: { id: 'Edit', defaultMessage: 'Edit' },
+      cancelEdit: { id: 'CancelEdit', defaultMessage: 'Cancel edit' },
       viewDetails: {
         id: 'viewDetails',
         defaultMessage: 'View Details',
@@ -564,7 +564,7 @@ class Expense extends React.Component {
                         mr={2}
                         my={1}
                       >
-                        <FormattedMessage id="expense.delete.btn" defaultMessage="Delete" />
+                        <FormattedMessage id="actions.delete" defaultMessage="Delete" />
                       </StyledButton>
                     )}
                   </Flex>

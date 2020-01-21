@@ -79,7 +79,7 @@ const Triangle = styled.div`
 
 const Translations = defineMessages({
   settings: {
-    id: 'collective.settings',
+    id: 'Settings',
     defaultMessage: 'Settings',
   },
   uploadImage: {

@@ -52,8 +52,8 @@ class EditGoals extends React.Component {
       balance: { id: 'goal.balance.label', defaultMessage: 'Balance' },
       yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
       title: { id: 'goal.title.label', defaultMessage: 'Title' },
-      description: { id: 'goal.description.label', defaultMessage: 'Description' },
-      amount: { id: 'goal.amount.label', defaultMessage: 'Amount' },
+      description: { id: 'Fields.description', defaultMessage: 'Description' },
+      amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
       showToggle: { id: 'goal.show', defaultMessage: 'Show the goals on my collective page' },
     });
 

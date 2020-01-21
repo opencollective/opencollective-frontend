@@ -67,7 +67,7 @@ const EventSponsorCard = ({ sponsor }) => (
         <p className="name">{get(sponsor, 'tier.name')}</p>
         <p className="since">
           <FormattedMessage
-            id="EventSponsorCard.since"
+            id="membership.since"
             defaultMessage="since {date}"
             values={{ date: <FormattedDate value={sponsor.createdAt} month="long" year="numeric" /> }}
           />

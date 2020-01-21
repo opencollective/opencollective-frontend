@@ -39,16 +39,16 @@ class EditPaymentMethod extends React.Component {
 
     this.messages = defineMessages({
       'paymentMethod.edit': {
-        id: 'paymentMethod.edit',
-        defaultMessage: 'edit',
+        id: 'Edit',
+        defaultMessage: 'Edit',
       },
       'paymentMethod.remove': {
-        id: 'paymentMethod.remove',
-        defaultMessage: 'remove',
+        id: 'Remove',
+        defaultMessage: 'Remove',
       },
       'paymentMethod.editSubscriptions': {
         id: 'paymentMethod.editSubscriptions',
-        defaultMessage: 'edit recurring financial contributions',
+        defaultMessage: 'Edit recurring financial contributions',
       },
       'paymentMethod.monthlyLimitPerMember.label': {
         id: 'paymentMethod.monthlyLimitPerMember.label',

@@ -133,32 +133,6 @@ class GoalsCover extends React.Component {
     this.updateGoals = debounce(this.updateGoals.bind(this), 100, { maxWait: 200 });
     this.labelsRefs = {};
     this.messages = defineMessages({
-      admin: { id: 'menu.admin', defaultMessage: 'admin' },
-      backer: { id: 'menu.backer', defaultMessage: 'backer' },
-      attendee: { id: 'menu.attendee', defaultMessage: 'attendee' },
-      fundraiser: { id: 'menu.fundraiser', defaultMessage: 'fundraiser' },
-      parenting: { id: 'menu.parenting', defaultMessage: 'member collectives' },
-      about: { id: 'menu.about', defaultMessage: 'about' },
-      events: { id: 'menu.events', defaultMessage: 'events' },
-      updates: { id: 'menu.updates', defaultMessage: 'updates' },
-      budget: { id: 'menu.budget', defaultMessage: 'budget' },
-      contributors: { id: 'menu.contributors', defaultMessage: 'contributors' },
-      'menu.edit.collective': {
-        id: 'menu.edit.collective',
-        defaultMessage: 'edit collective',
-      },
-      'menu.edit.user': {
-        id: 'menu.edit.user',
-        defaultMessage: 'edit profile',
-      },
-      'menu.edit.organization': {
-        id: 'menu.edit.organization',
-        defaultMessage: 'edit organization',
-      },
-      'menu.edit.event': {
-        id: 'menu.edit.event',
-        defaultMessage: 'edit event',
-      },
       'bar.balance': {
         id: 'cover.bar.balance',
         defaultMessage: "Today's Balance",

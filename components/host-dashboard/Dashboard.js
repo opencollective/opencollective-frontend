@@ -72,7 +72,7 @@ class HostDashboard extends React.Component {
         <div id="expenses">
           <div className="header">
             <H5 my={3} textAlign="center">
-              <FormattedMessage id="host.expenses.title" defaultMessage="Expenses" />
+              <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
             </H5>
           </div>
           <ExpensesWithData
@@ -101,11 +101,7 @@ class HostDashboard extends React.Component {
       <div id="orders" className="col center-block">
         <div className="header">
           <H5 my={3} textAlign="center">
-            <FormattedMessage
-              id="collective.orders.title"
-              values={{ n: this.totalOrders }}
-              defaultMessage="Financial Contributions"
-            />
+            <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
           </H5>
         </div>
         <OrdersWithData

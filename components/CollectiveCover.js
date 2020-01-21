@@ -105,13 +105,13 @@ class CollectiveCover extends React.Component {
     super(props);
 
     this.messages = defineMessages({
-      contribute: { id: 'collective.contribute', defaultMessage: 'contribute' },
+      contribute: { id: 'Contribute', defaultMessage: 'Contribute' },
       apply: {
         id: 'host.apply.btn',
         defaultMessage: 'Apply with {collective}',
       },
-      ADMIN: { id: 'roles.admin.label', defaultMessage: 'Collective Admin' },
-      MEMBER: { id: 'roles.member.label', defaultMessage: 'Core Contributor' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Collective Admin' },
+      MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
     });
 
     this.description = props.description || props.collective.description;
@@ -605,10 +605,7 @@ ${description}`;
                   <div className="totalAmountSpent value">
                     <Currency value={stats.totalAmountSpent} currency={collective.currency} />
                   </div>
-                  <FormattedMessage
-                    id="collective.stats.totalAmountSpent.label"
-                    defaultMessage="Total amount contributed"
-                  />
+                  <FormattedMessage id="membership.totalDonations" defaultMessage="Total amount contributed" />
                 </div>
               </div>
             )}

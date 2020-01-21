@@ -30,7 +30,7 @@ class ExpensesSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/expenses/new`,
-        label: <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />,
+        label: <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />,
       };
     }
 

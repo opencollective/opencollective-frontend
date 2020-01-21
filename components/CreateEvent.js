@@ -127,7 +127,7 @@ class CreateEvent extends React.Component {
                 </p>
                 <p>
                   <Button bsStyle="primary" href={`/signin?next=/${collective.slug}/events/new`}>
-                    <FormattedMessage id="login.button" defaultMessage="Sign In" />
+                    <FormattedMessage id="signIn" defaultMessage="Sign In" />
                   </Button>
                 </p>
               </div>

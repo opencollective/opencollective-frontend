@@ -377,7 +377,7 @@ class CreateExpenseForm extends React.Component {
             <div className="row">
               <div className="col large">
                 <label>
-                  <FormattedMessage id="expense.description" defaultMessage="description" />
+                  <FormattedMessage id="Fields.description" defaultMessage="Description" />
                 </label>
                 <div className="description">
                   <span className="description">
@@ -396,7 +396,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage id="expense.amount" defaultMessage="amount" />
+                <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
               </label>
               <div className="amountDetails">
                 <span className="amount">
@@ -515,7 +515,7 @@ class CreateExpenseForm extends React.Component {
               <div>
                 <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
                   {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-                  {!this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />}
+                  {!this.state.loading && <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />}
                 </Button>
               </div>
 

@@ -40,7 +40,7 @@ class LoginBtn extends React.Component {
       return <StyledSpinner size="1em" />;
     }
 
-    return this.props.children || <FormattedMessage id="login.button" defaultMessage="Sign In" />;
+    return this.props.children || <FormattedMessage id="signIn" defaultMessage="Sign In" />;
   }
 
   render() {

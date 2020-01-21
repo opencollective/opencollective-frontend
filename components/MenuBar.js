@@ -99,7 +99,7 @@ class MenuBar extends React.Component {
         defaultMessage: 'edit collective',
       },
       'menu.edit.user': {
-        id: 'menu.edit.user',
+        id: 'collective.edit',
         defaultMessage: 'edit profile',
       },
       'menu.edit.organization': {

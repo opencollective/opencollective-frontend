@@ -111,7 +111,7 @@ class PayExpenseBtn extends React.Component {
       >
         {loading ? (
           <Fragment>
-            <StyledSpinner /> <FormattedMessage id="expense.payExpenseBtn.processing" defaultMessage="Processing..." />
+            <StyledSpinner /> <FormattedMessage id="ProcessingWithDots" defaultMessage="Processing…" />
           </Fragment>
         ) : (
           <FormattedMessage

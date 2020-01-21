@@ -8,7 +8,7 @@ import Contribute from './Contribute';
 
 const messages = defineMessages({
   title: {
-    id: 'CollectivePage.Contribute.Custom',
+    id: 'Donation',
     defaultMessage: 'Donation',
   },
   description: {

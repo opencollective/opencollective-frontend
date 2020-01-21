@@ -47,7 +47,7 @@ class UserCollective extends React.Component {
           'You can now make financial contributions as an Organization. You can also edit your Organization profile, add team members and admins, and attach a credit card with a monthly limit.',
       },
       'organization.isArchived': {
-        id: 'organization.isArchived',
+        id: 'collective.isArchived',
         defaultMessage: '{name} has been archived.',
       },
       'organization.isArchived.description': {
@@ -63,19 +63,19 @@ class UserCollective extends React.Component {
         defaultMessage: 'This account has been archived and is no longer active.',
       },
       'organization.collective.since': {
-        id: 'organization.collective.since',
-        defaultMessage: 'Contributing Since {year}',
+        id: 'ContributingSince',
+        defaultMessage: 'Contributing since {year}',
       },
       'user.collective.since': {
-        id: 'user.collective.since',
-        defaultMessage: 'Contributing Since {year}',
+        id: 'ContributingSince',
+        defaultMessage: 'Contributing since {year}',
       },
       'organization.collective.edit': {
         id: 'organization.collective.edit',
         defaultMessage: 'edit Organization',
       },
       'user.collective.edit': {
-        id: 'user.collective.edit',
+        id: 'collective.edit',
         defaultMessage: 'edit profile',
       },
       'user.collective.memberOf.collective.host.title': {
@@ -152,9 +152,9 @@ class UserCollective extends React.Component {
         id: 'section.admin',
         defaultMessage: 'Administrating',
       },
-      'section.member': { id: 'section.member', defaultMessage: 'Core Contributor' },
+      'section.member': { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       'section.backer': { id: 'section.backer', defaultMessage: 'Financial contributor' },
-      'section.attendee': { id: 'section.attendee', defaultMessage: 'Events' },
+      'section.attendee': { id: 'Events', defaultMessage: 'Events' },
       'section.fundraiser': {
         id: 'section.fundraiser',
         defaultMessage: 'Fund raising',

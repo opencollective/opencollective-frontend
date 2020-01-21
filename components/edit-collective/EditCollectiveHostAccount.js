@@ -110,7 +110,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
-        <FormattedMessage id="collective.hostAccount.title" defaultMessage={'Fiscal Host'} />
+        <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />
       </H2>
 
       {!isHostAccount && (
@@ -140,7 +140,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
 
       {!isHostAccount && (
         <StyledButton onClick={() => setModal({ type: 'Activate', show: true })} loading={processing} disabled={false}>
-          <FormattedMessage id="collective.hostAccount.activate.button" defaultMessage={'Activate as Host'} />
+          <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
         </StyledButton>
       )}
 
@@ -160,7 +160,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
           loading={processing}
           disabled={collective.plan.hostedCollectives > 0}
         >
-          <FormattedMessage id="collective.hostAccount.deactivate.button" defaultMessage={'Desactivate as Host'} />
+          <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
         </StyledButton>
       )}
 
@@ -177,13 +177,10 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
       <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
         <ModalHeader>
           {modal.type === 'Activate' && (
-            <FormattedMessage id="collective.hostAccount.modal.activate.header" defaultMessage={'Activate as Host'} />
+            <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
           )}
           {modal.type === 'Deactivate' && (
-            <FormattedMessage
-              id="collective.hostAccount.modal.deactivate.header"
-              defaultMessage={'Deactivate as Host'}
-            />
+            <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
           )}
         </ModalHeader>
         <ModalBody>
@@ -216,7 +213,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
             <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
-              <FormattedMessage id="collective.hostAccount.cancel.btn" defaultMessage={'Cancel'} />
+              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton
               buttonStyle="primary"
@@ -230,16 +227,10 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
               }}
             >
               {modal.type === 'Activate' && (
-                <FormattedMessage
-                  id="collective.hostAccount.confirm.activate.btn"
-                  defaultMessage={'Activate as Host'}
-                />
+                <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
               )}
               {modal.type === 'Deactivate' && (
-                <FormattedMessage
-                  id="collective.hostAccount.confirm.deactivate.btn"
-                  defaultMessage={'Deactivate as Host'}
-                />
+                <FormattedMessage id="host.deactivate" defaultMessage={'Deactivate as Host'} />
               )}
             </StyledButton>
           </Container>

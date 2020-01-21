@@ -40,7 +40,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
   return (
     <Box my={2}>
       <P fontSize="Tiny" textTransform="uppercase">
-        <FormattedMessage id="collective.stats.totalAmountSpent.label" defaultMessage="Total amount contributed" />
+        <FormattedMessage id="membership.totalDonations" defaultMessage="Total amount contributed" />
       </P>
       <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountStyles={amountStyles} />
     </Box>

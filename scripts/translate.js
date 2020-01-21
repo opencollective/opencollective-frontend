@@ -1,17 +1,20 @@
 import * as fs from 'fs';
 import { sync as globSync } from 'glob';
 import { sync as mkdirpSync } from 'mkdirp';
-import { orderBy, difference, has } from 'lodash';
+import { orderBy, difference, has, invertBy } from 'lodash';
 import locales from '../lib/constants/locales';
 
 const MESSAGES_PATTERN = './dist/messages/**/*.json';
 const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
+const DUPLICATED_IGNORED_IDS = new Set(['section.team.title', 'contribute.step.details']);
+const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other']);
 
 // Aggregates the default messages that were extracted from the app's
 // React components via the React Intl Babel plugin. An error will be thrown if
 // there are messages in different components that use the same `id`. The result
 // is a flat collection of `id: message` pairs for the app's default locale.
+const duplicateIds = [];
 const defaultMessages = globSync(MESSAGES_PATTERN)
   .map(filename => fs.readFileSync(filename, 'utf8'))
   .map(file => JSON.parse(file))
@@ -19,12 +22,17 @@ const defaultMessages = globSync(MESSAGES_PATTERN)
     descriptors.forEach(({ id, defaultMessage }) => {
       if (Object.prototype.hasOwnProperty.call(collection, id)) {
         if (collection[id] !== defaultMessage) {
-          console.error(`🛑 [Error] Duplicate message id with different messages: ${id}`);
+          duplicateIds.push(id);
         }
         return;
       }
       collection[id] = defaultMessage;
     });
+
+    if (duplicateIds.length > 0) {
+      duplicateIds.forEach(id => console.error(`🛑 [Error] Duplicate message id with different messages: ${id}`));
+      throw new Error('The strings include duplicate IDs with different messages');
+    }
 
     return collection;
   }, {});
@@ -97,6 +105,19 @@ const translate = (locale, defaultMessages, updatedKeys) => {
   fs.writeFileSync(`${LANG_DIR}${locale}.json`, translations);
 };
 
+const warnForDuplicateMessages = messages => {
+  const groupedMessages = invertBy(messages);
+  Object.entries(groupedMessages).forEach(([message, ids]) => {
+    const filteredIds = ids.filter(id => !DUPLICATED_IGNORED_IDS.has(id));
+    if (filteredIds.length > 1 && !DUPLICATED_IGNORED_MESSAGES.has(message.toLowerCase())) {
+      console.info(`ℹ️  Found similar message for IDs (${filteredIds.join(', ')}): ${message}`);
+    }
+  });
+};
+
+// Look for duplicate messages
+warnForDuplicateMessages(defaultMessages);
+
 // Load existing translations, check what changed
 const existingTranslationsObj = JSON.parse(fs.readFileSync(DEFAULT_TRANSLATIONS_FILE, 'utf8'));
 const diff = getDiff(existingTranslationsObj, defaultMessages);
@@ -115,3 +136,4 @@ supportedLocales.forEach(locale => {
 
 // Write root file at the end to only save if translations don't crash
 fs.writeFileSync(DEFAULT_TRANSLATIONS_FILE, convertToJSON(defaultMessages));
+console.info('✔️  Done!');

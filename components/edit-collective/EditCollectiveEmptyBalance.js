@@ -89,14 +89,14 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
             <ModalFooter>
               <Container display="flex" justifyContent="flex-end">
                 <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
-                  <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
+                  <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
                 </StyledButton>
                 <StyledButton
                   buttonStyle="primary"
                   data-cy="action"
                   onClick={() => setModal({ ...modal, show: false, isApproved: true })}
                 >
-                  <FormattedMessage id="collective.empty.confirm.btn" defaultMessage={'Confirm'} />
+                  <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
                 </StyledButton>
               </Container>
             </ModalFooter>

@@ -199,7 +199,7 @@ class EditPaymentMethods extends React.Component {
             <Span textTransform="capitalize">
               <FormattedMessage
                 id="paymentMethod.editSubscriptions"
-                defaultMessage="edit recurring financial contributions"
+                defaultMessage="Edit recurring financial contributions"
               />
             </Span>
           </Link>
@@ -346,7 +346,7 @@ class EditPaymentMethods extends React.Component {
               <img src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
             </Flex>
             <H2>
-              <FormattedMessage id="paymentMethods.manual.pricing" defaultMessage="Pricing" />
+              <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
             </H2>
             <P>
               <FormattedMessage
@@ -383,7 +383,7 @@ class EditPaymentMethods extends React.Component {
                 onClick={() => this.setState({ showManualPaymentMethodForm: false, error: null })}
                 disabled={submitting}
               >
-                <FormattedMessage id="paymentMethod.cancel" defaultMessage="Cancel" />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </StyledButton>
               <StyledButton
                 buttonStyle="primary"
@@ -393,7 +393,7 @@ class EditPaymentMethods extends React.Component {
                 disabled={submitting}
                 loading={submitting}
               >
-                <FormattedMessage id="paymentMethod.save" defaultMessage="Save" />
+                <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Box>
           </Container>
@@ -427,7 +427,7 @@ class EditPaymentMethods extends React.Component {
                 onClick={() => this.setState({ showCreditCardForm: false, error: null })}
                 disabled={submitting}
               >
-                <FormattedMessage id="paymentMethod.cancel" defaultMessage="Cancel" />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </StyledButton>
               <StyledButton
                 buttonStyle="primary"
@@ -437,7 +437,7 @@ class EditPaymentMethods extends React.Component {
                 disabled={submitting}
                 loading={submitting}
               >
-                <FormattedMessage id="paymentMethod.save" defaultMessage="Save" />
+                <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Box>
           </Container>

@@ -160,7 +160,7 @@ class HostPendingApplications extends React.Component {
                         buttonStyle="success"
                         minWidth={125}
                       >
-                        <FormattedMessage id="host.pending-applications.approve" defaultMessage="Approve" />
+                        <FormattedMessage id="actions.approve" defaultMessage="Approve" />
                       </StyledButton>
                     )}
                   </Mutation>
@@ -170,7 +170,7 @@ class HostPendingApplications extends React.Component {
                     m={1}
                     onClick={() => this.setState({ showRejectionModal: true, collectiveId: c.id })}
                   >
-                    <FormattedMessage id="host.pending-applications.reject" defaultMessage="Reject" />
+                    <FormattedMessage id="actions.reject" defaultMessage="Reject" />
                   </StyledButton>
                 </Fragment>
               )}

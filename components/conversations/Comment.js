@@ -66,13 +66,13 @@ const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, o
       {canEdit && (
         <CommentBtn onClick={onEdit} ml={2}>
           <Edit size="1em" />
-          <FormattedMessage tagName="span" id="comment.edit" defaultMessage="Edit" />
+          <FormattedMessage tagName="span" id="Edit" defaultMessage="Edit" />
         </CommentBtn>
       )}
       {canDelete && (
         <CommentBtn onClick={() => setDeleting(true)} ml={2}>
           <X size="1em" />
-          <FormattedMessage tagName="span" id="comment.delete" defaultMessage="Delete" />
+          <FormattedMessage tagName="span" id="actions.delete" defaultMessage="Delete" />
         </CommentBtn>
       )}
       {/** Confirm Modals */}

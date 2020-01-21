@@ -95,9 +95,9 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.changeUrl.label',
         defaultMessage: 'URL slug',
       },
-      'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
-      'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
-      'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
+      'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
+      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'collective.tos.label',
         defaultMessage: 'Terms of Service',
@@ -119,8 +119,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
-        id: 'collective.amount.label',
-        defaultMessage: 'amount',
+        id: 'Fields.amount',
+        defaultMessage: 'Amount',
       },
       'description.label': {
         id: 'collective.description.label',
@@ -141,7 +141,7 @@ class EditCollectiveForm extends React.Component {
           'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
       },
       'startsAt.label': {
-        id: 'collective.startsAt.label',
+        id: 'startDateAndTime',
         defaultMessage: 'start date and time',
       },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
@@ -149,16 +149,8 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.backgroundImage.label',
         defaultMessage: 'Cover image',
       },
-      'twitterHandle.label': {
-        id: 'collective.twitterHandle.label',
-        defaultMessage: 'Twitter',
-      },
-      'githubHandle.label': {
-        id: 'collective.githubHandle.label',
-        defaultMessage: 'Github',
-      },
       'website.label': {
-        id: 'collective.website.label',
+        id: 'Fields.website',
         defaultMessage: 'Website',
       },
       'markdown.label': {
@@ -186,7 +178,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
       'hostFeePercent.label': {
-        id: 'collective.hostFeePercent.label',
+        id: 'HostFee',
         defaultMessage: 'Host fee',
       },
       'hostFeePercent.description': {
@@ -472,6 +464,7 @@ class EditCollectiveForm extends React.Component {
           pre: 'https://twitter.com/',
           maxLength: 255,
           placeholder: '',
+          label: 'Twitter',
         },
         {
           name: 'githubHandle',
@@ -479,6 +472,7 @@ class EditCollectiveForm extends React.Component {
           pre: 'https://github.com/',
           maxLength: 39,
           placeholder: '',
+          label: 'Github',
         },
         {
           name: 'website',
