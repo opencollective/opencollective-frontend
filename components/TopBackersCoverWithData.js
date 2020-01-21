@@ -86,9 +86,15 @@ class TopBackersCoverWithData extends React.Component {
   }
 
   renderMember(member, index) {
-    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member, index);
-    if (member.member.type === 'COLLECTIVE') return this.renderOrganization(member, index);
-    if (member.member.type === 'USER') return this.renderUser(member, index);
+    if (member.member.type === 'ORGANIZATION') {
+      return this.renderOrganization(member, index);
+    }
+    if (member.member.type === 'COLLECTIVE') {
+      return this.renderOrganization(member, index);
+    }
+    if (member.member.type === 'USER') {
+      return this.renderUser(member, index);
+    }
   }
 
   render() {

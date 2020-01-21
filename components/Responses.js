@@ -10,7 +10,9 @@ class Responses extends React.Component {
 
   render() {
     const { responses } = this.props;
-    if (!responses || responses.length === 0) return <div />;
+    if (!responses || responses.length === 0) {
+      return <div />;
+    }
     return (
       <div className="Responses">
         <style jsx>

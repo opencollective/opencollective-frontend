@@ -23,7 +23,9 @@ class Membership extends React.Component {
 
     const name = (collective.name && collective.name.match(/^null/) ? null : collective.name) || collective.slug;
 
-    if (!name) return <div />;
+    if (!name) {
+      return <div />;
+    }
 
     return (
       <React.Fragment>

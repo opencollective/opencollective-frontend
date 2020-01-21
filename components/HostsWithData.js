@@ -182,7 +182,9 @@ export const addHostsData = graphql(getHostsQuery, {
           limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
           // Update the results object with new entries
           const { __typename, total, collectives } = previousResult.allHosts;
           const all = collectives.concat(fetchMoreResult.allHosts.collectives);

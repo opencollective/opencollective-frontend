@@ -19,7 +19,9 @@ export const transformResultInCSV = json => {
   const d = value => moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss');
 
   // Sanity check. It will return an empty CSV for the user
-  if (json.length === 0) return '';
+  if (json.length === 0) {
+    return '';
+  }
 
   // All the json lines contain the same values for these two
   // variables. It's save to get them from any index.

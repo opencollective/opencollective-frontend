@@ -510,7 +510,9 @@ class CreateOrderPage extends React.Component {
     if (this.props.contributeAs) {
       const otherProfiles = this.getOtherProfiles();
       const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
-      if (contributorProfile) return contributorProfile;
+      if (contributorProfile) {
+        return contributorProfile;
+      }
     }
     if (get(this.state, 'stepProfile')) {
       return this.state.stepProfile;
@@ -523,7 +525,9 @@ class CreateOrderPage extends React.Component {
   /** Returns logged-in user profile */
   getPersonalProfile() {
     const { LoggedInUser } = this.props;
-    if (!LoggedInUser) return {};
+    if (!LoggedInUser) {
+      return {};
+    }
 
     return { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
   }
@@ -531,7 +535,9 @@ class CreateOrderPage extends React.Component {
   /** Return an array of any other associated profile the user might control */
   getOtherProfiles() {
     const { LoggedInUser, collective } = this.props;
-    if (!LoggedInUser) return [];
+    if (!LoggedInUser) {
+      return [];
+    }
 
     return LoggedInUser.memberOf
       .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')

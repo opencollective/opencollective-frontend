@@ -64,7 +64,9 @@ class TierCard extends React.Component {
       tier.orders.map(o => o.fromCollective).filter(c => c && fromCollectiveTypeArray.includes(c.type)),
       c => c.id,
     );
-    if (fromCollectives.length === 0) return;
+    if (fromCollectives.length === 0) {
+      return;
+    }
     return (
       <div>
         <style jsx>

@@ -108,8 +108,11 @@ const EditHostSettings = props => {
 
           let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
           // Rename verb to Upgrade/Downgrade if subscribed to active Tier
-          if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
-          else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
+          if (subscribedTier && subscribedTier.amount > tier.amount) {
+            verb = 'Downgrade';
+          } else if (subscribedTier && subscribedTier.amount < tier.amount) {
+            verb = 'Upgrade';
+          }
 
           return (
             <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>

@@ -32,14 +32,18 @@ class Button extends React.Component {
 
   async onClick(e) {
     const { type, href, onClick, disabled } = this.props;
-    if (type === 'submit') return;
+    if (type === 'submit') {
+      return;
+    }
     e.preventDefault();
     if (href && href.substr(0, 1) !== '#') {
       await Router.pushRoute(href);
       window.scrollTo(0, 0);
       document.body.focus();
     }
-    if (!onClick) return;
+    if (!onClick) {
+      return;
+    }
     return !disabled && onClick && onClick();
   }
 

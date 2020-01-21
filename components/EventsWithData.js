@@ -75,14 +75,19 @@ class EventsWithData extends React.Component {
   render() {
     const { loading, allEvents } = this.props.data;
 
-    if (loading || !allEvents) return <div />;
+    if (loading || !allEvents) {
+      return <div />;
+    }
 
     const now = new Date(),
       pastEvents = [],
       futureEvents = [];
     allEvents.map(event => {
-      if (new Date(event.startsAt) > now) futureEvents.push(event);
-      else pastEvents.push(event);
+      if (new Date(event.startsAt) > now) {
+        futureEvents.push(event);
+      } else {
+        pastEvents.push(event);
+      }
     });
     pastEvents.reverse();
 

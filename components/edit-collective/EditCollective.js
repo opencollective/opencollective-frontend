@@ -98,7 +98,9 @@ class EditCollective extends React.Component {
   render() {
     const { intl, LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
 
-    if (!collective || !collective.slug) return <div />;
+    if (!collective || !collective.slug) {
+      return <div />;
+    }
 
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};

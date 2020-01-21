@@ -284,7 +284,9 @@ class EditTiers extends React.Component {
 
   removeTier(index) {
     let tiers = this.state.tiers;
-    if (index < 0 || index > tiers.length) return;
+    if (index < 0 || index > tiers.length) {
+      return;
+    }
     tiers = [...tiers.slice(0, index), ...tiers.slice(index + 1)];
     this.setState({ tiers });
     this.onChange({ tiers });

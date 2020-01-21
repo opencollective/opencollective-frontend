@@ -261,14 +261,18 @@ class EditCollectiveForm extends React.Component {
         'expenses',
       ];
       let section = hash.substr(1);
-      if (section === 'connectedAccounts') section = 'connected-accounts';
-      else if (section === 'paymentMethods') section = 'payment-methods';
-      if (legacySections.includes(section))
+      if (section === 'connectedAccounts') {
+        section = 'connected-accounts';
+      } else if (section === 'paymentMethods') {
+        section = 'payment-methods';
+      }
+      if (legacySections.includes(section)) {
         Router.pushRoute('editCollective', {
           ...this.props.router.query,
           slug: this.props.collective.slug,
           section: section,
         });
+      }
     }
   }
 

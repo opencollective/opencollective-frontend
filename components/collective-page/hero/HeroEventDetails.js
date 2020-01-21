@@ -104,7 +104,9 @@ class HeroEventDetails extends React.Component {
   }
 
   isSameDay(startsAt, endsAt, timezone) {
-    if (!endsAt) return true;
+    if (!endsAt) {
+      return true;
+    }
     const tzStartsAt = moment.tz(new Date(startsAt), timezone);
     const tzEndsAt = moment.tz(new Date(endsAt), timezone);
     return tzStartsAt.isSame(tzEndsAt, 'day');

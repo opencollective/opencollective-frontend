@@ -71,7 +71,9 @@ class Update extends React.Component {
   }
 
   async deleteUpdate() {
-    if (!confirm('😱 Are you really sure you want to delete this update?')) return;
+    if (!confirm('😱 Are you really sure you want to delete this update?')) {
+      return;
+    }
 
     try {
       await this.props.deleteUpdate(this.props.update.id);

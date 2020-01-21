@@ -388,8 +388,12 @@ const CollectiveNavbar = ({
               key={section}
               isSelected={section === selected}
               onClick={() => {
-                if (isExpended) setExpended(false);
-                if (onSectionClick) onSectionClick(section);
+                if (isExpended) {
+                  setExpended(false);
+                }
+                if (onSectionClick) {
+                  onSectionClick(section);
+                }
               }}
             >
               <MenuLink

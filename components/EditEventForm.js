@@ -122,7 +122,9 @@ class EditEventForm extends React.Component {
   render() {
     const { event, loading, intl, deleting, onDelete } = this.props;
 
-    if (!event.parentCollective) return <div />;
+    if (!event.parentCollective) {
+      return <div />;
+    }
 
     const isNew = !(event && event.id);
     const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';

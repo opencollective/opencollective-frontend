@@ -413,7 +413,9 @@ export const addGetExpense = component => {
 
   // if we don't have an accessToken, there is no need to get the details of a expense
   // as we won't have access to any more information than the allExpenses query
-  if (!accessToken) return component;
+  if (!accessToken) {
+    return component;
+  }
 
   return graphql(getExpenseQuery, {
     options(props) {

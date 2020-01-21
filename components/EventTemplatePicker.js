@@ -39,7 +39,9 @@ class EventTemplatePicker extends React.Component {
   render() {
     const { loading, allEvents } = this.props.data;
 
-    if (loading) return <div />;
+    if (loading) {
+      return <div />;
+    }
 
     return (
       <FormGroup className="EventTemplatePicker">
