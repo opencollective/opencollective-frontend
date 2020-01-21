@@ -11,8 +11,6 @@ import { loadScriptAsync } from '../lib/utils';
 // hardcode loaders for specific files
 import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/sponsor-page/js/scripts.js'; // eslint-disable-line
 import sponsorPageStyle from '!css-loader!../static/sponsor-page/css/styles.css'; // eslint-disable-line
-import pricingPageScript from '!file-loader?publicPath=/_next/static/javascripts/&outputPath=static/javascripts/&name=[name]-[hash].[ext]!../static/pricing-page/javascripts/scripts.js'; // eslint-disable-line
-import pricingPageStyle from '!css-loader!../static/pricing-page/stylesheets/styles.css'; // eslint-disable-line
 import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../static/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
 import howItWorksPageStyle from '!css-loader!../static/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../static/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
@@ -44,11 +42,6 @@ const PAGES = {
     css: giftCardPageStyle,
     className: 'mkt-page-how-it-works',
   },
-  pricing: {
-    pageContents: importAll(require.context('../static/pricing-page', false, /\.(html)$/)),
-    css: pricingPageStyle,
-    js: pricingPageScript,
-  },
   'become-a-fiscal-host': {
     pageContents: importAll(require.context('../static/become-a-fiscal-host-page', false, /\.(html)$/)),
     css: becomeAFiscalHostStyle,
@@ -65,14 +58,11 @@ function importAll(r) {
 }
 
 function getmenuItem(pageSlug) {
-  if (
-    pageSlug == 'how-it-works' ||
-    pageSlug == 'pricing' ||
-    pageSlug == 'become-a-sponsor' ||
-    pageSlug == 'become-a-fiscal-host'
-  )
+  if (['how-it-works', 'pricing', 'become-a-sponsor', 'become-a-fiscal-host'].includes(pageSlug)) {
     return { pricing: true, howItWorks: true };
-  else return { pricing: false, howItWorks: false };
+  } else {
+    return { pricing: false, howItWorks: false };
+  }
 }
 
 class MarketingPage extends React.Component {
