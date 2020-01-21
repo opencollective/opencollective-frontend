@@ -190,6 +190,7 @@
     "file-loader": "^5.0.2",
     "html-loader": "^0.5.5",
     "husky": "^4.2.1",
+    "istanbul-lib-coverage": "^3.0.0",
     "jest": "^25.1.0",
     "jest-styled-components": "^7.0.0",
     "lint-staged": "^10.0.2",
