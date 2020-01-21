@@ -35,7 +35,7 @@ const Plan = styled.div`
   ${({ active }) => (active ? `border: 1px solid rgb(143, 199, 255); border-radius: 16px; margin: 19px;` : '')}
 `;
 
-const PlanFeatures = styled.p`
+const PlanFeatures = styled.div`
   font-size: 1.1rem;
   text-align: center;
   min-height: 11rem;

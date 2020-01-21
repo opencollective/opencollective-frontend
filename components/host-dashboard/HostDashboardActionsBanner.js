@@ -149,7 +149,7 @@ class HostDashboardActionsBanner extends React.Component {
     }
 
     const hostAddedFundsLimit = get(host, 'plan.addedFundsLimit');
-    const hostHasFunds = (hostAddedFundsLimit && get(host, 'plan.addedFunds') < hostAddedFundsLimit) === true;
+    const hostCanAddFunds = hostAddedFundsLimit === null || get(host, 'plan.addedFunds') < hostAddedFundsLimit;
 
     const allCollectivesLabel = intl.formatMessage(this.messages.allCollectives);
     const customOptions = selectedCollective ? [{ label: allCollectivesLabel, value: null }] : undefined;
@@ -187,10 +187,10 @@ class HostDashboardActionsBanner extends React.Component {
             )}
             {selectedCollective && !this.state.showAddFunds && this.canEdit() && (
               <React.Fragment>
-                <StyledButton onClick={this.toggleAddFunds} disabled={!hostHasFunds}>
+                <StyledButton onClick={this.toggleAddFunds} disabled={!hostCanAddFunds}>
                   <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
                 </StyledButton>
-                {!hostHasFunds && (
+                {!hostCanAddFunds && (
                   <Disclaimer>
                     <FormattedMessage
                       id="addFunds.error.planLimitReached"
