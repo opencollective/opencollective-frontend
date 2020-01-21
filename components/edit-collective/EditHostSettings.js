@@ -81,7 +81,7 @@ const EditHostSettings = props => {
   return (
     <div className="ExportData">
       <h3>
-        <FormattedMessage id="Host.Plan" defaultMessage="Host.Plan" />
+        <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
       </h3>
 
       <PlanGrid>

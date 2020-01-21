@@ -759,7 +759,7 @@
   "host.link": "Использовать этот хост",
   "host.paymentMethod.manual.instructions": "Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).",
   "host.pending-applications.noPending": "Нет коллективов ждущих подтверждения",
-  "Host.Plan": "Host.Plan",
+  "Host.Plan": "Host Plan",
   "host.tos": "Terms of fiscal sponsorship",
   "host.types.label": "Тип юридического лица",
   "host.types.organization.description": "Legal entity (ideally a non profit organization) that will receive the funds and issue invoices on behalf of the collective. Recommended if you plan to host more than one collective or if your collective expects to collect more than $10,000/year.",
