@@ -15,7 +15,9 @@ class Modal extends React.Component {
   }
 
   render() {
-    if (typeof document !== 'undefined') document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
+    if (typeof document !== 'undefined') {
+      document.body.classList[this.props.show ? 'add' : 'remove']('showModal');
+    }
 
     const style = {
       display: this.props.show ? 'block' : 'none',

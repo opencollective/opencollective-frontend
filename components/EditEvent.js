@@ -64,7 +64,9 @@ class EditEvent extends React.Component {
   render() {
     const event = this.props.event || {};
 
-    if (!event.name) return <div />;
+    if (!event.name) {
+      return <div />;
+    }
 
     const { LoggedInUser } = this.props;
 

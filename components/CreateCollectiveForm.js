@@ -229,7 +229,9 @@ class CreateCollectiveForm extends React.Component {
           }
         })
         .then(json => {
-          if (!json || !json.data || json.data.errors) return;
+          if (!json || !json.data || json.data.errors) {
+            return;
+          }
           const {
             city,
             localized_location,

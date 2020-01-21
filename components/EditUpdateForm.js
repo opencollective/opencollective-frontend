@@ -111,7 +111,9 @@ class EditUpdateForm extends React.Component {
   render() {
     const { collective, LoggedInUser } = this.props;
     const { update } = this.state;
-    if (!this._isMounted) return <div />;
+    if (!this._isMounted) {
+      return <div />;
+    }
 
     const editor =
       get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||

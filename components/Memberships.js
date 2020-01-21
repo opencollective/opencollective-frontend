@@ -23,7 +23,9 @@ class Collectives extends React.Component {
       }
     });
 
-    if (!memberships || memberships.length === 0) return <div />;
+    if (!memberships || memberships.length === 0) {
+      return <div />;
+    }
 
     return (
       <div className="Collectives">

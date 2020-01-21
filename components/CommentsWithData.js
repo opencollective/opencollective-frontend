@@ -53,7 +53,7 @@ class CommentsWithData extends React.Component {
   }
 
   renderUserAction(LoggedInUser, expense, notice) {
-    if (!LoggedInUser)
+    if (!LoggedInUser) {
       return (
         <div>
           <hr />
@@ -62,6 +62,7 @@ class CommentsWithData extends React.Component {
           </LoginBtn>
         </div>
       );
+    }
     return <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} notice={notice} />;
   }
 

@@ -22,14 +22,20 @@ class CollectivesIframe extends React.Component {
   };
 
   onChange = change => {
-    if (!change) return;
+    if (!change) {
+      return;
+    }
     this.height = change.height;
     this.sendMessageToParentWindow();
   };
 
   sendMessageToParentWindow = () => {
-    if (!window.parent) return;
-    if (!this.height) return;
+    if (!window.parent) {
+      return;
+    }
+    if (!this.height) {
+      return;
+    }
     const message = `oc-${JSON.stringify({
       id: this.props.id,
       height: this.height,

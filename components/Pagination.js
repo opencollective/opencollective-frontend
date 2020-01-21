@@ -14,10 +14,14 @@ const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisab
   const currentPage = offset / limit + 1;
 
   const changePage = async ({ target, key }) => {
-    if (key && key !== 'Enter') return;
+    if (key && key !== 'Enter') {
+      return;
+    }
 
     const { value } = target;
-    if (!value) return;
+    if (!value) {
+      return;
+    }
 
     await router.push({ pathname, query: { ...query, offset: (value - 1) * limit } });
 

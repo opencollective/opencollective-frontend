@@ -46,7 +46,9 @@ class EventPage extends React.Component {
 
   checkForRefetch() {
     const { alreadyRefetch } = this.state;
-    if (alreadyRefetch) return;
+    if (alreadyRefetch) {
+      return;
+    }
 
     const { loadingLoggedInUser, LoggedInUser, data } = this.props;
     const event = data.Collective;
@@ -66,7 +68,9 @@ class EventPage extends React.Component {
     const { data } = this.props;
     const { LoggedInUser } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data.Collective) {
+      return <ErrorPage data={data} />;
+    }
 
     const event = data.Collective;
 

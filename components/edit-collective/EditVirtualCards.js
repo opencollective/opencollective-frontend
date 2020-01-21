@@ -58,8 +58,12 @@ class EditVirtualCards extends React.Component {
 
   renderFilters(onlyConfirmed) {
     let selected = 'all';
-    if (onlyConfirmed) selected = 'redeemed';
-    if (onlyConfirmed === false) selected = 'pending';
+    if (onlyConfirmed) {
+      selected = 'redeemed';
+    }
+    if (onlyConfirmed === false) {
+      selected = 'pending';
+    }
 
     return (
       <StyledButtonSet

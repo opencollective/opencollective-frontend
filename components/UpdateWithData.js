@@ -19,9 +19,13 @@ class UpdateWithData extends React.Component {
 
   render() {
     const { data, editable, LoggedInUser } = this.props;
-    if (data.loading) return <div />;
+    if (data.loading) {
+      return <div />;
+    }
     const update = data.Update;
-    if (!update) return <NotFound />;
+    if (!update) {
+      return <NotFound />;
+    }
 
     return (
       <div className={'UpdateWithData'}>

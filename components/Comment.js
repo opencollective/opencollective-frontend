@@ -101,7 +101,9 @@ class Comment extends React.Component {
   render() {
     const { intl, LoggedInUser, editable } = this.props;
     const { comment } = this.state;
-    if (!comment) return <div />;
+    if (!comment) {
+      return <div />;
+    }
 
     return (
       <div className={`comment ${this.state.mode}View`}>

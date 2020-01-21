@@ -34,7 +34,9 @@ class ExpensesSection extends React.Component {
       };
     }
 
-    if (!collective) return <NotFound />;
+    if (!collective) {
+      return <NotFound />;
+    }
 
     // We don't show the Budget section on event if there is no transaction
     if (collective.type === 'EVENT' && this.totalTransactions === 0) {

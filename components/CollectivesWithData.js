@@ -204,7 +204,9 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
           limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
           // Update the results object with new entries
           const { __typename, total, collectives } = previousResult.allCollectives;
           const all = collectives.concat(fetchMoreResult.allCollectives.collectives);

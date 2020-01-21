@@ -28,7 +28,9 @@ class UpdatesPage extends React.Component {
   render() {
     const { data, action, LoggedInUser } = this.props;
 
-    if (!data.Collective) return <ErrorPage data={data} />;
+    if (!data.Collective) {
+      return <ErrorPage data={data} />;
+    }
 
     const collective = data.Collective;
 
