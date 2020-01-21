@@ -19,6 +19,7 @@ env:
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
   TERM: xterm
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   e2e:
@@ -174,3 +175,6 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
+
+      - name: Report Coverage
+        run: npm run test:coverage
