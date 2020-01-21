@@ -251,6 +251,64 @@ jobs:
 
       - run: npm run db:setup
 
-      - run: npm run test
+      - run: npm run test:lib
+      - run: npm run test:models
+      - run: npm run test:payment-providers
+      - run: npm run test:routes
+      - run: npm run test:scripts
+
+      - run: npm run test:coverage
+
+  test-graphql:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+      postgres:
+        image: mdillon/postgis:9.6
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Restore node_modules
+        uses: actions/cache@v1
+        id: api-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-api-node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore .npm cache
+        if: steps.api-node-modules.outputs.cache-hit != 'true'
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-api-npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            - ${{ runner.os }}-api-npm-cache-${{ hashFiles('package-lock.json') }}
+            - ${{ runner.os }}-api-npm-cache-
+
+      - name: Install dependencies
+        if: steps.api-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - run: npm run db:setup
+
+      - run: npm run test:graphql
 
       - run: npm run test:coverage
