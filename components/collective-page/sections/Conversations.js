@@ -45,7 +45,7 @@ class SectionConversations extends React.PureComponent {
       collective: PropTypes.shape({
         conversations: PropTypes.shape({
           totalCount: PropTypes.number,
-          nodes: PropTypes.object,
+          nodes: PropTypes.arrayOf(PropTypes.object),
         }),
       }),
     }),
