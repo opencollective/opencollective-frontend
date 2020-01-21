@@ -32,6 +32,11 @@ module.exports = (server, app) => {
     next();
   });
 
+  server.use('/_next/static', (req, res, next) => {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    next();
+  });
+
   server.use((req, res, next) => {
     if (req.query.language && intl.languages.includes(req.query.language) && req.query.set) {
       res.cookie('language', req.language);
