@@ -5,12 +5,14 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from '../StyledButton';
+import { getErrorFromGraphqlException } from '../../lib/utils';
 
 class RejectExpenseBtn extends React.Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     rejectExpense: PropTypes.func.isRequired,
     refetch: PropTypes.func,
+    onError: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -20,8 +22,13 @@ class RejectExpenseBtn extends React.Component {
 
   async onClick() {
     const { id } = this.props;
-    await this.props.rejectExpense(id);
-    await this.props.refetch();
+    try {
+      await this.props.rejectExpense(id);
+      await this.props.refetch();
+    } catch (e) {
+      const error = getErrorFromGraphqlException(e).message;
+      this.props.onError(error);
+    }
   }
 
   render() {

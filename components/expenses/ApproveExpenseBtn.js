@@ -4,6 +4,8 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
+import { getErrorFromGraphqlException } from '../../lib/utils';
+
 import StyledButton from '../StyledButton';
 
 class ApproveExpenseBtn extends React.Component {
@@ -11,6 +13,7 @@ class ApproveExpenseBtn extends React.Component {
     id: PropTypes.number.isRequired,
     approveExpense: PropTypes.func.isRequired,
     refetch: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -20,8 +23,13 @@ class ApproveExpenseBtn extends React.Component {
 
   async onClick() {
     const { id } = this.props;
-    await this.props.approveExpense(id);
-    await this.props.refetch();
+    try {
+      await this.props.approveExpense(id);
+      await this.props.refetch();
+    } catch (e) {
+      const error = getErrorFromGraphqlException(e).message;
+      this.props.onError(error);
+    }
   }
 
   render() {
