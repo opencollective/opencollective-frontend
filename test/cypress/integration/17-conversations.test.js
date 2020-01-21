@@ -39,6 +39,13 @@ describe('Conversations', () => {
         '<div>Hello from <a href="https://opencollective.com/opencollective">https://opencollective.com/opencollective</a> 👋👋👋</div><div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, levis; Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.</div>',
       );
 
+      // Edit tags
+      const sampleTag = 'alot more amazing stuff';
+      cy.getByDataCy('InlineEditField-Trigger-tags').click();
+      cy.getByDataCy('styled-input-tags').type(`${sampleTag}{enter}`);
+      cy.getByDataCy('InlineEditField-Btn-Save').click();
+      cy.contains(`${sampleTag}`.toUpperCase());
+
       // Add comment
       cy.get('[data-cy="comment-form"] [data-cy="RichTextEditor"] trix-editor').as('comment-editor');
       cy.get('@comment-editor').type('I post a reply');

@@ -752,6 +752,11 @@ type Mutation {
     Conversation's title
     """
     title: String!
+
+    """
+    Conversation's tags
+    """
+    tags: [String]
   ): Conversation
 
   """
