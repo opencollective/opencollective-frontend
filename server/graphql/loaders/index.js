@@ -10,8 +10,8 @@ import models, { Op, sequelize } from '../../models';
 import { sortResults, createDataLoaderWithOptions } from './helpers';
 
 // Loaders generators
-import generateCommentsLoader from './comments';
-import generateConversationLoaders from './conversation';
+import commentsLoader from './comments';
+import conversationLoaders from './conversation';
 import { generateExpenseAttachmentsLoader } from './expenses';
 import { generateCollectivePaypalPayoutMethodsLoader, generateCollectivePayoutMethodsLoader } from './payout-method';
 import { generateCanSeeUserPrivateInfoLoader } from './user';
@@ -20,11 +20,22 @@ export const loaders = req => {
   const cache = {};
   const context = createContext(sequelize);
 
-  context.loaders.Comment = generateCommentsLoader(req, cache);
-  context.loaders.Conversation = generateConversationLoaders(req, cache);
+  // Comment
+  context.loaders.Comment.findAllByAttribute = commentsLoader.findAllByAttribute(req, cache);
+  context.loaders.Comment.countByExpenseId = commentsLoader.countByExpenseId(req, cache);
+
+  // Conversation
+  context.loaders.Conversation.followers = conversationLoaders.followers(req, cache);
+  context.loaders.Conversation.commentsCount = conversationLoaders.commentsCount(req, cache);
+
+  // Expense
   context.loaders.ExpenseAttachment.byExpenseId = generateExpenseAttachmentsLoader(req, cache);
+
+  // Payout method
   context.loaders.PayoutMethod.paypalByCollectiveId = generateCollectivePaypalPayoutMethodsLoader(req, cache);
   context.loaders.PayoutMethod.byCollectiveId = generateCollectivePayoutMethodsLoader(req, cache);
+
+  // User
   context.loaders.User.canSeeUserPrivateInfo = generateCanSeeUserPrivateInfoLoader(req, cache);
 
   /** *** Collective *****/
