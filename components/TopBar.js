@@ -143,7 +143,7 @@ class TopBar extends React.Component {
               )}
               {merged.pricing && (
                 <NavLinkContainer>
-                  <NavLink href="/pricing">
+                  <NavLink href="https://docs.opencollective.com/help/about/pricing">
                     <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
                   </NavLink>
                 </NavLinkContainer>
