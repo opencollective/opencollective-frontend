@@ -759,7 +759,7 @@
   "host.link": "Use este organizador",
   "host.paymentMethod.manual.instructions": "As instruções para efetuar o pagamento de {amount} serão enviadas para o seu endereço de e-mail {email}. Seu pedido ficará pendente até que os fundos sejam recebidos pelo host ({host}).",
   "host.pending-applications.noPending": "Nenhum coletivo aguardando aprovação",
-  "Host.Plan": "Host.Plan",
+  "Host.Plan": "Host Plan",
   "host.tos": "Termos de patrocínio fiscal",
   "host.types.label": "Tipo de entidade administrativa",
   "host.types.organization.description": "Entidade legal (de preferência uma organização sem fins lucrativos) que receberá os fundos e emitirá faturas em nome do coletivo. Recomendado se você planeja hospedar mais de um coletivo ou se espera coletar mais de US$ 10.000/ano.",
