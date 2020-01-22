@@ -13,6 +13,7 @@ import * as utils from '../../utils';
 import config from 'config';
 import nock from 'nock';
 import initNock from '../../nocks/email.routes.test.nock.js';
+import { fakeCollective, fakeUser } from '../../test-helpers/fake-data';
 
 const generateToken = (email, slug, template) => {
   const uid = `${email}.${slug}.${template}.${config.keys.opencollective.jwtSecret}`;
@@ -105,22 +106,41 @@ describe('server/routes/email.test.js', () => {
       .catch(console.error);
   });
 
-  it('forwards emails sent to info@:slug.opencollective.com', () => {
+  it('forwards emails sent to info@:slug.opencollective.com', async () => {
     const spy = sandbox.spy(emailLib, 'sendMessage');
+    const collective = await fakeCollective();
+    const users = await Promise.all([fakeUser(), fakeUser(), fakeUser()]);
+    await Promise.all(users.map(user => collective.addUserWithRole(user, 'ADMIN')));
 
     return request(app)
       .post('/webhooks/mailgun')
       .send(
         Object.assign({}, webhookBodyPayload, {
-          recipient: 'info@testcollective.opencollective.com',
+          recipient: `info@${collective.slug}.opencollective.com`,
         }),
       )
       .then(res => {
         expect(res.statusCode).to.equal(200);
-        expect(spy.lastCall.args[0]).to.equal('info@testcollective.opencollective.com');
+        expect(spy.lastCall.args[0]).to.equal(`info@${collective.slug}.opencollective.com`);
         expect(spy.lastCall.args[1]).to.equal(webhookBodyPayload.subject);
-        expect(usersData.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1).to.be.true;
+        expect(users.map(u => u.email).indexOf(spy.lastCall.args[3].bcc) !== -1).to.be.true;
       });
+  });
+
+  it('do not forwards emails sent to info@:slug.opencollective.com if disabled', async () => {
+    const spy = sandbox.spy(emailLib, 'sendMessage');
+    const collective = await fakeCollective({ settings: { features: { forwardEmails: false } } });
+    const user = await fakeUser();
+    await collective.addUserWithRole(user, 'ADMIN');
+    const endpoint = request(app).post('/webhooks/mailgun');
+    const res = await endpoint.send(
+      Object.assign({}, webhookBodyPayload, {
+        recipient: `info@${collective.slug}.opencollective.com`,
+      }),
+    );
+
+    expect(res.body.error).to.exist;
+    expect(spy.lastCall).to.not.exist;
   });
 
   it('forwards the email for approval to the core members', () => {

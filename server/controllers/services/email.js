@@ -167,7 +167,7 @@ export const getNotificationType = email => {
   return res;
 };
 
-export const webhook = (req, res, next) => {
+export const webhook = async (req, res, next) => {
   const email = req.body;
   const { recipient } = email;
   debugWebhook('>>> webhook received', JSON.stringify(email));
@@ -192,26 +192,23 @@ export const webhook = (req, res, next) => {
   // If an email is sent to [info|hello|members|admins|organizers]@:collectiveSlug.opencollective.com,
   // we simply forward it to admins who subscribed to that mailinglist (no approval process)
   if (mailinglist === 'admins') {
-    return models.Collective.findOne({ where: { slug: collectiveSlug } }).then(collective => {
-      if (!collective || !collective.canContact()) {
-        return res.send({
-          error: {
-            message: `This Collective doesn't exist or can't be emailed directly using this address`,
-          },
+    const collective = await models.Collective.findOne({ where: { slug: collectiveSlug } });
+    if (!collective) {
+      return res.send({
+        error: { message: `This Collective doesn't exist or can't be emailed directly using this address` },
+      });
+    } else if (get(collective.settings, 'features.forwardEmails') === false || !(await collective.canContact())) {
+      return res.send({
+        error: { message: `This Collective can't be emailed directly using this address` },
+      });
+    } else {
+      return sendEmailToList(recipient, { subject: email.subject, body, from: email.from })
+        .then(() => res.send('ok'))
+        .catch(e => {
+          debugWebhook('Error: ', e);
+          next(e);
         });
-      } else {
-        return sendEmailToList(recipient, {
-          subject: email.subject,
-          body,
-          from: email.from,
-        })
-          .then(() => res.send('ok'))
-          .catch(e => {
-            debugWebhook('Error: ', e);
-            next(e);
-          });
-      }
-    });
+    }
   }
 
   // If the email is sent to :tierSlug or :eventSlug@:collectiveSlug.opencollective.com
