@@ -15,7 +15,7 @@ import { fakeCollective } from '../../../test-helpers/fake-data';
 
 const application = utils.data('application');
 
-describe('paypal.payment', () => {
+describe('server/paymentProviders/paypal/payment', () => {
   describe('#paypalUrl', () => {
     let configStub;
 

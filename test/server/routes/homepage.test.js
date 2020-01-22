@@ -8,7 +8,7 @@ const application = utils.data('application');
 const userData = utils.data('user1');
 const collectiveData = utils.data('collective1');
 
-describe('homepage.routes.test.js', () => {
+describe('server/routes/homepage', () => {
   let user, collective, paymentMethod;
 
   beforeEach(() => utils.resetTestDB());

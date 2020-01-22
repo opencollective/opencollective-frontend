@@ -3,7 +3,7 @@ import models from '../../../server/models';
 import { randEmail, newCollectiveWithHost } from '../../stores';
 import { SequelizeValidationError } from 'sequelize';
 
-describe('Conversation model', () => {
+describe('server/models/Conversation', () => {
   let collective, user, validConversationParams;
 
   before(async () => {

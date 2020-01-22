@@ -185,22 +185,21 @@
     "script": "babel-node --extensions .js,.ts $1",
     "sequelize": "babel-node --extensions .js,.ts -- ./node_modules/.bin/sequelize --config config/sequelize-cli.js",
     "start": "node ./dist/index.js",
-    "test": "TZ=UTC nyc --reporter=lcov mocha",
+    "test": "TZ=UTC nyc mocha",
     "test:clean": "rm -rf .nyc_output coverage",
     "test:coverage": "codecov",
-    "test:graphql": "TZ=UTC mocha test/server/graphql",
-    "test:lib": "TZ=UTC mocha test/server/lib",
-    "test:models": "TZ=UTC mocha test/server/models",
-    "test:payment-providers": "TZ=UTC mocha test/server/paymentProviders",
-    "test:routes": "TZ=UTC mocha test/server/routes",
-    "test:scripts": "TZ=UTC mocha test/scripts",
-    "test:watch": "TZ=UTC nyc mocha --watch",
+    "test:graphql": "npm run test test/server/graphql",
+    "test:lib": "npm run test test/server/lib",
+    "test:models": "npm run test test/server/models",
+    "test:payment-providers": "npm run test test/server/paymentProviders",
+    "test:routes": "npm run test test/server/routes",
+    "test:scripts": "npm run test test/scripts",
+    "test:sql": "npm run test test/sql",
     "type:check": "tsc"
   },
   "nyc": {
     "reporter": [
-      "lcov",
-      "text"
+      "lcov"
     ],
     "cache": true
   },

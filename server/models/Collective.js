@@ -863,7 +863,7 @@ export default function(Sequelize, DataTypes) {
   // this Payment Method will be used for "Add Funds"
   Collective.prototype.becomeHost = async function() {
     if (this.type !== 'USER' && this.type !== 'ORGANIZATION') {
-      throw new Error('Only USER or ORGANIZATION can become Host.');
+      return;
     }
 
     if (!this.isHostAccount) {

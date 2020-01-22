@@ -6,7 +6,7 @@ import models from '../../../server/models';
 import { PLANS_COLLECTIVE_SLUG } from '../../../server/constants/plans';
 import { subscribeOrUpgradePlan, validatePlanRequest } from '../../../server/lib/plans';
 
-describe('lib/plans.ts', () => {
+describe('server/lib/plans', () => {
   let collective, opencollective, user, order;
 
   beforeEach(utils.resetTestDB);

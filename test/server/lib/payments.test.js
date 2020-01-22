@@ -24,7 +24,7 @@ const EMAIL = 'anotheruser@email.com';
 const userData = utils.data('user3');
 const PLAN_NAME = 'small';
 
-describe('lib.payments.test.js', () => {
+describe('server/lib/payments', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
 
   before(() => {
@@ -217,6 +217,8 @@ describe('lib.payments.test.js', () => {
 
             it('calls subscribeOrUpgradePlan', async () => {
               expect(plansLib.subscribeOrUpgradePlan.callCount).to.equal(1);
+              // This test is too fast and that can lead to deadlock issues
+              await new Promise(res => setTimeout(res, 100));
             });
 
             it('successfully sends out an email to donor1', async () => {

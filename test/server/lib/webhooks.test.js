@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { sanitizeActivity, enrichActivity } from '../../../server/lib/webhooks';
 import { activities } from '../../../server/constants';
 
-describe('test/server/lib/webhooks', () => {
+describe('server/lib/webhooks', () => {
   describe('sanitizeActivity', () => {
     it('Strips the data for unknown types', () => {
       const sanitized = sanitizeActivity({ type: 'NOT_A_VALID_TYPE', data: { hello: 'world' } });

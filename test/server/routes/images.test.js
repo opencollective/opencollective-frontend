@@ -13,7 +13,7 @@ import * as utils from '../../utils';
 const application = utils.data('application');
 const userData = utils.data('user1');
 
-describe('images.routes.test.js', () => {
+describe('server/routes/images', () => {
   let user;
 
   before(function() {

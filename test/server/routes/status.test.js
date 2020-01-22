@@ -2,7 +2,7 @@ import app from '../../../server/index';
 import { expect } from 'chai';
 import request from 'supertest';
 
-describe('status.routes.test.js', () => {
+describe('server/routes/status', () => {
   describe('GET /status', () => {
     it('responds with status information', done => {
       request(app)

@@ -11,7 +11,7 @@ const {
   requestStatus: { RECEIVED },
 } = LegalDocument;
 
-describe('LegalDocument model', () => {
+describe('server/models/LegalDocument', () => {
   // globals to be set in the before hooks.
   let hostCollective, user, userCollective;
 

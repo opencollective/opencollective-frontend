@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { diffDBEntries } from '../../../server/lib/data';
 
-describe('diffDBEntries', () => {
+describe('server/lib/data', () => {
   it('works with empty lists', () => {
     const [toCreate, toRemove, toUpdate] = diffDBEntries([], [], []);
     expect(toCreate).to.eql([]);

@@ -6,7 +6,7 @@ import activitiesLib from '../../../server/lib/activities';
 
 import slackLib from '../../../server/lib/slack';
 
-describe('lib/slack', () => {
+describe('server/lib/slack', () => {
   describe('calling postMessage', () => {
     const message = 'lorem ipsum';
     const webhookUrl = 'hookurl';

@@ -22,7 +22,7 @@ async function donation(collective, user, amount, currency, createdAt) {
  * The goal here is to test a host with collectives in multiple currencies
  * We use sanitized data from wwcode for this
  */
-describe('libhost', () => {
+describe('server/lib/host', () => {
   const where = {}; // Will be filled in by 'get hosted collectives'
   const startDate = new Date('2017-02-01');
   const endDate = new Date('2017-03-01');

@@ -6,7 +6,7 @@ import { randEmail, newCollectiveWithHost } from '../../stores';
 
 const { Collective, User } = models;
 
-describe('Collective model', () => {
+describe('server/models/Tier', () => {
   let collective = {},
     tiers;
 

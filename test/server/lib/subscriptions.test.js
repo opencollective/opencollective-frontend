@@ -55,7 +55,7 @@ async function createOrderWithSubscription(interval, date, quantity = 1) {
   return { order, subscription, user, collective };
 }
 
-describe('LibSubscription', () => {
+describe('server/lib/subscriptions', () => {
   describe('#getNextChargeAndPeriodStartDates', () => {
     it("should use the next month's first day for monthly subscriptions", () => {
       // Given the following order with subscription

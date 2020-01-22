@@ -368,7 +368,7 @@ describe('server/graphql/v1/paymentMethods', () => {
   });
 });
 
-describe('CRUD', () => {
+describe('server/graphql/v1/paymentMethods/CRUD', () => {
   // Queries
   const CreateCreditCardMutation = `
     mutation createCreditCard(

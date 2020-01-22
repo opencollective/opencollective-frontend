@@ -4,7 +4,7 @@ import models from '../../../../server/models';
 import ManualPaymentMethod from '../../../../server/paymentProviders/opencollective/manual';
 import * as store from '../../../stores';
 
-describe('Manual Payment Method', () => {
+describe('server/paymentProviders/opencollective/manual', () => {
   const hostFeePercent = 5;
 
   let user, host, collective;

@@ -8,7 +8,7 @@ import models from '../../../server/models';
 const clientId = config.github.clientID;
 const application = utils.data('application');
 
-describe('connectedAccounts.routes.test.js: GIVEN a collective', () => {
+describe('server/routes/connectedAccounts', () => {
   let req, user;
 
   beforeEach(() => utils.resetTestDB());

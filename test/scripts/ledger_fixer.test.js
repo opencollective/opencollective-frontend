@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 import { Migration } from '../../scripts/ledger_fixer';
 
-describe('Migration', () => {
+describe('scripts/ledger_fixer', () => {
   // The changes performed by the migration code are stored within a
   // JSON key that contains the date the change happened. So to test
   // it properly here time has to be frozen.

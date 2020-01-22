@@ -5,7 +5,7 @@ import * as utils from '../../utils';
 
 const application = utils.data('application');
 
-describe('notFound.routes.test.js', () => {
+describe('server/routes/notFound', () => {
   describe('WHEN calling unknown route', () => {
     let req;
 
