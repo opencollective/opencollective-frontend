@@ -53,7 +53,7 @@ async function createOrderWithPaymentMethod(paymentMethodName, orderParams = {})
   return { order, user, collective, paymentMethod, connectedAccount };
 }
 
-describe('paymentmethods.stripe.creditcard', () => {
+describe('server/paymentProviders/stripe/creditcard', () => {
   describe('#processOrder()', async () => {
     let secondCallToCreateCustomer;
 

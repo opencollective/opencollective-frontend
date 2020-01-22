@@ -67,7 +67,7 @@ const createOrderQuery = `
   }
 `;
 
-describe('opencollective.virtualcard', () => {
+describe('server/paymentProviders/opencollective/virtualcard', () => {
   let sandbox, sendEmailSpy;
 
   before(initNock);

@@ -36,7 +36,7 @@ const createOrderQuery = `
   }
 `;
 
-describe('server/paymentProviders/opencollective/collective.test.js', () => {
+describe('server/paymentProviders/opencollective/collective', () => {
   before(async () => {
     await utils.resetTestDB();
   });

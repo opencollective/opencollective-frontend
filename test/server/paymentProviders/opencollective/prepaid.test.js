@@ -6,7 +6,7 @@ import prepaid from '../../../../server/paymentProviders/opencollective/prepaid'
 
 import { randEmail } from '../../../stores';
 
-describe('paymentMethods.opencollective.prepaid', () => {
+describe('server/paymentProviders/opencollective/prepaid', () => {
   const PREPAID_INITIAL_BALANCE = 5000;
   const CURRENCY = 'USD';
   let user = null;
