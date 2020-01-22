@@ -6,7 +6,7 @@ import * as utils from '../../utils';
 import models from '../../../server/models';
 import { randEmail } from '../../stores';
 
-describe('paymentmethod.model.test.js', () => {
+describe('server/models/PaymentMethod', () => {
   let timer, user, collective, organization, paymentMethod;
 
   before(async () => {

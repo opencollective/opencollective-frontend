@@ -3,7 +3,7 @@ import * as utils from '../../utils';
 import models from '../../../server/models';
 import { randEmail } from '../../stores';
 
-describe('order.model.test.js', () => {
+describe('server/models/Order', () => {
   let user, collective, tier, order;
   before(() => utils.resetTestDB());
   before('create a user', () =>

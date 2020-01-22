@@ -19,7 +19,7 @@ const assertCollectionIsUnchanged = async col => {
   });
 };
 
-describe('cron/monthly/verify-plans.js', () => {
+describe('cron/monthly/verify-plans', () => {
   let opencollective, otherCollectives;
   beforeEach(async () => {
     await utils.resetTestDB();

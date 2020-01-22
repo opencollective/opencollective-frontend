@@ -9,7 +9,7 @@ const userData = utils.data('user1');
 const collectiveData = utils.data('collective1');
 const transactionsData = utils.data('transactions1').transactions;
 
-describe('transaction model', () => {
+describe('server/models/Transaction', () => {
   let user, host, collective, defaultTransactionData;
 
   beforeEach(() => utils.resetTestDB());

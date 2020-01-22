@@ -14,7 +14,7 @@ const userData = utils.data('user1');
 
 const { User } = models;
 
-describe('user.model.test.js', () => {
+describe('server/models/User', () => {
   beforeEach(() => utils.resetTestDB());
 
   /**
