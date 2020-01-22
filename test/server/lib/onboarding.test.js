@@ -6,7 +6,7 @@ import models from '../../../server/models';
 import * as utils from '../../utils';
 import Promise from 'bluebird';
 
-describe('onboarding', () => {
+describe('server/lib/onboarding', () => {
   let admins, sandbox, emailLibSendSpy;
   before(async () => {
     await utils.resetTestDB();

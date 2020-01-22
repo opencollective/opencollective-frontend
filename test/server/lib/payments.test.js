@@ -24,7 +24,7 @@ const EMAIL = 'anotheruser@email.com';
 const userData = utils.data('user3');
 const PLAN_NAME = 'small';
 
-describe('lib.payments.test.js', () => {
+describe('server/lib/payments', () => {
   let host, user, user2, collective, order, collective2, sandbox, emailSendSpy;
 
   before(() => {

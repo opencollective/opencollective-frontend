@@ -1,7 +1,7 @@
 import { expect, assert } from 'chai';
 import { exportToPDF, sanitizeForLogs } from '../../../server/lib/utils';
 
-describe('utils', () => {
+describe('server/lib/utils', () => {
   it('sanitize for logs', () => {
     const obj = {
       user: {

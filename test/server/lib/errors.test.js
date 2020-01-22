@@ -4,7 +4,7 @@ import { expect } from 'chai';
 /**
  * Tests.
  */
-describe('lib.errors.test.js', () => {
+describe('server/lib/errors', () => {
   it('BadRequest', () => {
     const e = new errors.BadRequest('message');
     expect(e).to.have.property('message', 'message');

@@ -3,7 +3,7 @@ import * as currencylib from '../../../server/lib/currency';
 import nock from 'nock';
 import config from 'config';
 
-describe('currencylib', () => {
+describe('server/lib/currency', () => {
   const startDate = '2017-02-01';
   const endDate = '2017-03-01';
 

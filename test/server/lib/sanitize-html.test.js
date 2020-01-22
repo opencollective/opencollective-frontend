@@ -93,59 +93,61 @@ const improperlyFormattedContent = `
   <script<p>content</p>alert("script")>alert("script")
 `;
 
-describe('stripHTML', () => {
-  it("Doesn't allow anything", () => {
-    expect(stripHTML(fullContent)).to.eq(fullContentStripped);
-  });
+describe('server/lib/sanitize-html', () => {
+  describe('stripHTML', () => {
+    it("Doesn't allow anything", () => {
+      expect(stripHTML(fullContent)).to.eq(fullContentStripped);
+    });
 
-  it('Works with improperly formatted content', () => {
-    expect(stripHTML(improperlyFormattedContent)).to.eq(`
+    it('Works with improperly formatted content', () => {
+      expect(stripHTML(improperlyFormattedContent)).to.eq(`
   Won't be fooled by your !
   contentalert("script")&gt;alert("script")
 `);
-  });
-});
-
-describe('sanitizeHTML + buildSanitizerOptions', () => {
-  it('defaults to strip everything', () => {
-    expect(sanitizeHTML(fullContent, buildSanitizerOptions())).to.eq(fullContentStripped);
-    expect(sanitizeHTML(fullContent, buildSanitizerOptions({}))).to.eq(fullContentStripped);
+    });
   });
 
-  it('Downcase big titles', () => {
-    expect(sanitizeHTML('<h1>Hello World</h1>', buildSanitizerOptions({ titles: true }))).to.to.eq(
-      '<h3>Hello World</h3>',
-    );
+  describe('sanitizeHTML + buildSanitizerOptions', () => {
+    it('defaults to strip everything', () => {
+      expect(sanitizeHTML(fullContent, buildSanitizerOptions())).to.eq(fullContentStripped);
+      expect(sanitizeHTML(fullContent, buildSanitizerOptions({}))).to.eq(fullContentStripped);
+    });
+
+    it('Downcase big titles', () => {
+      expect(sanitizeHTML('<h1>Hello World</h1>', buildSanitizerOptions({ titles: true }))).to.to.eq(
+        '<h3>Hello World</h3>',
+      );
+    });
+
+    it('allow videos', () => {
+      expect(sanitizeHTML(fullContent, buildSanitizerOptions({ videoIframes: true }))).to.include(
+        '<iframe width="560" height="315" src="https://www.youtube.com/embed/4in0wKB1jRU?start=461" frameborder="0" allow allowfullscreen>',
+      );
+    });
   });
 
-  it('allow videos', () => {
-    expect(sanitizeHTML(fullContent, buildSanitizerOptions({ videoIframes: true }))).to.include(
-      '<iframe width="560" height="315" src="https://www.youtube.com/embed/4in0wKB1jRU?start=461" frameborder="0" allow allowfullscreen>',
-    );
-  });
-});
+  describe('generateSummaryForHTML', () => {
+    it('Sanitizes, trim and truncate', () => {
+      expect(generateSummaryForHTML(fullContent, 4)).to.to.eq('E...');
+      expect(generateSummaryForHTML(fullContent, 32)).to.to.eq('Ergo illi intellegunt quid Ep...');
+      expect(generateSummaryForHTML(fullContent.slice(272), 80)).to.to.eq(
+        'Reges: constructio interrete. <i>Suo genere perveniant ad extremum;</i> Atqui...',
+      );
+      expect(generateSummaryForHTML(fullContent.slice(1000), 1000)).to.to.eq(
+        'Si qua in iis corrigere voluit, deteriora fecit. Nec enim, dum metuit, iustus est, et certe, si metuere destiterit, non erit; Unum nescio, quo modo possit, si luxuriosus sit, finitas cupiditates habere. Illud vero minime consectarium, sed in primis hebes, illorum scilicet, non tuum, gloriatione dignam esse beatam vitam. Entry Header 1 Entry Header 2 Entry Header 3 Entry Line 1 Entry Line 2 Entry Line 3 Quid affers, cur Thorius, cur Caius Postumius, cur omnium horum magister, Orata, non iucundissime vixerit? Non laboro, inquit, de nomine. <i>Ex rebus enim timiditas, non ex vocabulis nascitur.</i> Hoc loco discipulos quaerere videtur, ut, qui asoti esse velint, philosophi ante fiant. <a href="http://loripsum.net/" target="_blank">Dicimus aliquem hilare vivere;</a> Quae quidem sapientes sequuntur duce natura tamquam videntes; Nulla erit controversia. Si verbum sequimur, primum longius verbum praepositum quam bonum. Eorum enim omnium multa praetermittentium, dum eligant aliquid, quod se...',
+      );
+    });
 
-describe('generateSummaryForHTML', () => {
-  it('Sanitizes, trim and truncate', () => {
-    expect(generateSummaryForHTML(fullContent, 4)).to.to.eq('E...');
-    expect(generateSummaryForHTML(fullContent, 32)).to.to.eq('Ergo illi intellegunt quid Ep...');
-    expect(generateSummaryForHTML(fullContent.slice(272), 80)).to.to.eq(
-      'Reges: constructio interrete. <i>Suo genere perveniant ad extremum;</i> Atqui...',
-    );
-    expect(generateSummaryForHTML(fullContent.slice(1000), 1000)).to.to.eq(
-      'Si qua in iis corrigere voluit, deteriora fecit. Nec enim, dum metuit, iustus est, et certe, si metuere destiterit, non erit; Unum nescio, quo modo possit, si luxuriosus sit, finitas cupiditates habere. Illud vero minime consectarium, sed in primis hebes, illorum scilicet, non tuum, gloriatione dignam esse beatam vitam. Entry Header 1 Entry Header 2 Entry Header 3 Entry Line 1 Entry Line 2 Entry Line 3 Quid affers, cur Thorius, cur Caius Postumius, cur omnium horum magister, Orata, non iucundissime vixerit? Non laboro, inquit, de nomine. <i>Ex rebus enim timiditas, non ex vocabulis nascitur.</i> Hoc loco discipulos quaerere videtur, ut, qui asoti esse velint, philosophi ante fiant. <a href="http://loripsum.net/" target="_blank">Dicimus aliquem hilare vivere;</a> Quae quidem sapientes sequuntur duce natura tamquam videntes; Nulla erit controversia. Si verbum sequimur, primum longius verbum praepositum quam bonum. Eorum enim omnium multa praetermittentium, dum eligant aliquid, quod se...',
-    );
-  });
+    it("Doesn't cut anchors", () => {
+      expect(generateSummaryForHTML("I'd like to say <strong>Hello World</strong>", 30)).to.to.eq(
+        "I'd like to say <strong>Hel...</strong>",
+      );
+    });
 
-  it("Doesn't cut anchors", () => {
-    expect(generateSummaryForHTML("I'd like to say <strong>Hello World</strong>", 30)).to.to.eq(
-      "I'd like to say <strong>Hel...</strong>",
-    );
-  });
-
-  it('Adds separator after titles', () => {
-    expect(generateSummaryForHTML(`<h3>Mene ergo et Triarium</h3><p>Lorem ipsum dolor.</p>`, 150)).to.to.eq(
-      'Mene ergo et Triarium · Lorem ipsum dolor.',
-    );
+    it('Adds separator after titles', () => {
+      expect(generateSummaryForHTML(`<h3>Mene ergo et Triarium</h3><p>Lorem ipsum dolor.</p>`, 150)).to.to.eq(
+        'Mene ergo et Triarium · Lorem ipsum dolor.',
+      );
+    });
   });
 });

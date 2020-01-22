@@ -9,7 +9,7 @@ import { expect } from 'chai';
 // what's being tested
 import * as auth from '../../../server/lib/auth';
 
-describe('authlib', () => {
+describe('server/lib/auth', () => {
   it('should generate valid tokens', () => {
     // Given that time `Date.now` returns zero (0)
     const clock = sinon.useFakeTimers();

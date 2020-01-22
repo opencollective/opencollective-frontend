@@ -6,7 +6,7 @@ import twitter from '../../../server/lib/twitter';
  * The goal here is to test a host with collectives in multiple currencies
  * We use sanitized data from wwcode for this
  */
-describe('lib.twitter.test.js', () => {
+describe('server/lib/twitter', () => {
   describe('compile the tweet', () => {
     const data = {
       month: 'December',
