@@ -55,8 +55,32 @@ jobs:
       - name: Checkout (api)
         uses: actions/checkout@v2-beta
 
-      - name: Checkout (frontend)
-        run: ./scripts/ci_checkout_frontend.sh
+      - name: Check matching branch
+        id: check-matching-branch
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/:owner/:repo/git/:ref
+          owner: opencollective
+          repo: opencollective-frontend
+          ref: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Checkout (frontend - matching branch)
+        if: steps.check-matching-branch.outputs.status == 200
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-frontend
+          path: opencollective-frontend
+          ref: ${{ github.ref }}
+
+      - name: Checkout (frontend - master)
+        if: steps.check-matching-branch.outputs.status != 200
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-frontend
+          path: opencollective-frontend
 
       - name: Setup node
         uses: actions/setup-node@v1
@@ -121,16 +145,16 @@ jobs:
         id: next-build
         with:
           path: opencollective-frontend/dist
-          key: ${{ runner.os }}-next-build-${{ hashFiles('opencollective-frontend/archive.tar.gz') }}
+          key: ${{ runner.os }}-next-build-${{ hashFiles('opencollective-frontend/**') }}
 
       - name: Restore .next cache (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'
         uses: actions/cache@v1
         with:
           path: opencollective-frontend/.next/cache
-          key: ${{ runner.os }}-next-cache-${{ hashFiles('opencollective-frontend/archive.tar.gz') }}
+          key: ${{ runner.os }}-next-cache-${{ hashFiles('opencollective-frontend/**') }}
           restore-keys: |
-            ${{ runner.os }}-next-cache-${{ hashFiles('opencollective-frontend/archive.tar.gz') }}
+            ${{ runner.os }}-next-cache-${{ hashFiles('opencollective-frontend/**') }}
             ${{ runner.os }}-next-cache-
 
       - name: Build (frontend)
