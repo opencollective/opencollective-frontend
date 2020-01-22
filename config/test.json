@@ -18,5 +18,8 @@
   "mailgun": {
     "user": "",
     "password": ""
+  },
+  "fixer": {
+    "accessKey": "UNDEFINED_FIXER_ACCESS_KEY"
   }
 }
