@@ -119,7 +119,7 @@ class Event extends React.Component {
     guests.interested = [];
     filterCollection(event.members, { role: 'FOLLOWER' }).map(follower => {
       if (!follower.member) {
-        console.error('>>> no user collective for membership', follower);
+        // console.error('>>> no user collective for membership', follower);
         return;
       }
       guests.interested.push({
@@ -130,7 +130,7 @@ class Event extends React.Component {
     guests.confirmed = [];
     event.orders.map(order => {
       if (!order.fromCollective) {
-        console.error('>>> no user collective for order', order);
+        // console.error('>>> no user collective for order', order);
         return;
       }
       if (get(order, 'tier.name', '').match(/sponsor/i)) {

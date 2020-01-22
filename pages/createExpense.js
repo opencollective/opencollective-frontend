@@ -47,9 +47,9 @@ class CreateExpensePage extends React.Component {
       if (LoggedInUser) {
         expense.user.id = LoggedInUser.id;
       }
-      console.log('>>> createExpense', expense);
+      // console.log('>>> createExpense', expense);
       const res = await this.props.createExpense(expense);
-      console.log('>>> createExpense res', res);
+      // console.log('>>> createExpense res', res);
       const expenseCreated = res.data.createExpense;
       Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/?createSuccess=true`);
     } catch (e) {

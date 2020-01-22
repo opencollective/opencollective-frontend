@@ -124,9 +124,10 @@ class StyledUpdate extends Component {
 
   save = async update => {
     update.id = get(this.props, 'update.id');
-    console.log('>>> updating ', update);
-    const res = await this.props.editUpdate(update);
-    console.log('>>> save res', res);
+    // console.log('>>> updating ', update);
+    // const res =
+    await this.props.editUpdate(update);
+    // console.log('>>> save res', res);
     this.setState({ modified: false, mode: 'details' });
   };
 

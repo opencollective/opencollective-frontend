@@ -52,7 +52,7 @@ class CreateOrganization extends React.Component {
 
     this.setState({ status: 'loading' });
     CollectiveInputType.type = 'ORGANIZATION';
-    console.log('>>> createOrganization', CollectiveInputType);
+    // console.log('>>> createOrganization', CollectiveInputType);
 
     try {
       const res = await this.props.createCollective(CollectiveInputType);
@@ -71,7 +71,7 @@ class CreateOrganization extends React.Component {
         status: 'collectiveCreated',
       });
     } catch (err) {
-      console.error('>>> createOrganization error: ', JSON.stringify(err));
+      // console.error('>>> createOrganization error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);

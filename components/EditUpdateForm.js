@@ -65,7 +65,7 @@ class EditUpdateForm extends React.Component {
   componentDidMount() {
     const savedState = storage.get(this.storageKey);
     if (savedState && !this.props.update) {
-      console.log('>>> restoring EditUpdateForm state', savedState);
+      // console.log('>>> restoring EditUpdateForm state', savedState);
       this.setState(savedState);
     }
     this._isMounted = true;

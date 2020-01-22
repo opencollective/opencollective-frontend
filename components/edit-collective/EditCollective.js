@@ -89,7 +89,7 @@ class EditCollective extends React.Component {
         this.setState({ status: null });
       }, 3000);
     } catch (err) {
-      console.error('>>> editCollective error:', JSON.stringify(err));
+      // console.error('>>> editCollective error:', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: null, result: { error: errorMsg } });
     }

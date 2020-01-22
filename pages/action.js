@@ -152,10 +152,10 @@ class ActionPage extends React.Component {
       this.setState({ actionTriggered: true });
       try {
         const res = await this.props[mutationName](this.props.id);
-        console.log('>>> res', JSON.stringify(res));
+        // console.log('>>> res', JSON.stringify(res));
         this.setState({ loading: false, result: res.data[mutationName] });
       } catch (error) {
-        console.log('>>> error', JSON.stringify(error));
+        // console.log('>>> error', JSON.stringify(error));
         this.setState({ loading: false, error: getErrorFromGraphqlException(error) });
       }
     }

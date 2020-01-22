@@ -49,7 +49,7 @@ class CreateEvent extends React.Component {
     this.setState({ status: 'loading' });
     EventInputType.type = 'EVENT';
     EventInputType.ParentCollectiveId = parentCollective.id;
-    console.log('>>> createEvent', EventInputType);
+    // console.log('>>> createEvent', EventInputType);
     try {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;
@@ -60,7 +60,7 @@ class CreateEvent extends React.Component {
       });
       window.location.replace(eventUrl);
     } catch (err) {
-      console.error('>>> createEvent error: ', JSON.stringify(err));
+      // console.error('>>> createEvent error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({
         status: 'idle',
