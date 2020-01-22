@@ -624,6 +624,7 @@
   "expenses.byRecipient": "Dépenses par {recipient}",
   "expenses.collectivePicker.subtitle": "pour {n} {n, plural, one {collectif} other {collectifs}}",
   "expenses.collectivePicker.title": "Finances",
+  "expenses.create.archived": "Cannot submit expenses for an archived collective.",
   "expenses.create.login": "Créez un compte ou identifiez-vous pour pouvoir ajouter une dépense.",
   "expenses.empty": "Pas de dépenses",
   "expenses.ready": "prêt à payer",

@@ -162,6 +162,7 @@ const getCollectiveQuery = gql`
       backgroundImage
       isHost
       isActive
+      isArchived
       tags
       stats {
         id
