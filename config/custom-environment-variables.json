@@ -92,7 +92,6 @@
   "host": {
     "api": "API_URL",
     "images": "IMAGES_URL",
-    "webapp": "WEBAPP_URL",
     "frontend": "FRONTEND_URL",
     "website": "WEBSITE_URL",
     "invoices": "INVOICES_URL"
