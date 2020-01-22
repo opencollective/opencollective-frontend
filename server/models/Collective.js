@@ -905,13 +905,7 @@ export default function(Sequelize, DataTypes) {
    * It does **not** check that the collective is indeed a host.
    */
   Collective.prototype.canApply = async function() {
-    const canApplySetting = Boolean(this.settings && this.settings.apply);
-    if (!canApplySetting) {
-      return false;
-    }
-
-    const hostPlan = await this.getPlan();
-    return !hostPlan.hostedCollectivesLimit || hostPlan.hostedCollectivesLimit > hostPlan.hostedCollectives;
+    return Boolean(this.settings && this.settings.apply);
   };
 
   /**
