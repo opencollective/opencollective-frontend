@@ -176,8 +176,6 @@
   "collective.isArchived.description": "Este coletivo foi arquivado e não pode ser mais usado para nenhuma atividade.",
   "collective.isArchived.edit.description": "Este {type} foi arquivado e não pode ser mais usado para nenhuma atividade.",
   "collective.location.label": "Cidade",
-  "collective.markdown.description": "Use editor markdown",
-  "collective.markdown.label": "Editor padrão",
   "collective.meetup.label": "URL do Meetup",
   "collective.members.admin.title": "{n} {n, plural, one {contribuínte central} other {colaboradores centrais}}",
   "collective.members.backer.title": "{n} {n, plural, one {apoiador} other {apoiadores}}",

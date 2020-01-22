@@ -176,8 +176,6 @@
   "collective.isArchived.description": "This collective has been archived and can no longer be used for any activities.",
   "collective.isArchived.edit.description": "This {type} has been archived and can no longer be used for any activities.",
   "collective.location.label": "Città",
-  "collective.markdown.description": "Usa editor markdown",
-  "collective.markdown.label": "Editor predefinito",
   "collective.meetup.label": "Meetup URL",
   "collective.members.admin.title": "{n} {n, plural, one {core contributor} other {core contributors}}",
   "collective.members.backer.title": "{n} {n, plural, one {backer} other {backers}}",
