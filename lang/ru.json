@@ -176,8 +176,6 @@
   "collective.isArchived.description": "Этот коллектив добавили в архив, и он не может быть использован.",
   "collective.isArchived.edit.description": "Этот {type} был добавлен в архив и больше не может быть использован.",
   "collective.location.label": "Город",
-  "collective.markdown.description": "Использовать редактор markdown",
-  "collective.markdown.label": "Редактор по умолчанию",
   "collective.meetup.label": "URL митапа",
   "collective.members.admin.title": "{n} {n, plural, one {core contributor} other {core contributors}}",
   "collective.members.backer.title": "{n} {n, plural, one {попечитель} other {попечители}}",

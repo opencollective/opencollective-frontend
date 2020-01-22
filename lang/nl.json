@@ -176,8 +176,6 @@
   "collective.isArchived.description": "Dit collectief is gearchiveerd en kan niet meer gebruikt worden voor enige activiteiten.",
   "collective.isArchived.edit.description": "Deze {type} is gearchiveerd en kan niet meer gebruikt worden voor enige activiteiten.",
   "collective.location.label": "Stad",
-  "collective.markdown.description": "Gebruik prijsverlagingsbewerker",
-  "collective.markdown.label": "Standaard editor",
   "collective.meetup.label": "Bijeenkomst URL",
   "collective.members.admin.title": "{n} {n, plural, one {essentiële bijdrager} other {essentiële bijdragers}}",
   "collective.members.backer.title": "{n} {n, plural, one {supporter} other {supporters}}",

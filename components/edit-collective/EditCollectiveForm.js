@@ -153,14 +153,6 @@ class EditCollectiveForm extends React.Component {
         id: 'Fields.website',
         defaultMessage: 'Website',
       },
-      'markdown.label': {
-        id: 'collective.markdown.label',
-        defaultMessage: 'Default editor',
-      },
-      'markdown.description': {
-        id: 'collective.markdown.description',
-        defaultMessage: 'Use markdown editor',
-      },
       'sendInvoiceByEmail.label': {
         id: 'collective.sendInvoiceByEmail.label',
         defaultMessage: 'Invoices',
@@ -605,14 +597,6 @@ class EditCollectiveForm extends React.Component {
           post: '%',
           defaultValue: get(this.state.collective, 'settings.hostFeePercent'),
           when: () => this.state.section === 'advanced' && collective.isHost,
-        },
-        {
-          name: 'markdown',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
-          when: () =>
-            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
         },
       ],
     };
