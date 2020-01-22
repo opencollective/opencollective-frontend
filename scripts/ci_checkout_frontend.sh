@@ -19,34 +19,14 @@ else
   BRANCH="master";
 fi
 
-# If we already have an archive of the branch locally (in ~/cache)
-# Then we check to see if the size matches the online version
-# If they do, we proceed to start the api server
-# Otherwise we remove the local cache and install latest version of the branch
-
-TARBALL_SIZE=$(curl -s --head --request GET "${TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
-
-if [ ! $TARBALL_SIZE ]; then
-  # First request doesn't always provide the content length for some reason (it's probably added by their caching layer)
-  TARBALL_SIZE=$(curl -s --head --request GET "${TARBALL_URL}${BRANCH}" | grep "Content-Length" | sed -E "s/.*: *([0-9]+).*/\1/")
-fi
-
 ARCHIVE="${BRANCH//\//-}.tgz"
+TIMESTAMP="$(date +%s)"
 
-if [ -e $ARCHIVE ];
-then
-  LSIZE=$(wc -c $ARCHIVE | sed -E "s/ ?([0-9]+).*/\1/")
-  test $TARBALL_SIZE = $LSIZE && echo "Size matches $ARCHIVE (${TARBALL_SIZE}:${LSIZE})" || (echo "> Removing old $ARCHIVE (size doesn't match: ${TARBALL_SIZE}:${LSIZE})"; rm $ARCHIVE; echo "File removed";)
-fi
-
-if [ ! -e $ARCHIVE ];
-then
-  echo "> Downloading tarball ${TARBALL_URL}${BRANCH}"
-  curl "${TARBALL_URL}${BRANCH}" -o $ARCHIVE
-  echo "> Extracting $ARCHIVE"
-  tar -xzf $ARCHIVE
-  mkdir -p $FRONTEND_FOLDER
-  rm -rf $FRONTEND_FOLDER
-  mv "opencollective-frontend-${BRANCH//\//-}" $FRONTEND_FOLDER
-  mv $ARCHIVE $FRONTEND_FOLDER/archive.tar.gz
-fi
+echo "> Downloading tarball ${TARBALL_URL}${BRANCH}?nocache=${TIMESTAMP}"
+curl "${TARBALL_URL}${BRANCH}?nocache=${TIMESTAMP}" -o $ARCHIVE
+echo "> Extracting $ARCHIVE"
+tar -xzf $ARCHIVE
+mkdir -p $FRONTEND_FOLDER
+rm -rf $FRONTEND_FOLDER
+mv "opencollective-frontend-${BRANCH//\//-}" $FRONTEND_FOLDER
+mv $ARCHIVE $FRONTEND_FOLDER/archive.tar.gz
