@@ -103,9 +103,6 @@
   "algolia": {
     "index": "dvl_collectives"
   },
-  "fixer": {
-    "accessKey": "UNDEFINED_FIXER_ACCESS_KEY"
-  },
   "stripe": {
     "accountId": "acct_15vekcDjPFcHOcTm",
     "clientId": "ca_68FQcZXEcV66Kjg7egLnR1Ce87cqwoue",
