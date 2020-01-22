@@ -6,7 +6,7 @@ import app from '../../../server/index';
 import originalStripeMock from '../../mocks/stripe';
 import stripe from '../../../server/lib/stripe';
 
-describe('webhooks.stripe.test.js', () => {
+describe('server/routes/webhooks.stripe', () => {
   let sandbox;
 
   it('returns 200 if the event is not livemode in production', done => {

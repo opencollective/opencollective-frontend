@@ -12,7 +12,7 @@ import roles from '../../../server/constants/roles';
 
 const application = utils.data('application');
 
-describe('stripe.routes.test.js', () => {
+describe('server/routes/stripe', () => {
   let host, user, collective;
 
   beforeEach(() => utils.resetTestDB());

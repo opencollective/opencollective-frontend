@@ -59,7 +59,7 @@ const collectiveData = {
 let collective,
   users = [];
 
-describe('server/routes/email.test.js', () => {
+describe('server/routes/email', () => {
   let sandbox;
 
   before(() => utils.resetTestDB());

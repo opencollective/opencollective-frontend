@@ -18,7 +18,7 @@ const application = utils.data('application');
 /**
  * Tests.
  */
-describe('routes/users.test.js', () => {
+describe('server/routes/users', () => {
   let nm;
 
   beforeEach(() => utils.resetTestDB());
