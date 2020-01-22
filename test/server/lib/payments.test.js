@@ -217,6 +217,8 @@ describe('lib.payments.test.js', () => {
 
             it('calls subscribeOrUpgradePlan', async () => {
               expect(plansLib.subscribeOrUpgradePlan.callCount).to.equal(1);
+              // This test is too fast and that can lead to deadlock issues
+              await new Promise(res => setTimeout(res, 100));
             });
 
             it('successfully sends out an email to donor1', async () => {
