@@ -19,7 +19,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 
 const conversationsQuery = gqlV2`
   query ConversationSection($collectiveSlug: String!) {
-    collective(slug: $collectiveSlug, throwIfMissing: false) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       conversations(limit: 3) {
         ...ConversationListFragment
@@ -42,7 +42,7 @@ class SectionConversations extends React.PureComponent {
 
     /** Conversations */
     data: PropTypes.shape({
-      collective: PropTypes.shape({
+      account: PropTypes.shape({
         conversations: PropTypes.shape({
           totalCount: PropTypes.number,
           nodes: PropTypes.arrayOf(PropTypes.object),
@@ -53,7 +53,7 @@ class SectionConversations extends React.PureComponent {
 
   render() {
     const { collective, data } = this.props;
-    const conversations = get(data, 'collective.conversations', {});
+    const conversations = get(data, 'account.conversations', {});
 
     return (
       <ContainerSectionContent pt={5} pb={3}>
