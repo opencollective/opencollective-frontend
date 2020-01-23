@@ -21,7 +21,7 @@ process.on('uncaughtException', err => {
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
-    const { locale, localeDataScript, url } = ctx.req;
+    const { locale, url } = ctx.req;
 
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
@@ -60,7 +60,6 @@ export default class IntlDocument extends Document {
         ...initialProps,
         ...page,
         locale,
-        localeDataScript,
         clientAnalytics,
         styles: (
           <React.Fragment>
@@ -115,11 +114,6 @@ export default class IntlDocument extends Document {
         <Head />
         <body>
           <Main />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: this.props.localeDataScript,
-            }}
-          />
           <NextScript />
           {this.props.clientAnalytics.enabled && (
             <script dangerouslySetInnerHTML={{ __html: this.clientAnalyticsCode() }} />

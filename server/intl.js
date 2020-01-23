@@ -4,7 +4,6 @@ const IntlPolyfill = require('intl');
 Intl.NumberFormat = IntlPolyfill.NumberFormat;
 Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 
-const fs = require('fs');
 const path = require('path');
 
 const glob = require('glob');
@@ -21,23 +20,7 @@ const languages = [
     .filter(locale => locale !== 'en'),
 ];
 
-// We need to expose React Intl's locale data on the request for the user's
-// locale. This function will also cache the scripts by lang in memory.
-const localeDataCache = new Map();
-
-function getLocaleDataScript(locale = 'en') {
-  const lang = locale.split('-')[0];
-  if (!localeDataCache.has(lang)) {
-    const localeDataFile = require.resolve(`@formatjs/intl-relativetimeformat/dist/locale-data/${lang}`);
-    const localeDataScript = fs.readFileSync(localeDataFile, 'utf8');
-    localeDataCache.set(lang, localeDataScript);
-  }
-  return localeDataCache.get(lang);
-}
-
-// We need to load and expose the translations on the request for the user's
-// locale. These will only be used in production, in dev the `defaultMessage` in
-// each message description in the source code will be used.
+// We need to load and expose the translations on the request for the user's locale
 function getMessages(locale) {
   const localeFile = path.join(__dirname, `../lang/${locale}.json`);
   return require(localeFile);
@@ -61,7 +44,6 @@ function middleware() {
     }
 
     logger.debug('url %s locale %s', req.url, req.locale);
-    req.localeDataScript = getLocaleDataScript(req.locale);
     req.messages = getMessages(req.locale);
     next();
   };

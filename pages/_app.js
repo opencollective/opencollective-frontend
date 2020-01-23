@@ -7,14 +7,7 @@ import { ThemeProvider } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
 import * as Sentry from '@sentry/browser';
 
-// For old browsers without window.Intl
-import 'intl';
-import 'intl/locale-data/jsonp/en.js';
-import 'intl-pluralrules';
-import '@formatjs/intl-relativetimeformat/polyfill';
-import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
-
-import { IntlProvider } from 'react-intl';
+import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 
 import UserProvider from '../components/UserProvider';
 import StripeProviderSSR from '../components/StripeProvider';
@@ -52,10 +45,13 @@ if (!process.browser) {
   global.DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
 }
 
+// This is optional but highly recommended
+// since it prevents memory leak
+const cache = createIntlCache();
+
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
     pageProps: PropTypes.object.isRequired,
-    initialNow: PropTypes.number.isRequired,
     scripts: PropTypes.object.isRequired,
     locale: PropTypes.string,
     messages: PropTypes.object,
@@ -87,12 +83,7 @@ class OpenCollectiveFrontendApp extends App {
     // Get react-intl data from props or local data if client side
     const { locale, messages } = ctx.req || window.__NEXT_DATA__.props;
 
-    // Store server time to avoid React checksum mistmatch that could happen
-    // with react-intl `FormattedRelative` when server and client time are different.
-    // See https://github.com/formatjs/react-intl/issues/254
-    const initialNow = Date.now();
-
-    return { pageProps, scripts, initialNow, locale, messages };
+    return { pageProps, scripts, locale, messages };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -121,18 +112,20 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
+    const { client, Component, pageProps, scripts, locale, messages } = this.props;
+
+    const intl = createIntl({ locale, messages }, cache);
 
     return (
       <Fragment>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
-              <IntlProvider initialNow={initialNow} locale={locale || 'en'} messages={messages}>
+              <RawIntlProvider value={intl}>
                 <UserProvider apiKey={process.env.STRIPE_KEY}>
                   <Component {...pageProps} />
                 </UserProvider>
-              </IntlProvider>
+              </RawIntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
