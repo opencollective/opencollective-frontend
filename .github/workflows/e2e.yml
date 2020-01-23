@@ -55,8 +55,32 @@ jobs:
       - name: Checkout (frontend)
         uses: actions/checkout@v2-beta
 
-      - name: Checkout (api)
-        run: ./scripts/ci_checkout_api.sh
+      - name: Check matching branch
+        id: check-matching-branch
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/:owner/:repo/git/:ref
+          owner: opencollective
+          repo: opencollective-api
+          ref: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Checkout (api - matching branch)
+        if: steps.check-matching-branch.outputs.status == 200
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-api
+          path: opencollective-api
+          ref: ${{ github.ref }}
+
+      - name: Checkout (api - master)
+        if: steps.check-matching-branch.outputs.status != 200
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-api
+          path: opencollective-api
 
       - name: Setup node
         uses: actions/setup-node@v1
