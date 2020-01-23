@@ -131,7 +131,7 @@
     "nodemon": "^2.0.2",
     "nyc": "^15.0.0",
     "prettier": "1.19.1",
-    "sinon": "^8.1.0",
+    "sinon": "^8.1.1",
     "supertest": "^4.0.2",
     "supertest-as-promised": "^4.0.2",
     "typescript": "^3.7.5"
