@@ -21,6 +21,11 @@ const defaults = {
   CLIENT_ANALYTICS_ENABLED: false,
 };
 
+if (process.env.NODE_ENV === 'e2e') {
+  defaults.API_URL = 'http://localhost:3060';
+  defaults.API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
+}
+
 for (const key in defaults) {
   if (process.env[key] === undefined) {
     process.env[key] = defaults[key];
