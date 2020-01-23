@@ -15,7 +15,7 @@ import {
 import { Kind } from 'graphql/language';
 import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
-import { pick } from 'lodash';
+import { pick, omit } from 'lodash';
 import moment from 'moment';
 
 import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
@@ -33,6 +33,7 @@ import roles from '../../constants/roles';
 import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
 import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
 import * as commonComment from '../common/comment';
+import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
@@ -657,6 +658,21 @@ export const InvoiceType = new GraphQLObjectType({
   },
 });
 
+export const ExpenseAttachmentType = new GraphQLObjectType({
+  name: 'ExpenseAttachment',
+  description: 'Public fields for an expense attachment',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLInt) },
+    amount: { type: new GraphQLNonNull(GraphQLInt) },
+    createdAt: { type: new GraphQLNonNull(IsoDateString) },
+    updatedAt: { type: new GraphQLNonNull(IsoDateString) },
+    incurredAt: { type: new GraphQLNonNull(IsoDateString) },
+    deletedAt: { type: IsoDateString },
+    description: { type: GraphQLString },
+    url: { type: GraphQLString },
+  },
+});
+
 export const ExpenseType = new GraphQLObjectType({
   name: 'ExpenseType',
   description: 'This represents an Expense',
@@ -748,21 +764,24 @@ export const ExpenseType = new GraphQLObjectType({
       },
       attachment: {
         type: GraphQLString,
-        resolve(expense, args, req) {
-          if (!req.remoteUser) {
+        deprecationReason: '2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.',
+        async resolve(expense, args, req) {
+          if (!(await canViewExpensePrivateInfo(expense, req))) {
             return null;
+          } else {
+            const attachments = await getExpenseAttachments(expense.id, req);
+            return attachments[0] && attachments[0].url;
           }
-          if (req.remoteUser.isAdmin(expense.CollectiveId) || req.remoteUser.id === expense.UserId) {
-            return expense.attachment;
-          }
-          return req.loaders.Collective.byId.load(expense.CollectiveId).then(collective => {
-            if (
-              req.remoteUser.isAdmin(collective.HostCollectiveId) ||
-              req.remoteUser.isAdmin(collective.ParentCollectiveId)
-            ) {
-              return expense.attachment;
+        },
+      },
+      attachments: {
+        type: new GraphQLList(ExpenseAttachmentType),
+        async resolve(expense, _, req) {
+          return (await getExpenseAttachments(expense.id, req)).map(async attachment => {
+            if (await canViewExpensePrivateInfo(expense, req)) {
+              return attachment;
             } else {
-              return null;
+              return omit(attachment, ['url']);
             }
           });
         },

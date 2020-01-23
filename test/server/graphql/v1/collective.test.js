@@ -79,6 +79,7 @@ describe('server/graphql/v1/collective', () => {
         description: 'test',
         currency,
         payoutMethod: 'manual',
+        attachments: [{ amount: 100 * (i + 1), url: store.randUrl() }],
         collective: { id: apex.id },
       });
       await expenses.payExpense(hostAdmin, { id: expense.id });
@@ -295,6 +296,7 @@ describe('server/graphql/v1/collective', () => {
       currency: 'EUR',
       payoutMethod: 'manual',
       collective: { id: cid },
+      attachments: [{ url: store.randUrl(), amount }],
     });
 
     // And given that we add some expenses to brussels together:

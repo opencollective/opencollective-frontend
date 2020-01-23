@@ -14,6 +14,7 @@ import {
 import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
 import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString, ExpenseType } from './types';
+import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
 
 export const TransactionInterfaceType = new GraphQLInterfaceType({
   name: 'Transaction',
@@ -313,12 +314,19 @@ export const TransactionExpenseType = new GraphQLObjectType({
       attachment: {
         type: GraphQLString,
         deprecationReason: 'Please use transaction.expense.attachment',
-        resolve(transaction, args, req) {
-          // If it's a expense transaction it'll have an ExpenseId
-          // otherwise we return null
-          return transaction.ExpenseId
-            ? req.loaders.Expense.byId.load(transaction.ExpenseId).then(expense => expense && expense.attachment)
-            : null;
+        async resolve(transaction, args, req) {
+          // If it's a expense transaction it'll have an ExpenseId otherwise we return null
+          if (!transaction.ExpenseId) {
+            return null;
+          } else {
+            const expense = req.loaders.Expense.byId(transaction.ExpenseId);
+            if (!expense || !(await canViewExpensePrivateInfo(expense, req))) {
+              return null;
+            } else {
+              const attachments = await getExpenseAttachments(transaction.ExpenseId, req);
+              return attachments[0] && attachments[0].url;
+            }
+          }
         },
       },
     };

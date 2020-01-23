@@ -12,6 +12,7 @@ import { sortResults, createDataLoaderWithOptions } from './helpers';
 // Loaders generators
 import generateCommentsLoader from './comments';
 import generateConversationLoaders from './conversation';
+import { generateExpenseAttachmentsLoader } from './expenses';
 
 export const loaders = req => {
   const cache = {};
@@ -19,6 +20,7 @@ export const loaders = req => {
 
   context.loaders.Comment = generateCommentsLoader(req, cache);
   context.loaders.Conversation = generateConversationLoaders(req, cache);
+  context.loaders.ExpenseAttachment.byExpenseId = generateExpenseAttachmentsLoader(req, cache);
 
   /** *** Collective *****/
 

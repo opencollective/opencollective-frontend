@@ -334,7 +334,7 @@ const checkTransactions = () => {
                 GROUP BY "ExpenseId"
                 HAVING COUNT(*) != 2
       )
-      SELECT ie."ExpenseId", ie."numberOfTransactions", c.slug as collective, e.category, e.amount, e.currency, e.description, e."payoutMethod", u.email as "user email", u."paypalEmail", e.attachment, e."incurredAt", e."createdAt", e."updatedAt" FROM "invalidExpenses" ie LEFT JOIN "Expenses" e ON ie."ExpenseId" = e.id LEFT JOIN "Users" u ON u.id=e."UserId" LEFT JOIN "Collectives" c ON c.id=e."CollectiveId" WHERE e.id IN (select "ExpenseId" FROM "invalidExpenses" WHERE valid is false)
+      SELECT ie."ExpenseId", ie."numberOfTransactions", c.slug as collective, e.category, e.amount, e.currency, e.description, e."payoutMethod", u.email as "user email", u."paypalEmail", e."incurredAt", e."createdAt", e."updatedAt" FROM "invalidExpenses" ie LEFT JOIN "Expenses" e ON ie."ExpenseId" = e.id LEFT JOIN "Users" u ON u.id=e."UserId" LEFT JOIN "Collectives" c ON c.id=e."CollectiveId" WHERE e.id IN (select "ExpenseId" FROM "invalidExpenses" WHERE valid is false)
     `,
           { type: sequelize.QueryTypes.SELECT },
         ),

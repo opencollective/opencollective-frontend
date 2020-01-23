@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 
 /* Test utilities */
+import { pick } from 'lodash';
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
 
@@ -17,6 +18,8 @@ import emailLib from '../../../../server/lib/email';
 import { getFxRate } from '../../../../server/lib/currency';
 
 import paypalAdaptive from '../../../../server/paymentProviders/paypal/adaptiveGateway';
+import { fakeExpense, fakeUser, fakeExpenseAttachment, fakeCollective, randStr } from '../../../test-helpers/fake-data';
+import { roles } from '../../../../server/constants';
 
 /* Queries used throughout these tests */
 const allExpensesQuery = `
@@ -27,7 +30,10 @@ const allExpensesQuery = `
       amount
       category
       user { id email paypalEmail collective { id slug } }
-      collective { id slug } } }`;
+      collective { id slug } 
+      attachment
+    } 
+  }`;
 
 const expensesQuery = `
   query expenses($CollectiveId: Int, $CollectiveSlug: String, $category: String, $FromCollectiveId: Int, $FromCollectiveSlug: String, $status: ExpenseStatus, $offset: Int, $limit: Int, $orderBy: OrderByType) {
@@ -44,12 +50,61 @@ const expensesQuery = `
   }
 `;
 
+const expenseQuery = `
+  query expense($id: Int!) {
+    Expense(id: $id) {
+      id
+      description
+      amount
+      category
+      user { id email paypalEmail collective { id slug } }
+      collective { id slug }
+      attachment
+      attachments {
+        id
+        amount
+        description
+        url
+      }
+    }
+  }
+`;
+
 const createExpenseQuery = `
   mutation createExpense($expense: ExpenseInputType!) {
     createExpense(expense: $expense) {
       id
       status
-      user { id name collective { id name slug } } } }`;
+      user { id name collective { id name slug } }
+      amount
+      attachment
+      attachments {
+        id
+        url
+        amount
+        description
+        incurredAt
+      } 
+    } 
+  }`;
+
+const editExpenseMutation = `
+  mutation editExpense($expense: ExpenseInputType!) {
+    editExpense(expense: $expense) {
+      id
+      status
+      user { id name collective { id name slug } }
+      amount
+      attachment
+      attachments {
+        id
+        url
+        amount
+        description
+        incurredAt
+      } 
+    } 
+  }`;
 
 const approveExpenseQuery = `
   mutation approveExpense($id: Int!) {
@@ -135,26 +190,31 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 2000 }],
         amount: 2000,
         description: 'Beer',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 3000 }],
         amount: 3000,
         description: 'Banner',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 4000 }],
         amount: 4000,
         description: 'Stickers',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 5000 }],
         amount: 5000,
         description: 'T-shirts',
         ...data,
@@ -194,11 +254,13 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 2000 }],
         amount: 2000,
         description: 'Beer',
         ...data,
@@ -207,11 +269,13 @@ describe('server/graphql/v1/expenses', () => {
       // two expenses
       data.collective = { id: anotherCollective.id };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 3000 }],
         amount: 3000,
         description: 'Banner',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 4000 }],
         amount: 4000,
         description: 'Stickers',
         ...data,
@@ -220,6 +284,7 @@ describe('server/graphql/v1/expenses', () => {
       // one expense
       data.collective = { id: inactiveCollective.id };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 3500 }],
         amount: 3500,
         description: 'Banner inactive',
         ...data,
@@ -256,12 +321,14 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         category: 'legal',
         description: 'Pizza',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 2000 }],
         amount: 2000,
         category: 'treat',
         description: 'Beer',
@@ -271,12 +338,14 @@ describe('server/graphql/v1/expenses', () => {
       // two expenses but just one categorized as `legal`.
       data.collective = { id: anotherCollective.id };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 3000 }],
         amount: 3000,
         category: 'legal',
         description: 'Banner',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 4000 }],
         amount: 4000,
         category: 'stuff',
         description: 'Stickers',
@@ -313,12 +382,14 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       await store.createExpense(xdamman, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         category: 'legal',
         description: 'Pizza',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 2000 }],
         amount: 2000,
         category: 'treat',
         description: 'Beer',
@@ -328,12 +399,14 @@ describe('server/graphql/v1/expenses', () => {
       // two expenses but just one filed by our user
       data.collective = { id: anotherCollective.id };
       await store.createExpense(xdamman, {
+        attachments: [{ url: store.randUrl(), amount: 3000 }],
         amount: 3000,
         category: 'legal',
         description: 'Banner',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 4000 }],
         amount: 4000,
         category: 'stuff',
         description: 'Stickers',
@@ -387,26 +460,31 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 2000 }],
         amount: 2000,
         description: 'Beer',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 3000 }],
         amount: 3000,
         description: 'Banner',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 4000 }],
         amount: 4000,
         description: 'Stickers',
         ...data,
       });
       await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 5000 }],
         amount: 5000,
         description: 'T-shirts',
         ...data,
@@ -428,6 +506,55 @@ describe('server/graphql/v1/expenses', () => {
       // collective
       expect(expenses.map(e => e.description)).to.deep.equal(['T-shirts', 'Stickers', 'Banner', 'Beer', 'Pizza']);
     }); /* End of "gets the latest expenses from one collective" */
+  });
+
+  describe('#expense', () => {
+    it('hides attachment if not allowed to see', async () => {
+      const host = await fakeCollective({ type: 'ORGANIZATION' });
+      const collective = await fakeCollective({ host });
+      const expense = await fakeExpense({ collective, attachments: [] });
+      const attachment = await fakeExpenseAttachment({ expense });
+      const collectiveAdmin = await fakeUser();
+      await collective.addUserWithRole(collectiveAdmin, roles.ADMIN);
+      const hostAdmin = await fakeUser();
+      await host.addUserWithRole(hostAdmin, roles.ADMIN);
+
+      // Fetch as unauthenticated (should not have URL)
+      let result = await utils.graphqlQuery(expenseQuery, { id: expense.id });
+      expect(result.data.Expense.attachment).to.be.null;
+      result.data.Expense.attachments.forEach(attachmentFromAPI => {
+        expect(attachmentFromAPI.url).to.be.null;
+      });
+
+      // Fetch as another user (should not have URL)
+      const randomUser = await fakeUser();
+      result = await utils.graphqlQuery(expenseQuery, { id: expense.id }, randomUser);
+      expect(result.data.Expense.attachment).to.be.null;
+      result.data.Expense.attachments.forEach(attachmentFromAPI => {
+        expect(attachmentFromAPI.url).to.be.null;
+      });
+
+      // Fetch as expense's creator (should have URL)
+      result = await utils.graphqlQuery(expenseQuery, { id: expense.id }, expense.User);
+      expect(result.data.Expense.attachment).to.eq(attachment.url);
+      result.data.Expense.attachments.forEach(attachmentFromAPI => {
+        expect(attachmentFromAPI.url).to.eq(attachment.url);
+      });
+
+      // Fetch as collective admin (should have URL)
+      result = await utils.graphqlQuery(expenseQuery, { id: expense.id }, collectiveAdmin);
+      expect(result.data.Expense.attachment).to.eq(attachment.url);
+      result.data.Expense.attachments.forEach(attachmentFromAPI => {
+        expect(attachmentFromAPI.url).to.eq(attachment.url);
+      });
+
+      // Fetch as host admin (should have URL)
+      result = await utils.graphqlQuery(expenseQuery, { id: expense.id }, hostAdmin);
+      expect(result.data.Expense.attachment).to.eq(attachment.url);
+      result.data.Expense.attachments.forEach(attachmentFromAPI => {
+        expect(attachmentFromAPI.url).to.eq(attachment.url);
+      });
+    });
   });
 
   describe('#createExpense', () => {
@@ -499,6 +626,8 @@ describe('server/graphql/v1/expenses', () => {
       expect(result.data.createExpense.status).to.equal('PENDING');
       // And then the expense's creator should be our user
       expect(result.data.createExpense.user.id).to.equal(user.id);
+      expect(result.data.createExpense.attachment).to.equal(data.attachment);
+      expect(result.data.createExpense.attachments[0].url).to.equal(data.attachment);
 
       // And then the user should become a member of the project
       const membership = await models.Member.findOne({
@@ -526,6 +655,71 @@ describe('server/graphql/v1/expenses', () => {
       const res = await utils.graphqlQuery(createExpenseQuery, { expense: data }, user);
       expect(res.errors).to.not.exist;
     }); /* End of "creates a new expense logged in and send email to collective admin for approval" */
+
+    it('creates an expense using the new "attachments" field', async () => {
+      const user = await fakeUser();
+      const collective = await fakeCollective();
+      const expenseData = {
+        amount: 500,
+        description: 'Bought some potatoes',
+        type: 'RECEIPT',
+        category: 'food',
+        collective: { id: collective.id },
+        attachments: [
+          {
+            amount: 250,
+            description: 'Burger',
+            url: store.randUrl(),
+            incurredAt: new Date('2000-01-01T00:00:00'),
+          },
+          {
+            amount: 250,
+            description: 'French Fries',
+            url: store.randUrl(),
+            incurredAt: new Date('2000-01-03T00:00:00'),
+          },
+        ],
+      };
+
+      const result = await utils.graphqlQuery(createExpenseQuery, { expense: expenseData }, user);
+      const attachments = result.data.createExpense.attachments;
+      expect(result.data.createExpense.amount).to.equal(expenseData.amount);
+      attachments.forEach(attachment => {
+        const baseData = expenseData.attachments.find(a => a.description === attachment.description);
+        expect(baseData.url).to.equal(attachment.url);
+        expect(baseData.amount).to.equal(attachment.amount);
+      });
+    });
+
+    it("fails if attachments amount don't match expense", async () => {
+      const user = await fakeUser();
+      const collective = await fakeCollective();
+      const expenseData = {
+        amount: 500,
+        description: 'Bought some potatoes',
+        type: 'RECEIPT',
+        category: 'food',
+        collective: { id: collective.id },
+        attachments: [
+          {
+            amount: 250,
+            description: 'Burger',
+            url: store.randUrl(),
+          },
+          {
+            amount: 400,
+            description: 'French Fries',
+            url: store.randUrl(),
+          },
+        ],
+      };
+
+      const result = await utils.graphqlQuery(createExpenseQuery, { expense: expenseData }, user);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal(
+        "The sum of all attachments must be equal to the total expense's amount. Expense's total is 500, but the total of attachments was 650.",
+      );
+    });
   }); /* End of "#createExpense" */
 
   describe('#approveExpense', () => {
@@ -548,6 +742,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -581,6 +776,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -632,6 +828,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -687,6 +884,7 @@ describe('server/graphql/v1/expenses', () => {
       // And given the above collective has one expense (in PENDING
       // state)
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         currency: 'USD',
@@ -715,6 +913,7 @@ describe('server/graphql/v1/expenses', () => {
       // And given the above collective has one expense (in PENDING
       // state)
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         currency: 'USD',
@@ -750,6 +949,7 @@ describe('server/graphql/v1/expenses', () => {
       // And given the above collective has one expense (in PENDING
       // state)
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         currency: 'USD',
@@ -789,6 +989,7 @@ describe('server/graphql/v1/expenses', () => {
       // And given the above collective has one expense (in PENDING
       // state)
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         currency: 'USD',
@@ -851,6 +1052,7 @@ describe('server/graphql/v1/expenses', () => {
         // And given the above collective has one expense (in PENDING
         // state)
         expense = await store.createExpense(user, {
+          attachments: [{ url: store.randUrl(), amount: 1000 }],
           amount: 1000,
           description: 'Pizza',
           currency: 'EUR',
@@ -907,6 +1109,7 @@ describe('server/graphql/v1/expenses', () => {
         // And given the above collective has one expense (in PENDING
         // state)
         expense = await store.createExpense(user, {
+          attachments: [{ url: store.randUrl(), amount: 1000 }],
           amount: 1000,
           description: 'Pizza',
           currency: 'EUR',
@@ -1026,7 +1229,133 @@ describe('server/graphql/v1/expenses', () => {
   }); /* End of #payExpense */
 
   describe('#editExpense', () => {
-    // not implemented
+    it('goes back to pending if editing critical fields', async () => {
+      // Amount
+      let expense = await fakeExpense({ status: 'APPROVED', amount: 1000 });
+      let newExpenseData = { expense: { id: expense.id, amount: 100 } };
+      let result = await utils.graphqlQuery(editExpenseMutation, newExpenseData, expense.User);
+      expect(result.data.editExpense.status).to.equal('PENDING');
+
+      // Payout
+      expense = await fakeExpense({ status: 'APPROVED', payoutMethod: 'other' });
+      newExpenseData = { id: expense.id, payoutMethod: 'paypal' };
+      result = await utils.graphqlQuery(editExpenseMutation, { expense: newExpenseData }, expense.User);
+      expect(result.data.editExpense.status).to.equal('PENDING');
+
+      // Attachment(s)
+      expense = await fakeExpense({ status: 'APPROVED' });
+      newExpenseData = { id: expense.id, attachment: store.randUrl() };
+      result = await utils.graphqlQuery(editExpenseMutation, { expense: newExpenseData }, expense.User);
+      expect(result.data.editExpense.status).to.equal('PENDING');
+
+      // Description => should not change status
+      expense = await fakeExpense({ status: 'APPROVED' });
+      newExpenseData = { id: expense.id, description: randStr() };
+      result = await utils.graphqlQuery(editExpenseMutation, { expense: newExpenseData }, expense.User);
+      expect(result.data.editExpense.status).to.equal('APPROVED');
+    });
+
+    it('updates an expense using the new "attachments" field', async () => {
+      const expense = await fakeExpense({ amount: 1000 });
+      const expenseUpdateData = {
+        id: expense.id,
+        attachments: [
+          {
+            amount: 800,
+            description: 'Burger',
+            url: store.randUrl(),
+          },
+          {
+            amount: 200,
+            description: 'French Fries',
+            url: store.randUrl(),
+          },
+        ],
+      };
+
+      const result = await utils.graphqlQuery(editExpenseMutation, { expense: expenseUpdateData }, expense.User);
+      const attachmentsFromAPI = result.data.editExpense.attachments;
+      expect(result.data.editExpense.amount).to.equal(1000);
+      expect(attachmentsFromAPI.length).to.equal(2);
+      expenseUpdateData.attachments.forEach(attachment => {
+        const attachmentFromApi = attachmentsFromAPI.find(a => a.description === attachment.description);
+        expect(attachmentFromApi).to.exist;
+        expect(attachmentFromApi.url).to.equal(attachment.url);
+        expect(attachmentFromApi.amount).to.equal(attachment.amount);
+      });
+    });
+
+    it("fails if attachments amount doesn't match expense", async () => {
+      const expense = await fakeExpense({ amount: 1000 });
+      const expenseUpdateData = {
+        id: expense.id,
+        attachments: [
+          { amount: 800, url: store.randUrl() },
+          { amount: 300, url: store.randUrl() },
+        ],
+      };
+
+      const result = await utils.graphqlQuery(editExpenseMutation, { expense: expenseUpdateData }, expense.User);
+      expect(result.errors).to.exist;
+      expect(result.errors[0].message).to.equal(
+        "The sum of all attachments must be equal to the total expense's amount. Expense's total is 1000, but the total of attachments was 1100.",
+      );
+    });
+
+    it('updates the attachments', async () => {
+      const expense = await fakeExpense({ amount: 10000, attachments: [] });
+      const attachments = await Promise.all([
+        fakeExpenseAttachment({ ExpenseId: expense.id, amount: 2000 }),
+        fakeExpenseAttachment({ ExpenseId: expense.id, amount: 3000 }),
+        fakeExpenseAttachment({ ExpenseId: expense.id, amount: 5000 }),
+      ]);
+
+      const updatedExpenseData = {
+        id: expense.id,
+        attachments: [
+          pick(attachments[0], ['id', 'url', 'amount']), // Don't change the first one (value=2000)
+          { ...pick(attachments[1], ['id', 'url']), amount: 7000 }, // Update amount for the second one
+          { amount: 1000, url: store.randUrl() }, // Remove the third one and create another instead
+        ],
+      };
+
+      const result = await utils.graphqlQuery(editExpenseMutation, { expense: updatedExpenseData }, expense.User);
+      const returnedAttachments = result.data.editExpense.attachments;
+      const sumAttachments = returnedAttachments.reduce((total, attachment) => total + attachment.amount, 0);
+      expect(sumAttachments).to.equal(10000);
+      expect(returnedAttachments.find(a => a.id === attachments[0].id)).to.exist;
+      expect(returnedAttachments.find(a => a.id === attachments[1].id)).to.exist;
+      expect(returnedAttachments.find(a => a.id === attachments[2].id)).to.not.exist;
+      expect(returnedAttachments.find(a => a.id === attachments[1].id).amount).to.equal(7000);
+    });
+
+    it('Updates the attachments and the expense amount at the same time', async () => {
+      const expense = await fakeExpense({ amount: 10000, attachments: [] });
+      const attachments = await Promise.all([
+        fakeExpenseAttachment({ ExpenseId: expense.id, amount: 2000 }),
+        fakeExpenseAttachment({ ExpenseId: expense.id, amount: 3000 }),
+        fakeExpenseAttachment({ ExpenseId: expense.id, amount: 5000 }),
+      ]);
+
+      const updatedExpenseData = {
+        id: expense.id,
+        amount: 15000,
+        attachments: [
+          pick(attachments[0], ['id', 'url', 'amount']), // Don't change the first one (value=2000)
+          { ...pick(attachments[1], ['id', 'url']), amount: 7000 }, // Update amount for the second one
+          { amount: 6000, url: store.randUrl() }, // Remove the third one and create another instead
+        ],
+      };
+
+      const result = await utils.graphqlQuery(editExpenseMutation, { expense: updatedExpenseData }, expense.User);
+      const returnedAttachments = result.data.editExpense.attachments;
+      const sumAttachments = returnedAttachments.reduce((total, attachment) => total + attachment.amount, 0);
+      expect(sumAttachments).to.equal(15000);
+      expect(returnedAttachments.find(a => a.id === attachments[0].id)).to.exist;
+      expect(returnedAttachments.find(a => a.id === attachments[1].id)).to.exist;
+      expect(returnedAttachments.find(a => a.id === attachments[2].id)).to.not.exist;
+      expect(returnedAttachments.find(a => a.id === attachments[1].id).amount).to.equal(7000);
+    });
   }); /* End of "#editExpense" */
 
   describe('#deleteExpense', () => {
@@ -1040,6 +1369,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1064,6 +1394,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(hostAdmin, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1091,6 +1422,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1122,6 +1454,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1153,6 +1486,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1181,6 +1515,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1209,6 +1544,7 @@ describe('server/graphql/v1/expenses', () => {
         collective: { id: collective.id },
       };
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         amount: 1000,
         description: 'Pizza',
         ...data,
@@ -1242,6 +1578,7 @@ describe('server/graphql/v1/expenses', () => {
       // state)
       const expenseAmount = 1500;
       const expense = await store.createExpense(user, {
+        attachments: [{ url: store.randUrl(), amount: expenseAmount }],
         amount: expenseAmount,
         description: 'Pizza',
         currency: 'USD',
@@ -1311,6 +1648,7 @@ describe('server/graphql/v1/expenses', () => {
       const expense = await store.createExpense(user, {
         amount: 1000,
         description: 'Pizza',
+        attachments: [{ url: store.randUrl(), amount: 1000 }],
         ...data,
       });
       // approve the expense

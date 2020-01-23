@@ -79,6 +79,7 @@ export function setupModels(client) {
     'Conversation',
     'ConversationFollower',
     'Expense',
+    'ExpenseAttachment',
     'LegalDocument',
     'Member',
     'MemberInvitation',
@@ -199,8 +200,12 @@ export function setupModels(client) {
     foreignKey: 'CollectiveId',
     as: 'collective',
   });
+  m.Expense.hasMany(m.ExpenseAttachment);
   m.Transaction.belongsTo(m.Expense);
   m.Transaction.belongsTo(m.Order);
+
+  // Expense attachments
+  m.ExpenseAttachment.belongsTo(m.Expense);
 
   // Order.
   m.Order.belongsTo(m.User, {

@@ -75,7 +75,6 @@ export default function(Sequelize, DataTypes) {
       },
 
       privateMessage: DataTypes.STRING,
-      attachment: DataTypes.STRING,
       category: DataTypes.STRING,
       vat: DataTypes.INTEGER,
 
@@ -141,7 +140,6 @@ export default function(Sequelize, DataTypes) {
             currency: this.currency,
             amount: this.amount,
             description: this.description,
-            attachment: this.attachment,
             category: this.category,
             payoutMethod: this.payoutMethod,
             vat: this.vat,
@@ -179,6 +177,9 @@ export default function(Sequelize, DataTypes) {
             case status.APPROVED:
               return expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
           }
+        },
+        afterDestroy(expense) {
+          return models.ExpenseAttachment.destroy({ where: { ExpenseId: expense.id } });
         },
       },
     },

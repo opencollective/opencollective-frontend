@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { Op } from 'sequelize';
+import { Op, Model } from 'sequelize';
 import { differenceBy } from 'lodash';
 
 import models from '../models';
@@ -25,18 +25,23 @@ export async function getRecommendedCollectives(collective, limit) {
  * @param {Array} diffedFields: The fields used to compare objects for ``
  * @returns [newEntries, removedEntries, updatedEntries]
  */
-export function diffDBEntries(oldEntries, newEntries, diffedFields) {
-  const toRemove = differenceBy(oldEntries, newEntries, 'id');
+export function diffDBEntries<T extends Model<T>>(
+  oldEntries: T[],
+  newEntriesData: object[],
+  diffedFields: string[],
+  idField = 'id',
+): [object[], T[], object[]] {
+  const toRemove = differenceBy(oldEntries, newEntriesData, idField);
   const toCreate = [];
   const toUpdate = [];
 
-  newEntries.forEach(entry => {
-    if (!entry.id) {
+  newEntriesData.forEach(entry => {
+    if (!entry[idField]) {
       toCreate.push(entry);
     } else {
-      const existingEntry = oldEntries.find(e => e.id === entry.id);
+      const existingEntry = oldEntries.find(oldEntry => oldEntry.get(idField) === entry[idField]);
       // We throw here to protect against security issues where users would try
-      // to update an entry that doesn't exist among `oldEntries`. Example: trying
+      // to update an entry that doesn't exist in `oldEntries`. Example: trying
       // to update an existing member that's part of another collective.
       // The error can also be throwed if users edit an entity that has been removed in
       // another tab or by someone else.

@@ -1,6 +1,11 @@
 import { expect } from 'chai';
 import { diffDBEntries } from '../../../server/lib/data';
 
+// Models have a `get` method to access properties. We need to simulate that for old entries.
+const simulateModel = data => {
+  return { ...data, get: key => data[key] };
+};
+
 describe('server/lib/data', () => {
   it('works with empty lists', () => {
     const [toCreate, toRemove, toUpdate] = diffDBEntries([], [], []);
@@ -10,18 +15,18 @@ describe('server/lib/data', () => {
   });
 
   it('returns correct results', () => {
-    const [toCreate, toRemove, toUpdate] = diffDBEntries(
-      [
-        { id: 1, msg: 'I am 1' },
-        { id: 2, msg: 'I am 2' },
-        { id: 3, msg: 'I am 3' },
-      ],
-      [{ id: 1, msg: 'I am 1 edited' }, { id: 2, msg: 'I am 2' }, { msg: 'I am the new one!' }],
-      ['msg'],
-    );
+    const existingEntries = [
+      simulateModel({ id: 1, msg: 'I am 1' }),
+      simulateModel({ id: 2, msg: 'I am 2' }),
+      simulateModel({ id: 3, msg: 'I am 3' }),
+    ];
+    const newEntries = [{ id: 1, msg: 'I am 1 edited' }, { id: 2, msg: 'I am 2' }, { msg: 'I am the new one!' }];
+    const diffFields = ['msg'];
+
+    const [toCreate, toRemove, toUpdate] = diffDBEntries(existingEntries, newEntries, diffFields);
 
     expect(toCreate).to.eql([{ msg: 'I am the new one!' }]);
-    expect(toRemove).to.eql([{ id: 3, msg: 'I am 3' }]);
+    expect(toRemove).to.eql([existingEntries[2]]);
     expect(toUpdate).to.eql([{ id: 1, msg: 'I am 1 edited' }]);
   });
 
