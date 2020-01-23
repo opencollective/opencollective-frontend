@@ -17,17 +17,21 @@ To make sure tests are properly reproduceable, you will need to setup the Open C
 
 We recommend to run a build and not the development environment.
 
+First:
+
 - clone and install [opencollective-api](https://github.com/opencollective/opencollective-api)
-- `NODE_ENV=e2e npm run build`
 
-We also recommend to restore the development dump of the database before you start the tests.
+Then, simply start it for E2E with:
 
-- `npm run db:restore:e2e`
-- `NODE_ENV=e2e npm run db:migrate`
+- `npm run start:e2e`
 
-Then start the API:
+Behing the scenes it will (you don't have to do that):
 
-- `TZ=UTC NODE_ENV=e2e E2E_TEST=1 npm run start`
+- set environment variables: `TZ=UTC NODE_ENV=e2e E2E_TEST=1`
+- reset a dedicated database (opencollective_e2e): `npm run db:restore:e2e`
+- migrate the database: `npm run db:migrate`
+- build the API server: `npm run build`
+- start the API server: `npm run start`
 
 ### 2. Frontend: Server
 
