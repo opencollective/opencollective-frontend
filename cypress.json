@@ -2,7 +2,7 @@
   "viewportWidth": 1000,
   "viewportHeight": 1660,
   "projectId": "yt5kwm",
-  "defaultCommandTimeout": 8000,
+  "defaultCommandTimeout": 15000,
   "video": false,
   "chromeWebSecurity": false,
   "blacklistHosts": ["wtfismyip.com"],
