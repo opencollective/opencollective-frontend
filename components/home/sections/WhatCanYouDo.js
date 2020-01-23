@@ -1,147 +1,216 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import themeGet from '@styled-system/theme-get';
 import { display } from 'styled-system';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
 import { Link } from '../../../server/pages';
-import { P, H3 } from '../../Text';
+import { P, H3, H4 } from '../../Text';
 import Illustration from '../HomeIllustration';
-import HomePrimaryLink from '../HomePrimaryLink';
+import { HomePrimaryLink } from '../HomeLinks';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import SectionSubTitle from '../SectionSubtitle';
 
+const Wrapper = styled(Box)`
+  background-image: ${props =>
+    props.hovering
+      ? "url('/static/images/create-collective-bg-illustration-hover-sm.png')"
+      : "url('/static/images/create-collective-bg-illustration-sm.png')"};
+  background-size: 100% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media screen and (min-width: 52em) {
+    background-image: ${props =>
+      props.hovering
+        ? "url('/static/images/create-collective-bg-illustration-hover.png')"
+        : "url('/static/images/create-collective-bg-illustration.png')"};
+    background-size: 100% 100%;
+  }
+`;
+
 const Title = styled(H3)`
-  font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
-  line-height: 22px;
+  font-size: 15px;
+  line-height: 25px;
   letter-spacing: -0.008em;
   font-weight: bold;
   margin-bottom: 16px;
   margin-top: 16px;
+  color: ${themeGet('colors.black.800')};
+  ${display}
 
   @media screen and (min-width: 64em) {
-    font-size: ${props => props.theme.fontSizes.H5}px;
-    line-height: 28px;
+    font-size: ${props => props.theme.fontSizes.H4}px;
+    line-height: ${props => props.theme.lineHeights.H4};
     letter-spacing: -0.2px;
   }
 `;
 
 const Description = styled(P)`
-  font-size: 13px;
+  font-size: ${props => props.theme.fontSizes.Caption}px;
   line-height: 19px;
-  letter-spacing: -0.012em;
-  font-weight: 500;
+  letter-spacing: -0.016em;
+  color: ${themeGet('colors.black.600')};
   ${display}
 
-  @media screen and (min-width: 88em) {
-    font-size: 15px;
-    line-height: 25px;
+  @media screen and (min-width: 52em) {
+    font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
+    line-height: 26px;
+    letter-spacing: -0.016em;
   }
 `;
 
-const WhatCanYouDo = () => (
-  <Flex mx={[3, 4]} my={4} flexDirection="column" textAlign="center">
-    <SectionTitle>
-      <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do on Open Collective?" />
-    </SectionTitle>
-    <SectionSubTitle>
-      <FormattedMessage
-        id="home.whatCanYouDoSection.subTitle"
-        defaultMessage="Collect and spend money for your community in a transparent way."
-      />
-    </SectionSubTitle>
-    <Flex mb={4} flexDirection={['column', 'row']} justifyContent={['none', 'space-evenly']}>
-      <Flex flexDirection="column" alignItems="center" my={[null, 3]} width={[1, '288px', null, null, '370px']}>
-        <Illustration
-          src="/static/images/collectmoney-illustration.png"
-          display={['block', null, null, null, 'none']}
-          alt="Collect money"
-        />
-        <Illustration
-          src="/static/images/collectmoney-illustration-lg.png"
-          display={['none', null, null, null, 'block']}
-          alt="Collect money"
-        />
-        <Title>
+const WhatCanYouDo = () => {
+  const [hoverCreateCollectiveButton, setHoverCreateCollectiveButton] = useState(false);
+
+  return (
+    <Flex mx={[3, 4]} my={4} flexDirection="column" alignItems="center" textAlign="center">
+      <SectionTitle>
+        <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do on Open Collective" />
+      </SectionTitle>
+      <Box width={['288px', 1, null, '672px']} textAlign="center">
+        <SectionSubTitle>
+          <FormattedMessage
+            id="home.whatCanYouDoSection.subTitle"
+            defaultMessage="Accept donations and sponsorships, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
+          />
+        </SectionSubTitle>
+      </Box>
+      <Flex
+        my={[3, 5]}
+        flexDirection={['column', 'row']}
+        alignItems="center"
+        justifyContent={[null, 'space-between', null, 'space-around']}
+        width={1}
+      >
+        <Title textAlign="center" display={['block', null, 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
         </Title>
-        <Description display={['block', null, 'none']}>
-          <FormattedMessage
-            id="home.whatCanYouDoSection.collectMoney.shortDescription"
-            defaultMessage="Collect money online by credit card or directly on your bank account and record it in your..."
+        <Box width={[null, '448px', null, null, '576px', '583px']}>
+          <Illustration
+            src="/static/images/collectmoney-illustration-md.png"
+            display={['block', null, null, 'none']}
+            alt="Collect money"
           />
-        </Description>
-        <Description display={['none', null, 'block']}>
-          <FormattedMessage
-            id="home.whatCanYouDoSection.collectMoney.longDescription"
-            defaultMessage="Collect money online by credit card or directly on your bank account and record it in your transparent budget. Define different ways people can contribute (one time or recurring donations, set up your own tiers)."
+          <Illustration
+            src="/static/images/collectmoney-illustration-lg.png"
+            display={['none', null, null, 'block']}
+            alt="Collect money"
           />
-        </Description>
+        </Box>
+        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left">
+          <Title display={['none', null, 'block']}>
+            <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
+          </Title>
+          <Description>
+            <FormattedMessage
+              id="home.whatCanYouDoSection.collectMoney.longDescription"
+              defaultMessage="Receive funds by credit card, Paypal, or bank transfer, and record everything in your transparent budget. Define different ways people can contribute with customizable tiers and rewards."
+            />
+          </Description>
+        </Box>
       </Flex>
-      <Flex flexDirection="column" alignItems="center" my={3} width={[1, '288px', null, null, '370px']}>
-        <Illustration
-          src="/static/images/spendmoney-illustration.png"
-          display={['block', null, null, null, 'none']}
-          alt="Spend money"
-        />
-        <Illustration
-          src="/static/images/spendmoney-illustration-lg.png"
-          display={['none', null, null, null, 'block']}
-          alt="Spend money"
-        />
-        <Title>
+      <Flex
+        my={[3, 5]}
+        flexDirection={['column', 'row-reverse']}
+        alignItems="center"
+        justifyContent={[null, 'space-between', null, 'space-around']}
+        width={1}
+      >
+        <Title textAlign="center" display={['block', null, 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
         </Title>
-        <Description display={['block', null, 'none']}>
-          <FormattedMessage
-            id="home.whatCanYouDoSection.spendMoney.shortDescription"
-            defaultMessage="You don’t manage money in a community like you do in a private company. Open..."
+        <Box width={[null, '448px', null, null, '576px', '583px']}>
+          <Illustration
+            src="/static/images/spendmoney-illustration-md.png"
+            display={['block', null, null, 'none']}
+            alt="Spend money"
           />
-        </Description>
-        <Description display={['none', null, 'block']}>
-          <FormattedMessage
-            id="home.whatCanYouDoSection.spendMoney.longDescription"
-            defaultMessage="Enable anyone in your community to submit their expenses. Once approved, reimburse them in one click with paypal or manually mark them as paid. All transactions are recorded publicly in your transparent budget (attachments are kept private to respect privacy)."
+          <Illustration
+            src="/static/images/spendmoney-illustration-lg.png"
+            display={['none', null, null, 'block']}
+            alt="Spend money"
           />
-        </Description>
+        </Box>
+        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left">
+          <Title display={['none', null, 'block']}>
+            <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
+          </Title>
+          <Description>
+            <FormattedMessage
+              id="home.whatCanYouDoSection.spendMoney.longDescription"
+              defaultMessage="Anyone in your community can submit expenses. Once approved, pay in one click with Paypal or manually. All transactions are public in your transparent budget (with personal information kept private)."
+            />
+          </Description>
+        </Box>
       </Flex>
-      <Flex flexDirection="column" alignItems="center" my={3} width={[1, '288px', null, null, '370px']}>
-        <Illustration
-          src="/static/images/managemoney-illustration.png"
-          alt="Manage money"
-          display={['block', null, null, null, 'none']}
-        />
-        <Illustration
-          src="/static/images/managemoney-illustration-lg.png"
-          alt="Manage money"
-          display={['none', null, null, null, 'block']}
-        />
-        <Title>
+      <Flex
+        my={[3, 5]}
+        flexDirection={['column', 'row']}
+        alignItems="center"
+        justifyContent={[null, 'space-between', null, 'space-around']}
+        width={1}
+      >
+        <Title textAlign="center" display={['block', null, 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
         </Title>
-        <Description display={['block', null, 'none']}>
-          <FormattedMessage
-            id="home.whatCanYouDoSection.manageMoney.shortDescription"
-            defaultMessage="You don’t manage money in a community like you do in a private company. Open..."
+        <Box width={[null, '448px', null, null, '576px', '583px']}>
+          <Illustration
+            src="/static/images/managemoney-illustration-md.png"
+            alt="Manage money"
+            display={['block', null, null, 'none']}
           />
-        </Description>
-        <Description display={['none', null, 'block']}>
-          <FormattedMessage
-            id="home.whatCanYouDoSection.manageMoney.longDescription"
-            defaultMessage="You don’t manage money in a community like you do in a private company. Open Collective lets you manage your finances in a transparent way so that everyone can see and trust that their money is put to good use."
+          <Illustration
+            src="/static/images/managemoney-illustration-lg.png"
+            alt="Manage money"
+            display={['none', null, null, 'block']}
           />
-        </Description>
+        </Box>
+        <Box ml={[null, 4, 0]} width={[null, '352px', null, null, '368px', '408px']} textAlign="left">
+          <Title display={['none', null, 'block']}>
+            <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
+          </Title>
+          <Description>
+            <FormattedMessage
+              id="home.whatCanYouDoSection.manageMoney.longDescription"
+              defaultMessage="Create Collectives for different projects for easy budget tracking. No need for messy spreadsheets! Automatic monthly reports make accounting a breeze."
+            />
+          </Description>
+        </Box>
       </Flex>
+      <Container
+        mt={5}
+        mb={4}
+        display="flex"
+        flexDirection={['column', 'row']}
+        justifyContent="center"
+        width={1}
+        alignItems="center"
+      >
+        <Box width={[null, null, '286px']} mb={2} textAlign={['center', 'left']}>
+          <H4 fontSize="H4" lineHeight="H4" letterSpacing="-0.2px" fontWeight="bold">
+            <FormattedMessage
+              id="home.whatCanYouDoSection.areYouReady"
+              defaultMessage="Are you ready to make your community sustainable?"
+            />
+          </H4>
+        </Box>
+        <Wrapper width={['288px', '380px']} height={['288px', '375px']} hovering={hoverCreateCollectiveButton}>
+          <Link route="/create" passHref>
+            <HomePrimaryLink
+              border="none"
+              onMouseEnter={() => setHoverCreateCollectiveButton(true)}
+              onMouseLeave={() => setHoverCreateCollectiveButton(false)}
+            >
+              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+            </HomePrimaryLink>
+          </Link>
+        </Wrapper>
+      </Container>
     </Flex>
-    <Container display={['none', 'none', 'flex']} justifyContent="center" width={1}>
-      <Link route="/create" passHref>
-        <HomePrimaryLink>
-          <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-        </HomePrimaryLink>
-      </Link>
-    </Container>
-  </Flex>
-);
-
+  );
+};
 export default WhatCanYouDo;

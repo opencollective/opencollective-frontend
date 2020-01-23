@@ -1,67 +1,124 @@
 import React from 'react';
+import styled from 'styled-components';
+import themeGet from '@styled-system/theme-get';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
+import { P } from '../../Text';
 import { Link } from '../../../server/pages';
 import Container from '../../Container';
-import Illustration from '../HomeIllustration';
-import HomePrimaryLink from '../HomePrimaryLink';
-import Hide from '../../Hide';
+import { HomePrimaryLink } from '../HomeLinks';
 import SectionTitle from '../SectionTitle';
-import SectionSubtitle from '../SectionSubtitle';
+import Illustration from '../HomeIllustration';
+
+const Wrapper = styled(Container)`
+  background-image: url('/static/images/fiscalhost-bg-sm.png');
+  background-size: 100% 100%;
+
+  @media screen and (min-width: 52em) {
+    background-image: url('/static/images/fiscalhost-bg-md.png');
+    background-size: 100% 100%;
+  }
+
+  @media screen and (min-width: 88em) {
+    background-image: url('/static/images/fiscalhost-bg-lg.png');
+    background-size: 100% 100%;
+  }
+`;
+
+const JoinHostLink = styled(HomePrimaryLink)`
+  color: #fff;
+  background: transparent;
+  border-color: #fff;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    border-color: #fff;
+  }
+`;
 
 const FiscalHost = () => (
-  <Flex flexDirection={'column'} alignItems="center">
-    <Container display={['block', null, 'none']}>
-      <Illustration
-        width="100%"
-        src="/static/images/fiscalhost-mobile-illustration.png"
-        alt="Open Collective for Fiscal Sponsors"
-      />
-    </Container>
-    <Container
-      ml={[3, 4, null, null, 6]}
-      mr={[3, null, null, 0]}
-      textAlign={['center', null, 'left']}
-      display="flex"
-      flexDirection="column"
-      alignItems={['center', null, 'flex-start']}
+  <Wrapper mb={5} pt={[3, null, '124px']} pb={[2, null, '116px']}>
+    <Flex
+      mx={[3, 4]}
+      flexDirection={['column-reverse', null, 'row']}
+      alignItems="center"
+      justifyContent={[null, null, 'space-around', null, 'center']}
     >
-      <SectionTitle>
-        <FormattedMessage id="home.fiscalHostSection.title" defaultMessage="Open Collective for Fiscal Sponsors" />
-      </SectionTitle>
-      <Container display="flex">
-        <Box width={[1, null, '608px', null, '784px']}>
-          <SectionSubtitle>
+      <Container textAlign="left" color="#fff" mr={[null, null, null, null, 4]}>
+        <Box width={['268px', 1, '372px']} textAlign={['center', 'left']}>
+          <SectionTitle color="#fff">
+            <FormattedMessage id="home.fiscalHostSection.title" defaultMessage="Open Collective for Fiscal Hosts" />
+          </SectionTitle>
+        </Box>
+        <Box width={['288px', 1, '480px', null, '583px']}>
+          <P mt={3} mb={[2, 4]} fontSize={['Caption', '15px']} fontWeight={['19px', '25px']} letterSpacing="-0.016em">
             <FormattedMessage
-              id="home.fiscalHostSection.subtitle"
-              defaultMessage="Some communities don’t want or can’t collect money on a personal bank account. They need to be able to piggyback on an existing legal entity. This is known as “Fiscal Sponsorship”. Open Collective offers Fiscal Sponsors a dashboard to easily manage multiple collectives. No more hairy spreadsheets that are so hard to maintain!"
+              id="home.fiscalHostSection.explanation1"
+              defaultMessage="Some Collectives don’t have a bank account or legal entity set up to receive funds, and want help taking care of things like tax reporting and financial admin. We call organizations who provide this service (sometimes called fiscal sponsorship) Fiscal Hosts."
             />
-          </SectionSubtitle>
+          </P>
+          <P my={[1, 3]} fontSize={['12px', '15px']} fontWeight={['19px', '25px']} letterSpacing="-0.016em">
+            <FormattedMessage
+              id="home.fiscalHostSection.explanation2"
+              defaultMessage="Open Collective allows fiscal hosts to reduce overhead and easily manage budgets and expenses for multiple projects. Our automated reporting makes accounting a breeze. No more messy spreadsheets!"
+            />
+          </P>
+        </Box>
+        <Box my={5} display="flex" flexDirection={['column', 'row']} alignItems="center">
           <Link route="/become-a-sponsor" passHref>
-            <HomePrimaryLink width="304px" mt={4} display={['none', null, 'block']}>
-              <FormattedMessage id="home.fiscalSponsor.knowMore" defaultMessage="Know more about Fiscal Sponsors" />
+            <HomePrimaryLink
+              mb={[3, 0]}
+              fontSize={['Paragraph', '13px']}
+              lineHeight={['Caption', '16px']}
+              width={'197px'}
+              mr={[null, 3]}
+              border="none"
+              background="#fff"
+              color="black.700"
+              fontWeight="500"
+              css={`
+                &:hover {
+                  border-color: 1px solid #8fc7ff;
+                  background: #fff;
+                  color: ${themeGet('colors.black.700')};
+                }
+                &:visited {
+                  background: #fff;
+                  color: ${themeGet('colors.black.700')};
+                }
+              `}
+            >
+              <FormattedMessage id="home.fiscalHost.becomeHostBtn" defaultMessage="Become a fiscal host" />
             </HomePrimaryLink>
+          </Link>
+          <Link route="#" passHref>
+            <JoinHostLink buttonStyle="standard">
+              <FormattedMessage id="home.joinHost" defaultMessage="Join a fiscal host" />
+            </JoinHostLink>
           </Link>
         </Box>
-        <Hide xs sm position="relative" top="-50px">
-          <Illustration
-            src="/static/images/fiscalhost-desktop-illustration.png"
-            alt="Open Collective for Fiscal Sponsors"
-          />
-        </Hide>
       </Container>
-      <Container position={[null, null, 'relative']}>
-        <Hide md lg>
-          <Link route="/become-a-sponsor" passHref>
-            <HomePrimaryLink display="block" width="218px" my={3} position={[null, null, 'relative']}>
-              <FormattedMessage id="home.fiscalHost.becomeHostBtn" defaultMessage="Become a fiscal sponsor" />
-            </HomePrimaryLink>
-          </Link>
-        </Hide>
+      <Container ml={[null, null, null, null, 4]}>
+        <Illustration
+          display={['block', null, 'none', null, 'none']}
+          src="/static/images/fiscalhost-illustration-sm.png"
+          alt="Fiscal Host"
+        />
+        <Illustration
+          display={['none', null, 'block', null, 'none']}
+          src="/static/images/fiscalhost-illustration.png"
+          alt="Fiscal Host"
+        />
+        <Illustration
+          display={['none', null, 'none', null, 'block']}
+          src="/static/images/fiscalhost-illustration-lg.png"
+          alt="Fiscal Host"
+        />
       </Container>
-    </Container>
-  </Flex>
+    </Flex>
+  </Wrapper>
 );
 
 export default FiscalHost;

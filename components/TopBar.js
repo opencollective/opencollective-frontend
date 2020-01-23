@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import SearchIcon from './SearchIcon';
 import TopBarProfileMenu from './TopBarProfileMenu';
@@ -16,7 +17,7 @@ import { withUser } from './UserProvider';
 import theme from '../lib/theme';
 
 const Logo = styled.img.attrs({
-  src: '/static/images/opencollective.svg',
+  src: '/static/images/opencollective-logo-new.svg',
   alt: 'Open Collective logo',
 })`
   ${({ animate }) => (animate ? rotateMixin : null)};
@@ -37,14 +38,21 @@ const NavList = styled(Flex)`
 const NavLinkContainer = styled(Box)`
   text-align: center;
 `;
+
 NavLinkContainer.defaultProps = {
   as: 'li',
   px: [1, 2, 3],
 };
 
 const NavLink = styled.a`
-  color: #777777;
-  font-size: 1.4rem;
+  color: ${themeGet('colors.black.800')};
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: -0.016em;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.7);
+  }
 `;
 
 class TopBar extends React.Component {
@@ -77,7 +85,7 @@ class TopBar extends React.Component {
         alignItems="center"
         justifyContent="space-between"
         flexDirection="row"
-        css={{ height: theme.sizes.navbarHeight, background: 'white' }}
+        css={{ height: theme.sizes.navbarHeight }}
       >
         <Link route="home" passHref>
           <Flex as="a" alignItems="center">
@@ -94,7 +102,7 @@ class TopBar extends React.Component {
           {showSearch && (
             <Flex justifyContent="center" flex="1 1 auto">
               <Hide xs width={1}>
-                <SearchFormContainer p={2} width="280px">
+                <SearchFormContainer p={2} width={[null, null, '280px', null, '288px']}>
                   <SearchForm />
                 </SearchFormContainer>
               </Hide>

@@ -1,49 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import styled, { css } from 'styled-components';
-import { find } from 'lodash';
+import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
-import { Pin } from '@styled-icons/octicons/Pin';
-import { WbCloudy } from '@styled-icons/material/WbCloudy';
-import { Bell } from '@styled-icons/fa-solid/Bell';
-import { Server } from '@styled-icons/fa-solid/Server';
-import { Lightbulb } from '@styled-icons/fa-solid/Lightbulb';
-import { Bullhorn } from '@styled-icons/fa-solid/Bullhorn';
 
-import DownArrowHead from '../../icons/DownArrowHeadIcon';
-import Hide from '../../Hide';
-import { Span } from '../../Text';
+import { Span, H4, P } from '../../Text';
 import Container from '../../Container';
-import HomePrimaryLink from '../HomePrimaryLink';
 import SectionTitle from '../SectionTitle';
 import SectionSubtitle from '../SectionSubtitle';
+import Illustration from '../HomeIllustration';
+import StyledCarousel from '../../StyledCarousel';
 
 const SelectFeatureButton = styled.button`
   width: 100%;
   cursor: pointer;
   color: #1869f5;
-  font-size: 16px;
-  letter-spacing: -0.008em;
-  line-height: 22px;
   border: none;
   outline: none;
   background: #fff;
+  padding: 0;
 
   @media screen and (min-width: 64em) {
-    color: #4e5052;
-    width: 240px;
-    padding: 10px;
-    font-size: 14px;
-    line-height: 24px;
+    color: ${themeGet('colors.black.700')};
+    width: 286px;
 
     ${props =>
       props.active &&
       css`
-        color: #1869f5;
+        color: #dc5f7d;
         border: 1px solid #e6f3ff;
         border-radius: 8px;
         background: #ffffff;
         outline: none;
+        box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
       `}
 
     &:hover {
@@ -52,17 +42,13 @@ const SelectFeatureButton = styled.button`
   }
 
   @media screen and (min-width: 88em) {
-    width: 312px;
-    padding: 15px 10px;
-    font-size: 16px;
-    line-height: 22px;
+    width: 317px;
   }
 `;
 
 const FeatureListWrapper = styled(Box)`
   margin: 0;
   padding: 0;
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -73,53 +59,41 @@ const FeatureList = styled(Box)`
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 8px 0;
+  margin: 14px 0;
 `;
 
-const Img = styled.img`
-  max-width: 100%;
-`;
-
-const Feature = styled(Span)`
+const Title = styled(Span)`
   @media screen and (min-width: 64em) {
-    color: ${props => props.active && '#1869F5'};
+    color: ${props => props.active && '#DC5F7D'};
   }
 `;
 
-const BoxWrapper = styled(Box)`
-  transition: display 0.5s ease;
+const LearnMoreLink = styled.a`
+  color: #dc5f7d;
+
+  &:hover {
+    color: #dc5f7d;
+  }
 `;
 
 const features = [
   {
     id: 'shareBudget',
-    mobileScreenshot: '/static/images/share-budget-mobile-screenshot.svg',
-    desktopScreenshot: '/static/images/share-budget-desktop-screenshot.svg',
   },
   {
-    id: 'receiveDonations',
-    mobileScreenshot: '/static/images/share-budget-mobile-screenshot.svg',
-    desktopScreenshot: '/static/images/share-budget-desktop-screenshot.svg',
+    id: 'receiveContributions',
   },
   {
-    id: 'submitExpenses',
-    mobileScreenshot: '/static/images/share-budget-mobile-screenshot.svg',
-    desktopScreenshot: '/static/images/share-budget-desktop-screenshot.svg',
+    id: 'manageExpenses',
   },
   {
-    id: 'approveExpenses',
-    mobileScreenshot: '/static/images/share-budget-mobile-screenshot.svg',
-    desktopScreenshot: '/static/images/share-budget-desktop-screenshot.svg',
+    id: 'engageCommunity',
   },
   {
-    id: 'postUpdates',
-    mobileScreenshot: '/static/images/share-budget-mobile-screenshot.svg',
-    desktopScreenshot: '/static/images/share-budget-desktop-screenshot.svg',
+    id: 'celebrateSupporters',
   },
   {
-    id: 'receiveMonthlyReports',
-    mobileScreenshot: '/static/images/share-budget-mobile-screenshot.svg',
-    desktopScreenshot: '/static/images/share-budget-desktop-screenshot.svg',
+    id: 'getMonthlyReports',
   },
 ];
 
@@ -128,129 +102,189 @@ const messages = defineMessages({
     id: 'home.feature.shareBudget',
     defaultMessage: 'Share your budget',
   },
-  'home.feature.receiveDonations': {
-    id: 'home.feature.receiveDonations',
-    defaultMessage: 'Receive Donations',
+  'home.feature.shareBudget.description': {
+    id: 'home.feature.shareBudget.description',
+    defaultMessage:
+      'Everyone can see where money comes from and where it goes. Clarity and accountability without any spreadsheets or extra work!',
   },
-  'home.feature.submitExpenses': {
-    id: 'home.feature.submitExpenses',
-    defaultMessage: 'Submit Expenses',
+  'home.feature.receiveContributions': {
+    id: 'home.feature.receiveContributions',
+    defaultMessage: 'Receive Contributions',
   },
-  'home.feature.approveExpenses': {
-    id: 'home.feature.approveExpenses',
-    defaultMessage: 'Approve Expenses',
+  'home.feature.receiveContributions.description': {
+    id: 'home.feature.receiveContributions.description',
+    defaultMessage:
+      'Accept payments by credit card, bank transfer, and Paypal. Define custom tiers and set goals to motivate your supporters to give.',
   },
-  'home.feature.postUpdates': {
-    id: 'home.feature.postUpdates',
-    defaultMessage: 'Post Updates',
+  'home.feature.manageExpenses': {
+    id: 'home.feature.manageExpenses',
+    defaultMessage: 'Manage Expenses',
   },
-  'home.feature.receiveMonthlyReports': {
-    id: 'home.feature.receiveMonthlyReports',
-    defaultMessage: 'Receive monthly reports',
+  'home.feature.manageExpenses.description': {
+    id: 'home.feature.manageExpenses.description',
+    defaultMessage:
+      'Contributors and vendors can easily submit receipts and invoices. You approve or reject them, and once paid your balance updates automatically.',
+  },
+  'home.feature.engageCommunity': {
+    id: 'home.feature.engageCommunity',
+    defaultMessage: 'Engage your community',
+  },
+  'home.feature.engageCommunity.description': {
+    id: 'home.feature.engageCommunity.description',
+    defaultMessage:
+      'Post Updates to engage supporters and share your progress and the impact of their funding. Use Conversations as a community discussion forum.',
+  },
+  'home.feature.celebrateSupporters': {
+    id: 'home.feature.celebrateSupporters',
+    defaultMessage: 'Celebrate your supporters',
+  },
+  'home.feature.celebrateSupporters.description': {
+    id: 'home.feature.celebrateSupporters.description',
+    defaultMessage:
+      'Leaderboard of your top funders, plus highlight how your whole community contributes in different ways.',
+  },
+  'home.feature.getMonthlyReports': {
+    id: 'home.feature.getMonthlyReports',
+    defaultMessage: 'Get monthly reports',
+  },
+  'home.feature.getMonthlyReports.description': {
+    id: 'home.feature.getMonthlyReports.description',
+    defaultMessage:
+      'A summary of your group’s activities, progress on your budget goals, new contributors, and expense details, with all transaction data and receipts/invoices attached. ',
   },
 });
 
-const getFeatureIcon = featureId => {
-  switch (featureId) {
-    case 'shareBudget':
-      return <Bullhorn size="32" />;
-    case 'receiveDonations':
-      return <Pin size="32" />;
-    case 'submitExpenses':
-      return <WbCloudy size="32" />;
-    case 'approveExpenses':
-      return <Bell size="32" />;
-    case 'postUpdates':
-      return <Server size="32" />;
-    case 'receiveMonthlyReports':
-      return <Lightbulb size="32" />;
-  }
+const FeatureTitle = ({ feature, intl, activeFeature, ...props }) => {
+  const iconUrl =
+    activeFeature === feature ? `/static/images/${feature}-icon.png` : `/static/images/${feature}-icon-black.png`;
+
+  return (
+    <Flex alignItems="center" justifyContent="space-between" width={1} {...props}>
+      <Container display="flex" alignItems="center">
+        <Box width={['36px', null, '64px']} height={['36px', null, '64px']} mr={[3, null, 2]}>
+          <Illustration src={iconUrl} alt={`${feature} icon`} />
+        </Box>
+        <Title
+          color={['black.700', null, null]}
+          active={feature === activeFeature}
+          fontWeight={['500', null, 'bold']}
+          textAlign="left"
+          fontSize={['18px', null, '16px']}
+          lineHeight={['26px', null, '22px']}
+          letterSpacing={['-0.012em', null, '-0.008em']}
+        >
+          {intl.formatMessage(messages[`home.feature.${feature}`])}
+        </Title>
+      </Container>
+    </Flex>
+  );
 };
 
-const getActiveFeatureImgSrc = id => {
-  return find(features, ['id', id]).desktopScreenshot;
+FeatureTitle.propTypes = {
+  feature: PropTypes.string.isRequired,
+  activeFeature: PropTypes.string,
+  intl: PropTypes.any.isRequired,
+};
+
+const FeatureDescription = ({ intl, feature, ...props }) => (
+  <Box {...props}>
+    <P
+      fontSize={['Caption', 'LeadParagraph']}
+      lineHeight={['19px', '26px']}
+      color="black.600"
+      letterSpacing={'-0.016em'}
+      textAlign="left"
+    >
+      {intl.formatMessage(messages[`home.feature.${feature}.description`])}{' '}
+      <LearnMoreLink href="#">
+        <FormattedMessage id="home.feature.learnmore" defaultMessage="Learn more..." />
+      </LearnMoreLink>
+    </P>
+  </Box>
+);
+
+FeatureDescription.propTypes = {
+  feature: PropTypes.string.isRequired,
+  intl: PropTypes.any.isRequired,
+};
+
+const Feature = ({ feature, intl }) => (
+  <Container width={1} display="flex" mr={2} flexDirection="column">
+    <FeatureTitle intl={intl} feature={feature} activeFeature={feature} display={[null, null, 'none']} />
+    <Container mb={[2, null, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
+      <H4 display={['none', null, 'block']} letterSpacing="-0.4px" fontWeight="500" color="black.800" my={3}>
+        {intl.formatMessage(messages[`home.feature.${feature}`])}
+      </H4>
+      <FeatureDescription intl={intl} feature={feature} display={['none', null, 'block']} />
+    </Container>
+    <Container width={[null, null, '609px', null, '735px']}>
+      <Box display={['none', null, 'block']}>
+        <Illustration
+          src={`/static/images/${feature}-screenshot.png`}
+          alt={intl.formatMessage(messages[`home.feature.${feature}`])}
+        />
+      </Box>
+      <Box display={['block', null, 'none']}>
+        <Illustration
+          src={`/static/images/${feature}-screenshot-sm.png`}
+          alt={intl.formatMessage(messages[`home.feature.${feature}`])}
+        />
+      </Box>
+    </Container>
+    <FeatureDescription intl={intl} feature={feature} display={['block', null, 'none']} mt={2} />
+  </Container>
+);
+
+Feature.propTypes = {
+  feature: PropTypes.string.isRequired,
+  intl: PropTypes.any.isRequired,
 };
 
 const Features = () => {
-  const [activeFeature, setActiveFeature] = useState('receiveDonations');
+  const [activeFeature, setActiveFeature] = useState('shareBudget');
   const intl = useIntl();
 
   return (
     <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
-      <Hide sm md lg>
-        <SectionTitle>
-          <FormattedMessage id="home.featureSection.mobileTitle" defaultMessage="Features" />
-        </SectionTitle>
-      </Hide>
-      <Hide xs>
-        <SectionTitle>
-          <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective?" />
-        </SectionTitle>
-      </Hide>
+      <SectionTitle>
+        <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective?" />
+      </SectionTitle>
       <SectionSubtitle>
         <FormattedMessage
           id="home.featureSection.subTitle"
-          defaultMessage="Discover all the possibilities of what you can do with the platform’s features."
+          defaultMessage="Discover the possibilities of our features."
         />
       </SectionSubtitle>
-      <Flex flexDirection={[null, null, 'row-reverse']} mt={3} justifyContent="center">
-        <FeatureListWrapper as="ul" width={[1, null, '240px', null, '312px']}>
+      <Flex
+        flexDirection={['column', null, 'row-reverse']}
+        alignItems={[null, null, 'center', null, 'flex-end']}
+        mt={4}
+        justifyContent="center"
+      >
+        <FeatureListWrapper as="ul" display={['none', null, 'flex']}>
           {features.map(feature => (
-            <FeatureList mr={[null, null, null, null, 2]} as="li" key={feature.id}>
+            <FeatureList ml={[null, null, 4, null, 6]} mr={[null, null, null, null, 2]} as="li" key={feature.id}>
               <SelectFeatureButton
                 width={1}
                 onClick={() => setActiveFeature(feature.id)}
                 active={activeFeature === feature.id}
               >
-                <Flex alignItems="center" justifyContent="space-between" width={1}>
-                  <Container display="flex" alignItems="center">
-                    <Span mr={[3, null, 3]}>{getFeatureIcon(feature.id)}</Span>
-                    <Feature
-                      color={['black.700', null, null]}
-                      active={activeFeature === feature.id}
-                      fontWeight="bold"
-                      letterSpacing={'-0.008em'}
-                      textAlign="left"
-                    >
-                      {intl.formatMessage(messages[`home.feature.${feature.id}`])}
-                    </Feature>
-                  </Container>
-                  <Span display={[null, null, 'none']}>
-                    <DownArrowHead size="32" color="blue.600" />
-                  </Span>
-                </Flex>
+                <FeatureTitle intl={intl} feature={feature.id} activeFeature={activeFeature} />
               </SelectFeatureButton>
-              {activeFeature === feature.id && (
-                <BoxWrapper width={1} display={[null, null, 'none']} mt={2}>
-                  <Hide sm md lg>
-                    <Img
-                      src={feature.mobileScreenshot}
-                      alt={intl.formatMessage(messages[`home.feature.${feature.id}`])}
-                    />
-                  </Hide>
-                  <Hide xs>
-                    <Img
-                      src={feature.desktopScreenshot}
-                      alt={intl.formatMessage(messages[`home.feature.${feature.id}`])}
-                    />
-                  </Hide>
-                </BoxWrapper>
-              )}
             </FeatureList>
           ))}
         </FeatureListWrapper>
-        <Box display={['none', 'none', 'block']} mr={4}>
-          <Img
-            src={getActiveFeatureImgSrc(activeFeature)}
-            alt={intl.formatMessage(messages[`home.feature.${activeFeature}`])}
-          />
-        </Box>
+        <StyledCarousel display={[null, null, 'none']} width={1}>
+          {features.map(feature => (
+            <Fragment key={feature.id}>
+              <Feature feature={feature.id} intl={intl} />
+            </Fragment>
+          ))}
+        </StyledCarousel>
+        <Container display={['none', null, 'block']} height="672px">
+          <Feature feature={activeFeature} intl={intl} />
+        </Container>
       </Flex>
-      <Container display={['none', 'none', 'flex']} justifyContent="center" mt={5} mb={4} width={1}>
-        <HomePrimaryLink href="https://docs.opencollective.com" width="304px" display="block">
-          <FormattedMessage id="home.readPlatformDocumentation" defaultMessage="Read the platform documentation" />
-        </HomePrimaryLink>
-      </Container>
     </Flex>
   );
 };

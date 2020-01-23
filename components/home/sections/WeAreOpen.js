@@ -1,144 +1,247 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 import { Box } from '@rebass/grid';
-import { FormattedMessage } from 'react-intl';
-import { typography } from 'styled-system';
-import { ArrowRight } from '@styled-icons/feather/ArrowRight';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
-import { P, Span } from '../../Text';
+import { P, H4 } from '../../Text';
+import { HomeStandardLink } from '../HomeLinks';
 import Hide from '../../Hide';
 import Illustration from '../HomeIllustration';
 import StyledCarousel from '../../StyledCarousel';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
-import StyledLink from '../../StyledLink';
+import SectionSubtitle from '../SectionSubtitle';
+import StyledCard from '../../StyledCard';
 
-const List = styled.li`
-  font-weight: 300;
-  list-style: none;
-  ${typography}
+const Wrapper = styled(Container)`
+  background-image: ${props => props.openFeature && `url('/static/images/${props.openFeature}-bg-sm.png')`};
+  background-size: 100% 100%;
+  flex-wrap: wrap;
 
-  &::before {
-    content: '•';
-    color: ${themeGet('colors.blue.600')};
-    display: ${props => (props.noListStyle ? 'none' : 'inline-block')};
-    width: 1em;
+  @media screen and (min-width: 64em) {
+    background-image: url('/static/images/weareopen-bg.png');
+    background-size: 100% 100%;
+  }
+
+  @media screen and (min-width: 88em) {
+    background-image: url('/static/images/weareopen-bg-lg.png');
+    background-size: 100% 100%;
   }
 `;
 
+const messsages = defineMessages({
+  'home.weAreOpenSection.openData': {
+    id: 'home.weAreOpenSection.openData',
+    defaultMessage: 'Open Data',
+  },
+  'home.weAreOpenSection.openData.linkText': {
+    id: 'home.weAreOpenSection.openData.linkText',
+    defaultMessage: 'Find out how',
+  },
+  'home.weAreOpenSection.openData.description': {
+    id: 'home.weAreOpenSection.openData.description',
+    defaultMessage: 'We will never lock you in. Your data is yours and can be exported anytime.',
+  },
+  'home.weAreOpenSection.openSource': {
+    id: 'home.weAreOpenSection.openSource',
+    defaultMessage: 'Open Source.',
+  },
+  'home.weAreOpenSection.openSource.description': {
+    id: 'home.weAreOpenSection.openSource.description',
+    defaultMessage: 'Everything we do is open source.',
+  },
+  'home.weAreOpenSection.openSource.linkText': {
+    id: 'home.weAreOpenSection.openSource.linkText',
+    defaultMessage: 'Our code base',
+  },
+  'home.weAreOpenSection.openCompany': {
+    id: 'home.weAreOpenSection.openCompany',
+    defaultMessage: 'Open Company',
+  },
+  'home.weAreOpenSection.openCompany.description': {
+    id: 'home.weAreOpenSection.openCompany.description',
+    defaultMessage: 'Our metrics, financials, and other documents are public.',
+  },
+  'home.weAreOpenSection.openCompany.linkText': {
+    id: 'home.weAreOpenSection.openCompany.linkText',
+    defaultMessage: 'Public drive',
+  },
+  'home.weAreOpenSection.openFinances': {
+    id: 'home.weAreOpenSection.openFinances',
+    defaultMessage: 'Open Finances',
+  },
+  'home.weAreOpenSection.openFinances.description': {
+    id: 'home.weAreOpenSection.openFinances.description',
+    defaultMessage: 'We operate as an Open Collective ourselves, with transparent budgets.',
+  },
+  'home.weAreOpenSection.openFinances.linkText': {
+    id: 'home.weAreOpenSection.openFinances.linkText',
+    defaultMessage: 'See our Collectives',
+  },
+});
+
 const openFeatures = [
   {
-    id: 1,
-    name: 'Open Source',
-    description: 'We will never lock you in. Everything we do is open source (MIT License)',
-    features: ['Submit a bug report', 'Submit a feature request', 'Contribute'],
-    linkText: 'View our code base on github',
+    id: 'openData',
+    link: 'https://drive.google.com/drive/u/1/folders/1OwRpuIehFQxRnJIRAksQ1Jd2xXZrhz5L',
+  },
+  {
+    id: 'openSource',
     url: 'https://github.com/opencollective',
   },
   {
-    id: 2,
-    name: 'Open Data',
-    description: 'The data is yours and can be exported anytime in open data format.',
-    features: ['All our metrics, financials, presentations and other documents are on our public drive.'],
-    linkText: 'View our public drive',
-    link: '/',
+    id: 'openCompany',
+    url: 'http://drive.opencollective.com',
+  },
+  {
+    id: 'openFinances',
+    url: 'https://opencollective.com/opencollectiveinc',
   },
 ];
 
-const OpenFeature = ({ id, name, description, features, linkText, url }) => (
-  <Container mr={[null, null, 2]} width={[null, null, '288px', null, '370px']}>
-    <Box my={3}>
+const OpenFeature = ({ id, url }) => {
+  const intl = useIntl();
+
+  return (
+    <StyledCard
+      width={[1, null, '448px', null, '576px']}
+      height={['164px', null, '192px', null, '194px']}
+      py={3}
+      px={[3, null, '24px', null, '32px']}
+      my={[4, null, 0]}
+    >
+      <H4 fontSize={['15px', 'H4']} lineHeight={['25px', 'H4']} letterSpacing={['-0.008em', '-0.2px']} my={2}>
+        {intl.formatMessage(messsages[`home.weAreOpenSection.${id}`])}
+      </H4>
       <P
-        fontSize={['H5', null, 'H4', null, 'H3']}
-        lineHeight={['28px', null, 'H3', null, '40px']}
-        color="blue.600"
-        letterSpacing={['-0.2px', null, null, null, '-0.4px']}
-        fontWeight="bold"
+        my={3}
+        fontSize={['Caption', '15px']}
+        lineHeight={['19px', '25px']}
+        letterSpacing={'-0.016em'}
+        color="black.600"
       >
-        {name}
+        {intl.formatMessage(messsages[`home.weAreOpenSection.${id}.description`])}
       </P>
-    </Box>
-    <Box mb={3}>
-      <P
-        fontSize={['16px', null, 'Paragraph', null, '16px']}
-        lineHeight={['22px', null, 'H5', null, '22px']}
-        color="black.900"
-        letterSpacing={'-0.008em'}
-        fontWeight="bold"
+      <Box
+        mt={[
+          id === 'openSource' ? '35px' : null,
+          null,
+          id === 'openSource' || id === 'openCompany' ? '40px' : null,
+          null,
+          4,
+        ]}
+        mb={2}
       >
-        {description}
-      </P>
-    </Box>
-    <Box listStyle="none" px={[null, null, 2]} mb={3}>
-      {features.map((feature, index) => (
-        <List
-          key={(id + index).toString()}
-          noListStyle={features.length === 1}
-          fontSize={['H5', null, 'LeadParagraph', null, 'H5']}
-          lineHeight={['28px', null, '22px', null, 'H4']}
-          letterSpacing={['-0.6px', null, '-0.016em', null, '-0.8px']}
-        >
-          {feature}
-        </List>
-      ))}
-    </Box>
-    <StyledLink href={url} color="blue.600">
-      <Span mr={2} fontSize={'13px'} lineHeight={'16px'}>
-        {linkText}
-      </Span>
-      <ArrowRight size="14" />
-    </StyledLink>
-  </Container>
-);
+        <HomeStandardLink href={url}>
+          {intl.formatMessage(messsages[`home.weAreOpenSection.${id}.linkText`])}
+        </HomeStandardLink>
+      </Box>
+    </StyledCard>
+  );
+};
 
 OpenFeature.propTypes = {
-  id: PropTypes.number,
-  name: PropTypes.string,
-  description: PropTypes.string,
-  features: PropTypes.array,
-  linkText: PropTypes.string,
+  id: PropTypes.string,
   url: PropTypes.string,
 };
 
 const WeAreOpen = () => (
-  <Container display="flex" flexDirection="column" alignItems="center" mx={[3, 4]}>
-    <SectionTitle>
-      <FormattedMessage
-        id="home.weAreOpenSection.title"
-        defaultMessage="We are Open in  
-        every way"
-      />
-    </SectionTitle>
-    <Hide md lg>
-      <Illustration src="/static/images/weareopen-mobile-illustration.png" alt="We are Open in every way" />
+  <Container display="flex" flexDirection="column" alignItems="center" mx={[0, 4, 0, null, null, 5]}>
+    <Box textAlign="center">
+      <SectionTitle>
+        <FormattedMessage
+          id="home.weAreOpenSection.title"
+          defaultMessage="We are Open in  
+          every way"
+        />
+      </SectionTitle>
+      <SectionSubtitle>
+        <FormattedMessage
+          id="home.weAreOpenSection.subtitle"
+          defaultMessage="We not only help you be transparent, we are too!"
+        />
+      </SectionSubtitle>
+    </Box>
+    <Hide md lg my={3}>
+      <Illustration src="/static/images/weareopen-illustration-sm.png" alt="We are Open in every way" />
     </Hide>
     <StyledCarousel display={[null, null, 'none']} width={1}>
       {openFeatures.map(openFeature => (
-        <Fragment key={openFeature.id}>
-          <OpenFeature {...openFeature} />
-        </Fragment>
+        <Wrapper
+          width={1}
+          key={openFeature.id}
+          display="flex"
+          justifyContent="center"
+          openFeature={openFeature.id}
+          py="40px"
+        >
+          <Container width="90%">
+            <OpenFeature {...openFeature} />
+          </Container>
+        </Wrapper>
       ))}
     </StyledCarousel>
-    <Container display={['none', null, 'flex']} justifyContent={[null, null, null, null, 'center']}>
+    <Container display={['none', null, 'flex']} justifyContent={'center'} my={5}>
       <Illustration
         display={['none', null, 'block', null, 'none']}
-        src="/static/images/weareopen-illustration-1x.png"
+        src="/static/images/weareopen-illustration-md.png"
         alt="We are Open in every way"
       />
       <Illustration
         display={['none', null, null, null, 'block']}
-        src="/static/images/weareopen-illustration-2x.png"
+        src="/static/images/weareopen-illustration-md.png"
         alt="We are Open in every way"
         mr={3}
       />
-      {openFeatures.map(openFeature => (
-        <Fragment key={openFeature.id}>
-          <OpenFeature {...openFeature} />
-        </Fragment>
-      ))}
     </Container>
+    <Wrapper
+      width={[1, null, null, null, '1376px']}
+      display={['none', null, 'flex']}
+      justifyContent={[null, null, null, 'center']}
+      pt={[null, null, '85px', null, '80px']}
+      pb={[null, null, '90px', null, '120px']}
+      px={[null, null, '50px', null, '70px']}
+    >
+      {openFeatures.map(openFeature => {
+        const id = openFeature.id;
+        return (
+          <Box
+            key={id}
+            mr={[
+              null,
+              null,
+              id === 'openData' || id === 'openCompany' ? '10px' : null,
+              null,
+              id === 'openData' || id === 'openCompany' ? '33px' : null,
+            ]}
+            ml={[
+              null,
+              null,
+              id === 'openSource' || id === 'openFinances' ? '10px' : null,
+              null,
+              id === 'openSource' || id === 'openFinances' ? '33px' : null,
+            ]}
+            mb={[
+              null,
+              null,
+              id === 'openData' || id === 'openSource' ? '13px' : null,
+              null,
+              id === 'openData' || id === 'openSource' ? '26px' : null,
+            ]}
+            mt={[
+              null,
+              null,
+              id === 'openCompany' || id === 'openFinances' ? '13px' : null,
+              null,
+              id === 'openCompany' || id === 'openFinances' ? '26px' : null,
+            ]}
+          >
+            <OpenFeature {...openFeature} />
+          </Box>
+        );
+      })}
+    </Wrapper>
   </Container>
 );
 
