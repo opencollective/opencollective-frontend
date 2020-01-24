@@ -24,6 +24,16 @@ npm start &
 FRONTEND_PID=$!
 cd -
 
+echo "> Starting images server"
+if [ -z "$IMAGES_FOLDER" ]; then
+  cd ~/images
+else
+  cd $IMAGES_FOLDER
+fi
+npm start &
+IMAGES_PID=$!
+cd -
+
 # Set `$CYPRESS_RECORD` to `true` in ENV to activate records
 if [ "$CYPRESS_RECORD" = "true" ]; then
   CYPRESS_RECORD="--record"
@@ -51,9 +61,11 @@ function wait_for_service() {
 echo ""
 wait_for_service MAILDEV 127.0.0.1 1080
 echo ""
-wait_for_service API 127.0.0.1 3000
+wait_for_service API 127.0.0.1 3060
 echo ""
-wait_for_service Frontend 127.0.0.1 3060
+wait_for_service Frontend 127.0.0.1 3000
+echo ""
+wait_for_service IMAGES 127.0.0.1 3001
 
 echo ""
 echo "> Running cypress tests"
@@ -69,5 +81,6 @@ echo "Killing all node processes"
 kill $MAILDEV_PID;
 kill $API_PID;
 kill $FRONTEND_PID;
+kill $IMAGES_PID;
 echo "Exiting with code $RETURN_CODE"
 exit $RETURN_CODE
