@@ -16,7 +16,6 @@
   "host": {
     "api": "https://api.opencollective.com",
     "frontend": "https://frontend.opencollective.com",
-    "webapp": "https://app.opencollective.com",
     "website": "https://opencollective.com",
     "images": "https://images.opencollective.com",
     "invoices": "https://invoices.opencollective.com"
