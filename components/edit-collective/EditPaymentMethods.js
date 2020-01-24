@@ -68,8 +68,6 @@ class EditPaymentMethods extends React.Component {
 
   updateBankDetails = async () => {
     if (!this.state.bankDetails) {
-      // we haven't modified anything, return
-      console.info('>>> updateBankDetails: no change to save, skipping');
       this.setState({ showCreditCardForm: false, error: null, showManualPaymentMethodForm: false, submitting: false });
       return;
     }
@@ -81,7 +79,6 @@ class EditPaymentMethods extends React.Component {
       await this.props.editCollective(CollectiveInputType);
       this.handleSuccess();
     } catch (e) {
-      console.error('>>> EditPaymentMethods > error to save collective', e);
       this.setState({ error: e.message });
     } finally {
       this.setState({ submitting: false });

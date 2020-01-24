@@ -54,8 +54,7 @@ class HostsWithData extends React.Component {
     const { data } = this.props;
 
     if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={data.error.message} />;
     }
     if (!data.allHosts || !data.allHosts.collectives) {
       return <div />;

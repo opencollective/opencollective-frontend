@@ -111,7 +111,8 @@ class HTMLEditor extends React.Component {
       if (/^image\//.test(file.type)) {
         this.saveToServer(file);
       } else {
-        console.warn('You can only upload images.');
+        // TODO: this should be reported to the user
+        console.error('HTMLEditor > File not an image', file);
       }
     };
   }
@@ -127,7 +128,8 @@ class HTMLEditor extends React.Component {
         return this.insertToEditor(fileUrl);
       })
       .catch(e => {
-        console.error('Error uploading image', e);
+        // TODO: this should be reported to the user
+        console.error('HTMLEditor > Error uploading image', e);
       });
   }
 

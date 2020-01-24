@@ -157,6 +157,7 @@ class AddFundsForm extends React.Component {
       const { hostFeePercent } = result.data.Collective;
       return hostFeePercent;
     } catch (error) {
+      // TODO: this should be reported to the user
       console.error(error);
     }
   };

@@ -73,6 +73,7 @@ class Comment extends React.Component {
       await this.props.deleteComment(this.state.comment.id);
       this.setState({ showDeleteModal: false });
     } catch (err) {
+      // TODO: this should be reported to the user
       console.error(err);
       this.setState({ showDeleteModal: false });
     }

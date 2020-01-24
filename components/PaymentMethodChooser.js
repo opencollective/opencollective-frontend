@@ -145,7 +145,6 @@ class PaymentMethodChooser extends React.Component {
       try {
         res = await getStripeToken('cc', card);
       } catch (e) {
-        console.log('>>> error: ', typeof e, e);
         this.error(e);
         return false;
       }

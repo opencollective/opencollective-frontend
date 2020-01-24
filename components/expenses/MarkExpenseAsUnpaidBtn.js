@@ -31,7 +31,6 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch, onError }) =
       await markExpenseAsUnpaid(id, state.processorFeeRefunded);
       await refetch();
     } catch (err) {
-      console.log('>>> payExpense error: ', err);
       const error = getErrorFromGraphqlException(err).message;
       onError(error);
       setState({ ...state, disableBtn: false });

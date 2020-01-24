@@ -34,8 +34,9 @@ class ConnectPaypal extends React.Component {
       this.props.onClickRefillBalance(); // save the current filter preferences before redirect
       window.location.replace(json.redirectUrl);
     } catch (e) {
-      this.setState({ connectingPaypal: false });
+      // TODO: this should be reported to the user
       console.error(e);
+      this.setState({ connectingPaypal: false });
     }
   }
 

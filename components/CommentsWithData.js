@@ -70,8 +70,7 @@ class CommentsWithData extends React.Component {
     const { data, LoggedInUser, collective, expense, view, fetchMore, deleteComment, editComment } = this.props;
     const { expense: expenseComments, error } = data;
     if (error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={error.message} />;
     }
 
     let comments;

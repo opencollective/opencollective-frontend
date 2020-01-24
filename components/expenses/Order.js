@@ -85,7 +85,6 @@ class Order extends React.Component {
         showCancelOrderModal: false,
         error: err.message,
       });
-      console.error(err);
     }
   };
 

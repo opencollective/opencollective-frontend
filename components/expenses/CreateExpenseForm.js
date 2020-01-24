@@ -181,8 +181,9 @@ class CreateExpenseForm extends React.Component {
         loading: false,
       });
     } catch (e) {
+      // TODO: this should be reported to the user
+      console.error('CreateExpenseForm > onSubmit > error', e);
       this.setState({ loading: false });
-      console.error('CreateExpenseForm onSubmit error', e);
     }
     return false;
   }

@@ -22,8 +22,7 @@ class SubscriptionsWithData extends React.Component {
     const { data, LoggedInUser, subscriptions } = this.props;
 
     if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={data.error.message} />;
     }
 
     return (

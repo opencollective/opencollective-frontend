@@ -56,11 +56,8 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       id: this.inactiveCollective.id,
       HostCollectiveId: host.id,
     };
-    // console.log('>>> editCollective', CollectiveInputType);
-    // const res =
     await this.props.editCollective(CollectiveInputType);
     this.setState({ showModal: false });
-    // console.log('>>> res', res);
   };
 
   handleModalDisplay() {

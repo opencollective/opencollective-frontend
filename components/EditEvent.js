@@ -41,7 +41,6 @@ class EditEvent extends React.Component {
       Router.pushRoute(eventRoute);
       this.setState({ result: { success: 'Event edited successfully' } });
     } catch (err) {
-      // console.error('>>> editEvent error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
     }
@@ -55,7 +54,6 @@ class EditEvent extends React.Component {
       this.setState({ result: { success: 'Event deleted successfully' } });
       Router.pushRoute(`/${event.parentCollective.slug}`);
     } catch (err) {
-      // console.error('>>> deleteEvent error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
     }
