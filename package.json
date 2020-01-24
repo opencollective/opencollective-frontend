@@ -228,8 +228,7 @@
   },
   "lint-staged": {
     "*.{js,json,md,graphql}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "cacheDirectories": [
