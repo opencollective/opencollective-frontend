@@ -25,7 +25,7 @@ Then, simply start it for E2E with:
 
 - `npm run start:e2e`
 
-Behing the scenes it will (you don't have to do that):
+Behind the scenes it will do the following (so you don't have to do it):
 
 - set environment variables: `TZ=UTC NODE_ENV=e2e E2E_TEST=1`
 - reset a dedicated database (opencollective_e2e): `npm run db:restore:e2e`
