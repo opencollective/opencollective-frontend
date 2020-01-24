@@ -10,6 +10,7 @@ env:
   PGHOST: localhost
   PGUSER: postgres
   WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CYPRESS_RECORD: false
@@ -18,6 +19,7 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   API_FOLDER: /home/runner/work/opencollective-api/opencollective-api
   FRONTEND_FOLDER: /home/runner/work/opencollective-api/opencollective-api/opencollective-frontend
+  IMAGES_FOLDER: /home/runner/work/opencollective-api/opencollective-api/opencollective-images
   TERM: xterm
 
 jobs:
@@ -54,6 +56,27 @@ jobs:
       - name: Install postgresql-client
         run: sudo apt-get install -y postgresql-client
 
+      - name: Install graphicsmagick
+        run: sudo apt-get install -y graphicsmagick
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      # Npm cache
+
+      - name: Restore .npm cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-cache-${{ github.sha }}
+          restore-keys: |
+            - ${{ runner.os }}-npm-cache-${{ github.sha }}
+            - ${{ runner.os }}-npm-cache-
+
+      # Checkouts
+
       - name: Checkout (api)
         uses: actions/checkout@v2-beta
 
@@ -84,23 +107,13 @@ jobs:
           repository: opencollective/opencollective-frontend
           path: opencollective-frontend
 
-      - name: Setup node
-        uses: actions/setup-node@v1
+      - name: Checkout (images)
+        uses: actions/checkout@v2-beta
         with:
-          node-version: '12.x'
+          repository: opencollective/opencollective-images
+          path: opencollective-images
 
-      # Restore .npm cache
-
-      - name: Restore .npm cache (api + frontend)
-        uses: actions/cache@v1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            - ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-            - ${{ runner.os }}-npm-cache-
-
-      # Setup API
+      # Prepare API
 
       - name: Restore node_modules (api)
         uses: actions/cache@v1
@@ -113,8 +126,6 @@ jobs:
         if: steps.api-node-modules.outputs.cache-hit != 'true'
         run: npm ci --prefer-offline --no-audit
 
-      # Build API
-
       - name: Restore build (api)
         uses: actions/cache@v1
         id: api-build
@@ -126,7 +137,7 @@ jobs:
         if: steps.api-build.outputs.cache-hit != 'true'
         run: npm run build
 
-      # Setup Frontend
+      # Prepare Frontend
 
       - name: Restore node_modules (frontend)
         uses: actions/cache@v1
@@ -139,8 +150,6 @@ jobs:
         if: steps.frontend-node-modules.outputs.cache-hit != 'true'
         working-directory: opencollective-frontend
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
-
-      # Build Frontend
 
       - name: Restore build (frontend)
         uses: actions/cache@v1
@@ -162,6 +171,24 @@ jobs:
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'
         working-directory: opencollective-frontend
+        run: npm run build
+
+      # Prepare Images
+
+      - name: Restore node_modules (images)
+        uses: actions/cache@v1
+        id: images-node-modules
+        with:
+          path: opencollective-images/node_modules
+          key: ${{ runner.os }}-images-node-modules-${{ hashFiles('opencollective-images/package-lock.json') }}
+
+      - name: Install dependencies (images)
+        working-directory: opencollective-images
+        if: steps.images-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build (images)
+        working-directory: opencollective-images
         run: npm run build
 
       # Setup Cypress
