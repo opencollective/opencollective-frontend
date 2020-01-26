@@ -840,6 +840,7 @@
   "MessageSent": "Message sent",
   "moreInfo": "詳細",
   "multiemail.invalids": "メールアドレスが正しくありません:",
+  "mustBeAdmin": "You must be an admin of this collective to see this page",
   "mustBeLoggedIn": "You must be logged in to see this page",
   "mustBeLoggedInWithLink": "You must be <login-link>logged in</login-link>",
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
