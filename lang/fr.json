@@ -840,6 +840,7 @@
   "MessageSent": "Message envoyé",
   "moreInfo": "Plus d'info",
   "multiemail.invalids": "Emails non valides :",
+  "mustBeAdmin": "You must be an admin of this collective to see this page",
   "mustBeLoggedIn": "Vous devez être connecté·e pour voir cette page",
   "mustBeLoggedInWithLink": "Vous devez être <login-link>authentifié·e</login-link>",
   "NCP.SectionFetchError": "Une erreur est survenue lors de la récupération des données pour cette section.",
