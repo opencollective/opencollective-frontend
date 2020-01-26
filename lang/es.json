@@ -840,6 +840,7 @@
   "MessageSent": "Message sent",
   "moreInfo": "Más información",
   "multiemail.invalids": "Correos inválidos:",
+  "mustBeAdmin": "You must be an admin of this collective to see this page",
   "mustBeLoggedIn": "Necesitas iniciar cesión para ver esta página",
   "mustBeLoggedInWithLink": "You must be <login-link>logged in</login-link>",
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
