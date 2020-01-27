@@ -4,7 +4,7 @@ else
   cd $API_FOLDER
 fi
 echo "> Restoring opencollective_dvl database for e2e testing";
-PGHOST=localhost PGUSER=postgres npm run db:restore
+npm run db:restore
 npm run db:migrate
 if [ $? -ne 0 ]; then
   echo "Error with restoring opencollective_dvl, exiting"

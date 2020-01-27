@@ -17,16 +17,21 @@ To make sure tests are properly reproduceable, you will need to setup the Open C
 
 We recommend to run a build and not the development environment.
 
+First:
+
 - clone and install [opencollective-api](https://github.com/opencollective/opencollective-api)
-- `NODE_ENV=e2e npm run build`
 
-We also recommend to restore the development dump of the database before you start the tests.
+Then, simply start it for E2E with:
 
-- `npm run db:restore && npm run db:migrate`
+- `npm run start:e2e`
 
-Then start the API:
+Behind the scenes it will do the following (so you don't have to do it):
 
-- `TZ=UTC NODE_ENV=e2e E2E_TEST=1 npm run start`
+- set environment variables: `TZ=UTC NODE_ENV=e2e E2E_TEST=1`
+- reset a dedicated database (opencollective_e2e): `npm run db:restore:e2e`
+- migrate the database: `npm run db:migrate`
+- build the API server: `npm run build`
+- start the API server: `npm run start`
 
 ### 2. Frontend: Server
 
@@ -64,3 +69,8 @@ Cypress tests are split in 4 different groups. You can run these groups individu
 To inspect tests, you can open the Cypress application with the following command:
 
 - `npm run cypress:open`
+
+#### Troubleshooting
+
+- To launch with Chrome, use `npm run cypress:open -- --browser chrome` (double check Chrome is selected in the UI before running)
+- On Mac OS, to force Chrome to use the English language: `defaults write com.google.Chrome AppleLanguages '(en, en-US)'`

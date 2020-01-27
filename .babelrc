@@ -26,6 +26,12 @@
     "development": {
       "compact": false
     },
+    "e2e": {
+      "plugins": ["istanbul"]
+    },
+    "ci": {
+      "plugins": ["istanbul"]
+    },
     "production": {
       "plugins": [
         [
@@ -34,7 +40,12 @@
             "removeImport": true
           }
         ],
-        ["react-remove-properties", { "properties": ["data-cy"] }]
+        [
+          "react-remove-properties",
+          {
+            "properties": ["data-cy"]
+          }
+        ]
       ]
     }
   }
