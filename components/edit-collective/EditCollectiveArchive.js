@@ -45,7 +45,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         isArchived: true,
       });
     } catch (err) {
-      console.error('>>> archiveCollective error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }
@@ -62,7 +61,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         isArchived: false,
       });
     } catch (err) {
-      console.error('>>> archiveCollective error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }

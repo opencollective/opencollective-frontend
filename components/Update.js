@@ -75,7 +75,8 @@ class Update extends React.Component {
       await this.props.deleteUpdate(this.props.update.id);
       Router.pushRoute('collective', { slug: this.props.collective.slug });
     } catch (err) {
-      console.error('>>> deleteUpdate error: ', JSON.stringify(err));
+      // TODO: this should be reported to the user
+      console.error('Update > deleteUpdate > error: ', err);
     }
   }
 
@@ -85,9 +86,7 @@ class Update extends React.Component {
 
   async save(update) {
     update.id = get(this.props, 'update.id');
-    console.log('>>> updating ', update);
-    const res = await this.props.editUpdate(update);
-    console.log('>>> save res', res);
+    await this.props.editUpdate(update);
     this.setState({ modified: false, mode: 'details' });
   }
 

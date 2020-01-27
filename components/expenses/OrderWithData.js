@@ -24,9 +24,10 @@ class OrderWithData extends React.Component {
   render() {
     const { data, LoggedInUser, collective, view } = this.props;
 
-    if (!data || data.error) {
-      console.error('graphql error>>>', data);
-      return <Error message="GraphQL error" />;
+    if (!data) {
+      return <Error message="Data error: no data" />;
+    } else if (data.error) {
+      return <Error message={data.error.message} />;
     } else if (data.loading) {
       return (
         <div>

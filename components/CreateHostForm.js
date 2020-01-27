@@ -93,7 +93,6 @@ class CreateHostForm extends React.Component {
   }
 
   static getDerivedStateFromProps(newProps) {
-    console.log('>>> getDerivedStateFromProps', newProps);
     const { intl } = newProps;
     const organizationsOptions = [];
     newProps.organizations.map(collective => {
@@ -128,13 +127,11 @@ class CreateHostForm extends React.Component {
   handleChange(attr, value) {
     const { form } = this.state;
     form[attr] = value;
-    console.log('>>> CreateHostForm.handleChange', attr, value, 'state.form', form);
     if (attr === 'hostType') {
       const defaultHostCollectiveId = {
         user: this.props.userCollective.id,
         organization: this.state.organizationsOptions[0].value,
       };
-      console.log('>>> defaultHostCollectiveId', defaultHostCollectiveId);
       form['HostCollectiveId'] = defaultHostCollectiveId[value];
     }
     this.setState({ form });
@@ -159,7 +156,6 @@ class CreateHostForm extends React.Component {
         when: form => form.hostType === 'organization',
       },
     ];
-    console.log('>>> generateInputFields', this.state, this.fields);
     this.fields = this.fields.map(field => {
       if (this.messages[`${field.name}.label`]) {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);

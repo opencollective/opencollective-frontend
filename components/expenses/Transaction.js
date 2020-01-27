@@ -128,7 +128,7 @@ class Transaction extends React.Component {
     } = this.props;
 
     if (!fromCollective) {
-      console.error('No FromCollective for transaction', this.props);
+      console.warn('No FromCollective for transaction', this.props);
       return <div />;
     }
 

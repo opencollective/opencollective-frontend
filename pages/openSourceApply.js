@@ -105,7 +105,6 @@ class OpenSourceApplyPage extends Component {
         status: 'collectiveCreated',
       });
     } catch (err) {
-      console.error('>>> createCollective error: ', JSON.stringify(err)); // TODO - Remove
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({
         creatingCollective: false,

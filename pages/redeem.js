@@ -109,26 +109,22 @@ class RedeemPage extends React.Component {
     this.setState({ loading: true });
     const { code, email, name } = this.state.form;
     try {
-      let res;
       if (this.props.LoggedInUser) {
-        res = await this.props.claimPaymentMethod(code);
+        await this.props.claimPaymentMethod(code);
 
         // Refresh LoggedInUser
         this.props.refetchLoggedInUser();
         Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
         return;
       } else {
-        res = await this.props.claimPaymentMethod(code, { email, name });
+        await this.props.claimPaymentMethod(code, { email, name });
       }
-      console.log('>>> res graphql: ', JSON.stringify(res, null, '  '));
       // TODO: need to know from API if an account was created or not
       // TODO: or refuse to create an account automatically and ask to sign in
       this.setState({ loading: false, view: 'success' });
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
       this.setState({ loading: false, error });
-      // console.log(">>> error graphql: ", JSON.stringify(error, null, '  '));
-      console.log('>>> error graphql: ', error);
     }
   }
 

@@ -61,7 +61,6 @@ const InputTypeDropzone = props => {
         return onChange(fileUrl);
       })
       .catch(err => {
-        console.error('>>> error uploading image', file, err);
         const message = get(err, ['json', 'error', 'fields', 'file']);
         setError(message || 'error uploading image, please try again');
         setLoading(false);

@@ -163,7 +163,6 @@ class Expense extends React.Component {
       this.setState({ showUnapproveModal: false });
       await this.props.refetch();
     } catch (err) {
-      console.error(err);
       this.setState({ showUnapproveModal: false, error: err.message });
     }
   };
@@ -174,7 +173,6 @@ class Expense extends React.Component {
       this.setState({ showDeleteExpenseModal: false, error: null });
       await this.props.refetch();
     } catch (err) {
-      console.error(err);
       this.setState({ showDeleteExpenseModal: false, error: err.message });
     }
   };
@@ -198,7 +196,7 @@ class Expense extends React.Component {
     const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
 
     if (!expense.fromCollective) {
-      console.error('No FromCollective for expense', expense);
+      console.warn('No FromCollective for expense', expense);
       return <div />;
     }
 

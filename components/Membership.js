@@ -17,7 +17,7 @@ class Membership extends React.Component {
     const { collective } = memberships[0];
 
     if (!collective) {
-      console.error('>>> no collective attached to this membership:', memberships[0]);
+      console.warn('Membership -> no collective attached', memberships[0]);
       return <div />;
     }
 

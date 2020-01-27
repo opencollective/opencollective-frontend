@@ -94,11 +94,11 @@ class HostDashboardActionsBanner extends React.Component {
     if (form.totalAmount === 0) {
       const error = intl.formatMessage(this.messages['addFunds.error.amountMustBeGreatherThanZero']);
       this.setState({ error });
-      return console.error(error);
+      return;
     } else if (!form.FromCollectiveId) {
       const error = intl.formatMessage(this.messages.addFundsMissingFromCollective);
       this.setState({ error });
-      return console.error(error);
+      return;
     }
 
     this.setState({ loading: true });
@@ -113,7 +113,7 @@ class HostDashboardActionsBanner extends React.Component {
         error: "This host doesn't have an opencollective payment method",
         loading: false,
       });
-      return console.error('>>> payment methods: ', hostCollective.paymentMethods);
+      return;
     }
     order.paymentMethod = {
       uuid: pm.uuid,

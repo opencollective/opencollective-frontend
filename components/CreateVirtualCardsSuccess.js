@@ -56,6 +56,7 @@ export default class CreateVirtualCardsSuccess extends React.Component {
       this.redeemLinkTextareaRef.current.select();
       document.execCommand('copy');
     } catch (e) {
+      // TODO: this should be reported to the user
       console.error('Cannot copy to clipboard', e);
     }
   };

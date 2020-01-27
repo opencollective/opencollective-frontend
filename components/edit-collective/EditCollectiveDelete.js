@@ -41,7 +41,6 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
       }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {
-      console.error('>>> deleteUserCollective error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       setDeleteStatus({ deleting: false, error: errorMsg });
     }
