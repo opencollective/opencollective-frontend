@@ -50,11 +50,11 @@ export const purgeCacheForPage = pagePaths => {
     addPage(urlsToPurge, pagePaths);
   }
 
-  logger.info(`Asking cloudflare to purge the cache for ${urlsToPurge}`);
-
   if (!isLiveServer || !hasConfig) {
     return Promise.resolve({ success: true, errors: [], messages: [], result: {} });
   }
+
+  logger.info(`Asking cloudflare to purge the cache for ${urlsToPurge}`);
 
   return CloudflareLib.zones.purgeCache(cfConfig.zone, { files: urlsToPurge }).catch(logger.error);
 };

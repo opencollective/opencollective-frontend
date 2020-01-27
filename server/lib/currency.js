@@ -83,7 +83,7 @@ export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
       })
       .catch(error => {
         if (!config.env || !['staging', 'production'].includes(config.env)) {
-          logger.warn(`Unable to fetch fxRate with Fixer API: ${error.message}. Returning 1.1`);
+          logger.info(`Unable to fetch fxRate with Fixer API: ${error.message}. Returning 1.1`);
           return resolve(1.1);
         } else {
           logger.error(`Unable to fetch fxRate with Fixer API: ${error.message}`);

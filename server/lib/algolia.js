@@ -2,12 +2,14 @@ import algoliasearch from 'algoliasearch';
 import config from 'config';
 import { has } from 'lodash';
 
+import logger from './logger';
+
 function checkConfig(keys = []) {
   let configOk = true;
 
   for (const configKey of keys) {
     if (!has(config, ['algolia', configKey])) {
-      console.log(`Missing Algolia config: ${configKey}`);
+      logger.info(`Missing Algolia config: ${configKey}`);
       configOk = false;
     }
   }

@@ -110,9 +110,11 @@ export const _authenticateUserByJwt = async (req, res, next) => {
           logger.warn(req.jwtPayload);
         }
       } else if (user.lastLoginAt.getTime() !== req.jwtPayload.lastLoginAt) {
-        logger.error('This login link is expired or has already been used');
         if (config.env === 'production') {
+          logger.error('This login link is expired or has already been used');
           return next(errors.Unauthorized('This login link is expired or has already been used'));
+        } else {
+          logger.info('This login link is expired or has already been used. Ignoring in non-production environment.');
         }
       }
     }
