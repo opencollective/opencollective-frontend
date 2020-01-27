@@ -40,7 +40,6 @@ describe('new expense when logged in', () => {
     cy.get('.inputField.paypalEmail input').type('paypal@test.com');
     cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
     cy.get('button[type=submit]').click();
-    // cy.screenshot('expenseCreatedPaypalLoggedOut');
     cy.get('[data-cy="expenseCreated"]').contains('success');
     cy.get('[data-cy="viewAllExpenses"]').click();
     cy.wait(300);
@@ -63,7 +62,6 @@ describe('new expense when logged in', () => {
     });
     cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
     cy.get('button[type=submit]').click();
-    // cy.screenshot('expenseCreatedLoggedIn');
     cy.get('[data-cy="expenseCreated"]').contains('success');
     cy.get('[data-cy="viewAllExpenses"]').click();
     cy.wait(300);
@@ -73,7 +71,6 @@ describe('new expense when logged in', () => {
     cy.get('.Expenses .expense:first .privateMessage').contains('Some private note for the host');
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.get('.Expenses .expense:first .status').contains('approved');
-    // cy.screenshot('expenseApproved');
     cy.get('.Expenses .expense:first .toggleEditExpense').click();
     cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
     cy.get('.Expenses .expense:first .inputField.amount input').type('{selectall}13');
@@ -83,13 +80,11 @@ describe('new expense when logged in', () => {
     );
     cy.get('.Expenses .expense:first .inputField.description input').focus();
     cy.wait(300);
-    // cy.screenshot('editExpense');
     cy.get('.Expenses .expense:first button.save').click();
     cy.get('.Expenses .expense:first .status').contains('pending'); // editing an expense should switch status back to pending
     cy.get('.Expenses .expense:first .description').contains('edited');
     cy.get('.Expenses .expense:first .privateMessage').contains('edited');
     cy.get('.Expenses .expense:first .amount').contains('$13.00');
-    // cy.screenshot('expenseSaved');
     cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
     cy.wait(300);
     cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains('approved');
