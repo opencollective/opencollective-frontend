@@ -1,5 +1,4 @@
 import Promise from 'bluebird';
-import async from 'async';
 import request from 'supertest';
 import sinon from 'sinon';
 import { expect } from 'chai';
@@ -23,36 +22,10 @@ describe('server/routes/paypal.preapproval', () => {
     paypalAdaptive.preapproval.restore();
   });
 
-  beforeEach(done => {
-    async.auto(
-      {
-        resetDB: cb => {
-          utils.resetTestDB().asCallback(cb);
-        },
-        createUserA: [
-          'resetDB',
-          (_, cb) => {
-            models.User.createUserWithCollective(utils.data('user1'))
-              .then(user => cb(null, user))
-              .catch(cb);
-          },
-        ],
-        createUserB: [
-          'createUserA',
-          (_, cb) => {
-            models.User.createUserWithCollective(utils.data('user2'))
-              .then(user => cb(null, user))
-              .catch(cb);
-          },
-        ],
-      },
-      (e, results) => {
-        expect(e).to.not.exist;
-        user = results.createUserA;
-        user2 = results.createUserB;
-        done();
-      },
-    );
+  beforeEach(async () => {
+    await utils.resetTestDB();
+    user = await models.User.createUserWithCollective(utils.data('user1'));
+    user2 = await models.User.createUserWithCollective(utils.data('user2'));
   });
 
   /**

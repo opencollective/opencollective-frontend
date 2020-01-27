@@ -1,4 +1,3 @@
-import async from 'async';
 import config from 'config';
 import nock from 'nock';
 import request from 'supertest';
@@ -152,7 +151,7 @@ describe('server/routes/stripe', () => {
         });
     });
 
-    it('should set a stripeAccount', done => {
+    it('should set a stripeAccount', async () => {
       const encodedJWT = jwt.sign(
         {
           CollectiveId: collective.id,
@@ -161,80 +160,32 @@ describe('server/routes/stripe', () => {
         config.keys.opencollective.jwtSecret,
         { expiresIn: '1h' },
       );
-      async.auto(
-        {
-          request: cb => {
-            request(app)
-              .get(`/connected-accounts/stripe/callback?state=${encodedJWT}&code=abc&api_key=${application.api_key}`)
-              .expect(302)
-              .end(() => cb());
-          },
 
-          // This is veriyfing that a a connected account was properly created
-          // and that the data in the database match Stripe's mocked data
-          checkStripeAccount: [
-            'request',
-            (_, cb) => {
-              return models.ConnectedAccount.findAndCountAll({})
-                .then(res => {
-                  expect(res.count).to.be.equal(1);
-                  const account = res.rows[0];
-                  expect(account).to.have.property('token', stripeResponse.access_token);
-                  expect(account).to.have.property('refreshToken', stripeResponse.refresh_token);
-                  expect(account).to.have.property('username', stripeResponse.stripe_user_id);
-                  expect(account.data).to.have.property('tokenType', stripeResponse.token_type);
-                  expect(account.data).to.have.property('publishableKey', stripeResponse.stripe_publishable_key);
-                  expect(account.data).to.have.property('scope', stripeResponse.scope);
-                  expect(account.data).to.have.property('account');
-                  expect(account.data.account.default_currency).to.equal('eur');
-                  cb(null, account);
-                })
-                .catch(cb);
-            },
-          ],
+      const url = `/connected-accounts/stripe/callback?state=${encodedJWT}&code=abc&api_key=${application.api_key}`;
+      const result = await request(app).get(url);
+      expect(result.statusCode).to.eq(302);
 
-          // This is veriyfing that currency and timezone are updated
-          // according to what can be found in Stripe's mocked data
-          // the function doing that is in paymentProviders/stripe/index.js -> updateHost
-          checkHost: [
-            'checkStripeAccount',
-            (results, cb) => {
-              return models.Collective.findByPk(results.checkStripeAccount.CollectiveId)
-                .then(collective => {
-                  expect(collective.id).to.be.equal(collective.id);
-                  expect(collective.currency).to.equal('EUR');
-                  expect(collective.timezone).to.equal('Europe/Madrid');
-                  cb();
-                })
-                .catch(cb);
-            },
-          ],
+      // This is veriyfing that a a connected account was properly created
+      // and that the data in the database match Stripe's mocked data
+      const connectedAccounts = await models.ConnectedAccount.findAndCountAll({});
+      expect(connectedAccounts.count).to.be.equal(1);
+      const account = connectedAccounts.rows[0];
+      expect(account).to.have.property('token', stripeResponse.access_token);
+      expect(account).to.have.property('refreshToken', stripeResponse.refresh_token);
+      expect(account).to.have.property('username', stripeResponse.stripe_user_id);
+      expect(account.data).to.have.property('tokenType', stripeResponse.token_type);
+      expect(account.data).to.have.property('publishableKey', stripeResponse.stripe_publishable_key);
+      expect(account.data).to.have.property('scope', stripeResponse.scope);
+      expect(account.data).to.have.property('account');
+      expect(account.data.account.default_currency).to.equal('eur');
 
-          // This is veriyfing that after connecting the Stripe's account
-          // the opencollective paymentmethod is set to EUR, not USD (like the host)
-          // but nowhere in the code base such behavior is found, DISABLING
-
-          /*
-          checkPaymentMethod: [
-            'checkStripeAccount',
-            (results, cb) => {
-              return models.PaymentMethod.findOne({
-                where: {
-                  CollectiveId: results.checkStripeAccount.CollectiveId,
-                },
-              })
-                .then(pm => {
-                  expect(pm.service).to.equal('opencollective');
-                  expect(pm.currency).to.equal('EUR');
-                  cb();
-                })
-                .catch(cb);
-            },
-          ],
-          */
-        },
-        done,
-      );
+      // This is veriyfing that currency and timezone are updated
+      // according to what can be found in Stripe's mocked data
+      // the function doing that is in paymentProviders/stripe/index.js -> updateHost
+      const updatedCollective = await models.Collective.findByPk(account.CollectiveId);
+      expect(updatedCollective.id).to.be.equal(collective.id);
+      expect(updatedCollective.currency).to.equal('EUR');
+      expect(updatedCollective.timezone).to.equal('Europe/Madrid');
     });
   });
 });
