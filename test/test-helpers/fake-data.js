@@ -11,7 +11,7 @@ import { get, sample } from 'lodash';
 import models from '../../server/models';
 import { types as CollectiveType } from '../../server/constants/collectives';
 import { randEmail, randUrl } from '../stores';
-import { PayoutMethodType } from '../../server/models/PayoutMethod';
+import { PayoutMethodTypes } from '../../server/models/PayoutMethod';
 import { roles } from '../../server/constants';
 
 export const randStr = (prefix = '') => `${prefix}${uuid().split('-')[0]}`;
@@ -151,16 +151,16 @@ export const fakeExpenseAttachment = async (attachmentData = {}) => {
  */
 export const fakePayoutMethod = async (data = {}) => {
   const generateData = type => {
-    if (type === PayoutMethodType.PAYPAL) {
+    if (type === PayoutMethodTypes.PAYPAL) {
       return { email: randEmail() };
-    } else if (type === PayoutMethodType.OTHER) {
+    } else if (type === PayoutMethodTypes.OTHER) {
       return { content: randStr() };
     } else {
       return null;
     }
   };
 
-  const type = (data && data.type) || PayoutMethodType.PAYPAL;
+  const type = (data && data.type) || PayoutMethodTypes.PAYPAL;
   return models.PayoutMethod.create({
     name: randStr('Fake Payout Method '),
     data: generateData(type),

@@ -27,7 +27,7 @@ import {
   fakePayoutMethod,
 } from '../../../test-helpers/fake-data';
 import { roles } from '../../../../server/constants';
-import { PayoutMethodType } from '../../../../server/models/PayoutMethod';
+import { PayoutMethodTypes } from '../../../../server/models/PayoutMethod';
 
 /* Queries used throughout these tests */
 const allExpensesQuery = `
@@ -611,7 +611,7 @@ describe('server/graphql/v1/expenses', () => {
       await collective.addUserWithRole(admin, 'ADMIN');
       // And given a user to file expenses
       const { user } = await store.newUser('someone cool');
-      await fakePayoutMethod({ type: PayoutMethodType.PAYPAL, CollectiveId: user.CollectiveId });
+      await fakePayoutMethod({ type: PayoutMethodTypes.PAYPAL, CollectiveId: user.CollectiveId });
       // When a new expense is created
       const data = {
         amount: 1000,
@@ -833,7 +833,7 @@ describe('server/graphql/v1/expenses', () => {
         currency: 'USD',
         privateMessage: 'Private instructions to reimburse this expense',
         collective: { id: collective.id },
-        PayoutMethod: { type: PayoutMethodType.PAYPAL, data: { email: 'testuser@paypal.com' } },
+        PayoutMethod: { type: PayoutMethodTypes.PAYPAL, data: { email: 'testuser@paypal.com' } },
       };
       const expense = await store.createExpense(user, {
         attachments: [{ url: store.randUrl(), amount: 1000 }],
@@ -1066,7 +1066,7 @@ describe('server/graphql/v1/expenses', () => {
           currency: 'EUR',
           legacyPayoutMethod: 'paypal',
           collective: { id: collective.id },
-          PayoutMethod: { type: PayoutMethodType.PAYPAL, data: { email: store.randEmail() } },
+          PayoutMethod: { type: PayoutMethodTypes.PAYPAL, data: { email: store.randEmail() } },
         });
 
         // And given the expense is approved
@@ -1200,7 +1200,10 @@ describe('server/graphql/v1/expenses', () => {
         emailSendMessageSpy.resetHistory();
 
         // payout the expense using paypal
-        const payoutMethod = await fakePayoutMethod({ type: PayoutMethodType.PAYPAL, CollectiveId: hostCollective.id });
+        const payoutMethod = await fakePayoutMethod({
+          type: PayoutMethodTypes.PAYPAL,
+          CollectiveId: hostCollective.id,
+        });
         expense.CollectiveId = collective.id;
         expense.legacyPayoutMethod = 'paypal';
         expense.PayoutMethodId = payoutMethod.id;
@@ -1252,7 +1255,7 @@ describe('server/graphql/v1/expenses', () => {
       it('Payout', async () => {
         // With legacy field
         const expense = await fakeExpense({ status: 'APPROVED', legacyPayoutMethod: 'other' });
-        await fakePayoutMethod({ type: PayoutMethodType.PAYPAL, CollectiveId: expense.FromCollectiveId }); // Add a PayPal PM for this user
+        await fakePayoutMethod({ type: PayoutMethodTypes.PAYPAL, CollectiveId: expense.FromCollectiveId }); // Add a PayPal PM for this user
         const newExpenseData = { id: expense.id, payoutMethod: 'paypal' };
         const result = await utils.graphqlQuery(editExpenseMutation, { expense: newExpenseData }, expense.User);
         expect(result.errors).to.not.exist;
@@ -1664,7 +1667,7 @@ describe('server/graphql/v1/expenses', () => {
       const { hostAdmin, collective } = await store.newCollectiveWithHost('rollup', 'USD', 'USD', 10);
       // And given a user that will file an expense
       const { user } = await store.newUser('an internet user');
-      await fakePayoutMethod({ type: PayoutMethodType.PAYPAL, CollectiveId: user.CollectiveId });
+      await fakePayoutMethod({ type: PayoutMethodTypes.PAYPAL, CollectiveId: user.CollectiveId });
       // And given the above collective has one expense (created by
       // the above user)
       const data = {

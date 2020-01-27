@@ -13,7 +13,7 @@ import debugLib from 'debug';
 import { canUseFeature } from '../../../lib/user-permissions';
 import FEATURE from '../../../constants/feature';
 import { FeatureNotAllowedForUser, ValidationFailed } from '../../errors';
-import { PayoutMethodType } from '../../../models/PayoutMethod';
+import { PayoutMethodTypes } from '../../../models/PayoutMethod';
 
 const debug = debugLib('expenses');
 
@@ -139,7 +139,7 @@ const getPaypalPaymentMethodFromExpenseData = async (expenseData, remoteUser, fr
     // @deprecated - Should use `PayoutMethod` argument
     if (get(expenseData, 'user.paypalEmail')) {
       return models.PayoutMethod.getOrCreateFromData(
-        { type: PayoutMethodType.PAYPAL, data: { email: get(expenseData, 'user.paypalEmail') } },
+        { type: PayoutMethodTypes.PAYPAL, data: { email: get(expenseData, 'user.paypalEmail') } },
         remoteUser,
         fromCollective,
         dbTransaction,
@@ -482,7 +482,7 @@ export async function payExpense(remoteUser, args) {
   const feesInHostCurrency = {};
   const payoutMethod = await expense.getPayoutMethod();
   const payoutMethodType = payoutMethod ? payoutMethod.type : expense.getPayoutMethodTypeFromLegacy();
-  if (payoutMethodType === PayoutMethodType.PAYPAL && !args.forceManual) {
+  if (payoutMethodType === PayoutMethodTypes.PAYPAL && !args.forceManual) {
     fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders.paypal.types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
@@ -516,7 +516,7 @@ export async function payExpense(remoteUser, args) {
   }
 
   // Pay expense based on chosen payout method
-  if (payoutMethodType === PayoutMethodType.PAYPAL) {
+  if (payoutMethodType === PayoutMethodTypes.PAYPAL) {
     const paypalEmail = payoutMethod.data.email;
     let paypalPaymentMethod = null;
     try {

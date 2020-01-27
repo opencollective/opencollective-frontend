@@ -7,7 +7,7 @@ import expenseType from '../constants/expense_type';
 import CustomDataTypes from '../models/DataTypes';
 import { reduceArrayToCurrency } from '../lib/currency';
 import models, { Op } from './';
-import { PayoutMethodType } from './PayoutMethod';
+import { PayoutMethodTypes } from './PayoutMethod';
 
 export default function(Sequelize, DataTypes) {
   const Expense = Sequelize.define(
@@ -306,7 +306,7 @@ export default function(Sequelize, DataTypes) {
    * Returns the legacy `payoutMethod` based on the new `PayoutMethod` type
    */
   Expense.getLegacyPayoutMethodTypeFromPayoutMethod = function(payoutMethod) {
-    if (payoutMethod && payoutMethod.type === PayoutMethodType.PAYPAL) {
+    if (payoutMethod && payoutMethod.type === PayoutMethodTypes.PAYPAL) {
       return 'paypal';
     } else {
       return 'other';
@@ -317,7 +317,7 @@ export default function(Sequelize, DataTypes) {
    * Returns the PayoutMethod.type based on the legacy `payoutMethod`
    */
   Expense.getPayoutMethodTypeFromLegacy = function(legacyPayoutMethod) {
-    return legacyPayoutMethod === 'paypal' ? PayoutMethodType.PAYPAL : PayoutMethodType.OTHER;
+    return legacyPayoutMethod === 'paypal' ? PayoutMethodTypes.PAYPAL : PayoutMethodTypes.OTHER;
   };
 
   Temporal(Expense, Sequelize);

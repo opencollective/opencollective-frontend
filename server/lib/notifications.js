@@ -12,7 +12,7 @@ import models from '../models';
 import debugLib from 'debug';
 import { channels } from '../constants';
 import { sanitizeActivity, enrichActivity } from './webhooks';
-import { PayoutMethodType } from '../models/PayoutMethod';
+import { PayoutMethodTypes } from '../models/PayoutMethod';
 
 const debug = debugLib('notification');
 
@@ -279,7 +279,7 @@ async function notifyByEmail(activity) {
       activity.data.actions = {
         viewLatestExpenses: `${config.host.website}/${activity.data.collective.slug}/expenses#expense${activity.data.expense.id}`,
       };
-      if (get(activity.data, 'payoutMethod.type') === PayoutMethodType.PAYPAL) {
+      if (get(activity.data, 'payoutMethod.type') === PayoutMethodTypes.PAYPAL) {
         activity.data.expense.payoutMethodLabel = `PayPal (${get(activity.data, 'payoutMethod.data.email')})`;
       }
       notifyUserId(activity.data.expense.UserId, activity);

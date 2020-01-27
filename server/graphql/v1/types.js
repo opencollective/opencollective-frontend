@@ -34,7 +34,7 @@ import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
 import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
 import * as commonComment from '../common/comment';
 import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
-import { PayoutMethodType as PayoutMethodTypes } from '../../models/PayoutMethod';
+import { PayoutMethodTypes } from '../../models/PayoutMethod';
 
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { SequelizeValidationError, ValidationError } from 'sequelize';
 import { fakeUser } from '../../test-helpers/fake-data';
 import models from '../../../server/models';
-import { PayoutMethodType } from '../../../server/models/PayoutMethod';
+import { PayoutMethodTypes } from '../../../server/models/PayoutMethod';
 import { randEmail } from '../../stores';
 
 describe('server/models/PayoutMethod', () => {
@@ -10,7 +10,7 @@ describe('server/models/PayoutMethod', () => {
     describe('for PayPal', () => {
       it('check email', async () => {
         const user = await fakeUser();
-        const baseData = { CollectiveId: user.collective.id, CreatedByUserId: user.id, type: PayoutMethodType.PAYPAL };
+        const baseData = { CollectiveId: user.collective.id, CreatedByUserId: user.id, type: PayoutMethodTypes.PAYPAL };
 
         // Invalid
         const promise = models.PayoutMethod.create({ ...baseData, data: { email: 'Nope' } });
@@ -23,7 +23,7 @@ describe('server/models/PayoutMethod', () => {
 
       it('make sure only allowed fields are set', async () => {
         const user = await fakeUser();
-        const baseData = { CollectiveId: user.collective.id, CreatedByUserId: user.id, type: PayoutMethodType.PAYPAL };
+        const baseData = { CollectiveId: user.collective.id, CreatedByUserId: user.id, type: PayoutMethodTypes.PAYPAL };
         const promise = models.PayoutMethod.create({ ...baseData, data: { email: randEmail(), hello: true } });
         await expect(promise).to.be.rejectedWith(
           ValidationError,
@@ -35,7 +35,7 @@ describe('server/models/PayoutMethod', () => {
     describe('for "other"', () => {
       it('only allows content', async () => {
         const user = await fakeUser();
-        const baseData = { CollectiveId: user.collective.id, CreatedByUserId: user.id, type: PayoutMethodType.OTHER };
+        const baseData = { CollectiveId: user.collective.id, CreatedByUserId: user.id, type: PayoutMethodTypes.OTHER };
 
         // Invalid
         const promise = models.PayoutMethod.create({ ...baseData, data: { content: 'Yep', nope: 'maybe' } });

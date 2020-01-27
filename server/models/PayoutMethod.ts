@@ -7,7 +7,7 @@ import { objHasOnlyKeys } from '../lib/utils';
 /**
  * Match the Postgres enum defined for `PayoutMethods` > `type`
  */
-export enum PayoutMethodType {
+export enum PayoutMethodTypes {
   PAYPAL = 'PAYPAL',
   OTHER = 'OTHER',
 }
@@ -30,7 +30,7 @@ export type PayoutMethodDataType = PaypalPayoutMethodData | OtherPayoutMethodDat
  */
 export class PayoutMethod extends Model<PayoutMethod> {
   public readonly id!: number;
-  public type!: PayoutMethodType;
+  public type!: PayoutMethodTypes;
   public createdAt!: Date;
   public updatedAt!: Date;
   public deletedAt: Date;
@@ -49,9 +49,9 @@ export class PayoutMethod extends Model<PayoutMethod> {
   /** A whitelist filter on `data` field. The returned object is safe to send to allowed users. */
   get data(): PayoutMethodDataType {
     switch (this.type) {
-      case PayoutMethodType.PAYPAL:
+      case PayoutMethodTypes.PAYPAL:
         return { email: this.data['email'] } as PaypalPayoutMethodData;
-      case PayoutMethodType.OTHER:
+      case PayoutMethodTypes.OTHER:
         return { content: this.data['content'] } as OtherPayoutMethodData;
       default:
         return {};
@@ -94,7 +94,7 @@ export class PayoutMethod extends Model<PayoutMethod> {
   ): Promise<PayoutMethod> {
     // We try to load the existing payment method if it exists for this collective
     let existingPm = null;
-    if (payoutMethodData['type'] === PayoutMethodType.PAYPAL) {
+    if (payoutMethodData['type'] === PayoutMethodTypes.PAYPAL) {
       const email = get(payoutMethodData, 'data.email');
       if (email && isEmail(email)) {
         existingPm = await PayoutMethod.scope('paypal').findOne({
@@ -141,8 +141,8 @@ export default (sequelize, DataTypes): typeof PayoutMethod => {
         allowNull: false,
         validate: {
           isIn: {
-            args: [Object.values(PayoutMethodType)],
-            msg: `Must be one of ${Object.values(PayoutMethodType)}`,
+            args: [Object.values(PayoutMethodTypes)],
+            msg: `Must be one of ${Object.values(PayoutMethodTypes)}`,
           },
         },
       },
@@ -151,13 +151,13 @@ export default (sequelize, DataTypes): typeof PayoutMethod => {
         allowNull: false,
         validate: {
           isValidValue(value): void {
-            if (this.type === PayoutMethodType.PAYPAL) {
+            if (this.type === PayoutMethodTypes.PAYPAL) {
               if (!value || !value.email || !isEmail(value.email)) {
                 throw new Error('Invalid PayPal email address');
               } else if (!objHasOnlyKeys(value, ['email'])) {
                 throw new Error('Data for this payout method contains too much information');
               }
-            } else if (this.type === PayoutMethodType.OTHER) {
+            } else if (this.type === PayoutMethodTypes.OTHER) {
               if (!value || !value.content || typeof value.content !== 'string') {
                 throw new Error('Invalid format of custom payout method');
               } else if (!objHasOnlyKeys(value, ['content'])) {
@@ -210,7 +210,7 @@ export default (sequelize, DataTypes): typeof PayoutMethod => {
           where: { isSaved: true },
         },
         paypal: {
-          where: { type: PayoutMethodType.PAYPAL },
+          where: { type: PayoutMethodTypes.PAYPAL },
         },
       },
     },
