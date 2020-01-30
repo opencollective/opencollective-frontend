@@ -97,7 +97,7 @@
     "showdown": "1.9.1",
     "stripe": "8.8.0",
     "tweetnacl": "1.0.2",
-    "tweetnacl-util": "0.15.0",
+    "tweetnacl-util": "0.15.1",
     "twitter": "1.7.1",
     "uuid": "3.4.0",
     "validator": "12.2.0",
