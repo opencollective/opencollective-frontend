@@ -9,17 +9,30 @@ import Container from './Container';
 /**
  * Component for controlling a list of radio inputs
  */
-const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, disabled, ...props }) => {
+const StyledRadioList = ({
+  children,
+  id,
+  name,
+  onChange,
+  options,
+  keyGetter,
+  disabled,
+  containerProps,
+  labelProps,
+  ...props
+}) => {
   const [selected, setSelected] = useState(props.defaultValue);
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
   const defaultValueStr = props.defaultValue !== undefined && props.defaultValue.toString();
   return (
     <Container
+      id={id}
       as="fieldset"
       border="none"
       m={0}
       p={0}
+      {...containerProps}
       onChange={event => {
         event.stopPropagation();
         const target = event.target;
@@ -27,10 +40,9 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, dis
         onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
         setSelected(target.value);
       }}
-      id={id}
     >
       {items.map(({ value, key }, index) => (
-        <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0}>
+        <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0} {...labelProps}>
           {children({
             checked: selected && key === selected,
             index,
@@ -78,6 +90,10 @@ StyledRadioList.propTypes = {
   ]).isRequired,
   /** A key name of a getter function to extract the unique key from option */
   keyGetter: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  /** To pass to the fieldset container */
+  containerProps: PropTypes.object,
+  /** To pass to the label container */
+  labelProps: PropTypes.object,
   /** If true, user won't be able to interact with the element */
   disabled: PropTypes.bool,
 };

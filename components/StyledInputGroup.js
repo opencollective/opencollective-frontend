@@ -28,11 +28,7 @@ const InputContainer = styled(Container)`
   }
 `;
 
-const getColor = ({ error, focused, success, blurred }) => {
-  if (focused || blurred) {
-    return 'black.800';
-  }
-
+const getColor = ({ error, success }) => {
   if (error) {
     return 'red.300';
   }
@@ -41,7 +37,7 @@ const getColor = ({ error, focused, success, blurred }) => {
     return 'green.300';
   }
 
-  return 'black.400';
+  return 'black.800';
 };
 
 const getBgColor = ({ error, focused, success }) => {
@@ -73,7 +69,7 @@ const getBorderColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  return 'black.400';
+  return 'black.300';
 };
 
 /**
@@ -92,8 +88,6 @@ const StyledInputGroup = ({
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
-  const [blurred, setOnBlur] = useState(false);
-
   return (
     <React.Fragment>
       <InputContainer
@@ -113,7 +107,7 @@ const StyledInputGroup = ({
             borderRadius="4px 0 0 4px"
             py={2}
             px={2}
-            color={getColor({ error, focused, success, blurred })}
+            color={getColor({ error, success })}
             {...prependProps}
             bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
           >
@@ -122,7 +116,7 @@ const StyledInputGroup = ({
         )}
         <StyledInput
           bare
-          color={getColor({ error, focused, success, blurred })}
+          color={getColor({ error, success })}
           type="text"
           overflow="scroll"
           fontSize="Paragraph"
@@ -140,7 +134,6 @@ const StyledInputGroup = ({
           }}
           onBlur={e => {
             setFocus(false);
-            setOnBlur(true);
             if (inputProps && inputProps.onBlur) {
               inputProps.onBlur(e);
             }
@@ -148,13 +141,13 @@ const StyledInputGroup = ({
         />
         {append && (
           <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
-            <Span color={getColor({ error, focused, success })} fontSize="Paragraph">
+            <Span color={getColor({ error, success })} fontSize="Paragraph">
               {append}
             </Span>
           </Container>
         )}
       </InputContainer>
-      {error && (
+      {error && typeof error !== 'boolean' && (
         <Span display="block" color="red.500" pt={2} fontSize="Tiny">
           {error}
         </Span>

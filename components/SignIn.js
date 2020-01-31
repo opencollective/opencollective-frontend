@@ -60,6 +60,7 @@ export default class SignIn extends React.Component {
             as="form"
             method="POST"
             noValidate
+            data-cy="signIn-form"
             onSubmit={event => {
               event.preventDefault();
               onSubmit(email);

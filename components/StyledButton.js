@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { border, color, layout, typography, space, flexbox } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
+import { get } from 'lodash';
 
 import { textTransform } from '../lib/styled_system_custom';
 import { buttonSize, buttonStyle } from '../lib/theme';
@@ -20,6 +21,10 @@ const StyledButtonContent = styled.button`
   outline: 0;
   border: 1px solid;
   border-radius: 100px;
+
+  &:focus {
+    box-shadow: 0px 0px 0px 1px #90F0BD;
+  }
 
   &:disabled {
     cursor: not-allowed;
@@ -45,6 +50,10 @@ const StyledButtonContent = styled.button`
 
       &:active {
         color: ${themeGet('colors.primary.400')};
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 1px ${props => get(props.theme.colors, props.focusColor) || props.theme.colors.primary['300']};
       }
     `}
 

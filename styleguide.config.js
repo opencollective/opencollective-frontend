@@ -45,6 +45,11 @@ module.exports = {
       description: 'FAQs.',
     },
     {
+      name: 'Expenses',
+      components: 'components/expenses/*.js',
+      description: 'Expense flow',
+    },
+    {
       name: 'Collective Page',
       components: 'components/collective-page/*.js',
       description: 'These components are used collective page.',
