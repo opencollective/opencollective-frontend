@@ -174,7 +174,15 @@ jobs:
         if: steps.cypress.outputs.cache-hit != 'true'
         run: npx cypress install
 
+      - name: Restore .next build (frontend)
+        uses: actions/cache@v1
+        id: next-build
+        with:
+          path: .next
+          key: ${{ runner.os }}-next-build-${{ github.sha }}
+
       - name: Restore .next cache (frontend)
+        if: steps.next-build.outputs.cache-hit != 'true'
         uses: actions/cache@v1
         with:
           path: .next/cache
@@ -182,13 +190,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-next-cache-${{ github.sha }}
             ${{ runner.os }}-next-cache-
-
-      - name: Restore build (frontend)
-        uses: actions/cache@v1
-        id: next-build
-        with:
-          path: dist
-          key: ${{ runner.os }}-next-build-${{ github.sha }}
 
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'

@@ -144,6 +144,7 @@
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
     "start": "node dist/server",
+    "start:coverage": "nyc --silent --exclude \".next/**\" node server",
     "styleguide:build": "styleguidist build",
     "styleguide:dev": "styleguidist server",
     "test": "npm run test:jest",
