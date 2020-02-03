@@ -359,7 +359,7 @@ class EditCollectiveForm extends React.Component {
           defaultType={this.defaultTierType}
         />
       );
-    } else if (section === EDIT_COLLECTIVE_SECTIONS.GOALS) {
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS) {
       return <EditGoals collective={collective} currency={collective.currency} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST) {
       return (
