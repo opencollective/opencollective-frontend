@@ -378,7 +378,7 @@ class CollectiveCard extends React.Component {
               membership =>
                 membership.role === 'BACKER' &&
                 get(membership, 'stats.totalDonations') > 0 && (
-                  <div className="totalDonations">
+                  <div className="totalDonations" key={membership.id}>
                     <div className="totalDonationsAmount">
                       <Currency
                         value={get(membership, 'stats.totalDonations')}
