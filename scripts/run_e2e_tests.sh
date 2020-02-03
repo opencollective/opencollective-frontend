@@ -20,7 +20,7 @@ if [ -z "$FRONTEND_FOLDER" ]; then
 else
   cd $FRONTEND_FOLDER
 fi
-npm run start:coverage &
+npm run start:ci &
 FRONTEND_PID=$!
 cd -
 

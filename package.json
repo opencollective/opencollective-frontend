@@ -116,6 +116,7 @@
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
+    "build:e2e": "cross-env NODE_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
     "build:langs": "npm run langs:update",
     "build:next": "cross-env scripts/build_next.sh",
@@ -144,7 +145,8 @@
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
     "start": "node dist/server",
-    "start:coverage": "nyc --silent --exclude \".next/**\" node server",
+    "start:ci": "nyc --silent --exclude \".next/**\" node server",
+    "start:e2e": "cross-env TZ=UTC NODE_ENV=e2e node server",
     "styleguide:build": "styleguidist build",
     "styleguide:dev": "styleguidist server",
     "test": "npm run test:jest",
