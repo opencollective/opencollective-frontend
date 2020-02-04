@@ -53,7 +53,7 @@
     "graphql-iso-date": "3.6.1",
     "graphql-type-json": "0.3.1",
     "handlebars": "4.5.3",
-    "hashids": "2.1.0",
+    "hashids": "2.2.0",
     "he": "1.2.0",
     "helloworks-sdk": "1.2.1",
     "helmet": "3.21.2",
