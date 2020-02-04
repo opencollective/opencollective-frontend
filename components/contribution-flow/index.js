@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { isURL } from 'validator';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
+import { URLSearchParams } from 'universal-url';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { AmountTypes } from '../../lib/constants/tiers-types';
@@ -472,10 +473,14 @@ class CreateOrderPage extends React.Component {
       this.props.onSuccess();
     }
     if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
-      const orderId = get(orderCreated, 'id', null);
-      const transactionId = get(orderCreated, 'transactions[0].id', null);
-      const status = orderCreated.status;
-      const redirectTo = `${this.props.redirect}?orderId=${orderId}&transactionid=${transactionId}&status=${status}`;
+      const urlParams = new URLSearchParams({
+        orderId: get(orderCreated, 'id', null),
+        orderUuid: get(orderCreated, 'uuid', null),
+        transactionid: get(orderCreated, 'transactions[0].id', null),
+        transactionUuid: get(orderCreated, 'transactions[0].uuid', null),
+        status: orderCreated.status,
+      });
+      const redirectTo = `${this.props.redirect}?${urlParams.toString()}`;
       window.location.href = redirectTo;
     } else {
       this.pushStepRoute('success', { OrderId: orderCreated.id });
@@ -1065,6 +1070,7 @@ class CreateOrderPage extends React.Component {
 const SubmitOrderFragment = gql`
   fragment SubmitOrderFragment on OrderType {
     id
+    uuid
     status
     stripeError {
       message
@@ -1073,6 +1079,7 @@ const SubmitOrderFragment = gql`
     }
     transactions {
       id
+      uuid
     }
   }
 `;
