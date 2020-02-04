@@ -127,6 +127,7 @@ const getPaypalPaymentMethodFromExpenseData = async (expenseData, remoteUser, fr
       } else if (pm.CollectiveId !== fromCollective.id) {
         throw new Error('This payout method cannot be used for this collective');
       }
+      return pm;
     } else {
       return models.PayoutMethod.getOrCreateFromData(
         expenseData.PayoutMethod,
