@@ -26,14 +26,6 @@ const app = next({ dev, dir: path.dirname(__dirname) });
 const port = process.env.PORT;
 
 app.prepare().then(() => {
-  if (env === 'e2e' || process.env.E2E_TEST) {
-    server.get('/__coverage__', (req, res) => {
-      res.json({
-        coverage: global.__coverage__ || null,
-      });
-    });
-  }
-
   server.use(loggerMiddleware.logger);
 
   server.use(helmet());
