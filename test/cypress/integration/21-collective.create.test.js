@@ -12,7 +12,7 @@ describe('create a collective', () => {
     cy.wait(100);
     cy.get('.actions button').click();
     cy.get('.error').contains('Please accept the terms of service');
-    cy.get('.tos input[name="tos"]').click({ force: true });
+    cy.get('.tos input[name="tos"]').click();
     cy.get('.actions button').click();
     cy.get('.result').contains('Collective created successfully');
     cy.wait(800);
@@ -40,14 +40,14 @@ describe('create a collective', () => {
     cy.wait(300);
     cy.contains('Host fee: 0%');
     cy.get('[data-cy="host-apply-btn"]').should('not.be.disabled');
-    cy.contains('[data-cy="host-apply-btn"]', 'Apply with New collective').click({ force: true });
+    cy.contains('[data-cy="host-apply-btn"]:visible', 'Apply with New collective').click();
     cy.get('.ApplyToHostBtn').contains(`Application pending for ${collectiveName}`);
     // Go back to collective page
-    cy.get('.ApplyToHostBtn a')
+    cy.get('.ApplyToHostBtn:visible a')
       .first()
-      .click({ force: true });
+      .click();
     // Click on edit collective
-    cy.get('[data-cy="edit-collective-btn"]').click({ force: true });
+    cy.get('[data-cy="edit-collective-btn"]').click();
     cy.getByDataCy('menu-item-host', { timeout: 10000 }).click();
     cy.get('.removeHostBtn').click();
     cy.get('[data-cy=continue]').click();
