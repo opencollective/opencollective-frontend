@@ -53,6 +53,9 @@ class SectionTransactions extends React.Component {
     /** Wether user is admin of `collective` */
     isAdmin: PropTypes.bool,
 
+    /** Wether user is root user */
+    isRoot: PropTypes.bool,
+
     /** @ignore from withData */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -112,9 +115,11 @@ class SectionTransactions extends React.Component {
   state = { filter: FILTERS.ALL };
 
   componentDidUpdate(oldProps) {
-    // If user just logged in, refetch the data so we can get the transactions `uuid` that
-    // will make it possible for him to download the expenses.
-    if (!oldProps.idAdmin && this.props.isAdmin) {
+    // If users just logged in (or logged  out), refetch the data so we can get the transactions
+    // `uuid` that will make it possible for them to download the expenses.
+    const hadAccess = oldProps.isAdmin || oldProps.isRoot;
+    const hasAccess = this.props.isAdmin || this.props.isRoot;
+    if (hadAccess !== hasAccess) {
       this.props.data.refetch();
     }
   }
@@ -130,7 +135,7 @@ class SectionTransactions extends React.Component {
   });
 
   render() {
-    const { data, intl, collective, isAdmin } = this.props;
+    const { data, intl, collective, isAdmin, isRoot } = this.props;
     const { filter } = this.state;
     let showFilters = true;
 
@@ -177,7 +182,7 @@ class SectionTransactions extends React.Component {
         )}
 
         <ContainerSectionContent>
-          <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin} isInverted />
+          <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin || isRoot} isInverted />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
             <StyledButton mt={3} width="100%">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →

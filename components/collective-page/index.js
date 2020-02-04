@@ -190,7 +190,13 @@ class CollectivePage extends Component {
       case Sections.CONVERSATIONS:
         return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
       case Sections.TRANSACTIONS:
-        return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
+        return (
+          <SectionTransactions
+            collective={this.props.collective}
+            isAdmin={this.props.isAdmin}
+            isRoot={this.props.isRoot}
+          />
+        );
       case Sections.GOALS:
         return <SectionGoals collective={this.props.collective} />;
       case Sections.TICKETS:
