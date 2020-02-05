@@ -1,67 +1,59 @@
 import React from 'react';
-import Container from './Container';
-import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import { Envelope } from '@styled-icons/fa-solid/Envelope';
-
-import StyledInput from '../components/StyledInput';
-import StyledButton from './StyledButton';
-import { Span } from '../components/Text';
+import { H5 } from './Text';
+import Container from './Container';
+import { Flex } from '@rebass/grid';
+import StyledInput, { SubmitInput } from '../components/StyledInput';
 
 class NewsletterContainer extends React.Component {
   render() {
     return (
-      <Container>
-        <Flex>
-          <Box
-            as="form"
+      <Container py={5}>
+        <H5 mb={4} px={3} textAlign="center">
+          <FormattedMessage
+            id="newsletter.container.title"
+            defaultMessage="Stay updated about our news and progress."
+          />
+        </H5>
+
+        <Flex justifyContent="center">
+          <form
             action="https://opencollective.us12.list-manage.com/subscribe/post?u=88fc8f0f3b646152f1cfe447a&amp;id=475db6d2d7"
             method="post"
             name="mc-embedded-subscribe-form"
             target="_blank"
           >
             <Container
-              borderRadius={10}
+              border="1px solid"
+              borderColor="black.transparent.20"
+              borderRadius={50}
               bg="white.full"
               display="flex"
               justifyContent="space-between"
-              alignItems="center"
               overflow="hidden"
-              width={[1, null, '400px']}
-              pl={3}
+              width={300}
             >
-              <Span color="#5F617D">
-                <Envelope size="16" />
-              </Span>
               <StyledInput
                 bare
                 fontSize="Paragraph"
                 name="EMAIL"
                 px={3}
-                py={2}
-                minWidth={[121, null, 230]}
-                placeholder="Enter your email address"
+                py={1}
+                minWidth={200}
+                placeholder="Your email address"
                 type="email"
                 width={1}
-                color="black.800"
               />
-              <StyledButton
-                py="10px"
-                px="14px"
-                fontSize="13px"
-                lineHeight="16px"
+              <SubmitInput
+                buttonSize="small"
+                fontWeight="500"
+                textAlign="center"
                 name="subscribe"
                 type="submit"
-                borderRadius="0"
-                border="none"
-                borderLeft="1px solid"
-                borderColor="black.700"
-                outline="none"
-              >
-                <FormattedMessage id="newsletter.subscribe" defaultMessage="Subscribe" />
-              </StyledButton>
+                value="Subscribe"
+              />
             </Container>
-          </Box>
+          </form>
         </Flex>
       </Container>
     );

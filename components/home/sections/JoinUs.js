@@ -6,7 +6,7 @@ import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 
 import { H1, P } from '../../Text';
 import Container from '../../Container';
-import NewsletterContainer from '../../NewsletterContainer';
+import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 import Link from '../../Link';
 
@@ -148,7 +148,7 @@ const JoinUs = () => (
                 <FormattedMessage id="home.joinUsSection.weNeedUpdate" defaultMessage="We send updates once a month." />
               </P>
             </Box>
-            <NewsletterContainer />
+            <Newsletter />
           </Container>
         </Wrapper>
       </Container>
