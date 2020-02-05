@@ -41,13 +41,13 @@ Make sure the Frontend is talking to the local API:
 
 - copy [`.env.local`](.env.local) to `.env`.
 
-We recommend to run a production build of the Frontend. It will be faster and more reliable.
+We recommend to run a build of the Frontend. It will be faster and more reliable.
 
-- `NODE_ENV=e2e npm run build`
+- `npm run build:e2e`
 
 Start from the build:
 
-- `TZ=UTC NODE_ENV=e2e npm run start`
+- `npm run start:e2e`
 
 When investigating a specific test, feel free to switch to the development environment:
 

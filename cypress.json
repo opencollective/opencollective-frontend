@@ -7,7 +7,10 @@
   "chromeWebSecurity": false,
   "blacklistHosts": ["wtfismyip.com"],
   "env": {
-    "MAILDEV_URL": "http://localhost:1080"
+    "MAILDEV_URL": "http://localhost:1080",
+    "codeCoverage": {
+      "url": "/__coverage__"
+    }
   },
   "fixturesFolder": "test/cypress/fixtures",
   "integrationFolder": "test/cypress/integration",

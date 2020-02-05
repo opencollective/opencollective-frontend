@@ -95,6 +95,15 @@ module.exports = (server, app) => {
     }
   });
 
+  // This is used by Cypress to collect server side coverage
+  if (process.env.NODE_ENV === 'e2e' || process.env.E2E_TEST) {
+    server.get('/__coverage__', (req, res) => {
+      res.json({
+        coverage: global.__coverage__ || null,
+      });
+    });
+  }
+
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';
     res.sendFile(
