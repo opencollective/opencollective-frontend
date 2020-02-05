@@ -594,6 +594,8 @@
   "expense.pay.manual.btn": "Record as paid",
   "expense.paymentProcessorFeeInCollectiveCurrency": "комиссия обработки платежа",
   "expense.payoutMethod": "метод выплат",
+  "expense.payoutMethod.banktransfer": "Bank Transfer",
+  "expense.payoutMethod.donation": "Пожертвование",
   "expense.payoutMethod.manual": "Другое (см. инструкции)",
   "expense.payoutMethod.paypal": "PayPal ({paypalEmail, select, missing {отсутствует} other {{paypalEmail}}})",
   "expense.payoutMethod.paypal.hidden": "PayPal ({paypalEmail, select, missing {отсутствует} hidden {скрыт} other {{paypalEmail}}})",

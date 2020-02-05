@@ -594,6 +594,8 @@
   "expense.pay.manual.btn": "Record as paid",
   "expense.paymentProcessorFeeInCollectiveCurrency": "支払い処理手数料",
   "expense.payoutMethod": "支払方法",
+  "expense.payoutMethod.banktransfer": "Bank Transfer",
+  "expense.payoutMethod.donation": "寄付",
   "expense.payoutMethod.manual": "その他 (説明を見る)",
   "expense.payoutMethod.paypal": "PayPal ({paypalEmail, select, missing {未入力} other {{paypalEmail}}})",
   "expense.payoutMethod.paypal.hidden": "PayPal ({paypalEmail, select, missing {未入力} hidden {非表示} other {{paypalEmail}}})",

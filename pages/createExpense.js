@@ -186,6 +186,12 @@ const getCollectiveQuery = gql`
         name
         image
         expensePolicy
+        connectedAccounts {
+          id
+          service
+          createdAt
+          updatedAt
+        }
       }
       parentCollective {
         id

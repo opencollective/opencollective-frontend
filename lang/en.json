@@ -594,6 +594,8 @@
   "expense.pay.manual.btn": "Record as paid",
   "expense.paymentProcessorFeeInCollectiveCurrency": "payment processor fee",
   "expense.payoutMethod": "payout method",
+  "expense.payoutMethod.banktransfer": "Bank Transfer",
+  "expense.payoutMethod.donation": "Donation",
   "expense.payoutMethod.manual": "Other (see instructions)",
   "expense.payoutMethod.paypal": "PayPal ({paypalEmail, select, missing {missing} other {{paypalEmail}}})",
   "expense.payoutMethod.paypal.hidden": "PayPal ({paypalEmail, select, missing {missing} hidden {hidden} other {{paypalEmail}}})",

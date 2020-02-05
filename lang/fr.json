@@ -594,6 +594,8 @@
   "expense.pay.manual.btn": "Marquer comme payé",
   "expense.paymentProcessorFeeInCollectiveCurrency": "commission du processeur de paiement",
   "expense.payoutMethod": "moyen de paiement",
+  "expense.payoutMethod.banktransfer": "Bank Transfer",
+  "expense.payoutMethod.donation": "Don",
   "expense.payoutMethod.manual": "Autre (voir instructions)",
   "expense.payoutMethod.paypal": "PayPal ({paypalEmail, select, missing {non fourni} other {{paypalEmail}}})",
   "expense.payoutMethod.paypal.hidden": "PayPal ({paypalEmail, select, missing {manquant} hidden {caché} other {{paypalEmail}}} )",
