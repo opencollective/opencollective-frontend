@@ -306,3 +306,49 @@ export const fakeOrder = async (orderData = {}) => {
   order.createdByUser = user;
   return order;
 };
+
+/**
+ * Creates a fake connectedAccount. All params are optionals.
+ */
+export const fakeConnectedAccount = async (connectedAccountData = {}) => {
+  const CollectiveId = connectedAccountData.CollectiveId || (await fakeCollective());
+  const service = sample(['github', 'twitter', 'stripe', 'transferwise']);
+
+  return models.ConnectedAccount.create({
+    service,
+    CollectiveId,
+    ...connectedAccountData,
+  });
+};
+
+/**
+ * Creates a fake transaction. All params are optionals.
+ */
+export const fakeTransaction = async (transactionData = {}) => {
+  const amount = transactionData.amount || randAmount(10, 100) * 100;
+  let CreatedByUserId = get(transactionData, 'CreatedByUserId') || get(transactionData, 'createdByUser.id');
+  if (!CreatedByUserId) {
+    CreatedByUserId = (await fakeUser()).id;
+  }
+  let FromCollectiveId = get(transactionData, 'FromCollectiveId') || get(transactionData, 'fromCollective.id');
+  if (!FromCollectiveId) {
+    FromCollectiveId = (await fakeCollective()).id;
+  }
+  let CollectiveId = get(transactionData, 'CollectiveId') || get(transactionData, 'collective.id');
+  if (!CollectiveId) {
+    CollectiveId = (await fakeCollective()).id;
+  }
+  return models.Transaction.create({
+    type: amount < 0 ? 'DEBIT' : 'CREDIT',
+    currency: 'USD',
+    CreatedByUserId,
+    FromCollectiveId,
+    CollectiveId,
+    hostCurrency: 'USD',
+    hostCurrencyFxRate: 1,
+    amount,
+    netAmountInCollectiveCurrency: amount,
+    amountInHostCurrency: amount,
+    ...transactionData,
+  });
+};
