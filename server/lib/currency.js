@@ -37,19 +37,16 @@ if (!get(config, 'fixer.accessKey') && !['staging', 'production'].includes(confi
 export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
   debug(`getFxRate for ${date} ${fromCurrency} -> ${toCurrency}`);
 
-  if (!get(config, 'fixer.accessKey')) {
+  if (fromCurrency === toCurrency) {
+    return Promise.resolve(1);
+  } else if (!fromCurrency || !toCurrency) {
+    return Promise.resolve(1);
+  } else if (!get(config, 'fixer.accessKey')) {
     if (['staging', 'production'].includes(config.env)) {
       throw new Error('Unable to fetch fxRate, Fixer API is not configured.');
     } else {
       return Promise.resolve(1.1);
     }
-  }
-
-  if (fromCurrency === toCurrency) {
-    return Promise.resolve(1);
-  }
-  if (!fromCurrency || !toCurrency) {
-    return Promise.resolve(1);
   }
 
   date = getDate(date);
