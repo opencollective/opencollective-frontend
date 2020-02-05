@@ -475,9 +475,9 @@ class CreateOrderPage extends React.Component {
     if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
       const urlParams = new URLSearchParams({
         orderId: get(orderCreated, 'id', null),
-        orderUuid: get(orderCreated, 'uuid', null),
+        orderIdV2: get(orderCreated, 'idV2', null),
         transactionid: get(orderCreated, 'transactions[0].id', null),
-        transactionUuid: get(orderCreated, 'transactions[0].uuid', null),
+        transactionIdV2: get(orderCreated, 'transactions[0].idV2', null),
         status: orderCreated.status,
       });
       const redirectTo = `${this.props.redirect}?${urlParams.toString()}`;
@@ -1070,7 +1070,7 @@ class CreateOrderPage extends React.Component {
 const SubmitOrderFragment = gql`
   fragment SubmitOrderFragment on OrderType {
     id
-    uuid
+    idV2
     status
     stripeError {
       message
@@ -1079,7 +1079,7 @@ const SubmitOrderFragment = gql`
     }
     transactions {
       id
-      uuid
+      idV2
     }
   }
 `;
