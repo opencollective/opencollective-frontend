@@ -1549,7 +1549,7 @@ export const OrderType = new GraphQLObjectType({
           return order.id;
         },
       },
-      uuid: {
+      idV2: {
         type: GraphQLString,
         resolve(order) {
           return idEncode(order.id, 'order');
