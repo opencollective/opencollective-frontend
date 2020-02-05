@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Feb 05 2020 10:46:52 GMT+0100 (Central European Standard Time)
+# timestamp: Wed Feb 12 2020 15:42:14 GMT-0300 (Brasilia Standard Time)
 
 """
 Application model
@@ -256,6 +256,11 @@ type Collective implements CollectiveInterface {
     """
     includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
 
   """
   List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
@@ -527,6 +532,11 @@ interface CollectiveInterface {
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
 
   """
   List all the gift cards batches emitted by this collective. May include `null` as key for unbatched gift cards.
@@ -1142,6 +1152,11 @@ type Event implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
   List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
   """
   virtualCardsBatches: [PaymentMethodBatchInfo]
@@ -1266,6 +1281,7 @@ input ExpenseInputType {
   Can be: paypal, other. Also deprecated: donation, manual
   """
   payoutMethod: String
+  PayoutMethod: PayoutMethodInput
   privateMessage: String
   attachment: String
   attachments: [ExpenseAttachmentInputType]
@@ -1308,6 +1324,8 @@ enum ExpenseStatus {
   PENDING
   APPROVED
   REJECTED
+  PROCESSING
+  ERROR
   PAID
 }
 
@@ -1325,7 +1343,13 @@ type ExpenseType {
   category: String
   status: String
   type: String
-  payoutMethod: String
+  payoutMethod: String @deprecated(reason: "2020-01-23 - Please use the private field instead.")
+  PayoutMethod: PayoutMethod
+
+  """
+  Returns true if current user is allowed to see expense's private info, such as attachment's URLS or payout methods.
+  """
+  canSeePrivateInfo: Boolean
   privateMessage: String
   attachment: String
     @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
@@ -2367,6 +2391,11 @@ type Organization implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
   List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
   """
   virtualCardsBatches: [PaymentMethodBatchInfo]
@@ -2528,6 +2557,31 @@ type PaymentMethodType {
   fromCollectives(limit: Int, offset: Int): CollectiveSearchResults
   currency: String
   stripeError: StripeError
+}
+
+"""
+A payout method for expenses
+"""
+type PayoutMethod {
+  id: Int
+  type: PayoutMethodTypeEnum
+  name: String
+  isSaved: Boolean
+  data: JSON
+}
+
+input PayoutMethodInput {
+  id: Int
+  data: JSON
+  name: String
+  isSaved: Boolean
+  type: PayoutMethodTypeEnum
+}
+
+enum PayoutMethodTypeEnum {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
 }
 
 """
@@ -3405,6 +3459,11 @@ type User implements CollectiveInterface {
   ): [PaymentMethodType]
 
   """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
   List all the gift cards batches emitted by this collective. May include `null` for unbatched gift cards.
   """
   virtualCardsBatches: [PaymentMethodBatchInfo]
@@ -3446,7 +3505,7 @@ type UserDetails {
   email: String
   emailWaitingForValidation: String
   memberOf: [Member]
-  paypalEmail: String
+  paypalEmail: String @deprecated(reason: "2020-01-20 - Payout methods are now attached to collectives")
 
   """
   Returns true if user account is limited (user can't use any feature)
