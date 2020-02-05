@@ -48,6 +48,10 @@ class ExpenseDetails extends React.Component {
         id: 'Donation',
         defaultMessage: 'Donation',
       },
+      banktransfer: {
+        id: 'expense.payoutMethod.banktransfer',
+        defaultMessage: 'Bank Transfer',
+      },
     });
 
     this.state = { modified: false, expense: {} };
@@ -78,7 +82,10 @@ class ExpenseDetails extends React.Component {
     const canEditAmount = expense.status !== 'PAID' || expense.payoutMethod !== 'paypal';
     const editMode = canEditExpense && this.props.mode === 'edit';
     const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
-    const payoutMethod = this.state.expense.payoutMethod || expense.payoutMethod;
+    const payoutMethod =
+      get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT'
+        ? 'banktransfer'
+        : this.state.expense.payoutMethod || expense.payoutMethod;
     const paypalEmail = get(expense, 'user.paypalEmail') || get(expense, 'user.email');
     // Don't display "donation" unless it's the current payoutMethod (phasing out)
     const payoutMethods = expense.payoutMethod === 'donation' ? ['paypal', 'other', 'donation'] : ['paypal', 'other'];
@@ -311,7 +318,7 @@ class ExpenseDetails extends React.Component {
             </label>
             {!editMode &&
               capitalize(
-                intl.formatMessage(this.messages[expense.payoutMethod], {
+                intl.formatMessage(this.messages[payoutMethod], {
                   paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
                 }),
               )}
@@ -320,7 +327,7 @@ class ExpenseDetails extends React.Component {
                 name="payoutMethod"
                 type="select"
                 options={payoutMethodOptions}
-                defaultValue={expense.payoutMethod}
+                defaultValue={payoutMethod}
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
               />
             )}
@@ -369,6 +376,10 @@ const getExpenseQuery = gql`
       currency
       attachment
       payoutMethod
+      PayoutMethod {
+        id
+        type
+      }
       type
       privateMessage
       collective {

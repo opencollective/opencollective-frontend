@@ -85,12 +85,12 @@ class PayExpenseBtn extends React.Component {
         const paypalPaymentMethod =
           get(host, 'paymentMethods') && host.paymentMethods.find(pm => pm.service === 'paypal');
         if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
-          selectedPayoutMethod = 'other';
+          return null;
         }
       }
-    }
-
-    if (selectedPayoutMethod === 'other') {
+    } else if (get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT') {
+      selectedPayoutMethod = 'Transferwise';
+    } else if (selectedPayoutMethod === 'other') {
       return null;
     }
 
@@ -117,7 +117,7 @@ class PayExpenseBtn extends React.Component {
           <FormattedMessage
             id="expense.pay.btn"
             defaultMessage="Pay with {paymentMethod}"
-            values={{ paymentMethod: expense.payoutMethod }}
+            values={{ paymentMethod: selectedPayoutMethod }}
           />
         )}
       </StyledButton>
