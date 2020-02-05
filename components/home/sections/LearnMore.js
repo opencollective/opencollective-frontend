@@ -53,11 +53,11 @@ const messages = defineMessages({
   'home.learnMore.blog': {
     id: 'home.learnMore.blog',
     defaultMessage:
-      'Discover how to create an open collective, how to become a fiscal sponsor to enable communities to operate without a legal entity, how to use our software, our API and much more.',
+      'Stay up to date with the latest news, collectives and sponsors’ stories. Our newsletter and updates are regularly published as well.',
   },
   'home.learnMore.blog.buttonText': {
     id: 'home.learnMore.blog.buttonText',
-    defaultMessage: 'Vist our blog',
+    defaultMessage: 'Visit our blog',
   },
   'home.learnMore.slack': {
     id: 'home.learnMore.slack',
