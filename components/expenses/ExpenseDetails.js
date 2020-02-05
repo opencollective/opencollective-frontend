@@ -316,13 +316,13 @@ class ExpenseDetails extends React.Component {
             <label>
               <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
             </label>
-            {!editMode &&
+            {(!editMode || payoutMethod === 'banktransfer') &&
               capitalize(
                 intl.formatMessage(this.messages[payoutMethod], {
                   paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
                 }),
               )}
-            {editMode && (
+            {editMode && payoutMethod !== 'banktransfer' && (
               <InputField
                 name="payoutMethod"
                 type="select"
