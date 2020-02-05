@@ -45,7 +45,7 @@ const messsages = defineMessages({
   },
   'home.weAreOpenSection.openSource': {
     id: 'home.weAreOpenSection.openSource',
-    defaultMessage: 'Open Source.',
+    defaultMessage: 'Open Source',
   },
   'home.weAreOpenSection.openSource.description': {
     id: 'home.weAreOpenSection.openSource.description',
@@ -152,7 +152,7 @@ const WeAreOpen = () => (
       <SectionTitle>
         <FormattedMessage
           id="home.weAreOpenSection.title"
-          defaultMessage="We are Open in  
+          defaultMessage="We are Open in
           every way"
         />
       </SectionTitle>

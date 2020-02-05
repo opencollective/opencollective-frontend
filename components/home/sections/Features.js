@@ -150,7 +150,7 @@ const messages = defineMessages({
   'home.feature.getMonthlyReports.description': {
     id: 'home.feature.getMonthlyReports.description',
     defaultMessage:
-      'A summary of your group’s activities, progress on your budget goals, new contributors, and expense details, with all transaction data and receipts/invoices attached. ',
+      'A summary of your group’s activities, progress on your budget goals, new contributors, and expense details, with all transaction data and receipts/invoices attached.',
   },
 });
 
@@ -247,7 +247,7 @@ const Features = () => {
   return (
     <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
       <SectionTitle>
-        <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective?" />
+        <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
       </SectionTitle>
       <SectionSubtitle>
         <FormattedMessage
