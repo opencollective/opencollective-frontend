@@ -259,6 +259,18 @@ export default function(Sequelize, DataTypes) {
     return this.save();
   };
 
+  Expense.prototype.setProcessing = function(lastEditedById) {
+    this.status = status.PROCESSING;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
+  Expense.prototype.setError = function(lastEditedById) {
+    this.status = status.ERROR;
+    this.lastEditedById = lastEditedById;
+    return this.save();
+  };
+
   /**
    * Returns the PayoutMethod.type based on the legacy `payoutMethod`
    */
