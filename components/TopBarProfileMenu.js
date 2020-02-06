@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Badge } from 'react-bootstrap';
 import { get, uniqBy } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+
+import { Settings } from '@styled-icons/feather/Settings';
 
 import { Link } from '../server/pages';
 import { formatCurrency, capitalize } from '../lib/utils';
@@ -45,6 +46,10 @@ class TopBarProfileMenu extends React.Component {
       'menu.applications': {
         id: 'menu.applications',
         defaultMessage: 'applications',
+      },
+      settings: {
+        id: 'Settings',
+        defaultMessage: 'Settings',
       },
     });
   }
@@ -89,6 +94,46 @@ class TopBarProfileMenu extends React.Component {
     }
     return str;
   }
+
+  renderMembershipLine = membership => {
+    const { intl, LoggedInUser } = this.props;
+    const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(membership.collective);
+    return (
+      <ListItem
+        key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}
+        py={1}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Link route={`/${get(membership, 'collective.slug')}`} passHref>
+          <StyledLink
+            title={this.tooltip(membership)}
+            color="black.700"
+            fontSize="1.2rem"
+            fontFamily="montserratlight, arial"
+            fontWeight="400"
+            truncateOverflow
+            maxWidth="90%"
+          >
+            <Flex alignItems="center">
+              <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
+              <P fontSize="Caption" truncateOverflow>
+                {get(membership, 'collective.name')}
+              </P>
+            </Flex>
+          </StyledLink>
+        </Link>
+        {isAdmin && (
+          <Link route="editCollective" params={{ slug: membership.collective.slug }} passHref>
+            <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
+              <Settings size="1.2em" />
+            </StyledLink>
+          </Link>
+        )}
+      </ListItem>
+    );
+  };
 
   renderProfileMenu() {
     const { LoggedInUser, intl } = this.props;
@@ -144,32 +189,12 @@ class TopBarProfileMenu extends React.Component {
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/create" passHref>
               <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
-                + New
+                + <FormattedMessage id="Collective.New" defaultMessage="New" />
               </StyledLink>
             </Link>
           </Flex>
           <Box as="ul" p={0} my={2}>
-            {collectives.map(membership => (
-              <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
-                <Link route={`/${get(membership, 'collective.slug')}`} passHref>
-                  <StyledLink
-                    title={this.tooltip(membership)}
-                    color="#494D52"
-                    fontSize="1.2rem"
-                    fontFamily="montserratlight, arial"
-                    fontWeight="400"
-                  >
-                    <Flex alignItems="center">
-                      <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
-                      {get(membership, 'collective.name')}
-                    </Flex>
-                  </StyledLink>
-                </Link>
-                {get(membership, 'collective.stats.expenses.pending') > 0 && (
-                  <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge>
-                )}
-              </ListItem>
-            ))}
+            {collectives.map(this.renderMembershipLine)}
           </Box>
           {collectives.length === 0 && (
             <Box my={2}>
@@ -197,32 +222,12 @@ class TopBarProfileMenu extends React.Component {
             <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
             <Link route="/organizations/new" passHref>
               <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
-                + New
+                + <FormattedMessage id="Organization.New" defaultMessage="New" />
               </StyledLink>
             </Link>
           </Flex>
           <Box as="ul" p={0} my={2}>
-            {orgs.map(membership => (
-              <ListItem py={1} key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}>
-                <Link route={`/${get(membership, 'collective.slug')}`} passHref>
-                  <StyledLink
-                    title={this.tooltip(membership)}
-                    color="#494D52"
-                    fontSize="1.2rem"
-                    fontFamily="montserratlight, arial"
-                    fontWeight="400"
-                  >
-                    <Flex alignItems="center">
-                      <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
-                      {get(membership, 'collective.name')}
-                    </Flex>
-                  </StyledLink>
-                </Link>
-                {get(membership, 'collective.stats.expenses.pending') > 0 && (
-                  <Badge>{get(membership, 'collective.stats.expenses.pending')}</Badge>
-                )}
-              </ListItem>
-            ))}
+            {orgs.map(this.renderMembershipLine)}
           </Box>
           {orgs.length === 0 && (
             <Box my={2}>
