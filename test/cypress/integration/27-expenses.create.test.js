@@ -12,7 +12,7 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone input') => {
 describe('new expense when logged out', () => {
   it('requires to login to submit an expense', () => {
     cy.visit('/testcollective/expenses');
-    cy.containsInDataCy('submit-expense-btn', 'Submit Expense').click();
+    cy.containsInDataCy('submit-expense-btn', 'Submit Expense').click({ force: true });
     cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
     cy.get('#email').type('testuser+admin@opencollective.com');
     cy.get('[data-cy="signin-btn"]').click();

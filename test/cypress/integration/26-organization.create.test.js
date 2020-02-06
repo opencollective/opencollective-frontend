@@ -7,7 +7,7 @@ describe('create an organization', () => {
     cy.fillInputField('name', 'New org');
     cy.fillInputField('description', 'short description for new org');
     cy.fillInputField('website', 'https://newco.com');
-    cy.get('.tos input[name="tos"]').click();
+    cy.get('.tos input[name="tos"]').click({ force: true });
     cy.wait(500);
     cy.get('.actions button').click();
     cy.wait(1000);

@@ -78,7 +78,6 @@ describe('edit collective', () => {
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     const tierCardSelector = '[data-cy="financial-contributions"] [data-cy="contribute-card-tier"]';
-    cy.disableSmoothScroll();
     cy.get(tierCardSelector, { timeout: 5000 });
     cy.get(tierCardSelector)
       .first()
@@ -98,7 +97,7 @@ describe('edit collective', () => {
     cy.get(tierCardSelector)
       .first()
       .find('[data-cy="contribute-btn"]')
-      .click();
+      .click({ force: true });
 
     // Ensure the new tiers are properly displayed on order form
     cy.contains('button', 'Next step', { timeout: 20000 }).click();
