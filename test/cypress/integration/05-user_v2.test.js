@@ -4,7 +4,7 @@ describe('New users profiles', () => {
   });
   describe('Contributions section', () => {
     it('Shows contributions with date since and amount contributed', () => {
-      cy.get('[data-cy=section-contributions]').click();
+      cy.get('[data-cy=section-contributions]').click({ force: true });
       cy.hash().should('eq', '#section-contributions');
       cy.get('[data-cy=section-contributions-title]').contains('Contributions');
       cy.get('[data-cy=contribution-date-since]')
@@ -27,17 +27,17 @@ describe('New users profiles', () => {
 
     it('Can filter by contribution type (admin, financial...etc)', () => {
       cy.get('[data-cy=filters]');
-      cy.get('[data-cy="filter-button core"]').click();
+      cy.get('[data-cy="filter-button core"]').click({ force: true });
       cy.get('[data-cy=collective-contribution]')
         .first()
         .get('[data-cy=caption]')
         .contains('Collective Admin since');
-      cy.get('[data-cy="filter-button financial"]').click();
+      cy.get('[data-cy="filter-button financial"]').click({ force: true });
       cy.get('[data-cy=collective-contribution]')
         .first()
         .get('[data-cy=caption]')
         .contains('Financial Contributor since');
-      cy.get('[data-cy="filter-button events"]').click();
+      cy.get('[data-cy="filter-button events"]').click({ force: true });
       cy.get('[data-cy=collective-contribution]')
         .first()
         .get('[data-cy=caption]')
@@ -47,15 +47,15 @@ describe('New users profiles', () => {
 
   describe('Transactions section', () => {
     it('Can filter by expense/contributions', () => {
-      cy.get('[data-cy=section-transactions]').click();
+      cy.get('[data-cy=section-transactions]').click({ force: true });
       cy.hash().should('eq', '#section-transactions');
       cy.get('[data-cy=section-transactions-title]').contains('Transactions');
-      cy.get('button[data-cy="filter-button expenses"]').click();
+      cy.get('button[data-cy="filter-button expenses"]').click({ force: true });
       cy.get('[data-cy="expenses transactions"]');
       cy.get('[data-cy="transaction-sign"]')
         .first()
         .contains('+');
-      cy.get('button[data-cy="filter-button contributions"]').click();
+      cy.get('button[data-cy="filter-button contributions"]').click({ force: true });
       cy.get('[data-cy="contributions transactions"]');
       cy.get('[data-cy="transaction-sign"]')
         .first()

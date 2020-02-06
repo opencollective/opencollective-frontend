@@ -5,7 +5,7 @@ describe('host dashboard', () => {
 
   it('mark pending application approved', () => {
     cy.wait(2000);
-    cy.get('[data-cy="host-apply-btn"]:visible').click();
+    cy.contains('[data-cy="host-apply-btn"]', 'Apply').click({ force: true });
     cy.wait(1000);
     cy.fillInputField('name', 'Cavies United');
     cy.fillInputField('description', 'We will rule the world with our cute squeaks');
@@ -20,8 +20,8 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
       cy.get('[data-cy="host-dashboard-menu-bar"]')
         .contains('Pending applications')
-        .click();
-      cy.get(`[data-cy="${CollectiveSlug}-approve"]`).click();
+        .click({ force: true });
+      cy.get(`[data-cy="${CollectiveSlug}-approve"]`).click({ force: true });
       cy.get(`[data-cy="${CollectiveSlug}-approved"]`).should('have.attr', 'color', 'green.700');
     });
   });
@@ -41,14 +41,14 @@ describe('host dashboard', () => {
     cy.get('[data-cy="expense-paid"]').as('currentExpense');
     cy.get('[data-cy="expense-actions"]')
       .contains('button', 'Unapprove')
-      .click();
-    cy.get('[data-cy="confirmation-modal-continue"]').click();
+      .click({ force: true });
+    cy.get('[data-cy="confirmation-modal-continue"]').click({ force: true });
     cy.wait(500);
     cy.get('[data-cy="reject-expense-btn"]').within(() => {
-      cy.get('button').click();
+      cy.get('button').click({ force: true });
     });
     cy.get('[data-cy="approve-expense-btn"]').within(() => {
-      cy.get('button').click();
+      cy.get('button').click({ force: true });
     });
   });
 
@@ -57,7 +57,7 @@ describe('host dashboard', () => {
     cy.get('[data-cy="expense-approved"]').as('currentExpense');
     cy.get('[data-cy="expense-actions"]')
       .contains('button', 'Record as paid')
-      .click();
+      .click({ force: true });
     cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-paid');
   });
 
@@ -67,10 +67,10 @@ describe('host dashboard', () => {
     cy.get('[data-cy="expense-actions"]')
       .as('currentExpenseActions')
       .contains('button', 'Mark as unpaid')
-      .click();
+      .click({ force: true });
     cy.get('@currentExpenseActions')
       .contains('button', 'Continue')
-      .click();
+      .click({ force: true });
     cy.get('@currentExpense').should('have.attr', 'data-cy', 'expense-approved');
   });
 
@@ -79,8 +79,8 @@ describe('host dashboard', () => {
     cy.get('[data-cy="expense-rejected"]').as('currentExpense');
     cy.get('[data-cy="expense-actions"]')
       .contains('button', 'Delete')
-      .click();
-    cy.get('[data-cy="confirmation-modal-continue"]').click();
+      .click({ force: true });
+    cy.get('[data-cy="confirmation-modal-continue"]').click({ force: true });
     cy.get('[data-cy="errorMessage"]').should('not.exist');
   });
 });

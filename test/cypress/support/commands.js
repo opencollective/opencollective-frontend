@@ -3,7 +3,7 @@ import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
 import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
 import { CreditCards } from '../../stripe-helpers';
-import { disableSmoothScroll } from './helpers';
+
 /**
  * Login with an exising account. If not provided in `params`, the email used for
  * authentication will be `defaultTestUserEmail`.
@@ -60,7 +60,7 @@ Cypress.Commands.add('openExternalLink', url => {
     link.setAttribute('href', url);
     link.setAttribute('id', linkIdentifier);
     window.document.body.appendChild(link);
-    cy.get(`#${linkIdentifier}`).click();
+    cy.get(`#${linkIdentifier}`).click({ force: true });
   });
 });
 
@@ -302,14 +302,6 @@ Cypress.Commands.add('containsInDataCy', (query, content, params) => {
   } else {
     return cy.contains(`[data-cy="${query}"]`, content, params);
   }
-});
-
-/**
- * Helper to disable smooth scroll on page to help prevent cypress from missing elements
- * that may be hidden from view.
- */
-Cypress.Commands.add('disableSmoothScroll', () => {
-  disableSmoothScroll();
 });
 
 // ---- Private ----
