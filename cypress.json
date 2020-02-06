@@ -3,6 +3,7 @@
   "viewportHeight": 1660,
   "projectId": "yt5kwm",
   "defaultCommandTimeout": 15000,
+  "responseTimeout": 60000,
   "video": false,
   "chromeWebSecurity": false,
   "blacklistHosts": ["wtfismyip.com"],
