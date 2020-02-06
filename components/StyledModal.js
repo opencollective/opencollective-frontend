@@ -147,9 +147,9 @@ StyledModal.propTypes = {
   /** a boolean to determin when to show modal */
   show: PropTypes.bool.isRequired,
   /** width of the modal component */
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** height of the modal component */
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** width of the modal component */
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
