@@ -44,7 +44,7 @@ const messages = defineMessages({
 const users = [
   {
     id: 'opensource',
-    name: 'Babel collective',
+    name: 'Babel Collective',
     type: 'Open Source Projects',
     description: '',
     collectivePath: '/babel',

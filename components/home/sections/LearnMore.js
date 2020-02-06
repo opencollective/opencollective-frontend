@@ -44,7 +44,7 @@ const messages = defineMessages({
   'home.learnMore.documentation': {
     id: 'home.learnMore.documentation',
     defaultMessage:
-      'Discover how to create an open collective, how to become a fiscal sponsor, how to use our software, our API and much more.',
+      'Discover how to create an open collective, how to become a Fiscal Host, how to use our software, our API and much more.',
   },
   'home.learnMore.documentation.buttonText': {
     id: 'home.learnMore.buttonText',

@@ -67,7 +67,7 @@ const FiscalHost = () => (
           </P>
         </Box>
         <Box my={5} display="flex" flexDirection={['column', 'row']} alignItems="center">
-          <Link route="/become-a-sponsor" passHref>
+          <Link route="/become-a-fiscal-host" passHref>
             <HomePrimaryLink
               mb={[3, 0]}
               fontSize={['Paragraph', '13px']}
@@ -93,7 +93,7 @@ const FiscalHost = () => (
               <FormattedMessage id="home.fiscalHost.becomeHostBtn" defaultMessage="Become a fiscal host" />
             </HomePrimaryLink>
           </Link>
-          <Link route="#" passHref>
+          <Link route="/hosts" passHref>
             <JoinHostLink buttonStyle="standard">
               <FormattedMessage id="home.joinHost" defaultMessage="Join a fiscal host" />
             </JoinHostLink>

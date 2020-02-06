@@ -84,7 +84,7 @@ const messsages = defineMessages({
 const openFeatures = [
   {
     id: 'openData',
-    link: 'https://drive.google.com/drive/u/1/folders/1OwRpuIehFQxRnJIRAksQ1Jd2xXZrhz5L',
+    url: 'https://docs.opencollective.com/help/collectives/data-export',
   },
   {
     id: 'openSource',
@@ -150,11 +150,7 @@ const WeAreOpen = () => (
   <Container display="flex" flexDirection="column" alignItems="center" mx={[0, 4, 0, null, null, 5]}>
     <Box textAlign="center">
       <SectionTitle>
-        <FormattedMessage
-          id="home.weAreOpenSection.title"
-          defaultMessage="We are Open in
-          every way"
-        />
+        <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
       </SectionTitle>
       <SectionSubtitle>
         <FormattedMessage
@@ -164,7 +160,7 @@ const WeAreOpen = () => (
       </SectionSubtitle>
     </Box>
     <Hide md lg my={3}>
-      <Illustration src="/static/images/weareopen-illustration-sm.png" alt="We are Open in every way" />
+      <Illustration src="/static/images/weareopen-illustration-sm.png" alt="We are open in every way" />
     </Hide>
     <StyledCarousel display={[null, null, 'none']} width={1}>
       {openFeatures.map(openFeature => (
@@ -186,12 +182,12 @@ const WeAreOpen = () => (
       <Illustration
         display={['none', null, 'block', null, 'none']}
         src="/static/images/weareopen-illustration-md.png"
-        alt="We are Open in every way"
+        alt="We are open in every way"
       />
       <Illustration
         display={['none', null, null, null, 'block']}
         src="/static/images/weareopen-illustration-md.png"
-        alt="We are Open in every way"
+        alt="We are open in every way"
         mr={3}
       />
     </Container>
