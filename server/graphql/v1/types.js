@@ -35,6 +35,8 @@ import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
 import * as commonComment from '../common/comment';
 import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
 
+import { idEncode } from '../v2/identifiers';
+
 /**
  * Take a graphql type and return a wrapper type that adds pagination. The pagination
  * object has limit, offset and total keys to manage pages and stores the result
@@ -1545,6 +1547,12 @@ export const OrderType = new GraphQLObjectType({
         type: GraphQLInt,
         resolve(order) {
           return order.id;
+        },
+      },
+      idV2: {
+        type: GraphQLString,
+        resolve(order) {
+          return idEncode(order.id, 'order');
         },
       },
       quantity: {

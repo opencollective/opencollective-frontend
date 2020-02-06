@@ -21,9 +21,7 @@ describe('server/lib/utils', () => {
     expect(res.card.expYear).to.equal(obj.card.expYear);
   });
 
-  it('exports PDF', function(done) {
-    this.timeout(10000);
-
+  it('exports PDF', done => {
     const data = {
       host: {
         name: 'WWCode',
