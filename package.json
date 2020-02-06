@@ -240,9 +240,5 @@
     "*.{js,json,md,graphql}": [
       "prettier --write"
     ]
-  },
-  "cacheDirectories": [
-    "node_modules",
-    ".next/cache"
-  ]
+  }
 }
