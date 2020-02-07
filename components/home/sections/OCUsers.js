@@ -95,7 +95,7 @@ const User = ({ id, name, picture, type, collectivePath }) => {
         >
           {type}
         </P>
-        <Box width={id === 'opensource' ? '150px' : null} mb={[2, null, 4]}>
+        <Box width={[null, null, id === 'opensource' ? '150px' : null]} mb={[2, null, 4]}>
           <P
             fontSize={['H5', null, 'H4', null, 'H3']}
             lineHeight={['28px', null, 'H4', null, '40px']}
@@ -147,7 +147,7 @@ const OCUsers = () => {
           </HomeStandardLink>
         </Box>
       </Container>
-      <StyledCarousel showArrowController={false} options={users} display={[null, null, 'none']} width={1}>
+      <StyledCarousel options={users} display={[null, null, 'none']} width={1}>
         {users.map(user => (
           <User key={user.id} {...user} />
         ))}
