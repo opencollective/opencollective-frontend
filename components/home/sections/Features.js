@@ -79,21 +79,27 @@ const LearnMoreLink = styled.a`
 const features = [
   {
     id: 'shareBudget',
+    learnMoreLink: 'https://docs.opencollective.com/help/collectives/budget',
   },
   {
     id: 'receiveContributions',
+    learnMoreLink: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',
   },
   {
     id: 'manageExpenses',
+    learnMoreLink: 'https://docs.opencollective.com/help/expenses-and-getting-paid/expenses',
   },
   {
     id: 'engageCommunity',
+    learnMoreLink: 'https://docs.opencollective.com/help/collectives/conversations',
   },
   {
     id: 'celebrateSupporters',
+    learnMoreLink: null,
   },
   {
     id: 'getMonthlyReports',
+    learnMoreLink: null,
   },
 ];
 
@@ -154,26 +160,25 @@ const messages = defineMessages({
   },
 });
 
-const FeatureTitle = ({ feature, intl, activeFeature, ...props }) => {
-  const iconUrl =
-    activeFeature === feature ? `/static/images/${feature}-icon.png` : `/static/images/${feature}-icon-black.png`;
+const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
+  const iconUrl = activeFeature === id ? `/static/images/${id}-icon.png` : `/static/images/${id}-icon-black.png`;
 
   return (
     <Flex alignItems="center" justifyContent="space-between" width={1} {...props}>
       <Container display="flex" alignItems="center">
         <Box width={['36px', null, '64px']} height={['36px', null, '64px']} mr={[3, null, 2]}>
-          <Illustration src={iconUrl} alt={`${feature} icon`} />
+          <Illustration src={iconUrl} alt={`${id} icon`} />
         </Box>
         <Title
           color={['black.700', null, null]}
-          active={feature === activeFeature}
+          active={id === activeFeature}
           fontWeight={['500', null, 'bold']}
           textAlign="left"
           fontSize={['18px', null, '16px']}
           lineHeight={['26px', null, '22px']}
           letterSpacing={['-0.012em', null, '-0.008em']}
         >
-          {intl.formatMessage(messages[`home.feature.${feature}`])}
+          {intl.formatMessage(messages[`home.feature.${id}`])}
         </Title>
       </Container>
     </Flex>
@@ -181,12 +186,12 @@ const FeatureTitle = ({ feature, intl, activeFeature, ...props }) => {
 };
 
 FeatureTitle.propTypes = {
-  feature: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   activeFeature: PropTypes.string,
   intl: PropTypes.any.isRequired,
 };
 
-const FeatureDescription = ({ intl, feature, ...props }) => (
+const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
   <Box {...props}>
     <P
       fontSize={['Caption', 'LeadParagraph']}
@@ -195,53 +200,57 @@ const FeatureDescription = ({ intl, feature, ...props }) => (
       letterSpacing={'-0.016em'}
       textAlign="left"
     >
-      {intl.formatMessage(messages[`home.feature.${feature}.description`])}{' '}
-      <LearnMoreLink href="#">
-        <FormattedMessage id="home.feature.learnmore" defaultMessage="Learn more..." />
-      </LearnMoreLink>
+      {intl.formatMessage(messages[`home.feature.${id}.description`])}{' '}
+      {learnMoreLink && (
+        <LearnMoreLink href={learnMoreLink}>
+          <FormattedMessage id="home.feature.learnmore" defaultMessage="Learn more..." />
+        </LearnMoreLink>
+      )}
     </P>
   </Box>
 );
 
 FeatureDescription.propTypes = {
-  feature: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   intl: PropTypes.any.isRequired,
+  learnMoreLink: PropTypes.string,
 };
 
-const Feature = ({ feature, intl }) => (
+const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
-    <FeatureTitle intl={intl} feature={feature} activeFeature={feature} display={[null, null, 'none']} />
+    <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, null, 'none']} />
     <Container mb={[2, null, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
       <H4 display={['none', null, 'block']} letterSpacing="-0.4px" fontWeight="500" color="black.800" my={3}>
-        {intl.formatMessage(messages[`home.feature.${feature}`])}
+        {intl.formatMessage(messages[`home.feature.${id}`])}
       </H4>
-      <FeatureDescription intl={intl} feature={feature} display={['none', null, 'block']} />
+      <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', null, 'block']} />
     </Container>
     <Container width={[null, null, '609px', null, '735px']}>
       <Box display={['none', null, 'block']}>
         <Illustration
-          src={`/static/images/${feature}-screenshot.png`}
-          alt={intl.formatMessage(messages[`home.feature.${feature}`])}
+          src={`/static/images/${id}-screenshot.png`}
+          alt={intl.formatMessage(messages[`home.feature.${id}`])}
         />
       </Box>
       <Box display={['block', null, 'none']}>
         <Illustration
-          src={`/static/images/${feature}-screenshot-sm.png`}
-          alt={intl.formatMessage(messages[`home.feature.${feature}`])}
+          src={`/static/images/${id}-screenshot-sm.png`}
+          alt={intl.formatMessage(messages[`home.feature.${id}`])}
         />
       </Box>
     </Container>
-    <FeatureDescription intl={intl} feature={feature} display={['block', null, 'none']} mt={2} />
+    <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', null, 'none']} mt={2} />
   </Container>
 );
 
 Feature.propTypes = {
-  feature: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   intl: PropTypes.any.isRequired,
+  learnMoreLink: PropTypes.string,
 };
 
 const Features = () => {
-  const [activeFeature, setActiveFeature] = useState('shareBudget');
+  const [activeFeature, setActiveFeature] = useState(features[0]);
   const intl = useIntl();
 
   return (
@@ -266,10 +275,10 @@ const Features = () => {
             <FeatureList ml={[null, null, 4, null, 6]} mr={[null, null, null, null, 2]} as="li" key={feature.id}>
               <SelectFeatureButton
                 width={1}
-                onClick={() => setActiveFeature(feature.id)}
+                onClick={() => setActiveFeature(feature)}
                 active={activeFeature === feature.id}
               >
-                <FeatureTitle intl={intl} feature={feature.id} activeFeature={activeFeature} />
+                <FeatureTitle intl={intl} id={feature.id} activeFeature={activeFeature.id} />
               </SelectFeatureButton>
             </FeatureList>
           ))}
@@ -277,12 +286,12 @@ const Features = () => {
         <StyledCarousel display={[null, null, 'none']} width={1}>
           {features.map(feature => (
             <Fragment key={feature.id}>
-              <Feature feature={feature.id} intl={intl} />
+              <Feature id={feature.id} learnMoreLink={feature.learnMoreLink} intl={intl} />
             </Fragment>
           ))}
         </StyledCarousel>
         <Container display={['none', null, 'block']} height="672px">
-          <Feature feature={activeFeature} intl={intl} />
+          <Feature id={activeFeature.id} learnMoreLink={activeFeature.learnMoreLink} intl={intl} />
         </Container>
       </Flex>
     </Flex>
