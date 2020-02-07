@@ -101,6 +101,7 @@ module.exports = (server, app) => {
       res.json({
         coverage: global.__coverage__ || null,
       });
+      global.__coverage__ = {};
     });
   }
 
