@@ -204,6 +204,6 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Report Coverage
-        run: npm run test:coverage -- --env=CYPRESS_TEST_FILES
+        run: npm run test:coverage -- --build=E2E --env=CYPRESS_TEST_FILES
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
