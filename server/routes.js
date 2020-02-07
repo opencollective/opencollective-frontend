@@ -98,10 +98,19 @@ module.exports = (server, app) => {
   // This is used by Cypress to collect server side coverage
   if (process.env.NODE_ENV === 'e2e' || process.env.E2E_TEST) {
     server.get('/__coverage__', (req, res) => {
-      res.json({
-        coverage: global.__coverage__ || null,
-      });
-      global.__coverage__ = {};
+      console.log('__coverage__');
+      const coverage = global.__coverage__ || {};
+      console.log(Object.values(coverage).length, 'total coverage entries');
+      console.time('stringify');
+      const coverageStringified = JSON.stringify(coverage);
+      console.timeEnd('stringify');
+      console.log(coverageStringified.length, 'bytes for stringified coverage');
+      res.set('Content-Type', 'application/json');
+      console.time('send');
+      res.send(coverageStringified);
+      console.timeEnd('send');
+      // Reseting coverage
+      // global.__coverage__ = {};
     });
   }
 
