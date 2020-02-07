@@ -83,13 +83,13 @@ const WhatCanYouDo = () => {
         my={[3, 5]}
         flexDirection={['column', 'row']}
         alignItems="center"
-        justifyContent={[null, 'space-between', null, 'space-around']}
+        justifyContent={[null, 'space-between', null, 'center']}
         width={1}
       >
-        <Title textAlign="center" display={['block', null, 'none']}>
+        <Title textAlign="center" display={['block', 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
         </Title>
-        <Box width={[null, '448px', null, null, '576px', '583px']}>
+        <Box width={[null, '448px', null, null, '576px', '583px']} mr={[null, null, null, 5]}>
           <Illustration
             src="/static/images/collectmoney-illustration-md.png"
             display={['block', null, null, 'none']}
@@ -101,8 +101,8 @@ const WhatCanYouDo = () => {
             alt="Collect money"
           />
         </Box>
-        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left">
-          <Title display={['none', null, 'block']}>
+        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left" ml={[null, null, null, 5]}>
+          <Title display={['none', 'block']}>
             <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
           </Title>
           <Description>
@@ -117,13 +117,13 @@ const WhatCanYouDo = () => {
         my={[3, 5]}
         flexDirection={['column', 'row-reverse']}
         alignItems="center"
-        justifyContent={[null, 'space-between', null, 'space-around']}
+        justifyContent={[null, 'space-between', null, 'center']}
         width={1}
       >
-        <Title textAlign="center" display={['block', null, 'none']}>
+        <Title textAlign="center" display={['block', 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
         </Title>
-        <Box width={[null, '448px', null, null, '576px', '583px']}>
+        <Box width={[null, '448px', null, null, '576px', '583px']} ml={[null, null, null, 5]}>
           <Illustration
             src="/static/images/spendmoney-illustration-md.png"
             display={['block', null, null, 'none']}
@@ -135,8 +135,8 @@ const WhatCanYouDo = () => {
             alt="Spend money"
           />
         </Box>
-        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left">
-          <Title display={['none', null, 'block']}>
+        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left" mr={[null, null, null, 5]}>
+          <Title display={['none', 'block']}>
             <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
           </Title>
           <Description>
@@ -151,13 +151,13 @@ const WhatCanYouDo = () => {
         my={[3, 5]}
         flexDirection={['column', 'row']}
         alignItems="center"
-        justifyContent={[null, 'space-between', null, 'space-around']}
+        justifyContent={[null, 'space-between', null, 'center']}
         width={1}
       >
-        <Title textAlign="center" display={['block', null, 'none']}>
+        <Title textAlign="center" display={['block', 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
         </Title>
-        <Box width={[null, '448px', null, null, '576px', '583px']}>
+        <Box width={[null, '448px', null, null, '576px', '583px']} mr={[null, null, null, 5]}>
           <Illustration
             src="/static/images/managemoney-illustration-md.png"
             alt="Manage money"
@@ -169,8 +169,8 @@ const WhatCanYouDo = () => {
             display={['none', null, null, 'block']}
           />
         </Box>
-        <Box ml={[null, 4, 0]} width={[null, '352px', null, null, '368px', '408px']} textAlign="left">
-          <Title display={['none', null, 'block']}>
+        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left" ml={[null, 4, 0, 5]}>
+          <Title display={['none', 'block']}>
             <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
           </Title>
           <Description>
