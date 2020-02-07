@@ -157,7 +157,15 @@ jobs:
         if: steps.node-modules.outputs.cache-hit != 'true'
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
+      - name: Cache .next build
+        uses: actions/cache@v1
+        id: next-build
+        with:
+          path: .next
+          key: ${{ runner.os }}-next-build-${{ github.sha }}
+
       - name: Restore .next cache
+        if: steps.next-build.outputs.cache-hit != 'true'
         uses: actions/cache@v1
         with:
           path: .next/cache
@@ -165,12 +173,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-next-cache-${{ github.sha }}
             ${{ runner.os }}-next-cache-
-
-      - name: Cache build
-        uses: actions/cache@v1
-        with:
-          path: dist
-          key: ${{ runner.os }}-next-build-${{ github.sha }}
 
       - name: Build
         run: npm run build
