@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CreateCollective from '../components/CreateCollective_v2';
+import CreateCollective from '../components/create-collective/CreateCollective_v2';
 import ErrorPage from '../components/ErrorPage';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';

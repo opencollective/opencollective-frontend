@@ -1,22 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Page from './Page';
-import { Span, P, H1, H2, H3, H4, H5 } from './Text';
-import Container from './Container';
-import StyledButton from './StyledButton';
-import Illustration from './home/HomeIllustration';
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
-import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateCollectiveCover from './CreateCollectiveCover';
-import ErrorPage from './ErrorPage';
-import SignInOrJoinFree from './SignInOrJoinFree';
+import Page from '../Page';
+import ChooseCollectiveType from './sections/ChooseCollectiveType';
+import { Span, P, H1, H2, H3, H4, H5 } from '../Text';
+import Container from '../Container';
+import StyledButton from '../StyledButton';
+import Illustration from '../home/HomeIllustration';
+import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
+import CreateCollectiveForm from '../CreateCollectiveForm';
+import CreateCollectiveCover from '../CreateCollectiveCover';
+import ErrorPage from '../ErrorPage';
+import SignInOrJoinFree from '../SignInOrJoinFree';
 import { get } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import styled, { css } from 'styled-components';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Router, Link } from '../server/pages';
-import { withUser } from './UserProvider';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { Router, Link } from '../../server/pages';
+import { withUser } from '../UserProvider';
+import { getErrorFromGraphqlException } from '../../lib/utils';
 
 class CreateCollective extends React.Component {
   static propTypes = {
@@ -180,77 +181,10 @@ class CreateCollective extends React.Component {
       );
     }
 
-    const ExamplesLink = styled.a`
-      color: #297eff;
-
-      &:hover {
-        color: #dc5f7d;
-      }
-    `;
-
     return (
       <Page>
         <div className="CreateCollective">
-          <Flex flexDirection="column" justifyContent="center" alignItems="center" p={5}>
-            <H1
-              fontSize={['H3', null, 'H1']}
-              lineHeight={['H3', null, 'H1']}
-              fontWeight="bold"
-              textAlign="center"
-              mb={4}
-            >
-              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-            </H1>
-            <Box alignItems="center" p={3}>
-              <Flex justifyContent="center" alignItems="center" p={4}>
-                <Box alignItems="center" width={['400px']} p={3}>
-                  <Flex flexDirection="column" justifyContent="center" alignItems="center" p={1}>
-                    <Illustration
-                      src="/static/images/createcollective-opensource.png"
-                      display={['none', null, null, 'block']}
-                      alt="For open source projects"
-                    />
-                    <StyledButton buttonSize="large" buttonStyle="primary" mb={4} px={4}>
-                      <FormattedMessage id="createCollective.opensource" defaultMessage="For open source projects" />
-                    </StyledButton>
-                    <ExamplesLink href="#">
-                      <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
-                    </ExamplesLink>
-                  </Flex>
-                </Box>
-                <Box alignItems="center" width={['400px']} p={3}>
-                  <Flex flexDirection="column" justifyContent="center" alignItems="center" p={1}>
-                    <Illustration
-                      src="/static/images/createcollective-anycommunity.png"
-                      display={['none', null, null, 'block']}
-                      alt="For any community"
-                    />
-                    <StyledButton buttonSize="large" buttonStyle="primary" mb={4} px={4}>
-                      <FormattedMessage id="createCollective.anycommunity" defaultMessage="For any community" />
-                    </StyledButton>
-                    <ExamplesLink href="#">
-                      <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
-                    </ExamplesLink>
-                  </Flex>
-                </Box>
-                <Box alignItems="center" width={['400px']} p={3}>
-                  <Flex flexDirection="column" justifyContent="center" alignItems="center" p={1}>
-                    <Illustration
-                      src="/static/images/createcollective-climateinitiative.png"
-                      display={['none', null, null, 'block']}
-                      alt="For climate initiatives"
-                    />
-                    <StyledButton buttonSize="large" buttonStyle="primary" mb={4} px={4}>
-                      <FormattedMessage id="createCollective.climate" defaultMessage="For climate initiatives" />
-                    </StyledButton>
-                    <ExamplesLink href="#">
-                      <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
-                    </ExamplesLink>
-                  </Flex>
-                </Box>
-              </Flex>
-            </Box>
-          </Flex>
+          <ChooseCollectiveType />
         </div>
       </Page>
     );

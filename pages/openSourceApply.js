@@ -209,6 +209,18 @@ class OpenSourceApplyPage extends Component {
         >
           <FormattedMessage id="openSourceApply.GetStarted" defaultMessage="Get started" />
         </StyledButton>
+        <StyledButton
+          textAlign="center"
+          buttonSize="large"
+          buttonStyle="secondary"
+          onClick={() => {
+            window.location.replace(this.getGithubConnectUrl());
+          }}
+          loading={this.state.loadingRepos}
+          disabled={this.state.loadingRepos}
+        >
+          <FormattedMessage id="openSourceApply.ManualVerification" defaultMessage="Request manual verification" />
+        </StyledButton>
       </StyledCard>
     );
   }
