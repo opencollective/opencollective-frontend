@@ -110,7 +110,9 @@ module.exports = (server, app) => {
       res.send(coverageStringified);
       console.timeEnd('send');
       // Reseting coverage
-      // global.__coverage__ = {};
+      if (process.env.NODE_ENV === 'ci' && process.env.E2E_TEST) {
+        global.__coverage__ = {};
+      }
     });
   }
 
