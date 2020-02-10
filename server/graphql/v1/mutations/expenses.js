@@ -1,6 +1,7 @@
 import { get, omit, pick, flatten } from 'lodash';
 import errors from '../../../lib/errors';
 import roles from '../../../constants/roles';
+import expenseType from '../../../constants/expense_type';
 import statuses from '../../../constants/expense_status';
 import activities from '../../../constants/activities';
 import models, { sequelize } from '../../../models';
@@ -113,6 +114,16 @@ const checkExpenseAttachments = (expenseData, attachments) => {
     throw new ValidationFailed({
       message: `The sum of all attachments must be equal to the total expense's amount. Expense's total is ${expenseData.amount}, but the total of attachments was ${sumAttachments}.`,
     });
+  }
+
+  // If expense is a receipt (not an invoice) then files must be attached
+  if (expenseData.type === expenseType.RECEIPT) {
+    const hasMissingFiles = attachments.some(a => !a.url);
+    if (hasMissingFiles) {
+      throw new ValidationFailed({
+        message: 'Some attachments are missing a file',
+      });
+    }
   }
 };
 
