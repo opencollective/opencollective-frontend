@@ -28,7 +28,7 @@
     "bcrypt": "3.0.8",
     "bluebird": "3.7.2",
     "body-parser": "1.19.0",
-    "burner-email-providers": "1.0.11",
+    "burner-email-providers": "1.0.12",
     "cloudflare": "2.7.0",
     "cloudflare-ip": "0.0.7",
     "config": "3.2.5",
