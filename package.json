@@ -87,7 +87,7 @@
     "pg-connection-string": "2.1.0",
     "pg-format": "1.0.4",
     "prepend-http": "3.0.1",
-    "redis": "2.8.0",
+    "redis": "3.0.2",
     "request-as-curl": "0.1.0",
     "request-promise": "4.2.5",
     "sanitize-html": "1.21.1",
