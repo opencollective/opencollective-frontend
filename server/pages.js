@@ -9,6 +9,7 @@ const routes = require('next-routes');
 const pages = routes()
   .add('home', '/', 'index')
   .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring|pricing)', 'staticPage')
+  .add('pricing', '/pricing/v2', 'pricing')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
   .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
   .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
