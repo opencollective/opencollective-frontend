@@ -20,7 +20,11 @@ const query = {
   loggedInAccount: {
     type: Account,
     resolve(_, args, req) {
-      return models.Collective.findByPk(req.remoteUser.CollectiveId);
+      if (!req.remoteUser) {
+        return null;
+      } else {
+        return models.Collective.findByPk(req.remoteUser.CollectiveId);
+      }
     },
   },
 };
