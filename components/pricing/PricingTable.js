@@ -24,6 +24,8 @@ const PlanLink = styled(StyledLink).attrs({
   width: 72px;
   ${display};
   margin: auto;
+  white-space: nowrap;
+
   @media screen and (min-width: 64em) {
     width: 100px;
   }
