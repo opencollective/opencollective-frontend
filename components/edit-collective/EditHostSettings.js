@@ -35,7 +35,7 @@ const Plan = styled.div`
   ${({ active }) => (active ? `border: 1px solid rgb(143, 199, 255); border-radius: 16px; margin: 19px;` : '')}
 `;
 
-const PlanFeatures = styled.p`
+const PlanFeatures = styled.div`
   font-size: 1.1rem;
   text-align: center;
   min-height: 11rem;
@@ -81,7 +81,7 @@ const EditHostSettings = props => {
   return (
     <div className="ExportData">
       <h3>
-        <FormattedMessage id="collective.hostSettings.changePlan.title" defaultMessage="Host Plan" />
+        <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
       </h3>
 
       <PlanGrid>
@@ -108,8 +108,11 @@ const EditHostSettings = props => {
 
           let verb = isCurrentPlan ? 'Subscribed' : 'Subscribe';
           // Rename verb to Upgrade/Downgrade if subscribed to active Tier
-          if (subscribedTier && subscribedTier.amount > tier.amount) verb = 'Downgrade';
-          else if (subscribedTier && subscribedTier.amount < tier.amount) verb = 'Upgrade';
+          if (subscribedTier && subscribedTier.amount > tier.amount) {
+            verb = 'Downgrade';
+          } else if (subscribedTier && subscribedTier.amount < tier.amount) {
+            verb = 'Upgrade';
+          }
 
           return (
             <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>

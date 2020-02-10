@@ -352,7 +352,7 @@ class TierPage extends Component {
                       }}
                     >
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
-                        <FormattedMessage id="Tier.Contribute" defaultMessage="Contribute" />
+                        <FormattedMessage id="Contribute" defaultMessage="Contribute" />
                       </StyledButton>
                     </Link>
                   )}

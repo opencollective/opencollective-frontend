@@ -45,7 +45,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         isArchived: true,
       });
     } catch (err) {
-      console.error('>>> archiveCollective error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }
@@ -62,7 +61,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         isArchived: false,
       });
     } catch (err) {
-      console.error('>>> archiveCollective error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       setArchiveStatus({ ...archiveStatus, processing: false, error: errorMsg });
     }
@@ -106,7 +104,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         >
           <FormattedMessage
             values={{ type: collectiveType.toLowerCase() }}
-            id="collective.archive.button"
+            id="collective.archive.title"
             defaultMessage={'Archive this {type}'}
           />
         </StyledButton>
@@ -126,7 +124,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         <P color="rgb(224, 183, 0)">
           <FormattedMessage
             id="collective.archive.isHost"
-            defaultMessage={"You can't archive your collective while being a Host, please Desactivate as Host first."}
+            defaultMessage={"You can't archive your collective while being a Host, please deactivate as Host first."}
           />
         </P>
       )}
@@ -166,7 +164,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
             <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
-              <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
+              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton
               buttonStyle="primary"

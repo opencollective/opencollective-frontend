@@ -60,10 +60,6 @@ class SubscriptionCard extends React.Component {
         id: 'subscription.pastDue.msg',
         defaultMessage: 'Update payment info',
       },
-      'subscription.whyPastDueTitle': {
-        id: 'subscription.whyPastDueTitle',
-        defaultMessage: 'Update payment info',
-      },
       'subscription.whyPastDueText': {
         id: 'subscription.whyPastDueText',
         defaultMessage:
@@ -177,7 +173,7 @@ class SubscriptionCard extends React.Component {
     const menuItemStyle = { margin: '0rem', fontSize: '12px' };
 
     const popover = (
-      <Popover id="popover-positioned-bottom" title={intl.formatMessage(this.messages['subscription.whyPastDueTitle'])}>
+      <Popover id="popover-positioned-bottom" title={intl.formatMessage(this.messages['subscription.pastDue.msg'])}>
         {intl.formatMessage(this.messages['subscription.whyPastDueText'])}
       </Popover>
     );
@@ -525,7 +521,7 @@ class SubscriptionCard extends React.Component {
                 </div>
                 <div className="update-buttons">
                   <SmallButton className="no" onClick={this.resetState}>
-                    <FormattedMessage id="subscription.updateAmount.cancel.btn" defaultMessage="Cancel" />
+                    <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                   </SmallButton>
                   <SmallButton
                     className="yes"
@@ -604,7 +600,7 @@ class SubscriptionCard extends React.Component {
               Cancel this subscription?
               <div className="cancel-buttons">
                 <SmallButton className="no" onClick={this.resetState}>
-                  <FormattedMessage id="subscription.cancel.no.btn" defaultMessage="no" />
+                  <FormattedMessage id="no" defaultMessage="No" />
                 </SmallButton>
                 <CancelSubscriptionBtn id={subscription.id} onError={this.onError} />
               </div>

@@ -95,9 +95,9 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.changeUrl.label',
         defaultMessage: 'URL slug',
       },
-      'type.label': { id: 'collective.type.label', defaultMessage: 'type' },
-      'name.label': { id: 'collective.name.label', defaultMessage: 'name' },
-      'tags.label': { id: 'collective.tags.label', defaultMessage: 'Tags' },
+      'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
+      'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
+      'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'collective.tos.label',
         defaultMessage: 'Terms of Service',
@@ -119,8 +119,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Start with a @ to reference an organization (e.g. @airbnb)',
       },
       'amount.label': {
-        id: 'collective.amount.label',
-        defaultMessage: 'amount',
+        id: 'Fields.amount',
+        defaultMessage: 'Amount',
       },
       'description.label': {
         id: 'collective.description.label',
@@ -141,7 +141,7 @@ class EditCollectiveForm extends React.Component {
           'For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.',
       },
       'startsAt.label': {
-        id: 'collective.startsAt.label',
+        id: 'startDateAndTime',
         defaultMessage: 'start date and time',
       },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
@@ -149,25 +149,9 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.backgroundImage.label',
         defaultMessage: 'Cover image',
       },
-      'twitterHandle.label': {
-        id: 'collective.twitterHandle.label',
-        defaultMessage: 'Twitter',
-      },
-      'githubHandle.label': {
-        id: 'collective.githubHandle.label',
-        defaultMessage: 'Github',
-      },
       'website.label': {
-        id: 'collective.website.label',
+        id: 'Fields.website',
         defaultMessage: 'Website',
-      },
-      'markdown.label': {
-        id: 'collective.markdown.label',
-        defaultMessage: 'Default editor',
-      },
-      'markdown.description': {
-        id: 'collective.markdown.description',
-        defaultMessage: 'Use markdown editor',
       },
       'sendInvoiceByEmail.label': {
         id: 'collective.sendInvoiceByEmail.label',
@@ -186,7 +170,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
       'hostFeePercent.label': {
-        id: 'collective.hostFeePercent.label',
+        id: 'HostFee',
         defaultMessage: 'Host fee',
       },
       'hostFeePercent.description': {
@@ -261,14 +245,18 @@ class EditCollectiveForm extends React.Component {
         'expenses',
       ];
       let section = hash.substr(1);
-      if (section === 'connectedAccounts') section = 'connected-accounts';
-      else if (section === 'paymentMethods') section = 'payment-methods';
-      if (legacySections.includes(section))
+      if (section === 'connectedAccounts') {
+        section = 'connected-accounts';
+      } else if (section === 'paymentMethods') {
+        section = 'payment-methods';
+      }
+      if (legacySections.includes(section)) {
         Router.pushRoute('editCollective', {
           ...this.props.router.query,
           slug: this.props.collective.slug,
           section: section,
         });
+      }
     }
   }
 
@@ -371,7 +359,7 @@ class EditCollectiveForm extends React.Component {
           defaultType={this.defaultTierType}
         />
       );
-    } else if (section === EDIT_COLLECTIVE_SECTIONS.GOALS) {
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS) {
       return <EditGoals collective={collective} currency={collective.currency} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST) {
       return (
@@ -468,6 +456,7 @@ class EditCollectiveForm extends React.Component {
           pre: 'https://twitter.com/',
           maxLength: 255,
           placeholder: '',
+          label: 'Twitter',
         },
         {
           name: 'githubHandle',
@@ -475,6 +464,7 @@ class EditCollectiveForm extends React.Component {
           pre: 'https://github.com/',
           maxLength: 39,
           placeholder: '',
+          label: 'Github',
         },
         {
           name: 'website',
@@ -607,14 +597,6 @@ class EditCollectiveForm extends React.Component {
           post: '%',
           defaultValue: get(this.state.collective, 'settings.hostFeePercent'),
           when: () => this.state.section === 'advanced' && collective.isHost,
-        },
-        {
-          name: 'markdown',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'settings.editor') === 'markdown',
-          when: () =>
-            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'COLLECTIVE'),
         },
       ],
     };

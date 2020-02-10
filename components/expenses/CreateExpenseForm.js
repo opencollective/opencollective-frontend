@@ -181,8 +181,9 @@ class CreateExpenseForm extends React.Component {
         loading: false,
       });
     } catch (e) {
+      // TODO: this should be reported to the user
+      console.error('CreateExpenseForm > onSubmit > error', e);
       this.setState({ loading: false });
-      console.error('CreateExpenseForm onSubmit error', e);
     }
     return false;
   }
@@ -377,7 +378,7 @@ class CreateExpenseForm extends React.Component {
             <div className="row">
               <div className="col large">
                 <label>
-                  <FormattedMessage id="expense.description" defaultMessage="description" />
+                  <FormattedMessage id="Fields.description" defaultMessage="Description" />
                 </label>
                 <div className="description">
                   <span className="description">
@@ -396,7 +397,7 @@ class CreateExpenseForm extends React.Component {
 
             <div className="col">
               <label>
-                <FormattedMessage id="expense.amount" defaultMessage="amount" />
+                <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
               </label>
               <div className="amountDetails">
                 <span className="amount">
@@ -515,7 +516,7 @@ class CreateExpenseForm extends React.Component {
               <div>
                 <Button className="blue" type="submit" disabled={this.state.loading || !this.state.isExpenseValid}>
                   {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-                  {!this.state.loading && <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />}
+                  {!this.state.loading && <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />}
                 </Button>
               </div>
 
@@ -528,7 +529,7 @@ class CreateExpenseForm extends React.Component {
   }
 
   render() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, collective } = this.props;
 
     if (!LoggedInUser) {
       return (
@@ -537,6 +538,17 @@ class CreateExpenseForm extends React.Component {
             <FormattedMessage id="expenses.create.login" defaultMessage="Sign up or login to submit an expense." />
           </P>
           <SignInOrJoinFree />
+        </div>
+      );
+    } else if (collective.isArchived) {
+      return (
+        <div className="CreateExpenseForm">
+          <P textAlign="center" mt={4} fontSize="LeadParagraph" lineHeight="LeadParagraph">
+            <FormattedMessage
+              id="expenses.create.archived"
+              defaultMessage="Cannot submit expenses for an archived collective."
+            />
+          </P>
         </div>
       );
     } else {

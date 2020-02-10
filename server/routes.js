@@ -32,6 +32,11 @@ module.exports = (server, app) => {
     next();
   });
 
+  server.use('/_next/static', (req, res, next) => {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    next();
+  });
+
   server.use((req, res, next) => {
     if (req.query.language && intl.languages.includes(req.query.language) && req.query.set) {
       res.cookie('language', req.language);
@@ -89,6 +94,16 @@ module.exports = (server, app) => {
       res.send('User-agent: *\nAllow: /');
     }
   });
+
+  // This is used by Cypress to collect server side coverage
+  if (process.env.NODE_ENV === 'e2e' || process.env.E2E_TEST) {
+    server.get('/__coverage__', (req, res) => {
+      res.json({
+        coverage: global.__coverage__ || null,
+      });
+      global.__coverage__ = {};
+    });
+  }
 
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';

@@ -157,16 +157,16 @@ class CreatePledgePage extends React.Component {
       defaultMessage: 'Make a Pledge',
     },
     'frequency.monthly': {
-      id: 'createPledge.monthly',
+      id: 'Frequency.Monthly',
       defaultMessage: 'Monthly',
     },
     'frequency.yearly': {
-      id: 'createPledge.yearly',
+      id: 'Frequency.Yearly',
       defaultMessage: 'Yearly',
     },
     'frequency.oneTime': {
-      id: 'createPledge.oneTime',
-      defaultMessage: 'One-Time',
+      id: 'Frequency.OneTime',
+      defaultMessage: 'One time',
     },
   });
 
@@ -379,14 +379,14 @@ class CreatePledgePage extends React.Component {
                       >
                         <Flex flexDirection="column" mb={3} pr={[0, null, 3]}>
                           <P {...labelStyles} htmlFor="name">
-                            <FormattedMessage id="createPledge.name" defaultMessage="Name" />
+                            <FormattedMessage id="Fields.name" defaultMessage="Name" />
                           </P>
                           <TextInput name="name" id="name" defaultValue={name} />
                         </Flex>
 
                         <Flex flexDirection="column" mb={3}>
                           <P {...labelStyles} htmlFor="slug">
-                            <FormattedMessage id="createPledge.collectiveURL" defaultMessage="Collective URL" />
+                            <FormattedMessage id="Collective.URL" defaultMessage="Collective URL" />
                           </P>
                           <StyledInputGroup
                             prepend="https://opencollective.com/"
@@ -445,7 +445,7 @@ class CreatePledgePage extends React.Component {
 
                     <Flex flexDirection="column" mb={3} width={200}>
                       <P {...labelStyles} htmlFor="interval">
-                        <FormattedMessage id="createPledge.frequency" defaultMessage="Frequency" />
+                        <FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />
                       </P>
                       <select id="interval" name="interval" defaultValue="monthly">
                         <option key="monthly" value="month">

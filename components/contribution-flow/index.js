@@ -9,8 +9,9 @@ import styled from 'styled-components';
 import { isURL } from 'validator';
 import uuid from 'uuid/v4';
 import * as LibTaxes from '@opencollective/taxes';
+import { URLSearchParams } from 'universal-url';
 
-import { OPENSOURCE_COLLECTIVE_ID, CollectiveType } from '../../lib/constants/collectives';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
@@ -120,6 +121,7 @@ class CreateOrderPage extends React.Component {
       name: PropTypes.string.isRequired,
       location: PropTypes.shape({ country: PropTypes.string }),
       settings: PropTypes.object,
+      connectedAccounts: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     skipStepDetails: PropTypes.bool,
     tier: PropTypes.shape({
@@ -471,10 +473,14 @@ class CreateOrderPage extends React.Component {
       this.props.onSuccess();
     }
     if (this.props.redirect && this.isValidRedirect(this.props.redirect)) {
-      const orderId = get(orderCreated, 'id', null);
-      const transactionId = get(orderCreated, 'transactions[0].id', null);
-      const status = orderCreated.status;
-      const redirectTo = `${this.props.redirect}?orderId=${orderId}&transactionid=${transactionId}&status=${status}`;
+      const urlParams = new URLSearchParams({
+        orderId: get(orderCreated, 'id', null),
+        orderIdV2: get(orderCreated, 'idV2', null),
+        transactionid: get(orderCreated, 'transactions[0].id', null),
+        transactionIdV2: get(orderCreated, 'transactions[0].idV2', null),
+        status: orderCreated.status,
+      });
+      const redirectTo = `${this.props.redirect}?${urlParams.toString()}`;
       window.location.href = redirectTo;
     } else {
       this.pushStepRoute('success', { OrderId: orderCreated.id });
@@ -509,7 +515,9 @@ class CreateOrderPage extends React.Component {
     if (this.props.contributeAs) {
       const otherProfiles = this.getOtherProfiles();
       const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.contributeAs);
-      if (contributorProfile) return contributorProfile;
+      if (contributorProfile) {
+        return contributorProfile;
+      }
     }
     if (get(this.state, 'stepProfile')) {
       return this.state.stepProfile;
@@ -522,7 +530,9 @@ class CreateOrderPage extends React.Component {
   /** Returns logged-in user profile */
   getPersonalProfile() {
     const { LoggedInUser } = this.props;
-    if (!LoggedInUser) return {};
+    if (!LoggedInUser) {
+      return {};
+    }
 
     return { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
   }
@@ -530,7 +540,9 @@ class CreateOrderPage extends React.Component {
   /** Return an array of any other associated profile the user might control */
   getOtherProfiles() {
     const { LoggedInUser, collective } = this.props;
-    if (!LoggedInUser) return [];
+    if (!LoggedInUser) {
+      return [];
+    }
 
     return LoggedInUser.memberOf
       .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
@@ -737,7 +749,11 @@ class CreateOrderPage extends React.Component {
 
   /* We only support paypal for one time donations to the open source collective for now. */
   hasPaypal() {
-    return this.props.host.id === OPENSOURCE_COLLECTIVE_ID && !get(this.state, 'stepDetails.interval');
+    return (
+      !get(this.state, 'stepDetails.interval') &&
+      this.props.host.connectedAccounts &&
+      Boolean(this.props.host.connectedAccounts.find(ca => ca.service === 'paypal'))
+    );
   }
 
   /* We might have problems with postal code and this should be disablable */
@@ -975,6 +991,7 @@ class CreateOrderPage extends React.Component {
           {isPaypal && step.isLastStep ? (
             <PaypalButtonContainer>
               <PayWithPaypalButton
+                host={this.props.host}
                 totalAmount={this.getTotalAmountWithTaxes()}
                 currency={this.getCurrency()}
                 style={{ size: 'responsive', height: 55 }}
@@ -1053,6 +1070,7 @@ class CreateOrderPage extends React.Component {
 const SubmitOrderFragment = gql`
   fragment SubmitOrderFragment on OrderType {
     id
+    idV2
     status
     stripeError {
       message
@@ -1061,6 +1079,7 @@ const SubmitOrderFragment = gql`
     }
     transactions {
       id
+      idV2
     }
   }
 `;

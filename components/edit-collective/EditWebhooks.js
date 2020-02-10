@@ -143,7 +143,9 @@ class EditWebhooks extends React.Component {
 
   removeWebhook = index => {
     const { webhooks } = this.state;
-    if (index < 0 || index > webhooks.length) return;
+    if (index < 0 || index > webhooks.length) {
+      return;
+    }
     webhooks.splice(index, 1);
     this.setState({ webhooks, modified: true });
   };

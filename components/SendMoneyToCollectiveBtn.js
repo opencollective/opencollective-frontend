@@ -48,7 +48,6 @@ class SendMoneyToCollectiveBtn extends React.Component {
     } = this.props;
     if (!paymentMethods || paymentMethods.length === 0) {
       const error = "We couldn't find a payment method to make this transaction";
-      console.error(error);
       this.setState({ error });
       return;
     }
@@ -62,8 +61,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       paymentMethod: { uuid: paymentMethods[0].uuid },
     };
     try {
-      const res = await this.props.createOrder(order);
-      console.log('>>> createOrder result:', res);
+      await this.props.createOrder(order);
       this.setState({ loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');

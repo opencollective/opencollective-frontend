@@ -34,7 +34,6 @@ describe('EditEventForm component', () => {
       .first()
       .simulate('click');
     component.find('.actions Button').simulate('click');
-    // console.log("labels", component.find('label').map(node => node.text()));
     expect(
       component
         .find('label')

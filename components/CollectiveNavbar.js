@@ -167,47 +167,47 @@ const CollectiveName = styled.h1`
 
 const i18nSection = defineMessages({
   [Sections.CONTRIBUTE]: {
-    id: 'CollectivePage.NavBar.Contribute',
+    id: 'Contribute',
     defaultMessage: 'Contribute',
   },
   [Sections.CONVERSATIONS]: {
-    id: 'CollectivePage.NavBar.Conversations',
+    id: 'conversations',
     defaultMessage: 'Conversations',
   },
   [Sections.BUDGET]: {
-    id: 'CollectivePage.NavBar.Budget',
+    id: 'section.budget.title',
     defaultMessage: 'Budget',
   },
   [Sections.CONTRIBUTORS]: {
-    id: 'CollectivePage.NavBar.Contributors',
+    id: 'section.contributors.title',
     defaultMessage: 'Contributors',
   },
   [Sections.ABOUT]: {
-    id: 'CollectivePage.NavBar.About',
+    id: 'collective.about.title',
     defaultMessage: 'About',
   },
   [Sections.UPDATES]: {
-    id: 'CollectivePage.NavBar.Updates',
+    id: 'section.updates.title',
     defaultMessage: 'Updates',
   },
   [Sections.CONTRIBUTIONS]: {
-    id: 'CollectivePage.NavBar.Contributions',
+    id: 'Contributions',
     defaultMessage: 'Contributions',
   },
   [Sections.TRANSACTIONS]: {
-    id: 'CollectivePage.NavBar.Transactions',
+    id: 'SectionTransactions.Title',
     defaultMessage: 'Transactions',
   },
   [Sections.GOALS]: {
-    id: 'CollectivePage.NavBar.Goals',
+    id: 'Goals',
     defaultMessage: 'Goals',
   },
   [Sections.TICKETS]: {
-    id: 'CollectivePage.NavBar.Tickets',
+    id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
   [Sections.LOCATION]: {
-    id: 'CollectivePage.NavBar.Location',
+    id: 'SectionLocation.Title',
     defaultMessage: 'Location',
   },
   [Sections.PARTICIPANTS]: {
@@ -388,8 +388,12 @@ const CollectiveNavbar = ({
               key={section}
               isSelected={section === selected}
               onClick={() => {
-                if (isExpended) setExpended(false);
-                if (onSectionClick) onSectionClick(section);
+                if (isExpended) {
+                  setExpended(false);
+                }
+                if (onSectionClick) {
+                  onSectionClick(section);
+                }
               }}
             >
               <MenuLink

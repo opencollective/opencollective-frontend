@@ -115,7 +115,6 @@ class CreateCollective extends React.Component {
     delete CollectiveInputType.category;
     delete CollectiveInputType.tos;
     delete CollectiveInputType.hostTos;
-    console.log('>>> creating collective ', CollectiveInputType);
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
@@ -142,7 +141,6 @@ class CreateCollective extends React.Component {
         Router.pushRoute('editCollective', { slug: collective.slug, section: 'host' });
       }
     } catch (err) {
-      console.error('>>> createCollective error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', result: { error: errorMsg } });
       throw new Error(errorMsg);

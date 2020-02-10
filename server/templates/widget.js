@@ -8,8 +8,12 @@
   window.OC = window.OC || {};
   window.OC.widgets = { '{{widget}}': [] };
   window.addEventListener('message', e => {
-    if (e.origin !== '{{host}}') return;
-    if (typeof e.data !== 'string' || e.data.substr(0, 3) !== 'oc-') return;
+    if (e.origin !== '{{host}}') {
+      return;
+    }
+    if (typeof e.data !== 'string' || e.data.substr(0, 3) !== 'oc-') {
+      return;
+    }
     const data = JSON.parse(e.data.substr(3));
     const widget = data.id.substr(0, data.id.indexOf('-'));
     for (let i = 0; i < window.OC.widgets[widget].length; i++) {
@@ -23,7 +27,9 @@
 
   function css(selector, property) {
     const element = document.querySelector(selector);
-    if (!element) return null;
+    if (!element) {
+      return null;
+    }
     return window.getComputedStyle(element, null).getPropertyValue(property);
   }
 

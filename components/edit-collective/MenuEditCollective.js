@@ -58,11 +58,11 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Expenses Policy',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
-    id: 'editCollective.menu.host',
+    id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: {
-    id: 'editCollective.menu.hostSettings',
+    id: 'Host Plan',
     defaultMessage: 'Host Plan',
   },
   [EDIT_COLLECTIVE_SECTIONS.IMAGES]: {

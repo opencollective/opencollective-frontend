@@ -30,11 +30,13 @@ class ExpensesSection extends React.Component {
     if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
       action = {
         href: `/${collective.slug}/expenses/new`,
-        label: <FormattedMessage id="expense.new.submit" defaultMessage="Submit Expense" />,
+        label: <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />,
       };
     }
 
-    if (!collective) return <NotFound />;
+    if (!collective) {
+      return <NotFound />;
+    }
 
     // We don't show the Budget section on event if there is no transaction
     if (collective.type === 'EVENT' && this.totalTransactions === 0) {

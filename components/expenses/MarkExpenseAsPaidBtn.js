@@ -7,7 +7,6 @@ import { get } from 'lodash';
 import { isValidEmail, getErrorFromGraphqlException } from '../../lib/utils';
 
 import StyledButton from '../StyledButton';
-import { P } from '../Text';
 import StyledTooltip from '../StyledTooltip';
 import { payExpenseMutation } from './graphql/mutations';
 import StyledSpinner from '../StyledSpinner';
@@ -25,6 +24,7 @@ class MarkExpenseAsPaidBtn extends React.Component {
     mutate: PropTypes.func,
     refetch: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    onError: PropTypes.func,
   };
 
   constructor(props) {
@@ -64,14 +64,15 @@ class MarkExpenseAsPaidBtn extends React.Component {
       unlock();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
-      this.setState({ error, loading: false });
+      this.props.onError(error);
+      this.setState({ loading: false });
       unlock();
     }
   }
 
   render() {
     const { collective, expense, intl } = this.props;
-    const { loading, error } = this.state;
+    const { loading } = this.state;
     let disabled = this.state.loading || this.props.disabled;
     let disabledMessage = '';
 
@@ -99,7 +100,7 @@ class MarkExpenseAsPaidBtn extends React.Component {
       >
         {loading ? (
           <React.Fragment>
-            <StyledSpinner /> <FormattedMessage id="expense.payExpenseBtn.processing" defaultMessage="Processing..." />
+            <StyledSpinner /> <FormattedMessage id="ProcessingWithDots" defaultMessage="Processing…" />
           </React.Fragment>
         ) : (
           <FormattedMessage id="expense.pay.manual.btn" defaultMessage="Record as paid" />
@@ -115,11 +116,6 @@ class MarkExpenseAsPaidBtn extends React.Component {
           <StyledTooltip display="grid" content={disabledMessage}>
             {button}
           </StyledTooltip>
-        )}
-        {error && (
-          <P color="red.500" pr={2}>
-            {error}
-          </P>
         )}
       </React.Fragment>
     );

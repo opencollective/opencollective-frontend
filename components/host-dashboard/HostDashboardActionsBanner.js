@@ -94,11 +94,11 @@ class HostDashboardActionsBanner extends React.Component {
     if (form.totalAmount === 0) {
       const error = intl.formatMessage(this.messages['addFunds.error.amountMustBeGreatherThanZero']);
       this.setState({ error });
-      return console.error(error);
+      return;
     } else if (!form.FromCollectiveId) {
       const error = intl.formatMessage(this.messages.addFundsMissingFromCollective);
       this.setState({ error });
-      return console.error(error);
+      return;
     }
 
     this.setState({ loading: true });
@@ -113,7 +113,7 @@ class HostDashboardActionsBanner extends React.Component {
         error: "This host doesn't have an opencollective payment method",
         loading: false,
       });
-      return console.error('>>> payment methods: ', hostCollective.paymentMethods);
+      return;
     }
     order.paymentMethod = {
       uuid: pm.uuid,
@@ -149,7 +149,7 @@ class HostDashboardActionsBanner extends React.Component {
     }
 
     const hostAddedFundsLimit = get(host, 'plan.addedFundsLimit');
-    const hostHasFunds = (hostAddedFundsLimit && get(host, 'plan.addedFunds') < hostAddedFundsLimit) === true;
+    const hostCanAddFunds = hostAddedFundsLimit === null || get(host, 'plan.addedFunds') < hostAddedFundsLimit;
 
     const allCollectivesLabel = intl.formatMessage(this.messages.allCollectives);
     const customOptions = selectedCollective ? [{ label: allCollectivesLabel, value: null }] : undefined;
@@ -187,10 +187,10 @@ class HostDashboardActionsBanner extends React.Component {
             )}
             {selectedCollective && !this.state.showAddFunds && this.canEdit() && (
               <React.Fragment>
-                <StyledButton onClick={this.toggleAddFunds} disabled={!hostHasFunds}>
+                <StyledButton onClick={this.toggleAddFunds} disabled={!hostCanAddFunds}>
                   <FormattedMessage id="addfunds.submit" defaultMessage="Add Funds" />
                 </StyledButton>
-                {!hostHasFunds && (
+                {!hostCanAddFunds && (
                   <Disclaimer>
                     <FormattedMessage
                       id="addFunds.error.planLimitReached"

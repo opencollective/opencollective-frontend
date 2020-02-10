@@ -53,7 +53,7 @@ class CommentsWithData extends React.Component {
   }
 
   renderUserAction(LoggedInUser, expense, notice) {
-    if (!LoggedInUser)
+    if (!LoggedInUser) {
       return (
         <div>
           <hr />
@@ -62,6 +62,7 @@ class CommentsWithData extends React.Component {
           </LoginBtn>
         </div>
       );
+    }
     return <CommentForm onSubmit={this.createComment} LoggedInUser={LoggedInUser} notice={notice} />;
   }
 
@@ -69,8 +70,7 @@ class CommentsWithData extends React.Component {
     const { data, LoggedInUser, collective, expense, view, fetchMore, deleteComment, editComment } = this.props;
     const { expense: expenseComments, error } = data;
     if (error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={error.message} />;
     }
 
     let comments;

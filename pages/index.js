@@ -478,7 +478,7 @@ class HomePage extends React.Component {
             <Container display="flex" flexDirection={['column', null, 'row']} maxWidth={1200} mx="auto">
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.sponsor" defaultMessage="Become a sponsor" />
+                  <FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" />
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
@@ -522,7 +522,7 @@ class HomePage extends React.Component {
                       fontWeight="bold"
                       textAlign="center"
                     >
-                      <FormattedMessage id="home.sponsor" defaultMessage="Become a sponsor" />
+                      <FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" />
                     </StyledLink>
                   </Link>
                 </Flex>
@@ -613,7 +613,7 @@ class HomePage extends React.Component {
             >
               <Container width={[1, null, 0.5]}>
                 <H2 {...sectionHeadingStyles}>
-                  <FormattedMessage id="home.contribute" defaultMessage="Contribute" /> 🙌
+                  <FormattedMessage id="Contribute" defaultMessage="Contribute" /> 🙌
                 </H2>
 
                 <H4 {...sectionSubHeadingStyles}>
@@ -783,7 +783,7 @@ class HomePage extends React.Component {
                       <Currency value={totalAnnualBudget} abbreviate currency="USD" />
                     </P>
                     <P>
-                      <FormattedMessage id="home.totalContributed" defaultMessage="contributed" />
+                      <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />
                     </P>
                   </Container>
                 </Container>

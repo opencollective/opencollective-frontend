@@ -133,32 +133,6 @@ class GoalsCover extends React.Component {
     this.updateGoals = debounce(this.updateGoals.bind(this), 100, { maxWait: 200 });
     this.labelsRefs = {};
     this.messages = defineMessages({
-      admin: { id: 'menu.admin', defaultMessage: 'admin' },
-      backer: { id: 'menu.backer', defaultMessage: 'backer' },
-      attendee: { id: 'menu.attendee', defaultMessage: 'attendee' },
-      fundraiser: { id: 'menu.fundraiser', defaultMessage: 'fundraiser' },
-      parenting: { id: 'menu.parenting', defaultMessage: 'member collectives' },
-      about: { id: 'menu.about', defaultMessage: 'about' },
-      events: { id: 'menu.events', defaultMessage: 'events' },
-      updates: { id: 'menu.updates', defaultMessage: 'updates' },
-      budget: { id: 'menu.budget', defaultMessage: 'budget' },
-      contributors: { id: 'menu.contributors', defaultMessage: 'contributors' },
-      'menu.edit.collective': {
-        id: 'menu.edit.collective',
-        defaultMessage: 'edit collective',
-      },
-      'menu.edit.user': {
-        id: 'menu.edit.user',
-        defaultMessage: 'edit profile',
-      },
-      'menu.edit.organization': {
-        id: 'menu.edit.organization',
-        defaultMessage: 'edit organization',
-      },
-      'menu.edit.event': {
-        id: 'menu.edit.event',
-        defaultMessage: 'edit event',
-      },
       'bar.balance': {
         id: 'cover.bar.balance',
         defaultMessage: "Today's Balance",
@@ -261,8 +235,11 @@ class GoalsCover extends React.Component {
 
     // Animate only the most advanced one
     if (goals.length === 2) {
-      if (goals[0].amount <= goals[1].amount) goals[0].animateProgress = false;
-      else goals[1].animateProgress = false;
+      if (goals[0].amount <= goals[1].amount) {
+        goals[0].animateProgress = false;
+      } else {
+        goals[1].animateProgress = false;
+      }
     }
 
     return goals;
@@ -375,10 +352,15 @@ class GoalsCover extends React.Component {
       maxCustomGoalsToShow = 0;
     } else {
       availWidth = get(window, 'screen.availWidth') || 560;
-      if (availWidth <= 560) maxCustomGoalsToShow = 0;
-      else if (availWidth < 728) maxCustomGoalsToShow = 1;
-      else if (availWidth < 896) maxCustomGoalsToShow = 2;
-      else if (availWidth < 1120) maxCustomGoalsToShow = 3;
+      if (availWidth <= 560) {
+        maxCustomGoalsToShow = 0;
+      } else if (availWidth < 728) {
+        maxCustomGoalsToShow = 1;
+      } else if (availWidth < 896) {
+        maxCustomGoalsToShow = 2;
+      } else if (availWidth < 1120) {
+        maxCustomGoalsToShow = 3;
+      }
     }
 
     // Get all goals sorted by amount
@@ -430,8 +412,12 @@ class GoalsCover extends React.Component {
       // on server side to avoid getting the marker stuck while waiting for
       // re-hydrating
       if (goal.animateProgress && !isLastGoal) {
-        if (isServerSide) goal.hidden = true;
-        if (isInitialRender) goal.progress = 0;
+        if (isServerSide) {
+          goal.hidden = true;
+        }
+        if (isInitialRender) {
+          goal.progress = 0;
+        }
       }
     }
 

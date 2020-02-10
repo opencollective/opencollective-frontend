@@ -34,8 +34,9 @@ class ConnectPaypal extends React.Component {
       this.props.onClickRefillBalance(); // save the current filter preferences before redirect
       window.location.replace(json.redirectUrl);
     } catch (e) {
-      this.setState({ connectingPaypal: false });
+      // TODO: this should be reported to the user
       console.error(e);
+      this.setState({ connectingPaypal: false });
     }
   }
 
@@ -147,7 +148,7 @@ class ConnectPaypal extends React.Component {
                 <div>
                   <SmallButton onClick={this.connectPaypal} disabled={this.state.connectingPaypal}>
                     {this.state.connectingPaypal ? (
-                      <FormattedMessage id="ConnectPaypal.processing" defaultMessage="Processing..." />
+                      <FormattedMessage id="ProcessingWithDots" defaultMessage="Processing…" />
                     ) : (
                       <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
                     )}

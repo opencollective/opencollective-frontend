@@ -86,7 +86,6 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective }) => {
                         setError(null);
                         return null;
                       } catch (e) {
-                        console.error(e);
                         return finalizeWithError(e.message && e.message.replace(/GraphQL error:/, ''));
                       }
                     }}

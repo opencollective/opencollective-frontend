@@ -99,7 +99,7 @@ class MenuBar extends React.Component {
         defaultMessage: 'edit collective',
       },
       'menu.edit.user': {
-        id: 'menu.edit.user',
+        id: 'collective.edit',
         defaultMessage: 'edit profile',
       },
       'menu.edit.organization': {
@@ -134,7 +134,6 @@ class MenuBar extends React.Component {
 
     const { collective } = this.props;
     if (!collective) {
-      console.error('>>> this is a weird error, collective should always be set', this.props);
       return;
     }
 

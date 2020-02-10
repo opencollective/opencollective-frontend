@@ -33,6 +33,9 @@ export default class PayWithPaypalButton extends Component {
       funding: PropTypes.shape({ allowed: PropTypes.array, disallowed: PropTypes.array }),
       fundingicons: PropTypes.bool,
     }),
+    host: PropTypes.shape({
+      id: PropTypes.number,
+    }),
   };
 
   constructor(props) {
@@ -69,6 +72,7 @@ export default class PayWithPaypalButton extends Component {
         const { id } = await actions.request.post(paymentURL, {
           amount: this.props.totalAmount / 100,
           currency: this.props.currency,
+          hostId: this.props.host.id,
         });
         return id;
       },

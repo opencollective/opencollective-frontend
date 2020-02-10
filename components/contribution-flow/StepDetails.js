@@ -28,7 +28,7 @@ const FrequenciesI18n = defineMessages({
     defaultMessage: 'Monthly',
   },
   year: {
-    id: 'Frequency.Year',
+    id: 'Frequency.Yearly',
     defaultMessage: 'Yearly',
   },
 });
@@ -254,10 +254,10 @@ const StepDetails = ({
         <ModalFooter>
           <Container display="flex" justifyContent="flex-end">
             <StyledButton mx={20} onClick={() => setShowModal(false)}>
-              <FormattedMessage id="collective.archive.cancel.btn" defaultMessage={'Cancel'} />
+              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
             </StyledButton>
             <StyledButton buttonStyle="primary" onClick={() => confirmIntervalChange()}>
-              <FormattedMessage id="collective.empty.confirm.btn" defaultMessage={'Confirm'} />
+              <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
             </StyledButton>
           </Container>
         </ModalFooter>

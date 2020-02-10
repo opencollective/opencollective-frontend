@@ -4,6 +4,8 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
+import { getErrorFromGraphqlException } from '../../lib/utils';
+
 import StyledButton from '../StyledButton';
 import StyledCheckBox from '../StyledCheckbox';
 
@@ -14,7 +16,7 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
+const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch, onError }) => {
   const [state, setState] = useState({
     showProcessorFeeConfirmation: false,
     processorFeeRefunded: false,
@@ -25,12 +27,13 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
 
   async function handleOnClickContinue() {
     try {
-      setState({ disableBtn: true });
+      setState({ ...state, disableBtn: true });
       await markExpenseAsUnpaid(id, state.processorFeeRefunded);
       await refetch();
     } catch (err) {
-      console.log('>>> payExpense error: ', err);
-      setState({ disableBtn: false });
+      const error = getErrorFromGraphqlException(err).message;
+      onError(error);
+      setState({ ...state, disableBtn: false });
     }
   }
 
@@ -41,7 +44,7 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
           <StyledCheckBox
             name="processorFeeRefunded"
             checked={state.processorFeeRefunded}
-            onChange={({ checked }) => setState({ processorFeeRefunded: checked })}
+            onChange={({ checked }) => setState({ ...state, processorFeeRefunded: checked })}
             label={intl.formatMessage(messages['processorFeeRefunded.checkbox.label'])}
           />
           <StyledButton
@@ -50,11 +53,11 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch }) => {
             buttonStyle="primary"
             onClick={() => handleOnClickContinue()}
           >
-            <FormattedMessage id="expense.markAsUnpaid.continue.btn" defaultMessage="Continue" />
+            <FormattedMessage id="actions.continue" defaultMessage="Continue" />
           </StyledButton>
         </Fragment>
       ) : (
-        <StyledButton onClick={() => setState({ showProcessorFeeConfirmation: true })} mt={2}>
+        <StyledButton onClick={() => setState({ ...state, showProcessorFeeConfirmation: true })} mt={2}>
           <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
         </StyledButton>
       )}
@@ -66,6 +69,7 @@ MarkExpenseAsUnpaidBtn.propTypes = {
   id: PropTypes.number.isRequired,
   markExpenseAsUnpaid: PropTypes.func.isRequired,
   refetch: PropTypes.func,
+  onError: PropTypes.func.isRequired,
 };
 
 const markExpenseAsUnpaidQuery = gql`

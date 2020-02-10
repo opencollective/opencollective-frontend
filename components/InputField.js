@@ -126,7 +126,9 @@ class InputField extends React.Component {
   }
 
   validate(value) {
-    if (!value) return !this.props.required;
+    if (!value) {
+      return !this.props.required;
+    }
     const type = this.props.type || 'text';
     if (this.props.validate && !type.match(/^date/)) {
       return this.props.validate(value);

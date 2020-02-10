@@ -26,8 +26,7 @@ class OrdersWithData extends React.Component {
     const { data, LoggedInUser, collective, view, includeHostedCollectives, filters } = this.props;
 
     if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={data.error.message} />;
     }
 
     const orders = data.allOrders;

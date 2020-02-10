@@ -66,6 +66,7 @@ class CreateOrderPage extends React.Component {
       try {
         query.data = JSON.parse(query.data);
       } catch (err) {
+        // TODO: this should be reported to the user
         console.error(err);
       }
     }
@@ -230,6 +231,10 @@ const collectiveFields = `
     id
     name
     settings
+    connectedAccounts {
+      id
+      service
+    }
     location {
       country
     }

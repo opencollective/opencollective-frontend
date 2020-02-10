@@ -60,8 +60,7 @@ class CollectivesWithData extends React.Component {
     const { data } = this.props;
 
     if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={data.error.message} />;
     }
     if (!data.allCollectives || !data.allCollectives.collectives) {
       return <div />;
@@ -204,7 +203,9 @@ export const addCollectivesData = graphql(getCollectivesQuery, {
           limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
           // Update the results object with new entries
           const { __typename, total, collectives } = previousResult.allCollectives;
           const all = collectives.concat(fetchMoreResult.allCollectives.collectives);

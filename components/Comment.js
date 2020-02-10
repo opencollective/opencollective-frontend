@@ -35,10 +35,10 @@ class Comment extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.messages = defineMessages({
-      edit: { id: 'comment.edit', defaultMessage: 'Edit' },
-      cancelEdit: { id: 'comment.cancelEdit', defaultMessage: 'Cancel edit' },
-      delete: { id: 'comment.delete', defaultMessage: 'Delete' },
-      'delete.modal.cancel': { id: 'cancel', defaultMessage: 'Cancel' },
+      edit: { id: 'Edit', defaultMessage: 'Edit' },
+      cancelEdit: { id: 'CancelEdit', defaultMessage: 'Cancel edit' },
+      delete: { id: 'actions.delete', defaultMessage: 'Delete' },
+      'delete.modal.cancel': { id: 'actions.cancel', defaultMessage: 'Cancel' },
       'delete.modal.header': {
         id: 'delete.modal.header',
         defaultMessage: 'Delete comment',
@@ -73,6 +73,7 @@ class Comment extends React.Component {
       await this.props.deleteComment(this.state.comment.id);
       this.setState({ showDeleteModal: false });
     } catch (err) {
+      // TODO: this should be reported to the user
       console.error(err);
       this.setState({ showDeleteModal: false });
     }
@@ -101,7 +102,9 @@ class Comment extends React.Component {
   render() {
     const { intl, LoggedInUser, editable } = this.props;
     const { comment } = this.state;
-    if (!comment) return <div />;
+    if (!comment) {
+      return <div />;
+    }
 
     return (
       <div className={`comment ${this.state.mode}View`}>

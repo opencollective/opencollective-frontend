@@ -13,7 +13,9 @@ class Sponsors extends React.Component {
 
   render() {
     const { sponsors } = this.props;
-    if (!sponsors || sponsors.length === 0) return <div />;
+    if (!sponsors || sponsors.length === 0) {
+      return <div />;
+    }
     return (
       <div className="Sponsors">
         <style jsx>

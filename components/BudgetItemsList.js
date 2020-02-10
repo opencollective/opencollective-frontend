@@ -365,13 +365,13 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
               {INFO_SEPARATOR}
               {isExpanded ? (
                 <ViewMoreLink onClick={() => setExpanded(false)}>
-                  <FormattedMessage id="transaction.closeDetails" defaultMessage="Close Details" />
+                  <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
                   &nbsp;
                   <ChevronUp size="1em" />
                 </ViewMoreLink>
               ) : (
                 <ViewMoreLink onClick={() => setExpanded(true)}>
-                  <FormattedMessage id="transaction.viewDetails" defaultMessage="View Details" />
+                  <FormattedMessage id="viewDetails" defaultMessage="View Details" />
                   &nbsp;
                   <ChevronDown size="1em" />
                 </ViewMoreLink>

@@ -2,6 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
+import { background, space } from 'styled-system';
 import { Times } from '@styled-icons/fa-solid/Times';
 
 import Container from './Container';
@@ -14,13 +15,19 @@ const ModalWrapper = styled(Container).attrs(props => ({
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white;
   z-index: 3000;
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
-  padding: 20px;
   overflow-y: auto;
+
+  ${space};
+  ${background};
 `;
+
+ModalWrapper.defaultProps = {
+  background: 'white',
+  padding: '20px',
+};
 
 const GlobalModalStyle = createGlobalStyle`
   body {
@@ -140,9 +147,9 @@ StyledModal.propTypes = {
   /** a boolean to determin when to show modal */
   show: PropTypes.bool.isRequired,
   /** width of the modal component */
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** height of the modal component */
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** width of the modal component */
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */

@@ -67,7 +67,9 @@ class CommentForm extends React.Component {
 
   render() {
     const { LoggedInUser, notice } = this.props;
-    if (!LoggedInUser) return <div />;
+    if (!LoggedInUser) {
+      return <div />;
+    }
 
     const comment = {
       createdAt: new Date(),

@@ -38,7 +38,7 @@ class Tier extends React.Component {
     };
 
     this.messages = defineMessages({
-      'amount.label': { id: 'tier.amount.label', defaultMessage: 'amount' },
+      'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },
       'customAmount.error.minimumAmount': {
         id: 'tier.customAmount.error.minimumAmount',
         defaultMessage: 'Minimum amount should be {minimumAmount}',
@@ -69,7 +69,7 @@ class Tier extends React.Component {
 
     switch (props.tier.type) {
       case 'DONATION':
-        this.buttonLabel = <FormattedMessage id="tier.donation.button" defaultMessage="donate" />;
+        this.buttonLabel = <FormattedMessage id="collective.donate" defaultMessage="donate" />;
         this.defaultDescription = (
           <FormattedMessage id="tier.donation.description" defaultMessage="Thank you for your kind donation 🙏" />
         );
@@ -123,7 +123,9 @@ class Tier extends React.Component {
 
   handleTicketsChange(quantity) {
     const { availableQuantity } = this.props.tier.stats;
-    if (availableQuantity && quantity > availableQuantity) return;
+    if (availableQuantity && quantity > availableQuantity) {
+      return;
+    }
     const currentValues = this.calcCurrentValues();
 
     const response = {

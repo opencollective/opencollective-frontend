@@ -33,6 +33,7 @@ import InlineEditField from '../components/InlineEditField';
 import FollowConversationButton from '../components/conversations/FollowConversationButton';
 import CommentIcon from '../components/icons/CommentIcon';
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
+import StyledInputTags from '../components/StyledInputTags';
 
 const conversationPageQuery = gqlV2`
   query Conversation($collectiveSlug: String!, $id: String!) {
@@ -45,6 +46,11 @@ const conversationPageQuery = gqlV2`
       settings
       imageUrl
       twitterHandle
+      conversationsTags {
+        id
+        tag
+      }
+
       ... on Collective {
         isApproved
       }
@@ -79,10 +85,11 @@ const conversationPageQuery = gqlV2`
 `;
 
 const editConversationMutation = gqlV2`
-  mutation EditConversation($id: String!, $title: String!) {
-    editConversation(id: $id, title: $title) {
+  mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
+    editConversation(id: $id, title: $title, tags: $tags) {
       id
       title
+      tags
     }
   }
 `;
@@ -115,6 +122,12 @@ class ConversationPage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
+        conversationsTags: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+            tag: PropTypes.string,
+          }),
+        ),
       }),
       conversation: PropTypes.shape({
         id: PropTypes.string.isRequired,
@@ -215,6 +228,21 @@ class ConversationPage extends React.Component {
 
   onConversationDeleted = () => {
     return Router.pushRoute('conversations', { collectiveSlug: this.props.collectiveSlug });
+  };
+
+  getSuggestedTags(collective) {
+    const tagsStats = (collective && collective.conversationsTags) || null;
+    return tagsStats && tagsStats.map(({ tag }) => tag);
+  }
+
+  getDefaultValue = tags => {
+    if (isEmpty(tags)) return [];
+    return tags.map(label => ({ label, value: label }));
+  };
+
+  handleTagsChange = (options, setValue) => {
+    if (isEmpty(options)) setValue([]);
+    else setValue(options.map(i => i.value));
   };
 
   render() {
@@ -340,18 +368,46 @@ class ConversationPage extends React.Component {
                             </Box>
                           </Flex>
                         </Box>
-                        {!isEmpty(conversation.tags) && (
+                        {!(isEmpty(conversation.tags) && !canEdit) && (
                           <Box mt={4}>
-                            <H4 px={2} mb={2} fontWeight="normal">
-                              <FormattedMessage id="Tags" defaultMessage="Tags" />
-                            </H4>
-                            <Flex flexWrap="wrap">
-                              {conversation.tags.map(tag => (
-                                <Box key={tag} m={2}>
-                                  <StyledTag>{tag}</StyledTag>
-                                </Box>
-                              ))}
-                            </Flex>
+                            <InlineEditField
+                              topEdit={2}
+                              field="tags"
+                              buttonsMinWidth={145}
+                              canEdit={canEdit}
+                              values={conversation}
+                              mutation={editConversationMutation}
+                              mutationOptions={{ context: API_V2_CONTEXT }}
+                              prepareVariables={(value, draft) => ({
+                                ...value,
+                                tags: draft,
+                              })}
+                            >
+                              {({ isEditing, setValue }) => (
+                                <React.Fragment>
+                                  <H4 px={2} mb={2} fontWeight="normal">
+                                    <FormattedMessage id="Tags" defaultMessage="Tags" />
+                                  </H4>
+                                  {!isEditing ? (
+                                    !isEmpty(conversation.tags) && (
+                                      <Flex flexWrap="wrap">
+                                        {conversation.tags.map(tag => (
+                                          <Box key={tag} m={2}>
+                                            <StyledTag>{tag}</StyledTag>
+                                          </Box>
+                                        ))}
+                                      </Flex>
+                                    )
+                                  ) : (
+                                    <StyledInputTags
+                                      suggestedTags={this.getSuggestedTags(collective)}
+                                      defaultValue={this.getDefaultValue(conversation.tags)}
+                                      onChange={options => this.handleTagsChange(options, setValue)}
+                                    />
+                                  )}
+                                </React.Fragment>
+                              )}
+                            </InlineEditField>
                           </Box>
                         )}
                       </Box>

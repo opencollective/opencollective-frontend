@@ -7,16 +7,21 @@ env:
   TZ: UTC
   E2E_TEST: 1
   NODE_ENV: ci
+  PGHOST: localhost
+  PGUSER: postgres
   WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-  API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
+  API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
+  IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
   TERM: xterm
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   e2e:
@@ -52,16 +57,64 @@ jobs:
       - name: Install postgresql-client
         run: sudo apt-get install -y postgresql-client
 
-      - name: Checkout (frontend)
-        uses: actions/checkout@v2-beta
-
-      - name: Checkout (api)
-        run: ./scripts/ci_checkout_api.sh
+      - name: Install graphicsmagick
+        run: sudo apt-get install -y graphicsmagick
 
       - name: Setup node
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
+
+      # Npm cache
+
+      - name: Restore .npm cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-cache-${{ github.sha }}
+          restore-keys: |
+            - ${{ runner.os }}-npm-cache-${{ github.sha }}
+            - ${{ runner.os }}-npm-cache-
+
+      # Checkouts
+
+      - name: Checkout (frontend)
+        uses: actions/checkout@v2-beta
+
+      - name: Check matching branch (api)
+        id: check-matching-branch
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/:owner/:repo/git/:ref
+          owner: opencollective
+          repo: opencollective-api
+          ref: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Checkout (api - matching branch)
+        if: steps.check-matching-branch.outputs.status == 200
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-api
+          path: opencollective-api
+          ref: ${{ github.ref }}
+
+      - name: Checkout (api - master)
+        if: steps.check-matching-branch.outputs.status != 200
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-api
+          path: opencollective-api
+
+      - name: Checkout (images)
+        uses: actions/checkout@v2-beta
+        with:
+          repository: opencollective/opencollective-images
+          path: opencollective-images
+
+      # Prepare API
 
       - name: Restore node_modules (api)
         uses: actions/cache@v1
@@ -69,16 +122,6 @@ jobs:
         with:
           path: opencollective-api/node_modules
           key: ${{ runner.os }}-api-node-modules-${{ hashFiles('opencollective-api/package-lock.json') }}
-
-      - name: Restore .npm cache (api)
-        if: steps.api-node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-api-npm-cache-${{ hashFiles('opencollective-api/package-lock.json') }}
-          restore-keys: |
-            - ${{ runner.os }}-api-npm-cache-${{ hashFiles('opencollective-api/package-lock.json') }}
-            - ${{ runner.os }}-api-npm-cache-
 
       - name: Install dependencies (api)
         working-directory: opencollective-api
@@ -89,22 +132,32 @@ jobs:
         working-directory: opencollective-api
         run: npm run build
 
+      # Prepare Images
+
+      - name: Restore node_modules (images)
+        uses: actions/cache@v1
+        id: images-node-modules
+        with:
+          path: opencollective-images/node_modules
+          key: ${{ runner.os }}-images-node-modules-${{ hashFiles('opencollective-images/package-lock.json') }}
+
+      - name: Install dependencies (images)
+        working-directory: opencollective-images
+        if: steps.images-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build (images)
+        working-directory: opencollective-images
+        run: npm run build
+
+      # Prepare Frontend
+
       - name: Restore node_modules (frontend)
         uses: actions/cache@v1
         id: node-modules
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-
-      - name: Restore .npm cache (frontend)
-        if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v1
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
-            ${{ runner.os }}-npm-cache-
 
       - name: Install dependencies (frontend)
         if: steps.node-modules.outputs.cache-hit != 'true'
@@ -121,7 +174,15 @@ jobs:
         if: steps.cypress.outputs.cache-hit != 'true'
         run: npx cypress install
 
+      - name: Restore .next build (frontend)
+        uses: actions/cache@v1
+        id: next-build
+        with:
+          path: .next
+          key: ${{ runner.os }}-next-build-${{ github.sha }}
+
       - name: Restore .next cache (frontend)
+        if: steps.next-build.outputs.cache-hit != 'true'
         uses: actions/cache@v1
         with:
           path: .next/cache
@@ -129,13 +190,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-next-cache-${{ github.sha }}
             ${{ runner.os }}-next-cache-
-
-      - name: Restore build (frontend)
-        uses: actions/cache@v1
-        id: next-build
-        with:
-          path: dist
-          key: ${{ runner.os }}-next-build-${{ github.sha }}
 
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'
@@ -148,3 +202,6 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
+
+      - name: Report Coverage
+        run: npm run test:coverage

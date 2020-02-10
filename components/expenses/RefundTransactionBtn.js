@@ -129,7 +129,7 @@ class RefundTransactionBtn extends React.Component {
                 <FormattedMessage id="transaction.refund.yes.btn" defaultMessage="Yes, refund!" />
               </SmallButton>
               <SmallButton className="no" onClick={() => this.setShowingState({ canRefund: true })}>
-                <FormattedMessage id="transaction.refund.no.btn" defaultMessage="no" />
+                <FormattedMessage id="no" defaultMessage="No" />
               </SmallButton>
             </div>
           </div>

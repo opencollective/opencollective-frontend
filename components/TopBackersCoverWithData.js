@@ -86,17 +86,22 @@ class TopBackersCoverWithData extends React.Component {
   }
 
   renderMember(member, index) {
-    if (member.member.type === 'ORGANIZATION') return this.renderOrganization(member, index);
-    if (member.member.type === 'COLLECTIVE') return this.renderOrganization(member, index);
-    if (member.member.type === 'USER') return this.renderUser(member, index);
+    if (member.member.type === 'ORGANIZATION') {
+      return this.renderOrganization(member, index);
+    }
+    if (member.member.type === 'COLLECTIVE') {
+      return this.renderOrganization(member, index);
+    }
+    if (member.member.type === 'USER') {
+      return this.renderUser(member, index);
+    }
   }
 
   render() {
     const { data, collective } = this.props;
 
     if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={data.error.message} />;
     }
 
     if (!data.allMembers) {

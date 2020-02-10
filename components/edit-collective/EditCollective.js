@@ -89,7 +89,6 @@ class EditCollective extends React.Component {
         this.setState({ status: null });
       }, 3000);
     } catch (err) {
-      console.error('>>> editCollective error:', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: null, result: { error: errorMsg } });
     }
@@ -98,7 +97,9 @@ class EditCollective extends React.Component {
   render() {
     const { intl, LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
 
-    if (!collective || !collective.slug) return <div />;
+    if (!collective || !collective.slug) {
+      return <div />;
+    }
 
     const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
     const notification = {};

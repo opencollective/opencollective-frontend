@@ -186,7 +186,7 @@ class EditTwitterAccount extends React.Component {
         <Form horizontal>
           <details>
             <summary>
-              <FormattedMessage id="connectedAccounts.twitter.settings" defaultMessage="Settings" />
+              <FormattedMessage id="Settings" defaultMessage="Settings" />
             </summary>
             {this.notificationTypes.map(this.renderNotification)}
             <Row>

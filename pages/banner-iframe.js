@@ -43,8 +43,12 @@ class BannerIframe extends React.Component {
   };
 
   sendMessageToParentWindow = () => {
-    if (!window.parent) return;
-    if (!this.height) return;
+    if (!window.parent) {
+      return;
+    }
+    if (!this.height) {
+      return;
+    }
     const message = `oc-${JSON.stringify({
       id: this.props.id,
       height: this.height,
@@ -53,8 +57,12 @@ class BannerIframe extends React.Component {
   };
 
   sendMessageToParentWindow = () => {
-    if (!window.parent) return;
-    if (!this.height) return;
+    if (!window.parent) {
+      return;
+    }
+    if (!this.height) {
+      return;
+    }
     const message = `oc-${JSON.stringify({
       id: this.props.id,
       height: this.height,

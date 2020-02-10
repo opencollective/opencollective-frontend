@@ -64,14 +64,11 @@ class CreateUpdatePage extends React.Component {
     } = this.props;
     try {
       update.collective = { id: Collective.id };
-      console.log('>>> createUpdate', update);
       const res = await this.props.createUpdate(update);
-      console.log('>>> createUpdate res', res);
       this.setState({ isModified: false });
       return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
-      console.error(e);
-      this.setState({ status: 'error', error: `${e}` });
+      this.setState({ status: 'error', error: e.message });
     }
   };
 
@@ -127,7 +124,7 @@ class CreateUpdatePage extends React.Component {
                   </p>
                   <p>
                     <Button className="blue" href={`/signin?next=/${collective.slug}/updates/new`}>
-                      <FormattedMessage id="login.button" defaultMessage="Sign In" />
+                      <FormattedMessage id="signIn" defaultMessage="Sign In" />
                     </Button>
                   </p>
                 </div>

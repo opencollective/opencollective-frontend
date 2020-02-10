@@ -47,7 +47,7 @@ class UserCollective extends React.Component {
           'You can now make financial contributions as an Organization. You can also edit your Organization profile, add team members and admins, and attach a credit card with a monthly limit.',
       },
       'organization.isArchived': {
-        id: 'organization.isArchived',
+        id: 'collective.isArchived',
         defaultMessage: '{name} has been archived.',
       },
       'organization.isArchived.description': {
@@ -63,19 +63,19 @@ class UserCollective extends React.Component {
         defaultMessage: 'This account has been archived and is no longer active.',
       },
       'organization.collective.since': {
-        id: 'organization.collective.since',
-        defaultMessage: 'Contributing Since {year}',
+        id: 'ContributingSince',
+        defaultMessage: 'Contributing since {year}',
       },
       'user.collective.since': {
-        id: 'user.collective.since',
-        defaultMessage: 'Contributing Since {year}',
+        id: 'ContributingSince',
+        defaultMessage: 'Contributing since {year}',
       },
       'organization.collective.edit': {
         id: 'organization.collective.edit',
         defaultMessage: 'edit Organization',
       },
       'user.collective.edit': {
-        id: 'user.collective.edit',
+        id: 'collective.edit',
         defaultMessage: 'edit profile',
       },
       'user.collective.memberOf.collective.host.title': {
@@ -152,9 +152,9 @@ class UserCollective extends React.Component {
         id: 'section.admin',
         defaultMessage: 'Administrating',
       },
-      'section.member': { id: 'section.member', defaultMessage: 'Core Contributor' },
+      'section.member': { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       'section.backer': { id: 'section.backer', defaultMessage: 'Financial contributor' },
-      'section.attendee': { id: 'section.attendee', defaultMessage: 'Events' },
+      'section.attendee': { id: 'Events', defaultMessage: 'Events' },
       'section.fundraiser': {
         id: 'section.fundraiser',
         defaultMessage: 'Fund raising',
@@ -176,18 +176,24 @@ class UserCollective extends React.Component {
     const memberOfByRole = groupBy(collective.memberOf, 'role');
 
     const renderRoleForType = memberOfCollectiveType => {
-      if (role === 'ADMIN' && memberOfCollectiveType === 'EVENT') return;
+      if (role === 'ADMIN' && memberOfCollectiveType === 'EVENT') {
+        return;
+      }
 
       let memberships = memberOfByRole[role].filter(m => get(m, 'collective.type') === memberOfCollectiveType);
       memberships = uniqBy(memberships, member => member.collective.id);
-      if (memberships.length === 0) return;
+      if (memberships.length === 0) {
+        return;
+      }
 
       let subtitle;
       const collectiveType = memberOfCollectiveType.toLowerCase();
       const titleMessageId = `section.${role.toLowerCase()}`;
       const values = { n: memberships.length };
       const title = this.messages[titleMessageId] && intl.formatMessage(this.messages[titleMessageId], values);
-      if (!title) return;
+      if (!title) {
+        return;
+      }
       const subtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.title`;
       const loggedInSubtitleMessageId = `${type}.collective.memberOf.${collectiveType}.${role.toLowerCase()}.LoggedInDescription`;
       if (LoggedInUser && this.messages[loggedInSubtitleMessageId]) {

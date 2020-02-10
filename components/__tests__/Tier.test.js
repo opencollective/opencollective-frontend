@@ -122,7 +122,9 @@ describe('Tier component', () => {
         onClick,
       });
 
-      if (DEBUG) console.log('>>> state', component.state());
+      if (DEBUG) {
+        console.log('>>> state', component.state());
+      }
       expect(
         component
           .find('.title')

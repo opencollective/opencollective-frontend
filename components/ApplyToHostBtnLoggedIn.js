@@ -56,10 +56,8 @@ class ApplyToHostBtnLoggedIn extends React.Component {
       id: this.inactiveCollective.id,
       HostCollectiveId: host.id,
     };
-    console.log('>>> editCollective', CollectiveInputType);
-    const res = await this.props.editCollective(CollectiveInputType);
+    await this.props.editCollective(CollectiveInputType);
     this.setState({ showModal: false });
-    console.log('>>> res', res);
   };
 
   handleModalDisplay() {
@@ -162,14 +160,14 @@ class ApplyToHostBtnLoggedIn extends React.Component {
           <ModalFooter>
             <Container display="flex" justifyContent="flex-end">
               <StyledButton mx={20} onClick={() => this.setState({ showModal: false })}>
-                <FormattedMessage id="apply.host.tos.cancel" defaultMessage={'Cancel'} />
+                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
               </StyledButton>
               <StyledButton
                 buttonStyle="primary"
                 disabled={!this.state.checkTOS}
                 onClick={() => this.handleContinueBtn()}
               >
-                <FormattedMessage id="apply.host.tos.continue" defaultMessage={'Continue'} />
+                <FormattedMessage id="actions.continue" defaultMessage={'Continue'} />
               </StyledButton>
             </Container>
           </ModalFooter>

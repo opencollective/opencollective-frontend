@@ -45,12 +45,8 @@ class Update extends React.Component {
     this.toggleEdit = this.toggleEdit.bind(this);
     this.deleteUpdate = this.deleteUpdate.bind(this);
     this.messages = defineMessages({
-      pending: { id: 'update.pending', defaultMessage: 'pending' },
-      paid: { id: 'update.paid', defaultMessage: 'paid' },
-      approved: { id: 'update.approved', defaultMessage: 'approved' },
-      rejected: { id: 'update.rejected', defaultMessage: 'rejected' },
-      edit: { id: 'update.edit', defaultMessage: 'edit' },
-      cancelEdit: { id: 'update.cancelEdit', defaultMessage: 'cancel edit' },
+      edit: { id: 'Edit', defaultMessage: 'Edit' },
+      cancelEdit: { id: 'CancelEdit', defaultMessage: 'Cancel edit' },
       viewLatestUpdates: {
         id: 'update.viewLatestUpdates',
         defaultMessage: 'View latest updates',
@@ -71,13 +67,16 @@ class Update extends React.Component {
   }
 
   async deleteUpdate() {
-    if (!confirm('😱 Are you really sure you want to delete this update?')) return;
+    if (!confirm('😱 Are you really sure you want to delete this update?')) {
+      return;
+    }
 
     try {
       await this.props.deleteUpdate(this.props.update.id);
       Router.pushRoute('collective', { slug: this.props.collective.slug });
     } catch (err) {
-      console.error('>>> deleteUpdate error: ', JSON.stringify(err));
+      // TODO: this should be reported to the user
+      console.error('Update > deleteUpdate > error: ', err);
     }
   }
 
@@ -87,9 +86,7 @@ class Update extends React.Component {
 
   async save(update) {
     update.id = get(this.props, 'update.id');
-    console.log('>>> updating ', update);
-    const res = await this.props.editUpdate(update);
-    console.log('>>> save res', res);
+    await this.props.editUpdate(update);
     this.setState({ modified: false, mode: 'details' });
   }
 

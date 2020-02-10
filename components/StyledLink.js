@@ -37,6 +37,14 @@ const StyledLink = styled.a`
   }
 
   ${props =>
+    props.truncateOverflow &&
+    css`
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    `}
+
+  ${props =>
     props.buttonStyle &&
     css`
       outline: 0;
@@ -86,6 +94,8 @@ StyledLink.propTypes = {
   textDecoration: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** Disable the link, make it unclickable */
   disabled: PropTypes.bool,
+  /** Wether text should be truncated if too long */
+  truncateOverflow: PropTypes.bool,
 };
 
 /** @component */

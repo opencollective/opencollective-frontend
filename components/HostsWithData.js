@@ -54,8 +54,7 @@ class HostsWithData extends React.Component {
     const { data } = this.props;
 
     if (data.error) {
-      console.error('graphql error>>>', data.error.message);
-      return <Error message="GraphQL error" />;
+      return <Error message={data.error.message} />;
     }
     if (!data.allHosts || !data.allHosts.collectives) {
       return <div />;
@@ -182,7 +181,9 @@ export const addHostsData = graphql(getHostsQuery, {
           limit: ownProps.limit || COLLECTIVE_CARDS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
           // Update the results object with new entries
           const { __typename, total, collectives } = previousResult.allHosts;
           const all = collectives.concat(fetchMoreResult.allHosts.collectives);

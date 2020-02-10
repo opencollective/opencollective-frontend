@@ -28,6 +28,7 @@ const useForm = () => {
         event.stopPropagation();
         const { target } = event;
         setState(state => ({
+          ...state,
           [target.name]: target.value,
           errors: { ...state.errors, [target.name]: null },
         }));
@@ -36,6 +37,7 @@ const useForm = () => {
         event.persist();
         event.preventDefault();
         setState(state => ({
+          ...state,
           errors: { ...state.errors, [event.target.name]: event.target.validationMessage },
         }));
       },
@@ -110,9 +112,10 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                 options={['repository', 'organization']}
                 defaultValue={'repository'}
                 onChange={({ key }) => {
-                  setState({
+                  setState(state => ({
+                    ...state,
                     useType: key,
-                  });
+                  }));
                 }}
               >
                 {props => {
@@ -152,7 +155,7 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
 
             <Box mb={3}>
               <StyledInputField
-                label={<FormattedMessage id="GithubFlow.CollectiveURL" defaultMessage="Collective URL" />}
+                label={<FormattedMessage id="Collective.URL" defaultMessage="Collective URL" />}
                 htmlFor="slug"
                 error={getFieldError('slug')}
               >

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Jan 14 2020 18:10:43 GMT+0100 (Central European Standard Time)
+# timestamp: Wed Feb 05 2020 10:46:52 GMT+0100 (Central European Standard Time)
 
 """
 Application model
@@ -1169,6 +1169,7 @@ Expense model
 """
 type Expense implements Transaction {
   id: Int
+  idV2: String
   refundTransaction: Transaction
   uuid: String
   type: String
@@ -1223,6 +1224,31 @@ type Expense implements Transaction {
 }
 
 """
+Public fields for an expense attachment
+"""
+type ExpenseAttachment {
+  id: Int!
+  amount: Int!
+  createdAt: IsoDateString!
+  updatedAt: IsoDateString!
+  incurredAt: IsoDateString!
+  deletedAt: IsoDateString
+  description: String
+  url: String
+}
+
+"""
+Fields for creating or editing an expense attachment
+"""
+input ExpenseAttachmentInputType {
+  id: Int
+  url: DateString!
+  amount: Int!
+  incurredAt: DateString
+  description: String
+}
+
+"""
 Input type for ExpenseType
 """
 input ExpenseInputType {
@@ -1242,6 +1268,7 @@ input ExpenseInputType {
   payoutMethod: String
   privateMessage: String
   attachment: String
+  attachments: [ExpenseAttachmentInputType]
   user: UserInputType
   collective: CollectiveAttributesInputType
 }
@@ -1301,6 +1328,8 @@ type ExpenseType {
   payoutMethod: String
   privateMessage: String
   attachment: String
+    @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
+  attachments: [ExpenseAttachment]
   userTaxFormRequiredBeforePayment: Boolean
   user: UserDetails
   fromCollective: CollectiveInterface
@@ -1891,6 +1920,7 @@ Order model
 """
 type Order implements Transaction {
   id: Int
+  idV2: String
   refundTransaction: Transaction
   uuid: String
   type: String
@@ -2035,6 +2065,7 @@ This is an order (for donations, buying tickets, subscribing to a Tier, pledging
 """
 type OrderType {
   id: Int
+  idV2: String
 
   """
   quantity of items (defined by Tier)
@@ -3021,6 +3052,7 @@ Transaction interface
 """
 interface Transaction {
   id: Int
+  idV2: String
   uuid: String
   amount: Int
   currency: String

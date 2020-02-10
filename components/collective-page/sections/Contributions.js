@@ -32,19 +32,19 @@ const I18nFilters = defineMessages({
     defaultMessage: 'All Contributions',
   },
   [FILTERS.HOST]: {
-    id: 'SectionContributions.Host',
+    id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
   },
   [FILTERS.FINANCIAL]: {
-    id: 'SectionContributions.Financial',
+    id: 'Member.Role.BACKER',
     defaultMessage: 'Financial Contributor',
   },
   [FILTERS.CORE]: {
-    id: 'SectionContributions.Core',
+    id: 'Member.Role.MEMBER',
     defaultMessage: 'Core Contributor',
   },
   [FILTERS.EVENTS]: {
-    id: 'SectionContributions.Events',
+    id: 'Events',
     defaultMessage: 'Events',
   },
 });
@@ -216,7 +216,6 @@ class SectionContributions extends React.PureComponent {
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
     } else if (!data.Collective) {
-      console.error(`Empty collective data #${collective.id} in Contributions section`);
       return (
         <Container display="flex" border="1px dashed #d1d1d1" justifyContent="center" py={[6, 7]} background="#f8f8f8">
           <MessageBox type="error" withIcon>
@@ -255,7 +254,7 @@ class SectionContributions extends React.PureComponent {
               <React.Fragment>
                 <ContainerSectionContent>
                   <SectionTitle data-cy="section-contributions-title" textAlign="left" mb={1}>
-                    <FormattedMessage id="CollectivePage.SectionContributions.Title" defaultMessage="Contributions" />
+                    <FormattedMessage id="Contributions" defaultMessage="Contributions" />
                   </SectionTitle>
                   {data.Collective.stats.collectives.hosted > 0 && (
                     <H3 fontSize="H5" fontWeight="500" color="black.600">

@@ -94,6 +94,10 @@ const nextConfig = {
       },
     });
 
+    if (['ci', 'e2e'].includes(process.env.NODE_ENV)) {
+      config.optimization.minimize = false;
+    }
+
     return config;
   },
 };

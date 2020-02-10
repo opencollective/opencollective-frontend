@@ -2,12 +2,16 @@
   "viewportWidth": 1000,
   "viewportHeight": 1660,
   "projectId": "yt5kwm",
-  "defaultCommandTimeout": 8000,
+  "defaultCommandTimeout": 15000,
+  "responseTimeout": 60000,
   "video": false,
   "chromeWebSecurity": false,
   "blacklistHosts": ["wtfismyip.com"],
   "env": {
-    "MAILDEV_URL": "http://localhost:1080"
+    "MAILDEV_URL": "http://localhost:1080",
+    "codeCoverage": {
+      "url": "/__coverage__"
+    }
   },
   "fixturesFolder": "test/cypress/fixtures",
   "integrationFolder": "test/cypress/integration",

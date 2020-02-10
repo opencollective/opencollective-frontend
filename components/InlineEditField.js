@@ -33,7 +33,6 @@ const EditIcon = styled(PencilAlt)`
 const FormButton = styled(StyledButton)`
   width: 35%;
   font-weight: normal;
-  min-width: 225px;
   text-transform: capitalize;
   margin: 4px 8px;
   animation: ${fadeIn} 0.3s;
@@ -82,6 +81,8 @@ class InlineEditField extends Component {
      * Highly recommended if field is nullable.
      */
     placeholder: PropTypes.node,
+    /** To set the min width of Cancel/Save buttons */
+    buttonsMinWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Editing the top value. */
     topEdit: PropTypes.number,
     /** @ignore from injectIntl */
@@ -90,6 +91,7 @@ class InlineEditField extends Component {
 
   static defaultProps = {
     showEditIcon: true,
+    buttonsMinWidth: 225,
     topEdit: -5,
   };
 
@@ -164,6 +166,7 @@ class InlineEditField extends Component {
       warnIfUnsavedChanges,
     } = this.props;
     const { draft, isEditing } = this.state;
+    const { buttonsMinWidth } = this.props;
     const value = get(values, field);
     const touched = draft !== value;
 
@@ -226,7 +229,12 @@ class InlineEditField extends Component {
                     </MessageBox>
                   )}
                   <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
-                    <FormButton data-cy="InlineEditField-Btn-Cancel" disabled={loading} onClick={this.disableEditor}>
+                    <FormButton
+                      data-cy="InlineEditField-Btn-Cancel"
+                      disabled={loading}
+                      minWidth={buttonsMinWidth}
+                      onClick={this.disableEditor}
+                    >
                       <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                     </FormButton>
                     <FormButton
@@ -234,6 +242,7 @@ class InlineEditField extends Component {
                       loading={loading}
                       disabled={!touched}
                       data-cy="InlineEditField-Btn-Save"
+                      minWidth={buttonsMinWidth}
                       onClick={() => {
                         let variables = null;
                         if (prepareVariables) {

@@ -96,11 +96,11 @@ class Collective extends React.Component {
         defaultMessage: '{n} {n, plural, one {follower} other {followers}}',
       },
       'collective.menu.host': {
-        id: 'collective.menu.host',
+        id: 'collective.contributingTo',
         defaultMessage: 'contributing to {n} {n, plural, one {collective} other {collectives}}',
       },
       'collective.menu.admin': {
-        id: 'collective.menu.admin',
+        id: 'collective.contributingTo',
         defaultMessage: 'contributing to {n} {n, plural, one {collective} other {collectives}}',
       },
       'collective.menu.member': {

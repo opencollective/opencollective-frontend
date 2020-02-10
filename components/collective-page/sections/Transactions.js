@@ -35,7 +35,7 @@ const I18nFilters = defineMessages({
     defaultMessage: 'Expenses',
   },
   [FILTERS.CONTRIBUTIONS]: {
-    id: 'SectionTransactions.Contributions',
+    id: 'Contributions',
     defaultMessage: 'Contributions',
   },
 });

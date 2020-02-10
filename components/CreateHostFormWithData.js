@@ -28,13 +28,11 @@ class CreateHostFormWithData extends React.Component {
   async createOrganization(CollectiveInputType) {
     this.setState({ status: 'loading' });
     CollectiveInputType.type = 'ORGANIZATION';
-    console.log('>>> createOrganization', CollectiveInputType);
     try {
       const res = await this.props.createCollective(CollectiveInputType);
       const collective = res.data.createCollective;
       return collective;
     } catch (err) {
-      console.error('>>> createOrganization error: ', JSON.stringify(err));
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ result: { error: errorMsg } });
       throw new Error(errorMsg);

@@ -65,7 +65,6 @@ class EditUpdateForm extends React.Component {
   componentDidMount() {
     const savedState = storage.get(this.storageKey);
     if (savedState && !this.props.update) {
-      console.log('>>> restoring EditUpdateForm state', savedState);
       this.setState(savedState);
     }
     this._isMounted = true;
@@ -101,9 +100,8 @@ class EditUpdateForm extends React.Component {
       await this.props.onSubmit(this.state.update);
       this.setState({ modified: false, loading: false });
       storage.set(this.storageKey, null);
-    } catch (e) {
-      this.setState({ loading: false, error: `${e}` });
-      console.error('EditUpdateForm onSubmit error', e);
+    } catch (error) {
+      this.setState({ loading: false, error: error.message });
     }
     return false;
   }
@@ -111,7 +109,9 @@ class EditUpdateForm extends React.Component {
   render() {
     const { collective, LoggedInUser } = this.props;
     const { update } = this.state;
-    if (!this._isMounted) return <div />;
+    if (!this._isMounted) {
+      return <div />;
+    }
 
     const editor =
       get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||

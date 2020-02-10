@@ -8,7 +8,7 @@ import { useIntl, defineMessages } from 'react-intl';
 
 const messages = defineMessages({
   cancel: {
-    id: 'cancel',
+    id: 'actions.cancel',
     defaultMessage: 'Cancel',
   },
 });

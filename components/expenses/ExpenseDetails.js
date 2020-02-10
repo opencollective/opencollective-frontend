@@ -45,7 +45,7 @@ class ExpenseDetails extends React.Component {
         defaultMessage: 'Other (see instructions)',
       },
       donation: {
-        id: 'expense.payoutMethod.donation',
+        id: 'Donation',
         defaultMessage: 'Donation',
       },
     });
@@ -225,7 +225,7 @@ class ExpenseDetails extends React.Component {
             <div className="row">
               <div className="col large">
                 <label>
-                  <FormattedMessage id="expense.description" defaultMessage="description" />
+                  <FormattedMessage id="Fields.description" defaultMessage="Description" />
                 </label>
                 <div className="description">
                   <span className="description">
@@ -284,7 +284,7 @@ class ExpenseDetails extends React.Component {
 
           <div className="col">
             <label>
-              <FormattedMessage id="expense.amount" defaultMessage="amount" />
+              <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
             </label>
             <div className="amountDetails">
               <span className="amount">
@@ -413,7 +413,9 @@ export const addGetExpense = component => {
 
   // if we don't have an accessToken, there is no need to get the details of a expense
   // as we won't have access to any more information than the allExpenses query
-  if (!accessToken) return component;
+  if (!accessToken) {
+    return component;
+  }
 
   return graphql(getExpenseQuery, {
     options(props) {

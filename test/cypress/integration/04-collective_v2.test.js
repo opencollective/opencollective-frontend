@@ -164,12 +164,13 @@ describe('New collective page', () => {
       const richDescription = 'Hello world!';
       scrollToSection(Sections.ABOUT);
       cy.contains('#section-about button', 'Add a description').click();
+      // {ctrl}b fails on macos
+      // {ctrl} maps control key & {meta} maps command key
+      const ctrlOrMetaKey = Cypress.platform === 'darwin' ? '{meta}' : '{ctrl}';
       cy.get('#section-about [data-cy="RichTextEditor"] trix-editor')
         .type(richDescription)
         .type('{selectall}')
-        // {ctrl}b fails on macos
-        // {ctrl} maps control key & {meta} maps command key
-        .type('{ctrl}b');
+        .type(`${ctrlOrMetaKey}b`);
       cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
       cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
     });

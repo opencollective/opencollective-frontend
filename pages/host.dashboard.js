@@ -81,6 +81,15 @@ class HostDashboardPage extends React.Component {
           <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />
         </MessageBox>
       );
+    } else if (LoggedInUser && !LoggedInUser.canEditCollective(data.Collective)) {
+      return (
+        <MessageBox m={5} type="error" withIcon>
+          <FormattedMessage
+            id="mustBeAdmin"
+            defaultMessage="You must be an admin of this collective to see this page"
+          />
+        </MessageBox>
+      );
     } else if (!data.Collective) {
       return (
         <MessageBox m={5} type="error" withIcon>
@@ -156,7 +165,7 @@ class HostDashboardPage extends React.Component {
                 isActive={view === 'expenses'}
               >
                 <ReceiptIcon size="1em" />
-                <FormattedMessage id="host.dashboard.tab.expenses" defaultMessage="Expenses" />
+                <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"
@@ -164,10 +173,7 @@ class HostDashboardPage extends React.Component {
                 isActive={view === 'donations'}
               >
                 <DonateIcon size="1em" />
-                <FormattedMessage
-                  id="host.dashboard.tab.financialContributions"
-                  defaultMessage="Financial Contributions"
-                />
+                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
               </MenuLink>
               <MenuLink
                 route="host.dashboard"
