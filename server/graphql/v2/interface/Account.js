@@ -66,6 +66,9 @@ const accountFieldsDefinition = () => ({
   currency: {
     type: GraphQLString,
   },
+  expensePolicy: {
+    type: GraphQLString,
+  },
   imageUrl: {
     type: GraphQLString,
     args: {
