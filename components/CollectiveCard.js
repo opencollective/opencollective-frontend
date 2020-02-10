@@ -47,6 +47,7 @@ class CollectiveCard extends React.Component {
     membership: PropTypes.object,
     memberships: PropTypes.array,
     intl: PropTypes.object.isRequired,
+    showApplyButton: PropTypes.bool,
   };
 
   constructor(props) {
