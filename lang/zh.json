@@ -986,7 +986,7 @@
   "pricing.fiscalHost.applyOpenSource": "If you are an open source project, you can apply to join",
   "pricing.fiscalHost.description": "A Fiscal Host <strong>is an organization who offers fund-holding as a service.</strong> They keep your money in their bank account. Fiscal Hosts <strong>handle things like accounting, taxes, admin, payments, and liability-</strong>so you don’t have to!",
   "pricing.fiscalHost.reasonToJoin": "If you join a Fiscal Host, <strong>you don’t need to pay Open Collective,</strong> as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives.",
-  "pricing.hostOrganization.note1": "A host dashboard to easily manage budgets and expenses across all your Collectives, including one-click payouts via Paypal.",
+  "pricing.hostOrganization.note1": "Your choice of plan will depend on the number of Collectives you host.",
   "pricing.hostOrganization.note2": "You pay Open Collective for use of our platform on behalf of your Collectives, and can charge them a fee if you wish.",
   "pricing.starterPlans": "The STARTER PLAN includes:",
   "pricing.starterPlans.addFunds": "Manually <strong>add funds raised</strong> through other channels (e.g. bank transfers) to your transparent budget (free up to $1,000, then you’ll need to upgrade to a paid plan).",

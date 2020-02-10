@@ -239,7 +239,7 @@ const HostOrganization = () => (
             <P fontSize={['Caption']} lineHeight={['19px']} letterSpacing="-0.016em;">
               <FormattedMessage
                 id="pricing.hostOrganization.note1"
-                defaultMessage="A host dashboard to easily manage budgets and expenses across all your Collectives, including one-click payouts via Paypal."
+                defaultMessage="Your choice of plan will depend on the number of Collectives you host."
               />
             </P>
           </Box>
