@@ -789,7 +789,7 @@ export const ExpenseType = new GraphQLObjectType({
           if (!(await canViewExpensePrivateInfo(expense, req)) || !expense.PayoutMethodId) {
             return null;
           } else {
-            return expense.payoutMethod || req.loaders.PayoutMethod.byId(expense.PayoutMethodId);
+            return expense.payoutMethod || req.loaders.PayoutMethod.byId.load(expense.PayoutMethodId);
           }
         },
       },

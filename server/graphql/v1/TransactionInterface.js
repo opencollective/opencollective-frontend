@@ -328,7 +328,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
           if (!transaction.ExpenseId) {
             return null;
           } else {
-            const expense = req.loaders.Expense.byId(transaction.ExpenseId);
+            const expense = req.loaders.Expense.byId.load(transaction.ExpenseId);
             if (!expense || !(await canViewExpensePrivateInfo(expense, req))) {
               return null;
             } else {
