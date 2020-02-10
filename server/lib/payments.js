@@ -445,7 +445,6 @@ const sendManualPendingOrderEmail = async order => {
 
 export const sendReminderPendingOrderEmail = async order => {
   const { collective, fromCollective } = order;
-  const user = order.createdByUser;
   const host = await collective.getHostCollective();
 
   // It could be that pending orders are from pledged collective and don't have an host
@@ -457,14 +456,16 @@ export const sendReminderPendingOrderEmail = async order => {
 
   const data = {
     order: order.info,
-    user: user.info,
     collective: collective.info,
     host: host.info,
     fromCollective: fromCollective.activity,
     viewDetailsLink: `${config.host.website}/${collective.slug}/orders/${order.id}`,
   };
 
-  return emailLib.send('order.reminder.pendingFinancialContribution', user.email, data, {
-    from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
-  });
+  const adminUsers = await collective.getAdminUsers();
+  for (const adminUser of adminUsers) {
+    await emailLib.send('order.reminder.pendingFinancialContribution', adminUser.email, data, {
+      from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
+    });
+  }
 };
