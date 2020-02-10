@@ -50,7 +50,7 @@ const onlyCollectivesWithoutTwitterActivated = collective => {
 
 Promise.all([
   processOnBoardingTemplate('onboarding.day35.inactive', XDaysAgo(35), onlyInactiveCollectives),
-  processOnBoardingTemplate('onboarding.day28', XDaysAgo(28)),
+  processOnBoardingTemplate('onboarding.day7-b', XDaysAgo(7)),
   processOnBoardingTemplate('onboarding.day21.noTwitter', XDaysAgo(21), onlyCollectivesWithoutTwitterActivated),
   processOnBoardingTemplate('onboarding.noExpenses', XDaysAgo(14), onlyCollectivesWithoutExpenses),
   processOnBoardingTemplate('onboarding.noExpenses', XDaysAgo(35), onlyCollectivesWithoutExpenses), // another reminder after 35 days if no expenses filed yet
