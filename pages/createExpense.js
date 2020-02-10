@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Box, Flex } from '@rebass/grid';
-import { pick } from 'lodash';
 
 import { compose } from '../lib/utils';
 
@@ -34,19 +33,23 @@ class CreateExpensePage extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  getPayoutMethod = expenseData => {
+    if (expenseData.payoutMethod === 'paypal') {
+      return { type: 'PAYPAL', data: { email: expenseData.paypalEmail } };
+    } else {
+      return null;
+    }
+  };
+
   createExpense = async expense => {
-    const { LoggedInUser } = this.props;
     const collective = this.props.data.Collective;
 
     try {
       expense.collective = { id: collective.id };
       expense.currency = collective.currency;
-      expense.user = pick(expense, ['paypalEmail']);
+      expense.PayoutMethod = this.getPayoutMethod(expense);
       delete expense.paypalEmail;
-
-      if (LoggedInUser) {
-        expense.user.id = LoggedInUser.id;
-      }
+      delete expense.payoutMethod;
       const res = await this.props.createExpense(expense);
       const expenseCreated = res.data.createExpense;
       Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/?createSuccess=true`);
