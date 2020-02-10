@@ -16,16 +16,15 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
 
 {{#if interval}}
   {{#if firstPayment }}
-    <p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency order.totalAmount currency=order.currency}}} per {{interval}}.
-      Your first payment was received on {{{moment order.createdAt}}}. Your contribution helps us make this conversation happen!</p>
+    <p>Thank you so much for your contribution of {{{currency order.totalAmount currency=order.currency}}} per {{interval}} to SustainOSS .
+      Your first payment was received on {{{moment order.createdAt}}}. Your contribution helps us continue growing the SustainOSS ecosystem and projects.</p>
     {{> charge_date_notice}}
   {{else}}
     <p>We would like to thank you for your continued support. Your latest {{interval}}ly contribution of {{{currency order.totalAmount currency=order.currency}}} was received on {{{moment transaction.createdAt}}}.
       Your contribution helps us continue our activities.</p>
   {{/if}}
 {{else}}
-<p>Thank you so much for being part of the first $ustainOSS Conversation and supporting us with {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}}.
-  If you made a $50 contribution for a ticket, we look forward to meeting you! We will be emailing details shortly. You do not have to worry about bringing a ticket but do save this email just in case.</p>
+<p>Thank you so much for your contribution of {{{currency order.totalAmount currency=order.currency}}} on {{{moment order.createdAt}}} to SustainOSS.</p>
 {{/if}}
 
 <p>Next steps:
@@ -34,13 +33,7 @@ Subject: Thank you for your {{{currency order.totalAmount currency=order.currenc
   <a href="https://opencollective.com/{{collective.slug}}">https://opencollective.com/{{collective.slug}}</a>.</li>
   <li>Follow us on <a href="https://twitter.com/sustainoss">Twitter</a></li>
   <li>Open Source with us on <a href="https://github.com/sustainers">GitHub</a></li>
-  <li><a href="https://changelog.com/community">Slack</a> with us on #sustain @ Changelog.</li>
- </p>
-
- <p>If you have any questions feel free to contact us:
- Chad Whitacre: chad@gratipay.com
- Justin Dorfman: jdorfman@stickermule.com
- Pía Mancini: pia@opencollective.com
+  <li><a href="slack.opencollective.com">Slack</a> with us on #sustain @ Open Collective.</li>
  </p>
 
 <p>
