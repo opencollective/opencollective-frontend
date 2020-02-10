@@ -51,7 +51,7 @@ export const templateNames = [
   'onboarding.noExpenses.opensource',
   'onboarding.noUpdates',
   'onboarding.day21.noTwitter',
-  'onboarding.day28',
+  'onboarding.day7-b',
   'onboarding.day35.active',
   'onboarding.day35.inactive',
   'organization.collective.created',
