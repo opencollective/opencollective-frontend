@@ -55,7 +55,7 @@ Promise.all([
   processOnBoardingTemplate('onboarding.noExpenses', XDaysAgo(14), onlyCollectivesWithoutExpenses),
   processOnBoardingTemplate('onboarding.noExpenses', XDaysAgo(35), onlyCollectivesWithoutExpenses), // another reminder after 35 days if no expenses filed yet
   processOnBoardingTemplate('onboarding.noUpdates', XDaysAgo(21), onlyCollectivesWithoutUpdates),
-  processOnBoardingTemplate('onboarding.day7', XDaysAgo(7)),
+  processOnBoardingTemplate('onboarding.day3-b', XDaysAgo(3)),
   processOnBoardingTemplate('onboarding.day2', XDaysAgo(2)),
 ]).then(() => {
   console.log('>>> all done');
