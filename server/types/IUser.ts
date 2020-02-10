@@ -8,6 +8,5 @@ interface IUser {
   email: string;
   emailWaitingForValidation: string;
   emailConfirmationToken: string;
-  paypalEmail: string;
   data: any | null;
 }

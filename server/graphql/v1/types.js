@@ -15,7 +15,7 @@ import {
 import { Kind } from 'graphql/language';
 import GraphQLJSON from 'graphql-type-json';
 import he from 'he';
-import { pick, omit } from 'lodash';
+import { pick, omit, get } from 'lodash';
 import moment from 'moment';
 
 import { CollectiveInterfaceType, CollectiveSearchResultsType } from './CollectiveInterface';
@@ -34,6 +34,7 @@ import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
 import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
 import * as commonComment from '../common/comment';
 import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
+import { PayoutMethodTypes } from '../../models/PayoutMethod';
 
 import { idEncode } from '../v2/identifiers';
 
@@ -83,6 +84,35 @@ export const IsoDateString = new GraphQLScalarType({
       throw new GraphQLError('Query error: unable to pass date string. Expected a valid ISO-8601 date string.');
     }
     return date;
+  },
+});
+
+export const PayoutMethodTypeEnum = new GraphQLEnumType({
+  name: 'PayoutMethodTypeEnum',
+  values: Object.keys(PayoutMethodTypes).reduce((values, key) => {
+    return { ...values, [key]: { value: PayoutMethodTypes[key] } };
+  }, {}),
+});
+
+export const PayoutMethodType = new GraphQLObjectType({
+  name: 'PayoutMethod',
+  description: 'A payout method for expenses',
+  fields: {
+    id: {
+      type: GraphQLInt,
+    },
+    type: {
+      type: PayoutMethodTypeEnum,
+    },
+    name: {
+      type: GraphQLString,
+    },
+    isSaved: {
+      type: GraphQLBoolean,
+    },
+    data: {
+      type: GraphQLJSON,
+    },
   },
 });
 
@@ -168,8 +198,14 @@ export const UserType = new GraphQLObjectType({
       },
       paypalEmail: {
         type: GraphQLString,
-        resolve(user, args, req) {
-          return user.getPersonalDetails && user.getPersonalDetails(req.remoteUser).then(user => user.paypalEmail);
+        deprecationReason: '2020-01-20 - Payout methods are now attached to collectives',
+        async resolve(user, args, req) {
+          if (!req.remoteUser || !(await req.loaders.User.canSeeUserPrivateInfo.load(user))) {
+            return null;
+          } else {
+            const payoutMethods = await req.loaders.PayoutMethod.paypalByCollectiveId.load(user.CollectiveId);
+            return get(payoutMethods[0], 'data.email');
+          }
         },
       },
       isLimited: {
@@ -742,8 +778,27 @@ export const ExpenseType = new GraphQLObjectType({
       },
       payoutMethod: {
         type: GraphQLString,
+        deprecationReason: '2020-01-23 - Please use the private field instead.',
         resolve(expense) {
-          return expense.payoutMethod;
+          return expense.legacyPayoutMethod;
+        },
+      },
+      PayoutMethod: {
+        type: PayoutMethodType,
+        async resolve(expense, _, req) {
+          if (!(await canViewExpensePrivateInfo(expense, req)) || !expense.PayoutMethodId) {
+            return null;
+          } else {
+            return expense.payoutMethod || req.loaders.PayoutMethod.byId(expense.PayoutMethodId);
+          }
+        },
+      },
+      canSeePrivateInfo: {
+        type: GraphQLBoolean,
+        description:
+          "Returns true if current user is allowed to see expense's private info, such as attachment's URLS or payout methods.",
+        resolve(expense, _, req) {
+          return canViewExpensePrivateInfo(expense, req);
         },
       },
       privateMessage: {

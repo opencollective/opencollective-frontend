@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import Temporal from 'sequelize-temporal';
 import { TransactionTypes } from '../constants/transactions';
 import activities from '../constants/activities';
@@ -7,6 +7,7 @@ import expenseType from '../constants/expense_type';
 import CustomDataTypes from '../models/DataTypes';
 import { reduceArrayToCurrency } from '../lib/currency';
 import models, { Op } from './';
+import { PayoutMethodTypes } from './PayoutMethod';
 
 export default function(Sequelize, DataTypes) {
   const Expense = Sequelize.define(
@@ -61,7 +62,12 @@ export default function(Sequelize, DataTypes) {
         allowNull: false,
       },
 
-      payoutMethod: {
+      /**
+       * @deprecated Now using PaymentMethodId. The reason why this hadn't been removed yet
+       * is because we'd need to migrate the legacy `donation` payout types that exist in the
+       * DB and that `PayoutMethod` has no equivalent for.
+       */
+      legacyPayoutMethod: {
         type: DataTypes.STRING,
         validate: {
           isIn: {
@@ -72,6 +78,14 @@ export default function(Sequelize, DataTypes) {
         },
         allowNull: false,
         defaultValue: 'manual',
+      },
+
+      PayoutMethodId: {
+        type: DataTypes.INTEGER,
+        references: { key: 'id', model: 'PayoutMethods' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: true,
       },
 
       privateMessage: DataTypes.STRING,
@@ -137,11 +151,12 @@ export default function(Sequelize, DataTypes) {
             id: this.id,
             UserId: this.UserId,
             CollectiveId: this.CollectiveId,
+            FromCollectiveId: this.FromCollectiveId,
             currency: this.currency,
             amount: this.amount,
             description: this.description,
             category: this.category,
-            payoutMethod: this.payoutMethod,
+            legacyPayoutMethod: this.legacyPayoutMethod,
             vat: this.vat,
             privateMessage: this.privateMessage,
             lastEditedById: this.lastEditedById,
@@ -157,11 +172,12 @@ export default function(Sequelize, DataTypes) {
             id: this.id,
             UserId: this.UserId,
             CollectiveId: this.CollectiveId,
+            FromCollectiveId: this.FromCollectiveId,
             currency: this.currency,
             amount: this.amount,
             description: this.description,
             category: this.category,
-            payoutMethod: this.payoutMethod,
+            legacyPayoutMethod: this.legacyPayoutMethod,
             vat: this.vat,
             lastEditedById: this.lastEditedById,
             status: this.status,
@@ -195,6 +211,7 @@ export default function(Sequelize, DataTypes) {
       this.collective = await this.getCollective();
     }
     const host = await this.collective.getHostCollective(); // may be null
+    const payoutMethod = await this.getPayoutMethod();
     const transaction =
       this.status === status.PAID &&
       (await models.Transaction.findOne({
@@ -211,6 +228,7 @@ export default function(Sequelize, DataTypes) {
         fromCollective: userCollective.minimal,
         expense: this.info,
         transaction: transaction.info,
+        payoutMethod: payoutMethod && pick(payoutMethod.dataValues, ['id', 'type', 'data']),
       },
     });
   };
@@ -241,8 +259,11 @@ export default function(Sequelize, DataTypes) {
     return this.save();
   };
 
-  Expense.prototype.getPaypalEmail = function() {
-    return this.getUser().then(user => user.paypalEmail || user.email);
+  /**
+   * Returns the PayoutMethod.type based on the legacy `payoutMethod`
+   */
+  Expense.prototype.getPayoutMethodTypeFromLegacy = function() {
+    return Expense.getPayoutMethodTypeFromLegacy(this.legacyPayoutMethod);
   };
 
   /**
@@ -279,6 +300,24 @@ export default function(Sequelize, DataTypes) {
       }
     }
     return reduceArrayToCurrency(arr, baseCurrency);
+  };
+
+  /**
+   * Returns the legacy `payoutMethod` based on the new `PayoutMethod` type
+   */
+  Expense.getLegacyPayoutMethodTypeFromPayoutMethod = function(payoutMethod) {
+    if (payoutMethod && payoutMethod.type === PayoutMethodTypes.PAYPAL) {
+      return 'paypal';
+    } else {
+      return 'other';
+    }
+  };
+
+  /**
+   * Returns the PayoutMethod.type based on the legacy `payoutMethod`
+   */
+  Expense.getPayoutMethodTypeFromLegacy = function(legacyPayoutMethod) {
+    return legacyPayoutMethod === 'paypal' ? PayoutMethodTypes.PAYPAL : PayoutMethodTypes.OTHER;
   };
 
   Temporal(Expense, Sequelize);

@@ -1004,7 +1004,7 @@ export async function addFundsToCollective(order, remoteUser) {
   let fromCollective, user;
 
   if (order.user && order.user.email) {
-    user = await models.User.findByEmailOrPaypalEmail(order.user.email);
+    user = await models.User.findByEmail(order.user.email);
     if (!user) {
       user = await models.User.createUserWithCollective({
         ...order.user,

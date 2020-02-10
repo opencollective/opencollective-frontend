@@ -86,6 +86,7 @@ export function setupModels(client) {
     'Notification',
     'Order',
     'PaymentMethod',
+    'PayoutMethod',
     'RequiredLegalDocument',
     'Session',
     'Subscription',
@@ -196,9 +197,14 @@ export function setupModels(client) {
 
   // Expense
   m.Expense.belongsTo(m.User);
+  m.Expense.belongsTo(m.PayoutMethod);
   m.Expense.belongsTo(m.Collective, {
     foreignKey: 'CollectiveId',
     as: 'collective',
+  });
+  m.Expense.belongsTo(m.Collective, {
+    foreignKey: 'FromCollectiveId',
+    as: 'fromCollective',
   });
   m.Expense.hasMany(m.ExpenseAttachment);
   m.Transaction.belongsTo(m.Expense);
@@ -239,6 +245,10 @@ export function setupModels(client) {
   });
   m.PaymentMethod.hasMany(m.Order);
   m.Transaction.belongsTo(m.PaymentMethod);
+
+  // Payout method
+  m.PayoutMethod.belongsTo(m.User, { foreignKey: 'CreatedByUserId', as: 'createdByUser' });
+  m.PayoutMethod.belongsTo(m.Collective);
 
   // Tier
   m.Tier.belongsTo(m.Collective);

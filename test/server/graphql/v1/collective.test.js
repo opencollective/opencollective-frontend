@@ -78,7 +78,7 @@ describe('server/graphql/v1/collective', () => {
         amount: 100 * (i + 1),
         description: 'test',
         currency,
-        payoutMethod: 'manual',
+        legacyPayoutMethod: 'manual',
         attachments: [{ amount: 100 * (i + 1), url: store.randUrl() }],
         collective: { id: apex.id },
       });
@@ -294,7 +294,7 @@ describe('server/graphql/v1/collective', () => {
       amount,
       description,
       currency: 'EUR',
-      payoutMethod: 'manual',
+      legacyPayoutMethod: 'manual',
       collective: { id: cid },
       attachments: [{ url: store.randUrl(), amount }],
     });
