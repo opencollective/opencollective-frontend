@@ -76,12 +76,16 @@ const MakeCommunity = () => {
             <Span>
               <FormattedMessage
                 id="home.makeCommunitySection.title.makeYourCommunity"
-                defaultMessage="Make your community"
+                defaultMessage="Make your community {sustainable}"
+                values={{
+                  sustainable: (
+                    <SustainTextWrapper>
+                      <FormattedMessage id="home.makeCommunitySection.title.sustain" defaultMessage="sustainable" />
+                    </SustainTextWrapper>
+                  ),
+                }}
               />
-            </Span>{' '}
-            <SustainTextWrapper>
-              <FormattedMessage id="home.makeCommunitySection.title.sustain" defaultMessage="sustainable" />
-            </SustainTextWrapper>
+            </Span>
           </H1>
           <H4
             mb={[2, null, 4]}

@@ -94,7 +94,7 @@ const JoinUs = () => (
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </H1>
               <P fontSize={['Caption', null, '15px']} lineHeight={['19px', null, '25px']} letterSpacing="-0.016em">
-                <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now !" />
+                <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />
               </P>
             </Box>
             <Box className="arrowWrapper" color="black.500">
