@@ -22,6 +22,7 @@ const Page = ({
   menuItems,
   canonicalURL,
   withoutGlobalStyles,
+  withSmoothScroll,
   collective,
 }) => {
   if (data.error) {
@@ -43,7 +44,7 @@ const Page = ({
         collective={collective}
         menuItems={menuItems}
       />
-      <Body withoutGlobalStyles={withoutGlobalStyles}>
+      <Body withoutGlobalStyles={withoutGlobalStyles} withSmoothScroll={withSmoothScroll}>
         {typeof children === 'function' ? children(childProps) : children}
       </Body>
       <Footer />
@@ -65,6 +66,7 @@ Page.propTypes = {
   LoggedInUser: PropTypes.shape({}),
   showSearch: PropTypes.bool,
   withoutGlobalStyles: PropTypes.bool,
+  withSmoothScroll: PropTypes.bool,
   noRobots: PropTypes.bool,
   title: PropTypes.string,
   twitterHandle: PropTypes.string,
