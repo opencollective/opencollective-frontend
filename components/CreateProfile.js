@@ -187,7 +187,7 @@ const CreateProfile = ({
           <Box mb={24}>
             <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
               {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e John Doe" />
               )}
             </StyledInputField>
           </Box>
