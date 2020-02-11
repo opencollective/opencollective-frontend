@@ -1,6 +1,6 @@
 /** @module models/PaymentMethod */
 
-import libdebug from 'debug';
+import debugLib from 'debug';
 import Promise from 'bluebird';
 import { get, intersection } from 'lodash';
 import { Op } from 'sequelize';
@@ -17,7 +17,7 @@ import { isTestToken } from '../lib/stripe';
 
 import { maxInteger } from '../constants/math';
 
-const debug = libdebug('PaymentMethod');
+const debug = debugLib('PaymentMethod');
 
 export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;

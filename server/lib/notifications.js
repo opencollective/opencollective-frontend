@@ -15,6 +15,7 @@ import { sanitizeActivity, enrichActivity } from './webhooks';
 import { PayoutMethodTypes } from '../models/PayoutMethod';
 
 const debug = debugLib('notification');
+const debugActivityData = debugLib('activity.data');
 
 export default async (Sequelize, activity) => {
   // publish everything to our private channel
@@ -186,7 +187,7 @@ async function notifyMembersOfCollective(CollectiveId, activity, options) {
 
 async function notifyByEmail(activity) {
   debug('notifyByEmail', activity.type);
-  debugLib('activity.data')('activity.data', activity.data);
+  debugActivityData('activity.data', activity.data);
   switch (activity.type) {
     case activityType.TICKET_CONFIRMED:
       notifyUserId(activity.data.UserId, activity);

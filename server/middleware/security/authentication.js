@@ -1,4 +1,4 @@
-import debug from 'debug';
+import debugLib from 'debug';
 import config from 'config';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
@@ -20,6 +20,7 @@ const { User } = models;
 const { BadRequest, CustomError } = errors;
 
 const { jwtSecret } = config.keys.opencollective;
+const debug = debugLib('auth');
 
 /**
  * Middleware related to authentication.
@@ -128,7 +129,7 @@ export const _authenticateUserByJwt = async (req, res, next) => {
 
   req.remoteUser = user;
 
-  debug('auth')('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
+  debug('logged in user', req.remoteUser.id, 'roles:', req.remoteUser.rolesByCollectiveId);
   next();
 };
 
@@ -147,14 +148,14 @@ export function authenticateUser(req, res, next) {
   parseJwtNoExpiryCheck(req, res, e => {
     // If a token was submitted but is invalid, we continue without authenticating the user
     if (e) {
-      debug('auth')('>>> checkJwtExpiry invalid error', e);
+      debug('>>> checkJwtExpiry invalid error', e);
       return next();
     }
 
     checkJwtExpiry(req, res, e => {
       // If a token was submitted and is expired, we continue without authenticating the user
       if (e) {
-        debug('auth')('>>> checkJwtExpiry expiry error', e);
+        debug('>>> checkJwtExpiry expiry error', e);
         return next();
       }
       _authenticateUserByJwt(req, res, next);

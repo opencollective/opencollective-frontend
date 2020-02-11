@@ -1,5 +1,5 @@
 import config from 'config';
-import debug from 'debug';
+import debugLib from 'debug';
 
 import errors from '../../lib/errors';
 import { authenticateUser } from './authentication';
@@ -7,6 +7,8 @@ import { authenticateUser } from './authentication';
 import models from '../../models';
 
 const { Unauthorized } = errors;
+
+const debug = debugLib('auth');
 
 /**
  * Check Client App
@@ -21,7 +23,7 @@ export async function checkClientApp(req, res, next) {
       where: { type: 'apiKey', apiKey },
     });
     if (app) {
-      debug('auth')('Valid Client App (apiKey)');
+      debug('Valid Client App (apiKey)');
       req.clientApp = app;
       const collectiveId = app.CollectiveId;
       if (collectiveId) {
@@ -35,7 +37,7 @@ export async function checkClientApp(req, res, next) {
       }
       next();
     } else {
-      debug('auth')(`Invalid Client App (apiKey: ${apiKey}).`);
+      debug(`Invalid Client App (apiKey: ${apiKey}).`);
       next(new Unauthorized(`Invalid Api Key: ${apiKey}.`));
     }
   } else if (clientId) {
@@ -44,16 +46,16 @@ export async function checkClientApp(req, res, next) {
       where: { clientId },
     });
     if (app) {
-      debug('auth')('Valid Client App');
+      debug('Valid Client App');
       req.clientApp = app;
       next();
     } else {
-      debug('auth')(`Invalid Client App (clientId: ${clientId}).`);
+      debug(`Invalid Client App (clientId: ${clientId}).`);
       next(new Unauthorized(`Invalid Client Id: ${clientId}.`));
     }
   } else {
     next();
-    debug('auth')('No Client App');
+    debug('No Client App');
   }
 }
 
@@ -94,16 +96,16 @@ export function authorizeClientApp(req, res, next) {
 
   const apiKey = req.get('Api-Key') || req.query.apiKey || req.query.api_key || req.body.api_key;
   if (req.clientApp) {
-    debug('auth')('Valid Client App');
+    debug('Valid Client App');
     next();
   } else if (apiKey === config.keys.opencollective.apiKey) {
-    debug('auth')(`Valid API key: ${apiKey}`);
+    debug(`Valid API key: ${apiKey}`);
     next();
   } else if (apiKey) {
-    debug('auth')(`Invalid API key: ${apiKey}`);
+    debug(`Invalid API key: ${apiKey}`);
     next(new Unauthorized(`Invalid API key: ${apiKey}`));
   } else {
-    debug('auth')('Missing API key or Client Id');
+    debug('Missing API key or Client Id');
     next();
   }
 }
