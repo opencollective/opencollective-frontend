@@ -53,7 +53,6 @@ Promise.all([
   processOnBoardingTemplate('onboarding.day7-b', XDaysAgo(7)),
   processOnBoardingTemplate('onboarding.day21.noTwitter', XDaysAgo(21), onlyCollectivesWithoutTwitterActivated),
   processOnBoardingTemplate('onboarding.noExpenses', XDaysAgo(14), onlyCollectivesWithoutExpenses),
-  processOnBoardingTemplate('onboarding.noExpenses', XDaysAgo(35), onlyCollectivesWithoutExpenses), // another reminder after 35 days if no expenses filed yet
   processOnBoardingTemplate('onboarding.noUpdates', XDaysAgo(21), onlyCollectivesWithoutUpdates),
   processOnBoardingTemplate('onboarding.day7', XDaysAgo(7)),
   processOnBoardingTemplate('onboarding.day2', XDaysAgo(2)),
