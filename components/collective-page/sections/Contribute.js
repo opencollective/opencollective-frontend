@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 import { orderBy } from 'lodash';
+import styled from 'styled-components';
+import css from '@styled-system/css';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
@@ -24,6 +26,12 @@ import TopContributors from '../TopContributors';
 import SectionTitle from '../SectionTitle';
 
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];
+
+const ContributeCardContainer = styled(Box).attrs({ px: CONTRIBUTE_CARD_PADDING_X })(
+  css({
+    scrollSnapAlign: ['center', null, 'start'],
+  }),
+);
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -175,7 +183,7 @@ class SectionContribute extends React.PureComponent {
                   </ContainerSectionContent>
 
                   <ContributeCardsContainer ref={ref}>
-                    <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeCardContainer>
                       <ContributeCustom
                         collective={collective}
                         contributors={financialContributorsWithoutTier}
@@ -183,23 +191,23 @@ class SectionContribute extends React.PureComponent {
                         hideContributors={hasNoContributor}
                         disableCTA={!collective.isActive}
                       />
-                    </Box>
+                    </ContributeCardContainer>
                     {sortedTiers.map(tier => (
-                      <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeCardContainer key={tier.id}>
                         <ContributeTier
                           collective={collective}
                           tier={tier}
                           hideContributors={hasNoContributor}
                           disableCTA={!collective.isActive}
                         />
-                      </Box>
+                      </ContributeCardContainer>
                     ))}
                     {isAdmin && (
-                      <Box px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeCardContainer>
                         <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
                           <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
                         </CreateNew>
-                      </Box>
+                      </ContributeCardContainer>
                     )}
                   </ContributeCardsContainer>
                 </div>
