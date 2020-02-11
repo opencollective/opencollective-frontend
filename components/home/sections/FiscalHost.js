@@ -12,16 +12,16 @@ import SectionTitle from '../SectionTitle';
 import Illustration from '../HomeIllustration';
 
 const Wrapper = styled(Container)`
-  background-image: url('/static/images/fiscalhost-bg-sm.png');
+  background-image: url('/static/images/home/fiscalhost-bg-sm.png');
   background-size: 100% 100%;
 
   @media screen and (min-width: 52em) {
-    background-image: url('/static/images/fiscalhost-bg-md.png');
+    background-image: url('/static/images/home/fiscalhost-bg-md.png');
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background-image: url('/static/images/fiscalhost-bg-lg.png');
+    background-image: url('/static/images/home/fiscalhost-bg-lg.png');
     background-size: 100% 100%;
   }
 `;
@@ -103,17 +103,17 @@ const FiscalHost = () => (
       <Container ml={[null, null, null, null, 4]}>
         <Illustration
           display={['block', null, 'none', null, 'none']}
-          src="/static/images/fiscalhost-illustration-sm.png"
+          src="/static/images/home/fiscalhost-illustration-sm.png"
           alt="Fiscal Host"
         />
         <Illustration
           display={['none', null, 'block', null, 'none']}
-          src="/static/images/fiscalhost-illustration.png"
+          src="/static/images/home/fiscalhost-illustration.png"
           alt="Fiscal Host"
         />
         <Illustration
           display={['none', null, 'none', null, 'block']}
-          src="/static/images/fiscalhost-illustration-lg.png"
+          src="/static/images/home/fiscalhost-illustration-lg.png"
           alt="Fiscal Host"
         />
       </Container>

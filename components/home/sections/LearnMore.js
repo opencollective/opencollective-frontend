@@ -99,7 +99,7 @@ const LearnMore = () => {
             <Container display="flex" alignItems="center" my={2}>
               <IconWrapper mr={4}>
                 <Illustration
-                  src={`/static/images/${channel.id}-illustration.png`}
+                  src={`/static/images/home/${channel.id}-illustration.png`}
                   alt={`${channel.id} illustration`}
                 />
               </IconWrapper>
