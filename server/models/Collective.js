@@ -1507,9 +1507,11 @@ export default function(Sequelize, DataTypes) {
       throw new Error(`This collective already has a host (HostCollectiveId: ${this.HostCollectiveId})`);
     }
 
-    const hostPlan = await hostCollective.getPlan();
-    if (hostPlan.hostedCollectivesLimit && hostPlan.hostedCollectives >= hostPlan.hostedCollectivesLimit) {
-      throw new Error('Host is already hosting the maximum amount of collectives its plan allows');
+    if (this.type === types.COLLECTIVE) {
+      const hostPlan = await hostCollective.getPlan();
+      if (hostPlan.hostedCollectivesLimit && hostPlan.hostedCollectives >= hostPlan.hostedCollectivesLimit) {
+        throw new Error('Host is already hosting the maximum amount of collectives its plan allows');
+      }
     }
 
     const member = {
