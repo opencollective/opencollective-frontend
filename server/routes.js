@@ -94,21 +94,25 @@ export default app => {
     });
     app.use('/graphql', rateLimiter);
   }
-
   if (process.env.DEBUG) {
+    const debugOperation = debug('operation');
+    const debugParams = debug('params');
+    const debugHeaders = debug('headers');
+    const debugCurl = debug('curl');
+
     app.use('*', (req, res, next) => {
       const body = sanitizeForLogs(req.body || {});
-      debug('operation')(body.operationName, JSON.stringify(body.variables, null));
+      debugOperation(body.operationName, JSON.stringify(body.variables, null));
       if (body.query) {
         const query = body.query;
-        debug('params')(query);
+        debugParams(query);
         delete body.query;
       }
-      debug('params')('req.query', req.query);
-      debug('params')('req.body', JSON.stringify(body, null, '  '));
-      debug('params')('req.params', req.params);
-      debug('headers')('req.headers', req.headers);
-      debug('curl')('curl', curlify(req, req.body));
+      debugParams('req.query', req.query);
+      debugParams('req.body', JSON.stringify(body, null, '  '));
+      debugParams('req.params', req.params);
+      debugHeaders('req.headers', req.headers);
+      debugCurl('curl', curlify(req, req.body));
       next();
     });
   }

@@ -10,6 +10,8 @@ import status from '../../constants/order_status';
 import activities from '../../constants/activities';
 import * as paymentsLib from '../payments';
 
+const debug = debugLib('dispatch_prepaid_subscription');
+
 export function needsDispatching(nextDispatchDate) {
   const needs = moment(nextDispatchDate).isSameOrBefore();
   return needs;
@@ -61,7 +63,6 @@ async function createPaymentMethod(originalCreditTransaction) {
 }
 
 export async function dispatchFunds(order) {
-  const debug = debugLib('dispatch_prepaid_subscription');
   // Amount shareable amongst dependencies
   const transaction = await models.Transaction.findOne({
     where: { OrderId: order.id, type: 'CREDIT' },

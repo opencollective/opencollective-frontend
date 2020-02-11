@@ -1,7 +1,9 @@
-import debug from 'debug';
+import debugLib from 'debug';
 import { graphql } from 'graphql';
 import { loaders } from '../loaders';
 import schema from './schema';
+
+const debug = debugLib('graphql');
 
 export const makeRequest = (remoteUser, query) => {
   return {
@@ -22,9 +24,9 @@ export const graphqlQuery = async (query, variables, remoteUser) => {
   };
 
   if (process.env.DEBUG && process.env.DEBUG.match(/graphql/)) {
-    debug('graphql')('query', query);
-    debug('graphql')('variables', variables);
-    debug('graphql')('context', remoteUser);
+    debug('query', query);
+    debug('variables', variables);
+    debug('context', remoteUser);
   }
 
   return prepare().then(() =>

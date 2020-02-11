@@ -33,14 +33,15 @@ export default function(app) {
   app.use(loadersMiddleware);
 
   if (process.env.DEBUG && process.env.DEBUG.match(/response/)) {
+    const debugResponse = debug('response');
     app.use((req, res, next) => {
       const temp = res.end;
       res.end = function(str) {
         try {
           const obj = JSON.parse(str);
-          debug('response')(JSON.stringify(obj, null, '  '));
+          debugResponse(JSON.stringify(obj, null, '  '));
         } catch (e) {
-          debug('response', str);
+          debugResponse(str);
         }
         temp.apply(this, arguments);
       };

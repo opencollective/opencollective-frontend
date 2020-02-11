@@ -1,7 +1,7 @@
 import pg from 'pg';
 import Sequelize from 'sequelize';
 import config from 'config';
-import debug from 'debug';
+import debugLib from 'debug';
 
 import logger from '../lib/logger';
 import { getDBConf } from '../lib/db';
@@ -11,6 +11,7 @@ import { getDBConf } from '../lib/db';
 pg.defaults.parseInt8 = true;
 
 const dbConfig = getDBConf('database');
+const debug = debugLib('psql');
 
 /**
  * Database connection.
@@ -26,12 +27,12 @@ if (config.database.options.logging) {
   if (process.env.NODE_ENV === 'production') {
     config.database.options.logging = (query, executionTime) => {
       if (executionTime > 50) {
-        debug('psql')(query.replace(/(\n|\t| +)/g, ' ').slice(0, 100), '|', executionTime, 'ms');
+        debug(query.replace(/(\n|\t| +)/g, ' ').slice(0, 100), '|', executionTime, 'ms');
       }
     };
   } else {
     config.database.options.logging = (query, executionTime) => {
-      debug('psql')(
+      debug(
         '\n-------------------- <query> --------------------\n',
         query,
         `\n-------------------- </query executionTime="${executionTime}"> --------------------\n`,
