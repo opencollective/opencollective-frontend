@@ -5,7 +5,7 @@ import { has } from 'lodash';
 /**
  * A background for the gift card redeem(ed) pages
  */
-const RedeemBackground = styled.div`
+const HappyBackground = styled.div`
   width: 100%;
   background-position: center top;
   background-repeat: no-repeat;
@@ -27,7 +27,7 @@ const RedeemBackground = styled.div`
   }}
 `;
 
-RedeemBackground.propTypes = {
+HappyBackground.propTypes = {
   /** On optional collective with settings to get the primary color */
   collective: PropTypes.shape({
     settings: PropTypes.object,
@@ -35,4 +35,4 @@ RedeemBackground.propTypes = {
 };
 
 /** @component */
-export default RedeemBackground;
+export default HappyBackground;

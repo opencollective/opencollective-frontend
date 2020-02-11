@@ -236,13 +236,18 @@ class ConversationPage extends React.Component {
   }
 
   getDefaultValue = tags => {
-    if (isEmpty(tags)) return [];
+    if (isEmpty(tags)) {
+      return [];
+    }
     return tags.map(label => ({ label, value: label }));
   };
 
   handleTagsChange = (options, setValue) => {
-    if (isEmpty(options)) setValue([]);
-    else setValue(options.map(i => i.value));
+    if (isEmpty(options)) {
+      setValue([]);
+    } else {
+      setValue(options.map(i => i.value));
+    }
   };
 
   render() {

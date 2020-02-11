@@ -27,7 +27,7 @@ import { isValidEmail, getErrorFromGraphqlException } from '../lib/utils';
 import StyledButton from '../components/StyledButton';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import RedeemBackground from '../components/virtual-cards/RedeemBackground';
+import HappyBackground from '../components/virtual-cards/HappyBackground';
 import CollectiveCard from '../components/virtual-cards/CollectiveCard';
 
 const ShadowBox = styled(Box)`
@@ -215,9 +215,9 @@ class RedeemPage extends React.Component {
         <Body>
           <CollectiveThemeProvider collective={collective}>
             <Flex alignItems="center" flexDirection="column">
-              <RedeemBackground collective={collective}>
+              <HappyBackground collective={collective}>
                 <div>{this.renderHeroContent()}</div>
-              </RedeemBackground>
+              </HappyBackground>
               <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
                 <Container mt={54} zIndex={2}>
                   <Flex justifyContent="center" alignItems="center" flexDirection="column">
