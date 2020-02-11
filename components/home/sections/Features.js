@@ -277,7 +277,7 @@ const Features = () => {
               <SelectFeatureButton
                 width={1}
                 onClick={() => setActiveFeature(feature)}
-                active={activeFeature === feature.id}
+                active={activeFeature.id === feature.id}
               >
                 <FeatureTitle intl={intl} id={feature.id} activeFeature={activeFeature.id} />
               </SelectFeatureButton>
