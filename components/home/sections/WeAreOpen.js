@@ -15,17 +15,17 @@ import SectionSubtitle from '../SectionSubtitle';
 import StyledCard from '../../StyledCard';
 
 const Wrapper = styled(Container)`
-  background-image: ${props => props.openFeature && `url('/static/images/${props.openFeature}-bg-sm.png')`};
+  background-image: ${props => props.openFeature && `url('/static/images/home/${props.openFeature}-bg-sm.png')`};
   background-size: 100% 100%;
   flex-wrap: wrap;
 
   @media screen and (min-width: 64em) {
-    background-image: url('/static/images/weareopen-bg.png');
+    background-image: url('/static/images/home/weareopen-bg.png');
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background-image: url('/static/images/weareopen-bg-lg.png');
+    background-image: url('/static/images/home/weareopen-bg-lg.png');
     background-size: 100% 100%;
   }
 `;
@@ -160,7 +160,7 @@ const WeAreOpen = () => (
       </SectionSubtitle>
     </Box>
     <Hide md lg my={3}>
-      <Illustration src="/static/images/weareopen-illustration-sm.png" alt="We are open in every way" />
+      <Illustration src="/static/images/home/weareopen-illustration-sm.png" alt="We are open in every way" />
     </Hide>
     <StyledCarousel display={[null, null, 'none']} width={1}>
       {openFeatures.map(openFeature => (
@@ -181,12 +181,12 @@ const WeAreOpen = () => (
     <Container display={['none', null, 'flex']} justifyContent={'center'} my={5}>
       <Illustration
         display={['none', null, 'block', null, 'none']}
-        src="/static/images/weareopen-illustration-md.png"
+        src="/static/images/home/weareopen-illustration-md.png"
         alt="We are open in every way"
       />
       <Illustration
         display={['none', null, null, null, 'block']}
-        src="/static/images/weareopen-illustration-md.png"
+        src="/static/images/home/weareopen-illustration-md.png"
         alt="We are open in every way"
         mr={3}
       />

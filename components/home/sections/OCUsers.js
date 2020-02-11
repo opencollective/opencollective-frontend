@@ -48,7 +48,7 @@ const users = [
     type: 'Open Source Projects',
     description: '',
     collectivePath: '/babel',
-    picture: '/static/images/oc-users-babel.png',
+    picture: '/static/images/home/oc-users-babel.png',
   },
   {
     id: 'meetups',
@@ -56,7 +56,7 @@ const users = [
     type: 'Meetups',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/wwcodeatl',
-    picture: '/static/images/oc-users-womenwhocode.png',
+    picture: '/static/images/home/oc-users-womenwhocode.png',
   },
   {
     id: 'movements',
@@ -64,7 +64,7 @@ const users = [
     type: 'Movements',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/xr-belgium',
-    picture: '/static/images/oc-users-extinctionrebllion.png',
+    picture: '/static/images/home/oc-users-extinctionrebllion.png',
   },
 ];
 

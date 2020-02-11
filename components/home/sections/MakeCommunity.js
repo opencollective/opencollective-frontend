@@ -14,7 +14,7 @@ import Modal from '../../StyledModal';
 import Container from '../../Container';
 
 const SustainTextWrapper = styled(Span)`
-  background-image: url('/static/images/sustain-underline-sm.png');
+  background-image: url('/static/images/home/sustain-underline-sm.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position-y: 7px;
@@ -22,7 +22,7 @@ const SustainTextWrapper = styled(Span)`
   padding-right: 12px;
 
   @media screen and (min-width: 64em) {
-    background-image: url('/static/images/sustain-underline.png');
+    background-image: url('/static/images/home/sustain-underline.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     background-position-y: 16px;
@@ -135,17 +135,17 @@ const MakeCommunity = () => {
         <Flex mt={5} width={[1, null, '672px']} justifyContent="center" alignItems="center">
           <Illustration
             alt="Make your community sustainable"
-            src="/static/images/makecommunity-section-illustration.png"
+            src="/static/images/home/makecommunity-section-illustration.png"
             display={['none', null, null, null, 'block']}
           />
           <Illustration
             alt="Make your community sustainable"
-            src="/static/images/makecommunity-section-illustration-md.png"
+            src="/static/images/home/makecommunity-section-illustration-md.png"
             display={['none', null, 'block', null, 'none']}
           />
           <Illustration
             alt="Make your community sustainable"
-            src="/static/images/makecommunity-illustration-sm.png"
+            src="/static/images/home/makecommunity-illustration-sm.png"
             display={['block', null, 'none']}
           />
         </Flex>

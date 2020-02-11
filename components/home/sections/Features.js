@@ -161,7 +161,8 @@ const messages = defineMessages({
 });
 
 const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
-  const iconUrl = activeFeature === id ? `/static/images/${id}-icon.png` : `/static/images/${id}-icon-black.png`;
+  const iconUrl =
+    activeFeature === id ? `/static/images/home/${id}-icon.png` : `/static/images/home/${id}-icon-black.png`;
 
   return (
     <Flex alignItems="center" justifyContent="space-between" width={1} {...props}>
@@ -228,13 +229,13 @@ const Feature = ({ id, learnMoreLink, intl }) => (
     <Container width={[null, null, '609px', null, '735px']}>
       <Box display={['none', null, 'block']}>
         <Illustration
-          src={`/static/images/${id}-screenshot.png`}
+          src={`/static/images/home/${id}-screenshot.png`}
           alt={intl.formatMessage(messages[`home.feature.${id}`])}
         />
       </Box>
       <Box display={['block', null, 'none']}>
         <Illustration
-          src={`/static/images/${id}-screenshot-sm.png`}
+          src={`/static/images/home/${id}-screenshot-sm.png`}
           alt={intl.formatMessage(messages[`home.feature.${id}`])}
         />
       </Box>

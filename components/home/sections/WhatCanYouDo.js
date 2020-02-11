@@ -16,8 +16,8 @@ import SectionSubTitle from '../SectionSubtitle';
 const Wrapper = styled(Box)`
   background-image: ${props =>
     props.hovering
-      ? "url('/static/images/create-collective-bg-illustration-hover-sm.png')"
-      : "url('/static/images/create-collective-bg-illustration-sm.png')"};
+      ? "url('/static/images/home/create-collective-bg-illustration-hover-sm.png')"
+      : "url('/static/images/home/create-collective-bg-illustration-sm.png')"};
   background-size: 100% 100%;
   display: flex;
   align-items: center;
@@ -26,8 +26,8 @@ const Wrapper = styled(Box)`
   @media screen and (min-width: 52em) {
     background-image: ${props =>
       props.hovering
-        ? "url('/static/images/create-collective-bg-illustration-hover.png')"
-        : "url('/static/images/create-collective-bg-illustration.png')"};
+        ? "url('/static/images/home/create-collective-bg-illustration-hover.png')"
+        : "url('/static/images/home/create-collective-bg-illustration.png')"};
     background-size: 100% 100%;
   }
 `;
@@ -91,12 +91,12 @@ const WhatCanYouDo = () => {
         </Title>
         <Box width={[null, '448px', null, null, '576px', '583px']} mr={[null, null, null, 5]}>
           <Illustration
-            src="/static/images/collectmoney-illustration-md.png"
+            src="/static/images/home/collectmoney-illustration-md.png"
             display={['block', null, null, 'none']}
             alt="Collect money"
           />
           <Illustration
-            src="/static/images/collectmoney-illustration-lg.png"
+            src="/static/images/home/collectmoney-illustration-lg.png"
             display={['none', null, null, 'block']}
             alt="Collect money"
           />
@@ -125,12 +125,12 @@ const WhatCanYouDo = () => {
         </Title>
         <Box width={[null, '448px', null, null, '576px', '583px']} ml={[null, null, null, 5]}>
           <Illustration
-            src="/static/images/spendmoney-illustration-md.png"
+            src="/static/images/home/spendmoney-illustration-md.png"
             display={['block', null, null, 'none']}
             alt="Spend money"
           />
           <Illustration
-            src="/static/images/spendmoney-illustration-lg.png"
+            src="/static/images/home/spendmoney-illustration-lg.png"
             display={['none', null, null, 'block']}
             alt="Spend money"
           />
@@ -159,12 +159,12 @@ const WhatCanYouDo = () => {
         </Title>
         <Box width={[null, '448px', null, null, '576px', '583px']} mr={[null, null, null, 5]}>
           <Illustration
-            src="/static/images/managemoney-illustration-md.png"
+            src="/static/images/home/managemoney-illustration-md.png"
             alt="Manage money"
             display={['block', null, null, 'none']}
           />
           <Illustration
-            src="/static/images/managemoney-illustration-lg.png"
+            src="/static/images/home/managemoney-illustration-lg.png"
             alt="Manage money"
             display={['none', null, null, 'block']}
           />
