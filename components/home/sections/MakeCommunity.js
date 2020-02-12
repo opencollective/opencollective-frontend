@@ -136,12 +136,7 @@ const MakeCommunity = () => {
           <Illustration
             alt="Make your community sustainable"
             src="/static/images/home/makecommunity-section-illustration.png"
-            display={['none', null, null, null, 'block']}
-          />
-          <Illustration
-            alt="Make your community sustainable"
-            src="/static/images/home/makecommunity-section-illustration-md.png"
-            display={['none', null, 'block', null, 'none']}
+            display={['none', null, 'block']}
           />
           <Illustration
             alt="Make your community sustainable"
