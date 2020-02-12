@@ -473,7 +473,9 @@ export async function payExpense(remoteUser, args) {
     throw new errors.Unauthorized('Expense has already been paid');
   }
   if (expense.status === statuses.PROCESSING) {
-    throw new errors.Unauthorized('Expense has already been paid but is still being processed');
+    throw new errors.Unauthorized(
+      'Expense is currently being processed, this means someone already started the payment process',
+    );
   }
   if (expense.status === statuses.ERROR) {
     throw new errors.Unauthorized('Expense has already been paid and it failed, please create a new one');
