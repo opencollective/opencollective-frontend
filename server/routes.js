@@ -1,8 +1,6 @@
 import serverStatus from 'express-server-status';
 import GraphHTTP from 'express-graphql';
-import curlify from 'request-as-curl';
 import multer from 'multer';
-import debug from 'debug';
 import config from 'config';
 
 import redis from 'redis';
@@ -29,7 +27,6 @@ import sanitizer from './middleware/sanitizer';
 import * as paypal from './paymentProviders/paypal/payment';
 
 import logger from './lib/logger';
-import { sanitizeForLogs } from './lib/utils';
 
 import graphqlSchemaV1 from './graphql/v1/schema';
 import graphqlSchemaV2 from './graphql/v2/schema';
@@ -93,28 +90,6 @@ export default app => {
       },
     });
     app.use('/graphql', rateLimiter);
-  }
-  if (process.env.DEBUG) {
-    const debugOperation = debug('operation');
-    const debugParams = debug('params');
-    const debugHeaders = debug('headers');
-    const debugCurl = debug('curl');
-
-    app.use('*', (req, res, next) => {
-      const body = sanitizeForLogs(req.body || {});
-      debugOperation(body.operationName, JSON.stringify(body.variables, null));
-      if (body.query) {
-        const query = body.query;
-        debugParams(query);
-        delete body.query;
-      }
-      debugParams('req.query', req.query);
-      debugParams('req.body', JSON.stringify(body, null, '  '));
-      debugParams('req.params', req.params);
-      debugHeaders('req.headers', req.headers);
-      debugCurl('curl', curlify(req, req.body));
-      next();
-    });
   }
 
   /**

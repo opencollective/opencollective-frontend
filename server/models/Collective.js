@@ -52,8 +52,7 @@ import plans, { PLANS_COLLECTIVE_SLUG } from '../constants/plans';
 
 import { getFxRate } from '../lib/currency';
 
-const debug = debugLib('collective');
-const debugcollectiveImage = debugLib('collectiveImage');
+const debug = debugLib('models:Collective');
 
 export const defaultTiers = (HostCollectiveId, currency) => {
   const tiers = [];
@@ -840,19 +839,15 @@ export default function(Sequelize, DataTypes) {
 
   // Save image it if it returns 200
   Collective.prototype.checkAndUpdateImage = async function(image) {
-    debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image}`);
     try {
       const response = await fetch(image);
-      debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image} response.status: ${response.status}`);
       if (response.status !== 200) {
         throw new Error(`status=${response.status}`);
       }
       const body = await response.text();
-      debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image} body.length: ${body.length}`);
       if (body.length === 0) {
         throw new Error(`length=0`);
       }
-      debugcollectiveImage(`checkAndUpdateImage ${this.slug} ${image} updating`);
       return this.update({ image });
     } catch (err) {
       logger.info(`collective.checkAndUpdateImage: Unable to fetch ${image} (${err.message})`);

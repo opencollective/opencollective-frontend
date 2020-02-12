@@ -1,5 +1,3 @@
-/** @module models/Transaction */
-
 import Promise from 'bluebird';
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
@@ -12,7 +10,7 @@ import CustomDataTypes from './DataTypes';
 import { toNegative } from '../lib/math';
 import { exportToCSV } from '../lib/utils';
 
-const debug = debugLib('transaction');
+const debug = debugLib('models:Transaction');
 
 /*
  * Transaction model

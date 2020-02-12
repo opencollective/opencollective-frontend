@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 import Promise from 'bluebird';
+import debugLib from 'debug';
 import { get, remove } from 'lodash';
 
 import activitiesLib from '../lib/activities';
@@ -9,13 +10,12 @@ import twitter from './twitter';
 import emailLib from '../lib/email';
 import activityType from '../constants/activities';
 import models from '../models';
-import debugLib from 'debug';
+
 import { channels } from '../constants';
 import { sanitizeActivity, enrichActivity } from './webhooks';
 import { PayoutMethodTypes } from '../models/PayoutMethod';
 
-const debug = debugLib('notification');
-const debugActivityData = debugLib('activity.data');
+const debug = debugLib('notifications');
 
 export default async (Sequelize, activity) => {
   // publish everything to our private channel
@@ -187,7 +187,6 @@ async function notifyMembersOfCollective(CollectiveId, activity, options) {
 
 async function notifyByEmail(activity) {
   debug('notifyByEmail', activity.type);
-  debugActivityData('activity.data', activity.data);
   switch (activity.type) {
     case activityType.TICKET_CONFIRMED:
       notifyUserId(activity.data.UserId, activity);

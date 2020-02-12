@@ -13,7 +13,7 @@ import roles from '../constants/roles';
 import { isValidEmail } from '../lib/utils';
 import emailLib from '../lib/email';
 
-const debug = debugLib('user');
+const debug = debugLib('models:User');
 
 /**
  * Constants.
