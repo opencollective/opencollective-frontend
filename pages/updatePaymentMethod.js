@@ -147,17 +147,7 @@ class UpdatePaymentPage extends React.Component {
     const { showCreditCardForm, submitting } = this.state;
     const { LoggedInUser, loadingLoggedInUser, data } = this.props;
 
-    if (!data || (data && data.loading) || loadingLoggedInUser) {
-      return (
-        <Page>
-          <Flex justifyContent="center" py={6}>
-            <Loading />
-          </Flex>
-        </Page>
-      );
-    } else if (data && data.error) {
-      return <ErrorPage data={data} />;
-    } else if (!LoggedInUser) {
+    if (!LoggedInUser && !loadingLoggedInUser) {
       return (
         <Page>
           <Flex justifyContent="center" p={5}>
@@ -165,6 +155,18 @@ class UpdatePaymentPage extends React.Component {
           </Flex>
         </Page>
       );
+    } else if (loadingLoggedInUser || (data && data.loading)) {
+      return (
+        <Page>
+          <Flex justifyContent="center" py={6}>
+            <Loading />
+          </Flex>
+        </Page>
+      );
+    } else if (!data) {
+      return <ErrorPage />;
+    } else if (data && data.error) {
+      return <ErrorPage data={data} />;
     }
 
     const filteredSubscriptions = this.props.subscriptions.filter(
