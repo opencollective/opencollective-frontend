@@ -297,7 +297,7 @@ class BannerIframe extends React.Component {
           `}
         </style>
 
-        {backers.organizations + backers.users === 0 && (
+        {backers.organizations + backers.collectives + backers.users === 0 && (
           <a
             type="button"
             className="button blue contribute"
@@ -307,13 +307,13 @@ class BannerIframe extends React.Component {
           />
         )}
 
-        {backers.organizations > 0 && (
+        {backers.organizations + backers.collectives > 0 && (
           <section id="organizations" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.organizations.title"
                 values={{
-                  n: backers.organizations,
+                  n: backers.organizations + backers.collectives,
                   collective: collective.name,
                 }}
                 defaultMessage={
@@ -328,13 +328,16 @@ class BannerIframe extends React.Component {
                 rel="noopener noreferrer"
                 style={style.a}
               >
-                <FormattedMessage id="widget.becomeSponsor" defaultMessage="Become a sponsor" />
+                <FormattedMessage
+                  id="widget.contributeOnOpenCollective"
+                  defaultMessage="Contribute on Open Collective"
+                />
               </a>
             </div>
             <MembersWithData
               collective={collective}
               onChange={this.onChange}
-              type="ORGANIZATION"
+              type="ORGANIZATION,COLLECTIVE"
               role="BACKER"
               limit={100}
             />
@@ -347,7 +350,7 @@ class BannerIframe extends React.Component {
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: backers.users, collective: collective.name }}
-                defaultMessage={'{n} {n, plural, one {person is} other {people are}} supporting {collective}'}
+                defaultMessage={'{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}'}
               />
             </h2>
 
@@ -358,7 +361,10 @@ class BannerIframe extends React.Component {
                 rel="noopener noreferrer"
                 style={style.a}
               >
-                <FormattedMessage id="widget.becomeBacker" defaultMessage="Become a backer" />
+                <FormattedMessage
+                  id="widget.contributeOnOpenCollective"
+                  defaultMessage="Contribute on Open Collective"
+                />
               </a>
             </div>
             <MembersWithData
@@ -388,6 +394,7 @@ const getMembersQuery = gql`
           id
           users
           organizations
+          collectives
         }
       }
     }
