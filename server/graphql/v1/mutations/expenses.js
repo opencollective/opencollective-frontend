@@ -7,6 +7,7 @@ import models, { sequelize } from '../../../models';
 import paymentProviders from '../../../paymentProviders';
 import * as libPayments from '../../../lib/payments';
 import { formatCurrency } from '../../../lib/utils';
+import { floatAmountToCents } from '../../../lib/math';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../../lib/transactions';
 import { getFxRate } from '../../../lib/currency';
 import debugLib from 'debug';
@@ -513,7 +514,7 @@ export async function payExpense(remoteUser, args) {
     }
     const quote = await paymentProviders.transferwise.getTemporaryQuote(connectedAccount, payoutMethod, expense);
     // Notice this is the FX rate between Host and Collective, that's why we use `fxrate`.
-    fees.paymentProcessorFeeInCollectiveCurrency = Math.round((quote.fee / fxrate) * 100);
+    fees.paymentProcessorFeeInCollectiveCurrency = floatAmountToCents(quote.fee / fxrate);
   } else if (payoutMethodType === PayoutMethodTypes.PAYPAL && !args.forceManual) {
     fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders.paypal.types['adaptive'].fees({
       amount: expense.amount,
