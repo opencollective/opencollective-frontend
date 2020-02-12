@@ -477,9 +477,6 @@ export async function payExpense(remoteUser, args) {
       'Expense is currently being processed, this means someone already started the payment process',
     );
   }
-  if (expense.status === statuses.ERROR) {
-    throw new errors.Unauthorized('Expense has already been paid and it failed, please create a new one');
-  }
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }
