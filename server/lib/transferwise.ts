@@ -1,10 +1,11 @@
 import axios from 'axios';
 import config from 'config';
-import { get, omitBy, isNull } from 'lodash/fp';
+import { omitBy, isNull } from 'lodash';
 
 import { Quote, RecipientAccount } from '../types/transferwise';
 
-const compactRecipientDetails = omitBy(isNull);
+const compactRecipientDetails = <T>(object: T): Partial<T> => omitBy(object, isNull);
+const getData = <T extends { data?: object }>(obj: T | undefined): T['data'] | undefined => obj && obj.data;
 
 interface CreateQuote {
   profileId: number;
@@ -31,7 +32,7 @@ export const createQuote = async (
       },
       { headers: { Authorization: `Bearer ${token}` } },
     )
-    .then(get('data'));
+    .then(getData);
 
 interface CreateRecipientAccount extends RecipientAccount {
   profileId: number;
@@ -71,7 +72,7 @@ export const createTransfer = async (
       { targetAccount, quote, customerTransactionId, details },
       { headers: { Authorization: `Bearer ${token}` } },
     )
-    .then(get('data'));
+    .then(getData);
 
 interface FundTransfer {
   profileId: number;
@@ -87,12 +88,10 @@ export const fundTransfer = async (
       { type: 'BALANCE' },
       { headers: { Authorization: `Bearer ${token}` } },
     )
-    .then(get('data'));
+    .then(getData);
 
 export const getProfiles = async (token: string): Promise<any> =>
-  axios
-    .get(`${config.transferwise.api}/v1/profiles`, { headers: { Authorization: `Bearer ${token}` } })
-    .then(get('data'));
+  axios.get(`${config.transferwise.api}/v1/profiles`, { headers: { Authorization: `Bearer ${token}` } }).then(getData);
 
 interface GetTemporaryQuote {
   sourceCurrency: string;
@@ -114,11 +113,11 @@ export const getTemporaryQuote = async (
         ...amount,
       },
     })
-    .then(get('data'));
+    .then(getData);
 
 export const getTransfer = async (token: string, transferId: number): Promise<any> =>
   axios
     .get(`${config.transferwise.api}/v1/transfers/${transferId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-    .then(get('data'));
+    .then(getData);
