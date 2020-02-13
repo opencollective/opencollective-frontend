@@ -681,7 +681,10 @@ export const getCollectiveSourcePaymentMethodsQuery = gql`
 `;
 
 const addData = graphql(getCollectiveSourcePaymentMethodsQuery, {
-  options: props => ({ variables: { id: props.collectiveId } }),
+  options: props => ({
+    variables: { id: props.collectiveId },
+    fetchPolicy: 'network-only',
+  }),
 });
 
 const createVirtualCardsMutationQuery = gql`
