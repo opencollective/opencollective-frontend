@@ -233,7 +233,11 @@ class CollectivePage extends Component {
     );
 
     return (
-      <Container position="relative" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
+      <Container
+        position="relative"
+        css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+        data-cy="collective-page-main"
+      >
         <Hero
           collective={collective}
           host={host}
