@@ -39,11 +39,7 @@
     }
   },
   "cache": {
-    "middleware": "CACHE_MIDDLEWARE",
-    "homepage": {
-      "disabled": "CACHE_HOMEPAGE_DISABLED",
-      "refreshInterval": "CACHE_HOMEPAGE_REFRESH_INTERVAL"
-    }
+    "middleware": "CACHE_MIDDLEWARE"
   },
   "log": {
     "level": "LOG_LEVEL",
