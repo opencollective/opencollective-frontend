@@ -192,7 +192,7 @@
   "collective.pending": "Collettivo in attesa di approvazione.",
   "collective.pending.description": "Questa collettivo è in attesa di approvazione da parte dell'ospite ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}",
-  "collective.section.backers.users.title": "{n} {n, plural, one {person is} other {people are}} supporting {collective}",
+  "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
   "collective.section.contributors.empty": "You don't have any financial contributors yet.",
   "collective.section.contributors.noHost": "Enable people to contribute financially to your collective by adding a host",
   "collective.sendInvoiceByEmail.description": "Include a PDF of receipts with your monthly report email",
@@ -1286,8 +1286,8 @@
   "webhooks.save": "Salva {count} webhooks",
   "webhooks.types.label": "Attività",
   "webhooks.url.label": "URL",
-  "widget.becomeBacker": "Become a backer",
   "widget.becomeSponsor": "Become a sponsor",
+  "widget.contributeOnOpenCollective": "Contribute on Open Collective",
   "YearlyBudget": "Budget annuale",
   "yes": "Yes"
 }

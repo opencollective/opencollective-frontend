@@ -192,7 +192,7 @@
   "collective.pending": "Коллектив ждёт одобрения.",
   "collective.pending.description": "Коллектив ждёт одобрения от хоста ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {организация} other {организации}} поддерживают {collective}",
-  "collective.section.backers.users.title": "{n} {n, plural, one {человек} other {люди}} поддерживают {collective}",
+  "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
   "collective.section.contributors.empty": "У вас пока нет взносов.",
   "collective.section.contributors.noHost": "Дайте людям возможность поддержать ваш коллектив материально. Для этого, добавьте представителя коллектива",
   "collective.sendInvoiceByEmail.description": "Include a PDF of receipts with your monthly report email",
@@ -1286,8 +1286,8 @@
   "webhooks.save": "Save {count} webhooks",
   "webhooks.types.label": "Activity",
   "webhooks.url.label": "URL",
-  "widget.becomeBacker": "Стать попечителем",
   "widget.becomeSponsor": "Стать спонсором",
+  "widget.contributeOnOpenCollective": "Contribute on Open Collective",
   "YearlyBudget": "Yearly budget",
   "yes": "Yes"
 }

@@ -192,7 +192,7 @@
   "collective.pending": "Collectief wacht op goedkeuring.",
   "collective.pending.description": "Dit collectief wacht op goedkeuring van de beheerder ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organisatie} other {organisaties}} steunen {collective}",
-  "collective.section.backers.users.title": "{n} {n, plural, one {persoon} other {personen}} steunen {collective}",
+  "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
   "collective.section.contributors.empty": "Je hebt nog geen financiële bijdragers.",
   "collective.section.contributors.noHost": "Laat mensen toe om financieel bij te dragen aan je collectief door een beheerder toe te voegen",
   "collective.sendInvoiceByEmail.description": "Voeg een PDF toe van ontvangstbewijzen met je maandelijkse rapportage e-mail",
@@ -1286,8 +1286,8 @@
   "webhooks.save": "Save {count} webhooks",
   "webhooks.types.label": "Activity",
   "webhooks.url.label": "URL",
-  "widget.becomeBacker": "Become a backer",
   "widget.becomeSponsor": "Become a sponsor",
+  "widget.contributeOnOpenCollective": "Contribute on Open Collective",
   "YearlyBudget": "Yearly budget",
   "yes": "Yes"
 }
