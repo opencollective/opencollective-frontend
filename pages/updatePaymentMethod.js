@@ -17,16 +17,13 @@ import NewCreditCardForm from '../components/NewCreditCardForm';
 import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import { withStripeLoader } from '../components/StripeProvider';
+import StyledButton from '../components/StyledButton';
+import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { formatCurrency, compose } from '../lib/utils';
-
-import { withStripeLoader } from '../components/StripeProvider';
-
 import { getSubscriptionsQuery } from '../lib/graphql/queries';
-
-import StyledButton from '../components/StyledButton';
-import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);
@@ -69,6 +66,7 @@ class UpdatePaymentPage extends React.Component {
     error: null,
     stripe: null,
     submitting: false,
+    success: false,
   };
 
   componentDidMount() {
@@ -79,15 +77,19 @@ class UpdatePaymentPage extends React.Component {
     const data = get(this.state, 'newCreditCardInfo.value');
 
     if (!data || !this.state.stripe) {
-      this.setState({ error: 'There was a problem initializing the payment form' });
+      this.setState({
+        error: 'There was a problem initializing the payment form',
+        submitting: false,
+        showCreditCardForm: false,
+      });
     } else if (data.error) {
-      this.setState({ error: data.error.message });
+      this.setState({ error: data.error.message, submitting: false, showCreditCardForm: false });
     } else {
       try {
         this.setState({ submitting: true });
         const { token, error } = await this.state.stripe.createToken();
         if (error) {
-          this.setState({ error: 'There was a problem with Stripe.' });
+          this.setState({ error: 'There was a problem with Stripe.', submitting: false, showCreditCardForm: false });
           throw error;
         }
         const paymentMethod = stripeTokenToPaymentMethod(token);
@@ -104,15 +106,27 @@ class UpdatePaymentPage extends React.Component {
           this.handleSuccess();
         }
       } catch (e) {
-        this.setState({ error: 'There was an issue updating your card details.', submitting: false });
+        const message = e.message.replace('GraphQL error: ', '');
+        this.setState({ error: message, submitting: false, showCreditCardForm: false });
       }
     }
   };
 
   handleSuccess = () => {
-    this.props.data.refetch();
     this.setState({
       showCreditCardForm: false,
+      showManualPaymentMethodForm: false,
+      error: null,
+      newCreditCardInfo: {},
+      submitting: false,
+      success: true,
+    });
+  };
+
+  handleReload = () => {
+    this.props.data.refetch();
+    this.setState({
+      showCreditCardForm: true,
       showManualPaymentMethodForm: false,
       error: null,
       newCreditCardInfo: null,
@@ -122,7 +136,7 @@ class UpdatePaymentPage extends React.Component {
 
   handleStripeError = async ({ message, response }) => {
     if (!response) {
-      this.setState({ error: message, submitting: false });
+      this.setState({ error: message, submitting: false, showCreditCardForm: false });
       return;
     }
 
@@ -130,7 +144,7 @@ class UpdatePaymentPage extends React.Component {
       const stripe = await getStripe();
       const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
       if (result.error) {
-        this.setState({ submitting: false, error: result.error.message });
+        this.setState({ submitting: false, error: result.error.message, showCreditCardForm: false });
       }
       if (result.setupIntent && result.setupIntent.status === 'succeeded') {
         this.handleSuccess();
@@ -138,13 +152,8 @@ class UpdatePaymentPage extends React.Component {
     }
   };
 
-  showError = error => {
-    this.setState({ error });
-    window.scrollTo(0, 0);
-  };
-
   render() {
-    const { showCreditCardForm, submitting } = this.state;
+    const { showCreditCardForm, submitting, error, success } = this.state;
     const { LoggedInUser, loadingLoggedInUser, data } = this.props;
 
     if (!LoggedInUser && !loadingLoggedInUser) {
@@ -231,8 +240,12 @@ class UpdatePaymentPage extends React.Component {
                           />
                         </Box>
                       )}
-                      {!showCreditCardForm && (
-                        <FormattedMessage id="success" defaultMessage="Your new card info has been added" />
+                      {!showCreditCardForm && error}
+                      {!showCreditCardForm && success && (
+                        <FormattedMessage
+                          id="updatePaymentMethod.form.success"
+                          defaultMessage="Your new card info has been added"
+                        />
                       )}
                     </ShadowBox>
                   </Container>
@@ -256,7 +269,22 @@ class UpdatePaymentPage extends React.Component {
                         />
                       </StyledButton>
                     )}
-                    {!showCreditCardForm && (
+                    {!showCreditCardForm && error && (
+                      <StyledButton
+                        buttonStyle="primary"
+                        buttonSize="large"
+                        mb={2}
+                        maxWidth={335}
+                        width={1}
+                        onClick={this.handleReload}
+                      >
+                        <FormattedMessage
+                          id="updatePaymentMethod.form.updatePaymentMethodError.btn"
+                          defaultMessage="Try again"
+                        />
+                      </StyledButton>
+                    )}
+                    {!showCreditCardForm && success && (
                       <Link route={`/${this.props.slug}`}>
                         <StyledButton
                           buttonStyle="primary"
