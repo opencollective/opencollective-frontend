@@ -1,36 +1,6 @@
-import _ from 'lodash';
-import curlify from 'request-as-curl';
-import libdebug from 'debug';
+import { map } from 'lodash';
 import errors from '../lib/errors';
-import emailLib from '../lib/email';
-
-const debug = libdebug('express');
-
-const sendErrorByEmail = (req, err) => {
-  let errorHTML = 'To reproduce this error, run this CURL command:<br />\n<br />\n';
-
-  if (req.body.password) {
-    req.body.password = '***********';
-  }
-
-  if (req.body.passwordConfirmation) {
-    req.body.passwordConfirmation = '***********';
-  }
-
-  errorHTML += curlify(req, req.body);
-  errorHTML += '<br />\n<br />\n';
-  errorHTML += 'Error: <br />\n';
-  errorHTML += JSON.stringify(err);
-
-  emailLib
-    .sendMessage(
-      'server-errors@opencollective.com',
-      `[${req.app.set('env')}] Error ${err.code}: ${req.method} ${req.url}`,
-      errorHTML,
-      { bcc: ' ' },
-    )
-    .catch(console.error);
-};
+import logger from '../lib/logger';
 
 /**
  * error handler of the api
@@ -55,13 +25,13 @@ export default (err, req, res, next) => {
   if (e.indexOf('validation') !== -1) {
     err = new errors.ValidationFailed(
       null,
-      _.map(err.errors, e => e.path),
+      map(err.errors, e => e.path),
       err.message,
     );
   } else if (e.indexOf('uniqueconstraint') !== -1) {
     err = new errors.ValidationFailed(
       null,
-      _.map(err.errors, e => e.path),
+      map(err.errors, e => e.path),
       'Unique Constraint Error.',
     );
   }
@@ -71,19 +41,7 @@ export default (err, req, res, next) => {
     err.code = err.status || code;
   }
 
-  // only send email for important errors. When someone gets wrong jwt token or api key, it shouldn't spam us.
-  if (
-    req.app.set('env') === 'production' &&
-    !(err.code === 400 && req.method === 'GET') &&
-    !(err.code === 404 && req.method === 'GET')
-  ) {
-    sendErrorByEmail(req, err);
-  }
-
-  debug('Error Express : ', err);
-  if (err.stack) {
-    debug(err.stack);
-  }
+  logger.error(`Express Error: ${err.message}`);
 
   res.status(err.code).send({ error: err });
 };

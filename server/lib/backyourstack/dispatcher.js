@@ -10,7 +10,7 @@ import status from '../../constants/order_status';
 import activities from '../../constants/activities';
 import * as paymentsLib from '../payments';
 
-const debug = debugLib('dispatch_prepaid_subscription');
+const debug = debugLib('backyourstack');
 
 export function needsDispatching(nextDispatchDate) {
   const needs = moment(nextDispatchDate).isSameOrBefore();

@@ -1,13 +1,13 @@
-import { TransactionTypes } from '../constants/transactions';
 import Promise from 'bluebird';
-import CustomDataTypes from './DataTypes';
 import Temporal from 'sequelize-temporal';
+import debugLib from 'debug';
 import { get } from 'lodash';
 
-import debugLib from 'debug';
-const debug = debugLib('order');
-
+import CustomDataTypes from './DataTypes';
 import status from '../constants/order_status';
+import { TransactionTypes } from '../constants/transactions';
+
+const debug = debugLib('models:Order');
 
 export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;

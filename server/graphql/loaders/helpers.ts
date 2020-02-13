@@ -1,8 +1,5 @@
 import { get } from 'lodash';
-import debugLib from 'debug';
 import DataLoader from 'dataloader';
-
-const debug = debugLib('loaders');
 
 /** A default getter that returns item's id */
 const defaultKeyGetter = (item): number | string => item.id;
@@ -84,7 +81,6 @@ export const sortResults = (
   attribute: string = 'id',
   defaultValue: any = undefined,
 ) => {
-  debug('sortResults', attribute, 'number of results:', results.length);
   const resultsById = {};
   results.forEach(r => {
     let key;

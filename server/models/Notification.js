@@ -1,18 +1,11 @@
-/*
- * Create a notification to receive certain type of events
- *
- * Notification.create({
- *  UserId, CollectiveId, type = 'collective.transaction.created', channel='email'
- * })
- * Notification.unsubscribe(); // To disable a notification
- */
 import Promise from 'bluebird';
-import _ from 'lodash';
+import { defaults } from 'lodash';
 import debugLib from 'debug';
 import { Op } from 'sequelize';
+
 import channels from '../constants/channels';
 
-const debug = debugLib('notification');
+const debug = debugLib('models:Notification');
 
 export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;
@@ -95,7 +88,7 @@ export default function(Sequelize, DataTypes) {
   };
 
   Notification.createMany = (notifications, defaultValues) => {
-    return Promise.map(notifications, u => Notification.create(_.defaults({}, u, defaultValues))).catch(console.error);
+    return Promise.map(notifications, u => Notification.create(defaults({}, u, defaultValues))).catch(console.error);
   };
 
   /**

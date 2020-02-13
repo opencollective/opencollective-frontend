@@ -35,7 +35,7 @@ if (!get(config, 'fixer.accessKey') && !['staging', 'production'].includes(confi
 }
 
 export function getFxRate(fromCurrency, toCurrency, date = 'latest') {
-  debug('>>> getFxRate for ', date, fromCurrency, toCurrency);
+  debug(`getFxRate for ${date} ${fromCurrency} -> ${toCurrency}`);
 
   if (!get(config, 'fixer.accessKey')) {
     if (['staging', 'production'].includes(config.env)) {

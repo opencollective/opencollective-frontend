@@ -5,14 +5,11 @@ import { URL } from 'url';
 
 import config from 'config';
 import Promise from 'bluebird';
-import debugLib from 'debug';
 import pdf from 'html-pdf';
 import sanitizeHtml from 'sanitize-html';
 import { get, cloneDeep, isEqual } from 'lodash';
 
 import handlebars from './handlebars';
-
-const debug = debugLib('utils');
 
 export function addParamsToUrl(url, obj) {
   const u = new URL(url);
@@ -210,7 +207,6 @@ export const getTiersStats = (tiers, startDate, endDate) => {
     if (get(tier, 'dataValues.users') && get(tier, 'dataValues.users').length > 0) {
       return true;
     } else {
-      debug('skipping tier', tier.dataValues, 'because it has no users');
       return false;
     }
   });
@@ -221,14 +217,12 @@ export const getTiersStats = (tiers, startDate, endDate) => {
   return Promise.map(tiers, tier => {
     const backers = get(tier, 'dataValues.users');
     let index = 0;
-    debug('> processing tier ', tier.name, 'total backers: ', backers.length, backers);
 
     // We sort backers by total donations DESC
     backers.sort((a, b) => b.totalDonations - a.totalDonations);
 
     return Promise.filter(backers, backer => {
       if (backersIds[backer.id]) {
-        debug('>>> backer ', backer.slug, 'is a duplicate');
         return false;
       }
       backersIds[backer.id] = true;
@@ -249,14 +243,6 @@ export const getTiersStats = (tiers, startDate, endDate) => {
             backer.isLost = true;
             stats.backers.lost++;
           }
-
-          debug('----------- ', backer.slug, '----------');
-          debug('firstDonation', backer.firstDonation && backer.firstDonation.toISOString().substr(0, 10));
-          debug('totalDonations', backer.totalDonations / 100);
-          debug('active last month?', backer.activeLastMonth);
-          debug('active previous month?', backer.activePreviousMonth);
-          debug('is new?', backer.isNew === true);
-          debug('is lost?', backer.isLost === true);
           if (backer.activePreviousMonth) {
             stats.backers.previousMonth++;
           }

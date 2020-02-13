@@ -1,6 +1,6 @@
 import Temporal from 'sequelize-temporal';
 import Promise from 'bluebird';
-import _ from 'lodash';
+import { defaults } from 'lodash';
 import debugLib from 'debug';
 import slugify from 'limax';
 import { Op } from 'sequelize';
@@ -10,7 +10,7 @@ import { maxInteger } from '../constants/math';
 import { capitalize, days, formatCurrency, strip_tags } from '../lib/utils';
 import { isSupportedVideoProvider, supportedVideoProviders } from '../lib/validators';
 
-const debug = debugLib('tier');
+const debug = debugLib('models:Tier');
 
 export default function(Sequelize, DataTypes) {
   const { models } = Sequelize;
@@ -370,7 +370,7 @@ export default function(Sequelize, DataTypes) {
    * Class Methods
    */
   Tier.createMany = (tiers, defaultValues = {}) => {
-    return Promise.map(tiers, t => Tier.create(_.defaults({}, t, defaultValues)), { concurrency: 1 });
+    return Promise.map(tiers, t => Tier.create(defaults({}, t, defaultValues)), { concurrency: 1 });
   };
 
   /**

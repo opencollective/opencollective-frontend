@@ -15,9 +15,6 @@ import whiteListDomains from './whiteListDomains';
 import { md5 } from './utils';
 
 const debug = debugLib('email');
-const debugData = debugLib('data');
-const debugText = debugLib('text');
-const debugHtml = debugLib('html');
 
 export const getMailer = () => {
   if (config.maildev.client) {
@@ -48,10 +45,6 @@ const render = (template, data) => {
     text = templates[`${template}.text`](data);
   }
   const html = juice(he.decode(templates[template](data)));
-
-  // When in development mode, we log the data used to compile the template
-  // (useful to get login token without sending an email)
-  debugData(`Rendering ${template} with data`, data);
 
   return { text, html };
 };
@@ -188,8 +181,6 @@ const sendMessage = (recipients, subject, html, options = {}) => {
     });
   } else {
     debug('>>> mailer not configured');
-    debugText(options.text);
-    debugHtml(html);
     return Promise.resolve();
   }
 };
