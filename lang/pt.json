@@ -1122,7 +1122,6 @@
   "subscription.whyPastDueText": "Não foi possível cobrar seu último pagamento. Atualize suas informações de pagamento para continuar com esta contribuição financeira recorrente.",
   "Subscriptions.Empty": "Nenhuma contribuição financeira recorrente.",
   "Subscriptions.Title": "Contribuições financeiras recorrentes de {collectiveName}",
-  "success": "Your new card info has been added",
   "table.head.large": "Large",
   "table.head.medium": "Medium",
   "table.head.network": "Network",

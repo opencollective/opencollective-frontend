@@ -1122,7 +1122,6 @@
   "subscription.whyPastDueText": "We were unable to charge your last payment. Please update your payment info to continue this recurring financial contribution.",
   "Subscriptions.Empty": "No active recurring financial contributions.",
   "Subscriptions.Title": "{collectiveName}'s recurring financial contributions",
-  "success": "Your new card info has been added",
   "table.head.large": "Large",
   "table.head.medium": "Medium",
   "table.head.network": "Network",

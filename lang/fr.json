@@ -1122,7 +1122,6 @@
   "subscription.whyPastDueText": "Nous n'avons pas pu exécuter votre dernier paiement. Merci de mettre à jour votre moyen de paiement pour poursuivre cette contribution.",
   "Subscriptions.Empty": "Aucune contribution financière récurrente n'est active.",
   "Subscriptions.Title": "Contributions financières récurrentes de {collectiveName}",
-  "success": "Your new card info has been added",
   "table.head.large": "Large",
   "table.head.medium": "Medium",
   "table.head.network": "Network",
