@@ -8,11 +8,16 @@ import PricingTable from '../PricingTable';
 import { H1, P, H3 } from '../../Text';
 import { Router } from '../../../server/pages';
 
-const headings = ['', 'Starter', 'Small', 'Medium', 'Large', 'Network'];
+const headings = ['', 'starter', 'small', 'medium', 'large', 'network'];
 
 const rows = [
   [
-    'Price',
+    {
+      type: 'component',
+      render() {
+        return <FormattedHTMLMessage id="pricingTable.row.price" defaultMessage="Price" />;
+      },
+    },
     {
       type: 'price',
       amount: 'Free',
@@ -40,8 +45,18 @@ const rows = [
     },
   ],
   [
-    'Collectives',
-    'Unlimited',
+    {
+      type: 'component',
+      render() {
+        return <FormattedHTMLMessage id="pricingTable.row.collectives" defaultMessage="Collectives" />;
+      },
+    },
+    {
+      type: 'component',
+      render() {
+        return <FormattedHTMLMessage id="pricingTable.cell.unlimited" defaultMessage="Unlimited" />;
+      },
+    },
     {
       type: 'html',
       html: '<strong>2</strong> to <strong>5</strong>',
@@ -60,7 +75,17 @@ const rows = [
     },
   ],
   [
-    'Credit card payments direct to Collectives',
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage
+            id="pricingTable.row.directPayment"
+            defaultMessage="Credit card payments direct to Collectives"
+          />
+        );
+      },
+    },
     {
       type: 'html',
       html: '<strong>5%</strong> + Stripe Fees',
@@ -83,7 +108,14 @@ const rows = [
     },
   ],
   [
-    'All Collective page features',
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage id="pricingTable.row.collectivePage" defaultMessage="All Collective page features" />
+        );
+      },
+    },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },
@@ -91,16 +123,50 @@ const rows = [
     { type: 'check' },
   ],
   [
-    'Add funds received through other channels',
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage
+            id="pricingTable.row.addFunds"
+            defaultMessage="Add funds received through other channels"
+          />
+        );
+      },
+    },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },
   ],
-  ['Enable bank transfer payments', '-', { type: 'check' }, { type: 'check' }, { type: 'check' }, { type: 'check' }],
   [
-    'Apply to your host feature and discovery',
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage id="pricingTable.row.bankTransfer" defaultMessage="Enable bank transfer payments" />
+        );
+      },
+    },
+    '-',
+    { type: 'check' },
+    { type: 'check' },
+    { type: 'check' },
+    { type: 'check' },
+  ],
+  [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage
+            id="pricingTable.row.hostFeature"
+            defaultMessage="Apply to your host feature and discovery"
+          />
+        );
+      },
+    },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },

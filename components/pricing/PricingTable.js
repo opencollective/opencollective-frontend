@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
+import { defineMessages, useIntl } from 'react-intl';
 import { display } from 'styled-system';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
@@ -46,6 +47,8 @@ const Wrapper = styled(Box)`
 
   @media screen and (min-width: 88em) {
     margin-left: 0;
+    border-radius: 8px;
+    border-left: 1px solid #dcdee0;
   }
 `;
 
@@ -99,14 +102,15 @@ const StyledTable = styled(Box)`
     @media screen and (min-width: 88em) {
       position: relative;
       left: 0;
+      border-left: none;
     }
   }
-
   td:nth-child(n + 2),
   th:nth-child(n + 2) {
     width: 120px;
     padding-right: 24px;
     padding-left: 24px;
+
     @media screen and (min-width: 64em) {
       width: 150px;
     }
@@ -126,7 +130,8 @@ const StyledTable = styled(Box)`
     padding-bottom: 10px;
   }
 
-  th:nth-child(n + 2) {
+  th:nth-child(n + 2),
+  .head {
     text-align: center;
     font-weight: bold;
     font-size: 14px;
@@ -138,6 +143,13 @@ const StyledTable = styled(Box)`
   th,
   td {
     border-right: 1px solid #dcdee0;
+  }
+
+  th:last-child,
+  td:last-child {
+    @media screen and (min-width: 88em) {
+      border-right: none;
+    }
   }
 
   td,
@@ -168,9 +180,36 @@ const getFrequencyShortForm = frequency => {
   }
 };
 
+const messages = defineMessages({
+  'table.head.starter': {
+    id: 'table.head.starter',
+    defaultMessage: 'Starter',
+  },
+  'table.head.singleCollective': {
+    id: 'table.head.singleCollective',
+    defaultMessage: 'Single Collective',
+  },
+  'table.head.small': {
+    id: 'table.head.small',
+    defaultMessage: 'Small',
+  },
+  'table.head.medium': {
+    id: 'table.head.medium',
+    defaultMessage: 'Medium',
+  },
+  'table.head.large': {
+    id: 'table.head.large',
+    defaultMessage: 'Large',
+  },
+  'table.head.network': {
+    id: 'table.head.network',
+    defaultMessage: 'Network',
+  },
+});
+
 const Cell = ({ content, header, height }) => {
   const style = height ? { height: `${height}px` } : undefined;
-
+  const intl = useIntl();
   if (isObject(content)) {
     switch (content.type) {
       case 'price':
@@ -180,10 +219,18 @@ const Cell = ({ content, header, height }) => {
             {content.frequency && (
               <Fragment>
                 <Box as="span" display={['none', null, 'inline']} className="frequency">
-                  {content.frequency}
+                  <FormattedMessage
+                    id="pricingTable.plan.frequency"
+                    defaultMessage="{frequency}"
+                    values={{ frequency: content.frequency }}
+                  />
                 </Box>
                 <Box as="span" display={['inline', null, 'none']} className="frequency">
-                  {getFrequencyShortForm(content.frequency)}
+                  <FormattedMessage
+                    id="pricingTable.plan.frequency.shortForm"
+                    defaultMessage="{frequency}"
+                    values={{ frequency: getFrequencyShortForm(content.frequency) }}
+                  />
                 </Box>
               </Fragment>
             )}
@@ -216,9 +263,11 @@ const Cell = ({ content, header, height }) => {
             </PlanLink>
           </td>
         );
+      case 'component':
+        return <td>{content.render()}</td>;
     }
   } else if (header) {
-    return <th style={style}>{content}</th>;
+    return content ? <th style={style}>{intl.formatMessage(messages[`table.head.${content}`])}</th> : <th></th>;
   } else {
     return <td style={style}>{content}</td>;
   }
@@ -305,16 +354,7 @@ class PricingTable extends React.Component {
   render() {
     const { headings, rows, footings, ...props } = this.props;
     return (
-      <Container
-        css={`
-          box-shadow: 4px 0px 8px rgba(20, 20, 20, 0.06);
-          border-radius: 8px;
-        `}
-        display="flex"
-        my={4}
-        justifyContent="center"
-        {...props}
-      >
+      <Container display="flex" my={4} justifyContent="center" {...props}>
         <Wrapper>
           <StyledTable as="table" height="407px" ref={this.tableRef}>
             <thead>

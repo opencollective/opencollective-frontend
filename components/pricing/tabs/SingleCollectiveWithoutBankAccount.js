@@ -7,13 +7,26 @@ import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import Container from '../../Container';
 import BackButton from '../BackButton';
 import StyledLink from '../../StyledLink';
-import { H1, P, H3 } from '../../Text';
+import { H1, P, H3, Span } from '../../Text';
+import Currency from '../../Currency';
 import { Router } from '../../../server/pages';
 import { addHostsData } from '../../HostsWithData';
-import CollectiveCard from '../../CollectiveCard';
+import StyledCollectiveCard from '../../StyledCollectiveCard';
+import StyledButton from '../../StyledButton';
+import Link from '../../Link';
 
 const HostsWrapper = styled(Flex)`
   overflow-x: auto;
+`;
+
+const ApplyButton = styled(StyledButton)`
+  font-weight: 500;
+  font-size: ${props => props.theme.fontSizes.Caption}px;
+  line-height: ${props => props.theme.lineHeights.Tiny};
+  border-radius: 100px;
+  min-width: 76px;
+  background: linear-gradient(180deg, #1869f5 0%, #1659e1 100%);
+  padding: 10px 20px;
 `;
 
 const SingleCollectiveWithoutBankAccount = ({ data }) => {
@@ -75,10 +88,65 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
         >
           <FormattedMessage id="pricing.checkFiscalHost" defaultMessage="Check these Fiscal Hosts." />
         </H3>
-        <HostsWrapper width={[1, null, '795px']} justifyContent="center" p={4}>
+        <HostsWrapper width={[1, null, '715px']} py={4}>
           {collectives.map(collective => (
             <Box mx={2} key={collective.id}>
-              <CollectiveCard showApplyButton={true} width="185px" collective={collective} />
+              <StyledCollectiveCard
+                width="224px"
+                collective={collective}
+                borderRadius="16px"
+                border="1px solid rgba(49, 50, 51, 0.1)"
+                boxShadow="0px 1px 4px rgba(26, 27, 31, 0.12)"
+              >
+                <Container>
+                  <Box>
+                    <P my={3} mx={3} fontSize="Caption">
+                      <FormattedMessage
+                        id="pricing.hostCollective.count"
+                        defaultMessage="{count, plural, =0 {No collective} one {{prettyCount} collective} other {{prettyCount} collectives} }"
+                        values={{
+                          count: collective.stats.collectives.hosted,
+                          prettyCount: (
+                            <Span fontWeight="bold" fontSize="LeadParagraph">
+                              {collective.stats.collectives.hosted}
+                            </Span>
+                          ),
+                        }}
+                      />
+                    </P>
+                    <P my={3} mx={3} fontSize="Caption">
+                      <FormattedMessage
+                        id="pricing.hostCollective.currency"
+                        defaultMessage="{currency} currency"
+                        values={{
+                          currency: (
+                            <Span fontWeight="bold" fontSize="LeadParagraph">
+                              {collective.currency}
+                            </Span>
+                          ),
+                        }}
+                      />
+                    </P>
+                    {collective.stats.yearlyBudget > 0 && (
+                      <P my={3} mx={3} fontSize="Caption">
+                        <Span fontSize="Caption">
+                          <FormattedMessage id="YearlyBudget" defaultMessage="Yearly budget" />
+                        </Span>
+                        <Span fontSize="LeadParagraph" fontWeight="bold">
+                          <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
+                        </Span>
+                      </P>
+                    )}
+                    <Box mx={3} my={3}>
+                      <Link route={`/${collective.slug}/apply`}>
+                        <ApplyButton buttonStyle="primary" data-cy="host-apply-btn">
+                          <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
+                        </ApplyButton>
+                      </Link>
+                    </Box>
+                  </Box>
+                </Container>
+              </StyledCollectiveCard>
             </Box>
           ))}
         </HostsWrapper>

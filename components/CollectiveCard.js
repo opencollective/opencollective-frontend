@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
 import { width } from 'styled-system';
 import { FormattedMessage, FormattedDate, injectIntl, defineMessages } from 'react-intl';
 import Currency from './Currency';
@@ -11,7 +10,6 @@ import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import Container from './Container';
-import StyledButton from './StyledButton';
 
 const CardWrapper = styled(Container)`
   display: flex;
@@ -31,23 +29,12 @@ const CardWrapper = styled(Container)`
   ${width}
 `;
 
-const ApplyButton = styled(StyledButton)`
-  font-weight: 500;
-  font-size: ${props => props.theme.fontSizes.Caption}px;
-  line-height: ${props => props.theme.lineHeights.Tiny};
-  border-radius: 100px;
-  width: 62px;
-  background: linear-gradient(180deg, #1869f5 0%, #1659e1 100%);
-  padding: 5px 14px;
-`;
-
 class CollectiveCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     membership: PropTypes.object,
     memberships: PropTypes.array,
     intl: PropTypes.object.isRequired,
-    showApplyButton: PropTypes.bool,
   };
 
   constructor(props) {
@@ -302,16 +289,6 @@ class CollectiveCard extends React.Component {
             <div className="description" title={description}>
               {truncatedDescription}
             </div>
-
-            {collective.isHost && this.props.showApplyButton && (
-              <Box textAlign="center" my={3}>
-                <Link route={`/${collective.slug}/apply`}>
-                  <ApplyButton buttonStyle="primary" data-cy="host-apply-btn">
-                    <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
-                  </ApplyButton>
-                </Link>
-              </Box>
-            )}
           </div>
           <div className="footer">
             {collective.type === 'COLLECTIVE' && get(collective, 'stats.backers.all') > 0 && (

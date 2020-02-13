@@ -6,18 +6,28 @@ import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import { Router } from '../../../server/pages';
 import Container from '../../Container';
 import BackButton from '../BackButton';
-import { H1, P, H3 } from '../../Text';
+import { H1, P, H3, Span } from '../../Text';
 import PricingTable from '../PricingTable';
 
-const headings = ['', 'Starter', 'Single Collective'];
+const headings = ['', 'starter', 'singleCollective'];
 
 const rows = [
   [
-    'Price',
     {
-      type: 'price',
-      amount: 'FREE',
-      frequency: null,
+      type: 'component',
+      render() {
+        return <FormattedHTMLMessage id="pricingTable.row.price" defaultMessage="Price" />;
+      },
+    },
+    {
+      type: 'component',
+      render() {
+        return (
+          <Span className="price">
+            <FormattedHTMLMessage id="pricingTable.cell.free" defaultMessage="Free" />
+          </Span>
+        );
+      },
     },
     {
       type: 'price',
@@ -26,7 +36,14 @@ const rows = [
     },
   ],
   [
-    'Fundraise via credit card payments',
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage id="pricingTable.row.fundraise" defaultMessage="Fundraise via credit card payments" />
+        );
+      },
+    },
     {
       type: 'html',
       html: '<strong>5%</strong> + Stripe Fees',
@@ -36,9 +53,47 @@ const rows = [
       html: '<strong>5%</strong> + Stripe Fees',
     },
   ],
-  ['All Collective page features', { type: 'check' }, { type: 'check' }],
-  ['Add founds received through other channels', { type: 'check' }, { type: 'check' }],
-  ['Enable bank transfer payments', { type: 'check' }, { type: 'check' }],
+  [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage id="pricingTable.row.collectivePage" defaultMessage="All Collective page features" />
+        );
+      },
+    },
+    { type: 'check' },
+    { type: 'check' },
+  ],
+  [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage
+            id="pricingTable.row.addFunds"
+            defaultMessage="Add funds received through other channels"
+          />
+        );
+      },
+    },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
+    {
+      type: 'check',
+    },
+  ],
+  [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage id="pricingTable.row.bankTransfer" defaultMessage="Enable bank transfer payments" />
+        );
+      },
+    },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
+    { type: 'check' },
+  ],
 ];
 
 const footings = [
