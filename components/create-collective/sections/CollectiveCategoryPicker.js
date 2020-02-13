@@ -30,7 +30,7 @@ class CollectiveCategoryPicker extends React.Component {
         defaultMessage: 'For any community',
       },
       opensource: {
-        id: 'collective.category.opensource',
+        id: 'collective.category.newopensource',
         defaultMessage: 'For open source projects',
       },
       climate: { id: 'collective.category.climate', defaultMessage: 'For climate initiatives' },

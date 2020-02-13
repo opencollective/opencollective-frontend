@@ -1,15 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Page from '../Page';
-import ChooseCollectiveType from './sections/ChooseCollectiveType';
 import CreateCollectiveHeader from './sections/CreateCollectiveHeader';
-import { Span, P, H1, H2, H3, H4, H5 } from '../Text';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import Illustration from '../home/HomeIllustration';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import CreateCollectiveForm from './sections/CreateCollectiveForm';
-import CreateCollectiveCover from '../CreateCollectiveCover';
 import ErrorPage from '../ErrorPage';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import { get } from 'lodash';
@@ -132,7 +126,7 @@ class CreateCollective extends React.Component {
           CollectiveSlug: collective.slug,
         });
       } else {
-        Router.pushRoute('editCollective', { slug: collective.slug, section: 'host' });
+        Router.pushRoute('collective', { slug: collective.slug });
       }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
