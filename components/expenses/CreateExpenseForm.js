@@ -185,27 +185,28 @@ class CreateExpenseForm extends React.Component {
   }
 
   handlePayoutChange(attr, value) {
-    let expense;
-    if (value === 'banktransfer') {
-      const bankAccount = this.props.LoggedInUser.collective.payoutMethods.find(pm => pm.type === 'BANK_ACCOUNT');
-      expense = {
-        ...this.state.expense,
-        payoutMethod: 'banktransfer',
-        PayoutMethod: { id: bankAccount.id },
+    this.setState((prevState, props) => {
+      let expense;
+      if (value === 'banktransfer') {
+        const bankAccount = props.LoggedInUser.collective.payoutMethods.find(pm => pm.type === 'BANK_ACCOUNT');
+        expense = {
+          ...prevState.expense,
+          payoutMethod: 'banktransfer',
+          PayoutMethod: { id: bankAccount.id },
+        };
+      } else {
+        expense = {
+          ...omit(prevState.expense, ['PayoutMethod']),
+          payoutMethod: value,
+        };
+      }
+      props.onChange && props.onChange(expense);
+      return {
+        modified: true,
+        expense,
+        isExpenseValid: this.validate(expense),
       };
-    } else {
-      expense = {
-        ...omit(this.state.expense, ['PayoutMethod']),
-        payoutMethod: value,
-      };
-    }
-    const newState = {
-      modified: true,
-      expense,
-      isExpenseValid: this.validate(expense),
-    };
-    this.setState(newState);
-    this.props.onChange && this.props.onChange(expense);
+    });
   }
 
   async onSubmit(e) {
