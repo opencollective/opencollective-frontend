@@ -276,3 +276,33 @@ export const fakeTier = async (tierData = {}) => {
     ...tierData,
   });
 };
+
+/**
+ * Creates a fake order. All params are optionals.
+ */
+export const fakeOrder = async (orderData = {}) => {
+  const CreatedByUserId = orderData.CreatedByUserId || (await fakeUser()).id;
+  const user = await models.User.findByPk(CreatedByUserId);
+  const FromCollectiveId = orderData.FromCollectiveId || (await models.Collective.findByPk(user.CollectiveId)).id;
+  const CollectiveId = orderData.CollectiveId || (await fakeCollective()).id;
+  const collective = await models.Collective.findByPk(CollectiveId);
+
+  const order = await models.Order.create({
+    quantity: 1,
+    currency: collective.currency,
+    totalAmount: randAmount(100, 99999999),
+    ...orderData,
+    CreatedByUserId,
+    FromCollectiveId,
+    CollectiveId,
+  });
+
+  if (order.PaymentMethodId) {
+    order.paymentMethod = await models.PaymentMethod.findByPk(order.PaymentMethodId);
+  }
+
+  order.fromCollective = await models.Collective.findByPk(order.FromCollectiveId);
+  order.collective = collective;
+  order.createdByUser = user;
+  return order;
+};

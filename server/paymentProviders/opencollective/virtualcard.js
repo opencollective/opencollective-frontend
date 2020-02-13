@@ -109,10 +109,16 @@ async function processOrder(order) {
   const sourcePaymentMethodProvider = libpayments.findPaymentMethodProvider(sourcePaymentMethod);
 
   // gets the Credit transaction generated
-  let creditTransaction = await sourcePaymentMethodProvider.processOrder(order);
-  // undo modification of original order after processing the source payment method order
-  order.PaymentMethodId = paymentMethod.id;
-  order.paymentMethod = paymentMethod;
+  let creditTransaction = null;
+  try {
+    creditTransaction = await sourcePaymentMethodProvider.processOrder(order);
+  } finally {
+    // undo modification of original order after processing the source payment method order
+    await order.update({ PaymentMethodId: paymentMethod.id });
+    order.PaymentMethodId = paymentMethod.id;
+    order.paymentMethod = paymentMethod;
+  }
+
   // gets the Debit transaction generated through the TransactionGroup field.
   const updatedTransactions = await models.Transaction.update(
     {

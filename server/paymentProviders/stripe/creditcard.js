@@ -7,6 +7,8 @@ import stripe, { extractFees } from '../../lib/stripe';
 import * as constants from '../../constants/transactions';
 import * as paymentsLib from '../../lib/payments';
 
+const UNKNOWN_ERROR_MSG = 'Something went wrong with the payment, please contact support@opencollective.com.';
+
 /**
  * Get or create a customer under the platform stripe account
  */
@@ -147,7 +149,7 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
   if (paymentIntent.status !== 'succeeded') {
     logger.error('Unknown error with Stripe Payment Intent.');
     logger.error(paymentIntent);
-    throw new Error('Unknown error with Stripe. Please contact support.')();
+    throw new Error(UNKNOWN_ERROR_MSG);
   }
 
   // Success: delete reference to paymentIntent
@@ -272,6 +274,8 @@ export default {
       if (error.message !== 'Payment Intent require action') {
         logger.error(`Stripe Payment Error: ${error.message}`);
         logger.error(error);
+        logger.error(error.stack);
+        throw new Error(UNKNOWN_ERROR_MSG);
       }
       throw error;
     }

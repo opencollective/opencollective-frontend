@@ -15,6 +15,7 @@ import { maxInteger } from '../../../../server/constants/math';
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
 import initNock from '../../../nocks/paymentMethods.opencollective.virtualcard.nock';
+import { fakeOrder } from '../../../test-helpers/fake-data';
 
 const ORDER_TOTAL_AMOUNT = 5000;
 const STRIPE_FEE_STUBBED_VALUE = 300;
@@ -598,19 +599,16 @@ describe('server/paymentProviders/opencollective/virtualcard', () => {
 
       it('refunds transaction and restore balance', async () => {
         const initialBalance = await virtualcard.getBalance(virtualCardPm);
-        const orderData = {
-          createdByUser: user,
+        const order = await fakeOrder({
           CreatedByUserId: user.id,
-          fromCollective: user.collective,
           FromCollectiveId: user.collective.id,
-          collective: targetCollective,
           CollectiveId: targetCollective.id,
-          paymentMethod: virtualCardPm,
+          PaymentMethodId: virtualCardPm.id,
           totalAmount: 1000,
           currency: 'USD',
-        };
+        });
 
-        const transaction = await virtualcard.processOrder(orderData);
+        const transaction = await virtualcard.processOrder(order);
         expect(transaction).to.exist;
 
         // Check balance decreased
