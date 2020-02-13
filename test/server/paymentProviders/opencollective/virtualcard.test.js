@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import app from '../../../../server/index';
 import models from '../../../../server/models';
 import virtualcard from '../../../../server/paymentProviders/opencollective/virtualcard';
+import creditCardLib from '../../../../server/paymentProviders/stripe/creditcard';
 import emailLib from '../../../../server/lib/email';
 import { maxInteger } from '../../../../server/constants/math';
 
@@ -529,6 +530,36 @@ describe('server/paymentProviders/opencollective/virtualcard', () => {
         });
         expect(collectiveMember).to.exist;
       }); /** End Of "Process order of a virtual card" */
+
+      describe('if the transaction fails', () => {
+        let creditCardProcessOrderMock;
+
+        beforeEach(() => {
+          creditCardProcessOrderMock = sinon.stub(creditCardLib, 'processOrder');
+        });
+
+        afterEach(() => {
+          creditCardProcessOrderMock.restore();
+        });
+
+        it('does not mess up with the PaymentMethodId', async () => {
+          const order = await fakeOrder({ PaymentMethodId: virtualCardPaymentMethod.id, totalAmount: 100 });
+          creditCardProcessOrderMock.callsFake(order =>
+            order.save().then(() => {
+              throw new Error();
+            }),
+          );
+
+          try {
+            await virtualcard.processOrder(order);
+          } catch {
+            // Ignore error
+          }
+
+          await order.reload();
+          expect(order.PaymentMethodId).to.eq(virtualCardPaymentMethod.id);
+        });
+      });
     }); /** End Of "#processOrder" */
 
     describe('#refundTransaction', () => {

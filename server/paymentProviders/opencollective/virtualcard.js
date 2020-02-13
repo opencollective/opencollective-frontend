@@ -102,15 +102,16 @@ async function processOrder(order) {
   }
   // finding Source Payment method and update order payment method properties
   const sourcePaymentMethod = await models.PaymentMethod.findByPk(paymentMethod.SourcePaymentMethodId);
-  // modifying original order to then process the order of the source payment method
-  order.PaymentMethodId = sourcePaymentMethod.id;
-  order.paymentMethod = sourcePaymentMethod;
+
   // finding the payment provider lib to execute the order
   const sourcePaymentMethodProvider = libpayments.findPaymentMethodProvider(sourcePaymentMethod);
 
-  // gets the Credit transaction generated
   let creditTransaction = null;
   try {
+    // modifying original order to then process the order of the source payment method
+    order.PaymentMethodId = sourcePaymentMethod.id;
+    order.paymentMethod = sourcePaymentMethod;
+    // gets the Credit transaction generated
     creditTransaction = await sourcePaymentMethodProvider.processOrder(order);
   } finally {
     // undo modification of original order after processing the source payment method order
