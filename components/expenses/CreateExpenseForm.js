@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { titleCase } from 'title-case';
 
 import { getCurrencySymbol } from '../../lib/utils';
@@ -45,6 +45,10 @@ class CreateExpenseForm extends React.Component {
       other: {
         id: 'expense.payoutMethod.manual',
         defaultMessage: 'Other (see instructions)',
+      },
+      banktransfer: {
+        id: 'expense.payoutMethod.banktransfer',
+        defaultMessage: 'Bank Transfer',
       },
       'error.descriptionMissing': {
         id: 'expense.error.descriptionMissing',
@@ -100,10 +104,26 @@ class CreateExpenseForm extends React.Component {
     }
   }
 
-  getOptions(arr, intlVars) {
-    return arr.map(key => {
+  getOptions() {
+    const { expense } = this.state;
+    const { intl, LoggedInUser, collective } = this.props;
+    const options = ['paypal', 'other'];
+    const intlVars = {
+      paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']),
+    };
+
+    if (
+      LoggedInUser &&
+      LoggedInUser.collective.payoutMethods.find(pm => pm.type === 'BANK_ACCOUNT') &&
+      collective &&
+      collective.host.connectedAccounts.find(ca => ca.service === 'transferwise')
+    ) {
+      options.unshift('banktransfer');
+    }
+
+    return options.map(key => {
       const obj = {};
-      obj[key] = this.props.intl.formatMessage(this.messages[key], intlVars);
+      obj[key] = intl.formatMessage(this.messages[key], intlVars);
       return obj;
     });
   }
@@ -164,6 +184,31 @@ class CreateExpenseForm extends React.Component {
     this.props.onChange && this.props.onChange(expense);
   }
 
+  handlePayoutChange(attr, value) {
+    this.setState((prevState, props) => {
+      let expense;
+      if (value === 'banktransfer') {
+        const bankAccount = props.LoggedInUser.collective.payoutMethods.find(pm => pm.type === 'BANK_ACCOUNT');
+        expense = {
+          ...prevState.expense,
+          payoutMethod: 'banktransfer',
+          PayoutMethod: { id: bankAccount.id },
+        };
+      } else {
+        expense = {
+          ...omit(prevState.expense, ['PayoutMethod']),
+          payoutMethod: value,
+        };
+      }
+      props.onChange && props.onChange(expense);
+      return {
+        modified: true,
+        expense,
+        isExpenseValid: this.validate(expense),
+      };
+    });
+  }
+
   async onSubmit(e) {
     if (e) {
       e.preventDefault();
@@ -189,12 +234,10 @@ class CreateExpenseForm extends React.Component {
   }
 
   renderForm() {
-    const { LoggedInUser, intl, collective } = this.props;
+    const { LoggedInUser, collective } = this.props;
     const { expense } = this.state;
 
-    const payoutMethodOptions = this.getOptions(['paypal', 'other'], {
-      paypalEmail: get(expense, 'user.paypalEmail') || intl.formatMessage(this.messages['newExpense.paypal.label']),
-    });
+    const payoutMethodOptions = this.getOptions();
 
     return (
       <div className={`CreateExpenseForm ${this.props.mode}`}>
@@ -475,7 +518,7 @@ class CreateExpenseForm extends React.Component {
                 name="payoutMethod"
                 options={payoutMethodOptions}
                 defaultValue={expense.payoutMethod}
-                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
+                onChange={payoutMethod => this.handlePayoutChange('payoutMethod', payoutMethod)}
               />
             </div>
 

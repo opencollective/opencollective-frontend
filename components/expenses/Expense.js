@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { Flex } from '@rebass/grid';
+import { get } from 'lodash';
 
 import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
@@ -93,6 +94,8 @@ class Expense extends React.Component {
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
       approved: { id: 'expense.approved', defaultMessage: 'approved' },
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
+      processing: { id: 'expense.processing', defaultMessage: 'processing' },
+      error: { id: 'expense.error', defaultMessage: 'error' },
       expenseTypeMissing: {
         id: 'expense.error.expenseTypeMissing',
         defaultMessage: 'Please pick the type of this expense',
@@ -511,7 +514,7 @@ class Expense extends React.Component {
                           unlock={this.props.unlockPayAction}
                           onError={this.handleErrorMessage}
                         />
-                        {expense.payoutMethod !== 'other' && (
+                        {(get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT' || expense.payoutMethod !== 'other') && (
                           <PayExpenseBtn
                             expense={expense}
                             collective={collective}

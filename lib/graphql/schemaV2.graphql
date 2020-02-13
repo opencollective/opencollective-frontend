@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Feb 04 2020 17:04:46 GMT+0100 (Central European Standard Time)
+# timestamp: Wed Feb 12 2020 15:34:50 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -25,6 +25,7 @@ interface Account {
   twitterHandle: String
   githubHandle: String
   currency: String
+  expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -145,6 +146,7 @@ type Bot implements Account {
   twitterHandle: String
   githubHandle: String
   currency: String
+  expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -230,6 +232,7 @@ type Collective implements Account {
   twitterHandle: String
   githubHandle: String
   currency: String
+  expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -503,6 +506,7 @@ type Event implements Account {
   twitterHandle: String
   githubHandle: String
   currency: String
+  expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -547,6 +551,16 @@ type Event implements Account {
   conversationsTags(limit: Int = 30): [TagStat]
 
   """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Int
+
+  """
+  Get the host collective that is receiving the money on behalf of this collective
+  """
+  host: Account
+
+  """
   Returns whether this collective is approved
   """
   isApproved: Boolean
@@ -589,6 +603,7 @@ type Individual implements Account {
   twitterHandle: String
   githubHandle: String
   currency: String
+  expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -849,6 +864,7 @@ type Organization implements Account {
   twitterHandle: String
   githubHandle: String
   currency: String
+  expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
 
   """

@@ -93,6 +93,10 @@ const getExpensesQuery = gql`
       type
       currency
       payoutMethod
+      PayoutMethod {
+        id
+        type
+      }
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment

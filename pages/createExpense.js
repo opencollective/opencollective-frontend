@@ -34,7 +34,9 @@ class CreateExpensePage extends React.Component {
   };
 
   getPayoutMethod = expenseData => {
-    if (expenseData.payoutMethod === 'paypal') {
+    if (expenseData.PayoutMethod) {
+      return expenseData.PayoutMethod;
+    } else if (expenseData.payoutMethod === 'paypal') {
       return { type: 'PAYPAL', data: { email: expenseData.paypalEmail } };
     } else {
       return null;
@@ -186,6 +188,12 @@ const getCollectiveQuery = gql`
         name
         image
         expensePolicy
+        connectedAccounts {
+          id
+          service
+          createdAt
+          updatedAt
+        }
       }
       parentCollective {
         id
