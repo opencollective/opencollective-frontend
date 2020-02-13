@@ -227,7 +227,7 @@ const Cell = ({ content, header, height }) => {
                 </Box>
                 <Box as="span" display={['inline', null, 'none']} className="frequency">
                   <FormattedMessage
-                    id="pricingTable.plan.frequency.shortForm"
+                    id="pricingTable.plan.frequency"
                     defaultMessage="{frequency}"
                     values={{ frequency: getFrequencyShortForm(content.frequency) }}
                   />
