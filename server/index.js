@@ -5,7 +5,6 @@ import config from 'config';
 import express from 'express';
 
 import routes from './routes';
-import backgroundJobs from './background-jobs';
 import expressLib from './lib/express';
 import logger from './lib/logger';
 
@@ -37,10 +36,5 @@ const server = app.listen(config.port, () => {
 });
 
 server.timeout = 25000; // sets timeout to 25 seconds
-
-/**
- * Start background jobs
- */
-backgroundJobs();
 
 export default app;

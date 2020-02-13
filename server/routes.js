@@ -10,7 +10,6 @@ import { formatError } from 'apollo-errors';
 import { get } from 'lodash';
 
 import * as connectedAccounts from './controllers/connectedAccounts';
-import getHomePage from './controllers/homepage';
 import uploadImage from './controllers/images';
 import { createPaymentMethod } from './controllers/paymentMethods';
 import * as users from './controllers/users';
@@ -161,11 +160,6 @@ export default app => {
   app.delete('/connected-accounts/:service/disconnect/:collectiveId', aN.authenticateServiceDisconnect);
 
   app.use(sanitizer()); // note: this break /webhooks/mailgun /graphiql
-
-  /**
-   * Homepage
-   */
-  app.get('/homepage', getHomePage); // This query takes 5s to execute!!!
 
   /**
    * Users.
