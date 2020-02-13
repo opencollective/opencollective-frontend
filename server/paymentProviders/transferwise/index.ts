@@ -9,8 +9,7 @@ async function populateProfileId(connectedAccount): Promise<void> {
     const profile =
       profiles.find(p => p.type === connectedAccount.type) || profiles.find(p => p.type === 'business') || profiles[0];
     if (profile) {
-      connectedAccount.set({ data: { ...connectedAccount.data, ...profile } });
-      await connectedAccount.save();
+      await connectedAccount.update({ data: { ...connectedAccount.data, ...profile } });
     }
   }
 }
