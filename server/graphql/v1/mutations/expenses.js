@@ -7,6 +7,7 @@ import models, { sequelize } from '../../../models';
 import paymentProviders from '../../../paymentProviders';
 import * as libPayments from '../../../lib/payments';
 import { formatCurrency } from '../../../lib/utils';
+import { floatAmountToCents } from '../../../lib/math';
 import { createFromPaidExpense as createTransactionFromPaidExpense } from '../../../lib/transactions';
 import { getFxRate } from '../../../lib/currency';
 import debugLib from 'debug';
@@ -127,6 +128,7 @@ const getPaypalPaymentMethodFromExpenseData = async (expenseData, remoteUser, fr
       } else if (pm.CollectiveId !== fromCollective.id) {
         throw new Error('This payout method cannot be used for this collective');
       }
+      return pm;
     } else {
       return models.PayoutMethod.getOrCreateFromData(
         expenseData.PayoutMethod,
@@ -376,14 +378,14 @@ export async function deleteExpense(remoteUser, expenseId) {
 }
 
 /** Helper that finishes the process of paying an expense */
-async function markExpenseAsPaid(expense) {
+async function markExpenseAsPaid(expense, userId) {
   debug('update expense status to PAID', expense.id);
-  const updatedExpense = await expense.update({ status: statuses.PAID });
+  await expense.setPaid(userId);
   await expense.createActivity(activities.COLLECTIVE_EXPENSE_PAID);
-  return updatedExpense;
+  return expense;
 }
 
-async function createTransactions(host, expense, fees = {}) {
+async function createTransactions(host, expense, fees = {}, data) {
   debug('marking expense as paid and creating transactions in the ledger', expense.id);
   return await createTransactionFromPaidExpense(
     host,
@@ -394,6 +396,7 @@ async function createTransactions(host, expense, fees = {}) {
     fees.paymentProcessorFeeInHostCurrency,
     fees.hostFeeInHostCurrency,
     fees.platformFeeInHostCurrency,
+    data,
   );
 }
 
@@ -432,6 +435,20 @@ async function payExpenseWithPayPal(remoteUser, expense, host, paymentMethod, to
   }
 }
 
+async function payExpenseWithTransferwise(host, payoutMethod, expense, fees) {
+  debug('payExpenseWithTransferwise', expense.id);
+  const [connectedAccount] = await host.getConnectedAccounts({
+    where: { service: 'transferwise', deletedAt: null },
+  });
+
+  if (!connectedAccount) {
+    throw new Error('Host is not connected to Transferwise');
+  }
+
+  const data = await paymentProviders.transferwise.payExpense(connectedAccount, payoutMethod, expense);
+  return createTransactions(host, expense, fees, data);
+}
+
 /**
  * Pay an expense based on the payout method defined in the Expense object
  * @PRE: fees { id, paymentProcessorFeeInCollectiveCurrency, hostFeeInCollectiveCurrency, platformFeeInCollectiveCurrency }
@@ -455,6 +472,11 @@ export async function payExpense(remoteUser, args) {
   if (expense.status === statuses.PAID) {
     throw new errors.Unauthorized('Expense has already been paid');
   }
+  if (expense.status === statuses.PROCESSING) {
+    throw new errors.Unauthorized(
+      'Expense is currently being processed, this means someone already started the payment process',
+    );
+  }
   if (expense.status !== statuses.APPROVED) {
     throw new errors.Unauthorized(`Expense needs to be approved. Current status of the expense: ${expense.status}.`);
   }
@@ -468,7 +490,6 @@ export async function payExpense(remoteUser, args) {
   }
 
   const balance = await expense.collective.getBalance();
-
   if (expense.amount > balance) {
     throw new errors.Unauthorized(
       `You don't have enough funds to pay this expense. Current balance: ${formatCurrency(
@@ -478,11 +499,22 @@ export async function payExpense(remoteUser, args) {
     );
   }
 
-  const fxrate = await getFxRate(expense.collective.currency, host.currency);
   const feesInHostCurrency = {};
+  const fxrate = await getFxRate(expense.collective.currency, host.currency);
   const payoutMethod = await expense.getPayoutMethod();
   const payoutMethodType = payoutMethod ? payoutMethod.type : expense.getPayoutMethodTypeFromLegacy();
-  if (payoutMethodType === PayoutMethodTypes.PAYPAL && !args.forceManual) {
+
+  if (payoutMethodType === PayoutMethodTypes.BANK_ACCOUNT) {
+    const [connectedAccount] = await host.getConnectedAccounts({
+      where: { service: 'transferwise', deletedAt: null },
+    });
+    if (!connectedAccount) {
+      throw new Error('Host is not connected to Transferwise');
+    }
+    const quote = await paymentProviders.transferwise.getTemporaryQuote(connectedAccount, payoutMethod, expense);
+    // Notice this is the FX rate between Host and Collective, that's why we use `fxrate`.
+    fees.paymentProcessorFeeInCollectiveCurrency = floatAmountToCents(quote.fee / fxrate);
+  } else if (payoutMethodType === PayoutMethodTypes.PAYPAL && !args.forceManual) {
     fees.paymentProcessorFeeInCollectiveCurrency = await paymentProviders.paypal.types['adaptive'].fees({
       amount: expense.amount,
       currency: expense.collective.currency,
@@ -536,12 +568,17 @@ export async function payExpense(remoteUser, args) {
     } else {
       throw new Error('No Paypal account linked, please reconnect Paypal or pay manually');
     }
+  } else if (payoutMethodType === PayoutMethodTypes.BANK_ACCOUNT) {
+    await payExpenseWithTransferwise(host, payoutMethod, expense, feesInHostCurrency);
+    await expense.setProcessing(remoteUser.id);
+    // Early return, we'll only mark as Paid when the transaction completes.
+    return;
   } else if (expense.legacyPayoutMethod === 'manual' || expense.legacyPayoutMethod === 'other') {
     // note: we need to check for manual and other for legacy reasons
     await createTransactions(host, expense, feesInHostCurrency);
   }
 
-  return markExpenseAsPaid(expense);
+  return markExpenseAsPaid(expense, remoteUser.id);
 }
 
 export async function markExpenseAsUnpaid(remoteUser, ExpenseId, processorFeeRefunded) {

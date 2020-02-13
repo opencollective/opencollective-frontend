@@ -34,5 +34,8 @@
     "rest": {
       "mode": "live"
     }
+  },
+  "transferwise": {
+    "api": "https://api.transferwise.com"
   }
 }

@@ -306,3 +306,40 @@ export const fakeOrder = async (orderData = {}) => {
   order.createdByUser = user;
   return order;
 };
+
+/**
+ * Creates a fake connectedAccount. All params are optionals.
+ */
+export const fakeConnectedAccount = async (connectedAccountData = {}) => {
+  const CollectiveId = connectedAccountData.CollectiveId || (await fakeCollective()).id;
+  const service = sample(['github', 'twitter', 'stripe', 'transferwise']);
+
+  return models.ConnectedAccount.create({
+    service,
+    ...connectedAccountData,
+    CollectiveId,
+  });
+};
+
+/**
+ * Creates a fake transaction. All params are optionals.
+ */
+export const fakeTransaction = async (transactionData = {}) => {
+  const amount = transactionData.amount || randAmount(10, 100) * 100;
+  const CreatedByUserId = transactionData.CreatedByUserId || (await fakeUser()).id;
+  const FromCollectiveId = transactionData.FromCollectiveId || (await fakeCollective()).id;
+  const CollectiveId = transactionData.CollectiveId || (await fakeCollective()).id;
+  return models.Transaction.create({
+    type: amount < 0 ? 'DEBIT' : 'CREDIT',
+    currency: 'USD',
+    hostCurrency: 'USD',
+    hostCurrencyFxRate: 1,
+    netAmountInCollectiveCurrency: amount,
+    amountInHostCurrency: amount,
+    ...transactionData,
+    amount,
+    CreatedByUserId,
+    FromCollectiveId,
+    CollectiveId,
+  });
+};

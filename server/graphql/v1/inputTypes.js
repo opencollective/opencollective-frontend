@@ -483,6 +483,7 @@ export const ExpenseInputType = new GraphQLInputObjectType({
         deprecationReason: '2020-21-01: Please use PayoutMethod',
       },
       PayoutMethod: {
+        id: { type: GraphQLInt },
         type: PayoutMethodInputType,
       },
       privateMessage: { type: GraphQLString },

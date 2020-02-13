@@ -130,5 +130,8 @@
   },
   "githubFlow": {
     "minNbStars": 100
+  },
+  "transferwise": {
+    "api": "https://api.sandbox.transferwise.tech"
   }
 }

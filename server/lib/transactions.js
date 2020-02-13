@@ -1,4 +1,5 @@
 import models, { Op, sequelize } from '../models';
+import { PayoutMethodTypes } from '../models/PayoutMethod';
 import errors from '../lib/errors';
 import { TransactionTypes } from '../constants/transactions';
 import { getFxRate } from '../lib/currency';
@@ -63,6 +64,7 @@ export async function createFromPaidExpense(
   paymentProcessorFeeInHostCurrency = 0,
   hostFeeInHostCurrency = 0,
   platformFeeInHostCurrency = 0,
+  transactionData,
 ) {
   const hostCurrency = host.currency;
   let createPaymentResponse, executePaymentResponse;
@@ -70,6 +72,8 @@ export async function createFromPaidExpense(
     hostFeeInCollectiveCurrency = 0,
     platformFeeInCollectiveCurrency = 0;
   let hostCurrencyFxRate = 1;
+  const payoutMethod = await expense.getPayoutMethod();
+  const payoutMethodType = payoutMethod ? payoutMethod.type : expense.getPayoutMethodTypeFromLegacy();
 
   // If PayPal
   if (paymentResponses) {
@@ -107,6 +111,13 @@ export async function createFromPaidExpense(
     const currencyConversion = createPaymentResponse.defaultFundingPlan.currencyConversion || { exchangeRate: 1 };
     hostCurrencyFxRate = 1 / parseFloat(currencyConversion.exchangeRate); // paypal returns a float from host.currency to expense.currency
     paymentProcessorFeeInHostCurrency = Math.round(hostCurrencyFxRate * paymentProcessorFeeInCollectiveCurrency);
+  } else if (payoutMethodType === PayoutMethodTypes.BANK_ACCOUNT) {
+    // Notice this is the FX rate between Host and Collective, the user is not involved here and that's why TransferWise quote rate is irrelavant here.
+    hostCurrencyFxRate = await getFxRate(expense.currency, host.currency);
+    paymentProcessorFeeInHostCurrency = Math.round(transactionData.quote.fee * 100);
+    paymentProcessorFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * paymentProcessorFeeInHostCurrency);
+    hostFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * hostFeeInHostCurrency);
+    platformFeeInCollectiveCurrency = Math.round((1 / hostCurrencyFxRate) * platformFeeInHostCurrency);
   } else {
     // If manual (add funds or manual reimbursement of an expense)
     hostCurrencyFxRate = await getFxRate(expense.currency, host.currency, expense.incurredAt || expense.createdAt);
@@ -137,6 +148,7 @@ export async function createFromPaidExpense(
     CollectiveId: expense.CollectiveId,
     HostCollectiveId: host.id,
     PaymentMethodId: paymentMethod ? paymentMethod.id : null,
+    data: transactionData,
   };
 
   transaction.hostCurrencyFxRate = hostCurrencyFxRate;

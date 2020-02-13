@@ -4,7 +4,7 @@ import config from 'config';
  * Model.
  */
 export default (Sequelize, DataTypes) => {
-  const supportedServices = ['paypal', 'stripe', 'github', 'twitter', 'meetup'];
+  const supportedServices = ['paypal', 'stripe', 'github', 'twitter', 'meetup', 'transferwise'];
 
   const ConnectedAccount = Sequelize.define(
     'ConnectedAccount',

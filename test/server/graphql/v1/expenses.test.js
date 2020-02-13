@@ -18,7 +18,10 @@ import emailLib from '../../../../server/lib/email';
 import { getFxRate } from '../../../../server/lib/currency';
 
 import paypalAdaptive from '../../../../server/paymentProviders/paypal/adaptiveGateway';
+import paymentProviders from '../../../../server/paymentProviders';
+
 import {
+  fakeConnectedAccount,
   fakeExpense,
   fakeUser,
   fakeExpenseAttachment,
@@ -27,6 +30,7 @@ import {
   fakePayoutMethod,
 } from '../../../test-helpers/fake-data';
 import { roles } from '../../../../server/constants';
+import expenseStatus from '../../../../server/constants/expense_status';
 import { PayoutMethodTypes } from '../../../../server/models/PayoutMethod';
 
 /* Queries used throughout these tests */
@@ -944,6 +948,28 @@ describe('server/graphql/v1/expenses', () => {
       );
     }); /* End of "fails if expense is not approved (REJECTED)" */
 
+    it('fails if expense is still being processed (PROCESSING)', async () => {
+      const { hostAdmin, collective } = await store.newCollectiveWithHost('railsgirlsatl', 'USD', 'USD', 10);
+      const expense = await fakeExpense({
+        status: 'PROCESSING',
+        amount: 10000,
+        CollectiveId: collective.id,
+        currency: 'USD',
+        category: 'Engineering',
+        type: 'INVOICE',
+        description: 'January Invoice',
+      });
+      const parameters = {
+        id: expense.id,
+        paymentProcessorFeeInCollectiveCurrency: 0,
+      };
+      const result = await utils.graphqlQuery(payExpenseQuery, parameters, hostAdmin);
+      // Then there should be errors
+      expect(result.errors).to.exist;
+      // And then the message of the error should be set accordingly
+      expect(result.errors[0].message).to.include('Expense is currently being processed');
+    });
+
     it('fails if not enough funds', async () => {
       // Given that we have a host and a collective
       const { hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
@@ -1096,6 +1122,76 @@ describe('server/graphql/v1/expenses', () => {
         const transactions = await models.Transaction.findAll({ where: { ExpenseId: expense.id } });
         expect(transactions.length).to.equal(0);
       }); /* End of "fails if not enough funds on the paypal preapproved key" */
+    });
+
+    describe('pay with transferwise', () => {
+      const fee = 1.74;
+      let hostAdmin, hostCollective, collective, expense, user, getTemporaryQuote;
+
+      beforeEach(() => {
+        getTemporaryQuote = sandbox.stub(paymentProviders.transferwise, 'getTemporaryQuote').resolves({ fee });
+        sandbox.stub(paymentProviders.transferwise, 'payExpense').resolves({ quote: { fee } });
+      });
+
+      beforeEach(async () => {
+        // Given that we have a host and a collective
+        ({ hostAdmin, hostCollective, collective } = await store.newCollectiveWithHost(
+          'WWCode Berlin',
+          'EUR',
+          'USD',
+          10,
+        ));
+        // And given a user to file expenses
+        ({ user } = await store.newUser('someone cool'));
+        await addFunds(user, hostCollective, collective, 15000000);
+        await fakeConnectedAccount({
+          CollectiveId: hostCollective.id,
+          service: 'transferwise',
+          token: 'faketoken',
+          data: { type: 'business', id: 0 },
+        });
+        const payoutMethod = await fakePayoutMethod({
+          type: PayoutMethodTypes.BANK_ACCOUNT,
+          data: {
+            accountHolderName: 'Leo Kewitz',
+            currency: 'EUR',
+            type: 'iban',
+            legalType: 'PRIVATE',
+            details: {
+              IBAN: 'DE89370400440532013000',
+            },
+          },
+        });
+        expense = await fakeExpense({
+          payoutMethod: 'transferwise',
+          status: expenseStatus.APPROVED,
+          amount: 1000000,
+          CollectiveId: collective.id,
+          currency: 'USD',
+          PayoutMethodId: payoutMethod.id,
+          category: 'Engineering',
+          type: 'INVOICE',
+          description: 'January Invoice',
+        });
+      });
+
+      it('includes TransferWise fees', async () => {
+        await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+
+        const [transaction] = await models.Transaction.findAll({ where: { ExpenseId: expense.id } });
+
+        expect(getTemporaryQuote.called).to.be.true;
+        expect(transaction)
+          .to.have.nested.property('paymentProcessorFeeInHostCurrency')
+          .to.equal(Math.round(fee * -100));
+      });
+
+      it('should update expense status to PROCESSING', async () => {
+        await utils.graphqlQuery(payExpenseQuery, { id: expense.id }, hostAdmin);
+
+        await expense.reload();
+        expect(expense.status).to.equal(expenseStatus.PROCESSING);
+      });
     });
 
     describe('success', () => {

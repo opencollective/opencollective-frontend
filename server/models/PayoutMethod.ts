@@ -8,8 +8,9 @@ import { objHasOnlyKeys } from '../lib/utils';
  * Match the Postgres enum defined for `PayoutMethods` > `type`
  */
 export enum PayoutMethodTypes {
-  PAYPAL = 'PAYPAL',
   OTHER = 'OTHER',
+  PAYPAL = 'PAYPAL',
+  BANK_ACCOUNT = 'BANK_ACCOUNT',
 }
 
 /** An interface for the values stored in `data` field for PayPal payout methods */
@@ -137,7 +138,7 @@ export default (sequelize, DataTypes): typeof PayoutMethod => {
       },
       type: {
         // Enum entries must match `PayoutMethodType`
-        type: DataTypes.ENUM('PAYPAL', 'OTHER'),
+        type: DataTypes.ENUM('PAYPAL', 'BANK_ACCOUNT', 'OTHER'),
         allowNull: false,
         validate: {
           isIn: {
@@ -162,6 +163,17 @@ export default (sequelize, DataTypes): typeof PayoutMethod => {
                 throw new Error('Invalid format of custom payout method');
               } else if (!objHasOnlyKeys(value, ['content'])) {
                 throw new Error('Data for this payout method contains too much information');
+              }
+            } else if (this.type === PayoutMethodTypes.BANK_ACCOUNT) {
+              if (
+                !value ||
+                !value.accountHolderName ||
+                !value.currency ||
+                !value.type ||
+                !value.legalType ||
+                !value.details
+              ) {
+                throw new Error('Invalid format of BANK_ACCOUNT payout method data');
               }
             } else if (!value || Object.keys(value).length > 0) {
               throw new Error('Data for this payout method is not properly formatted');
