@@ -128,6 +128,14 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
     } else if (!order.processedAt && order.data.savePaymentMethod) {
       payload.setup_future_usage = 'on_session';
     }
+    // Add Payment Method ID if it's available
+    const paymentMethodId = get(hostStripeCustomer, 'default_source', get(hostStripeCustomer, 'sources.data[0].id'));
+    if (paymentMethodId) {
+      payload.payment_method = paymentMethodId;
+    } else {
+      logger.info('paymentMethod is missing in hostStripeCustomer to pass to Payment Intent.');
+      logger.info(hostStripeCustomer);
+    }
     paymentIntent = await stripe.paymentIntents.create(payload, {
       stripeAccount: hostStripeAccount.username,
     });
