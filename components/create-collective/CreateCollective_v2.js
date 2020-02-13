@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Page from '../Page';
 import ChooseCollectiveType from './sections/ChooseCollectiveType';
+import CreateCollectiveHeader from './sections/CreateCollectiveHeader';
 import { Span, P, H1, H2, H3, H4, H5 } from '../Text';
 import Container from '../Container';
 import StyledButton from '../StyledButton';
 import Illustration from '../home/HomeIllustration';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
-import CreateCollectiveForm from '../CreateCollectiveForm';
+import CreateCollectiveForm from './sections/CreateCollectiveForm';
 import CreateCollectiveCover from '../CreateCollectiveCover';
 import ErrorPage from '../ErrorPage';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -30,7 +31,7 @@ class CreateCollective extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { collective: { type: 'COLLECTIVE' }, result: {} };
+    this.state = { collective: { type: 'COLLECTIVE' }, result: {}, subheader: null, path: null };
     this.createCollective = this.createCollective.bind(this);
     this.error = this.error.bind(this);
     this.resetError = this.resetError.bind(this);
@@ -55,19 +56,7 @@ class CreateCollective extends React.Component {
         apply: {
           title: this.props.intl.formatMessage(this.messages['collective.create.title']),
           description: this.props.intl.formatMessage(this.messages['collective.create.description']),
-          categories: [
-            'association',
-            'coop',
-            'lobby',
-            'meetup',
-            'movement',
-            'neighborhood',
-            'opensource',
-            'politicalparty',
-            'pta',
-            'studentclub',
-            'other',
-          ],
+          categories: ['community', 'climate', 'opensource'],
         },
       },
     };
@@ -171,20 +160,19 @@ class CreateCollective extends React.Component {
       return <ErrorPage loading />;
     }
 
-    if (!LoggedInUser) {
-      return (
-        <Page>
-          <Flex justifyContent="center" p={5}>
-            <SignInOrJoinFree />
-          </Flex>
-        </Page>
-      );
-    }
-
     return (
       <Page>
         <div className="CreateCollective">
-          <ChooseCollectiveType />
+          <CreateCollectiveHeader subheader={this.state.subheader} />
+          {canApply && !LoggedInUser && <SignInOrJoinFree />}
+          {canApply && LoggedInUser && (
+            <CreateCollectiveForm
+              host={this.host}
+              collective={this.state.collective}
+              onSubmit={this.createCollective}
+              onChange={this.resetError}
+            />
+          )}
         </div>
       </Page>
     );

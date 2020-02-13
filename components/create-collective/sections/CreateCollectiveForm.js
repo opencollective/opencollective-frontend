@@ -319,6 +319,11 @@ class CreateCollectiveForm extends React.Component {
               font-size: 1.5rem;
             }
 
+            .FormInputs {
+              max-width: 700px;
+              margin: 0 auto;
+            }
+
             .actions {
               margin: 5rem auto 1rem;
               text-align: center;

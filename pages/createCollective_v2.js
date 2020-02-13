@@ -31,6 +31,8 @@ class CreateCollectivePage extends React.Component {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
+    console.log(this.props);
+
     return <CreateCollective host={data.Collective} />;
   }
 }
