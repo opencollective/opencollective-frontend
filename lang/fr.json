@@ -1289,7 +1289,6 @@
   "webhooks.save": "Sauvegarder les {count} webhooks",
   "webhooks.types.label": "Activité",
   "webhooks.url.label": "Adresse URL",
-  "widget.becomeSponsor": "Deviens un sponsor",
   "widget.contributeOnOpenCollective": "Contribute on Open Collective",
   "YearlyBudget": "Budget annuel",
   "yes": "Oui"
