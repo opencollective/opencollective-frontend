@@ -6,7 +6,7 @@ const { default: fileExistsCaseInsensitive } = require('react-styleguidist/lib/s
 
 module.exports = {
   assetsDir: 'styleguide',
-  require: [path.join(__dirname, 'static/styles/app.css')],
+  require: [path.join(__dirname, 'static/styles/app.css'), path.join(__dirname, 'styleguide/static/styleguide.css')],
   getExampleFilename(componentPath) {
     const parsedPath = path.parse(componentPath);
     const parentDirName = parsedPath.dir.split('components/')[1] || '';
@@ -24,6 +24,10 @@ module.exports = {
     components: path.resolve(__dirname, 'components'),
   },
   sections: [
+    {
+      name: 'Home',
+      content: 'styleguide/pages/index.md',
+    },
     {
       name: 'Atoms',
       components: 'components/Styled*.js',
@@ -43,7 +47,7 @@ module.exports = {
     {
       name: 'Collective Page',
       components: 'components/collective-page/*.js',
-      description: 'These components are used on the donate/contribute flow.',
+      description: 'These components are used collective page.',
     },
     {
       name: 'Contribution Flow',
@@ -70,6 +74,9 @@ module.exports = {
     Wrapper: path.join(__dirname, 'styleguide/Wrapper'),
   },
   styles: {
+    Section: {
+      fontSize: '14px',
+    },
     Blockquote: {
       blockquote: {
         borderLeft: '3px solid grey',
