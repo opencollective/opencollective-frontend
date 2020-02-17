@@ -8,6 +8,7 @@ const ContributeCardsContainer = styled.div`
   padding: 16px 0;
   overflow-x: auto;
   scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
 
   ${CustomScrollbarCSS}
 

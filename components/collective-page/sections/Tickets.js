@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
 import { orderBy } from 'lodash';
+import styled from 'styled-components';
+import css from '@styled-system/css';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
@@ -16,6 +18,12 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];
+
+const ContributeCardContainer = styled(Box).attrs({ px: CONTRIBUTE_CARD_PADDING_X })(
+  css({
+    scrollSnapAlign: ['center', null, 'start'],
+  }),
+);
 
 /**
  * The tickets section, implemented as a pure component to avoid unnecessary
@@ -96,21 +104,21 @@ class SectionTickets extends React.PureComponent {
 
                 <ContributeCardsContainer ref={ref}>
                   {sortedTiers.map(tier => (
-                    <Box key={tier.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                    <ContributeCardContainer key={tier.id}>
                       <ContributeTier
                         collective={collective}
                         tier={tier}
                         hideContributors={hasNoContributor}
                         disableCTA={!collective.isActive}
                       />
-                    </Box>
+                    </ContributeCardContainer>
                   ))}
                   {isAdmin && (
-                    <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
+                    <ContributeCardContainer minHeight={150}>
                       <CreateNew route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`}>
                         <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
                       </CreateNew>
-                    </Box>
+                    </ContributeCardContainer>
                   )}
                 </ContributeCardsContainer>
               </div>
