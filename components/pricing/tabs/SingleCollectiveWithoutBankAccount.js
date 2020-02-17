@@ -100,7 +100,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
         >
           <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a fiscal host." />
         </H3>
-        <HostsWrapper width={[1, null, '715px']} py={4}>
+        <HostsWrapper width={1} justifyContent="center" py={4}>
           {hosts.map(collective => (
             <Box mx={2} key={collective.id}>
               <StyledCollectiveCard
