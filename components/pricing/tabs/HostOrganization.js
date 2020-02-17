@@ -3,6 +3,7 @@ import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
 import Container from '../../Container';
+import StyledLink from '../../StyledLink';
 import BackButton from '../BackButton';
 import PricingTable from '../PricingTable';
 import { H1, P, H3 } from '../../Text';
@@ -221,6 +222,17 @@ const HostOrganization = () => (
       <Container width={[1, null, 1, null, '992px']} display="flex" justifyContent="center" alignItems="center">
         <PricingTable width={1} headings={headings} rows={rows} footings={footings} />
       </Container>
+
+      <Box textAlign="center" my={3}>
+        <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <StyledLink href={'/become-a-fiscal-host'}>
+            <FormattedHTMLMessage
+              id="pricing.fiscalHost.learnMore"
+              defaultMessage="Learn more about becoming a Fiscal Host."
+            />
+          </StyledLink>
+        </P>
+      </Box>
 
       <Flex justifyContent="center" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
         <Container my={4} p={3} backgroundColor="black.50" borderRadius="8px" width={[1, null, '681px']}>
