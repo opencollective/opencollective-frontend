@@ -360,7 +360,7 @@ class PricingTable extends React.Component {
     return (
       <Container display="flex" my={4} justifyContent="center" {...props}>
         <Wrapper>
-          <StyledTable as="table" height="407px" ref={this.tableRef}>
+          <StyledTable as="table" ref={this.tableRef}>
             <thead>
               <tr>{headings.map(this.renderHeadingRow)}</tr>
             </thead>

@@ -133,21 +133,17 @@ const SingleCollectiveWithBankAccount = () => (
         </P>
       </Box>
 
-      <Flex
-        width={1}
-        flexDirection={['column', null, 'row']}
-        justifyContent={['space-between', null, null, null, 'center']}
-        alignItems="center"
-      >
-        <Container width={[1, null, '514px', null, '576px']} mr={[null, null, null, null, 3]}>
+      <Flex width={1} flexDirection={['column', null, 'row']} justifyContent={'center'} alignItems="center">
+        <Container width={[1, null, '514px', null, '576px']} mr={[null, null, 3]}>
           <PricingTable headings={headings} rows={rows} footings={footings} />
         </Container>
         <Container
           width={[1, null, '368px']}
+          minHeight="416px"
           p={3}
           backgroundColor="black.50"
           borderRadius="8px"
-          ml={[null, null, null, null, 3]}
+          ml={[null, null, 3]}
         >
           <H3
             my={2}
