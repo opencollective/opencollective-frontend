@@ -134,7 +134,7 @@ const rows = [
         );
       },
     },
-    { type: 'check' },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },
@@ -149,7 +149,7 @@ const rows = [
         );
       },
     },
-    '-',
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
     { type: 'check' },
     { type: 'check' },
     { type: 'check' },
