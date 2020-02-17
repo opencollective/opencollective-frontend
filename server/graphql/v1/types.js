@@ -711,6 +711,17 @@ export const ExpenseAttachmentType = new GraphQLObjectType({
   },
 });
 
+const ExpenseViewPermissions = new GraphQLObjectType({
+  name: 'ExpenseViewPermissions',
+  description:
+    "Returns info about whether user is allowed to see expense's private info, such as attachment's URLS or payout methods.",
+  fields: {
+    attachments: { type: GraphQLBoolean },
+    payoutMethod: { type: GraphQLBoolean },
+    userLocation: { type: GraphQLBoolean },
+  },
+});
+
 export const ExpenseType = new GraphQLObjectType({
   name: 'ExpenseType',
   description: 'This represents an Expense',
@@ -786,7 +797,8 @@ export const ExpenseType = new GraphQLObjectType({
       PayoutMethod: {
         type: PayoutMethodType,
         async resolve(expense, _, req) {
-          if (!(await canViewExpensePrivateInfo(expense, req)) || !expense.PayoutMethodId) {
+          const expensePermissions = await canViewExpensePrivateInfo(expense, req);
+          if (!expensePermissions.payoutMethod || !expense.PayoutMethodId) {
             return null;
           } else {
             return expense.payoutMethod || req.loaders.PayoutMethod.byId.load(expense.PayoutMethodId);
@@ -794,9 +806,8 @@ export const ExpenseType = new GraphQLObjectType({
         },
       },
       canSeePrivateInfo: {
-        type: GraphQLBoolean,
-        description:
-          "Returns true if current user is allowed to see expense's private info, such as attachment's URLS or payout methods.",
+        type: ExpenseViewPermissions,
+        description: 'Informs the frontend about what fields are accessible in the expense for current user',
         resolve(expense, _, req) {
           return canViewExpensePrivateInfo(expense, req);
         },
@@ -823,7 +834,8 @@ export const ExpenseType = new GraphQLObjectType({
         type: GraphQLString,
         deprecationReason: '2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.',
         async resolve(expense, args, req) {
-          if (!(await canViewExpensePrivateInfo(expense, req))) {
+          const expensePermissions = await canViewExpensePrivateInfo(expense, req);
+          if (!expensePermissions.attachments) {
             return null;
           } else {
             const attachments = await getExpenseAttachments(expense.id, req);
@@ -834,8 +846,9 @@ export const ExpenseType = new GraphQLObjectType({
       attachments: {
         type: new GraphQLList(ExpenseAttachmentType),
         async resolve(expense, _, req) {
+          const expensePermissions = await canViewExpensePrivateInfo(expense, req);
           return (await getExpenseAttachments(expense.id, req)).map(async attachment => {
-            if (await canViewExpensePrivateInfo(expense, req)) {
+            if (expensePermissions.attachments) {
               return attachment;
             } else {
               return omit(attachment, ['url']);

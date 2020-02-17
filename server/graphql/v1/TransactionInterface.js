@@ -329,7 +329,8 @@ export const TransactionExpenseType = new GraphQLObjectType({
             return null;
           } else {
             const expense = req.loaders.Expense.byId.load(transaction.ExpenseId);
-            if (!expense || !(await canViewExpensePrivateInfo(expense, req))) {
+            const expensePermissions = await canViewExpensePrivateInfo(expense, req);
+            if (!expense || !expensePermissions.attachments) {
               return null;
             } else {
               const attachments = await getExpenseAttachments(transaction.ExpenseId, req);

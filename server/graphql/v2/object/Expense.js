@@ -1,7 +1,10 @@
 import { GraphQLString, GraphQLObjectType } from 'graphql';
 import models, { Op } from '../../../models';
 
+import { setContextPermission, PERMISSION_TYPE } from '../../common/context-permissions';
+import { canViewExpensePrivateInfo } from '../../common/expenses';
 import { CommentCollection } from '../collection/CommentCollection';
+import { Account } from '../interface/Account';
 import { CollectionArgs } from '../interface/Collection';
 import { getIdEncodeResolver } from '../identifiers';
 
@@ -40,6 +43,18 @@ const Expense = new GraphQLObjectType({
             totalCount: count,
             nodes: rows,
           };
+        },
+      },
+      payee: {
+        type: Account,
+        description: 'The account being paid by this expense',
+        async resolve(expense, _, req) {
+          // Set the permissions for account's fields
+          const canSeePrivateInfo = (await canViewExpensePrivateInfo(expense, req)).userLocation;
+          setContextPermission(req, PERMISSION_TYPE.SEE_ACCOUNT_LOCATION, expense.FromCollectiveId, canSeePrivateInfo);
+
+          // Return fromCollective
+          return req.loaders.Collective.byId.load(expense.FromCollectiveId);
         },
       },
     };

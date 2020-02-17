@@ -32,6 +32,7 @@ import { ConversationCollection } from '../collection/ConversationCollection';
 import { TagStats } from '../object/TagStats';
 import { TransferWise } from '../object/TransferWise';
 import PayoutMethod from '../object/PayoutMethod';
+import { Location } from '../object/Location';
 
 const accountFieldsDefinition = () => ({
   // _internal_id: {
@@ -175,6 +176,10 @@ const accountFieldsDefinition = () => ({
   payoutMethods: {
     type: new GraphQLList(PayoutMethod),
     description: 'The list of payout methods that this collective can use to get paid',
+  },
+  location: {
+    type: Location,
+    description: 'The address associated to this account. This field is always public for collectives and events.',
   },
 });
 
