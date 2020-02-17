@@ -127,7 +127,9 @@ export const webpackCollective = {
   name: 'webpack',
   company: null,
   tags: ['open source'],
+  isApproved: true,
   image: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
+  imageUrl: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
   backgroundImage: 'https://cl.ly/2b1k0P030J3o/webpack-background-image.jpg',
   description: 'webpack is THE build solution for modern web applications.',
   longDescription:
