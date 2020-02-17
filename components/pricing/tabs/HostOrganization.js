@@ -162,7 +162,7 @@ const rows = [
         return (
           <FormattedHTMLMessage
             id="pricingTable.row.hostFeature"
-            defaultMessage="Apply to your host feature and discovery"
+            defaultMessage="Link for Collectives to discover and apply to your host"
           />
         );
       },
@@ -213,7 +213,7 @@ const HostOrganization = () => (
         <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
           <FormattedHTMLMessage
             id="pricing.tab.hostOrganization.description"
-            defaultMessage="You will be a <strong>Fiscal Host</strong> on our platform. That means you hold funds on behalf of Collectives."
+            defaultMessage="You will be a <strong>Fiscal Host</strong> on our platform. That means you hold funds on behalf of Collectives. You decide which Collectives to accept and what if any fees to charge them."
           />
         </P>
       </Box>
@@ -242,7 +242,7 @@ const HostOrganization = () => (
             <Box as="li" my={3}>
               <FormattedHTMLMessage
                 id="pricing.starterPlans.communication"
-                defaultMessage="Communication tools: <strong>post updates, start conversations,</strong> and <strong>get an email address</strong> for your group."
+                defaultMessage="Communication tools: <strong>post updates, start conversations,</strong> and <strong>a contact form</strong> for your group."
               />
             </Box>
             <Box as="li" my={3}>

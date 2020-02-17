@@ -98,7 +98,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           lineHeight={['26px']}
           letterSpacing={['-0.008em']}
         >
-          <FormattedMessage id="pricing.checkFiscalHost" defaultMessage="Check these Fiscal Hosts." />
+          <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a fiscal host." />
         </H3>
         <HostsWrapper width={[1, null, '715px']} py={4}>
           {hosts.map(collective => (

@@ -163,7 +163,7 @@ const SingleCollectiveWithBankAccount = () => (
             <Box as="li" my={3}>
               <FormattedHTMLMessage
                 id="pricing.starterPlans.communication"
-                defaultMessage="Communication tools: <strong>post updates, start conversations,</strong> and <strong>get an email address</strong> for your group."
+                defaultMessage="Communication tools: <strong>post updates, start conversations,</strong> and <strong>a contact form</strong> for your group."
               />
             </Box>
             <Box as="li" my={3}>
