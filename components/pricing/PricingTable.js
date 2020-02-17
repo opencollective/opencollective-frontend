@@ -2,9 +2,8 @@ import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 import { display } from 'styled-system';
-import { FormattedMessage } from 'react-intl';
 import { Box } from '@rebass/grid';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { isObject } from 'lodash';
@@ -22,13 +21,13 @@ const PlanLink = styled(StyledLink).attrs({
   line-height: 14px;
   padding: 5px 14px;
   color: #fff;
-  width: 72px;
+  min-width: 72px;
   ${display};
   margin: auto;
   white-space: nowrap;
 
   @media screen and (min-width: 64em) {
-    width: 100px;
+    min-width: 100px;
   }
 `;
 
@@ -45,7 +44,7 @@ const Wrapper = styled(Box)`
   margin-left: 136px;
   width: 100%;
 
-  @media screen and (min-width: 88em) {
+  @media screen and (min-width: 52em) {
     margin-left: 0;
     border-radius: 8px;
     border-left: 1px solid #dcdee0;
@@ -94,12 +93,13 @@ const StyledTable = styled(Box)`
     left: 16px;
     border-left: 1px solid #dcdee0;
     backface-visibility: hidden;
-    @media screen and (min-width: 64em) {
+
+    @media screen and (min-width: 52em) {
       width: 176px;
       left: 50px;
     }
 
-    @media screen and (min-width: 88em) {
+    @media screen and (min-width: 52em) {
       position: relative;
       left: 0;
       border-left: none;
@@ -255,19 +255,23 @@ const Cell = ({ content, header, height }) => {
       case 'button':
         return (
           <td className="footer" style={style}>
-            <PlanLink href={content.url} display={['none', null, 'block']}>
+            <PlanLink href={content.url} display={['none', null, null, 'block']}>
               <FormattedMessage id="pricingTable.action.choosePlan" defaultMessage="Choose plan" />
             </PlanLink>
-            <PlanLink href={content.url} display={['block', null, 'none']}>
+            <PlanLink href={content.url} display={['block', null, null, 'none']}>
               <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />
             </PlanLink>
           </td>
         );
       case 'component':
-        return <td>{content.render()}</td>;
+        return <td style={style}>{content.render()}</td>;
     }
   } else if (header) {
-    return content ? <th style={style}>{intl.formatMessage(messages[`table.head.${content}`])}</th> : <th></th>;
+    return content ? (
+      <th style={style}>{intl.formatMessage(messages[`table.head.${content}`])}</th>
+    ) : (
+      <th style={style}></th>
+    );
   } else {
     return <td style={style}>{content}</td>;
   }
