@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { graphql } from 'react-apollo';
 
 import Container from '../../Container';
 import BackButton from '../BackButton';
@@ -10,10 +12,11 @@ import StyledLink from '../../StyledLink';
 import { H1, P, H3, Span } from '../../Text';
 import Currency from '../../Currency';
 import { Router } from '../../../server/pages';
-import { addHostsData } from '../../HostsWithData';
 import StyledCollectiveCard from '../../StyledCollectiveCard';
 import StyledButton from '../../StyledButton';
 import Link from '../../Link';
+
+const featuredHostsSlugs = ['opensource', 'wwcodeinc', 'paris', 'allforclimate'];
 
 const HostsWrapper = styled(Flex)`
   overflow-x: auto;
@@ -30,10 +33,14 @@ const ApplyButton = styled(StyledButton)`
 `;
 
 const SingleCollectiveWithoutBankAccount = ({ data }) => {
-  let collectives = [];
-  if (data.allHosts && data.allHosts.collectives) {
-    collectives = [...data.allHosts.collectives];
-  }
+  const hosts = featuredHostsSlugs
+    .map(
+      slug =>
+        data.allCollectives &&
+        data.allCollectives.collectives &&
+        data.allCollectives.collectives.find(collective => collective.slug === slug),
+    )
+    .filter(collective => !!collective);
 
   return (
     <Container mx={3} my={4}>
@@ -54,27 +61,32 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
             <FormattedHTMLMessage
               id="pricing.tab.joinHost"
-              defaultMessage="We invite you to <strong>join a Fiscal Host</strong>"
+              defaultMessage="If you don't have access to a bank account you can use, please <strong>join a Fiscal Host</strong>!"
             />
           </P>
           <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
             <FormattedHTMLMessage
               id="pricing.fiscalHost.description"
-              defaultMessage="A Fiscal Host <strong>is an organization who offers fund-holding as a service.</strong> They keep your money in their bank account. Fiscal Hosts <strong>handle things like accounting, taxes, admin, payments, and liability-</strong>so you don’t have to!"
+              defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and  <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
             />
           </P>
           <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
             <FormattedHTMLMessage
               id="pricing.fiscalHost.reasonToJoin"
-              defaultMessage="If you join a Fiscal Host, <strong>you don’t need to pay Open Collective,</strong> as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives."
+              defaultMessage="If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations your raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan."
             />
           </P>
           <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
             <FormattedMessage
               id="pricing.fiscalHost.applyOpenSource"
-              defaultMessage="If you are an open source project, you can apply to join"
-            />{' '}
-            <StyledLink href="#">Open Source Collective.</StyledLink>
+              defaultMessage="If you are an open source project, you can apply to join  the Open Source Collective."
+            />
+          </P>
+          <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+            <FormattedHTMLMessage
+              id="pricing.fiscalHost.featured"
+              defaultMessage="Below are some of our most popular hosts or <a href='/hosts'>browse all of them</a>."
+            />
           </P>
         </Box>
       </Flex>
@@ -89,7 +101,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <FormattedMessage id="pricing.checkFiscalHost" defaultMessage="Check these Fiscal Hosts." />
         </H3>
         <HostsWrapper width={[1, null, '715px']} py={4}>
-          {collectives.map(collective => (
+          {hosts.map(collective => (
             <Box mx={2} key={collective.id}>
               <StyledCollectiveCard
                 width="224px"
@@ -150,6 +162,11 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
             </Box>
           ))}
         </HostsWrapper>
+        <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+          <StyledLink href={'/hosts'}>
+            <FormattedHTMLMessage id="pricing.fiscalHost.more" defaultMessage="See more fiscal hosts" />
+          </StyledLink>
+        </P>
       </Container>
     </Container>
   );
@@ -158,5 +175,37 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
 SingleCollectiveWithoutBankAccount.propTypes = {
   data: PropTypes.object,
 };
+
+const getHostsQuery = gql`
+  query allCollectives($slugs: [String]) {
+    allCollectives(slugs: $slugs) {
+      total
+      collectives {
+        id
+        isHost
+        type
+        createdAt
+        slug
+        name
+        description
+        longDescription
+        currency
+        backgroundImage
+        stats {
+          id
+          collectives {
+            hosted
+          }
+        }
+      }
+    }
+  }
+`;
+
+const addHostsData = graphql(getHostsQuery, {
+  options() {
+    return { variables: { slugs: featuredHostsSlugs } };
+  },
+});
 
 export default addHostsData(SingleCollectiveWithoutBankAccount);
