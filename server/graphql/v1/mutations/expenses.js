@@ -100,6 +100,17 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   return res;
 }
 
+/** Compute the total amount of expense from attachments */
+const getTotalAmountFromAttachments = attachments => {
+  if (!attachments) {
+    return 0;
+  } else {
+    return attachments.reduce((total, attachment) => {
+      return total + attachment.amount;
+    }, 0);
+  }
+};
+
 /** Check expense's attachments values, throw if something's wrong */
 const checkExpenseAttachments = (expenseData, attachments) => {
   // Check the number of attachments
@@ -110,7 +121,7 @@ const checkExpenseAttachments = (expenseData, attachments) => {
   }
 
   // Check amounts
-  const sumAttachments = attachments.reduce((total, attachment) => total + attachment.amount, 0);
+  const sumAttachments = getTotalAmountFromAttachments(attachments);
   if (sumAttachments !== expenseData.amount) {
     throw new ValidationFailed({
       message: `The sum of all attachments must be equal to the total expense's amount. Expense's total is ${expenseData.amount}, but the total of attachments was ${sumAttachments}.`,
@@ -223,6 +234,7 @@ export async function createExpense(remoteUser, expenseData) {
         incurredAt: expenseData.incurredAt || new Date(),
         PayoutMethodId: payoutMethod && payoutMethod.id,
         legacyPayoutMethod: models.Expense.getLegacyPayoutMethodTypeFromPayoutMethod(payoutMethod),
+        amount: expenseData.amount || getTotalAmountFromAttachments(attachmentsData),
       },
       { transaction: t },
     );
