@@ -178,25 +178,23 @@ const rows = [
 
 const footings = [
   '',
+  '',
   {
     type: 'button',
-    url: 'https://',
+    url: 'https://opencollective.com/opencollective/contribute/small-host-plan-11723',
   },
   {
     type: 'button',
-    url: 'https://',
+    url: 'https://opencollective.com/opencollective/contribute/medium-host-plan-11724',
   },
   {
     type: 'button',
-    url: 'https://',
+    url: 'https://opencollective.com/opencollective/contribute/large-host-plan-11725',
   },
   {
     type: 'button',
-    url: 'https://',
-  },
-  {
-    type: 'button',
-    url: 'https://',
+    cta: 'Contact Us',
+    url: '/support',
   },
 ];
 

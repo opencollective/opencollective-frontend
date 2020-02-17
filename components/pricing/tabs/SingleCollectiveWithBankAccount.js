@@ -98,13 +98,10 @@ const rows = [
 
 const footings = [
   '',
+  '',
   {
     type: 'button',
-    url: 'https://',
-  },
-  {
-    type: 'button',
-    url: 'https://',
+    url: 'https://opencollective.com/opencollective/contribute/single-host-plan-13173',
   },
 ];
 

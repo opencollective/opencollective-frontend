@@ -256,10 +256,10 @@ const Cell = ({ content, header, height }) => {
         return (
           <td className="footer" style={style}>
             <PlanLink href={content.url} display={['none', null, null, 'block']}>
-              <FormattedMessage id="pricingTable.action.choosePlan" defaultMessage="Choose plan" />
+              {content.cta || <FormattedMessage id="pricingTable.action.choosePlan" defaultMessage="Choose plan" />}
             </PlanLink>
             <PlanLink href={content.url} display={['block', null, null, 'none']}>
-              <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />
+              {content.cta || <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />}
             </PlanLink>
           </td>
         );
