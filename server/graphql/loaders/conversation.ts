@@ -1,14 +1,9 @@
 import models, { sequelize } from '../../models';
 import DataLoader from 'dataloader';
 
-interface IConversationLoader {
-  followers: DataLoader<number, any>;
-  commentsCount: DataLoader<number, number>;
-}
-
-export default function generateConversationLoaders(): IConversationLoader {
-  return {
-    followers: new DataLoader(async conversationIds => {
+export default {
+  followers: (): DataLoader<number, object> =>
+    new DataLoader(async conversationIds => {
       const subscribedCollectives = await sequelize.query(
         `
         SELECT      c.*, f."ConversationId" AS __conversation_id__
@@ -42,7 +37,8 @@ export default function generateConversationLoaders(): IConversationLoader {
         return groupedCollectives[conversationId] || [];
       });
     }),
-    commentsCount: new DataLoader(async (conversationsIds: number[]) => {
+  commentsCount: (): DataLoader<number, number> =>
+    new DataLoader(async (conversationsIds: number[]) => {
       const counts: Array<{ ConversationId: number; count: number }> = await sequelize.query(
         `
         SELECT "ConversationId", COUNT(id) as count
@@ -69,5 +65,4 @@ export default function generateConversationLoaders(): IConversationLoader {
         }
       });
     }),
-  };
-}
+};
