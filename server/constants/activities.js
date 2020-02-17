@@ -24,6 +24,7 @@ export default {
   COLLECTIVE_UPDATE_PUBLISHED: 'collective.update.published',
   COLLECTIVE_USER_ADDED: 'collective.user.added',
   COLLECTIVE_CONTACT: 'collective.contact',
+  COLLECTIVE_BADWORD_DETECTED: 'collective.badword.detected',
   ORGANIZATION_COLLECTIVE_CREATED: 'organization.collective.created',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   SUBSCRIPTION_CANCELED: 'subscription.canceled',

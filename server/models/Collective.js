@@ -51,6 +51,7 @@ import expenseTypes from '../constants/expense_type';
 import plans, { PLANS_COLLECTIVE_SLUG } from '../constants/plans';
 
 import { getFxRate } from '../lib/currency';
+import { collectiveSpamCheck } from '../lib/spam';
 
 const debug = debugLib('models:Collective');
 
@@ -664,7 +665,12 @@ export default function(Sequelize, DataTypes) {
             });
           }
 
+          collectiveSpamCheck(instance);
+
           return null;
+        },
+        afterUpdate: async instance => {
+          collectiveSpamCheck(instance);
         },
       },
     },
