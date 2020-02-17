@@ -1,6 +1,7 @@
 import uuidv4 from 'uuid/v4';
 
 import * as transferwise from '../../lib/transferwise';
+import cache from '../../lib/cache';
 import { Quote } from '../../types/transferwise';
 
 async function populateProfileId(connectedAccount): Promise<void> {
@@ -67,7 +68,57 @@ async function payExpense(connectedAccount, payoutMethod, expense): Promise<any>
   return { quote, recipient, transfer, fund };
 }
 
+async function getRequiredBankInformation(collective, currency: string): Promise<any> {
+  const cacheKey = `req_bank_info_${collective.id}_to_${currency}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const host = collective.isHostAccount ? collective : await collective.getHostCollective();
+  const [connectedAccount] = await host.getConnectedAccounts({
+    where: { service: 'transferwise', deletedAt: null },
+  });
+
+  if (!connectedAccount) {
+    throw new Error('Host is not connected to Transferwise');
+  }
+
+  const quote = await transferwise.createQuote(connectedAccount.token, {
+    profileId: connectedAccount.data.id,
+    sourceCurrency: collective.currency,
+    targetCurrency: currency,
+    targetAmount: 100,
+  });
+  const requiredFields = await transferwise.getAccountRequirements(connectedAccount.token, quote.id);
+  cache.set(cacheKey, requiredFields, 24 * 60 * 60 /* a whole day and we could probably increase */);
+  return requiredFields;
+}
+
+async function getAvailableCurrencies(collective): Promise<any> {
+  const cacheKey = `req_avail_currs_${collective.id}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const host = collective.isHostAccount ? collective : await collective.getHostCollective();
+  const [connectedAccount] = await host.getConnectedAccounts({
+    where: { service: 'transferwise', deletedAt: null },
+  });
+
+  if (!connectedAccount) {
+    throw new Error('Host is not connected to Transferwise');
+  }
+
+  const currencies = await transferwise.getCurrencyPairs(connectedAccount.token);
+  cache.set(cacheKey, currencies, 24 * 60 * 60 /* a whole day and we could probably increase */);
+  return currencies;
+}
+
 export default {
+  getAvailableCurrencies,
+  getRequiredBankInformation,
   getTemporaryQuote,
   quoteExpense,
   payExpense,
