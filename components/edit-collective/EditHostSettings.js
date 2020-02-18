@@ -95,6 +95,11 @@ const EditHostSettings = props => {
                 <br />
                 (across all collectives)
               </li>
+              <li>
+                Up to $1000 bank transfers
+                <br />
+                (across all collectives)
+              </li>
             </ul>
           </PlanFeatures>
           <PlanPrice>Free</PlanPrice>
@@ -142,7 +147,7 @@ const EditHostSettings = props => {
             <ul>
               <li>More than 25 collectives</li>
               <li>Unlimited added funds</li>
-              <li>Manual bank transfers</li>
+              <li>Unlimited bank transfers</li>
             </ul>
           </PlanFeatures>
           <PlanPrice>Talk to Us</PlanPrice>
@@ -192,7 +197,7 @@ const EditHostSettings = props => {
           )}
         </li>
         <li>
-          <strong>Manual Payments</strong>{' '}
+          <strong>Bank Transfers Limit</strong>{' '}
           <StyledTooltip
             content={() => (
               <FormattedMessage
@@ -203,7 +208,15 @@ const EditHostSettings = props => {
           >
             <LimitsInfoCircle size={12} />
           </StyledTooltip>
-          : {collective.plan.manualPayments ? 'Yes' : 'No'}
+          :{' '}
+          {collective.plan.bankTransfersLimit && (
+            <span>
+              ${collective.plan.bankTransfers / 100} of ${collective.plan.bankTransfersLimit / 100}
+            </span>
+          )}
+          {!collective.plan.bankTransfersLimit && (
+            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
+          )}
         </li>
       </ul>
     </div>
