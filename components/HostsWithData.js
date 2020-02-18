@@ -140,6 +140,7 @@ const getHostsQuery = gql`
       total
       collectives {
         id
+        isHost
         type
         createdAt
         slug

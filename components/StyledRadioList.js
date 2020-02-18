@@ -14,7 +14,6 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, dis
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
   const defaultValueStr = props.defaultValue !== undefined && props.defaultValue.toString();
-
   return (
     <Container
       as="fieldset"

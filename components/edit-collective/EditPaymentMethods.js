@@ -313,7 +313,7 @@ class EditPaymentMethods extends React.Component {
                       id="paymentMethods.manual.add.trial"
                       defaultMessage="Free for the first $1,000 received, "
                     />
-                    <a href="https://docs.opencollective.com/help/about/pricing">
+                    <a href="/pricing">
                       <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
                     </a>
                   </Box>

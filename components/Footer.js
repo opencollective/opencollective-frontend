@@ -51,7 +51,7 @@ const navigation = {
   PLATFORM: {
     Discover: '/discover',
     'How it Works': '/how-it-works',
-    Pricing: 'https://docs.opencollective.com/help/about/pricing',
+    Pricing: '/pricing',
     'Join Free': '/create-account',
     Login: '/signin',
   },
