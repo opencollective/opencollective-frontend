@@ -84,7 +84,7 @@ class Expenses extends React.Component {
               text-align: center;
             }
             .filter {
-              max-width: 500px;
+              max-width: 600px;
               width: 100%;
               margin: 0 auto;
               margin-bottom: 20px;
