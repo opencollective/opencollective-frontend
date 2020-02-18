@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Feb 12 2020 15:42:14 GMT-0300 (Brasilia Standard Time)
+# timestamp: Tue Feb 18 2020 09:12:12 GMT+0100 (Central European Standard Time)
 
 """
 Application model
@@ -2595,6 +2595,8 @@ type PlanType {
   addedFundsLimit: Int
   hostDashboard: Boolean
   manualPayments: Boolean
+  bankTransfers: Int
+  bankTransfersLimit: Int
 }
 
 """

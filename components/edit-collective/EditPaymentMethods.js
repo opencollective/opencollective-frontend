@@ -457,6 +457,8 @@ const getPaymentMethods = graphql(gql`
       plan {
         addedFunds
         addedFundsLimit
+        bankTransfers
+        bankTransfersLimit
         hostDashboard
         hostedCollectives
         hostedCollectivesLimit
