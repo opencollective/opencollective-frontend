@@ -797,6 +797,7 @@
   "Invitation.Declined": "Refusée",
   "loading": "chargement",
   "loadMore": "voir plus",
+  "location.googleAutocompleteService.unavailable": "Location field requires \"{service}\" to function properly.\n Make sure \"{domain}\" is not blocked by your browser.",
   "loggingout": "se déconnecter",
   "login.askAnother": "Vous pouvez demander un nouveau lien en utilisant le formulaire ci-dessous.",
   "login.failed": "Connexion échouée : {message}.",

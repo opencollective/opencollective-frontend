@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Geosuggest from 'react-geosuggest';
 import classNames from 'classnames';
 import Location from './Location';
+import MessageBox from './MessageBox';
+import { FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
 
 class InputTypeLocation extends React.Component {
   static propTypes = {
@@ -54,8 +57,13 @@ class InputTypeLocation extends React.Component {
     return this.props.onChange(location);
   }
 
+  isAutocompleteServiceAvailable() {
+    return window && Boolean(get(window, 'google.maps.places.AutocompleteService'));
+  }
+
   render() {
     const options = this.props.options || {};
+    const autoCompleteNotAvailable = !this.isAutocompleteServiceAvailable();
 
     return (
       <div className={classNames('InputTypeLocation', this.props.className)}>
@@ -131,12 +139,26 @@ class InputTypeLocation extends React.Component {
             }
           `}
         </style>
-        <Geosuggest
-          onSuggestSelect={event => this.handleChange(event)}
-          placeholder={this.props.placeholder}
-          {...options}
-        />
-        <Location location={this.state.value} showTitle={false} />
+        {autoCompleteNotAvailable ? (
+          <MessageBox withIcon type="warning">
+            <FormattedMessage
+              id="location.googleAutocompleteService.unavailable"
+              values={{ service: 'Google Autocomplete Service', domain: 'maps.googleapis.com' }}
+              defaultMessage={
+                'Location field requires "{service}" to function properly.\n Make sure "{domain}" is not blocked by your browser.'
+              }
+            />
+          </MessageBox>
+        ) : (
+          <Fragment>
+            <Geosuggest
+              onSuggestSelect={event => this.handleChange(event)}
+              placeholder={this.props.placeholder}
+              {...options}
+            />
+            <Location location={this.state.value} showTitle={false} />
+          </Fragment>
+        )}
       </div>
     );
   }
