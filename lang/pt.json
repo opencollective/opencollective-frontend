@@ -628,6 +628,8 @@
   "expenses.create.archived": "Não é possível enviar despesas para um Coletivo arquivado.",
   "expenses.create.login": "Cadastre-se ou entre para enviar uma despesa.",
   "expenses.empty": "Sem despesas",
+  "expenses.error": "error",
+  "expenses.processing": "processing",
   "expenses.ready": "pronto para pagar",
   "expenses.sendAnotherExpense": "Enviar outra despesa",
   "expenses.stats.byCategory.title": "Por categoria",

@@ -628,6 +628,8 @@
   "expenses.create.archived": "Ce Collectif est archivé, vous ne pouvez pas soumettre de dépense.",
   "expenses.create.login": "Créez un compte ou identifiez-vous pour pouvoir ajouter une dépense.",
   "expenses.empty": "Pas de dépenses",
+  "expenses.error": "error",
+  "expenses.processing": "processing",
   "expenses.ready": "prêt à payer",
   "expenses.sendAnotherExpense": "Ajouter une autre dépense",
   "expenses.stats.byCategory.title": "Par catégorie",

@@ -628,6 +628,8 @@
   "expenses.create.archived": "Cannot submit expenses for an archived collective.",
   "expenses.create.login": "Зарегистрируйтесь или войдите, чтобы учесть расходы.",
   "expenses.empty": "Нет расходов",
+  "expenses.error": "error",
+  "expenses.processing": "processing",
   "expenses.ready": "готово к оплате",
   "expenses.sendAnotherExpense": "Добавить новый Расход",
   "expenses.stats.byCategory.title": "По категории",

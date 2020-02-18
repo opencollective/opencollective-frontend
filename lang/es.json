@@ -628,6 +628,8 @@
   "expenses.create.archived": "Cannot submit expenses for an archived collective.",
   "expenses.create.login": "Regístrese o acredítese para enviar un gasto.",
   "expenses.empty": "No expenses",
+  "expenses.error": "error",
+  "expenses.processing": "processing",
   "expenses.ready": "listo para pagar",
   "expenses.sendAnotherExpense": "Enviar otro gasto",
   "expenses.stats.byCategory.title": "Por categoría",
