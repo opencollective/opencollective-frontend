@@ -2381,10 +2381,58 @@ export default function(Sequelize, DataTypes) {
     if (!this.isHostAccount) {
       return Promise.resolve(null);
     }
-    // This method is intended for hosts
+
     const result = await models.Transaction.findOne({
-      attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('amount')), 0), 'total']],
-      where: { type: 'CREDIT', HostCollectiveId: this.id, platformFeeInHostCurrency: 0 },
+      attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('Order.totalAmount')), 0), 'total']],
+      where: { HostCollectiveId: this.id, type: 'CREDIT' },
+      include: [
+        {
+          model: models.Order,
+          attributes: [],
+          where: { status: 'PAID' },
+          include: [
+            {
+              model: models.PaymentMethod,
+              as: 'paymentMethod',
+              attributes: [],
+              // This is the main chracateristic of Added Funds
+              // Some older usage before 2017 doesn't have it but it's ok
+              where: {
+                service: 'opencollective',
+                type: 'collective',
+                CollectiveId: this.id,
+              },
+            },
+          ],
+        },
+      ],
+      raw: true,
+    });
+
+    return result.total;
+  };
+
+  Collective.prototype.getTotalBankTransfers = async function() {
+    // This method is intended for hosts
+    if (!this.isHostAccount) {
+      return Promise.resolve(null);
+    }
+
+    const result = await models.Transaction.findOne({
+      attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('Order.totalAmount')), 0), 'total']],
+      where: { HostCollectiveId: this.id, type: 'CREDIT' },
+      include: [
+        {
+          model: models.Order,
+          attributes: [],
+          where: {
+            status: 'PAID',
+            PaymentMethodId: null, // This is the main chracteristic of Bank Transfers
+            totalAmount: { [Op.gte]: 0 }, // Skip Free Tiers which also have PaymentMethodId=null
+            processedAt: { [Op.gte]: '2018-11-01' }, // Skip old entries that predate Bank Transfers
+          },
+        },
+      ],
       raw: true,
     });
 
@@ -2392,9 +2440,10 @@ export default function(Sequelize, DataTypes) {
   };
 
   Collective.prototype.getPlan = async function() {
-    const [hostedCollectives, addedFunds] = await Promise.all([
+    const [hostedCollectives, addedFunds, bankTransfers] = await Promise.all([
       this.getHostedCollectivesCount(),
       this.getTotalAddedFunds(),
+      this.getTotalBankTransfers(),
     ]);
     if (this.plan) {
       const tier = await models.Tier.findOne({
@@ -2404,10 +2453,11 @@ export default function(Sequelize, DataTypes) {
       const plan = (tier && tier.data) || plans[this.plan];
       if (plan) {
         const extraPlanData = get(this.data, 'plan', {});
-        return { name: this.plan, hostedCollectives, addedFunds, ...plan, ...extraPlanData };
+        return { name: this.plan, hostedCollectives, addedFunds, bankTransfers, ...plan, ...extraPlanData };
       }
     }
-    return { name: 'default', hostedCollectives, addedFunds, ...plans.default };
+
+    return { name: 'default', hostedCollectives, addedFunds, bankTransfers, ...plans.default };
   };
 
   /**

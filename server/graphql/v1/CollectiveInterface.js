@@ -257,6 +257,12 @@ export const PlanType = new GraphQLObjectType({
     manualPayments: {
       type: GraphQLBoolean,
     },
+    bankTransfers: {
+      type: GraphQLInt,
+    },
+    bankTransfersLimit: {
+      type: GraphQLInt,
+    },
   },
 });
 
