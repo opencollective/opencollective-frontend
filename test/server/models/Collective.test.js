@@ -368,7 +368,8 @@ describe('server/models/Collective', () => {
       expect(plan).to.deep.equal({
         name: 'default',
         hostedCollectives: 2,
-        addedFunds: 500,
+        addedFunds: 0,
+        bankTransfers: 0,
         ...plans.default,
       });
     });

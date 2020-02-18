@@ -3,35 +3,40 @@ const plans = {
   'legacy-custom-host-plan': {
     hostedCollectivesLimit: 100,
     addedFundsLimit: 100000, // in dollar cents
-    manualPayments: false,
+    bankTransfersLimit: 100000, // in dollar cents
+    manualPayments: true,
     hostDashboard: true,
     level: 60,
   },
   'legacy-large-host-plan': {
     hostedCollectivesLimit: 25,
     addedFundsLimit: 100000, // in dollar cents
-    manualPayments: false,
+    bankTransfersLimit: 100000, // in dollar cents
+    manualPayments: true,
     hostDashboard: true,
     level: 50,
   },
   'legacy-medium-host-plan': {
     hostedCollectivesLimit: 10,
     addedFundsLimit: 100000, // in dollar cents
-    manualPayments: false,
+    bankTransfersLimit: 100000, // in dollar cents
+    manualPayments: true,
     hostDashboard: true,
     level: 40,
   },
   'legacy-small-host-plan': {
     hostedCollectivesLimit: 5,
     addedFundsLimit: 100000, // in dollar cents
-    manualPayments: false,
+    bankTransfersLimit: 100000, // in dollar cents
+    manualPayments: true,
     hostDashboard: true,
     level: 30,
   },
   'legacy-single-host-plan': {
     hostedCollectivesLimit: 1,
     addedFundsLimit: 100000, // in dollar cents
-    manualPayments: false,
+    bankTransfersLimit: 100000, // in dollar cents
+    manualPayments: true,
     hostDashboard: true,
     level: 20,
   },
@@ -41,6 +46,7 @@ const plans = {
   'network-host-plan': {
     hostedCollectivesLimit: 100,
     addedFundsLimit: null,
+    bankTransfersLimit: null,
     manualPayments: true,
     hostDashboard: true,
     level: 60,
@@ -48,6 +54,7 @@ const plans = {
   'large-host-plan': {
     hostedCollectivesLimit: 25,
     addedFundsLimit: null,
+    bankTransfersLimit: null,
     manualPayments: true,
     hostDashboard: true,
     level: 50,
@@ -55,6 +62,7 @@ const plans = {
   'medium-host-plan': {
     hostedCollectivesLimit: 10,
     addedFundsLimit: null,
+    bankTransfersLimit: null,
     manualPayments: true,
     hostDashboard: false,
     level: 40,
@@ -62,6 +70,7 @@ const plans = {
   'small-host-plan': {
     hostedCollectivesLimit: 5,
     addedFundsLimit: null,
+    bankTransfersLimit: null,
     manualPayments: true,
     hostDashboard: false,
     level: 30,
@@ -69,6 +78,7 @@ const plans = {
   'single-host-plan': {
     hostedCollectivesLimit: 1,
     addedFundsLimit: null,
+    bankTransfersLimit: null,
     manualPayments: true,
     hostDashboard: true,
     level: 20,
@@ -77,7 +87,8 @@ const plans = {
   default: {
     hostedCollectivesLimit: null,
     addedFundsLimit: 100000, // in dollar cents
-    manualPayments: false,
+    bankTransfersLimit: 100000, // in dollar cents
+    manualPayments: true,
     hostDashboard: true,
     level: 10,
   },
@@ -85,6 +96,7 @@ const plans = {
   owned: {
     hostedCollectivesLimit: null,
     addedFundsLimit: null,
+    bankTransfersLimit: null,
     manualPayments: true,
     hostDashboard: true,
     level: 100,
