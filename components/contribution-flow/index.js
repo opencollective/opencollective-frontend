@@ -84,6 +84,11 @@ const messages = defineMessages({
     defaultMessage:
       'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
   },
+  manualPaymentLimitWarning: {
+    id: 'host.paymentMethod.manual.limitWarning',
+    defaultMessage:
+      "{collective} can't accept manual payments right now because its financial host already reached its bank transfer limit. Manual bank transfers will be enabled again when the host upgrades its plan.",
+  },
   createUserLabel: {
     id: 'ContributionFlow.CreateUserLabel',
     defaultMessage: 'Contribute as an individual',
@@ -121,6 +126,7 @@ class CreateOrderPage extends React.Component {
       name: PropTypes.string.isRequired,
       location: PropTypes.shape({ country: PropTypes.string }),
       settings: PropTypes.object,
+      plan: PropTypes.object,
       connectedAccounts: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     skipStepDetails: PropTypes.bool,
@@ -722,8 +728,18 @@ class CreateOrderPage extends React.Component {
       return null;
     }
 
+    const plan = this.props.host.plan;
+    const isOverLimit =
+      plan && Boolean(plan.bankTransfers + get(this.state, 'stepDetails.totalAmount') > plan.bankTransfersLimit);
+    const disabledMessage =
+      isOverLimit &&
+      this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
+        collective: this.props.collective.name,
+      });
+
     return {
       ...pm,
+      disabledMessage,
       instructions: this.props.intl.formatMessage(messages.manualPm, {
         amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
         email: get(this.props, 'LoggedInUser.email', ''),

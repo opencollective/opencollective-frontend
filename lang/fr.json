@@ -781,6 +781,7 @@
   "host.hostLimit.warning": "L'hôte a déjà atteint la limite de collectifs hébergés pour son forfait. <a>Contactez {collectiveName}</a> et faites-leur savoir que vous souhaitez postuler.",
   "host.link": "Sélectionner cet hôte",
   "host.paymentMethod.manual.instructions": "Les instructions pour faire le paiement de {amount} seront envoyées à votre adresse {email}. Votre commande sera mise en attente jusqu'à ce que les fonds aient été reçus par l'hôte ({host}).",
+  "host.paymentMethod.manual.limitWarning": "{collective} can't accept manual payments right now because its financial host already reached its bank transfer limit. Manual bank transfers will be enabled again when the host upgrades its plan.",
   "host.pending-applications.noPending": "Aucun collectif n'est en attente d'approbation",
   "Host.Plan": "Forfait d'hôte",
   "host.tos": "Conditions de l'hôte fiscal",

@@ -781,6 +781,7 @@
   "host.hostLimit.warning": "O Organizador já atingiu o limite de coletivos hospedados para seu plano. <a>Contate {collectiveName}</a> e deixe-os saber que você quer se inscrever.",
   "host.link": "Use este organizador",
   "host.paymentMethod.manual.instructions": "As instruções para efetuar o pagamento de {amount} serão enviadas para o seu endereço de e-mail {email}. Seu pedido ficará pendente até que os fundos sejam recebidos pelo host ({host}).",
+  "host.paymentMethod.manual.limitWarning": "{collective} can't accept manual payments right now because its financial host already reached its bank transfer limit. Manual bank transfers will be enabled again when the host upgrades its plan.",
   "host.pending-applications.noPending": "Nenhum coletivo aguardando aprovação",
   "Host.Plan": "Plano de Organização",
   "host.tos": "Termos de patrocínio fiscal",

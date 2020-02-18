@@ -238,6 +238,10 @@ const collectiveFields = `
     location {
       country
     }
+    plan {
+      bankTransfers
+      bankTransfersLimit
+    }
   }
   parentCollective {
     slug
