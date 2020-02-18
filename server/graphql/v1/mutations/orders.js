@@ -214,9 +214,10 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     if (order.fromCollective && order.fromCollective.id === collective.id) {
       throw new Error('Orders cannot be created for a collective by that same collective.');
     }
+
+    const host = await collective.getHostCollective();
     if (order.hostFeePercent) {
-      const HostCollectiveId = await collective.getHostCollectiveId();
-      if (!remoteUser.isAdmin(HostCollectiveId)) {
+      if (!remoteUser.isAdmin(host.id)) {
         throw new Error('Only an admin of the host can change the hostFeePercent');
       }
     }
@@ -243,6 +244,12 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
         !(order.paymentMethod.uuid || order.paymentMethod.token || order.paymentMethod.type === 'manual'))
     ) {
       throw new Error('This order requires a payment method');
+    }
+    if (paymentRequired && order.paymentMethod && order.paymentMethod.type === 'manual') {
+      const hostPlan = await host.getPlan();
+      if (hostPlan.bankTransfersLimit && hostPlan.bankTransfers + order.totalAmount > hostPlan.bankTransfersLimit) {
+        throw new Error("Donation exceeds the host's current plan limit for bank transfers.");
+      }
     }
 
     if (tier && tier.maxQuantityPerUser > 0 && order.quantity > tier.maxQuantityPerUser) {
