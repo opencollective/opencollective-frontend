@@ -69,7 +69,7 @@ async function payExpense(connectedAccount, payoutMethod, expense): Promise<any>
 }
 
 async function getRequiredBankInformation(collective, currency: string): Promise<any> {
-  const cacheKey = `req_bank_info_${collective.id}_to_${currency}`;
+  const cacheKey = `transferwise_required_bank_info_${collective.id}_to_${currency}`;
   const fromCache = await cache.get(cacheKey);
   if (fromCache) {
     return fromCache;
@@ -96,7 +96,7 @@ async function getRequiredBankInformation(collective, currency: string): Promise
 }
 
 async function getAvailableCurrencies(collective): Promise<any> {
-  const cacheKey = `req_avail_currs_${collective.id}`;
+  const cacheKey = `transferwise_available_currencies_${collective.id}`;
   const fromCache = await cache.get(cacheKey);
   if (fromCache) {
     return fromCache;
