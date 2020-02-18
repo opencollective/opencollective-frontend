@@ -1,4 +1,4 @@
-import { GraphQLInt, GraphQLNonNull } from 'graphql';
+import { GraphQLNonNull, GraphQLString } from 'graphql';
 
 import RequiredBankInformation from '../object/RequiredBankInformation';
 import models from '../../../models';
@@ -6,8 +6,8 @@ import models from '../../../models';
 const RequiredBankInformationQuery = {
   type: RequiredBankInformation,
   args: {
-    collectiveId: {
-      type: new GraphQLNonNull(GraphQLInt),
+    slug: {
+      type: new GraphQLNonNull(GraphQLString),
       description: 'The public id identifying the host collective',
     },
   },
@@ -15,7 +15,8 @@ const RequiredBankInformationQuery = {
     if (!req.remoteUser) {
       return null;
     }
-    req.collective = await models.Collective.findByPk(args.collectiveId);
+    const slug = args.slug.toLowerCase();
+    req.collective = await models.Collective.findBySlug(slug);
     return {};
   },
 };
