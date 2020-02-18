@@ -628,6 +628,8 @@
   "expenses.create.archived": "Cannot submit expenses for an archived collective.",
   "expenses.create.login": "アカウントを作成するかログインして請求の送信をしてください。",
   "expenses.empty": "請求がありません",
+  "expenses.error": "error",
+  "expenses.processing": "processing",
   "expenses.ready": "支払う準備ができています",
   "expenses.sendAnotherExpense": "ほかの経費を申請する",
   "expenses.stats.byCategory.title": "カテゴリ",
