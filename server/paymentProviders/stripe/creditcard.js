@@ -134,7 +134,7 @@ const createChargeAndTransactions = async (hostStripeAccount, { order, hostStrip
       payload.payment_method = paymentMethodId;
     } else {
       logger.info('paymentMethod is missing in hostStripeCustomer to pass to Payment Intent.');
-      logger.info(hostStripeCustomer);
+      logger.info(JSON.stringify(hostStripeCustomer));
     }
     paymentIntent = await stripe.paymentIntents.create(payload, {
       stripeAccount: hostStripeAccount.username,
