@@ -87,7 +87,7 @@ export default (sequelize, DataTypes): typeof ExpenseAttachment => {
       },
       url: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isUrl: true,
         },
