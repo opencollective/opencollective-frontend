@@ -87,7 +87,7 @@ const messages = defineMessages({
   manualPaymentLimitWarning: {
     id: 'host.paymentMethod.manual.limitWarning',
     defaultMessage:
-      "{collective} can't accept manual payments right now because its financial host already reached its bank transfer limit. Manual bank transfers will be enabled again when the host upgrades its plan.",
+      "{host} can't receive Bank Transfers right now via Open Collective because they've reached their free plan limit. Once they upgrade to a paid plan, Bank Transfers will be available again.",
   },
   createUserLabel: {
     id: 'ContributionFlow.CreateUserLabel',
@@ -734,7 +734,7 @@ class CreateOrderPage extends React.Component {
     const disabledMessage =
       isOverLimit &&
       this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
-        collective: this.props.collective.name,
+        host: this.props.host.name,
       });
 
     return {

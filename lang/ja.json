@@ -781,7 +781,7 @@
   "host.hostLimit.warning": "Host already reached the limit of hosted collectives for its plan. <a>Contact {collectiveName}</a> and let them know you want to apply.",
   "host.link": "ホストを使う",
   "host.paymentMethod.manual.instructions": "Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).",
-  "host.paymentMethod.manual.limitWarning": "{collective} can't accept manual payments right now because its financial host already reached its bank transfer limit. Manual bank transfers will be enabled again when the host upgrades its plan.",
+  "host.paymentMethod.manual.limitWarning": "{host} can't receive Bank Transfers right now via Open Collective because they've reached their free plan limit. Once they upgrade to a paid plan, Bank Transfers will be available again.",
   "host.pending-applications.noPending": "No collective waiting for approval",
   "Host.Plan": "Host Plan",
   "host.tos": "Terms of fiscal sponsorship",
