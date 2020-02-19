@@ -5,10 +5,13 @@ import * as utils from '../../../utils';
 import { fakeCollective, fakeConnectedAccount, fakeExpense, fakePayoutMethod } from '../../../test-helpers/fake-data';
 import transferwise, { blackListedCurrencies } from '../../../../server/paymentProviders/transferwise';
 import * as transferwiseLib from '../../../../server/lib/transferwise';
+import cache from '../../../../server/lib/cache';
 import { PayoutMethodTypes } from '../../../../server/models/PayoutMethod';
+import { isTestToken } from '../../../../server/lib/stripe';
 
 const sandbox = sinon.createSandbox();
 const quote = {
+  id: 1234,
   source: 'USD',
   target: 'EUR',
   sourceAmount: 101.14,
@@ -48,6 +51,8 @@ sandbox.stub(transferwiseLib, 'getCurrencyPairs').resolves({
     },
   ],
 });
+const getAccountRequirements = sandbox.stub(transferwiseLib, 'getAccountRequirements').resolves({ success: true });
+const cacheSpy = sandbox.spy(cache);
 
 describe('paymentMethods.transferwise', () => {
   let connectedAccount, collective, host, payoutMethod, expense;
@@ -143,10 +148,40 @@ describe('paymentMethods.transferwise', () => {
     });
   });
 
+  describe('getRequiredBankInformation', () => {
+    before(async () => {
+      await transferwise.getRequiredBankInformation(host, 'EUR');
+    });
+
+    it('should check if cache already has the information', () => {
+      sinon.assert.calledWith(cacheSpy.get, `transferwise_required_bank_info_${host.id}_to_EUR`);
+    });
+
+    it('should cache the response', () => {
+      sinon.assert.calledWithMatch(cacheSpy.set, `transferwise_required_bank_info_${host.id}_to_EUR`);
+    });
+
+    it('should create a quote with desired currency', () => {
+      sinon.assert.calledWithMatch(createQuote, connectedAccount.token, {
+        sourceCurrency: host.currency,
+        targetCurrency: 'EUR',
+      });
+      sinon.assert.calledWithMatch(getAccountRequirements, connectedAccount.token, quote.id);
+    });
+  });
+
   describe('getAvailableCurrencies', () => {
     let data;
     before(async () => {
       data = await transferwise.getAvailableCurrencies(host);
+    });
+
+    it('should check if cache already has the information', () => {
+      sinon.assert.calledWith(cacheSpy.get, `transferwise_available_currencies_${host.id}`);
+    });
+
+    it('should cache the response', () => {
+      sinon.assert.calledWithMatch(cacheSpy.set, `transferwise_available_currencies_${host.id}`);
     });
 
     it('should return an array of available currencies for host', async () => {
