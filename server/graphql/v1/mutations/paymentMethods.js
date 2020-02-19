@@ -4,6 +4,7 @@ import { URLSearchParams } from 'url';
 import virtualcard from '../../../paymentProviders/opencollective/virtualcard';
 import { setupCreditCard } from '../../../paymentProviders/stripe/creditcard';
 import emailLib from '../../../lib/email';
+import logger from '../../../lib/logger';
 import models, { Op } from '../../../models';
 import { Forbidden, ValidationFailed } from '../../errors';
 
@@ -198,6 +199,7 @@ export async function updatePaymentMethod(args, remoteUser) {
 
 /** Update payment method with given args */
 export async function replaceCreditCard(args, remoteUser) {
+  logger.info(`Replacing Credit Card: ${args.id} ${remoteUser.id}`);
   const oldPaymentMethod = await models.PaymentMethod.findByPk(args.id);
   if (!oldPaymentMethod || !remoteUser || !remoteUser.isAdmin(oldPaymentMethod.CollectiveId)) {
     throw PaymentMethodPermissionError;
