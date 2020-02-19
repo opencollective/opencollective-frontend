@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 import * as utils from '../../../utils';
 import { fakeCollective, fakeConnectedAccount, fakeExpense, fakePayoutMethod } from '../../../test-helpers/fake-data';
-import transferwise from '../../../../server/paymentProviders/transferwise';
+import transferwise, { blackListedCurrencies } from '../../../../server/paymentProviders/transferwise';
 import * as transferwiseLib from '../../../../server/lib/transferwise';
 import { PayoutMethodTypes } from '../../../../server/models/PayoutMethod';
 
@@ -40,9 +40,17 @@ const createRecipientAccount = sandbox.stub(transferwiseLib, 'createRecipientAcc
 });
 const createTransfer = sandbox.stub(transferwiseLib, 'createTransfer').resolves({ id: 123 });
 const fundTransfer = sandbox.stub(transferwiseLib, 'fundTransfer').resolves({ status: 'COMPLETED' });
+sandbox.stub(transferwiseLib, 'getCurrencyPairs').resolves({
+  sourceCurrencies: [
+    {
+      currencyCode: 'USD',
+      targetCurrencies: [{ currencyCode: 'EUR' }, { currencyCode: 'GBP' }, { currencyCode: 'BRL' }],
+    },
+  ],
+});
 
 describe('paymentMethods.transferwise', () => {
-  let connectedAccount, host, payoutMethod, expense;
+  let connectedAccount, collective, host, payoutMethod, expense;
 
   after(sandbox.restore);
   before(utils.resetTestDB);
@@ -54,7 +62,7 @@ describe('paymentMethods.transferwise', () => {
       token: '33b5e94d-9815-4ebc-b970-3612b6aec332',
       data: { type: 'business', id: 0 },
     });
-    const collective = await fakeCollective({ HostCollectiveId: host.id });
+    collective = await fakeCollective({ isHostAccount: false, HostCollectiveId: host.id });
     payoutMethod = await fakePayoutMethod({
       type: PayoutMethodTypes.BANK_ACCOUNT,
       data: {
@@ -132,6 +140,21 @@ describe('paymentMethods.transferwise', () => {
     it('should fund transfer account and update data.fund', () => {
       expect(fundTransfer.called).to.be.true;
       expect(data).to.have.nested.property('fund');
+    });
+  });
+
+  describe('getAvailableCurrencies', () => {
+    let data;
+    before(async () => {
+      data = await transferwise.getAvailableCurrencies(host);
+    });
+
+    it('should return an array of available currencies for host', async () => {
+      expect(data).to.include('EUR');
+    });
+
+    it('should remove blackListed currencies', async () => {
+      expect(data).to.not.have.members(blackListedCurrencies);
     });
   });
 });
