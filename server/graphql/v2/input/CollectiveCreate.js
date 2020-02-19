@@ -1,13 +1,11 @@
-import { GraphQLInt, GraphQLString, GraphQLInputObjectType } from 'graphql';
+import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
 
 const CollectiveCreate = new GraphQLInputObjectType({
   name: 'CollectiveCreate',
   fields: () => ({
-    name: { type: GraphQLString },
-    slug: { type: GraphQLString },
-    description: { type: GraphQLString },
-    // TODO: replace by hashId or slug
-    HostCollectiveId: { type: GraphQLInt },
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    slug: { type: new GraphQLNonNull(GraphQLString) },
+    description: { type: new GraphQLNonNull(GraphQLString) },
   }),
 });
 
