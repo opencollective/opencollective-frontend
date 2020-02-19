@@ -25,7 +25,7 @@ async function createCollective(_, args, req) {
   }
 
   const collectiveData = {
-    ...pick(args.collective, ['name', 'slug', 'description']),
+    ...pick(args.collective, ['name', 'slug', 'description', 'tags']),
     isActive: false,
     CreatedByUserId: remoteUser.id,
     settings: { ...DEFAULT_COLLECTIVE_SETTINGS },

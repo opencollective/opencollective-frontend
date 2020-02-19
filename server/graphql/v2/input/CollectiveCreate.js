@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
+import { GraphQLString, GraphQLNonNull, GraphQLList, GraphQLInputObjectType } from 'graphql';
 
 const CollectiveCreate = new GraphQLInputObjectType({
   name: 'CollectiveCreate',
@@ -6,6 +6,7 @@ const CollectiveCreate = new GraphQLInputObjectType({
     name: { type: new GraphQLNonNull(GraphQLString) },
     slug: { type: new GraphQLNonNull(GraphQLString) },
     description: { type: new GraphQLNonNull(GraphQLString) },
+    tags: { type: new GraphQLList(GraphQLString) },
   }),
 });
 
