@@ -33,20 +33,11 @@ async function createCollective(_, args, req) {
 
   const collectiveWithSlug = await models.Collective.findBySlug(collectiveData.slug.toLowerCase());
   if (collectiveWithSlug) {
-    throw new errors.ValidationFailed({ message: 'Collective slug is already taken.' });
-  }
-
-  let host;
-  if (args.host) {
-    host = fetchAccountWithInput(args.host);
-    if (!host) {
-      throw new errors.ValidationFailed({ message: 'Host Not Found' });
-    }
-    if (req.remoteUser.hasRole([roles.ADMIN], host.id)) {
-      collectiveData.isActive = true;
-    }
-    collectiveData.currency = host.currency;
-    collectiveData.hostFeePercent = host.hostFeePercent;
+    throw new Error(
+      `The slug ${
+        collectiveData.slug
+      } is already taken. Please use another slug for your ${collectiveData.type.toLowerCase()}.`,
+    );
   }
 
   const collective = await models.Collective.create(collectiveData);
@@ -54,7 +45,13 @@ async function createCollective(_, args, req) {
   // Add authenticated user as an admin
   await collective.addUserWithRole(remoteUser, roles.ADMIN, { CreatedByUserId: remoteUser.id });
 
-  if (host) {
+  // Add the host if any
+  let host;
+  if (args.host) {
+    host = fetchAccountWithInput(args.host);
+    if (!host) {
+      throw new errors.ValidationFailed({ message: 'Host Not Found' });
+    }
     await collective.addHost(host, remoteUser);
     purgeCacheForPage(`/${host.slug}`);
   }
