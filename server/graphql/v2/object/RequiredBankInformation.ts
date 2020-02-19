@@ -3,10 +3,6 @@ import GraphQLJSON from 'graphql-type-json';
 
 import transferwise from '../../../paymentProviders/transferwise';
 
-const blackListedCurrencies = [
-  'BRL', // Businesses customers are not supported yet.
-];
-
 const RequiredBankInformation = new GraphQLObjectType({
   name: 'RequiredBankInformation',
   description: 'A list of required bank information inputs',
@@ -26,14 +22,7 @@ const RequiredBankInformation = new GraphQLObjectType({
     currencies: {
       type: GraphQLJSON,
       async resolve(_, __, req) {
-        const pairs = await transferwise.getAvailableCurrencies(req.collective);
-        const source = pairs?.sourceCurrencies?.find(sc => sc.currencyCode === req.collective.currency);
-        if (source?.targetCurrencies) {
-          return source.targetCurrencies
-            .filter(c => !blackListedCurrencies.includes(c.currencyCode))
-            .map(c => c.currencyCode);
-        }
-        return null;
+        return await transferwise.getAvailableCurrencies(req.collective);
       },
     },
   },

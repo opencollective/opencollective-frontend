@@ -4,6 +4,10 @@ import * as transferwise from '../../lib/transferwise';
 import cache from '../../lib/cache';
 import { Quote } from '../../types/transferwise';
 
+export const blackListedCurrencies = [
+  'BRL', // Businesses customers are not supported yet.
+];
+
 async function populateProfileId(connectedAccount): Promise<void> {
   if (!connectedAccount.data.profile) {
     const profiles = await transferwise.getProfiles(connectedAccount.token);
@@ -106,12 +110,15 @@ async function getAvailableCurrencies(collective): Promise<any> {
   const [connectedAccount] = await host.getConnectedAccounts({
     where: { service: 'transferwise', deletedAt: null },
   });
-
   if (!connectedAccount) {
     throw new Error('Host is not connected to Transferwise');
   }
 
-  const currencies = await transferwise.getCurrencyPairs(connectedAccount.token);
+  const pairs = await transferwise.getCurrencyPairs(connectedAccount.token);
+  const source = pairs.sourceCurrencies.find(sc => sc.currencyCode === host.currency);
+  const currencies = source.targetCurrencies
+    .filter(c => !blackListedCurrencies.includes(c.currencyCode))
+    .map(c => c.currencyCode);
   cache.set(cacheKey, currencies, 24 * 60 * 60 /* a whole day and we could probably increase */);
   return currencies;
 }
