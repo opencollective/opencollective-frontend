@@ -159,9 +159,8 @@ export const getTemporaryQuote = async (
     });
     return getData(response);
   } catch (e) {
-    const message = `Unable to get temporary quote: ${getAxiosError(e)}`;
-    logger.error(message, params);
-    throw new Error(message);
+    logger.error(`Unable to get temporary quote: ${getAxiosError(e)}`, params);
+    throw new Error('An unknown error happened with Transferwise. Please contact support@opencollective.com.');
   }
 };
 
@@ -172,9 +171,8 @@ export const getTransfer = async (token: string, transferId: number): Promise<an
     });
     return getData(response);
   } catch (e) {
-    const message = `Unable to get transfer data: ${getAxiosError(e)}`;
-    logger.error(message, { transferId });
-    throw new Error(message);
+    logger.error(`Unable to get transfer data: ${getAxiosError(e)}`, { transferId });
+    throw new Error('An unknown error happened with Transferwise. Please contact support@opencollective.com.');
   }
 };
 
@@ -185,9 +183,8 @@ export const getAccountRequirements = async (token: string, quoteId: number): Pr
     });
     return getData(response);
   } catch (e) {
-    const message = `Unable to get account requirements data: ${getAxiosError(e)}`;
-    logger.error(message, { quoteId });
-    throw new Error(message);
+    logger.error(`Unable to get account requirements data: ${getAxiosError(e)}`, { quoteId });
+    throw new Error('An unknown error happened with Transferwise. Please contact support@opencollective.com.');
   }
 };
 
@@ -198,8 +195,7 @@ export const getCurrencyPairs = async (token: string): Promise<any> => {
     });
     return getData(response);
   } catch (e) {
-    const message = `Unable to get currency pairs data: ${getAxiosError(e)}`;
-    logger.error(message);
-    throw new Error(message);
+    logger.error(`Unable to get currency pairs data: ${getAxiosError(e)}`);
+    throw new Error('An unknown error happened with Transferwise. Please contact support@opencollective.com.');
   }
 };
