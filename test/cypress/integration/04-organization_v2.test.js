@@ -12,7 +12,7 @@ describe('New organization profile', () => {
   describe('Contributors section', () => {
     it('Only shows core contributors without any filter', () => {
       cy.getByDataCy('filters').should('not.exist');
-      cy.getByDataCy('section-contributors').click({ force: true });
+      cy.getByDataCy('section-contributors').click();
       cy.hash().should('eq', '#section-contributors');
       cy.getByDataCy('section-contributors-title').contains('Core contributors');
       cy.getByDataCy('ContributorsGrid_ContributorCard').contains('Collective Admin');
@@ -23,7 +23,7 @@ describe('New organization profile', () => {
     // The rest of the transactions section tests are in `05-user_v2.test.js`
     it("Has no filters (because organizations don't have expenses)", () => {
       cy.getByDataCy('filters').should('not.exist');
-      cy.getByDataCy('section-transactions').click({ force: true });
+      cy.getByDataCy('section-transactions').click();
       cy.hash().should('eq', '#section-transactions');
       cy.contains('h2', 'Transactions');
       cy.contains('No transaction yet');
