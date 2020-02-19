@@ -16,8 +16,9 @@ const RequiredBankInformationQuery = {
       return null;
     }
     const slug = args.slug.toLowerCase();
-    req.collective = await models.Collective.findBySlug(slug);
-    return {};
+    const collective = await models.Collective.findBySlug(slug);
+    const host = collective.isHostAccount ? collective : await collective.getHostCollective();
+    return { host };
   },
 };
 

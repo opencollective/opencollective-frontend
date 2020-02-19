@@ -15,14 +15,14 @@ const RequiredBankInformation = new GraphQLObjectType({
         },
       },
       type: GraphQLJSON,
-      async resolve(_, args, req) {
-        return await transferwise.getRequiredBankInformation(req.collective, args.currency);
+      async resolve({ host }, args) {
+        return await transferwise.getRequiredBankInformation(host, args.currency);
       },
     },
     currencies: {
       type: GraphQLJSON,
-      async resolve(_, __, req) {
-        return await transferwise.getAvailableCurrencies(req.collective);
+      async resolve({ host }) {
+        return await transferwise.getAvailableCurrencies(host);
       },
     },
   },

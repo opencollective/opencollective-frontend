@@ -2,6 +2,7 @@ import uuidv4 from 'uuid/v4';
 
 import * as transferwise from '../../lib/transferwise';
 import cache from '../../lib/cache';
+import models from '../../models';
 import { Quote } from '../../types/transferwise';
 
 export const blackListedCurrencies = [
@@ -72,25 +73,23 @@ async function payExpense(connectedAccount, payoutMethod, expense): Promise<any>
   return { quote, recipient, transfer, fund };
 }
 
-async function getRequiredBankInformation(collective, currency: string): Promise<any> {
-  const cacheKey = `transferwise_required_bank_info_${collective.id}_to_${currency}`;
+async function getRequiredBankInformation(host: any, currency: string): Promise<any> {
+  const cacheKey = `transferwise_required_bank_info_${host.id}_to_${currency}`;
   const fromCache = await cache.get(cacheKey);
   if (fromCache) {
     return fromCache;
   }
 
-  const host = collective.isHostAccount ? collective : await collective.getHostCollective();
-  const [connectedAccount] = await host.getConnectedAccounts({
-    where: { service: 'transferwise', deletedAt: null },
+  const connectedAccount = await models.ConnectedAccount.findOne({
+    where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
   });
-
   if (!connectedAccount) {
     throw new Error('Host is not connected to Transferwise');
   }
 
   const quote = await transferwise.createQuote(connectedAccount.token, {
     profileId: connectedAccount.data.id,
-    sourceCurrency: collective.currency,
+    sourceCurrency: host.currency,
     targetCurrency: currency,
     targetAmount: 100,
   });
@@ -99,16 +98,19 @@ async function getRequiredBankInformation(collective, currency: string): Promise
   return requiredFields;
 }
 
-async function getAvailableCurrencies(collective): Promise<any> {
-  const cacheKey = `transferwise_available_currencies_${collective.id}`;
+async function getAvailableCurrencies(host: any): Promise<any> {
+  const cacheKey = `transferwise_available_currencies_${host.id}`;
   const fromCache = await cache.get(cacheKey);
   if (fromCache) {
     return fromCache;
   }
 
-  const host = collective.isHostAccount ? collective : await collective.getHostCollective();
-  const [connectedAccount] = await host.getConnectedAccounts({
-    where: { service: 'transferwise', deletedAt: null },
+  const connectedAccount = await models.ConnectedAccount.findOne({
+    where: {
+      service: 'transferwise',
+      CollectiveId: host.id,
+      deletedAt: null,
+    },
   });
   if (!connectedAccount) {
     throw new Error('Host is not connected to Transferwise');
