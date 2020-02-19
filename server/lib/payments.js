@@ -462,11 +462,9 @@ export const sendReminderPendingOrderEmail = async order => {
     viewDetailsLink: `${config.host.website}/${collective.slug}/orders/${order.id}`,
   };
 
-  const adminUsers = await collective.getAdminUsers();
+  const adminUsers = await host.getAdminUsers();
   for (const adminUser of adminUsers) {
-    await emailLib.send('order.reminder.pendingFinancialContribution', adminUser.email, data, {
-      from: `${collective.name} <hello@${collective.slug}.opencollective.com>`,
-    });
+    await emailLib.send('order.reminder.pendingFinancialContribution', adminUser.email, data);
   }
 };
 
