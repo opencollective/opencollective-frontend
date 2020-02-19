@@ -781,6 +781,7 @@
   "host.hostLimit.warning": "O Organizador já atingiu o limite de coletivos hospedados para seu plano. <a>Contate {collectiveName}</a> e deixe-os saber que você quer se inscrever.",
   "host.link": "Use este organizador",
   "host.paymentMethod.manual.instructions": "As instruções para efetuar o pagamento de {amount} serão enviadas para o seu endereço de e-mail {email}. Seu pedido ficará pendente até que os fundos sejam recebidos pelo host ({host}).",
+  "host.paymentMethod.manual.limitWarning": "{host} can't receive Bank Transfers right now via Open Collective because they've reached their free plan limit. Once they upgrade to a paid plan, Bank Transfers will be available again.",
   "host.pending-applications.noPending": "Nenhum coletivo aguardando aprovação",
   "Host.Plan": "Plano de Organização",
   "host.tos": "Termos de patrocínio fiscal",
