@@ -46,7 +46,17 @@ const run = async () => {
       const { id, CollectiveId, name } = card;
       const brand = card.data.brand || 'credit card';
 
+      // Sometime, CollectiveId is missing, we'll need to see what to do for these
+      if (!CollectiveId) {
+        logger.info(`Missing CollectiveId for card ${id}, ignoring.`);
+        continue;
+      }
       const collective = await models.Collective.findByPk(CollectiveId);
+      if (!collective) {
+        logger.info(`Missing collective for card ${id}, ignoring.`);
+        continue;
+      }
+
       const adminUsers = await collective.getAdminUsers();
 
       for (const adminUser of adminUsers) {

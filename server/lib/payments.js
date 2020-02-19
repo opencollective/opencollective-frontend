@@ -474,7 +474,5 @@ export const sendExpiringCreditCardUpdateEmail = async data => {
     updateDetailsLink: `${config.host.website}/${data.slug}/paymentmethod/${data.id}/update`,
   };
 
-  return emailLib.send('payment.creditcard.expiring', data.email, data, {
-    from: `${data.slug} <hello@${data.slug}.opencollective.com>`,
-  });
+  return emailLib.send('payment.creditcard.expiring', data.email, data);
 };
