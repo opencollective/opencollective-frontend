@@ -64,12 +64,6 @@ const nextConfig = {
         },
       },
       {
-        test: /static[\\/].*\.(css)$/,
-        use: {
-          loader: 'raw-loader',
-        },
-      },
-      {
         test: /static[\\/].*\.(jpg|gif|png|svg)$/,
         use: {
           loader: 'file-loader',
