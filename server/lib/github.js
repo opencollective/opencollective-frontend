@@ -149,3 +149,34 @@ export async function getOrgMemberships(accessToken) {
   // https://developer.github.com/v3/orgs/members/#list-your-organization-memberships
   return octokit.orgs.listMemberships({ page: 1, per_page: 100 }).then(getData);
 }
+
+export async function handleOpenSourceAutomatedApproval(githubHandle, accessToken) {
+  if (githubHandle.includes('/')) {
+    // A repository GitHub Handle (most common)
+    const repo = await getRepo(githubHandle, accessToken);
+    const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
+    if (!isGithubRepositoryAdmin) {
+      throw new Error("We could not verify that you're admin of the GitHub repository");
+    } else if (repo.stargazers_count < config.githubFlow.minNbStars) {
+      throw new Error(
+        `The repository need at least ${config.githubFlow.minNbStars} stars to apply to the Open Source Collective.`,
+      );
+    }
+  } else {
+    // An organization GitHub Handle
+    const memberships = await getOrgMemberships(accessToken);
+    const organizationAdminMembership =
+      memberships &&
+      memberships.find(m => m.organization.login === githubHandle && m.state === 'active' && m.role === 'admin');
+    if (!organizationAdminMembership) {
+      throw new Error("We could not verify that you're admin of the GitHub organization");
+    }
+    const allRepos = await getAllOrganizationPublicRepos(githubHandle).catch(() => null);
+    const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= config.githubFlow.minNbStars);
+    if (!repoWith100stars) {
+      throw new Error(
+        `The organization need at least one repository with ${config.githubFlow.minNbStars} GitHub stars to be pledged.`,
+      );
+    }
+  }
+}

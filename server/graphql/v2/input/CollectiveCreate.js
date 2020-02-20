@@ -7,6 +7,7 @@ const CollectiveCreate = new GraphQLInputObjectType({
     slug: { type: new GraphQLNonNull(GraphQLString) },
     description: { type: new GraphQLNonNull(GraphQLString) },
     tags: { type: new GraphQLList(GraphQLString) },
+    githubHandle: { type: GraphQLString },
   }),
 });
 
