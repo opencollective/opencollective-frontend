@@ -30,6 +30,8 @@ jsonData.application = {
   api_key: config.keys.opencollective.apiKey,
 };
 
+const debugWaitForCondition = debug('waitForCondition');
+
 export const data = path => {
   const copy = cloneDeep(get(jsonData, path)); // to avoid changing these data
   return isArray(get(jsonData, path)) ? values(copy) : copy;
@@ -89,7 +91,7 @@ export const waitForCondition = (cond, options = { timeout: 10000, delay: 0 }) =
     }, options.timeout || 10000);
     const isConditionMet = () => {
       hasConditionBeenMet = Boolean(cond());
-      debug('waitForCondition')(options.tag, `Has condition been met?`, hasConditionBeenMet);
+      debugWaitForCondition(options.tag, `Has condition been met?`, hasConditionBeenMet);
       if (hasConditionBeenMet) {
         return setTimeout(resolve, options.delay || 0);
       } else {
