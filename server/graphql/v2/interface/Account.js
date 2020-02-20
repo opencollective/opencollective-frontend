@@ -30,6 +30,7 @@ import { NotFound } from '../../errors';
 import models, { Op } from '../../../models';
 import { ConversationCollection } from '../collection/ConversationCollection';
 import { TagStats } from '../object/TagStats';
+import { TransferWise } from '../object/TransferWise';
 
 const accountFieldsDefinition = () => ({
   // _internal_id: {
@@ -159,6 +160,12 @@ const accountFieldsDefinition = () => ({
     description: "Returns conversation's tags for collective sorted by popularity",
     args: {
       limit: { type: GraphQLInt, defaultValue: 30 },
+    },
+  },
+  transferwise: {
+    type: TransferWise,
+    resolve(collective) {
+      return collective;
     },
   },
 });

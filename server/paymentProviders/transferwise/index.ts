@@ -1,7 +1,13 @@
 import uuidv4 from 'uuid/v4';
 
 import * as transferwise from '../../lib/transferwise';
+import cache from '../../lib/cache';
+import models from '../../models';
 import { Quote } from '../../types/transferwise';
+
+export const blackListedCurrencies = [
+  'BRL', // Businesses customers are not supported yet.
+];
 
 async function populateProfileId(connectedAccount): Promise<void> {
   if (!connectedAccount.data.profile) {
@@ -67,7 +73,61 @@ async function payExpense(connectedAccount, payoutMethod, expense): Promise<any>
   return { quote, recipient, transfer, fund };
 }
 
+async function getRequiredBankInformation(host: any, currency: string): Promise<any> {
+  const cacheKey = `transferwise_required_bank_info_${host.id}_to_${currency}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const connectedAccount = await models.ConnectedAccount.findOne({
+    where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
+  });
+  if (!connectedAccount) {
+    throw new Error('Host is not connected to Transferwise');
+  }
+
+  const quote = await transferwise.createQuote(connectedAccount.token, {
+    profileId: connectedAccount.data.id,
+    sourceCurrency: host.currency,
+    targetCurrency: currency,
+    targetAmount: 100,
+  });
+  const requiredFields = await transferwise.getAccountRequirements(connectedAccount.token, quote.id);
+  cache.set(cacheKey, requiredFields, 24 * 60 * 60 /* a whole day and we could probably increase */);
+  return requiredFields;
+}
+
+async function getAvailableCurrencies(host: any): Promise<any> {
+  const cacheKey = `transferwise_available_currencies_${host.id}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const connectedAccount = await models.ConnectedAccount.findOne({
+    where: {
+      service: 'transferwise',
+      CollectiveId: host.id,
+      deletedAt: null,
+    },
+  });
+  if (!connectedAccount) {
+    throw new Error('Host is not connected to Transferwise');
+  }
+
+  const pairs = await transferwise.getCurrencyPairs(connectedAccount.token);
+  const source = pairs.sourceCurrencies.find(sc => sc.currencyCode === host.currency);
+  const currencies = source.targetCurrencies
+    .filter(c => !blackListedCurrencies.includes(c.currencyCode))
+    .map(c => c.currencyCode);
+  cache.set(cacheKey, currencies, 24 * 60 * 60 /* a whole day and we could probably increase */);
+  return currencies;
+}
+
 export default {
+  getAvailableCurrencies,
+  getRequiredBankInformation,
   getTemporaryQuote,
   quoteExpense,
   payExpense,
