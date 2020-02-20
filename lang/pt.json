@@ -879,6 +879,7 @@
   "no": "Não",
   "notFound": "Não encontrado",
   "notFound.search": "Procure por {term}",
+  "OC.tagline": "Make your community sustainable. Collect and spend money transparently.",
   "OpenInbox": "Abrir {providerName}",
   "openSourceApply.description.p1": "Você está criando software. Você não deseja se preocupar em criar uma entidade legal ou uma conta bancária separada, pagar impostos ou fornecer faturas aos patrocinadores. Vamos cuidar de tudo isso, para que você possa se concentrar no seu projeto.",
   "openSourceApply.description.p2": "Criamos a {osclink}, uma organização guarda-chuva sem fins lucrativos, para servir a comunidade de código aberto. Para participar, você precisa de pelo menos 100 estrelas no Github (ou outra evidência equivalente da validade do seu projeto) e respeitar nosso {communityguidelineslink}.",
