@@ -2,7 +2,6 @@ import AccountQuery from './AccountQuery';
 import CollectiveQuery from './CollectiveQuery';
 import ExpenseQuery from './ExpenseQuery';
 import ConversationQuery from './ConversationQuery';
-import RequiredBankInformationQuery from './RequiredBankInformationQuery';
 
 // import TransactionQuery from './TransactionQuery';
 // import TransactionsQuery from './TransactionsQuery';
@@ -16,7 +15,6 @@ const query = {
   collective: CollectiveQuery,
   conversation: ConversationQuery,
   expense: ExpenseQuery,
-  requiredBankInformation: RequiredBankInformationQuery,
   // transaction: TransactionQuery,
   // transactions: TransactionsQuery,
   loggedInAccount: {
