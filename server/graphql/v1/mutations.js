@@ -255,7 +255,7 @@ const mutations = {
         defaultValue: true,
       },
     },
-    resolve(_, args) {
+    resolve(_, args, req) {
       return sequelize.transaction(async transaction => {
         let user = await models.User.findOne({ where: { email: args.user.email.toLowerCase() } }, { transaction });
         let organization = null;
@@ -264,7 +264,11 @@ const mutations = {
           throw new Error('User already exists for given email');
         } else if (!user) {
           // Create user
-          user = await models.User.createUserWithCollective(args.user, transaction);
+          const userData = {
+            ...args.user,
+            data: { creationRequest: { ip: req.ip, userAgent: req.header('user-agent') } },
+          };
+          user = await models.User.createUserWithCollective(userData, transaction);
         }
 
         // Create organization

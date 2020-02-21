@@ -460,7 +460,7 @@ export default (Sequelize, DataTypes) => {
 
     const sequelizeParams = transaction ? { transaction } : undefined;
     debug('createUserWithCollective', userData);
-    const cleanUserData = pick(userData, ['email', 'firstName', 'lastName', 'newsletterOptIn']);
+    const cleanUserData = pick(userData, ['email', 'firstName', 'lastName', 'newsletterOptIn', 'data']);
     const user = await User.create(cleanUserData, sequelizeParams);
     let name = userData.firstName;
     if (name && userData.lastName) {
