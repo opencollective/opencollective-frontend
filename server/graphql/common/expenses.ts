@@ -4,6 +4,7 @@ type ViewExpenseDataPermission = {
   attachments: boolean;
   payoutMethod: boolean;
   userLocation: boolean;
+  invoiceInfo: boolean;
 };
 
 /**
@@ -12,22 +13,38 @@ type ViewExpenseDataPermission = {
  */
 export const canViewExpensePrivateInfo = async (expense, req): Promise<ViewExpenseDataPermission> => {
   if (!req.remoteUser) {
-    return { attachments: false, payoutMethod: false, userLocation: false };
+    return {
+      attachments: false,
+      payoutMethod: false,
+      userLocation: false,
+      invoiceInfo: false,
+    };
   } else if (req.remoteUser.isAdmin(expense.FromCollectiveId) || req.remoteUser.id === expense.UserId) {
     // Users can see the all the private info for the collective they're admin of and the expenses they submit
-    return { attachments: true, payoutMethod: true, userLocation: true };
+    return {
+      attachments: true,
+      payoutMethod: true,
+      userLocation: true,
+      invoiceInfo: true,
+    };
   } else if (req.remoteUser.isAdmin(expense.CollectiveId)) {
-    // Collective admins can see the attachments, but not the payout method
-    return { attachments: true, payoutMethod: false, userLocation: false };
+    // Collective admins can see the attachments only
+    return {
+      attachments: true,
+      payoutMethod: false,
+      userLocation: false,
+      invoiceInfo: false,
+    };
   } else {
     // Users can see the private info for the expenses submitted to collectives they're hosting
     const collective = await req.loaders.Collective.byId.load(expense.CollectiveId);
     const isHostAdmin = req.remoteUser.isAdmin(collective.HostCollectiveId);
     const isParentCollectiveAdmin = req.remoteUser.isAdmin(collective.ParentCollectiveId);
     return {
-      payoutMethod: isHostAdmin,
       attachments: isHostAdmin || isParentCollectiveAdmin,
+      payoutMethod: isHostAdmin,
       userLocation: isHostAdmin,
+      invoiceInfo: isHostAdmin,
     };
   }
 };

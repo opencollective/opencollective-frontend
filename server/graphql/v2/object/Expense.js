@@ -64,6 +64,16 @@ const Expense = new GraphQLObjectType({
           return req.loaders.Collective.byId.load(expense.FromCollectiveId);
         },
       },
+      invoiceInfo: {
+        type: GraphQLString,
+        description: 'Information to display on the invoice. Only visible to user and admins.',
+        async resolve(expense, _, req) {
+          const expensePermissions = await canViewExpensePrivateInfo(expense, req);
+          if (expensePermissions.invoiceInfo) {
+            return expense.invoiceInfo;
+          }
+        },
+      },
     };
   },
 });

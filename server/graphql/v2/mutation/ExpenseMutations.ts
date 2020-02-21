@@ -30,7 +30,7 @@ const expenseMutations = {
       // of the `createExpense` endpoint in V1, the actual code to create the expense should be moved
       // here and cleaned.
       return createExpenseLegacy(req.remoteUser, {
-        ...pick(args.expense, ['description', 'tags', 'type', 'privateMessage', 'attachments']),
+        ...pick(args.expense, ['description', 'tags', 'type', 'privateMessage', 'attachments', 'invoiceInfo']),
         amount: args.expense.attachments.reduce((total, attachment) => total + attachment.amount, 0),
         PayoutMethod: payoutMethod,
         collective: await fetchAccountWithInput(args.account, req),

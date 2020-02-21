@@ -17,6 +17,10 @@ const ExpenseCreate = new GraphQLInputObjectType({
       type: GraphQLString,
       description: 'A private note that will be attached to your invoice',
     },
+    invoiceInfo: {
+      type: GraphQLString,
+      description: 'Tax ID, VAT number...etc This information will be printed on your invoice.',
+    },
     payoutMethod: {
       type: new GraphQLNonNull(PayoutMethodInput),
       description: 'The payout method that will be used to reimburse the expense',

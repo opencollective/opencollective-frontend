@@ -89,6 +89,7 @@ export default function(Sequelize, DataTypes) {
       },
 
       privateMessage: DataTypes.STRING,
+      invoiceInfo: DataTypes.TEXT,
       category: DataTypes.STRING,
       vat: DataTypes.INTEGER,
 

@@ -719,6 +719,7 @@ const ExpenseViewPermissions = new GraphQLObjectType({
     attachments: { type: GraphQLBoolean },
     payoutMethod: { type: GraphQLBoolean },
     userLocation: { type: GraphQLBoolean },
+    invoiceInfo: { type: GraphQLBoolean },
   },
 });
 

@@ -144,7 +144,7 @@ const checkExpenseAttachments = (expenseData, attachments) => {
   }
 };
 
-const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'privateMessage'];
+const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'privateMessage', 'invoiceInfo'];
 
 const getPaypalPaymentMethodFromExpenseData = async (expenseData, remoteUser, fromCollective, dbTransaction) => {
   if (expenseData.PayoutMethod) {
