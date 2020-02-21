@@ -729,17 +729,20 @@ class CreateOrderPage extends React.Component {
     }
 
     const plan = this.props.host.plan;
-    const isOverLimit =
-      plan && Boolean(plan.bankTransfers + get(this.state, 'stepDetails.totalAmount') > plan.bankTransfersLimit);
-    const disabledMessage =
-      isOverLimit &&
-      this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
-        host: this.props.host.name,
-      });
+    const disabled =
+      plan &&
+      plan.bankTransfersLimit !== null &&
+      Boolean(plan.bankTransfers + get(this.state, 'stepDetails.totalAmount') > plan.bankTransfersLimit);
+    const subtitle = disabled
+      ? this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
+          host: this.props.host.name,
+        })
+      : null;
 
     return {
       ...pm,
-      disabledMessage,
+      disabled,
+      subtitle,
       instructions: this.props.intl.formatMessage(messages.manualPm, {
         amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
         email: get(this.props, 'LoggedInUser.email', ''),
