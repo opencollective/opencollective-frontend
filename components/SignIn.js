@@ -6,7 +6,7 @@ import Container from './Container';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
-import { H5, P, Span } from './Text';
+import { H5, Span } from './Text';
 import { FormattedMessage } from 'react-intl';
 import StyledLink from './StyledLink';
 import { Link } from '../server/pages';
@@ -123,10 +123,12 @@ export default class SignIn extends React.Component {
         </Box>
 
         <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
-          <P color="black.700" mr={2}>
+          <Span color="black.700" mr={1} fontSize="Paragraph">
             <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
-          </P>
-          {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
+          </Span>{' '}
+          <Span fontSize="Paragraph">
+            {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
+          </Span>
         </Container>
       </StyledCard>
     );
