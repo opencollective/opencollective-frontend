@@ -88,6 +88,10 @@ export default (sequelize, DataTypes): typeof ExpenseAttachment => {
       url: {
         type: DataTypes.STRING,
         allowNull: true,
+        set(value: string | null): void {
+          // Make sure empty strings are converted to null
+          this.setDataValue('url', value || null);
+        },
         validate: {
           isUrl: true,
         },
