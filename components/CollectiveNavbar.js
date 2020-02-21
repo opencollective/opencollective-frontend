@@ -221,6 +221,7 @@ const DEFAULT_SECTIONS = {
   [CollectiveType.ORGANIZATION]: [
     Sections.CONTRIBUTIONS,
     Sections.CONTRIBUTORS,
+    Sections.UPDATES,
     Sections.CONVERSATIONS,
     Sections.TRANSACTIONS,
     Sections.ABOUT,
@@ -268,6 +269,10 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   // Check opt-in features
   if (!hasFeature(collective, FEATURES.COLLECTIVE_GOALS)) {
     toRemove.add(Sections.GOALS);
+  }
+
+  if (!hasFeature(collective, FEATURES.UPDATES)) {
+    toRemove.add(Sections.UPDATES);
   }
 
   if (!hasFeature(collective, FEATURES.CONVERSATIONS)) {
