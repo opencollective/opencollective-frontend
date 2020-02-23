@@ -12,15 +12,23 @@ import Container from '../Container';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
+import StyledTextarea from '../StyledTextarea';
 import { H3, P } from '../Text';
 import { updateSettingsMutation } from './mutations';
 
 const EditHostInvoice = ({ collective }) => {
+  // For invoice Title
   const defaultValue = get(collective.settings, 'invoiceTitle');
   const [setSettings, { loading, error, data }] = useMutation(updateSettingsMutation);
   const [value, setValue] = React.useState(defaultValue);
   const isTouched = value !== defaultValue;
   const isSaved = get(data, 'editCollective.settings.invoiceTitle') === value;
+
+  // For invoice extra info
+  const defaultInfo = get(collective.settings, 'extraInfo');
+  const [info, setInfo] = React.useState(defaultInfo);
+  const isSelected = info !== defaultInfo;
+  const isSave = get(data, 'editCollective.settings.extraInfo') === info;
 
   return (
     <Container>
@@ -43,19 +51,32 @@ const EditHostInvoice = ({ collective }) => {
           {getErrorFromGraphqlException(setValue).message}
         </MessageBox>
       )}
-      <Flex flexWrap="wrap">
+      <Flex flexWrap="wrap" flexDirection="column">
         <StyledInput
           placeholder="Payment Receipt"
           defaultValue={value}
           onChange={e => setValue(e.target.value)}
           width="100%"
           maxWidth={300}
+          my={3}
+        />
+
+        <StyledTextarea
+          placeholder="Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message."
+          defaultValue={info}
+          onChange={e => setInfo(e.target.value)}
+          width="100%"
+          height="150px"
+          maxWidth={300}
           my={2}
         />
+
+        {/* <textarea placeholder="Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message."defaultInfo={info} onChange={e => setInfo(e.target.value)}> </textarea> */}
+
         <StyledButton
           buttonStyle="primary"
-          mx={2}
           my={2}
+          maxWidth={300}
           minWidth={200}
           loading={loading}
           maxLength={255}
@@ -64,12 +85,12 @@ const EditHostInvoice = ({ collective }) => {
             setSettings({
               variables: {
                 id: collective.id,
-                settings: { ...collective.settings, invoiceTitle: value },
+                settings: { ...collective.settings, invoiceTitle: value, extraInfo: info },
               },
             })
           }
         >
-          {isSaved ? (
+          {isSaved && isSave ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
@@ -78,6 +99,7 @@ const EditHostInvoice = ({ collective }) => {
       </Flex>
       <Box mt={3} maxWidth={400}>
         <img src={imgInvoiceTitlePreview} alt="" />
+        {console.log(collective.settings)}
       </Box>
     </Container>
   );
