@@ -6,7 +6,7 @@ import Container from '../../Container';
 import StyledLink from '../../StyledLink';
 import BackButton from '../BackButton';
 import PricingTable from '../PricingTable';
-import { H1, P, H3 } from '../../Text';
+import { H1, P, H3, Span } from '../../Text';
 import { Router } from '../../../server/pages';
 
 const headings = ['', 'starter', 'small', 'medium', 'large', 'network'];
@@ -20,29 +20,39 @@ const rows = [
       },
     },
     {
-      type: 'price',
-      amount: 'Free',
-      frequency: null,
+      type: 'component',
+      render() {
+        return (
+          <Span fontSize={20} fontWeight="bold">
+            <FormattedHTMLMessage id="pricingTable.cell.free" defaultMessage="Free" />
+          </Span>
+        );
+      },
     },
     {
       type: 'price',
-      amount: '$25',
+      amount: 2500,
       frequency: 'month',
     },
     {
       type: 'price',
-      amount: '$50',
+      amount: 5000,
       frequency: 'month',
     },
     {
       type: 'price',
-      amount: '$100',
+      amount: 10000,
       frequency: 'month',
     },
     {
-      type: 'price',
-      amount: 'Talk to us',
-      frequency: null,
+      type: 'component',
+      render() {
+        return (
+          <Span fontSize={20} fontWeight="bold">
+            <FormattedHTMLMessage id="pricingTable.cell.talkToUs" defaultMessage="Talk to us" />
+          </Span>
+        );
+      },
     },
   ],
   [
