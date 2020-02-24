@@ -879,6 +879,7 @@
   "no": "No",
   "notFound": "Не найдено",
   "notFound.search": "Search for {term}",
+  "OC.tagline": "Make your community sustainable. Collect and spend money transparently.",
   "OpenInbox": "Open {providerName}",
   "openSourceApply.description.p1": "You're creating software. You don't want to worry about creating a legal entity or seperate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project.",
   "openSourceApply.description.p2": "We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github (or other equivilant evidence of your project's validity), and to respect our {communityguidelineslink}.",
