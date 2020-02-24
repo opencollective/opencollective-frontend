@@ -6,7 +6,12 @@ import models from '../../models';
 import { Quote } from '../../types/transferwise';
 
 export const blackListedCurrencies = [
-  'BRL', // Businesses customers are not supported yet.
+  /** Only private customers sending payments to private recipients. Business customers and business recipients are not supported yet. */
+  'BRL',
+  'BDT',
+  'PKR',
+  /** Incomplete requiredFields API */
+  'UYU',
 ];
 
 async function populateProfileId(connectedAccount): Promise<void> {
