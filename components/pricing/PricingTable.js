@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
@@ -10,6 +10,7 @@ import { isObject } from 'lodash';
 
 import StyledLink from '../StyledLink';
 import Container from '../Container';
+import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
 
 const PlanLink = styled(StyledLink).attrs({
   buttonStyle: 'primary',
@@ -152,33 +153,12 @@ const StyledTable = styled(Box)`
     }
   }
 
-  td,
-  span {
-    &.price {
-      font-weight: bold;
-      font-size: 20px;
-      line-height: 28px;
-      letter-spacing: -0.2px;
-    }
-    &.frequency {
-      font-weight: 300;
-    }
-  }
-
   .footer {
     padding-top: 16px;
     padding-bottom: 32px;
     text-align: center;
   }
 `;
-
-const getFrequencyShortForm = frequency => {
-  if (frequency === 'month') {
-    return 'mo';
-  } else if (frequency === 'year') {
-    return 'yr';
-  }
-};
 
 const messages = defineMessages({
   'table.head.starter': {
@@ -215,25 +195,25 @@ const Cell = ({ content, header, height }) => {
       case 'price':
         return (
           <td style={style}>
-            <span className="price">{content.amount}</span>{' '}
-            {content.frequency && (
-              <Fragment>
-                <Box as="span" display={['none', null, 'inline']} className="frequency">
-                  <FormattedMessage
-                    id="pricingTable.plan.frequency"
-                    defaultMessage="{frequency}"
-                    values={{ frequency: content.frequency }}
-                  />
-                </Box>
-                <Box as="span" display={['inline', null, 'none']} className="frequency">
-                  <FormattedMessage
-                    id="pricingTable.plan.frequency"
-                    defaultMessage="{frequency}"
-                    values={{ frequency: getFrequencyShortForm(content.frequency) }}
-                  />
-                </Box>
-              </Fragment>
-            )}
+            <Box as="span" display={['none', null, 'inline']}>
+              <FormattedMoneyAmount
+                amount={content.amount}
+                interval={content.frequency}
+                currency="USD"
+                amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontSize: 20 }}
+                showCurrencyCode={false}
+              />
+            </Box>
+            <Box as="span" display={['inline', null, 'none']}>
+              <FormattedMoneyAmount
+                amount={content.amount}
+                interval={content.frequency}
+                currency="USD"
+                amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontSize: 20 }}
+                showCurrencyCode={false}
+                abbreviateInterval
+              />
+            </Box>
           </td>
         );
       case 'check':

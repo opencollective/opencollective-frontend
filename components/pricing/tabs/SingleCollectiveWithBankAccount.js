@@ -31,7 +31,7 @@ const rows = [
     },
     {
       type: 'price',
-      amount: '$10',
+      amount: 1000,
       frequency: 'month',
     },
   ],
