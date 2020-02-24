@@ -186,6 +186,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective }) => {
                           payoutMethod={values.payoutMethod}
                           payoutMethods={get(values.payee, 'payoutMethods', [])}
                           disabled={!values.payee}
+                          collective={collective}
                           default
                         />
                       )}

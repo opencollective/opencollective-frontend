@@ -52,6 +52,14 @@ class PayoutMethodSelect extends React.Component {
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),
+    /** The Collective paying the expense */
+    collective: PropTypes.shape({
+      host: PropTypes.shape({
+        transferwise: PropTypes.shape({
+          availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+        }),
+      }),
+    }).isRequired,
   };
 
   getPayoutMethodLabel = payoutMethod => {
@@ -98,7 +106,15 @@ class PayoutMethodSelect extends React.Component {
   getOptions = memoizeOne(payoutMethods => {
     const { formatMessage } = this.props.intl;
     const groupedPms = groupBy(payoutMethods, 'type');
-    return Object.values(PayoutMethodType).map(pmType => ({
+    const pmTypes = Object.values(PayoutMethodType).filter(type => {
+      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host.transferwise) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    return pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(formatMessage, pmType),
       options: [
         // Add existing payout methods for this type
