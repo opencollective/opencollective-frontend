@@ -8,7 +8,7 @@ import { ssrNotFoundError } from '../lib/nextjs_utils';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import { Box, Flex } from '@rebass/grid';
 import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 import ErrorPage, { generateError } from '../components/ErrorPage';
@@ -76,16 +76,16 @@ class ExpensePage extends React.Component {
 
     const collective = data.Collective;
     const successMessage = this.getSuccessMessage();
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     return (
       <div className="ExpensePage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
+          <CollectiveNavbar
             collective={collective}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
+            isAdmin={canEdit}
+            showEdit
             callsToAction={{ hasSubmitExpense: !collective.isArchived }}
           />
 
