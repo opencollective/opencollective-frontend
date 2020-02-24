@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { find } from 'lodash';
 
 import * as transferwise from '../../lib/transferwise';
 import cache from '../../lib/cache';
@@ -78,31 +79,6 @@ async function payExpense(connectedAccount, payoutMethod, expense): Promise<any>
   return { quote, recipient, transfer, fund };
 }
 
-async function getRequiredBankInformation(host: any, currency: string): Promise<any> {
-  const cacheKey = `transferwise_required_bank_info_${host.id}_to_${currency}`;
-  const fromCache = await cache.get(cacheKey);
-  if (fromCache) {
-    return fromCache;
-  }
-
-  const connectedAccount = await models.ConnectedAccount.findOne({
-    where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
-  });
-  if (!connectedAccount) {
-    throw new Error('Host is not connected to Transferwise');
-  }
-
-  const quote = await transferwise.createQuote(connectedAccount.token, {
-    profileId: connectedAccount.data.id,
-    sourceCurrency: host.currency,
-    targetCurrency: currency,
-    targetAmount: 100,
-  });
-  const requiredFields = await transferwise.getAccountRequirements(connectedAccount.token, quote.id);
-  cache.set(cacheKey, requiredFields, 24 * 60 * 60 /* a whole day and we could probably increase */);
-  return requiredFields;
-}
-
 async function getAvailableCurrencies(host: any): Promise<any> {
   const cacheKey = `transferwise_available_currencies_${host.id}`;
   const fromCache = await cache.get(cacheKey);
@@ -110,13 +86,12 @@ async function getAvailableCurrencies(host: any): Promise<any> {
     return fromCache;
   }
 
-  const connectedAccount = await models.ConnectedAccount.findOne({
-    where: {
-      service: 'transferwise',
-      CollectiveId: host.id,
-      deletedAt: null,
-    },
-  });
+  const connectedAccount =
+    host.connectedAccount?.service === 'transferwise'
+      ? host.connectedAccount
+      : await models.ConnectedAccount.findOne({
+          where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
+        });
   if (!connectedAccount) {
     throw new Error('Host is not connected to Transferwise');
   }
@@ -125,9 +100,39 @@ async function getAvailableCurrencies(host: any): Promise<any> {
   const source = pairs.sourceCurrencies.find(sc => sc.currencyCode === host.currency);
   const currencies = source.targetCurrencies
     .filter(c => !blackListedCurrencies.includes(c.currencyCode))
-    .map(c => c.currencyCode);
+    .map(c => ({ code: c.currencyCode, minInvoiceAmount: c.minInvoiceAmount }));
   cache.set(cacheKey, currencies, 24 * 60 * 60 /* a whole day and we could probably increase */);
   return currencies;
+}
+
+async function getRequiredBankInformation(host: any, currency: string): Promise<any> {
+  const cacheKey = `transferwise_required_bank_info_${host.id}_to_${currency}`;
+  const fromCache = await cache.get(cacheKey);
+  if (fromCache) {
+    return fromCache;
+  }
+
+  const connectedAccount =
+    host.connectedAccount?.service === 'transferwise'
+      ? host.connectedAccount
+      : await models.ConnectedAccount.findOne({
+          where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
+        });
+  if (!connectedAccount) {
+    throw new Error('Host is not connected to Transferwise');
+  }
+
+  const currencyInfo = find(await getAvailableCurrencies(host), { code: currency });
+
+  const quote = await transferwise.createQuote(connectedAccount.token, {
+    profileId: connectedAccount.data.id,
+    sourceCurrency: host.currency,
+    targetCurrency: currency,
+    sourceAmount: currencyInfo.minInvoiceAmount * 20,
+  });
+  const requiredFields = await transferwise.getAccountRequirements(connectedAccount.token, quote.id);
+  cache.set(cacheKey, requiredFields, 24 * 60 * 60 /* a whole day and we could probably increase */);
+  return requiredFields;
 }
 
 export default {
