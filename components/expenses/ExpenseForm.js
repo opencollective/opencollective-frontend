@@ -80,7 +80,7 @@ const validate = expense => {
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
-const ExpenseFormBody = ({ formik, payoutProfiles }) => {
+const ExpenseFormBody = ({ formik, payoutProfiles, collective }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, handleChange, errors } = formik;
@@ -224,7 +224,12 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
                   <FastField name="payoutMethod">
                     {({ field, meta }) => (
                       <Box mr={fieldsMarginRight} mt={2} flex="1" minWidth={300}>
-                        <PayoutMethodForm fieldsPrefix="payoutMethod" payoutMethod={field.value} errors={meta.error} />
+                        <PayoutMethodForm
+                          fieldsPrefix="payoutMethod"
+                          payoutMethod={field.value}
+                          collective={collective}
+                          errors={meta.error}
+                        />
                       </Box>
                     )}
                   </FastField>
@@ -251,6 +256,14 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
 ExpenseFormBody.propTypes = {
   formik: PropTypes.object,
   payoutProfiles: PropTypes.array,
+  collective: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    host: PropTypes.shape({
+      transferwise: PropTypes.shape({
+        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+      }),
+    }),
+  }).isRequired,
 };
 
 /**
@@ -275,7 +288,7 @@ const ExpenseForm = ({ onSubmit, collective, expense, payoutProfiles }) => {
         }
       }}
     >
-      {formik => <ExpenseFormBody formik={formik} payoutProfiles={payoutProfiles} />}
+      {formik => <ExpenseFormBody formik={formik} payoutProfiles={payoutProfiles} collective={collective} />}
     </Formik>
   );
 };
@@ -284,6 +297,12 @@ ExpenseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired,
+    host: PropTypes.shape({
+      transferwise: PropTypes.shape({
+        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+      }),
+    }),
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({

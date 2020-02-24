@@ -13,6 +13,8 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
 
+import PayoutBankInformationForm from './PayoutBankInformationForm';
+
 const msg = defineMessages({
   email: {
     id: 'Email',
@@ -39,6 +41,13 @@ export const validatePayoutMethod = payoutMethod => {
     } else if (!isEmail(email)) {
       set(errors, 'data.email', createError(FORM_ERROR.PATTERN));
     }
+  } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
+    if (!payoutMethod.data.currency) {
+      set(errors, 'data.currency', createError(FORM_ERROR.REQUIRED));
+    }
+    if (!payoutMethod.data.accountHolderName) {
+      set(errors, 'data.accountHolderName', createError(FORM_ERROR.REQUIRED));
+    }
   } else if (payoutMethod.type === PayoutMethodType.OTHER) {
     const content = get(payoutMethod, 'data.content');
     if (!content) {
@@ -54,7 +63,7 @@ export const validatePayoutMethod = payoutMethod => {
  * This component is **fully controlled**, you need to call `validatePayoutMethod`
  * to proceed with the validation and pass the result with the `errors` prop.
  */
-const PayoutMethodForm = ({ payoutMethod, fieldsPrefix }) => {
+const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, collective }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
@@ -96,6 +105,14 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix }) => {
           )}
         </Field>
       )}
+      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
+        <PayoutBankInformationForm
+          payoutMethod={payoutMethod}
+          isNew={isNew}
+          getFieldName={getFieldName}
+          collective={collective}
+        />
+      )}
       {isNew && (
         <Box mt={3}>
           <Field name={getFieldName('isSaved')}>
@@ -108,6 +125,14 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix }) => {
 };
 
 PayoutMethodForm.propTypes = {
+  collective: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    host: PropTypes.shape({
+      transferwise: PropTypes.shape({
+        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+      }),
+    }),
+  }).isRequired,
   /** Set this to nil to create a new one */
   payoutMethod: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
