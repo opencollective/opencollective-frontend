@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import config from 'config';
-import { omitBy, isNull } from 'lodash';
+import { get, omitBy, isNull } from 'lodash';
 
 import logger from './logger';
 import { Quote, RecipientAccount } from '../types/transferwise';
@@ -44,9 +44,10 @@ export const createQuote = async (
     });
     return getData(response);
   } catch (e) {
-    const message = `Unable to create quote: ${getAxiosError(e)}`;
-    logger.error(message, data);
-    throw new Error(message);
+    logger.error(`Unable to create quote: ${getAxiosError(e)}`, data);
+    const publicMessage =
+      get(e, 'response.data.errors[0].message') || `Sorry, we can't make transfers to ${targetCurrency}.`;
+    throw new Error(publicMessage);
   }
 };
 
