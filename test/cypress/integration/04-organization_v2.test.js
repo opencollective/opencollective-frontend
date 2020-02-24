@@ -3,7 +3,7 @@ describe('New organization profile', () => {
    * Contributions section is already tested in `05-user_v2.test.js`
    * About section is already tested in `04-collective_v2.test.js`
    */
-  before(() => {
+  beforeEach(() => {
     cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
       const collectiveSlug = collective.slug;
       cy.visit(`/${collectiveSlug}/`);
