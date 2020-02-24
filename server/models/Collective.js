@@ -51,7 +51,13 @@ import expenseTypes from '../constants/expense_type';
 import plans, { PLANS_COLLECTIVE_SLUG } from '../constants/plans';
 
 import { getFxRate } from '../lib/currency';
-import { notifyTeamAboutSuspiciousCollective } from '../lib/spam';
+import {
+  notifyTeamAboutSuspiciousCollective,
+  collectiveSpamCheck,
+  notifyTeamAboutPreventedCollectiveCreate,
+} from '../lib/spam';
+import { canUseFeature } from '../lib/user-permissions';
+import FEATURE from '../constants/feature';
 
 const debug = debugLib('models:Collective');
 
@@ -650,6 +656,29 @@ export default function(Sequelize, DataTypes) {
             return Promise.resolve();
           });
         },
+        beforeCreate: async instance => {
+          // Make sure user is not prevented from creating collectives
+          const user = instance.CreatedByUserId && (await models.User.findByPk(instance.CreatedByUserId));
+          if (user && !canUseFeature(user, FEATURE.CREATE_COLLECTIVE)) {
+            throw new Error("You're not authorized to create new collectives at the moment.");
+          }
+
+          // Check if collective is spam
+          const spamReport = collectiveSpamCheck(instance, 'Collective.beforeCreate');
+          // If 100% sure that it's a spam
+          if (spamReport.score === 1) {
+            // Put the user into limited mode
+            if (user) {
+              await user.limitAcount(spamReport);
+            }
+
+            // Notify Slack
+            notifyTeamAboutPreventedCollectiveCreate(spamReport);
+
+            // Prevent collective creation
+            throw new Error('Collective creation failed');
+          }
+        },
         afterCreate: async instance => {
           instance.findImage();
 
@@ -665,11 +694,18 @@ export default function(Sequelize, DataTypes) {
             });
           }
 
-          notifyTeamAboutSuspiciousCollective(instance);
+          const spamReport = collectiveSpamCheck(instance, 'Collective.afterCreate');
+          if (spamReport.score > 0) {
+            notifyTeamAboutSuspiciousCollective(spamReport);
+          }
+
           return null;
         },
         afterUpdate: async instance => {
-          notifyTeamAboutSuspiciousCollective(instance);
+          const spamReport = collectiveSpamCheck(instance, 'Collective.afterUpdate');
+          if (spamReport.score > 0) {
+            notifyTeamAboutSuspiciousCollective(spamReport);
+          }
         },
       },
     },

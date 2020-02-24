@@ -5,6 +5,7 @@ import sinon from 'sinon';
 import emailLib from '../../../server/lib/email';
 import { roles } from '../../../server/constants';
 import plans from '../../../server/constants/plans';
+import { fakeUser } from '../../test-helpers/fake-data';
 
 const { Transaction, Collective, User } = models;
 
@@ -214,6 +215,32 @@ describe('server/models/Collective', () => {
       expect(collective.slug).to.contain('incognito-');
       expect(collective.slug.length).to.equal(18);
     });
+  });
+
+  it('prevents collective creation and limit user if spam is detected', async () => {
+    const user = await fakeUser();
+    const spamCollectiveData = {
+      name: 'BUY MY KETO',
+      website: 'https://supplementslove.com/buy-stuff',
+      CreatedByUserId: user.id,
+    };
+
+    // Should prevent collective creation
+    await expect(models.Collective.create(spamCollectiveData)).to.be.eventually.rejectedWith(
+      Error,
+      'Collective creation failed',
+    );
+
+    // Should limit user account
+    await user.reload();
+    expect(user.data.features.ALL).to.be.false;
+
+    // User should not be able to create any new collectives
+    const legitCollectiveData = { name: 'Legit project', CreatedByUserId: user.id };
+    await expect(models.Collective.create(legitCollectiveData)).to.be.eventually.rejectedWith(
+      Error,
+      "You're not authorized to create new collectives at the moment.",
+    );
   });
 
   it('does not create collective with a blacklisted slug', () => {
