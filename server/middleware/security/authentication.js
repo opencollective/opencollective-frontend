@@ -119,10 +119,11 @@ export const _authenticateUserByJwt = async (req, res, next) => {
         }
       }
     }
-    // The login was accepted, we can update lastLoginAt
-    // this will invalidate all older tokens
-    const now = new Date();
-    await user.update({ lastLoginAt: now });
+    await user.update({
+      // The login was accepted, we can update lastLoginAt. This will invalidate all older tokens.
+      lastLoginAt: new Date(),
+      data: { ...user.data, lastSignInRequest: { ip: req.ip, userAgent: req.header('user-agent') } },
+    });
   }
 
   await user.populateRoles();

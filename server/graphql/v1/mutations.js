@@ -255,7 +255,7 @@ const mutations = {
         defaultValue: true,
       },
     },
-    resolve(_, args) {
+    resolve(_, args, req) {
       return sequelize.transaction(async transaction => {
         let user = await models.User.findOne({ where: { email: args.user.email.toLowerCase() } }, { transaction });
         let organization = null;
@@ -265,6 +265,9 @@ const mutations = {
         } else if (!user) {
           // Create user
           user = await models.User.createUserWithCollective(args.user, transaction);
+          user = await user.update({
+            data: { creationRequest: { ip: req.ip, userAgent: req.header('user-agent') } },
+          });
         }
 
         // Create organization
