@@ -23,9 +23,7 @@ async function createCollective(_, args, req) {
   const { remoteUser, loaders } = req;
 
   if (!remoteUser) {
-    throw new errors.Unauthorized({
-      message: 'You need to be logged in to create a collective',
-    });
+    throw new errors.Unauthorized({ message: 'You need to be logged in to create a collective' });
   }
 
   const collectiveData = {
@@ -49,7 +47,7 @@ async function createCollective(_, args, req) {
   }
 
   // Handle GitHub automated approval for the Open Source Collective Host
-  if (args.automateApprovalWithGithub && args.githubHandle) {
+  if (args.automateApprovalWithGithub && args.collective.githubHandle) {
     const opensourceHost = defaultHostCollective('opensource');
     if (host.id === opensourceHost.CollectiveId) {
       try {
@@ -62,9 +60,7 @@ async function createCollective(_, args, req) {
         github.handleOpenSourceAutomatedApproval(args.githubHandle, githubAccount.token);
         shouldAutomaticallyApprove = true;
       } catch (error) {
-        throw new errors.ValidationFailed({
-          message: error.message,
-        });
+        throw new errors.ValidationFailed({ message: error.message });
       }
       if (args.githubHandle.includes('/')) {
         collectiveData.settings.githubRepo = args.githubHandle;
@@ -111,12 +107,15 @@ const createCollectiveMutations = {
     type: Collective,
     args: {
       collective: {
+        description: 'Information about the collective to create (name, slug, description, tags, ...)',
         type: new GraphQLNonNull(CreateCollectiveInput),
       },
       host: {
+        description: 'Reference to the host to apply on creation.',
         type: AccountInput,
       },
       automateApprovalWithGithub: {
+        description: 'Wether to trigger the automated approval for Open Source collectives with GitHub.',
         type: GraphQLBoolean,
         defaultValue: false,
       },

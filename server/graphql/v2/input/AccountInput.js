@@ -13,7 +13,7 @@ const AccountInput = new GraphQLInputObjectType({
     },
     legacyId: {
       type: GraphQLInt,
-      description: 'The internal id the account (ie: 580)',
+      description: 'The internal id of the account (ie: 580)',
       deprecationReason: '2020-01-01: should only be used during the transition to GraphQL API v2.',
     },
     slug: {
