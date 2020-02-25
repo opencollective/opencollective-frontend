@@ -31,8 +31,7 @@ const fetchAccountWithInput = async (input, { loaders, throwIfMissing } = {}) =>
   } else if (input.legacyId) {
     collective = await loaders.Collective.byId.load(input.legacyId);
   } else if (input.slug) {
-    const slug = input.slug.toLowerCase();
-    collective = await models.Collective.findBySlug(slug);
+    collective = await models.Collective.findOne({ where: { slug: input.slug.toLowerCase() } });
   } else {
     throw new Error('Please provide an id or a slug');
   }

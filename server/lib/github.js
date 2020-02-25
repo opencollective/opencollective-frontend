@@ -1,5 +1,5 @@
 import config from 'config';
-import octokitRest from '@octokit/rest';
+import { Octokit } from '@octokit/rest';
 import request from 'request-promise';
 import { get, has, pick } from 'lodash';
 
@@ -54,7 +54,7 @@ export function getOctokit(accessToken) {
     };
   }
 
-  return octokitRest(octokitParams);
+  return Octokit(octokitParams);
 }
 
 export function getData(res) {

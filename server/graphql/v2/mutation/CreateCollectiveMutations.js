@@ -40,9 +40,12 @@ async function createCollective(_, args, req) {
 
   let host;
   if (args.host) {
-    host = fetchAccountWithInput(args.host, { loaders });
+    host = await fetchAccountWithInput(args.host, { loaders });
     if (!host) {
       throw new errors.ValidationFailed({ message: 'Host Not Found' });
+    }
+    if (!host.isHostAccount) {
+      throw new errors.ValidationFailed({ message: 'Host account is not activated as Host.' });
     }
   }
 
@@ -57,15 +60,19 @@ async function createCollective(_, args, req) {
         if (!githubAccount) {
           throw new Error('You must have a connected GitHub Account to claim a collective');
         }
-        github.handleOpenSourceAutomatedApproval(args.githubHandle, githubAccount.token);
+        await github.handleOpenSourceAutomatedApproval(githubHandle, githubAccount.token);
         shouldAutomaticallyApprove = true;
       } catch (error) {
         throw new errors.ValidationFailed({ message: error.message });
       }
-      if (args.githubHandle.includes('/')) {
-        collectiveData.settings.githubRepo = args.githubHandle;
+      if (githubHandle.includes('/')) {
+        collectiveData.settings.githubRepo = githubHandle;
       } else {
-        collectiveData.settings.githubOrg = args.githubHandle;
+        collectiveData.settings.githubOrg = githubHandle;
+      }
+      collectiveData.tags = collectiveData.tags || [];
+      if (!collectiveData.tags.includes('open source')) {
+        collectiveData.tags.push('open source');
       }
     }
   }
