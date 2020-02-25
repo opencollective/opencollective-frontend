@@ -20,7 +20,7 @@ const DEFAULT_COLLECTIVE_SETTINGS = {
 async function createCollective(_, args, req) {
   let shouldAutomaticallyApprove = false;
 
-  const { remoteUser } = req;
+  const { remoteUser, loaders } = req;
 
   if (!remoteUser) {
     throw new errors.Unauthorized({
@@ -46,7 +46,7 @@ async function createCollective(_, args, req) {
 
   let host;
   if (args.host) {
-    host = fetchAccountWithInput(args.host);
+    host = fetchAccountWithInput(args.host, { loaders });
     if (!host) {
       throw new errors.ValidationFailed({ message: 'Host Not Found' });
     }

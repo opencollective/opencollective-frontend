@@ -23,20 +23,20 @@ const AccountInput = new GraphQLInputObjectType({
   }),
 });
 
-const fetchAccountWithInput = async (input, options) => {
+const fetchAccountWithInput = async (input, { loaders, throwIfMissing } = {}) => {
   let collective;
   if (input.id) {
     const id = idDecode(input.id, 'account');
-    collective = await models.Collective.findByPk(id);
+    collective = await loaders.Collective.byId.load(id);
   } else if (input.legacyId) {
-    collective = await models.Collective.findByPk(input.legacyId);
+    collective = await loaders.Collective.byId.load(input.legacyId);
   } else if (input.slug) {
     const slug = input.slug.toLowerCase();
     collective = await models.Collective.findBySlug(slug);
   } else {
     throw new Error('Please provide an id or a slug');
   }
-  if (!collective && options && options.throwIfMissing) {
+  if (!collective && throwIfMissing) {
     throw new NotFound({ message: 'Account Not Found' });
   }
   return collective;
