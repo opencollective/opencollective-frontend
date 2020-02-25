@@ -35,13 +35,9 @@ async function createCollective(_, args, req) {
     settings: { ...DEFAULT_COLLECTIVE_SETTINGS },
   };
 
-  const collectiveWithSlug = await models.Collective.findBySlug(collectiveData.slug.toLowerCase());
+  const collectiveWithSlug = await models.Collective.findOne({ where: { slug: collectiveData.slug.toLowerCase() } });
   if (collectiveWithSlug) {
-    throw new Error(
-      `The slug ${
-        collectiveData.slug
-      } is already taken. Please use another slug for your ${collectiveData.type.toLowerCase()}.`,
-    );
+    throw new Error(`The slug ${collectiveData.slug} is already taken. Please use another slug for your collective.}.`);
   }
 
   let host;
@@ -92,7 +88,7 @@ async function createCollective(_, args, req) {
   // Will send an email to the authenticated user
   // - tell them that their collective was successfully created
   // - tell them that their collective is pending validation (which might be wrong if it was automatically approved)
-  const remoteUserCollective = await models.Collective.findByPk(remoteUser.CollectiveId);
+  const remoteUserCollective = await loaders.Collective.byId.load(remoteUser.CollectiveId);
   models.Activity.create({
     type: activities.COLLECTIVE_CREATED,
     UserId: remoteUser.id,
