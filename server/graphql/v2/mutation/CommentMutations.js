@@ -39,7 +39,7 @@ const commentMutations = {
     },
     resolve: (entity, args, req) => {
       if (args.comment.ConversationId) {
-        args.comment.ConversationId = parseInt(idDecode(args.comment.ConversationId, IDENTIFIER_TYPES.CONVERSATION));
+        args.comment.ConversationId = idDecode(args.comment.ConversationId, IDENTIFIER_TYPES.CONVERSATION);
       }
 
       return createCommentResolver(entity, args, req);
