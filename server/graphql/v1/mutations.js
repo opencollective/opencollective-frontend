@@ -264,11 +264,10 @@ const mutations = {
           throw new Error('User already exists for given email');
         } else if (!user) {
           // Create user
-          const userData = {
-            ...args.user,
+          user = await models.User.createUserWithCollective(args.user, transaction);
+          user = await user.update({
             data: { creationRequest: { ip: req.ip, userAgent: req.header('user-agent') } },
-          };
-          user = await models.User.createUserWithCollective(userData, transaction);
+          });
         }
 
         // Create organization
