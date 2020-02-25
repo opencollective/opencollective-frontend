@@ -426,7 +426,7 @@
   "createPledge.faq.pay": "Once that pledged collective is claimed, we will email you to fulfill your pledge.",
   "createPledge.faq.paySummary": "¿Cuando pago?",
   "createPledge.faq.what": "A pledge allows supporters (companies and individuals) to pledge\n                funds towards a collective that hasn’t been created yet. If you can’t find a collective you want to\n                support, pledge to it!",
-  "createPledge.faq.whatHappens": "Once someone makes a pledge to a collective, we automatically create a pledged collective. We don’t spam\n                folks, so please help us reach out to the community via twitter / github or, if you can, via email.",
+  "createPledge.faq.whatHappens": "Una vez que alguien hace una promesa a un colectivo, automáticamente creamos un colectivo. No enviamos spam a\n                personas, así que por favor ayúdanos a llegar a la comunidad a través de twitter / github o, si puedes, por correo electrónico.",
   "createPledge.faq.whatHappensSummary": "¿Qué pasa después de que me comprometo?",
   "createPledge.faq.whatSummary": "¿Qué es un compromiso?",
   "createPledge.first": "¡Tú eres el primer prometedor!",
