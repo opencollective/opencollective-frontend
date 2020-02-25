@@ -54,7 +54,7 @@ export const idEncode = (integer, type) => {
 
 export const idDecode = (string, type) => {
   const decoded = getInstance(type).decode(string.split('-').join(''));
-  return Number(decoded);
+  return Number(decoded[0]);
 };
 
 /**
@@ -67,11 +67,9 @@ export const getIdEncodeResolver = (type, idField = 'id') => entity => idEncode(
 
 /**
  * Resolve original id by decoding if string, otherwise return as is.
- * @param {number|string} id - ide to decode
+ * @param {number|string} id - id to decode
  * @returns {number} decoded id
  */
 export function getDecodedId(id) {
-  return isNaN(id) && typeof id === 'string'
-    ? idDecode(id)[0] // idDecode returns an array.
-    : id;
+  return isNaN(id) && typeof id === 'string' ? idDecode(id) : id;
 }
