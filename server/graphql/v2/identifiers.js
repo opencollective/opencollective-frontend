@@ -53,7 +53,8 @@ export const idEncode = (integer, type) => {
 };
 
 export const idDecode = (string, type) => {
-  return getInstance(type).decode(string.split('-').join(''));
+  const decoded = getInstance(type).decode(string.split('-').join(''));
+  return Number(decoded);
 };
 
 /**
