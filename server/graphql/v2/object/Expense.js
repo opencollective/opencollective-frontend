@@ -2,7 +2,7 @@ import { GraphQLString, GraphQLObjectType, GraphQLInt } from 'graphql';
 import models, { Op } from '../../../models';
 
 import { setContextPermission, PERMISSION_TYPE } from '../../common/context-permissions';
-import { canViewExpensePrivateInfo } from '../../common/expenses';
+import { canSeeExpenseInvoiceInfo, canSeeExpensePayeeLocation } from '../../common/expenses';
 import { CommentCollection } from '../collection/CommentCollection';
 import { Account } from '../interface/Account';
 import { CollectionArgs } from '../interface/Collection';
@@ -57,8 +57,8 @@ const Expense = new GraphQLObjectType({
         description: 'The account being paid by this expense',
         async resolve(expense, _, req) {
           // Set the permissions for account's fields
-          const canSeePrivateInfo = (await canViewExpensePrivateInfo(expense, req)).userLocation;
-          setContextPermission(req, PERMISSION_TYPE.SEE_ACCOUNT_LOCATION, expense.FromCollectiveId, canSeePrivateInfo);
+          const canSeeLocation = await canSeeExpensePayeeLocation(req, expense);
+          setContextPermission(req, PERMISSION_TYPE.SEE_ACCOUNT_LOCATION, expense.FromCollectiveId, canSeeLocation);
 
           // Return fromCollective
           return req.loaders.Collective.byId.load(expense.FromCollectiveId);
@@ -68,8 +68,7 @@ const Expense = new GraphQLObjectType({
         type: GraphQLString,
         description: 'Information to display on the invoice. Only visible to user and admins.',
         async resolve(expense, _, req) {
-          const expensePermissions = await canViewExpensePrivateInfo(expense, req);
-          if (expensePermissions.invoiceInfo) {
+          if (await canSeeExpenseInvoiceInfo(req, expense)) {
             return expense.invoiceInfo;
           }
         },

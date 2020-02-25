@@ -1,52 +1,59 @@
 import { ExpenseAttachment } from '../../models/ExpenseAttachment';
 
-type ViewExpenseDataPermission = {
-  attachments: boolean;
-  payoutMethod: boolean;
-  userLocation: boolean;
-  invoiceInfo: boolean;
+const isOwner = async (req, expense): Promise<boolean> => {
+  return req.remoteUser.isAdmin(expense.FromCollectiveId) || req.remoteUser.id === expense.UserId;
+};
+
+const isCollectiveAdmin = async (req, expense): Promise<boolean> => {
+  if (req.remoteUser.isAdmin(expense.CollectiveId)) {
+    return true;
+  }
+
+  const collective = await req.loaders.Collective.byId.load(expense.CollectiveId);
+  return req.remoteUser.isAdmin(collective.ParentCollectiveId);
+};
+
+const isHostAdmin = async (req, expense): Promise<boolean> => {
+  const collective = await req.loaders.Collective.byId.load(expense.CollectiveId);
+  return req.remoteUser.isAdmin(collective.HostCollectiveId);
 };
 
 /**
- * Returns true if user is allowed to see the private infos for an expense.
- * Based on loaders, so it's safe to use this function in lists.
+ * Returns true if the expense meets at least one condition.
+ * Always returns false for unkauthenticated requests.
  */
-export const canViewExpensePrivateInfo = async (expense, req): Promise<ViewExpenseDataPermission> => {
+const checkExpensePermissions = async (req, expense, conditions): Promise<boolean> => {
   if (!req.remoteUser) {
-    return {
-      attachments: false,
-      payoutMethod: false,
-      userLocation: false,
-      invoiceInfo: false,
-    };
-  } else if (req.remoteUser.isAdmin(expense.FromCollectiveId) || req.remoteUser.id === expense.UserId) {
-    // Users can see the all the private info for the collective they're admin of and the expenses they submit
-    return {
-      attachments: true,
-      payoutMethod: true,
-      userLocation: true,
-      invoiceInfo: true,
-    };
-  } else if (req.remoteUser.isAdmin(expense.CollectiveId)) {
-    // Collective admins can see the attachments only
-    return {
-      attachments: true,
-      payoutMethod: false,
-      userLocation: false,
-      invoiceInfo: false,
-    };
-  } else {
-    // Users can see the private info for the expenses submitted to collectives they're hosting
-    const collective = await req.loaders.Collective.byId.load(expense.CollectiveId);
-    const isHostAdmin = req.remoteUser.isAdmin(collective.HostCollectiveId);
-    const isParentCollectiveAdmin = req.remoteUser.isAdmin(collective.ParentCollectiveId);
-    return {
-      attachments: isHostAdmin || isParentCollectiveAdmin,
-      payoutMethod: isHostAdmin,
-      userLocation: isHostAdmin,
-      invoiceInfo: isHostAdmin,
-    };
+    return false;
   }
+
+  for (const condition of conditions) {
+    if (await condition(req, expense)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+/** Checks if the user can see expense's attachments */
+export const canSeeExpenseAttachments = async (req, expense): Promise<boolean> => {
+  return checkExpensePermissions(req, expense, [isOwner, isCollectiveAdmin, isHostAdmin]);
+};
+
+/** Checks if the user can see expense's payout method */
+export const canSeeExpensePayoutMethod = async (req, expense): Promise<boolean> => {
+  return checkExpensePermissions(req, expense, [isOwner, isHostAdmin]);
+};
+
+/** Checks if the user can see expense's payout method */
+export const canSeeExpenseInvoiceInfo = async (req, expense): Promise<boolean> => {
+  return checkExpensePermissions(req, expense, [isOwner, isHostAdmin]);
+};
+
+/** Checks if the user can see expense's payout method */
+export const canSeeExpensePayeeLocation = async (req, expense): Promise<boolean> => {
+  return checkExpensePermissions(req, expense, [isOwner, isHostAdmin]);
 };
 
 /**
