@@ -1,7 +1,7 @@
 import { GraphQLString, GraphQLNonNull, GraphQLList, GraphQLInputObjectType } from 'graphql';
 
-const CollectiveCreate = new GraphQLInputObjectType({
-  name: 'CollectiveCreate',
+const CreateCollectiveInput = new GraphQLInputObjectType({
+  name: 'CreateCollectiveInput',
   fields: () => ({
     name: { type: new GraphQLNonNull(GraphQLString) },
     slug: { type: new GraphQLNonNull(GraphQLString) },
@@ -11,4 +11,4 @@ const CollectiveCreate = new GraphQLInputObjectType({
   }),
 });
 
-export { CollectiveCreate };
+export { CreateCollectiveInput };

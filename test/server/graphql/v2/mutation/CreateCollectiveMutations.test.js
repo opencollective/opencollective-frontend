@@ -4,7 +4,7 @@ import * as utils from '../../../../utils';
 import models from '../../../../../server/models';
 
 const createCollectiveQuery = `
-    mutation createCollective($collective: CollectiveCreate!) {
+    mutation createCollective($collective: CreateCollectiveInput!) {
       createCollective(collective: $collective) {
         name
         slug

@@ -2,7 +2,7 @@ import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import { get, pick } from 'lodash';
 
 import { Collective } from '../object/Collective';
-import { CollectiveCreate } from '../input/CollectiveCreate';
+import { CreateCollectiveInput } from '../input/CreateCollectiveInput';
 import { AccountInput, fetchAccountWithInput } from '../input/AccountInput';
 
 import * as errors from '../../errors';
@@ -111,7 +111,7 @@ const createCollectiveMutations = {
     type: Collective,
     args: {
       collective: {
-        type: new GraphQLNonNull(CollectiveCreate),
+        type: new GraphQLNonNull(CreateCollectiveInput),
       },
       host: {
         type: AccountInput,
