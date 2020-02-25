@@ -26,8 +26,8 @@ const msg = defineMessages({
     id: `ExpenseForm.DescriptionPlaceholder`,
     defaultMessage: 'Enter expense title',
   },
-  fromAccountLabel: {
-    id: `ExpenseForm.fromAccountLabel`,
+  payeeLabel: {
+    id: `ExpenseForm.payeeLabel`,
     defaultMessage: 'Who is being paid for this expense?',
   },
   payoutOptionLabel: {
@@ -47,7 +47,7 @@ const msg = defineMessages({
 const getDefaultExpense = (collective, payoutProfiles) => ({
   description: '',
   attachments: [],
-  fromAccount: first(payoutProfiles),
+  payee: first(payoutProfiles),
   payoutMethod: undefined,
   privateInfo: '',
   currency: collective.currency,
@@ -57,7 +57,7 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
  * Validate the expense
  */
 const validate = expense => {
-  const errors = requireFields(expense, ['description', 'fromAccount', 'payoutMethod', 'currency']);
+  const errors = requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.attachments.length > 0) {
     const attachmentsErrors = expense.attachments.map(attachment => validateAttachment(expense, attachment));
@@ -90,8 +90,8 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (!values.fromAccount && !isEmpty(payoutProfiles)) {
-      formik.setFieldValue('fromAccount', first(payoutProfiles));
+    if (!values.payee && !isEmpty(payoutProfiles)) {
+      formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles]);
 
@@ -137,11 +137,11 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
           {stepOneCompleted && (
             <Box>
               <Flex justifyContent="space-between" flexWrap="wrap">
-                <FastField name="fromAccount">
+                <FastField name="payee">
                   {({ field }) => (
                     <StyledInputField
                       name={field.name}
-                      label={formatMessage(msg.fromAccountLabel)}
+                      label={formatMessage(msg.payeeLabel)}
                       flex="1"
                       minWidth={250}
                       mr={fieldsMarginRight}
@@ -151,9 +151,9 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
                         <CollectivePicker
                           inputId={id}
                           collectives={payoutProfiles}
-                          getDefaultOptions={build => values.fromAccount && build(values.fromAccount)}
+                          getDefaultOptions={build => values.payee && build(values.payee)}
                           onChange={({ value }) => {
-                            formik.setFieldValue('fromAccount', value);
+                            formik.setFieldValue('payee', value);
                             formik.setFieldValue('payoutMethod', null);
                           }}
                         />
@@ -162,7 +162,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
                   )}
                 </FastField>
 
-                <FastField name="payoutMethod.type">
+                <Field name="payoutMethod">
                   {({ field }) => (
                     <StyledInputField
                       name={field.name}
@@ -183,15 +183,15 @@ const ExpenseFormBody = ({ formik, payoutProfiles }) => {
                           inputId={id}
                           error={error}
                           onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
-                          defaultPayoutMethod={values.payoutMethod}
-                          payoutMethods={get(values.fromAccount, 'payoutMethods', [])}
-                          disabled={!values.fromAccount}
+                          payoutMethod={values.payoutMethod}
+                          payoutMethods={get(values.payee, 'payoutMethods', [])}
+                          disabled={!values.payee}
                           default
                         />
                       )}
                     </StyledInputField>
                   )}
-                </FastField>
+                </Field>
               </Flex>
               <Flex justifyContent="space-between" mt={3} flexWrap="wrap">
                 {values.type === expenseTypes.INVOICE && (

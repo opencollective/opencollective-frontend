@@ -134,7 +134,7 @@ class CreateExpensePage extends React.Component {
         account: { id: this.props.data.account.id },
         expense: {
           ...pick(expense, ['description', 'type', 'privateMessage']),
-          fromAccount: pick(expense.fromAccount, ['id']),
+          payee: pick(expense.payee, ['id']),
           payoutMethod: pick(expense.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
           // Omit attachment's ids that were created for keying purposes
           attachments: expense.attachments.map(a => omit(a, ['id'])),

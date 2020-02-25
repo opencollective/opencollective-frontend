@@ -44,7 +44,7 @@ const PrivateNoteLabel = () => {
 const ExpenseSummary = ({ expense, host, onChange }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { fromAccount, createdByAccount } = expense;
+  const { payee, createdByAccount } = expense;
 
   return (
     <div>
@@ -72,12 +72,12 @@ const ExpenseSummary = ({ expense, host, onChange }) => {
           <Span fontWeight="bold" mb={2}>
             <FormattedMessage id="Expense.Payee" defaultMessage="Payee" />
           </Span>
-          <LinkCollective collective={fromAccount} data-cy="expense-summary-payee">
+          <LinkCollective collective={payee} data-cy="expense-summary-payee">
             <Span color="black.600" fontSize="Caption" fontWeight="bold">
-              {fromAccount.name}
+              {payee.name}
             </Span>
           </LinkCollective>
-          {fromAccount.location && (
+          {payee.location && (
             <React.Fragment>
               <Span fontSize="Caption" fontWeight="bold" color="black.700" mb={2} mt={3}>
                 <FormattedMessage id="PrivateAddress" defaultMessage="Private address" />
@@ -85,7 +85,7 @@ const ExpenseSummary = ({ expense, host, onChange }) => {
                 <PrivateInfoIcon color="#969BA3" />
               </Span>
               <P whiteSpace="pre-wrap" fontSize="Caption" color="black.600">
-                {fromAccount.location.address}
+                {payee.location.address}
               </P>
             </React.Fragment>
           )}
@@ -216,7 +216,7 @@ ExpenseSummary.propTypes = {
         url: PropTypes.string,
       }).isRequired,
     ).isRequired,
-    fromAccount: PropTypes.shape({
+    payee: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,

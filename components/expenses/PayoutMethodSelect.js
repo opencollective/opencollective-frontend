@@ -35,6 +35,11 @@ class PayoutMethodSelect extends React.Component {
   static propTypes = {
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+    /** Use this prop to control the component */
+    payoutMethod: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
+    }),
     /** The payout methods */
     payoutMethods: PropTypes.arrayOf(
       PropTypes.shape({
@@ -109,13 +114,15 @@ class PayoutMethodSelect extends React.Component {
   });
 
   render() {
-    const { payoutMethods, defaultPayoutMethod, ...props } = this.props;
+    const { payoutMethods, defaultPayoutMethod, payoutMethod, ...props } = this.props;
+    const value = payoutMethod && this.getOptionFromPayoutMethod(payoutMethod);
     return (
       <StyledSelect
         data-cy="payout-method-select"
         {...props}
         options={this.getOptions(payoutMethods)}
         defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
+        value={typeof value === 'undefined' ? undefined : value}
       />
     );
   }

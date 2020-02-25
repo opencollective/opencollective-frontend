@@ -24,7 +24,7 @@ export const expenseInvoice = {
       amount: 5600,
     },
   ],
-  fromAccount: {
+  payee: {
     id: 'v6r0gonw-x8kv75ml-74j9z3yq-emla4pdy',
     slug: 'betree',
     imageUrl: 'https://images-staging.opencollective.com/betree/a65d6a6/avatar.png',
@@ -66,7 +66,7 @@ export const expenseReceipt = {
       url: 'https://loremflickr.com/120/120/invoice?lock=1',
     },
   ],
-  fromAccount: {
+  payee: {
     id: 'v6r0gonw-x8kv75ml-74j9z3yq-emla4pdy',
     slug: 'betree',
     imageUrl: 'https://images-staging.opencollective.com/betree/a65d6a6/avatar.png',
