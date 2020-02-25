@@ -51,6 +51,7 @@ async function createCollective(_, args, req) {
 
   // Handle GitHub automated approval for the Open Source Collective Host
   if (args.automateApprovalWithGithub && args.collective.githubHandle) {
+    const githubHandle = args.collective.githubHandle;
     const opensourceHost = defaultHostCollective('opensource');
     if (host.id === opensourceHost.CollectiveId) {
       try {
