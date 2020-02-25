@@ -29,7 +29,7 @@ const ExpenseCreate = new GraphQLInputObjectType({
       type: new GraphQLNonNull(new GraphQLList(ExpenseAttachmentCreate)),
       description: 'The list of attachments for this expense. Total amount will be computed from them.',
     },
-    fromAccount: {
+    payee: {
       type: new GraphQLNonNull(AccountInput),
       description: 'Account to reimburse',
     },

@@ -34,6 +34,7 @@ const expenseMutations = {
         amount: args.expense.attachments.reduce((total, attachment) => total + attachment.amount, 0),
         PayoutMethod: payoutMethod,
         collective: await fetchAccountWithInput(args.account, req),
+        fromCollective: args.expense.payee,
       });
     },
   },

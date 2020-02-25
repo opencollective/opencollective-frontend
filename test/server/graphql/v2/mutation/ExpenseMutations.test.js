@@ -21,7 +21,7 @@ describe('server/graphql/v2/mutation/ExpenseMutations', () => {
         description: 'A valid expense',
         type: 'INVOICE',
         invoiceInfo: 'This will be printed on your invoice',
-        fromAccount: { legacyId: user.CollectiveId },
+        payee: { legacyId: user.CollectiveId },
         payoutMethod: { type: 'PAYPAL', data: { email: randEmail() } },
         attachments: [{ description: 'A first attachment', amount: 4200 }],
       };
