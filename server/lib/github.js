@@ -1,5 +1,6 @@
 import config from 'config';
 import { Octokit } from '@octokit/rest';
+import { createAppAuth } from '@octokit/auth-app';
 import request from 'request-promise';
 import { get, has, pick } from 'lodash';
 
@@ -48,6 +49,7 @@ export function getOctokit(accessToken) {
   if (accessToken) {
     octokitParams.auth = `token ${accessToken}`;
   } else if (has(config, 'github.clientID') && has(config, 'github.clientSecret')) {
+    octokitParams.authStrategy = createAppAuth;
     octokitParams.auth = {
       clientId: get(config, 'github.clientID'),
       clientSecret: get(config, 'github.clientSecret'),
