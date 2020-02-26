@@ -160,7 +160,7 @@ export async function handleOpenSourceAutomatedApproval(githubHandle, accessToke
     if (!organizationAdminMembership) {
       throw new Error("We could not verify that you're admin of the GitHub organization");
     }
-    const allRepos = await getAllOrganizationPublicRepos(githubHandle).catch(() => null);
+    const allRepos = await getAllOrganizationPublicRepos(githubHandle, accessToken).catch(() => null);
     const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= config.githubFlow.minNbStars);
     if (!repoWith100stars) {
       throw new Error(

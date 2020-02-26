@@ -35,46 +35,44 @@ async function createCollective(_, args, req) {
 
   const collectiveWithSlug = await models.Collective.findOne({ where: { slug: collectiveData.slug.toLowerCase() } });
   if (collectiveWithSlug) {
-    throw new Error(`The slug ${collectiveData.slug} is already taken. Please use another slug for your collective.}.`);
+    throw new Error(`The slug ${collectiveData.slug} is already taken. Please use another slug for your collective.`);
   }
 
   let host;
-  if (args.host) {
+
+  // Handle GitHub automated approval and apply to the Open Source Collective Host
+  if (args.automateApprovalWithGithub && args.collective.githubHandle) {
+    const githubHandle = args.collective.githubHandle;
+    const opensourceHost = defaultHostCollective('opensource');
+    host = await loaders.Collective.byId.load(opensourceHost.CollectiveId);
+    try {
+      const githubAccount = await models.ConnectedAccount.findOne({
+        where: { CollectiveId: remoteUser.CollectiveId, service: 'github' },
+      });
+      if (!githubAccount) {
+        throw new Error('You must have a connected GitHub Account to claim a collective');
+      }
+      await github.handleOpenSourceAutomatedApproval(githubHandle, githubAccount.token);
+      shouldAutomaticallyApprove = true;
+    } catch (error) {
+      throw new errors.ValidationFailed({ message: error.message });
+    }
+    if (githubHandle.includes('/')) {
+      collectiveData.settings.githubRepo = githubHandle;
+    } else {
+      collectiveData.settings.githubOrg = githubHandle;
+    }
+    collectiveData.tags = collectiveData.tags || [];
+    if (!collectiveData.tags.includes('open source')) {
+      collectiveData.tags.push('open source');
+    }
+  } else if (args.host) {
     host = await fetchAccountWithInput(args.host, { loaders });
     if (!host) {
       throw new errors.ValidationFailed({ message: 'Host Not Found' });
     }
     if (!host.isHostAccount) {
       throw new errors.ValidationFailed({ message: 'Host account is not activated as Host.' });
-    }
-  }
-
-  // Handle GitHub automated approval for the Open Source Collective Host
-  if (args.automateApprovalWithGithub && args.collective.githubHandle) {
-    const githubHandle = args.collective.githubHandle;
-    const opensourceHost = defaultHostCollective('opensource');
-    if (host.id === opensourceHost.CollectiveId) {
-      try {
-        const githubAccount = await models.ConnectedAccount.findOne({
-          where: { CollectiveId: remoteUser.CollectiveId, service: 'github' },
-        });
-        if (!githubAccount) {
-          throw new Error('You must have a connected GitHub Account to claim a collective');
-        }
-        await github.handleOpenSourceAutomatedApproval(githubHandle, githubAccount.token);
-        shouldAutomaticallyApprove = true;
-      } catch (error) {
-        throw new errors.ValidationFailed({ message: error.message });
-      }
-      if (githubHandle.includes('/')) {
-        collectiveData.settings.githubRepo = githubHandle;
-      } else {
-        collectiveData.settings.githubOrg = githubHandle;
-      }
-      collectiveData.tags = collectiveData.tags || [];
-      if (!collectiveData.tags.includes('open source')) {
-        collectiveData.tags.push('open source');
-      }
     }
   }
 
