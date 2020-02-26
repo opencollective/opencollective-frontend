@@ -1,7 +1,6 @@
 import config from 'config';
 import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
-import request from 'request-promise';
 import { get, has, pick } from 'lodash';
 
 import cache from './cache';
@@ -28,18 +27,6 @@ const compactRepo = repo => {
   // 4) Required on the frontend in the "GitHub flow" (OpenSourceApplyPage)
   return repo;
 };
-
-export default function fetchUser(username) {
-  return request({
-    uri: `https://api.github.com/users/${username}`,
-    qs: {
-      client_id: config.github.clientID,
-      client_secret: config.github.clientSecret,
-    },
-    headers: { 'User-Agent': 'OpenCollective' },
-    json: true,
-  });
-}
 
 export function getOctokit(accessToken) {
   const octokitParams = {};
