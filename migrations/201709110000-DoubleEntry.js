@@ -2,7 +2,7 @@
 
 const DRY_RUN = false;
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const Promise = require('bluebird');
 
 const pick = (obj, attributes) => {
@@ -23,9 +23,7 @@ const insert = (sequelize, table, entry) => {
   entry.data = entry.data && JSON.stringify(entry.data);
   return sequelize.query(
     `
-    INSERT INTO "${table}" ("${Object.keys(entry).join(
-      '","',
-    )}") VALUES (:${Object.keys(entry).join(',:')})
+    INSERT INTO "${table}" ("${Object.keys(entry).join('","')}") VALUES (:${Object.keys(entry).join(',:')})
   `,
     { replacements: entry },
   );
@@ -39,15 +37,12 @@ const updateTransactions = sequelize => {
     transaction.TransactionGroup = uuidv4();
 
     const updateOriginalTransaction = () =>
-      sequelize.query(
-        `UPDATE "Transactions" SET "TransactionGroup"=:TransactionGroup WHERE id=:id`,
-        {
-          replacements: {
-            id: transaction.id,
-            TransactionGroup: transaction.TransactionGroup,
-          },
+      sequelize.query(`UPDATE "Transactions" SET "TransactionGroup"=:TransactionGroup WHERE id=:id`, {
+        replacements: {
+          id: transaction.id,
+          TransactionGroup: transaction.TransactionGroup,
         },
-      );
+      });
 
     const oppositeTransaction = {
       ...transaction,
@@ -56,9 +51,7 @@ const updateTransactions = sequelize => {
       CollectiveId: transaction.FromCollectiveId,
       amount: -transaction.netAmountInCollectiveCurrency,
       netAmountInCollectiveCurrency: -transaction.amount,
-      amountInTxnCurrency:
-        -transaction.netAmountInCollectiveCurrency /
-        transaction.txnCurrencyFxRate,
+      amountInTxnCurrency: -transaction.netAmountInCollectiveCurrency / transaction.txnCurrencyFxRate,
       hostFeeInTxnCurrency: null,
       uuid: uuidv4(),
     };
@@ -92,9 +85,7 @@ const updateTransactions = sequelize => {
         .then(() => insert(sequelize, 'Transactions', oppositeTransaction))
         .then(updateOriginalTransaction);
     } else {
-      return insert(sequelize, 'Transactions', oppositeTransaction).then(
-        updateOriginalTransaction,
-      );
+      return insert(sequelize, 'Transactions', oppositeTransaction).then(updateOriginalTransaction);
     }
   };
 
@@ -104,20 +95,9 @@ const updateTransactions = sequelize => {
     .query(`SELECT * FROM "Transactions" ${limit}`, {
       type: sequelize.QueryTypes.SELECT,
     })
-    .then(
-      rows =>
-        rows && Promise.map(rows, processTransaction, { concurrency: 10 }),
-    )
-    .then(() =>
-      sequelize.query(
-        `UPDATE "Transactions" SET type='CREDIT' WHERE type='DONATION'`,
-      ),
-    )
-    .then(() =>
-      sequelize.query(
-        `UPDATE "Transactions" SET type='DEBIT' WHERE type='EXPENSE'`,
-      ),
-    );
+    .then(rows => rows && Promise.map(rows, processTransaction, { concurrency: 10 }))
+    .then(() => sequelize.query(`UPDATE "Transactions" SET type='CREDIT' WHERE type='DONATION'`))
+    .then(() => sequelize.query(`UPDATE "Transactions" SET type='DEBIT' WHERE type='EXPENSE'`));
 };
 
 module.exports = {
@@ -126,41 +106,11 @@ module.exports = {
     return queryInterface
       .addColumn('Transactions', 'TransactionGroup', { type: DataTypes.UUID })
       .then(() => updateTransactions(queryInterface.sequelize))
-      .then(() =>
-        queryInterface.renameColumn(
-          'Transactions',
-          'txnCurrency',
-          'hostCurrency',
-        ),
-      )
-      .then(() =>
-        queryInterface.renameColumn(
-          'Transactions',
-          'amountInTxnCurrency',
-          'amountInHostCurrency',
-        ),
-      )
-      .then(() =>
-        queryInterface.renameColumn(
-          'Transactions',
-          'platformFeeInTxnCurrency',
-          'platformFeeInHostCurrency',
-        ),
-      )
-      .then(() =>
-        queryInterface.renameColumn(
-          'Transactions',
-          'hostFeeInTxnCurrency',
-          'hostFeeInHostCurrency',
-        ),
-      )
-      .then(() =>
-        queryInterface.renameColumn(
-          'Transactions',
-          'txnCurrencyFxRate',
-          'hostCurrencyFxRate',
-        ),
-      )
+      .then(() => queryInterface.renameColumn('Transactions', 'txnCurrency', 'hostCurrency'))
+      .then(() => queryInterface.renameColumn('Transactions', 'amountInTxnCurrency', 'amountInHostCurrency'))
+      .then(() => queryInterface.renameColumn('Transactions', 'platformFeeInTxnCurrency', 'platformFeeInHostCurrency'))
+      .then(() => queryInterface.renameColumn('Transactions', 'hostFeeInTxnCurrency', 'hostFeeInHostCurrency'))
+      .then(() => queryInterface.renameColumn('Transactions', 'txnCurrencyFxRate', 'hostCurrencyFxRate'))
       .then(() =>
         queryInterface.renameColumn(
           'Transactions',

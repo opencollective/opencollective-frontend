@@ -2,7 +2,7 @@ import slugify from 'limax';
 import { get, omit, truncate } from 'lodash';
 import { map } from 'bluebird';
 import config from 'config';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import sanitize from 'sanitize-html';
 import sequelize from 'sequelize';
 
@@ -94,7 +94,7 @@ export async function createCollective(_, args, req) {
   // we force the slug to be of the form of `${slug}-${randomIdentifier}`
   if (collectiveData.type === 'EVENT') {
     const slug = slugify(args.collective.slug || args.collective.name);
-    collectiveData.slug = `${slug}-${uuidv4().substr(0, 8)}`;
+    collectiveData.slug = `${slug}-${uuid().substr(0, 8)}`;
   }
 
   try {

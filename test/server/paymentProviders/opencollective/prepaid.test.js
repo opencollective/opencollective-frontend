@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { expect } from 'chai';
 
 import models from '../../../../server/models';
@@ -50,7 +50,7 @@ describe('server/paymentProviders/opencollective/prepaid', () => {
       currency: CURRENCY,
       CollectiveId: user.collective.id,
       customerId: user.id,
-      uuid: uuidv4(),
+      uuid: uuid(),
       data: { HostCollectiveId: hostCollective.id },
       service: 'opencollective',
       type: 'prepaid',
