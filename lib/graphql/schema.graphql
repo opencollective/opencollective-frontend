@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Feb 26 2020 12:06:42 GMT+0100 (GMT+01:00)
+# timestamp: Wed Feb 26 2020 13:46:47 GMT+0000 (Greenwich Mean Time)
 
 """
 Application model
@@ -1347,15 +1347,9 @@ type ExpenseType {
   PayoutMethod: PayoutMethod
 
   """
-<<<<<<< HEAD
-  Informs the frontend about what fields are accessible in the expense for current user
-  """
-  canSeePrivateInfo: ExpenseViewPermissions
-=======
   Returns true if current user is allowed to see expense's private info, such as attachment's URLS or payout methods.
   """
   canSeePrivateInfo: Boolean
->>>>>>> feat(newccfform): First draft of new CCF form
   privateMessage: String
   attachment: String
     @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
@@ -1370,16 +1364,6 @@ type ExpenseType {
   Returns the DEBIT transaction to pay out this expense
   """
   transaction: Transaction
-}
-
-"""
-Returns info about whether user is allowed to see expense's private info, such as attachment's URLS or payout methods.
-"""
-type ExpenseViewPermissions {
-  attachments: Boolean
-  payoutMethod: Boolean
-  userLocation: Boolean
-  invoiceInfo: Boolean
 }
 
 """
