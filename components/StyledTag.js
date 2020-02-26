@@ -5,6 +5,7 @@ import { background, border, color, space, typography, layout, position } from '
 
 import { Times } from '@styled-icons/fa-solid/Times';
 
+import { textTransform } from '../lib/styled_system_custom';
 import { messageType } from '../lib/theme';
 import { Span } from './Text';
 
@@ -12,9 +13,7 @@ const StyledTagBase = styled.div`
   border-radius: 4px;
   padding: 8px;
   font-size: 8px;
-  letter-spacing: 0.2em;
   line-height: 12px;
-  text-transform: uppercase;
   background: #F0F2F5;
   color: #71757A;
   text-align: center;
@@ -31,6 +30,7 @@ const StyledTagBase = styled.div`
   ${typography}
   ${layout}
   ${position}
+  ${textTransform}
 
   ${messageType}
 `;
@@ -73,6 +73,10 @@ StyledTag.propTypes = {
   /** If defined, a close button will be displayed on the tag */
   closeButtonProps: PropTypes.object,
   children: PropTypes.node,
+};
+
+StyledTag.defaultProps = {
+  textTransform: 'uppercase',
 };
 
 export default StyledTag;

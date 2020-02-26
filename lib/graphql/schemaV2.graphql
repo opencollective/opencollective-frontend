@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Feb 12 2020 15:34:50 GMT-0300 (Brasilia Standard Time)
+# timestamp: Wed Feb 26 2020 12:07:20 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -21,6 +21,7 @@ interface Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -90,6 +91,17 @@ interface Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 }
 
 """
@@ -100,6 +112,23 @@ type AccountCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Account]
+}
+
+input AccountInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
 }
 
 """
@@ -142,6 +171,7 @@ type Bot implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -189,6 +219,17 @@ type Bot implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 }
 
 """
@@ -228,6 +269,7 @@ type Collective implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -275,6 +317,17 @@ type Collective implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -374,6 +427,14 @@ type ConversationStats {
   commentsCount: Int
 }
 
+input CreateCollectiveInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  githubHandle: String
+}
+
 """
 This represents a Credit transaction
 """
@@ -408,7 +469,7 @@ enum Currency {
   EUR
 
   """
-  British Pound
+  Pound Sterling
   """
   GBP
 
@@ -428,7 +489,7 @@ enum Currency {
   CHF
 
   """
-  Uruguayan Peso
+  Peso Uruguayo
   """
   UYU
 
@@ -443,7 +504,7 @@ enum Currency {
   INR
 
   """
-  Japanese Yen
+  Yen
   """
   JPY
 
@@ -452,6 +513,8 @@ enum Currency {
   """
   NZD
 }
+
+scalar DateString
 
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
@@ -502,6 +565,7 @@ type Event implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -549,6 +613,17 @@ type Event implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -571,11 +646,94 @@ This represents an Expense
 """
 type Expense {
   id: String
+
+  """
+  Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future.
+  """
+  legacyId: Int
   comments(
     limit: Int
     offset: Int
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): CommentCollection
+
+  """
+  The account being paid by this expense
+  """
+  payee: Account
+
+  """
+  Information to display on the invoice. Only visible to user and admins.
+  """
+  invoiceInfo: String
+}
+
+input ExpenseAttachmentCreate {
+  """
+  Amount in cents
+  """
+  amount: Int!
+
+  """
+  What is this attachment about?
+  """
+  description: String!
+
+  """
+  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
+  """
+  url: String
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
+input ExpenseCreate {
+  description: String!
+  tags: [String]
+  type: ExpenseType!
+
+  """
+  A private note that will be attached to your invoice
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput!
+
+  """
+  The list of attachments for this expense. Total amount will be computed from them.
+  """
+  attachments: [ExpenseAttachmentCreate]!
+
+  """
+  Account to reimburse
+  """
+  payee: AccountInput!
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseType {
+  """
+  Invoice: Get paid back for a purchase already made.
+  """
+  INVOICE
+
+  """
+  Receipt: Charge for your time or get paid in advance
+  """
+  RECEIPT
 }
 
 enum ImageFormat {
@@ -599,6 +757,7 @@ type Individual implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -646,6 +805,19 @@ type Individual implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
+  location: Location
   firstName: String
   lastName: String
   email: String
@@ -656,6 +828,36 @@ type Individual implements Account {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+Type for Geographic location
+"""
+type Location {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+}
 
 """
 This represents a Member relationship (ie: Organization backing a Collective)
@@ -788,6 +990,37 @@ type Mutation {
     """
     isActive: Boolean = true
   ): Boolean
+  createCollective(
+    """
+    Information about the collective to create (name, slug, description, tags, ...)
+    """
+    collective: CreateCollectiveInput!
+
+    """
+    Reference to the host to apply on creation.
+    """
+    host: AccountInput
+
+    """
+    Wether to trigger the automated approval for Open Source collectives with GitHub.
+    """
+    automateApprovalWithGithub: Boolean = false
+  ): Collective
+
+  """
+  Submit an expense to a collective
+  """
+  createExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseCreate!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountInput!
+  ): Expense
 }
 
 """
@@ -860,6 +1093,7 @@ type Organization implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -907,7 +1141,45 @@ type Organization implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of
+    - Hosts can see the address of organizations submitting expenses to their collectives
+  """
+  location: Location
   email: String
+}
+
+"""
+A payout method
+"""
+type PayoutMethod {
+  id: String!
+  type: PayoutMethodType
+  name: String
+  isSaved: Boolean
+  data: JSON
+}
+
+input PayoutMethodInput {
+  id: String
+  data: JSON
+  name: String
+  isSaved: Boolean
+  type: PayoutMethodType
+}
+
+enum PayoutMethodType {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
 }
 
 """
@@ -1039,4 +1311,327 @@ All transaction types
 enum TransactionType {
   DEBIT
   CREDIT
+}
+
+"""
+TransferWise related properties for bank transfer.
+"""
+type TransferWise {
+  requiredFields(
+    """
+    The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
+    """
+    currency: TransferWiseCurrency!
+  ): [TransferWiseRequiredField]
+  availableCurrencies: [TransferWiseCurrency]
+}
+
+"""
+All currencies supported by TransferWise
+"""
+enum TransferWiseCurrency {
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Indian Rupee
+  """
+  INR
+
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  UAE Dirham
+  """
+  AED
+
+  """
+  Argentine Peso
+  """
+  ARS
+
+  """
+  Australian Dollar
+  """
+  AUD
+
+  """
+  Taka
+  """
+  BDT
+
+  """
+  Bulgarian Lev
+  """
+  BGN
+
+  """
+  Brazilian Real
+  """
+  BRL
+
+  """
+  Pula
+  """
+  BWP
+
+  """
+  Canadian Dollar
+  """
+  CAD
+
+  """
+  Swiss Franc
+  """
+  CHF
+
+  """
+  Chilean Peso
+  """
+  CLP
+
+  """
+  Yuan Renminbi
+  """
+  CNY
+
+  """
+  Costa Rican Colon
+  """
+  CRC
+
+  """
+  Czech Koruna
+  """
+  CZK
+
+  """
+  Danish Krone
+  """
+  DKK
+
+  """
+  Egyptian Pound
+  """
+  EGP
+
+  """
+  Lari
+  """
+  GEL
+
+  """
+  Ghana Cedi
+  """
+  GHS
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Forint
+  """
+  HUF
+
+  """
+  Rupiah
+  """
+  IDR
+
+  """
+  New Israeli Sheqel
+  """
+  ILS
+
+  """
+  Yen
+  """
+  JPY
+
+  """
+  Kenyan Shilling
+  """
+  KES
+
+  """
+  Won
+  """
+  KRW
+
+  """
+  Sri Lanka Rupee
+  """
+  LKR
+
+  """
+  Moroccan Dirham
+  """
+  MAD
+
+  """
+  Mexican Peso
+  """
+  MXN
+
+  """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Norwegian Krone
+  """
+  NOK
+
+  """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
+  New Zealand Dollar
+  """
+  NZD
+
+  """
+  Nuevo Sol
+  """
+  PEN
+
+  """
+  Philippine Peso
+  """
+  PHP
+
+  """
+  Pakistan Rupee
+  """
+  PKR
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Russian Ruble
+  """
+  RUB
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  Singapore Dollar
+  """
+  SGD
+
+  """
+  Baht
+  """
+  THB
+
+  """
+  Turkish Lira
+  """
+  TRY
+
+  """
+  Tanzanian Shilling
+  """
+  TZS
+
+  """
+  Hryvnia
+  """
+  UAH
+
+  """
+  Uganda Shilling
+  """
+  UGX
+
+  """
+  Peso Uruguayo
+  """
+  UYU
+
+  """
+  Dong
+  """
+  VND
+
+  """
+  CFA Franc BCEAO
+  """
+  XOF
+
+  """
+  Rand
+  """
+  ZAR
+
+  """
+  Zambian Kwacha
+  """
+  ZMW
+}
+
+type TransferWiseField {
+  name: String
+  group: [TransferWiseFieldGroup]
+}
+
+type TransferWiseFieldGroup {
+  key: String
+  name: String
+  type: String
+  required: Boolean
+  displayFormat: String
+  example: String
+  minLength: Int
+  maxLength: Int
+  validationRegexp: String
+  validationAsync: String
+  valuesAllowed: [TransferWiseFieldVatvkluesAllowed]
+}
+
+type TransferWiseFieldVatvkluesAllowed {
+  key: String
+  name: String
+}
+
+type TransferWiseRequiredField {
+  type: String
+  title: String
+  fields: [TransferWiseField]
 }

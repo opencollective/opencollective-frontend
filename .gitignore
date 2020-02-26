@@ -2,6 +2,7 @@
 .env
 node_modules
 npm-debug.log.*
+./report.*.json
 *.log
 yarn.lock
 .DS_Store

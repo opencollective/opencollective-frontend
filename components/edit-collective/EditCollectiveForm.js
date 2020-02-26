@@ -571,7 +571,6 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'expensePolicy',
           type: 'textarea',
-          description: 'Protip: you can use markdown',
         },
       ],
       advanced: [
