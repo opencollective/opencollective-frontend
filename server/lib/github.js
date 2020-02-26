@@ -1,6 +1,6 @@
 import config from 'config';
 import { Octokit } from '@octokit/rest';
-import request from 'request-promise';
+import { createAppAuth } from '@octokit/auth-app';
 import { get, has, pick } from 'lodash';
 
 import cache from './cache';
@@ -28,18 +28,6 @@ const compactRepo = repo => {
   return repo;
 };
 
-export default function fetchUser(username) {
-  return request({
-    uri: `https://api.github.com/users/${username}`,
-    qs: {
-      client_id: config.github.clientID,
-      client_secret: config.github.clientSecret,
-    },
-    headers: { 'User-Agent': 'OpenCollective' },
-    json: true,
-  });
-}
-
 export function getOctokit(accessToken) {
   const octokitParams = {};
 
@@ -48,6 +36,7 @@ export function getOctokit(accessToken) {
   if (accessToken) {
     octokitParams.auth = `token ${accessToken}`;
   } else if (has(config, 'github.clientID') && has(config, 'github.clientSecret')) {
+    octokitParams.authStrategy = createAppAuth;
     octokitParams.auth = {
       clientId: get(config, 'github.clientID'),
       clientSecret: get(config, 'github.clientSecret'),
