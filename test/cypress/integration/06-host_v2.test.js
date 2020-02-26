@@ -11,7 +11,7 @@ describe('New host page', () => {
     it('Show fiscally hosted collectives', () => {
       cy.get('[data-cy~="filter-button"]')
         .contains('Fiscal Host')
-        .click({ force: true });
+        .click();
       cy.contains('[data-cy=Contributions]', 'Open Source Collective');
       cy.contains('[data-cy=Contributions]', 'APEX');
       cy.contains('[data-cy=Contributions]', 'tipbox');
