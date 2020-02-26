@@ -14,6 +14,8 @@ const instances = {};
 
 export const IDENTIFIER_TYPES = {
   CONVERSATION: 'conversation',
+  PAYOUT_METHOD: 'payout-method',
+  EXPENSE: 'expense',
 };
 
 const getDefaultInstance = type => {

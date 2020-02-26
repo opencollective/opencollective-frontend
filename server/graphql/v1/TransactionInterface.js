@@ -14,7 +14,7 @@ import {
 import { CollectiveInterfaceType, UserCollectiveType } from './CollectiveInterface';
 
 import { SubscriptionType, OrderType, PaymentMethodType, UserType, DateString, ExpenseType } from './types';
-import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
+import { getExpenseAttachments, canSeeExpenseAttachments } from '../common/expenses';
 
 import { idEncode } from '../v2/identifiers';
 
@@ -329,7 +329,7 @@ export const TransactionExpenseType = new GraphQLObjectType({
             return null;
           } else {
             const expense = req.loaders.Expense.byId.load(transaction.ExpenseId);
-            if (!expense || !(await canViewExpensePrivateInfo(expense, req))) {
+            if (!expense || !(await canSeeExpenseAttachments(req, expense))) {
               return null;
             } else {
               const attachments = await getExpenseAttachments(transaction.ExpenseId, req);

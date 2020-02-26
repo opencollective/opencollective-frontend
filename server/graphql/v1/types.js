@@ -33,7 +33,13 @@ import roles from '../../constants/roles';
 import { isUserTaxFormRequiredBeforePayment } from '../../lib/tax-forms';
 import { getCollectiveAvatarUrl } from '../../lib/collectivelib';
 import * as commonComment from '../common/comment';
-import { canViewExpensePrivateInfo, getExpenseAttachments } from '../common/expenses';
+import {
+  getExpenseAttachments,
+  canSeeExpensePayoutMethod,
+  canSeeExpenseInvoiceInfo,
+  canSeeExpensePayeeLocation,
+  canSeeExpenseAttachments,
+} from '../common/expenses';
 import { PayoutMethodTypes } from '../../models/PayoutMethod';
 
 import { idEncode } from '../v2/identifiers';
@@ -711,6 +717,18 @@ export const ExpenseAttachmentType = new GraphQLObjectType({
   },
 });
 
+const ExpenseViewPermissions = new GraphQLObjectType({
+  name: 'ExpenseViewPermissions',
+  description:
+    "Returns info about whether user is allowed to see expense's private info, such as attachment's URLS or payout methods.",
+  fields: {
+    attachments: { type: GraphQLBoolean },
+    payoutMethod: { type: GraphQLBoolean },
+    userLocation: { type: GraphQLBoolean },
+    invoiceInfo: { type: GraphQLBoolean },
+  },
+});
+
 export const ExpenseType = new GraphQLObjectType({
   name: 'ExpenseType',
   description: 'This represents an Expense',
@@ -786,7 +804,7 @@ export const ExpenseType = new GraphQLObjectType({
       PayoutMethod: {
         type: PayoutMethodType,
         async resolve(expense, _, req) {
-          if (!(await canViewExpensePrivateInfo(expense, req)) || !expense.PayoutMethodId) {
+          if (!expense.PayoutMethodId || !(await canSeeExpensePayoutMethod(req, expense))) {
             return null;
           } else {
             return expense.payoutMethod || req.loaders.PayoutMethod.byId.load(expense.PayoutMethodId);
@@ -794,11 +812,15 @@ export const ExpenseType = new GraphQLObjectType({
         },
       },
       canSeePrivateInfo: {
-        type: GraphQLBoolean,
-        description:
-          "Returns true if current user is allowed to see expense's private info, such as attachment's URLS or payout methods.",
-        resolve(expense, _, req) {
-          return canViewExpensePrivateInfo(expense, req);
+        type: ExpenseViewPermissions,
+        description: 'Informs the frontend about what fields are accessible in the expense for current user',
+        async resolve(expense, _, req) {
+          return {
+            attachments: await canSeeExpenseAttachments(req, expense),
+            payoutMethod: await canSeeExpensePayoutMethod(req, expense),
+            userLocation: await canSeeExpensePayeeLocation(req, expense),
+            invoiceInfo: await canSeeExpenseInvoiceInfo(req, expense),
+          };
         },
       },
       privateMessage: {
@@ -823,7 +845,7 @@ export const ExpenseType = new GraphQLObjectType({
         type: GraphQLString,
         deprecationReason: '2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.',
         async resolve(expense, args, req) {
-          if (!(await canViewExpensePrivateInfo(expense, req))) {
+          if (!(await canSeeExpenseAttachments(req, expense))) {
             return null;
           } else {
             const attachments = await getExpenseAttachments(expense.id, req);
@@ -834,8 +856,9 @@ export const ExpenseType = new GraphQLObjectType({
       attachments: {
         type: new GraphQLList(ExpenseAttachmentType),
         async resolve(expense, _, req) {
+          const canSeeAttachments = await canSeeExpenseAttachments(req, expense);
           return (await getExpenseAttachments(expense.id, req)).map(async attachment => {
-            if (await canViewExpensePrivateInfo(expense, req)) {
+            if (canSeeAttachments) {
               return attachment;
             } else {
               return omit(attachment, ['url']);

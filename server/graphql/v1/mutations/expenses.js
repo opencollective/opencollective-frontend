@@ -16,6 +16,7 @@ import { canUseFeature } from '../../../lib/user-permissions';
 import FEATURE from '../../../constants/feature';
 import { FeatureNotAllowedForUser, ValidationFailed } from '../../errors';
 import { PayoutMethodTypes } from '../../../models/PayoutMethod';
+import { types as collectiveTypes } from '../../../constants/collectives';
 
 const debug = debugLib('expenses');
 
@@ -100,6 +101,17 @@ export async function updateExpenseStatus(remoteUser, expenseId, status) {
   return res;
 }
 
+/** Compute the total amount of expense from attachments */
+const getTotalAmountFromAttachments = attachments => {
+  if (!attachments) {
+    return 0;
+  } else {
+    return attachments.reduce((total, attachment) => {
+      return total + attachment.amount;
+    }, 0);
+  }
+};
+
 /** Check expense's attachments values, throw if something's wrong */
 const checkExpenseAttachments = (expenseData, attachments) => {
   // Check the number of attachments
@@ -110,10 +122,14 @@ const checkExpenseAttachments = (expenseData, attachments) => {
   }
 
   // Check amounts
-  const sumAttachments = attachments.reduce((total, attachment) => total + attachment.amount, 0);
+  const sumAttachments = getTotalAmountFromAttachments(attachments);
   if (sumAttachments !== expenseData.amount) {
     throw new ValidationFailed({
       message: `The sum of all attachments must be equal to the total expense's amount. Expense's total is ${expenseData.amount}, but the total of attachments was ${sumAttachments}.`,
+    });
+  } else if (!sumAttachments) {
+    throw new ValidationFailed({
+      message: `The sum of all attachments must be above 0`,
     });
   }
 
@@ -128,7 +144,7 @@ const checkExpenseAttachments = (expenseData, attachments) => {
   }
 };
 
-const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'privateMessage'];
+const EXPENSE_EDITABLE_FIELDS = ['amount', 'description', 'category', 'type', 'privateMessage', 'invoiceInfo'];
 
 const getPaypalPaymentMethodFromExpenseData = async (expenseData, remoteUser, fromCollective, dbTransaction) => {
   if (expenseData.PayoutMethod) {
@@ -192,7 +208,7 @@ export async function createExpense(remoteUser, expenseData) {
   if (expenseData.attachment && expenseData.attachments) {
     throw new ValidationFailed({ message: 'Fields "attachment" and "attachments" are exclusive, please use only one' });
   } else if (expenseData.attachment) {
-    // Convert legacy attachment param to new format
+    // @deprecated Convert legacy attachment param to new format
     attachmentsData = [{ amount: expenseData.amount, url: expenseData.attachment }];
   }
 
@@ -201,6 +217,8 @@ export async function createExpense(remoteUser, expenseData) {
   const collective = await models.Collective.findByPk(expenseData.collective.id);
   if (!collective) {
     throw new errors.ValidationFailed('Collective not found');
+  } else if (![collectiveTypes.COLLECTIVE, collectiveTypes.EVENT].includes(collective.type)) {
+    throw new errors.ValidationFailed('Expenses can only be submitted to collectives and events');
   }
 
   // For now we only add expenses from user's collectives
@@ -223,6 +241,7 @@ export async function createExpense(remoteUser, expenseData) {
         incurredAt: expenseData.incurredAt || new Date(),
         PayoutMethodId: payoutMethod && payoutMethod.id,
         legacyPayoutMethod: models.Expense.getLegacyPayoutMethodTypeFromPayoutMethod(payoutMethod),
+        amount: expenseData.amount || getTotalAmountFromAttachments(attachmentsData),
       },
       { transaction: t },
     );
