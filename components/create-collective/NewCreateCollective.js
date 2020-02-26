@@ -1,8 +1,12 @@
 import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+
+const gqlV2 = gql; // Needed for lint validation of api v2 schema.
 
 import Page from '../Page';
 import { H1, P } from '../Text';
@@ -12,8 +16,8 @@ import ConnectGithub from './sections/ConnectGithub';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import { withUser } from '../UserProvider';
 
-import { addCreateCollectiveMutationV2 } from '../../lib/graphql/mutations';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getLoggedInUserQuery } from '../../lib/graphql/queries';
+import { getErrorFromGraphqlException, compose } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 class NewCreateCollective extends Component {
@@ -51,8 +55,6 @@ class NewCreateCollective extends Component {
         defaultMessage: 'The place for your community to collect money and share your finance in full transparency.',
       },
     });
-
-    this.host = props.host;
   }
 
   componentDidMount() {
@@ -104,9 +106,9 @@ class NewCreateCollective extends Component {
     });
   }
 
-  async createCollective(CreateCollectiveInputType) {
+  async createCollective(collective) {
     // check we have agreed to TOS
-    if (!CreateCollectiveInputType.tos) {
+    if (!collective.tos) {
       this.setState({
         error: 'Please accept the terms of service',
       });
@@ -117,42 +119,27 @@ class NewCreateCollective extends Component {
     this.setState({ status: 'loading' });
 
     // prepare object
-    CreateCollectiveInputType.tags = this.state.category;
+    collective.tags = [this.state.category];
     if (this.state.github) {
-      CreateCollectiveInputType.githubHandle = this.state.github.handle;
-      this.host = { slug: 'opensource' };
+      collective.githubHandle = this.state.github.handle;
+      this.props.host = { slug: 'opensource' };
     }
-    delete CreateCollectiveInputType.tos;
+    delete collective.tos;
 
     // try mutation
     try {
       const res = await this.props.createCollectiveV2({
-        collective: CreateCollectiveInputType,
-        host: this.host ? { slug: this.host.slug } : null,
-        automateApprovalWithGithub: CreateCollectiveInputType.githubHandle ? true : false,
+        collective,
+        host: this.props.host ? { slug: this.props.host.slug } : null,
+        automateApprovalWithGithub: this.state.github ? true : false,
       });
-      const collective = res.data.createCollective;
-      const successParams = {
-        slug: collective.slug,
-      };
+      const newCollective = res.data.createCollective;
       this.setState({
         status: 'idle',
         result: { success: 'Collective created successfully' },
       });
       await this.props.refetchLoggedInUser();
-      if (CreateCollectiveInputType.HostCollectiveId) {
-        successParams.status = 'collectiveCreated';
-        successParams.CollectiveId = collective.id;
-        successParams.collectiveSlug = collective.slug;
-        Router.pushRoute('collective', {
-          slug: collective.slug,
-          status: 'collectiveCreated',
-          CollectiveId: collective.id,
-          CollectiveSlug: collective.slug,
-        });
-      } else {
-        Router.pushRoute('collective', { slug: collective.slug });
-      }
+      Router.pushRoute('collective', { slug: newCollective.slug });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', error: errorMsg });
@@ -164,7 +151,7 @@ class NewCreateCollective extends Component {
     const { category, form, error } = this.state;
     const { token } = query;
 
-    const canApply = get(this.host, 'settings.apply') || true;
+    const canApply = get(this.props.host, 'settings.apply') || true;
 
     return (
       <Page>
@@ -193,7 +180,7 @@ class NewCreateCollective extends Component {
           )}
           {canApply && LoggedInUser && category && category !== 'opensource' && (
             <CreateCollectiveForm
-              host={this.host}
+              host={this.props.host}
               collective={this.state.collective}
               onSubmit={this.createCollective}
               onChange={(key, value) => this.handleChange(key, value)}
@@ -206,7 +193,7 @@ class NewCreateCollective extends Component {
           )}
           {canApply && LoggedInUser && category === 'opensource' && form && (
             <CreateCollectiveForm
-              host={this.host}
+              host={this.props.host}
               collective={this.state.collective}
               onSubmit={this.createCollective}
               onChange={(key, value) => this.handleChange(key, value)}
@@ -220,4 +207,53 @@ class NewCreateCollective extends Component {
   }
 }
 
-export default injectIntl(withUser(addCreateCollectiveMutationV2(NewCreateCollective)));
+const createCollectiveQueryV2 = gqlV2`
+  mutation createCollective(
+    $collective: CreateCollectiveInput!
+    $host: AccountInput
+    $automateApprovalWithGithub: Boolean
+  ) {
+    createCollective(collective: $collective, host: $host, automateApprovalWithGithub: $automateApprovalWithGithub) {
+      name
+      slug
+      tags
+      description
+      githubHandle
+    }
+  }
+`;
+
+const addCreateCollectiveMutationV2 = graphql(createCollectiveQueryV2, {
+  options: {
+    context: { apiVersion: '2' },
+  },
+  props: ({ mutate }) => ({
+    createCollectiveV2: async ({ collective, host }) => {
+      const CreateCollectiveInputType = pick(collective, [
+        'slug',
+        'name',
+        'description',
+        'githubHandle',
+        'tags',
+        CreateCollectiveInputType,
+      ]);
+      return await mutate({
+        variables: {
+          collective: CreateCollectiveInputType,
+          host: host,
+        },
+        update: (store, { data: { createCollectiveV2 } }) => {
+          const data = store.readQuery({ query: getLoggedInUserQuery });
+          data.LoggedInUser.memberOf.push({
+            __typename: 'Member',
+            collective: createCollectiveV2,
+            role: 'ADMIN',
+          });
+          store.writeQuery({ query: getLoggedInUserQuery, data });
+        },
+      });
+    },
+  }),
+});
+
+export default compose(addCreateCollectiveMutationV2)(injectIntl(withUser(NewCreateCollective)));
