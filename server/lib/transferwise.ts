@@ -1,12 +1,26 @@
 import Axios, { AxiosError } from 'axios';
 import config from 'config';
-import { omitBy, isNull } from 'lodash';
+import { omitBy, isNull, toInteger } from 'lodash';
+import url from 'url';
 
 import logger from './logger';
 import { Quote, RecipientAccount } from '../types/transferwise';
 
+const fixieUrl = config.fixie.url && new url.URL(config.fixie.url);
+const proxyOptions = fixieUrl
+  ? {
+      proxy: {
+        host: fixieUrl.host,
+        port: toInteger(fixieUrl.port),
+      },
+      headers: {
+        'Proxy-Authorization': `Basic ${Buffer.from(`${fixieUrl.username}:${fixieUrl.password}`).toString('base64')}`,
+      },
+    }
+  : {};
 const axios = Axios.create({
   baseURL: config.transferwise.apiUrl,
+  ...proxyOptions,
 });
 
 const compactRecipientDetails = <T>(object: T): Partial<T> => omitBy(object, isNull);

@@ -143,5 +143,8 @@
   },
   "transferwise": {
     "apiUrl": "TRANSFERWISE_API_URL"
+  },
+  "fixie": {
+    "url": "FIXIE_URL"
   }
 }
