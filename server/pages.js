@@ -53,7 +53,11 @@ const pages = routes()
   .add('update', '/:collectiveSlug/updates/:updateSlug')
   .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
   .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new-v2')
-  .add('expense', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)')
+  .add(
+    'expense',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    'expense-legacy',
+  )
   .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
