@@ -1,5 +1,5 @@
 import moment from 'moment';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import debugLib from 'debug';
 import Promise from 'bluebird';
 import { omit, get, isNil } from 'lodash';
@@ -885,7 +885,7 @@ export async function addFundsToOrg(args, remoteUser) {
     expiryDate: moment()
       .add(1, 'year')
       .format(),
-    uuid: uuidv4(),
+    uuid: uuid(),
     data: { HostCollectiveId: args.HostCollectiveId },
     service: 'opencollective',
     type: 'prepaid',

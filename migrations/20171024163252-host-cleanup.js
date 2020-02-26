@@ -1,25 +1,21 @@
 'use strict';
 
 const Promise = require('bluebird');
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 const DRY_RUN = false;
 
 const insert = (sequelize, table, entry) => {
   delete entry.id;
   console.log(
-    `INSERT INTO "${table}" ("${Object.keys(entry).join(
-      '","',
-    )}") VALUES (:${Object.values(entry).join(',:')})`,
+    `INSERT INTO "${table}" ("${Object.keys(entry).join('","')}") VALUES (:${Object.values(entry).join(',:')})`,
   );
   if (entry.data) {
     entry.data = JSON.stringify(entry.data);
   }
   return sequelize.query(
     `
-    INSERT INTO "${table}" ("${Object.keys(entry).join(
-      '","',
-    )}") VALUES (:${Object.keys(entry).join(',:')})
+    INSERT INTO "${table}" ("${Object.keys(entry).join('","')}") VALUES (:${Object.keys(entry).join(',:')})
   `,
     { replacements: entry },
   );
@@ -182,34 +178,17 @@ const findAndFixSuperCollectives = sequelize => {
   const fixTransactions = (superCollective, orgCollective) => {
     const splitTransactionGroup = transactions => {
       // Split the transactions group to identify each of the three transactions
-      const withoutFromCollective = transactions.filter(
-        t => !t.FromCollectiveId,
-      )[0];
+      const withoutFromCollective = transactions.filter(t => !t.FromCollectiveId)[0];
       const debit = transactions.filter(t => t.type === 'DEBIT')[0];
-      const credit = transactions.filter(
-        t => t.type === 'CREDIT' && t.FromCollectiveId,
-      )[0];
+      const credit = transactions.filter(t => t.type === 'CREDIT' && t.FromCollectiveId)[0];
 
       // check that each entry was filled
-      if (
-        !(
-          withoutFromCollective &&
-          withoutFromCollective.id &&
-          debit &&
-          debit.id &&
-          credit &&
-          credit.id
-        )
-      ) {
+      if (!(withoutFromCollective && withoutFromCollective.id && debit && debit.id && credit && credit.id)) {
         throw new Error('TransactionGroup check failed');
       }
 
       // check that each id is different
-      if (
-        withoutFromCollective.id === debit.id ||
-        debit.id === credit.id ||
-        credit.id === withoutFromCollective.id
-      ) {
+      if (withoutFromCollective.id === debit.id || debit.id === credit.id || credit.id === withoutFromCollective.id) {
         throw new Error('TransactionGroup duplicate ids found');
       }
 
@@ -252,10 +231,7 @@ const findAndFixSuperCollectives = sequelize => {
           ),
         )
         .then(transactionGroups => {
-          console.log(
-            '>>> transaction groups found: ',
-            transactionGroups.length,
-          );
+          console.log('>>> transaction groups found: ', transactionGroups.length);
           return transactionGroups;
         })
         .each(transactionGroup => {
@@ -281,10 +257,7 @@ const findAndFixSuperCollectives = sequelize => {
               3. take the credit and change FromCollectiveId to orgCollectiveId
             */
               if (transactions.length !== 3) {
-                throw new Error(
-                  'Found a transaction group of length',
-                  transactions.length,
-                );
+                throw new Error('Found a transaction group of length', transactions.length);
               }
 
               const tSplit = splitTransactionGroup(transactions);
@@ -353,15 +326,9 @@ const findAndFixSuperCollectives = sequelize => {
         return superCollectives;
       })
       // only return those that are using themselves as host
-      .filter(
-        superCollective =>
-          superCollective.HostCollectiveId === superCollective.id,
-      )
+      .filter(superCollective => superCollective.HostCollectiveId === superCollective.id)
       .then(superCollectivesSubset => {
-        console.log(
-          '>>> supercollectives need to be fixed: ',
-          superCollectivesSubset.length,
-        );
+        console.log('>>> supercollectives need to be fixed: ', superCollectivesSubset.length);
         console.log(
           '>>> supercollectives slugs: ',
           superCollectivesSubset.map(c => c.slug),
@@ -522,10 +489,7 @@ const addTransactionGroupsForOrders = sequelize => {
         .then(txns => {
           if (txns.length != 2) {
             console.log(txns.length);
-            throw Error(
-              'Expected two transactions with this orderId: ',
-              orderId.OrderId,
-            );
+            throw Error('Expected two transactions with this orderId: ', orderId.OrderId);
           } else {
             return sequelize
               .query(
@@ -587,10 +551,7 @@ const addTransactionGroupsForExpenses = sequelize => {
         .then(txns => {
           if (txns.length != 2) {
             console.log(txns.length);
-            throw Error(
-              'Expected two transactions with this expenseId: ',
-              expenseId.ExpenseId,
-            );
+            throw Error('Expected two transactions with this expenseId: ', expenseId.ExpenseId);
           } else {
             return sequelize
               .query(
@@ -618,9 +579,7 @@ const addTransactionGroupsForExpenses = sequelize => {
 // Take remaining rows that don't have a TransactionGroup and FromCollectiveId
 // and remove them
 const deleteRowsWithoutTransactionGroup = sequelize => {
-  console.log(
-    '>>> Deleting remaining rows without TransanctionGroup and without FromCollectiveId',
-  );
+  console.log('>>> Deleting remaining rows without TransanctionGroup and without FromCollectiveId');
   return sequelize.query(
     `
     UPDATE "Transactions"

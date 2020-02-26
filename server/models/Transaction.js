@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import moment from 'moment';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import debugLib from 'debug';
 import { get, isUndefined } from 'lodash';
 
@@ -398,7 +398,7 @@ export default (Sequelize, DataTypes) => {
   Transaction.createDoubleEntry = async transaction => {
     transaction.type = transaction.amount > 0 ? TransactionTypes.CREDIT : TransactionTypes.DEBIT;
     transaction.netAmountInCollectiveCurrency = transaction.netAmountInCollectiveCurrency || transaction.amount;
-    transaction.TransactionGroup = uuidv4();
+    transaction.TransactionGroup = uuid();
     transaction.hostCurrencyFxRate = transaction.hostCurrencyFxRate || 1;
 
     if (!isUndefined(transaction.amountInHostCurrency)) {

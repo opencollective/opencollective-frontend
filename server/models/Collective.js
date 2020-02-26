@@ -22,7 +22,7 @@ import {
   includes,
   isNull,
 } from 'lodash';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { isISO31661Alpha2 } from 'validator';
 import { Op } from 'sequelize';
 

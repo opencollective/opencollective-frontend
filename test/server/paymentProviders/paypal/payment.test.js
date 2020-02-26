@@ -1,5 +1,5 @@
 import config from 'config';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import nock from 'nock';
 import request from 'supertest';
 import sinon from 'sinon';
@@ -155,7 +155,7 @@ describe('server/paymentProviders/paypal/payment', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           CreatedByUserId: user.id,
-          uuid: uuidv4(),
+          uuid: uuid(),
           token: 'EC-88888888888888888',
         });
 
@@ -213,7 +213,7 @@ describe('server/paymentProviders/paypal/payment', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           CreatedByUserId: user.id,
-          uuid: uuidv4(),
+          uuid: uuid(),
           token: 'EC-88888888888888888',
         });
 

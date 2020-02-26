@@ -6,7 +6,7 @@
 // This lib is a superset of `utils.data` that generates values that are random and safe
 // to use in loops and repeted tests.
 
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { get, sample } from 'lodash';
 import models from '../../server/models';
 import { types as CollectiveType } from '../../server/constants/collectives';

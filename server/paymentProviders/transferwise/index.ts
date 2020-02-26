@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import * as transferwise from '../../lib/transferwise';
 import cache from '../../lib/cache';
@@ -56,7 +56,7 @@ async function payExpense(connectedAccount, payoutMethod, expense): Promise<any>
   const transfer = await transferwise.createTransfer(connectedAccount.token, {
     accountId: recipient.id,
     quoteId: quote.id,
-    uuid: uuidv4(),
+    uuid: uuid(),
     details: {
       reference: `Expense ${expense.id}`,
     },

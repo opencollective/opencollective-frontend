@@ -3,7 +3,7 @@ import nock from 'nock';
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { cloneDeep } from 'lodash';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 import models from '../../../../server/models';
 import twitter from '../../../../server/lib/twitter';

@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import uuidV4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import debugLib from 'debug';
 import moment from 'moment';
 import { map } from 'bluebird';
@@ -54,7 +54,7 @@ async function createPaymentMethod(originalCreditTransaction) {
     name: 'BackYourStack dispatch Payment Method',
     service: 'opencollective',
     type: 'prepaid',
-    uuid: uuidV4(),
+    uuid: uuid(),
     data: {
       HostCollectiveId: originalCreditTransaction.HostCollectiveId,
       hidden: true,

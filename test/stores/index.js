@@ -5,7 +5,7 @@
 
 /* Test libraries */
 import sinon from 'sinon';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /* Libraries that create the objects */
 import models from '../../server/models';
@@ -35,7 +35,7 @@ export function randEmail(email = 'test-user@emailprovider.com') {
 
 /** Returns a random URL. */
 export function randUrl() {
-  return `https://example.com/${uuidv4()}`;
+  return `https://example.com/${uuid()}`;
 }
 
 /** Convert string to lower case and swap spaces with dashes */
@@ -53,7 +53,7 @@ function slugify(value) {
  * @return {Object} with references for `user` and `userCollective`.
  */
 export async function newUser(name, data = {}) {
-  name = name || uuidv4().split('-')[0];
+  name = name || uuid().split('-')[0];
   const slug = slugify(name);
   const email = randEmail(`${slug}@oc.com`);
   const user = await models.User.createUserWithCollective({
@@ -154,7 +154,7 @@ export async function newOrganization(orgData, adminUser) {
  *  `hostAdmin`, and `collective`.
  */
 export async function newCollectiveWithHost(name, currency, hostCurrency, hostFee, user = null, data = {}) {
-  name = name || uuidv4();
+  name = name || uuid();
   const { hostAdmin, hostCollective } = await newHost(`${name} Host`, hostCurrency, hostFee, { currency });
   const slug = slugify(name);
   const { hostFeePercent } = hostCollective;

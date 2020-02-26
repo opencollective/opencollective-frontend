@@ -1,5 +1,5 @@
 import moment from 'moment';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { get, times, isEmpty } from 'lodash';
 import config from 'config';
 import sanitize from 'sanitize-html';
@@ -420,7 +420,7 @@ function getCreateParams(args, collective, sourcePaymentMethod, remoteUser) {
     limitedToTags: args.limitedToTags,
     limitedToCollectiveIds: isEmpty(args.limitedToCollectiveIds) ? null : args.limitedToCollectiveIds,
     limitedToHostCollectiveIds: isEmpty(args.limitedToHostCollectiveIds) ? null : args.limitedToHostCollectiveIds,
-    uuid: uuidv4(),
+    uuid: uuid(),
     service: 'opencollective',
     type: 'virtualcard',
     createdAt: new Date(),
