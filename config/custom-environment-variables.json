@@ -142,6 +142,6 @@
     "minNbStars": "GITHUB_FLOW_MIN_NB_STARS"
   },
   "transferwise": {
-    "api": "TRANSFERWISE_API"
+    "apiUrl": "TRANSFERWISE_API_URL"
   }
 }
