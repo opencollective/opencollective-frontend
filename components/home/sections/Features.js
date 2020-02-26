@@ -203,7 +203,7 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
     >
       {intl.formatMessage(messages[`home.feature.${id}.description`])}{' '}
       {learnMoreLink && (
-        <LearnMoreLink href={learnMoreLink}>
+        <LearnMoreLink href={learnMoreLink} target="_blank">
           <FormattedMessage id="home.feature.learnmore" defaultMessage="Learn more..." />
         </LearnMoreLink>
       )}

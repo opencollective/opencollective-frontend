@@ -112,7 +112,7 @@ const User = ({ id, name, picture, type, collectivePath }) => {
             {intl.formatMessage(messages[`home.OCusers.${id}`])}
           </P>
         </Box>
-        <HomeStandardLink width="72px" href="/discover">
+        <HomeStandardLink width="72px" href={collectivePath}>
           <FormattedMessage id="home.more" defaultMessage="More" />
         </HomeStandardLink>
       </Container>
