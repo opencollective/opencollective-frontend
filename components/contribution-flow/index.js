@@ -7,7 +7,7 @@ import { debounce, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import * as LibTaxes from '@opencollective/taxes';
 import { URLSearchParams } from 'universal-url';
 

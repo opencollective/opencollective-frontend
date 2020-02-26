@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 const StyledTooltipContainer = styled(ReactTooltip)`
   max-width: 320px;
