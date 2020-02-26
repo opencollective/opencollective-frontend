@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Feb 26 2020 13:47:01 GMT+0000 (Greenwich Mean Time)
+# timestamp: Wed Feb 26 2020 12:07:20 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -92,6 +92,16 @@ interface Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 }
 
 """
@@ -210,6 +220,16 @@ type Bot implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 }
 
 """
@@ -298,6 +318,16 @@ type Collective implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -484,6 +514,8 @@ enum Currency {
   NZD
 }
 
+scalar DateString
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
@@ -584,6 +616,16 @@ type Event implements Account {
   transferwise: TransferWise
 
   """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+
+  """
   Amount of money in cents in the currency of the collective currently available to spend
   """
   balance: Int
@@ -604,11 +646,94 @@ This represents an Expense
 """
 type Expense {
   id: String
+
+  """
+  Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future.
+  """
+  legacyId: Int
   comments(
     limit: Int
     offset: Int
     orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
   ): CommentCollection
+
+  """
+  The account being paid by this expense
+  """
+  payee: Account
+
+  """
+  Information to display on the invoice. Only visible to user and admins.
+  """
+  invoiceInfo: String
+}
+
+input ExpenseAttachmentCreate {
+  """
+  Amount in cents
+  """
+  amount: Int!
+
+  """
+  What is this attachment about?
+  """
+  description: String!
+
+  """
+  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
+  """
+  url: String
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
+input ExpenseCreate {
+  description: String!
+  tags: [String]
+  type: ExpenseType!
+
+  """
+  A private note that will be attached to your invoice
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput!
+
+  """
+  The list of attachments for this expense. Total amount will be computed from them.
+  """
+  attachments: [ExpenseAttachmentCreate]!
+
+  """
+  Account to reimburse
+  """
+  payee: AccountInput!
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseType {
+  """
+  Invoice: Get paid back for a purchase already made.
+  """
+  INVOICE
+
+  """
+  Receipt: Charge for your time or get paid in advance
+  """
+  RECEIPT
 }
 
 enum ImageFormat {
@@ -681,6 +806,18 @@ type Individual implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
+  location: Location
   firstName: String
   lastName: String
   email: String
@@ -691,6 +828,36 @@ type Individual implements Account {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+Type for Geographic location
+"""
+type Location {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+}
 
 """
 This represents a Member relationship (ie: Organization backing a Collective)
@@ -839,6 +1006,21 @@ type Mutation {
     """
     automateApprovalWithGithub: Boolean = false
   ): Collective
+
+  """
+  Submit an expense to a collective
+  """
+  createExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseCreate!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountInput!
+  ): Expense
 }
 
 """
@@ -960,7 +1142,44 @@ type Organization implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of
+    - Hosts can see the address of organizations submitting expenses to their collectives
+  """
+  location: Location
   email: String
+}
+
+"""
+A payout method
+"""
+type PayoutMethod {
+  id: String!
+  type: PayoutMethodType
+  name: String
+  isSaved: Boolean
+  data: JSON
+}
+
+input PayoutMethodInput {
+  id: String
+  data: JSON
+  name: String
+  isSaved: Boolean
+  type: PayoutMethodType
+}
+
+enum PayoutMethodType {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
 }
 
 """
