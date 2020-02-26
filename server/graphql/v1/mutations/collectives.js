@@ -244,7 +244,7 @@ export async function createCollectiveFromGithub(_, args, req) {
   }
 
   try {
-    await github.handleOpenSourceAutomatedApproval(githubHandle, req.remoteUser);
+    await github.handleOpenSourceAutomatedApproval(githubHandle, githubAccount.token);
     if (githubHandle.includes('/')) {
       const repo = await github.getRepo(githubHandle, githubAccount.token);
       collectiveData.tags = repo.topics || [];
