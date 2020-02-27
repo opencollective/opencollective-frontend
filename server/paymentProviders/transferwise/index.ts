@@ -118,6 +118,9 @@ async function getRequiredBankInformation(host: any, currency: string): Promise<
   }
 
   const currencyInfo = find(await getAvailableCurrencies(host), { code: currency });
+  if (!currencyInfo) {
+    throw new Error('This currency is not supported');
+  }
 
   const quote = await transferwise.createQuote(connectedAccount.token, {
     profileId: connectedAccount.data.id,
