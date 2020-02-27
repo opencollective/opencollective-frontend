@@ -97,16 +97,16 @@ class CreateCollectiveForm extends React.Component {
     const validate = values => {
       const errors = {};
 
-      if (values.name.length > 10) {
-        errors.name = 'Please use fewer than 10 characters';
+      if (values.name.length > 50) {
+        errors.name = 'Please use fewer than 50 characters';
       }
 
-      if (values.slug.length < 5) {
-        errors.slug = 'Please use more than 5 characters';
+      if (values.slug.length > 30) {
+        errors.slug = 'Please use fewer than 30 characters';
       }
 
       if (values.desc.length > 50) {
-        errors.desc = 'Please limit your description to 50 characters.';
+        errors.desc = 'Please use fewer than 30 characters';
       }
 
       return errors;

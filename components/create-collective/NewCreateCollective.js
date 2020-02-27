@@ -1,7 +1,7 @@
 import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
-import { get, pick } from 'lodash';
+import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 
@@ -15,7 +15,7 @@ import { withUser } from '../UserProvider';
 
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException, compose } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 class NewCreateCollective extends Component {
@@ -25,7 +25,7 @@ class NewCreateCollective extends Component {
     LoggedInUser: PropTypes.object, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     intl: PropTypes.object.isRequired,
-    createCollectiveV2: PropTypes.func,
+    createCollective: PropTypes.func,
   };
 
   constructor(props) {
@@ -127,7 +127,7 @@ class NewCreateCollective extends Component {
 
     // try mutation
     try {
-      const res = await this.props.createCollectiveV2({
+      const res = await this.props.createCollective({
         collective,
         host: this.props.host ? { slug: this.props.host.slug } : null,
         automateApprovalWithGithub: this.state.github ? true : false,
@@ -212,7 +212,7 @@ class NewCreateCollective extends Component {
   }
 }
 
-const createCollectiveQueryV2 = gqlV2`
+const createCollectiveQuery = gqlV2`
   mutation createCollective(
     $collective: CreateCollectiveInput!
     $host: AccountInput
@@ -228,37 +228,22 @@ const createCollectiveQueryV2 = gqlV2`
   }
 `;
 
-const addCreateCollectiveMutationV2 = graphql(createCollectiveQueryV2, {
+const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
   options: {
     context: API_V2_CONTEXT,
   },
   props: ({ mutate }) => ({
-    createCollectiveV2: async ({ collective, host }) => {
-      const createCollectiveInputType = pick(collective, [
-        'slug',
-        'name',
-        'description',
-        'githubHandle',
-        'tags',
-        createCollectiveInputType,
-      ]);
+    createCollective: async ({ collective, host }) => {
       return await mutate({
         variables: {
-          collective: createCollectiveInputType,
+          collective,
           host: host,
         },
-        update: (store, { data: { createCollectiveV2 } }) => {
-          const data = store.readQuery({ query: getLoggedInUserQuery });
-          data.LoggedInUser.memberOf.push({
-            __typename: 'Member',
-            collective: createCollectiveV2,
-            role: 'ADMIN',
-          });
-          store.writeQuery({ query: getLoggedInUserQuery, data });
-        },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
 });
 
-export default compose(addCreateCollectiveMutationV2)(injectIntl(withUser(NewCreateCollective)));
+export default injectIntl(withUser(addCreateCollectiveMutation(NewCreateCollective)));
