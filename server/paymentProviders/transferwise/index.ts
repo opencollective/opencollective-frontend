@@ -86,12 +86,9 @@ async function getAvailableCurrencies(host: any): Promise<any> {
     return fromCache;
   }
 
-  const connectedAccount =
-    host.connectedAccount?.service === 'transferwise'
-      ? host.connectedAccount
-      : await models.ConnectedAccount.findOne({
-          where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
-        });
+  const connectedAccount = await models.ConnectedAccount.findOne({
+    where: { service: 'transferwise', CollectiveId: host.id },
+  });
   if (!connectedAccount) {
     throw new Error('Host is not connected to Transferwise');
   }
@@ -112,12 +109,9 @@ async function getRequiredBankInformation(host: any, currency: string): Promise<
     return fromCache;
   }
 
-  const connectedAccount =
-    host.connectedAccount?.service === 'transferwise'
-      ? host.connectedAccount
-      : await models.ConnectedAccount.findOne({
-          where: { service: 'transferwise', CollectiveId: host.id, deletedAt: null },
-        });
+  const connectedAccount = await models.ConnectedAccount.findOne({
+    where: { service: 'transferwise', CollectiveId: host.id },
+  });
   if (!connectedAccount) {
     throw new Error('Host is not connected to Transferwise');
   }

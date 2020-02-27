@@ -171,10 +171,9 @@ const accountFieldsDefinition = () => ({
     type: TransferWise,
     async resolve(collective) {
       const connectedAccount = await models.ConnectedAccount.findOne({
-        where: { service: 'transferwise', CollectiveId: collective.id, deletedAt: null },
+        where: { service: 'transferwise', CollectiveId: collective.id },
       });
       if (connectedAccount) {
-        collective.connectedAccount = connectedAccount;
         return collective;
       } else {
         return null;
