@@ -280,7 +280,7 @@ async function HostReport(year, month, hostId) {
       .tap(transactions => {
         const csv = models.Transaction.exportCSV(transactions, collectivesById);
         attachments.push({
-          filename: csv_filename,
+          filename: `${host.slug}-${csv_filename}`,
           content: csv,
         });
       })
@@ -297,7 +297,7 @@ async function HostReport(year, month, hostId) {
       .then(pdf => {
         if (pdf) {
           attachments.push({
-            filename: pdf_filename,
+            filename: `${host.slug}-${pdf_filename}`,
             content: pdf,
           });
           data.expensesPdf = true;
