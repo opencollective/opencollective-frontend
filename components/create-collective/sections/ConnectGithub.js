@@ -350,7 +350,7 @@ class ConnectGithub extends React.Component {
                 <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
                   <StyledButton
                     mx={2}
-                    mb={[3, 0, null, null]}
+                    mb={[3, 0]}
                     px={[2, 3]}
                     textAlign="center"
                     buttonSize="medium"

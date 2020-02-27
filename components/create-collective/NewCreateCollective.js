@@ -4,9 +4,6 @@ import { Flex, Box } from '@rebass/grid';
 import { get, pick } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
-
-const gqlV2 = gql; // Needed for lint validation of api v2 schema.
 
 import Page from '../Page';
 import { H1, P } from '../Text';
@@ -17,6 +14,7 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import { withUser } from '../UserProvider';
 
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException, compose } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
@@ -151,7 +149,7 @@ class NewCreateCollective extends Component {
     const { category, form, error } = this.state;
     const { token } = query;
 
-    const canApply = get(this.props.host, 'settings.apply') || true;
+    const canApply = get(this.props.host, 'canApply') || true;
 
     return (
       <Page>
@@ -225,21 +223,21 @@ const createCollectiveQueryV2 = gqlV2`
 
 const addCreateCollectiveMutationV2 = graphql(createCollectiveQueryV2, {
   options: {
-    context: { apiVersion: '2' },
+    context: API_V2_CONTEXT,
   },
   props: ({ mutate }) => ({
     createCollectiveV2: async ({ collective, host }) => {
-      const CreateCollectiveInputType = pick(collective, [
+      const createCollectiveInputType = pick(collective, [
         'slug',
         'name',
         'description',
         'githubHandle',
         'tags',
-        CreateCollectiveInputType,
+        createCollectiveInputType,
       ]);
       return await mutate({
         variables: {
-          collective: CreateCollectiveInputType,
+          collective: createCollectiveInputType,
           host: host,
         },
         update: (store, { data: { createCollectiveV2 } }) => {
