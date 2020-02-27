@@ -11,8 +11,9 @@ export const blackListedCurrencies = [
   'BRL',
   'BDT',
   'PKR',
-  /** Incomplete requiredFields API */
+  /** Incomplete requiredFields API or MVP form support */
   'UYU',
+  'KRW',
 ];
 
 async function populateProfileId(connectedAccount): Promise<void> {
