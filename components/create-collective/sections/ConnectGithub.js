@@ -176,7 +176,7 @@ class ConnectGithub extends React.Component {
                         </a>
                       ),
                     }}
-                  />{' '}
+                  />
                 </P>
               </Box>
             </Flex>

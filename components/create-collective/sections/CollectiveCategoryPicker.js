@@ -91,7 +91,7 @@ class CollectiveCategoryPicker extends React.Component {
             color="black.900"
             textAlign="center"
           >
-            {intl.formatMessage(this.messages.header)}{' '}
+            {intl.formatMessage(this.messages.header)}
           </H1>
         </Box>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
