@@ -38,7 +38,7 @@ const StyledInput = styled.input`
   box-sizing: border-box;
   outline: none;
   background-color: ${themeGet('colors.white.full')};
-  display:block;
+
 
   ${props => {
     if (props.withOutline) {

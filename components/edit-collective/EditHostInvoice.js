@@ -27,8 +27,8 @@ const EditHostInvoice = ({ collective }) => {
   // For invoice extra info
   const defaultInfo = get(collective.settings, 'extraInfo');
   const [info, setInfo] = React.useState(defaultInfo);
-  const isTouch = info !== defaultInfo;
-  const isSave = get(data, 'editCollective.settings.extraInfo') === info;
+  const infoIsTouched = info !== defaultInfo;
+  const infoIsSaved = get(data, 'editCollective.settings.extraInfo') === info;
 
   return (
     <Container>
@@ -70,8 +70,6 @@ const EditHostInvoice = ({ collective }) => {
           maxWidth={300}
           my={2}
         />
-
-        {/* <textarea placeholder="Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message."defaultInfo={info} onChange={e => setInfo(e.target.value)}> </textarea> */}
 
         <StyledButton
           buttonStyle="primary"
