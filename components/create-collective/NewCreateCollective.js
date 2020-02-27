@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 
-import Page from '../Page';
 import { H1, P } from '../Text';
 import CreateCollectiveForm from './sections/CreateCollectiveForm';
 import CollectiveCategoryPicker from './sections/CollectiveCategoryPicker';
@@ -150,90 +149,89 @@ class NewCreateCollective extends Component {
   }
 
   render() {
-    const { LoggedInUser, query, intl } = this.props;
+    const { LoggedInUser, query, intl, host } = this.props;
     const { category, form, error } = this.state;
     const { token } = query;
 
-    let canApply;
-
-    if (query.verb === 'apply') {
-      canApply = get(this.props.host, 'canApply');
-    } else if (query.verb === 'create') {
-      canApply = true;
+    if (host && !host.canApply) {
+      return (
+        <Fragment>
+          <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+            <Flex flexDirection="column" p={4} mt={2}>
+              <Box mb={3}>
+                <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+                  <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+                </H1>
+              </Box>
+            </Flex>
+            <Flex alignItems="center" justifyContent="center">
+              <MessageBox type="warning" withIcon mb={[1, 3]}>
+                <FormattedMessage
+                  id="collectives.create.error.HostNotOpenToApplications"
+                  defaultMessage="This host is not open to applications"
+                />
+              </MessageBox>
+            </Flex>
+          </Flex>
+        </Fragment>
+      );
     }
 
-    return (
-      <Page>
-        <div>
-          {!canApply && (
-            <Fragment>
-              <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-                <Flex flexDirection="column" p={4} mt={2}>
-                  <Box mb={3}>
-                    <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                      <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-                    </H1>
-                  </Box>
-                </Flex>
-                <Flex alignItems="center" justifyContent="center">
-                  <MessageBox type="warning" withIcon mb={[1, 3]}>
-                    <FormattedMessage
-                      id="collectives.create.error.HostNotOpenToApplications"
-                      defaultMessage="This host is not open to applications"
-                    />
-                  </MessageBox>
-                </Flex>
-              </Flex>
-            </Fragment>
-          )}
-          {canApply && !LoggedInUser && (
-            <Fragment>
-              <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-                <Flex flexDirection="column" p={4} mt={2}>
-                  <Box mb={3}>
-                    <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                      {intl.formatMessage(this.messages.joinOC)}
-                    </H1>
-                  </Box>
-                  <Box textAlign="center">
-                    <P fontSize="Paragraph" color="black.600" mb={1}>
-                      {intl.formatMessage(this.messages.createOrSignIn)}
-                    </P>
-                  </Box>
-                </Flex>
-                <SignInOrJoinFree />
-              </Flex>
-            </Fragment>
-          )}
-          {canApply && LoggedInUser && !category && (
-            <CollectiveCategoryPicker query={query} onChange={(key, value) => this.handleChange(key, value)} />
-          )}
-          {canApply && LoggedInUser && category && category !== 'opensource' && (
-            <CreateCollectiveForm
-              host={this.props.host}
-              collective={this.state.collective}
-              onSubmit={this.createCollective}
-              onChange={(key, value) => this.handleChange(key, value)}
-              error={error}
-              query={query}
-            />
-          )}
-          {canApply && LoggedInUser && category === 'opensource' && !form && (
-            <ConnectGithub token={token} query={query} onChange={(key, value) => this.handleChange(key, value)} />
-          )}
-          {canApply && LoggedInUser && category === 'opensource' && form && (
-            <CreateCollectiveForm
-              host={this.props.host}
-              collective={this.state.collective}
-              onSubmit={this.createCollective}
-              onChange={(key, value) => this.handleChange(key, value)}
-              error={error}
-              query={query}
-            />
-          )}
-        </div>
-      </Page>
-    );
+    if (host && host.canApply) {
+      return (
+        <CreateCollectiveForm
+          host={this.props.host}
+          collective={this.state.collective}
+          onSubmit={this.createCollective}
+          onChange={(key, value) => this.handleChange(key, value)}
+          error={error}
+          query={query}
+        />
+      );
+    }
+
+    if (!LoggedInUser) {
+      return (
+        <Fragment>
+          <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+            <Flex flexDirection="column" p={4} mt={2}>
+              <Box mb={3}>
+                <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+                  {intl.formatMessage(this.messages.joinOC)}
+                </H1>
+              </Box>
+              <Box textAlign="center">
+                <P fontSize="Paragraph" color="black.600" mb={1}>
+                  {intl.formatMessage(this.messages.createOrSignIn)}
+                </P>
+              </Box>
+            </Flex>
+            <SignInOrJoinFree />
+          </Flex>
+        </Fragment>
+      );
+    }
+
+    if (!host && !category) {
+      return <CollectiveCategoryPicker query={query} onChange={(key, value) => this.handleChange(key, value)} />;
+    }
+
+    if (!host && category && (category !== 'opensource' || (category === 'opensource' && form))) {
+      return (
+        <CreateCollectiveForm
+          host={this.props.host}
+          collective={this.state.collective}
+          onSubmit={this.createCollective}
+          onChange={(key, value) => this.handleChange(key, value)}
+          error={error}
+          query={query}
+        />
+      );
+    }
+
+    if (!host && category && category === 'opensource' && !form) {
+      return <ConnectGithub token={token} query={query} onChange={(key, value) => this.handleChange(key, value)} />;
+    }
   }
 }
 
