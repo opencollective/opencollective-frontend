@@ -23,3 +23,5 @@ styleguide/build/
 
 # Git time manager
 .gtm
+
+ build/config.gypi:

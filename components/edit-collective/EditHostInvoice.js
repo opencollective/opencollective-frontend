@@ -78,7 +78,7 @@ const EditHostInvoice = ({ collective }) => {
           minWidth={200}
           loading={loading}
           maxLength={255}
-          disabled={!isTouched && !isTouch}
+          disabled={!isTouched && !infoIsTouched}
           onClick={() =>
             setSettings({
               variables: {
@@ -88,7 +88,7 @@ const EditHostInvoice = ({ collective }) => {
             })
           }
         >
-          {isSaved && isSave ? (
+          {isSaved && infoIsTouched ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
