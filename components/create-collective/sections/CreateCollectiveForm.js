@@ -14,8 +14,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledButton from '../../StyledButton';
 import MessageBox from '../../MessageBox';
-
-import { Router } from '../../../server/pages';
+import Link from '../../Link';
 
 class CreateCollectiveForm extends React.Component {
   static propTypes = {
@@ -75,18 +74,8 @@ class CreateCollectiveForm extends React.Component {
     });
   }
 
-  changeRoute = async params => {
-    params = {
-      ...params,
-      verb: this.props.query.verb,
-      hostCollectiveSlug: this.props.query.hostCollectiveSlug || undefined,
-    };
-    await Router.pushRoute('new-create-collective', params);
-    window.scrollTo(0, 0);
-  };
-
   render() {
-    const { intl, error } = this.props;
+    const { intl, error, query } = this.props;
 
     const initialValues = {
       name: '',
@@ -124,20 +113,17 @@ class CreateCollectiveForm extends React.Component {
     };
 
     return (
-      <Flex className="CreateCollectiveForm" flexDirection="column" m={[3, 4]}>
+      <Flex flexDirection="column" m={[3, 4]}>
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} width={[null, 832, 950, 1024]}>
-            <StyledButton
-              asLink
+            <Link
               fontSize="Paragraph"
               color="black.600"
-              onClick={() => {
-                this.changeRoute({ category: undefined });
-                this.handleChange('category', null);
-              }}
+              route="new-create-collective"
+              params={{ hostCollectiveSlug: query.hostCollectiveSlug, verb: query.verb }}
             >
               ←&nbsp;{intl.formatMessage(this.messages.back)}
-            </StyledButton>
+            </Link>
           </Box>
           <Box mb={[2, 3]}>
             <H1

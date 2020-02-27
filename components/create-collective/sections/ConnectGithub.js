@@ -13,6 +13,7 @@ import Loading from '../../Loading';
 import GithubRepositoriesFAQ from '../../faqs/GithubRepositoriesFAQ';
 import { withUser } from '../../UserProvider';
 import MessageBox from '../../MessageBox';
+import Link from '../../Link';
 
 import { Router } from '../../../server/pages';
 import { getGithubRepos } from '../../../lib/api';
@@ -121,26 +122,23 @@ class ConnectGithub extends React.Component {
   }
 
   render() {
-    const { token, intl } = this.props;
+    const { token, intl, query } = this.props;
     const { repositories, loadingRepos, error } = this.state;
 
     return (
-      <Flex className="openSourceApply" flexDirection="column" m={[3, 4]} mb={[4]}>
+      <Flex flexDirection="column" m={[3, 4]} mb={[4]}>
         {token && (
           <Fragment>
             <Flex flexDirection="column" my={[2, 4]}>
               <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
-                <StyledButton
-                  asLink
+                <Link
                   fontSize="Paragraph"
                   color="black.600"
-                  onClick={() => {
-                    this.changeRoute({ category: undefined });
-                    this.handleChange('category', null);
-                  }}
+                  route="new-create-collective"
+                  params={{ hostCollectiveSlug: query.hostCollectiveSlug, verb: query.verb, category: 'opensource' }}
                 >
                   ←&nbsp;{intl.formatMessage(this.messages.back)}
-                </StyledButton>
+                </Link>
               </Box>
               <Box mb={[2, 3]}>
                 <H1
@@ -226,17 +224,14 @@ class ConnectGithub extends React.Component {
           <Fragment>
             <Flex flexDirection="column" my={[2, 4]}>
               <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
-                <StyledButton
-                  asLink
+                <Link
                   fontSize="Paragraph"
                   color="black.600"
-                  onClick={() => {
-                    this.changeRoute({ category: undefined });
-                    this.handleChange('category', null);
-                  }}
+                  route="new-create-collective"
+                  params={{ hostCollectiveSlug: query.hostCollectiveSlug, verb: query.verb }}
                 >
                   ←&nbsp;{intl.formatMessage(this.messages.back)}
-                </StyledButton>
+                </Link>
               </Box>
               <Box mb={[2, 3]}>
                 <H1
