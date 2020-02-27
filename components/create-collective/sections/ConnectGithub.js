@@ -14,6 +14,7 @@ import GithubRepositoriesFAQ from '../../faqs/GithubRepositoriesFAQ';
 import { withUser } from '../../UserProvider';
 import MessageBox from '../../MessageBox';
 import Link from '../../Link';
+import ExternalLink from '../../ExternalLink';
 
 import { Router } from '../../../server/pages';
 import { getGithubRepos } from '../../../lib/api';
@@ -36,18 +37,6 @@ class ConnectGithub extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.messages = defineMessages({
-      guidelines: { id: 'openSourceApply.guidelines', defaultMessage: 'guidelines' },
-      'tos.label': {
-        id: 'createcollective.tosos.label',
-        defaultMessage: 'I agree with the {tososlink}',
-        values: {
-          tososlink: (
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              terms of fiscal sponsorship
-            </a>
-          ),
-        },
-      },
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       openSourceSubtitle: {
         id: 'collective.subtitle.opensource',
@@ -158,9 +147,9 @@ class ConnectGithub extends React.Component {
                     defaultMessage="Don't see the repository you're looking for? {helplink}."
                     values={{
                       helplink: (
-                        <a href="#" target="_blank" rel="noopener noreferrer">
+                        <ExternalLink href="#" openInNewTab>
                           Get help
-                        </a>
+                        </ExternalLink>
                       ),
                     }}
                   />
@@ -171,9 +160,9 @@ class ConnectGithub extends React.Component {
                     defaultMessage="Want to apply using alternative verification criteria? {altlink}."
                     values={{
                       altlink: (
-                        <a href="#" target="_blank" rel="noopener noreferrer">
-                          Click here
-                        </a>
+                        <ExternalLink href="#" openInNewTab>
+                          Get help
+                        </ExternalLink>
                       ),
                     }}
                   />
@@ -258,7 +247,7 @@ class ConnectGithub extends React.Component {
               </Flex>
             )}
             <Flex alignItems="center" justifyContent="center">
-              <Box mb={[1, 5]} minWidth={['300px', '576px']} maxWidth={[288, 608, 576, null]} px={[1, 4]}>
+              <Box mb={[1, 5]} minWidth={['300px', '576px']} maxWidth={[288, 608, 576]} px={[1, 4]}>
                 <P mb={3}>
                   <FormattedMessage
                     id="createcollective.opensource.p1"
@@ -271,14 +260,14 @@ class ConnectGithub extends React.Component {
                     defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github or meet our {criterialink}."
                     values={{
                       osclink: (
-                        <a href="https://opencollective.com/opensource" target="_blank" rel="noopener noreferrer">
+                        <ExternalLink href="https://opencollective.com/opensource" openInNewTab>
                           Open Source Collective 501c6
-                        </a>
+                        </ExternalLink>
                       ),
                       criterialink: (
-                        <a href="#" target="_blank" rel="noopener noreferrer">
+                        <ExternalLink href="#" openInNewTab>
                           alternative acceptance criteria
-                        </a>
+                        </ExternalLink>
                       ),
                     }}
                   />
@@ -302,9 +291,9 @@ class ConnectGithub extends React.Component {
                         defaultMessage="I agree with the <toslink>terms of fiscal sponsorship</toslink>."
                         values={{
                           toslink: msg => (
-                            <a href="/tos" target="_blank" rel="noopener noreferrer">
+                            <ExternalLink href="/tos" openInNewTab>
                               {msg}
-                            </a>
+                            </ExternalLink>
                           ),
                         }}
                       />

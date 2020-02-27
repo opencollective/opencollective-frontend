@@ -15,6 +15,7 @@ import StyledInputGroup from '../../StyledInputGroup';
 import StyledButton from '../../StyledButton';
 import MessageBox from '../../MessageBox';
 import Link from '../../Link';
+import ExternalLink from '../../ExternalLink';
 
 class CreateCollectiveForm extends React.Component {
   static propTypes = {
@@ -148,9 +149,9 @@ class CreateCollectiveForm extends React.Component {
         <Flex alignItems="center" justifyContent="center">
           <Container
             mb={[1, 5]}
-            width={[320, 512, 576, null]}
-            border={['none', '1px solid #E6E8EB', null, null]}
-            borderRadius={['none', '8px', null, null]}
+            width={[320, 512, 576]}
+            border={['none', '1px solid #E6E8EB']}
+            borderRadius={['none', '8px']}
             px={[1, 4]}
           >
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
@@ -215,9 +216,9 @@ class CreateCollectiveForm extends React.Component {
                             defaultMessage="I agree with the <toslink>terms of service</toslink> of Open Collective."
                             values={{
                               toslink: msg => (
-                                <a href="/tos" target="_blank" rel="noopener noreferrer">
+                                <ExternalLink href="/tos" openInNewTab>
                                   {msg}
-                                </a>
+                                </ExternalLink>
                               ),
                             }}
                           />
@@ -238,9 +239,9 @@ class CreateCollectiveForm extends React.Component {
                               defaultMessage="I agree with the <hosttoslink>the terms of fiscal sponsorship of the host</hosttoslink> that will collect money on behalf of our collective."
                               values={{
                                 hosttoslink: msg => (
-                                  <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
                                     {msg}
-                                  </a>
+                                  </ExternalLink>
                                 ),
                               }}
                             />

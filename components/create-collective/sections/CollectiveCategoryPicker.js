@@ -73,20 +73,14 @@ class CollectiveCategoryPicker extends React.Component {
     return (
       <div>
         <Box my={4}>
-          <H1
-            fontSize={['H5', 'H3', null, null]}
-            lineHeight={['H5', 'H3', null, null]}
-            fontWeight="bold"
-            color="black.900"
-            textAlign="center"
-          >
+          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             {intl.formatMessage(this.messages.header)}
           </H1>
         </Box>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
           <Box alignItems="center">
             <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
-              <Container alignItems="center" width={[null, 280, 312, null]} mb={[4, 0, null, null]}>
+              <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
                     className="categoryImage"
@@ -119,11 +113,11 @@ class CollectiveCategoryPicker extends React.Component {
                 </Flex>
               </Container>
               <Container
-                borderLeft={['none', '1px solid #E6E8EB', null]}
-                borderTop={['1px solid #E6E8EB', 'none', null]}
+                borderLeft={['none', '1px solid #E6E8EB']}
+                borderTop={['1px solid #E6E8EB', 'none']}
                 alignItems="center"
-                width={[null, 280, 312, null]}
-                mb={[4, 0, null, null]}
+                width={[null, 280, 312]}
+                mb={[4, 0]}
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
@@ -157,10 +151,10 @@ class CollectiveCategoryPicker extends React.Component {
                 </Flex>
               </Container>
               <Container
-                borderLeft={['none', '1px solid #E6E8EB', null, null]}
-                borderTop={['1px solid #E6E8EB', 'none', null, null]}
+                borderLeft={['none', '1px solid #E6E8EB']}
+                borderTop={['1px solid #E6E8EB', 'none']}
                 alignItems="center"
-                width={[null, 280, 312, null]}
+                width={[null, 280, 312]}
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
