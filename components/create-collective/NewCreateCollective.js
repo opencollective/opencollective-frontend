@@ -37,6 +37,7 @@ class NewCreateCollective extends Component {
       github: null,
       form: false,
       error: null,
+      status: null,
     };
     this.createCollective = this.createCollective.bind(this);
     this.messages = defineMessages({
@@ -149,7 +150,13 @@ class NewCreateCollective extends Component {
     const { category, form, error } = this.state;
     const { token } = query;
 
-    const canApply = get(this.props.host, 'canApply') || true;
+    let canApply;
+
+    if (query.verb === 'apply') {
+      canApply = get(this.props.host, 'canApply');
+    } else if (query.verb === 'create') {
+      canApply = true;
+    }
 
     return (
       <Page>

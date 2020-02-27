@@ -62,7 +62,6 @@ class ConnectGithub extends React.Component {
       },
     });
     this.state = {
-      result: {},
       loadingRepos: false,
       repositories: [],
       checked: false,
@@ -79,22 +78,19 @@ class ConnectGithub extends React.Component {
 
     try {
       const repositories = await getGithubRepos(token);
-      if (repositories.length !== 0) {
-        const filteredRepos = repositories.filter(repo => repo.stargazers_count >= 100);
-        this.setState({ repositories: filteredRepos, loadingRepos: false, result: {} });
+      const filteredRepos = repositories.filter(repo => repo.stargazers_count >= 100);
+      if (filteredRepos.length !== 0) {
+        this.setState({ repositories: filteredRepos, loadingRepos: false });
       } else {
         this.setState({
           loadingRepos: false,
-          result: {
-            type: 'info',
-            mesg: "We couldn't find any repositories (with >= 100 stars) linked to this account",
-          },
+          error: "We couldn't find any repositories (with >= 100 stars) linked to this account",
         });
       }
     } catch (error) {
       this.setState({
         loadingRepos: false,
-        result: { type: 'error', mesg: error.toString() },
+        error: error.toString(),
       });
     }
   }
@@ -112,25 +108,6 @@ class ConnectGithub extends React.Component {
     await Router.pushRoute('new-create-collective', params);
     window.scrollTo(0, 0);
   };
-
-  async createCollectives(collectiveInputType) {
-    collectiveInputType.type = 'COLLECTIVE';
-    try {
-      const res = await this.props.createCollectiveFromGithub(collectiveInputType);
-      const collective = res.data.createCollectiveFromGithub;
-      await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        slug: collective.slug,
-        status: 'collectiveCreated',
-      });
-    } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({
-        creatingCollective: false,
-        result: { type: 'error', mesg: errorMsg },
-      });
-    }
-  }
 
   getGithubConnectUrl() {
     const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/create/v2/opensource` });
@@ -205,45 +182,43 @@ class ConnectGithub extends React.Component {
                 </P>
               </Box>
             </Flex>
+            {error && (
+              <Flex alignItems="center" justifyContent="center">
+                <MessageBox type="error" withIcon mb={[1, 3]}>
+                  {error}
+                </MessageBox>
+              </Flex>
+            )}
             {loadingRepos && <Loading />}
             {repositories.length !== 0 && (
-              <Fragment>
-                {error && (
-                  <Flex alignItems="center" justifyContent="center">
-                    <MessageBox type="error" withIcon mb={[1, 3]}>
-                      {error}
-                    </MessageBox>
-                  </Flex>
-                )}
-                <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
-                  <Box width={[0, null, null, '24em']} />
-                  <Box maxWidth={[300, 500]} minWidth={[200, 400]}>
-                    <StyledInputField htmlFor="collective">
-                      {fieldProps => (
-                        <GithubRepositories
-                          {...fieldProps}
-                          repositories={repositories}
-                          sendRepoInfo={info => {
-                            this.handleChange('github', info);
-                            this.changeRoute({
-                              category: 'opensource',
-                              step: 'form',
-                            });
-                            this.handleChange('category', 'opensource');
-                          }}
-                        />
-                      )}
-                    </StyledInputField>
-                  </Box>
-                  <GithubRepositoriesFAQ
-                    mt={4}
-                    ml={4}
-                    display={['block', null, 'block']}
-                    width={1 / 5}
-                    minWidth={[200, 335]}
-                  />
-                </Flex>
-              </Fragment>
+              <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
+                <Box width={[0, null, null, '24em']} />
+                <Box maxWidth={[300, 500]} minWidth={[200, 400]}>
+                  <StyledInputField htmlFor="collective">
+                    {fieldProps => (
+                      <GithubRepositories
+                        {...fieldProps}
+                        repositories={repositories}
+                        sendRepoInfo={info => {
+                          this.handleChange('github', info);
+                          this.changeRoute({
+                            category: 'opensource',
+                            step: 'form',
+                          });
+                          this.handleChange('category', 'opensource');
+                        }}
+                      />
+                    )}
+                  </StyledInputField>
+                </Box>
+                <GithubRepositoriesFAQ
+                  mt={4}
+                  ml={4}
+                  display={['block', null, 'block']}
+                  width={1 / 5}
+                  minWidth={[200, 335]}
+                />
+              </Flex>
             )}
           </Fragment>
         )}
