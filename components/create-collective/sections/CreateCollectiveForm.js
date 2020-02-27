@@ -208,7 +208,7 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
 
-                    <Box className="tos" mx={1} my={4}>
+                    <Box mx={1} my={4}>
                       <StyledCheckbox
                         name="tos"
                         label={
@@ -276,7 +276,6 @@ class CreateCollectiveForm extends React.Component {
             <Flex justifyContent="center" mb={4} display={['flex', 'none']}>
               <Illustration
                 display={['block', 'none']}
-                className="formImage"
                 src="/static/images/createcollective-mobile-form.png"
                 width="320px"
                 height="200px"

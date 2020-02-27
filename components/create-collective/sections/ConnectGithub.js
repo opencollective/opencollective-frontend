@@ -292,7 +292,7 @@ class ConnectGithub extends React.Component {
                   />
                 </P>
 
-                <Box className="tos" mx={1} my={4}>
+                <Box mx={1} my={4}>
                   <StyledCheckbox
                     name="tos"
                     label={
