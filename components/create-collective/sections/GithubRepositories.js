@@ -128,7 +128,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
           m={2}
           px={[2, 3]}
         >
-          <FormattedMessage id="createcollective.opensource.continue" defaultMessage="Continue" />
+          <FormattedMessage id="actions.continue" defaultMessage="Continue" />
         </StyledButton>
       </Flex>
     </Fragment>

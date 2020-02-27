@@ -37,17 +37,17 @@ class ConnectGithub extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.messages = defineMessages({
-      header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
+      header: { id: 'home.create', defaultMessage: 'Create a Collective' },
       openSourceSubtitle: {
         id: 'collective.subtitle.opensource',
         defaultMessage: 'Open source projects are invited to join the Open Source Collective fiscal host.',
       },
       repoHeader: {
-        id: 'collective.header.pickarepo',
+        id: 'openSourceApply.GithubRepositories.title',
         defaultMessage: 'Pick a repository',
       },
       back: {
-        id: 'createCollective.link.back',
+        id: 'Back',
         defaultMessage: 'Back',
       },
     });
@@ -150,7 +150,7 @@ class ConnectGithub extends React.Component {
                           href="https://docs.opencollective.com/help/collectives/osc-verification"
                           openInNewTab
                         >
-                          Get help
+                          <FormattedMessage id="getHelp" defaultMessage="Get help" />
                         </ExternalLink>
                       ),
                     }}
@@ -166,12 +166,15 @@ class ConnectGithub extends React.Component {
                           href="https://docs.opencollective.com/help/collectives/osc-verification#applying-for-manual-verification"
                           openInNewTab
                         >
-                          Click here
+                          <FormattedMessage id="clickHere" defaultMessage="Click here" />
                         </ExternalLink>
                       ),
                       altverification: (
                         <ExternalLink href="https://www.oscollective.org/#criteria" openInNewTab>
-                          alternative verification criteria
+                          <FormattedMessage
+                            id="alternativeVerificationCriteria"
+                            defaultMessage="alternative verification criteria"
+                          />
                         </ExternalLink>
                       ),
                     }}
@@ -271,12 +274,18 @@ class ConnectGithub extends React.Component {
                     values={{
                       osclink: (
                         <ExternalLink href="https://opencollective.com/opensource" openInNewTab>
-                          Open Source Collective 501c6
+                          <FormattedMessage
+                            id="OpenSourceCollective501c6"
+                            defaultMessage="Open Source Collective 501c6"
+                          />
                         </ExternalLink>
                       ),
                       criterialink: (
-                        <ExternalLink href="#" openInNewTab>
-                          alternative acceptance criteria
+                        <ExternalLink href="https://www.oscollective.org/#criteria" openInNewTab>
+                          <FormattedMessage
+                            id="alternativeVerificationCriteria"
+                            defaultMessage="alternative verification criteria"
+                          />
                         </ExternalLink>
                       ),
                     }}
@@ -298,11 +307,11 @@ class ConnectGithub extends React.Component {
                     label={
                       <FormattedMessage
                         id="createcollective.opensourcetos.label"
-                        defaultMessage="I agree with the <toslink>terms of fiscal sponsorship</toslink>."
+                        defaultMessage="I agree with the {toslink}."
                         values={{
-                          toslink: msg => (
+                          toslink: (
                             <ExternalLink href="/tos" openInNewTab>
-                              {msg}
+                              <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
                             </ExternalLink>
                           ),
                         }}

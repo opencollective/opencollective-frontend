@@ -47,10 +47,10 @@ class CreateCollectiveForm extends React.Component {
         defaultMessage: 'Introduce your Collective to the community.',
       },
       back: {
-        id: 'createCollective.link.back',
+        id: 'Back',
         defaultMessage: 'Back',
       },
-      header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
+      header: { id: 'home.create', defaultMessage: 'Create a Collective' },
       nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
       slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
       descriptionLabel: {
@@ -58,7 +58,7 @@ class CreateCollectiveForm extends React.Component {
         defaultMessage: 'What does your collective do?',
       },
       createButton: {
-        id: 'createCollective.button.create',
+        id: 'collective.create.button',
         defaultMessage: 'Create Collective',
       },
     });
@@ -214,11 +214,11 @@ class CreateCollectiveForm extends React.Component {
                         label={
                           <FormattedMessage
                             id="createcollective.tos.label"
-                            defaultMessage="I agree with the <toslink>terms of service</toslink> of Open Collective."
+                            defaultMessage="I agree with the {toslink} of Open Collective."
                             values={{
-                              toslink: msg => (
+                              toslink: (
                                 <ExternalLink href="/tos" openInNewTab>
-                                  {msg}
+                                  <FormattedMessage id="tos" defaultMessage="terms of service" />
                                 </ExternalLink>
                               ),
                             }}
@@ -237,11 +237,11 @@ class CreateCollectiveForm extends React.Component {
                           label={
                             <FormattedMessage
                               id="createcollective.hosttos.label"
-                              defaultMessage="I agree with the <hosttoslink>the terms of fiscal sponsorship of the host</hosttoslink> that will collect money on behalf of our collective."
+                              defaultMessage="I agree with the the {hosttoslink} of the host that will collect money on behalf of our collective."
                               values={{
-                                hosttoslink: msg => (
+                                hosttoslink: (
                                   <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
-                                    {msg}
+                                    <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
                                   </ExternalLink>
                                 ),
                               }}

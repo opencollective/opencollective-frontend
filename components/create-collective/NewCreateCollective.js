@@ -171,14 +171,14 @@ class NewCreateCollective extends Component {
                 <Flex flexDirection="column" p={4} mt={2}>
                   <Box mb={3}>
                     <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                      <FormattedMessage id="createCollective.header.create" defaultMessage="Create a Collective" />
+                      <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
                     </H1>
                   </Box>
                 </Flex>
                 <Flex alignItems="center" justifyContent="center">
                   <MessageBox type="warning" withIcon mb={[1, 3]}>
                     <FormattedMessage
-                      id="collective.create.error.HostNotOpenToApplications"
+                      id="collectives.create.error.HostNotOpenToApplications"
                       defaultMessage="This host is not open to applications"
                     />
                   </MessageBox>
