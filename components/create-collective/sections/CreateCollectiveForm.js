@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Formik, Field, Form } from 'formik';
 import { Flex, Box } from '@rebass/grid';
-import { assign } from 'lodash';
+import { assign, get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
 import { H1, P } from '../../Text';
@@ -36,7 +36,8 @@ class CreateCollectiveForm extends React.Component {
 
     this.state = {
       collective,
-      checked: false,
+      tosChecked: false,
+      hostTosChceked: false,
     };
 
     this.messages = defineMessages({
@@ -60,11 +61,6 @@ class CreateCollectiveForm extends React.Component {
   }
 
   handleChange(fieldname, value) {
-    if (value === null) {
-      this.props.onChange(fieldname, value);
-      return;
-    }
-
     const collective = {};
 
     collective[fieldname] = value;
@@ -75,7 +71,9 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, query } = this.props;
+    const { intl, error, query, host } = this.props;
+
+    console.log(host);
 
     const initialValues = {
       name: '',
@@ -227,13 +225,38 @@ class CreateCollectiveForm extends React.Component {
                           />
                         }
                         required
-                        checked={this.state.checked}
+                        checked={this.state.tosChecked}
                         onChange={({ checked }) => {
                           this.handleChange('tos', checked);
                           this.setState({ checked });
                         }}
                       />
+                      {get(host, 'settings.tos') && (
+                        <StyledCheckbox
+                          name="hostTos"
+                          label={
+                            <FormattedMessage
+                              id="createcollective.hosttos.label"
+                              defaultMessage="I agree with the <hosttoslink>the terms of fiscal sponsorship of the host</hosttoslink> that will collect money on behalf of our collective."
+                              values={{
+                                hosttoslink: msg => (
+                                  <a href={get(host, 'settings.tos')} target="_blank" rel="noopener noreferrer">
+                                    {msg}
+                                  </a>
+                                ),
+                              }}
+                            />
+                          }
+                          required
+                          checked={this.state.hostTosChecked}
+                          onChange={({ checked }) => {
+                            this.handleChange('hostTos', checked);
+                            this.setState({ checked });
+                          }}
+                        />
+                      )}
                     </Box>
+
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton
                         buttonSize="small"

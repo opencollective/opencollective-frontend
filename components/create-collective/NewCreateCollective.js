@@ -2,7 +2,7 @@ import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 
 import Page from '../Page';
@@ -11,6 +11,7 @@ import CreateCollectiveForm from './sections/CreateCollectiveForm';
 import CollectiveCategoryPicker from './sections/CollectiveCategoryPicker';
 import ConnectGithub from './sections/ConnectGithub';
 import SignInOrJoinFree from '../SignInOrJoinFree';
+import MessageBox from '../MessageBox';
 import { withUser } from '../UserProvider';
 
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
@@ -109,6 +110,12 @@ class NewCreateCollective extends Component {
       });
       return;
     }
+    if (!collective.hostTos) {
+      this.setState({
+        error: 'Please accept the terms of fiscal sponsorship',
+      });
+      return;
+    }
 
     // set state to loading
     this.setState({ status: 'loading' });
@@ -120,6 +127,7 @@ class NewCreateCollective extends Component {
       this.props.host = { slug: 'opensource' };
     }
     delete collective.tos;
+    delete collective.hostTos;
 
     // try mutation
     try {
@@ -157,6 +165,27 @@ class NewCreateCollective extends Component {
     return (
       <Page>
         <div>
+          {!canApply && (
+            <Fragment>
+              <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+                <Flex flexDirection="column" p={4} mt={2}>
+                  <Box mb={3}>
+                    <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+                      <FormattedMessage id="createCollective.header.create" defaultMessage="Create a Collective" />
+                    </H1>
+                  </Box>
+                </Flex>
+                <Flex alignItems="center" justifyContent="center">
+                  <MessageBox type="warning" withIcon mb={[1, 3]}>
+                    <FormattedMessage
+                      id="collective.create.error.HostNotOpenToApplications"
+                      defaultMessage="This host is not open to applications"
+                    />
+                  </MessageBox>
+                </Flex>
+              </Flex>
+            </Fragment>
+          )}
           {canApply && !LoggedInUser && (
             <Fragment>
               <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
