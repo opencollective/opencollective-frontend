@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import config from 'config';
-import { get, omitBy, isNull } from 'lodash';
+import { omitBy, isNull } from 'lodash';
 
 import logger from './logger';
 import { Quote, RecipientAccount } from '../types/transferwise';
