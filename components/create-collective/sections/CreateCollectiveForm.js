@@ -73,8 +73,6 @@ class CreateCollectiveForm extends React.Component {
   render() {
     const { intl, error, query, host } = this.props;
 
-    console.log(host);
-
     const initialValues = {
       name: '',
       desc: '',

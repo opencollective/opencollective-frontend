@@ -342,27 +342,33 @@ class ConnectGithub extends React.Component {
                       defaultMessage="Verify using GitHub stars"
                     />
                   </StyledButton>
-                  <StyledButton
-                    textAlign="center"
-                    buttonSize="medium"
-                    height="36px"
-                    width="213px"
-                    buttonStyle="secondary"
-                    onClick={() => {
-                      this.handleChange('category', 'opensource');
-                      this.changeRoute({
-                        category: 'opensource',
-                        step: 'form',
-                      });
+                  <Link
+                    route="new-create-collective"
+                    params={{
+                      hostCollectiveSlug: query.hostCollectiveSlug,
+                      verb: query.verb,
+                      category: 'opensource',
+                      step: 'form',
                     }}
-                    mx={2}
-                    px={[2, 3]}
                   >
-                    <FormattedMessage
-                      id="createcollective.opensource.ManualVerification"
-                      defaultMessage="Request manual verification"
-                    />
-                  </StyledButton>
+                    <StyledButton
+                      textAlign="center"
+                      buttonSize="medium"
+                      height="36px"
+                      width="213px"
+                      buttonStyle="secondary"
+                      onClick={() => {
+                        this.handleChange('category', 'opensource');
+                      }}
+                      mx={2}
+                      px={[2, 3]}
+                    >
+                      <FormattedMessage
+                        id="createcollective.opensource.ManualVerification"
+                        defaultMessage="Request manual verification"
+                      />
+                    </StyledButton>
+                  </Link>
                 </Flex>
               </Box>
             </Flex>

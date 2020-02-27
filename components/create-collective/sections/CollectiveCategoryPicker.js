@@ -8,6 +8,7 @@ import themeGet from '@styled-system/theme-get';
 import { H1 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
+import Link from '../../Link';
 
 import { Router } from '../../../server/pages';
 
@@ -68,18 +69,8 @@ class CollectiveCategoryPicker extends React.Component {
     this.props.onChange(fieldname, value);
   }
 
-  changeRoute = async params => {
-    params = {
-      ...params,
-      verb: this.props.query.verb,
-      hostCollectiveSlug: this.props.query.hostCollectiveSlug || undefined,
-    };
-    await Router.pushRoute('new-create-collective', params);
-    window.scrollTo(0, 0);
-  };
-
   render() {
-    const { intl } = this.props;
+    const { intl, query } = this.props;
 
     return (
       <div>
@@ -104,20 +95,28 @@ class CollectiveCategoryPicker extends React.Component {
                     src="/static/images/createcollective-opensource.png"
                     alt={intl.formatMessage(this.messages.opensource)}
                   />
-                  <StyledButton
-                    buttonSize="small"
-                    height="35px"
-                    buttonStyle="primary"
-                    mt={[2, 3]}
-                    mb={2}
-                    px={3}
-                    onClick={() => {
-                      this.handleChange('category', 'opensource');
-                      this.changeRoute({ category: 'opensource' });
+                  <Link
+                    route="new-create-collective"
+                    params={{
+                      hostCollectiveSlug: query.hostCollectiveSlug,
+                      verb: query.verb,
+                      category: 'opensource',
                     }}
                   >
-                    {intl.formatMessage(this.messages.opensource)}
-                  </StyledButton>
+                    <StyledButton
+                      buttonSize="small"
+                      height="35px"
+                      buttonStyle="primary"
+                      mt={[2, 3]}
+                      mb={2}
+                      px={3}
+                      onClick={() => {
+                        this.handleChange('category', 'opensource');
+                      }}
+                    >
+                      {intl.formatMessage(this.messages.opensource)}
+                    </StyledButton>
+                  </Link>
                   <ExamplesLink href="#">{intl.formatMessage(this.messages.examples)}</ExamplesLink>
                 </Flex>
               </Container>
@@ -134,20 +133,28 @@ class CollectiveCategoryPicker extends React.Component {
                     src="/static/images/createcollective-anycommunity.png"
                     alt={intl.formatMessage(this.messages.community)}
                   />
-                  <StyledButton
-                    buttonSize="small"
-                    height="35px"
-                    buttonStyle="primary"
-                    mt={[2, 3]}
-                    mb={2}
-                    px={3}
-                    onClick={() => {
-                      this.handleChange('category', 'community');
-                      this.changeRoute({ category: 'community' });
+                  <Link
+                    route="new-create-collective"
+                    params={{
+                      hostCollectiveSlug: query.hostCollectiveSlug,
+                      verb: query.verb,
+                      category: 'community',
                     }}
                   >
-                    {intl.formatMessage(this.messages.community)}
-                  </StyledButton>
+                    <StyledButton
+                      buttonSize="small"
+                      height="35px"
+                      buttonStyle="primary"
+                      mt={[2, 3]}
+                      mb={2}
+                      px={3}
+                      onClick={() => {
+                        this.handleChange('category', 'community');
+                      }}
+                    >
+                      {intl.formatMessage(this.messages.community)}
+                    </StyledButton>
+                  </Link>
                   <ExamplesLink href="#">{intl.formatMessage(this.messages.examples)}</ExamplesLink>
                 </Flex>
               </Container>
@@ -163,20 +170,28 @@ class CollectiveCategoryPicker extends React.Component {
                     src="/static/images/createcollective-climateinitiative.png"
                     alt={intl.formatMessage(this.messages.climate)}
                   />
-                  <StyledButton
-                    buttonSize="small"
-                    height="35px"
-                    buttonStyle="primary"
-                    mt={[2, 3]}
-                    mb={2}
-                    px={3}
-                    onClick={() => {
-                      this.handleChange('category', 'climate');
-                      this.changeRoute({ category: 'climate' });
+                  <Link
+                    route="new-create-collective"
+                    params={{
+                      hostCollectiveSlug: query.hostCollectiveSlug,
+                      verb: query.verb,
+                      category: 'climate',
                     }}
                   >
-                    {intl.formatMessage(this.messages.climate)}
-                  </StyledButton>
+                    <StyledButton
+                      buttonSize="small"
+                      height="35px"
+                      buttonStyle="primary"
+                      mt={[2, 3]}
+                      mb={2}
+                      px={3}
+                      onClick={() => {
+                        this.handleChange('category', 'climate');
+                      }}
+                    >
+                      {intl.formatMessage(this.messages.climate)}
+                    </StyledButton>
+                  </Link>
                   <ExamplesLink href="#">{intl.formatMessage(this.messages.examples)}</ExamplesLink>
                 </Flex>
               </Container>
