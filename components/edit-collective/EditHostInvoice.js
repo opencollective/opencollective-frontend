@@ -88,7 +88,7 @@ const EditHostInvoice = ({ collective }) => {
             })
           }
         >
-          {isSaved && infoIsTouched ? (
+          {isSaved && infoIsSaved ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
