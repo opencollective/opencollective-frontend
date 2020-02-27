@@ -20,6 +20,21 @@ const ExamplesLink = styled.a`
   }
 `;
 
+const Image = styled.img`
+  @media screen and (min-width: 52em) {
+    height: 256px;
+    width: 256px;
+  }
+  @media screen and (max-width: 40em) {
+    height: 192px;
+    width: 192px;
+  }
+  @media screen and (min-width: 40em) and (max-width: 52em) {
+    height: 208px;
+    width: 208px;
+  }
+`;
+
 class CollectiveCategoryPicker extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -68,28 +83,6 @@ class CollectiveCategoryPicker extends React.Component {
 
     return (
       <div>
-        <style jsx>
-          {`
-            @media screen and (min-width: 52em) {
-              .categoryImage {
-                height: 256px;
-                width: 256px;
-              }
-            }
-            @media screen and (max-width: 40em) {
-              .categoryImage {
-                height: 192px;
-                width: 192px;
-              }
-            }
-            @media screen and (min-width: 40em) and (max-width: 52em) {
-              .categoryImage {
-                height: 208px;
-                width: 208px;
-              }
-            }
-          `}
-        </style>
         <Box my={4}>
           <H1
             fontSize={['H5', 'H3', null, null]}
@@ -106,7 +99,7 @@ class CollectiveCategoryPicker extends React.Component {
             <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
               <Container alignItems="center" width={[null, 280, 312, null]} mb={[4, 0, null, null]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <img
+                  <Image
                     className="categoryImage"
                     src="/static/images/createcollective-opensource.png"
                     alt={intl.formatMessage(this.messages.opensource)}
@@ -136,7 +129,7 @@ class CollectiveCategoryPicker extends React.Component {
                 mb={[4, 0, null, null]}
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <img
+                  <Image
                     className="categoryImage"
                     src="/static/images/createcollective-anycommunity.png"
                     alt={intl.formatMessage(this.messages.community)}
@@ -165,7 +158,7 @@ class CollectiveCategoryPicker extends React.Component {
                 width={[null, 280, 312, null]}
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <img
+                  <Image
                     className="categoryImage"
                     src="/static/images/createcollective-climateinitiative.png"
                     alt={intl.formatMessage(this.messages.climate)}
