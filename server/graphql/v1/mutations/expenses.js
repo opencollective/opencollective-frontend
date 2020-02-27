@@ -376,7 +376,7 @@ export async function editExpense(remoteUser, expenseData) {
     );
   });
 
-  updatedExpense.createActivity(activities.COLLECTIVE_EXPENSE_UPDATED);
+  await updatedExpense.createActivity(activities.COLLECTIVE_EXPENSE_UPDATED);
   return updatedExpense;
 }
 
