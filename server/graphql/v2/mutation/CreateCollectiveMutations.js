@@ -50,9 +50,10 @@ async function createCollective(_, args, req) {
         where: { CollectiveId: remoteUser.CollectiveId, service: 'github' },
       });
       if (!githubAccount) {
-        throw new Error('You must have a connected GitHub Account to claim a collective');
+        throw new Error('You must have a connected GitHub Account to create a collective with GitHub.');
       }
-      await github.handleOpenSourceAutomatedApproval(githubHandle, githubAccount.token);
+      await github.checkGithubAdmin(githubHandle, githubAccount.token);
+      await github.checkGithubStars(githubHandle, githubAccount.token);
       shouldAutomaticallyApprove = true;
     } catch (error) {
       throw new errors.ValidationFailed({ message: error.message });

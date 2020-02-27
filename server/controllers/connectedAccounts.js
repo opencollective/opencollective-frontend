@@ -202,6 +202,7 @@ const getGithubAccount = async req => {
 // Use a 1 minutes timeout as the default 25 seconds can leads to failing requests.
 const GITHUB_REPOS_FETCH_TIMEOUT = 1 * 60 * 1000;
 
+// used in Frontend by createCollective "GitHub flow"
 export const fetchAllRepositories = async (req, res, next) => {
   const githubAccount = await getGithubAccount(req);
   try {
@@ -218,6 +219,7 @@ export const fetchAllRepositories = async (req, res, next) => {
   }
 };
 
+// used in Frontend by claimCollective
 export const getRepo = async (req, res, next) => {
   const githubAccount = await getGithubAccount(req);
   try {
@@ -228,6 +230,7 @@ export const getRepo = async (req, res, next) => {
   }
 };
 
+// used in Frontend by claimCollective
 export const getOrgMemberships = async (req, res, next) => {
   const githubAccount = await getGithubAccount(req);
   try {

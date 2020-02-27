@@ -43,7 +43,7 @@ export function getOctokit(accessToken) {
     };
   }
 
-  return Octokit(octokitParams);
+  return new Octokit(octokitParams);
 }
 
 export function getData(res) {
@@ -139,17 +139,29 @@ export async function getOrgMemberships(accessToken) {
   return octokit.orgs.listMemberships({ page: 1, per_page: 100 }).then(getData);
 }
 
-export async function handleOpenSourceAutomatedApproval(githubHandle, accessToken) {
+export async function checkGithubExists(githubHandle, accessToken) {
+  if (githubHandle.includes('/')) {
+    // A repository GitHub Handle (most common)
+    const repo = await getRepo(githubHandle, accessToken).catch(() => null);
+    if (!repo) {
+      throw new Error('We could not verify the GitHub repository exists');
+    }
+  } else {
+    // An organization GitHub Handle
+    const org = await getOrg(githubHandle, accessToken).catch(() => null);
+    if (!org) {
+      throw new Error('We could not verify the GitHub organization exists');
+    }
+  }
+}
+
+export async function checkGithubAdmin(githubHandle, accessToken) {
   if (githubHandle.includes('/')) {
     // A repository GitHub Handle (most common)
     const repo = await getRepo(githubHandle, accessToken);
     const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
     if (!isGithubRepositoryAdmin) {
       throw new Error("We could not verify that you're admin of the GitHub repository");
-    } else if (repo.stargazers_count < config.githubFlow.minNbStars) {
-      throw new Error(
-        `The repository need at least ${config.githubFlow.minNbStars} stars to apply to the Open Source Collective.`,
-      );
     }
   } else {
     // An organization GitHub Handle
@@ -160,11 +172,23 @@ export async function handleOpenSourceAutomatedApproval(githubHandle, accessToke
     if (!organizationAdminMembership) {
       throw new Error("We could not verify that you're admin of the GitHub organization");
     }
+  }
+}
+
+export async function checkGithubStars(githubHandle, accessToken) {
+  if (githubHandle.includes('/')) {
+    // A repository GitHub Handle (most common)
+    const repo = await getRepo(githubHandle, accessToken);
+    if (repo.stargazers_count < config.githubFlow.minNbStars) {
+      throw new Error(`The repository need at least ${config.githubFlow.minNbStars} stars.`);
+    }
+  } else {
+    // An organization GitHub Handle
     const allRepos = await getAllOrganizationPublicRepos(githubHandle, accessToken).catch(() => null);
     const repoWith100stars = allRepos.find(repo => repo.stargazers_count >= config.githubFlow.minNbStars);
     if (!repoWith100stars) {
       throw new Error(
-        `The organization need at least one repository with ${config.githubFlow.minNbStars} GitHub stars to be pledged.`,
+        `The organization need at least one repository with ${config.githubFlow.minNbStars} GitHub stars.`,
       );
     }
   }

@@ -197,9 +197,9 @@ export default app => {
   /**
    * Github API - fetch all repositories using the user's access_token
    */
-  app.get('/github-repositories', connectedAccounts.fetchAllRepositories);
-  app.get('/github/repo', connectedAccounts.getRepo);
-  app.get('/github/orgMemberships', connectedAccounts.getOrgMemberships);
+  app.get('/github-repositories', connectedAccounts.fetchAllRepositories); // used in Frontend by createCollective "GitHub flow"
+  app.get('/github/repo', connectedAccounts.getRepo); // used in Frontend claimCollective
+  app.get('/github/orgMemberships', connectedAccounts.getOrgMemberships); // used in Frontend claimCollective
 
   /**
    * Hello Works API - Helloworks hits this endpoint when a document has been completed.

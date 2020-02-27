@@ -106,6 +106,7 @@ describe('server/graphql/v2/mutation/CreateCollectiveMutations', () => {
 
       nock('https://api.github.com:443')
         .get('/repos/backyourstack/backyourstack')
+        .times(2)
         .reply(200, {
           name: 'backyourstack',
           stargazers_count: 102,
