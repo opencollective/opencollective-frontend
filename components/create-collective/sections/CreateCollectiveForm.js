@@ -33,7 +33,7 @@ class CreateCollectiveForm extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
 
-    const collective = { ...(props.collective || {}) };
+    const collective = { ...props.collective }; // {}
 
     this.state = {
       collective,
