@@ -160,7 +160,7 @@ class NewCreateCollective extends Component {
 
     return (
       <Page>
-        <div className="CreateCollective">
+        <div>
           {canApply && !LoggedInUser && (
             <Fragment>
               <Flex flexDirection="column" alignItems="center" mb={5} p={2}>

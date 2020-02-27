@@ -11,6 +11,15 @@ import Container from '../../Container';
 
 import { Router } from '../../../server/pages';
 
+const ExamplesLink = styled.a`
+  color: ${themeGet('colors.blue.500')};
+  font-size: ${themeGet('fontSizes.Caption')}px;
+
+  &:hover {
+    color: #dc5f7d;
+  }
+`;
+
 class CollectiveCategoryPicker extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -57,17 +66,8 @@ class CollectiveCategoryPicker extends React.Component {
   render() {
     const { intl } = this.props;
 
-    const ExamplesLink = styled.a`
-      color: ${themeGet('colors.blue.500')};
-      font-size: ${themeGet('fontSizes.Caption')}px;
-
-      &:hover {
-        color: #dc5f7d;
-      }
-    `;
-
     return (
-      <div className="CollectiveCategoryPicker">
+      <div>
         <style jsx>
           {`
             @media screen and (min-width: 52em) {

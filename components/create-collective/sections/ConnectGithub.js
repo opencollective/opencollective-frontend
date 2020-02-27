@@ -16,7 +16,7 @@ import MessageBox from '../../MessageBox';
 
 import { Router } from '../../../server/pages';
 import { getGithubRepos } from '../../../lib/api';
-import { getWebsiteUrl, getErrorFromGraphqlException } from '../../../lib/utils';
+import { getWebsiteUrl } from '../../../lib/utils';
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../../../lib/local-storage';
 
 class ConnectGithub extends React.Component {
