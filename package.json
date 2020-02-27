@@ -22,7 +22,7 @@
     "apollo-errors": "1.9.0",
     "apollo-server-express": "2.10.1",
     "argparse": "1.0.10",
-    "aws-sdk": "2.626.0",
+    "aws-sdk": "2.627.0",
     "axios": "0.19.2",
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-lodash": "3.3.4",
