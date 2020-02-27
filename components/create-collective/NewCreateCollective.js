@@ -109,7 +109,7 @@ class NewCreateCollective extends Component {
       });
       return;
     }
-    if (!collective.hostTos) {
+    if (this.props.host && !collective.hostTos) {
       this.setState({
         error: 'Please accept the terms of fiscal sponsorship',
       });
