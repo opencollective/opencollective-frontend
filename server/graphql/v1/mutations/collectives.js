@@ -236,15 +236,13 @@ export async function createCollectiveFromGithub(_, args, req) {
   const githubAccount = await models.ConnectedAccount.findOne({
     where: { CollectiveId: req.remoteUser.CollectiveId, service: 'github' },
   });
-
   if (!githubAccount) {
-    throw new errors.Unauthorized({
-      message: 'You must have a connected GitHub Account to claim a collective',
-    });
+    throw new Error('You must have a connected GitHub Account to create a collective with GitHub.');
   }
 
   try {
-    await github.handleOpenSourceAutomatedApproval(githubHandle, githubAccount.token);
+    await github.checkGithubAdmin(githubHandle, githubAccount.token);
+    await github.checkGithubStars(githubHandle, githubAccount.token);
     if (githubHandle.includes('/')) {
       const repo = await github.getRepo(githubHandle, githubAccount.token);
       collectiveData.tags = repo.topics || [];
@@ -545,26 +543,11 @@ export async function claimCollective(_, args, req) {
     });
   }
 
-  if (githubHandle.includes('/')) {
-    // A repository GitHub Handle (most common)
-    const repo = await github.getRepo(githubHandle, githubAccount.token);
-    const isGithubRepositoryAdmin = get(repo, 'permissions.admin') === true;
-    if (!isGithubRepositoryAdmin) {
-      throw new errors.ValidationFailed({
-        message: "We could not verify that you're admin of the GitHub repository",
-      });
-    }
-  } else {
-    // An organization GitHub Handle
-    const memberships = await github.getOrgMemberships(githubAccount.token);
-    const organizationAdminMembership =
-      memberships &&
-      memberships.find(m => m.organization.login === githubHandle && m.state === 'active' && m.role === 'admin');
-    if (!organizationAdminMembership) {
-      throw new errors.ValidationFailed({
-        message: "We could not verify that you're admin of the GitHub organization",
-      });
-    }
+  try {
+    await github.checkGithubAdmin(githubHandle, githubAccount.token);
+    await github.checkGithubStars(githubHandle, githubAccount.token);
+  } catch (error) {
+    throw new errors.ValidationFailed({ message: error.message });
   }
 
   // add remoteUser as admin of collective
