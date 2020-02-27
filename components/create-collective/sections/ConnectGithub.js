@@ -68,9 +68,8 @@ class ConnectGithub extends React.Component {
 
     try {
       const repositories = await getGithubRepos(token);
-      const filteredRepos = repositories.filter(repo => repo.stargazers_count >= 100);
-      if (filteredRepos.length !== 0) {
-        this.setState({ repositories: filteredRepos, loadingRepos: false });
+      if (repositories.length !== 0) {
+        this.setState({ repositories, loadingRepos: false });
       } else {
         this.setState({
           loadingRepos: false,
@@ -147,7 +146,10 @@ class ConnectGithub extends React.Component {
                     defaultMessage="Don't see the repository you're looking for? {helplink}."
                     values={{
                       helplink: (
-                        <ExternalLink href="#" openInNewTab>
+                        <ExternalLink
+                          href="https://docs.opencollective.com/help/collectives/osc-verification"
+                          openInNewTab
+                        >
                           Get help
                         </ExternalLink>
                       ),
@@ -157,11 +159,19 @@ class ConnectGithub extends React.Component {
                 <P fontSize="Paragraph" color="black.600" mb={2}>
                   <FormattedMessage
                     id="collective.subtitle.altVerification"
-                    defaultMessage="Want to apply using alternative verification criteria? {altlink}."
+                    defaultMessage="Want to apply using {altverification}? {applylink}."
                     values={{
-                      altlink: (
-                        <ExternalLink href="#" openInNewTab>
-                          Get help
+                      applylink: (
+                        <ExternalLink
+                          href="https://docs.opencollective.com/help/collectives/osc-verification#applying-for-manual-verification"
+                          openInNewTab
+                        >
+                          Click here
+                        </ExternalLink>
+                      ),
+                      altverification: (
+                        <ExternalLink href="https://www.oscollective.org/#criteria" openInNewTab>
+                          alternative verification criteria
                         </ExternalLink>
                       ),
                     }}

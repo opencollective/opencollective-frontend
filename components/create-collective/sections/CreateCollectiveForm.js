@@ -38,7 +38,7 @@ class CreateCollectiveForm extends React.Component {
     this.state = {
       collective,
       tosChecked: false,
-      hostTosChceked: false,
+      hostTosChecked: false,
     };
 
     this.messages = defineMessages({
@@ -53,7 +53,10 @@ class CreateCollectiveForm extends React.Component {
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
       slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
-      descLabel: { id: 'createCollective.form.descLabel', defaultMessage: 'What does your collective do?' },
+      descriptionLabel: {
+        id: 'createCollective.form.descriptionLabel',
+        defaultMessage: 'What does your collective do?',
+      },
       createButton: {
         id: 'createCollective.button.create',
         defaultMessage: 'Create Collective',
@@ -66,9 +69,7 @@ class CreateCollectiveForm extends React.Component {
 
     collective[fieldname] = value;
 
-    this.setState({
-      collective: assign(this.state.collective, collective),
-    });
+    this.setState({ collective });
   }
 
   render() {
@@ -76,7 +77,7 @@ class CreateCollectiveForm extends React.Component {
 
     const initialValues = {
       name: '',
-      desc: '',
+      description: '',
       slug: '',
     };
 
@@ -91,18 +92,18 @@ class CreateCollectiveForm extends React.Component {
         errors.slug = 'Please use fewer than 30 characters';
       }
 
-      if (values.desc.length > 50) {
-        errors.desc = 'Please use fewer than 30 characters';
+      if (values.description.length > 50) {
+        errors.description = 'Please use fewer than 30 characters';
       }
 
       return errors;
     };
 
     const submit = values => {
-      const { desc, name, slug } = values;
+      const { description, name, slug } = values;
       const collective = {
         name,
-        description: desc,
+        description,
         slug,
       };
       assign(collective, this.state.collective);
@@ -190,11 +191,11 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
                     <StyledInputField
-                      name="desc"
-                      htmlFor="desc"
-                      error={touched.desc && errors.desc}
-                      label={intl.formatMessage(this.messages.descLabel)}
-                      value={values.desc}
+                      name="description"
+                      htmlFor="description"
+                      error={touched.description && errors.description}
+                      label={intl.formatMessage(this.messages.descriptionLabel)}
+                      value={values.description}
                       required
                       my={4}
                     >
@@ -227,7 +228,7 @@ class CreateCollectiveForm extends React.Component {
                         checked={this.state.tosChecked}
                         onChange={({ checked }) => {
                           this.handleChange('tos', checked);
-                          this.setState({ checked });
+                          this.setState({ tosChecked: checked });
                         }}
                       />
                       {get(host, 'settings.tos') && (
@@ -250,7 +251,7 @@ class CreateCollectiveForm extends React.Component {
                           checked={this.state.hostTosChecked}
                           onChange={({ checked }) => {
                             this.handleChange('hostTos', checked);
-                            this.setState({ checked });
+                            this.setState({ hostTosChecked: checked });
                           }}
                         />
                       )}
