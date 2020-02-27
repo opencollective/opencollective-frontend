@@ -107,7 +107,7 @@ class PayoutMethodSelect extends React.Component {
     const { formatMessage } = this.props.intl;
     const groupedPms = groupBy(payoutMethods, 'type');
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
-      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host.transferwise) {
+      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
         return false;
       } else {
         return true;
