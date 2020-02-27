@@ -48,6 +48,7 @@ const users = [
     type: 'Open Source Projects',
     description: '',
     collectivePath: '/babel',
+    learnMorePath: '/discover?show=open%20source',
     picture: '/static/images/home/oc-users-babel.png',
   },
   {
@@ -56,6 +57,7 @@ const users = [
     type: 'Meetups',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/wwcodeatl',
+    learnMorePath: '/wwcodeinc',
     picture: '/static/images/home/oc-users-womenwhocode.png',
   },
   {
@@ -64,11 +66,12 @@ const users = [
     type: 'Movements',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/xr-belgium',
+    learnMorePath: '/search?q=rebellion',
     picture: '/static/images/home/oc-users-extinctionrebllion.png',
   },
 ];
 
-const User = ({ id, name, picture, type, collectivePath }) => {
+const User = ({ id, name, picture, type, collectivePath, learnMorePath }) => {
   const intl = useIntl();
 
   return (
@@ -112,7 +115,7 @@ const User = ({ id, name, picture, type, collectivePath }) => {
             {intl.formatMessage(messages[`home.OCusers.${id}`])}
           </P>
         </Box>
-        <HomeStandardLink width="72px" href={collectivePath}>
+        <HomeStandardLink width="72px" href={learnMorePath}>
           <FormattedMessage id="home.more" defaultMessage="More" />
         </HomeStandardLink>
       </Container>
@@ -126,6 +129,7 @@ User.propTypes = {
   picture: PropTypes.string,
   type: PropTypes.string,
   collectivePath: PropTypes.string,
+  learnMorePath: PropTypes.string,
 };
 
 const OCUsers = () => {
@@ -142,7 +146,7 @@ const OCUsers = () => {
           />
         </SectionSubTitle>
         <Box mt={5}>
-          <HomeStandardLink fontSize="14px" lineHeight="18px" href="/discover">
+          <HomeStandardLink fontSize="14px" lineHeight="18px" href="https://blog.opencollective.com/tag/case-studies/">
             <FormattedMessage id="home.discover" defaultMessage="Discover more" />
           </HomeStandardLink>
         </Box>
