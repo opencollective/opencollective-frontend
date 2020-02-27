@@ -27,7 +27,7 @@ const EditHostInvoice = ({ collective }) => {
   // For invoice extra info
   const defaultInfo = get(collective.settings, 'extraInfo');
   const [info, setInfo] = React.useState(defaultInfo);
-  const isSelected = info !== defaultInfo;
+  const isTouch = info !== defaultInfo;
   const isSave = get(data, 'editCollective.settings.extraInfo') === info;
 
   return (
@@ -80,7 +80,7 @@ const EditHostInvoice = ({ collective }) => {
           minWidth={200}
           loading={loading}
           maxLength={255}
-          disabled={!isTouched}
+          disabled={!isTouched && !isTouch}
           onClick={() =>
             setSettings({
               variables: {
@@ -99,7 +99,6 @@ const EditHostInvoice = ({ collective }) => {
       </Flex>
       <Box mt={3} maxWidth={400}>
         <img src={imgInvoiceTitlePreview} alt="" />
-        {console.log(collective.settings)}
       </Box>
     </Container>
   );
