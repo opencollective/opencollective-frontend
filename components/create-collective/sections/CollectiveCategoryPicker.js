@@ -10,8 +10,6 @@ import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import Link from '../../Link';
 
-import { Router } from '../../../server/pages';
-
 const ExamplesLink = styled.a`
   color: ${themeGet('colors.blue.500')};
   font-size: ${themeGet('fontSizes.Caption')}px;
