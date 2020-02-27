@@ -41,17 +41,13 @@ class NewCreateCollective extends Component {
     };
     this.createCollective = this.createCollective.bind(this);
     this.messages = defineMessages({
-      'host.apply.title': {
-        id: 'host.apply.title',
-        defaultMessage: 'Apply to create a new {hostname} collective',
+      joinOC: {
+        id: 'collective.create.join',
+        defaultMessage: 'Join Open Collective',
       },
-      'collective.create.title': {
-        id: 'collective.create.title',
-        defaultMessage: 'Create an Open Collective',
-      },
-      'collective.create.description': {
-        id: 'collective.create.description',
-        defaultMessage: 'The place for your community to collect money and share your finance in full transparency.',
+      createOrSignIn: {
+        id: 'collective.create.createOrSignIn',
+        defaultMessage: 'Create an account (or sign in) to start a collective.',
       },
     });
   }
@@ -146,7 +142,7 @@ class NewCreateCollective extends Component {
   }
 
   render() {
-    const { LoggedInUser, query } = this.props;
+    const { LoggedInUser, query, intl } = this.props;
     const { category, form, error } = this.state;
     const { token } = query;
 
@@ -167,12 +163,12 @@ class NewCreateCollective extends Component {
                 <Flex flexDirection="column" p={4} mt={2}>
                   <Box mb={3}>
                     <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                      Join Open Collective
+                      {intl.formatMessage(this.messages.joinOC)}
                     </H1>
                   </Box>
                   <Box textAlign="center">
                     <P fontSize="Paragraph" color="black.600" mb={1}>
-                      Create an account (or sign in) to start a collective.
+                      {intl.formatMessage(this.messages.createOrSignIn)}
                     </P>
                   </Box>
                 </Flex>
