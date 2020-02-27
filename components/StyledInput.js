@@ -39,7 +39,6 @@ const StyledInput = styled.input`
   outline: none;
   background-color: ${themeGet('colors.white.full')};
 
-
   ${props => {
     if (props.withOutline) {
       return props.error
