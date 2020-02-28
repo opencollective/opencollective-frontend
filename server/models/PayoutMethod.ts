@@ -165,14 +165,7 @@ export default (sequelize, DataTypes): typeof PayoutMethod => {
                 throw new Error('Data for this payout method contains too much information');
               }
             } else if (this.type === PayoutMethodTypes.BANK_ACCOUNT) {
-              if (
-                !value ||
-                !value.accountHolderName ||
-                !value.currency ||
-                !value.type ||
-                !value.legalType ||
-                !value.details
-              ) {
+              if (!value || !value.accountHolderName || !value.currency || !value.type || !value.details) {
                 throw new Error('Invalid format of BANK_ACCOUNT payout method data');
               }
             } else if (!value || Object.keys(value).length > 0) {
