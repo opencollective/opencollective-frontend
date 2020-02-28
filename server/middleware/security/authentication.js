@@ -166,21 +166,20 @@ export function authenticateUser(req, res, next) {
 
 export const authenticateService = (req, res, next) => {
   const { service } = req.params;
+  const { context } = req.query;
   const opts = { callbackURL: getOAuthCallbackUrl(req) };
 
   if (service === 'github') {
-    /*
-      'repo' gives us access to org repos and private repos (latter is an issue for some people)
-      'public_repo' should give us all public_repos but in some cases users report not
-        being able to see their repos.
+    if (context == 'createCollective') {
+      opts.scope = [
+        // We need this to call github.getOrgMemberships and check if the user is an admin of a given Organization
+        'read:org',
+      ];
+    } else {
+      // We try to deprecate this scope by progressively forcing a context
+      opts.scope = ['user:email', 'public_repo', 'read:org'];
+    }
 
-      We have fluctuated back and forth. With the new simplified GitHub signup flow,
-      it's possible that 'public_repo' is enough.
-
-      Update: removing public_repo as well, since technically we shouldn't need it.
-    */
-
-    opts.scope = ['user:email', 'public_repo', 'read:org'];
     return passport.authenticate(service, opts)(req, res, next);
   }
 
