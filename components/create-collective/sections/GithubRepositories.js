@@ -45,7 +45,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
   const showSearch = true; // repositories.length >= 5;
   return (
     <Fragment>
-      <StyledCard maxWidth={[300, 500]} minWidth={[200, 464]}>
+      <StyledCard maxWidth={[300, 448, 500]}>
         {showSearch && (
           <Container
             display="flex"
@@ -96,7 +96,8 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
                         disabled: false,
                         repoInfo: {
                           type,
-                          handle: `${value.owner.login}/${value.name}`,
+                          handle: `{value.owner.login}/{value.name}`,
+                          repo: value.name,
                         },
                       }));
                     } else {
@@ -105,7 +106,8 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
                         disabled: false,
                         repoInfo: {
                           type,
-                          handle: `${value.owner.login}`,
+                          handle: value.owner.login,
+                          repo: value.name,
                         },
                       }));
                     }

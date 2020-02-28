@@ -38,6 +38,7 @@ class NewCreateCollective extends Component {
       form: false,
       error: null,
       status: null,
+      creating: false,
     };
 
     this.createCollective = this.createCollective.bind(this);
@@ -108,7 +109,7 @@ class NewCreateCollective extends Component {
       });
       return;
     }
-    if (this.props.host && !collective.hostTos) {
+    if (this.props.host && this.props.host.settings.tos && !collective.hostTos) {
       this.setState({
         error: 'Please accept the terms of fiscal sponsorship',
       });
@@ -116,7 +117,7 @@ class NewCreateCollective extends Component {
     }
 
     // set state to loading
-    this.setState({ status: 'loading' });
+    this.setState({ creating: true });
 
     // prepare object
     collective.tags = [this.state.category];
@@ -139,10 +140,10 @@ class NewCreateCollective extends Component {
         result: { success: 'Collective created successfully' },
       });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', { slug: newCollective.slug });
+      Router.pushRoute('collective', { slug: newCollective.slug, status: 'collectiveCreated' });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ status: 'idle', error: errorMsg });
+      this.setState({ status: 'idle', error: errorMsg, creating: false });
     }
   }
 
@@ -154,7 +155,7 @@ class NewCreateCollective extends Component {
     if (host && !host.canApply) {
       return (
         <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-          <Flex flexDirection="column" p={4} mt={2}>
+          <Flex flexDirection="column" p={4} mt={3}>
             <Box mb={3}>
               <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
@@ -205,8 +206,10 @@ class NewCreateCollective extends Component {
       <CreateCollectiveForm
         host={host}
         collective={this.state.collective}
+        github={this.state.github}
         onSubmit={this.createCollective}
         onChange={this.handleChange}
+        loading={this.state.creating}
         error={error}
         query={query}
       />
