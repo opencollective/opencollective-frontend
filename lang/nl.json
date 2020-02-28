@@ -131,6 +131,8 @@
   "collective.created": "Jouw collectief is succesvol aangemaakt.",
   "collective.created.description": "Terwijl je wacht op goedkeuring van je beheerder ({host}) kan je al je collectief aanpassen, onkostennota's indienen en evenementen aanmaken.",
   "Collective.CreateNew": "Nieuw Collective aanmaken",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "Deze {type} zal verwijderd worden, samen met alle gerelateerde data zoals rollen van Essentiële Bijdragers en betaalmogelijkheden.",
   "collective.delete.isHost": "Je kan je collectie niet archiveren terwijl je een host bent, deactiveer als Host eerst.",
   "collective.delete.isNotDeletable-message": "{type}s met transacties, bestellingen, evenementen of betaalde kosten kunnen niet worden verwijderd. Archiveer het alstublieft.",

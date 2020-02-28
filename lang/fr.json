@@ -131,6 +131,8 @@
   "collective.created": "Votre collectif a été créé avec succès.",
   "collective.created.description": "Pendant que vous attendez l'approbation de votre hôte ({host}), vous pouvez déjà personnaliser votre collectif, ajouter des dépenses et même créer des événements.",
   "Collective.CreateNew": "Créer un Collectif",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "Ce {type} va être supprimé ainsi que toutes les données associées, comme les abonnements et les moyens de paiement.",
   "collective.delete.isHost": "En tant qu'Hôte, vous ne pouvez pas supprimer votre collectif. Veuillez d'abord désactiver le mode Hôte.",
   "collective.delete.isNotDeletable-message": "Un {type} avec des transactions, des commandes, des événements ou des dépenses ne peut pas être supprimé. Veuillez plutôt l'archiver.",
