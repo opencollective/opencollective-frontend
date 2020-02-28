@@ -78,8 +78,8 @@ export function sortResultsArray<ResultType>(
 export const sortResults = (
   keys: readonly any[],
   results: readonly any[],
-  attribute: string = 'id',
-  defaultValue: any = undefined,
+  attribute = 'id',
+  defaultValue = undefined,
 ) => {
   const resultsById = {};
   results.forEach(r => {

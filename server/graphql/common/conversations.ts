@@ -6,7 +6,7 @@ import { canUseFeature } from '../../lib/user-permissions';
 import FEATURE from '../../constants/feature';
 
 /** Params given to create a new conversation */
-interface ICreateConversationParams {
+interface CreateConversationParams {
   title: string;
   html: string;
   CollectiveId: number;
@@ -18,7 +18,7 @@ interface ICreateConversationParams {
  *
  * @returns the conversation
  */
-export const createConversation = async (remoteUser, params: ICreateConversationParams) => {
+export const createConversation = async (remoteUser, params: CreateConversationParams) => {
   // For now any authenticated user can create a conversation to any collective
   if (!remoteUser) {
     throw new Unauthorized();
@@ -39,7 +39,7 @@ export const createConversation = async (remoteUser, params: ICreateConversation
   return models.Conversation.createWithComment(remoteUser, collective, title, html, tags);
 };
 
-interface IEditConversationParams {
+interface EditConversationParams {
   id: number;
   title: string;
 }
@@ -49,7 +49,7 @@ interface IEditConversationParams {
  *
  * @returns the conversation
  */
-export const editConversation = async (remoteUser, params: IEditConversationParams) => {
+export const editConversation = async (remoteUser, params: EditConversationParams) => {
   if (!remoteUser) {
     throw new Unauthorized();
   } else if (!canUseFeature(remoteUser, FEATURE.CONVERSATIONS)) {

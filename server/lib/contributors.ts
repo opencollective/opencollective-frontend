@@ -15,7 +15,7 @@ import { filterUntil } from './utils';
 /**
  * Represent a single contributor.
  */
-export interface IContributor {
+export interface Contributor {
   id: string;
   name: string;
   roles: Array<MemberRoles>;
@@ -37,7 +37,7 @@ export interface IContributor {
 /**
  * An entry in the cache to group contributors for a collective.
  */
-interface IContributorsCacheEntry {
+interface ContributorsCacheEntry {
   all: ContributorsList;
   tiers: {
     [tierId: string]: ContributorsList;
@@ -45,7 +45,7 @@ interface IContributorsCacheEntry {
 }
 
 /** An array of contributor */
-type ContributorsList = Array<IContributor>;
+type ContributorsList = Array<Contributor>;
 
 /** Time in seconds before contributors cache for a collective expires */
 const CACHE_VALIDITY = 3600; // 1h
@@ -78,7 +78,7 @@ const storeContributorsInCache = (collectiveId: number, allContributors: Contrib
     return tiers;
   }, {});
 
-  const cacheEntry: IContributorsCacheEntry = { all: allContributors, tiers: contributorsByTier };
+  const cacheEntry: ContributorsCacheEntry = { all: allContributors, tiers: contributorsByTier };
   cache.set(cacheKey, cacheEntry, CACHE_VALIDITY);
   return cacheEntry;
 };
@@ -86,7 +86,7 @@ const storeContributorsInCache = (collectiveId: number, allContributors: Contrib
 /**
  * Load contributors cache, filling it from DB if necessary.
  */
-const loadContributors = async (collectiveId: number): Promise<IContributorsCacheEntry> => {
+const loadContributors = async (collectiveId: number): Promise<ContributorsCacheEntry> => {
   const cacheKey = getCacheKey(collectiveId);
   const fromCache = await cache.get(cacheKey);
   if (fromCache) {
@@ -150,7 +150,7 @@ const loadContributors = async (collectiveId: number): Promise<IContributorsCach
   );
 
   // Pre-fill some properties for contributors so we don't have to re-compute them
-  allContributors.forEach((c: IContributor) => {
+  allContributors.forEach((c: Contributor) => {
     // Fill boolean flags for roles to easily check them
     c.isAdmin = c.roles.includes(MemberRoles.ADMIN);
     c.isCore = c.isAdmin || c.roles.includes(MemberRoles.MEMBER);
@@ -162,13 +162,13 @@ const loadContributors = async (collectiveId: number): Promise<IContributorsCach
 };
 
 /** Accepted params to filters contributors list */
-interface IContributorsFilters {
+interface ContributorsFilters {
   limit?: number;
   offset?: number;
   roles?: Array<MemberRoles>;
 }
 
-type ContributorsFilteringFunc = (contributors: IContributor) => boolean;
+type ContributorsFilteringFunc = (contributors: Contributor) => boolean;
 
 /**
  * Provide an optimized function to check the roles of a contributor. Most used filters for
@@ -201,7 +201,7 @@ const getContributorsFilteringFuncForRoles = (roles: Array<MemberRoles>): Contri
 /**
  * Filter and slice a list of contributors.
  */
-const filterContributors = (contributors: ContributorsList, filters: IContributorsFilters | null): ContributorsList => {
+const filterContributors = (contributors: ContributorsList, filters: ContributorsFilters | null): ContributorsList => {
   if (!filters) {
     return contributors;
   }
@@ -228,9 +228,9 @@ const filterContributors = (contributors: ContributorsList, filters: IContributo
  */
 export const getContributorsForCollective = async (
   collectiveId: number,
-  filters: IContributorsFilters | null,
+  filters: ContributorsFilters | null,
 ): Promise<ContributorsList> => {
-  const contributorsCache: IContributorsCacheEntry = await loadContributors(collectiveId);
+  const contributorsCache: ContributorsCacheEntry = await loadContributors(collectiveId);
   const contributors = contributorsCache.all || [];
   return filterContributors(contributors, filters);
 };
@@ -241,9 +241,9 @@ export const getContributorsForCollective = async (
 export const getContributorsForTier = async (
   collectiveId: number,
   tierId: number,
-  filters: IContributorsFilters | null,
+  filters: ContributorsFilters | null,
 ) => {
-  const contributorsCache: IContributorsCacheEntry = await loadContributors(collectiveId);
+  const contributorsCache: ContributorsCacheEntry = await loadContributors(collectiveId);
   const contributors = contributorsCache.tiers[tierId.toString()] || [];
   return filterContributors(contributors, filters);
 };
@@ -253,9 +253,9 @@ export const getContributorsForTier = async (
  */
 export const getContributorsWithoutTier = async (
   collectiveId: number,
-  filters: IContributorsFilters | null,
+  filters: ContributorsFilters | null,
 ): Promise<ContributorsList> => {
-  const contributorsCache: IContributorsCacheEntry = await loadContributors(collectiveId);
+  const contributorsCache: ContributorsCacheEntry = await loadContributors(collectiveId);
   const contributors = contributorsCache[CONTRIBUTORS_WITHOUT_TIER_KEY] || [];
   return filterContributors(contributors, filters);
 };

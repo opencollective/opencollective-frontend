@@ -1,7 +1,7 @@
 import LibSanitize from 'sanitize-html';
 import { truncate } from 'lodash';
 
-interface IAllowedContentType {
+interface AllowedContentType {
   /** Allows titles  supported by RichTextEditor (`h3` only) */
   titles?: boolean;
   /** Includes bold, italic, strong and strike */
@@ -20,12 +20,12 @@ interface IAllowedContentType {
 
 interface SanitizeOptions {
   allowedTags: string[];
-  allowedAttributes: Object;
+  allowedAttributes: Record<string, any>;
   allowedIframeHostnames: string[];
   transformTags: any;
 }
 
-export const buildSanitizerOptions = (allowedContent: IAllowedContentType = {}): SanitizeOptions => {
+export const buildSanitizerOptions = (allowedContent: AllowedContentType = {}): SanitizeOptions => {
   // Nothing allowed by default
   const allowedTags = [];
   const allowedAttributes = {};
