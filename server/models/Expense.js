@@ -189,10 +189,10 @@ export default function(Sequelize, DataTypes) {
         },
       },
       hooks: {
-        afterUpdate(expense) {
+        async afterUpdate(expense) {
           switch (expense.status) {
             case status.APPROVED:
-              return expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
+              return await expense.createActivity(activities.COLLECTIVE_EXPENSE_APPROVED);
           }
         },
         afterDestroy(expense) {
