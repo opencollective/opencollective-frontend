@@ -62,9 +62,8 @@ export const createQuote = async (
     });
     return getData(response);
   } catch (e) {
-    const message = `Unable to create quote: ${getAxiosError(e)}`;
-    logger.error(message, data);
-    throw new Error(message);
+    logger.error(`Unable to create quote: ${getAxiosError(e)}`, data);
+    throw new Error(`Sorry, we can't make transfers to ${targetCurrency}.`);
   }
 };
 

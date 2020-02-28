@@ -58,13 +58,22 @@ export const TransferWise = new GraphQLObjectType({
       },
       type: new GraphQLList(TransferWiseRequiredField),
       async resolve(host, args) {
-        return await transferwise.getRequiredBankInformation(host, args.currency);
+        if (host) {
+          return await transferwise.getRequiredBankInformation(host, args.currency);
+        } else {
+          return null;
+        }
       },
     },
     availableCurrencies: {
       type: new GraphQLList(TransferWiseCurrency),
       async resolve(host) {
-        return await transferwise.getAvailableCurrencies(host);
+        if (host) {
+          const availableCurrencies = await transferwise.getAvailableCurrencies(host);
+          return availableCurrencies.map(c => c.code);
+        } else {
+          return null;
+        }
       },
     },
   },

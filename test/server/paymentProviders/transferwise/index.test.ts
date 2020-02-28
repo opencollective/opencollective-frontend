@@ -47,7 +47,11 @@ sandbox.stub(transferwiseLib, 'getCurrencyPairs').resolves({
   sourceCurrencies: [
     {
       currencyCode: 'USD',
-      targetCurrencies: [{ currencyCode: 'EUR' }, { currencyCode: 'GBP' }, { currencyCode: 'BRL' }],
+      targetCurrencies: [
+        { currencyCode: 'EUR', minInvoiceAmount: 1 },
+        { currencyCode: 'GBP', minInvoiceAmount: 1 },
+        { currencyCode: 'BRL', minInvoiceAmount: 1 },
+      ],
     },
   ],
 });
@@ -185,11 +189,11 @@ describe('paymentMethods.transferwise', () => {
     });
 
     it('should return an array of available currencies for host', async () => {
-      expect(data).to.include('EUR');
+      expect(data).to.deep.include({ code: 'EUR', minInvoiceAmount: 1 });
     });
 
     it('should remove blackListed currencies', async () => {
-      expect(data).to.not.have.members(blackListedCurrencies);
+      expect(data).to.not.deep.include({ code: 'BRL', minInvoiceAmount: 1 });
     });
   });
 });
