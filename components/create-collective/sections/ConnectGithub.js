@@ -99,7 +99,10 @@ class ConnectGithub extends React.Component {
   };
 
   getGithubConnectUrl() {
-    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/create/v2/opensource` });
+    const urlParams = new URLSearchParams({
+      context: 'createCollective',
+      redirect: `${getWebsiteUrl()}/create/v2/opensource`,
+    });
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
     if (accessToken) {
