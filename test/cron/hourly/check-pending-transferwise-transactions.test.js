@@ -14,13 +14,16 @@ import * as transferwiseLib from '../../../server/lib/transferwise';
 import status from '../../../server/constants/expense_status';
 import { PayoutMethodTypes } from '../../../server/models/PayoutMethod';
 
-const getTransfer = sinon.stub(transferwiseLib, 'getTransfer');
-
 describe('cron/hourly/check-pending-transferwise-transactions.js', () => {
+  const sandbox = sinon.createSandbox();
+  let getTransfer;
   let expense;
 
-  after(sinon.restore);
+  afterEach(sandbox.restore);
   beforeEach(utils.resetTestDB);
+  beforeEach(() => {
+    getTransfer = sandbox.stub(transferwiseLib, 'getTransfer');
+  });
   beforeEach(async () => {
     const host = await fakeCollective({ isHostAccount: true });
     await fakeConnectedAccount({
