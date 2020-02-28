@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import NewCreateCollective from '../components/create-collective/NewCreateCollective';
 import ErrorPage from '../components/ErrorPage';
+import Page from '../components/Page';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { withUser } from '../components/UserProvider';
-
-import Page from '../components/Page';
 
 class NewCreateCollectivePage extends React.Component {
   static async getInitialProps({ query }) {

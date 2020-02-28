@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
@@ -29,6 +29,7 @@ class NewCreateCollective extends Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       collective: {},
       result: {},
@@ -38,7 +39,10 @@ class NewCreateCollective extends Component {
       error: null,
       status: null,
     };
+
     this.createCollective = this.createCollective.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+
     this.messages = defineMessages({
       joinOC: {
         id: 'collective.create.join',
@@ -68,7 +72,6 @@ class NewCreateCollective extends Component {
     } else if (!query.category) {
       this.setState({ category: null });
     }
-    return;
   }
 
   componentDidUpdate(oldProps) {
@@ -91,13 +94,10 @@ class NewCreateCollective extends Component {
         this.setState({ category: null });
       }
     }
-    return;
   }
 
   handleChange(key, value) {
-    this.setState({
-      [key]: value,
-    });
+    this.setState({ [key]: value });
   }
 
   async createCollective(collective) {
@@ -122,7 +122,6 @@ class NewCreateCollective extends Component {
     collective.tags = [this.state.category];
     if (this.state.github) {
       collective.githubHandle = this.state.github.handle;
-      this.props.host = { slug: 'opensource' };
     }
     delete collective.tos;
     delete collective.hostTos;
@@ -154,83 +153,64 @@ class NewCreateCollective extends Component {
 
     if (host && !host.canApply) {
       return (
-        <Fragment>
-          <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-            <Flex flexDirection="column" p={4} mt={2}>
-              <Box mb={3}>
-                <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                  <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-                </H1>
-              </Box>
-            </Flex>
-            <Flex alignItems="center" justifyContent="center">
-              <MessageBox type="warning" withIcon mb={[1, 3]}>
-                <FormattedMessage
-                  id="collectives.create.error.HostNotOpenToApplications"
-                  defaultMessage="This host is not open to applications"
-                />
-              </MessageBox>
-            </Flex>
+        <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+          <Flex flexDirection="column" p={4} mt={2}>
+            <Box mb={3}>
+              <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+              </H1>
+            </Box>
           </Flex>
-        </Fragment>
-      );
-    }
-
-    if (host && host.canApply) {
-      return (
-        <CreateCollectiveForm
-          host={this.props.host}
-          collective={this.state.collective}
-          onSubmit={this.createCollective}
-          onChange={(key, value) => this.handleChange(key, value)}
-          error={error}
-          query={query}
-        />
+          <Flex alignItems="center" justifyContent="center">
+            <MessageBox type="warning" withIcon mb={[1, 3]}>
+              <FormattedMessage
+                id="collectives.create.error.HostNotOpenToApplications"
+                defaultMessage="This host is not open to applications"
+              />
+            </MessageBox>
+          </Flex>
+        </Flex>
       );
     }
 
     if (!LoggedInUser) {
       return (
-        <Fragment>
-          <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-            <Flex flexDirection="column" p={4} mt={2}>
-              <Box mb={3}>
-                <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                  {intl.formatMessage(this.messages.joinOC)}
-                </H1>
-              </Box>
-              <Box textAlign="center">
-                <P fontSize="Paragraph" color="black.600" mb={1}>
-                  {intl.formatMessage(this.messages.createOrSignIn)}
-                </P>
-              </Box>
-            </Flex>
-            <SignInOrJoinFree />
+        <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+          <Flex flexDirection="column" p={4} mt={2}>
+            <Box mb={3}>
+              <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+                {intl.formatMessage(this.messages.joinOC)}
+              </H1>
+            </Box>
+            <Box textAlign="center">
+              <P fontSize="Paragraph" color="black.600" mb={1}>
+                {intl.formatMessage(this.messages.createOrSignIn)}
+              </P>
+            </Box>
           </Flex>
-        </Fragment>
+          <SignInOrJoinFree />
+        </Flex>
       );
     }
 
     if (!host && !category) {
-      return <CollectiveCategoryPicker query={query} onChange={(key, value) => this.handleChange(key, value)} />;
+      return <CollectiveCategoryPicker query={query} onChange={this.handleChange} />;
     }
 
-    if (!host && category && (category !== 'opensource' || (category === 'opensource' && form))) {
-      return (
-        <CreateCollectiveForm
-          host={this.props.host}
-          collective={this.state.collective}
-          onSubmit={this.createCollective}
-          onChange={(key, value) => this.handleChange(key, value)}
-          error={error}
-          query={query}
-        />
-      );
+    if (category === 'opensource' && !form) {
+      return <ConnectGithub token={token} query={query} onChange={this.handleChange} />;
     }
 
-    if (!host && category && category === 'opensource' && !form) {
-      return <ConnectGithub token={token} query={query} onChange={(key, value) => this.handleChange(key, value)} />;
-    }
+    return (
+      <CreateCollectiveForm
+        host={host}
+        collective={this.state.collective}
+        onSubmit={this.createCollective}
+        onChange={this.handleChange}
+        error={error}
+        query={query}
+      />
+    );
   }
 }
 
@@ -255,12 +235,9 @@ const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
     context: API_V2_CONTEXT,
   },
   props: ({ mutate }) => ({
-    createCollective: async ({ collective, host }) => {
+    createCollective: async ({ collective, host, automateApprovalWithGithub }) => {
       return await mutate({
-        variables: {
-          collective,
-          host: host,
-        },
+        variables: { collective, host, automateApprovalWithGithub },
         awaitRefetchQueries: true,
         refetchQueries: [{ query: getLoggedInUserQuery }],
       });
