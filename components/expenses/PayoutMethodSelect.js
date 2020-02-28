@@ -69,6 +69,18 @@ class PayoutMethodSelect extends React.Component {
         return payoutMethod.name;
       } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
         return get(payoutMethod.data, 'email');
+      } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
+        if (payoutMethod.data.details?.IBAN) {
+          return `IBAN ${payoutMethod.data.details.IBAN}`;
+        } else if (payoutMethod.data.details?.accountNumber) {
+          return `A/N ${payoutMethod.data.details.accountNumber}`;
+        } else if (payoutMethod.data.details?.clabe) {
+          return `Clabe ${payoutMethod.data.details.clabe}`;
+        } else if (payoutMethod.data.details?.bankgiroNumber) {
+          return `BankGiro ${payoutMethod.data.details.bankgiroNumber}`;
+        } else {
+          return `${payoutMethod.data.accountHolderName} (${payoutMethod.data.currency})`;
+        }
       } else {
         return i18nPayoutMethodType(formatMessage, payoutMethod.type);
       }
