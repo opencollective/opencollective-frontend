@@ -494,6 +494,7 @@
   "creditcard.label": "Cartão de crédito",
   "creditcard.save": "Salvar cartão de crédito na {type, select, user {minha conta} other {conta {type}}}",
   "currency": "moeda",
+  "Currency": "Currency",
   "Decline": "Recusar",
   "delete.modal.body": "Você tem certeza que deseja excluir este comentário?",
   "delete.modal.header": "Excluir comentário",

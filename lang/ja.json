@@ -494,6 +494,7 @@
   "creditcard.label": "クレジットカード",
   "creditcard.save": "Save credit card to {type, select, user {my account} other {{type} account}}",
   "currency": "通過",
+  "Currency": "Currency",
   "Decline": "許可しない",
   "delete.modal.body": "本当にこのコメントを削除しますか？",
   "delete.modal.header": "コメントの削除",

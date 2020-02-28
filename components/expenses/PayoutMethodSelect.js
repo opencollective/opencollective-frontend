@@ -52,6 +52,14 @@ class PayoutMethodSelect extends React.Component {
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),
+    /** The Collective paying the expense */
+    collective: PropTypes.shape({
+      host: PropTypes.shape({
+        transferwise: PropTypes.shape({
+          availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+        }),
+      }),
+    }).isRequired,
   };
 
   getPayoutMethodLabel = payoutMethod => {
@@ -61,6 +69,18 @@ class PayoutMethodSelect extends React.Component {
         return payoutMethod.name;
       } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
         return get(payoutMethod.data, 'email');
+      } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
+        if (payoutMethod.data.details?.IBAN) {
+          return `IBAN ${payoutMethod.data.details.IBAN}`;
+        } else if (payoutMethod.data.details?.accountNumber) {
+          return `A/N ${payoutMethod.data.details.accountNumber}`;
+        } else if (payoutMethod.data.details?.clabe) {
+          return `Clabe ${payoutMethod.data.details.clabe}`;
+        } else if (payoutMethod.data.details?.bankgiroNumber) {
+          return `BankGiro ${payoutMethod.data.details.bankgiroNumber}`;
+        } else {
+          return `${payoutMethod.data.accountHolderName} (${payoutMethod.data.currency})`;
+        }
       } else {
         return i18nPayoutMethodType(formatMessage, payoutMethod.type);
       }
@@ -98,7 +118,15 @@ class PayoutMethodSelect extends React.Component {
   getOptions = memoizeOne(payoutMethods => {
     const { formatMessage } = this.props.intl;
     const groupedPms = groupBy(payoutMethods, 'type');
-    return Object.values(PayoutMethodType).map(pmType => ({
+    const pmTypes = Object.values(PayoutMethodType).filter(type => {
+      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    return pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(formatMessage, pmType),
       options: [
         // Add existing payout methods for this type
