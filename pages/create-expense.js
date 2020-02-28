@@ -403,7 +403,7 @@ const getData = graphql(
 
 const withCreateExpenseMutation = graphql(
   gqlV2`
-  mutation createExpense($expense: ExpenseCreate!, $account: AccountInput!) {
+  mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
     createExpense(expense: $expense, account: $account) {
       id
       legacyId

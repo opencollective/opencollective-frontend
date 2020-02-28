@@ -216,8 +216,8 @@ class NewCreateCollective extends Component {
 
 const createCollectiveQuery = gqlV2`
   mutation createCollective(
-    $collective: CreateCollectiveInput!
-    $host: AccountInput
+    $collective: CollectiveCreateInput!
+    $host: AccountReferenceInput
     $automateApprovalWithGithub: Boolean
   ) {
     createCollective(collective: $collective, host: $host, automateApprovalWithGithub: $automateApprovalWithGithub) {

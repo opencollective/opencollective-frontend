@@ -201,7 +201,7 @@ export const commentsQuery = graphql(getCommentsQuery, {
 });
 
 const createCommentQuery = gqlV2`
-  mutation createComment($comment: CommentCreate!) {
+  mutation createComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       id
       html
@@ -293,7 +293,7 @@ const deleteCommentMutation = graphql(deleteCommentQuery, {
 });
 
 const editCommentQuery = gqlV2`
-  mutation editComment($comment: CommentEdit!) {
+  mutation editComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       id
       html

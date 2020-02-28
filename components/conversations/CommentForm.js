@@ -19,7 +19,7 @@ import MessageBox from '../MessageBox';
 import { CommentFieldsFragment } from './graphql';
 
 const createCommentMutation = gqlV2`
-  mutation CreateComment($comment: CommentCreate!) {
+  mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       ...CommentFields
     }
