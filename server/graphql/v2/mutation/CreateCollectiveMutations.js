@@ -2,8 +2,8 @@ import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import { get, pick } from 'lodash';
 
 import { Collective } from '../object/Collective';
-import { CreateCollectiveInput } from '../input/CreateCollectiveInput';
-import { AccountInput, fetchAccountWithInput } from '../input/AccountInput';
+import { CollectiveCreateInput } from '../input/CollectiveCreateInput';
+import { AccountReferenceInput, fetchAccountWithReference } from '../input/AccountReferenceInput';
 
 import * as errors from '../../errors';
 import models from '../../../models';
@@ -68,7 +68,7 @@ async function createCollective(_, args, req) {
       collectiveData.tags.push('open source');
     }
   } else if (args.host) {
-    host = await fetchAccountWithInput(args.host, { loaders });
+    host = await fetchAccountWithReference(args.host, { loaders });
     if (!host) {
       throw new errors.ValidationFailed({ message: 'Host Not Found' });
     }
@@ -115,11 +115,11 @@ const createCollectiveMutations = {
     args: {
       collective: {
         description: 'Information about the collective to create (name, slug, description, tags, ...)',
-        type: new GraphQLNonNull(CreateCollectiveInput),
+        type: new GraphQLNonNull(CollectiveCreateInput),
       },
       host: {
         description: 'Reference to the host to apply on creation.',
-        type: AccountInput,
+        type: AccountReferenceInput,
       },
       automateApprovalWithGithub: {
         description: 'Wether to trigger the automated approval for Open Source collectives with GitHub.',

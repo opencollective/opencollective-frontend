@@ -5,7 +5,7 @@ import * as utils from '../../../../utils';
 import models from '../../../../../server/models';
 
 const createCollectiveQuery = `
-    mutation createCollective($collective: CreateCollectiveInput!, $host: AccountInput, $automateApprovalWithGithub: Boolean) {
+    mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput, $automateApprovalWithGithub: Boolean) {
       createCollective(collective: $collective, host: $host, automateApprovalWithGithub: $automateApprovalWithGithub) {
         name
         slug

@@ -3,7 +3,7 @@ import { GraphQLInt } from 'graphql';
 import { TransactionCollection } from '../collection/TransactionCollection';
 import { TransactionType } from '../enum/TransactionType';
 
-import { ChronologicalOrder } from '../input/ChronologicalOrder';
+import { ChronologicalOrderInput } from '../input/ChronologicalOrderInput';
 
 import models from '../../../models';
 
@@ -25,9 +25,9 @@ const TransactionsQuery = {
       defaultValue: 0,
     },
     orderBy: {
-      type: ChronologicalOrder,
+      type: ChronologicalOrderInput,
       description: 'The order of results',
-      defaultValue: ChronologicalOrder.defaultValue,
+      defaultValue: ChronologicalOrderInput.defaultValue,
     },
   },
   async resolve(_, args) {

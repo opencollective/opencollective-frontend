@@ -1,8 +1,8 @@
 import { pick } from 'lodash';
 import { GraphQLNonNull } from 'graphql';
 import { Expense } from '../object/Expense';
-import { AccountInput, fetchAccountWithInput } from '../input/AccountInput';
-import { ExpenseCreate } from '../input/ExpenseCreate';
+import { AccountReferenceInput, fetchAccountWithReference } from '../input/AccountReferenceInput';
+import { ExpenseCreateInput } from '../input/ExpenseCreateInput';
 import { createExpense as createExpenseLegacy } from '../../v1/mutations/expenses';
 import { idDecode, IDENTIFIER_TYPES } from '../identifiers';
 
@@ -12,11 +12,11 @@ const expenseMutations = {
     description: 'Submit an expense to a collective',
     args: {
       expense: {
-        type: new GraphQLNonNull(ExpenseCreate),
+        type: new GraphQLNonNull(ExpenseCreateInput),
         description: 'Expense data',
       },
       account: {
-        type: new GraphQLNonNull(AccountInput),
+        type: new GraphQLNonNull(AccountReferenceInput),
         description: 'Account where the expense will be created',
       },
     },
@@ -33,7 +33,7 @@ const expenseMutations = {
         ...pick(args.expense, ['description', 'tags', 'type', 'privateMessage', 'attachments', 'invoiceInfo']),
         amount: args.expense.attachments.reduce((total, attachment) => total + attachment.amount, 0),
         PayoutMethod: payoutMethod,
-        collective: await fetchAccountWithInput(args.account, req),
+        collective: await fetchAccountWithReference(args.account, req),
         fromCollective: args.expense.payee,
       });
     },
