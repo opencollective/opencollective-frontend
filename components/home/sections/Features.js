@@ -11,6 +11,7 @@ import SectionTitle from '../SectionTitle';
 import SectionSubtitle from '../SectionSubtitle';
 import Illustration from '../HomeIllustration';
 import StyledCarousel from '../../StyledCarousel';
+import ExternalLink from '../../ExternalLink';
 
 const SelectFeatureButton = styled.button`
   width: 100%;
@@ -68,9 +69,8 @@ const Title = styled(Span)`
   }
 `;
 
-const LearnMoreLink = styled.a`
+const LearnMoreLink = styled(ExternalLink)`
   color: #dc5f7d;
-
   &:hover {
     color: #dc5f7d;
   }
@@ -203,7 +203,7 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
     >
       {intl.formatMessage(messages[`home.feature.${id}.description`])}{' '}
       {learnMoreLink && (
-        <LearnMoreLink href={learnMoreLink} target="_blank">
+        <LearnMoreLink href={learnMoreLink} openInNewTab>
           <FormattedMessage id="home.feature.learnmore" defaultMessage="Learn more..." />
         </LearnMoreLink>
       )}
