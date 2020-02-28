@@ -1,9 +1,27 @@
-import axios, { AxiosError } from 'axios';
+import Axios, { AxiosError } from 'axios';
 import config from 'config';
-import { omitBy, isNull } from 'lodash';
+import { omitBy, isNull, toInteger } from 'lodash';
+import url from 'url';
 
 import logger from './logger';
 import { Quote, RecipientAccount } from '../types/transferwise';
+
+const fixieUrl = config.fixie.url && new url.URL(config.fixie.url);
+const proxyOptions = fixieUrl
+  ? {
+      proxy: {
+        host: fixieUrl.host,
+        port: toInteger(fixieUrl.port),
+      },
+      headers: {
+        'Proxy-Authorization': `Basic ${Buffer.from(`${fixieUrl.username}:${fixieUrl.password}`).toString('base64')}`,
+      },
+    }
+  : {};
+const axios = Axios.create({
+  baseURL: config.transferwise.apiUrl,
+  ...proxyOptions,
+});
 
 const compactRecipientDetails = <T>(object: T): Partial<T> => omitBy(object, isNull);
 const getData = <T extends { data?: object }>(obj: T | undefined): T['data'] | undefined => obj && obj.data;
@@ -39,7 +57,7 @@ export const createQuote = async (
     sourceAmount,
   };
   try {
-    const response = await axios.post(`${config.transferwise.api}/v1/quotes`, data, {
+    const response = await axios.post(`/v1/quotes`, data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return getData(response);
@@ -59,7 +77,7 @@ export const createRecipientAccount = async (
 ): Promise<RecipientAccount> => {
   const data = { profile, currency, type, accountHolderName, legalType, details };
   try {
-    const response = await axios.post(`${config.transferwise.api}/v1/accounts`, data, {
+    const response = await axios.post(`/v1/accounts`, data, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -90,7 +108,7 @@ export const createTransfer = async (
 ): Promise<any> => {
   const data = { targetAccount, quote, customerTransactionId, details };
   try {
-    const response = await axios.post(`${config.transferwise.api}/v1/transfers`, data, {
+    const response = await axios.post(`/v1/transfers`, data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return getData(response);
@@ -111,7 +129,7 @@ export const fundTransfer = async (
 ): Promise<{ status: 'COMPLETED' | 'REJECTED'; errorCode: string }> => {
   try {
     const response = await axios.post(
-      `${config.transferwise.api}/v3/profiles/${profileId}/transfers/${transferId}/payments`,
+      `/v3/profiles/${profileId}/transfers/${transferId}/payments`,
       { type: 'BALANCE' },
       { headers: { Authorization: `Bearer ${token}` } },
     );
@@ -125,7 +143,7 @@ export const fundTransfer = async (
 
 export const getProfiles = async (token: string): Promise<any> => {
   try {
-    const response = await axios.get(`${config.transferwise.api}/v1/profiles`, {
+    const response = await axios.get(`/v1/profiles`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return getData(response);
@@ -153,7 +171,7 @@ export const getTemporaryQuote = async (
     ...amount,
   };
   try {
-    const response = await axios.get(`${config.transferwise.api}/v1/quotes`, {
+    const response = await axios.get(`/v1/quotes`, {
       headers: { Authorization: `Bearer ${token}` },
       params,
     });
@@ -166,7 +184,7 @@ export const getTemporaryQuote = async (
 
 export const getTransfer = async (token: string, transferId: number): Promise<any> => {
   try {
-    const response = await axios.get(`${config.transferwise.api}/v1/transfers/${transferId}`, {
+    const response = await axios.get(`/v1/transfers/${transferId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return getData(response);
@@ -178,7 +196,7 @@ export const getTransfer = async (token: string, transferId: number): Promise<an
 
 export const getAccountRequirements = async (token: string, quoteId: number): Promise<any> => {
   try {
-    const response = await axios.get(`${config.transferwise.api}/v1/quotes/${quoteId}/account-requirements`, {
+    const response = await axios.get(`/v1/quotes/${quoteId}/account-requirements`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return getData(response);
@@ -190,7 +208,7 @@ export const getAccountRequirements = async (token: string, quoteId: number): Pr
 
 export const getCurrencyPairs = async (token: string): Promise<any> => {
   try {
-    const response = await axios.get(`${config.transferwise.api}/v1/currency-pairs`, {
+    const response = await axios.get(`/v1/currency-pairs`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return getData(response);

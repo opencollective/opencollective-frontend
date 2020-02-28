@@ -132,6 +132,7 @@
     "minNbStars": 100
   },
   "transferwise": {
-    "api": "https://api.sandbox.transferwise.tech"
-  }
+    "apiUrl": "https://api.sandbox.transferwise.tech"
+  },
+  "fixie": {}
 }
