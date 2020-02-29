@@ -494,6 +494,7 @@
   "creditcard.label": "Kreditkarte",
   "creditcard.save": "Kreditkarte in {type, select, user {my account} other {{type} account}}",
   "currency": "Währung",
+  "Currency": "Currency",
   "Decline": "Verweigern",
   "delete.modal.body": "Möchtest du diesen Kommentar wirklich löschen?",
   "delete.modal.header": "Kommentar löschen",
