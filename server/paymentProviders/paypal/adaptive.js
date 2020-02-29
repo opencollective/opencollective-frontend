@@ -1,7 +1,7 @@
 import paypalAdaptive from './adaptiveGateway';
 import { get, isNil } from 'lodash';
 import config from 'config';
-import uuidv1 from 'uuid/v1';
+import { v1 as uuid } from 'uuid';
 import logger from '../../lib/logger';
 import errors from '../../lib/errors';
 
@@ -75,7 +75,7 @@ export default {
       currencyCode: expense.currency,
       feesPayer: 'SENDER',
       memo: `Reimbursement from ${collective.name}: ${expense.description}`,
-      trackingId: [uuidv1().substr(0, 8), expense.id].join(':'),
+      trackingId: [uuid().substr(0, 8), expense.id].join(':'),
       preapprovalKey,
       returnUrl: `${expenseUrl}?result=success&service=paypal`,
       cancelUrl: `${expenseUrl}?result=cancel&service=paypal`,

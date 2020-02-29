@@ -1,5 +1,5 @@
 import path from 'path';
-import uuidv1 from 'uuid/v1';
+import { v1 as uuid } from 'uuid';
 import config from 'config';
 
 import errors from '../lib/errors';
@@ -44,7 +44,7 @@ export default function uploadImage(req, res, next) {
    * We will replace the name to avoid collisions
    */
   const ext = path.extname(file.originalname);
-  const filename = [uuidv1(), ext].join('');
+  const filename = [uuid(), ext].join('');
 
   const uploadParams = {
     Bucket: config.aws.s3.bucket,
