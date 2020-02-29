@@ -6,9 +6,9 @@ import { Op } from 'sequelize';
 
 import models from '../models';
 import emailLib from './email';
-import { types } from '../constants/collectives';
 import status from '../constants/order_status';
 import roles from '../constants/roles';
+import tiers from '../constants/tiers';
 import activities from '../constants/activities';
 import paymentProviders from '../paymentProviders';
 import { subscribeOrUpgradePlan, validatePlanRequest } from './plans';
@@ -352,7 +352,7 @@ const sendOrderConfirmedEmail = async order => {
   const { collective, tier, interval, fromCollective } = order;
   const user = order.createdByUser;
 
-  if (collective.type === types.EVENT) {
+  if (tier && tier.type === tiers.TICKET) {
     return models.Activity.create({
       type: activities.TICKET_CONFIRMED,
       data: {
