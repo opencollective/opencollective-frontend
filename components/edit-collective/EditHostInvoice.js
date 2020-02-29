@@ -25,10 +25,10 @@ const EditHostInvoice = ({ collective }) => {
   const isSaved = get(data, 'editCollective.settings.invoiceTitle') === value;
 
   // For invoice extra info
-  const defaultInfo = get(collective.settings, 'extraInfo');
+  const defaultInfo = get(collective.settings, 'invoice.extraInfo');
   const [info, setInfo] = React.useState(defaultInfo);
-  const isSelected = info !== defaultInfo;
-  const isSave = get(data, 'editCollective.settings.extraInfo') === info;
+  const infoIsTouched = info !== defaultInfo;
+  const infoIsSaved = get(data, 'editCollective.settings.invoice.extraInfo') === info;
 
   return (
     <Container>
@@ -71,8 +71,6 @@ const EditHostInvoice = ({ collective }) => {
           my={2}
         />
 
-        {/* <textarea placeholder="Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message."defaultInfo={info} onChange={e => setInfo(e.target.value)}> </textarea> */}
-
         <StyledButton
           buttonStyle="primary"
           my={2}
@@ -80,17 +78,17 @@ const EditHostInvoice = ({ collective }) => {
           minWidth={200}
           loading={loading}
           maxLength={255}
-          disabled={!isTouched}
+          disabled={!isTouched && !infoIsTouched}
           onClick={() =>
             setSettings({
               variables: {
                 id: collective.id,
-                settings: { ...collective.settings, invoiceTitle: value, extraInfo: info },
+                settings: { ...collective.settings, invoiceTitle: value, invoice: { extraInfo: info } },
               },
             })
           }
         >
-          {isSaved && isSave ? (
+          {isSaved && infoIsSaved ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
@@ -99,7 +97,6 @@ const EditHostInvoice = ({ collective }) => {
       </Flex>
       <Box mt={3} maxWidth={400}>
         <img src={imgInvoiceTitlePreview} alt="" />
-        {console.log(collective.settings)}
       </Box>
     </Container>
   );
