@@ -25,10 +25,10 @@ const EditHostInvoice = ({ collective }) => {
   const isSaved = get(data, 'editCollective.settings.invoiceTitle') === value;
 
   // For invoice extra info
-  const defaultInfo = get(collective.settings, 'extraInfo');
+  const defaultInfo = get(collective.settings, 'invoice.extraInfo');
   const [info, setInfo] = React.useState(defaultInfo);
   const infoIsTouched = info !== defaultInfo;
-  const infoIsSaved = get(data, 'editCollective.settings.extraInfo') === info;
+  const infoIsSaved = get(data, 'editCollective.settings.invoice.extraInfo') === info;
 
   return (
     <Container>
@@ -83,7 +83,7 @@ const EditHostInvoice = ({ collective }) => {
             setSettings({
               variables: {
                 id: collective.id,
-                settings: { ...collective.settings, invoiceTitle: value, extraInfo: info },
+                settings: { ...collective.settings, invoiceTitle: value, invoice: {extraInfo: info} },
               },
             })
           }
