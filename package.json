@@ -142,7 +142,7 @@
     "lint": "eslint . --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
-    "optimize-png": "npm install --no-save imagemin imagemin-optipng && babel-node ./scripts/optimize-png",
+    "optimize-png": "npm install --no-save imagemin imagemin-optipng imagemin-pngquant && babel-node ./scripts/optimize-png",
     "prettier": "prettier \"*.@(js|json|md)\" \"@(components|lib|pages|scripts|server|test)/**/*.@(js|json|md)\"",
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",

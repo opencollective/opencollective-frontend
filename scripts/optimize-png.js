@@ -1,23 +1,35 @@
-import path from 'path';
-
-/* eslint-disable import/no-unresolved,node/no-missing-import */
+/* eslint-disable import/no-unresolved,node/no-missing-import,node/no-extraneous-import */
 import imagemin from 'imagemin';
 import imageminOptipng from 'imagemin-optipng';
-
-const filePaths = ['static/images/', 'static/images/buttons/', 'static/images/email/', 'static/images/icons/'];
+import imageminPngquant from 'imagemin-pngquant';
 
 const options = {};
 
-options.use = [];
+options.plugins = [];
 
-options.use.push(
+options.plugins.push(
+  imageminPngquant({
+    speed: 2,
+    quality: [0.1, 0.2],
+    verbose: true,
+  }),
   imageminOptipng({
     optimizationLevel: 7,
   }),
 );
 
-filePaths.forEach(filePath => {
-  imagemin([`${filePath}*.png`], path.dirname(`${filePath}*.png`), options).then(files => {
-    console.log(`${filePath}*.png was optimized, ${files.length} files`);
+const baseDirectory = `static/images`;
+
+const directories = [
+  // 'home',
+  'create-collective',
+];
+
+for (const directory of directories) {
+  imagemin([`${baseDirectory}/${directory}/original/*.png`], {
+    ...options,
+    destination: `${baseDirectory}/${directory}`,
+  }).then(files => {
+    console.log(`${baseDirectory}/${directory}/original/*.png was optimized, ${files.length} files`);
   });
-});
+}

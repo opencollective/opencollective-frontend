@@ -84,7 +84,7 @@ class CollectiveCategoryPicker extends React.Component {
               <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/createcollective-opensource.png"
+                    src="/static/images/create-collective/opensource.png"
                     alt={intl.formatMessage(this.messages.opensource)}
                   />
                   <Link
@@ -122,7 +122,7 @@ class CollectiveCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/createcollective-anycommunity.png"
+                    src="/static/images/create-collective/anycommunity.png"
                     alt={intl.formatMessage(this.messages.community)}
                   />
                   <Link
@@ -159,7 +159,7 @@ class CollectiveCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/createcollective-climateinitiative.png"
+                    src="/static/images/create-collective/climateinitiative.png"
                     alt={intl.formatMessage(this.messages.climate)}
                   />
                   <Link
