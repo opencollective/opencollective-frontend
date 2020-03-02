@@ -40,8 +40,7 @@ const fetchExpiringCreditCards = async (month, year) => {
 
 const run = async () => {
   const cards = await fetchExpiringCreditCards(month, year);
-  let reminder;
-  date === 21 ? (reminder = true) : (reminder = false);
+  const reminder = date === 21 ? true : false;
 
   for (const card of cards) {
     try {
