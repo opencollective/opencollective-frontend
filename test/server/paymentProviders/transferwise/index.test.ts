@@ -3,72 +3,73 @@ import sinon from 'sinon';
 
 import * as utils from '../../../utils';
 import { fakeCollective, fakeConnectedAccount, fakeExpense, fakePayoutMethod } from '../../../test-helpers/fake-data';
-import transferwise, { blackListedCurrencies } from '../../../../server/paymentProviders/transferwise';
+import transferwise from '../../../../server/paymentProviders/transferwise';
 import * as transferwiseLib from '../../../../server/lib/transferwise';
 import cache from '../../../../server/lib/cache';
 import { PayoutMethodTypes } from '../../../../server/models/PayoutMethod';
-import { isTestToken } from '../../../../server/lib/stripe';
-
-const sandbox = sinon.createSandbox();
-const quote = {
-  id: 1234,
-  source: 'USD',
-  target: 'EUR',
-  sourceAmount: 101.14,
-  targetAmount: 90.44,
-  rate: 0.9044,
-  fee: 1.14,
-};
-const createQuote = sandbox.stub(transferwiseLib, 'createQuote').resolves(quote);
-sandbox.stub(transferwiseLib, 'getTemporaryQuote').resolves(quote);
-sandbox.stub(transferwiseLib, 'getProfiles').resolves([
-  {
-    id: 217896,
-    type: 'personal',
-  },
-  {
-    id: 220192,
-    type: 'business',
-  },
-]);
-const createRecipientAccount = sandbox.stub(transferwiseLib, 'createRecipientAccount').resolves({
-  id: 13804569,
-  accountHolderName: 'Leo Kewitz',
-  currency: 'EUR',
-  country: 'DE',
-  type: 'iban',
-  details: {
-    IBAN: 'DE89370400440532013000',
-  },
-});
-const createTransfer = sandbox.stub(transferwiseLib, 'createTransfer').resolves({ id: 123 });
-const fundTransfer = sandbox.stub(transferwiseLib, 'fundTransfer').resolves({ status: 'COMPLETED' });
-sandbox.stub(transferwiseLib, 'getCurrencyPairs').resolves({
-  sourceCurrencies: [
-    {
-      currencyCode: 'USD',
-      targetCurrencies: [
-        { currencyCode: 'EUR', minInvoiceAmount: 1 },
-        { currencyCode: 'GBP', minInvoiceAmount: 1 },
-        { currencyCode: 'BRL', minInvoiceAmount: 1 },
-      ],
-    },
-  ],
-});
-const getAccountRequirements = sandbox.stub(transferwiseLib, 'getAccountRequirements').resolves({ success: true });
-const cacheSpy = sandbox.spy(cache);
 
 describe('paymentMethods.transferwise', () => {
+  const sandbox = sinon.createSandbox();
+  const quote = {
+    id: 1234,
+    source: 'USD',
+    target: 'EUR',
+    sourceAmount: 101.14,
+    targetAmount: 90.44,
+    rate: 0.9044,
+    fee: 1.14,
+  };
+  let createQuote, createRecipientAccount, createTransfer, fundTransfer, getAccountRequirements, cacheSpy;
   let connectedAccount, collective, host, payoutMethod, expense;
 
   after(sandbox.restore);
   before(utils.resetTestDB);
+  before(() => {
+    createQuote = sandbox.stub(transferwiseLib, 'createQuote').resolves(quote);
+    sandbox.stub(transferwiseLib, 'getTemporaryQuote').resolves(quote);
+    sandbox.stub(transferwiseLib, 'getProfiles').resolves([
+      {
+        id: 217896,
+        type: 'personal',
+      },
+      {
+        id: 220192,
+        type: 'business',
+      },
+    ]);
+    createRecipientAccount = sandbox.stub(transferwiseLib, 'createRecipientAccount').resolves({
+      id: 13804569,
+      accountHolderName: 'Leo Kewitz',
+      currency: 'EUR',
+      country: 'DE',
+      type: 'iban',
+      details: {
+        IBAN: 'DE89370400440532013000',
+      },
+    });
+    createTransfer = sandbox.stub(transferwiseLib, 'createTransfer').resolves({ id: 123 });
+    fundTransfer = sandbox.stub(transferwiseLib, 'fundTransfer').resolves({ status: 'COMPLETED' });
+    sandbox.stub(transferwiseLib, 'getCurrencyPairs').resolves({
+      sourceCurrencies: [
+        {
+          currencyCode: 'USD',
+          targetCurrencies: [
+            { currencyCode: 'EUR', minInvoiceAmount: 1 },
+            { currencyCode: 'GBP', minInvoiceAmount: 1 },
+            { currencyCode: 'BRL', minInvoiceAmount: 1 },
+          ],
+        },
+      ],
+    });
+    getAccountRequirements = sandbox.stub(transferwiseLib, 'getAccountRequirements').resolves({ success: true });
+    cacheSpy = sandbox.spy(cache);
+  });
   before(async () => {
     host = await fakeCollective({ isHostAccount: true });
     connectedAccount = await fakeConnectedAccount({
       CollectiveId: host.id,
       service: 'transferwise',
-      token: '33b5e94d-9815-4ebc-b970-3612b6aec332',
+      token: 'fake-token',
       data: { type: 'business', id: 0 },
     });
     collective = await fakeCollective({ isHostAccount: false, HostCollectiveId: host.id });

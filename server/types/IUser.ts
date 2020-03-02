@@ -1,7 +1,7 @@
 /**
  * Typescript interface for the `User` model ()
  */
-interface IUser {
+interface User {
   id: number;
   firstName: string | null;
   lastName: string | null;

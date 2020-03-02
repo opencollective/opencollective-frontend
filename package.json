@@ -172,7 +172,7 @@
     "forestadmin-schema:update": "npm run script scripts/forestadmin-schema-update && prettier .forestadmin-schema.json --write",
     "git:clean": "./scripts/git_clean.sh",
     "hint": "npm run lint:quiet",
-    "lint": "eslint .",
+    "lint": "eslint . --ext='js,ts'",
     "lint:check": "npm run lint -- --quiet",
     "lint:fix": "npm run lint -- --fix",
     "maildev": "maildev",
