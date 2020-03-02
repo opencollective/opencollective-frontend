@@ -95,6 +95,9 @@ module.exports = {
   webpackConfig: {
     resolve: { extensions: ['.js', '.json'] },
     stats: { children: false, chunks: false, modules: false, reasons: false },
+    optimization: {
+      minimize: false, // See https://github.com/terser/terser/issues/567
+    },
     module: {
       rules: [
         {
