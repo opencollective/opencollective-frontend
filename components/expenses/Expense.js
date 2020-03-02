@@ -6,7 +6,7 @@ import { graphql } from 'react-apollo';
 import { Flex } from '@rebass/grid';
 import { get } from 'lodash';
 
-import { capitalize, formatCurrency, compose } from '../../lib/utils';
+import { capitalize, formatCurrency, compose, getErrorFromGraphqlException } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
@@ -36,7 +36,7 @@ class Expense extends React.Component {
       amount: PropTypes.number.isRequired,
       currency: PropTypes.string.isRequired,
       incurredAt: PropTypes.string.isRequired,
-      category: PropTypes.string.isRequired,
+      category: PropTypes.string,
       payoutMethod: PropTypes.string.isRequired,
       description: PropTypes.string,
       userTaxFormRequiredBeforePayment: PropTypes.bool,
@@ -183,12 +183,16 @@ class Expense extends React.Component {
   };
 
   async save() {
-    const expense = {
-      id: this.props.expense.id,
-      ...this.state.expense,
-    };
-    await this.props.editExpense(expense);
-    this.setState({ modified: false, mode: 'details' });
+    try {
+      const expense = {
+        id: this.props.expense.id,
+        ...this.state.expense,
+      };
+      await this.props.editExpense(expense);
+      this.setState({ modified: false, mode: 'details' });
+    } catch (e) {
+      this.handleErrorMessage(getErrorFromGraphqlException(e).message);
+    }
   }
 
   handleErrorMessage(errorMessage) {
@@ -213,7 +217,6 @@ class Expense extends React.Component {
 
     const title = expense.description;
     const status = expense.status.toLowerCase();
-
     const view = this.props.view || 'summary';
     let { mode } = this.state;
     if (editable && LoggedInUser && !mode) {
@@ -414,23 +417,25 @@ class Expense extends React.Component {
               <span className="status" data-cy="expense-status-div">
                 {intl.formatMessage(this.messages[status])}
               </span>
-              {' | '}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
                 <ExpenseNeedsTaxFormBadge isTaxFormRequired={expense.userTaxFormRequiredBeforePayment} />
               )}
-              <span className="metaItem">
-                <Link
-                  route="expenses"
-                  params={{
-                    collectiveSlug: expense.collective.slug,
-                    filter: 'categories',
-                    value: expense.category,
-                  }}
-                  scroll={false}
-                >
-                  {capitalize(expense.category)}
-                </Link>
-              </span>
+              {expense.category && (
+                <span className="metaItem">
+                  {' | '}
+                  <Link
+                    route="expenses"
+                    params={{
+                      collectiveSlug: expense.collective.slug,
+                      filter: 'categories',
+                      value: expense.category,
+                    }}
+                    scroll={false}
+                  >
+                    {capitalize(expense.category)}
+                  </Link>
+                </span>
+              )}
               {editable && LoggedInUser && LoggedInUser.canEditExpense(expense) && (
                 <span>
                   {' | '}
@@ -456,6 +461,7 @@ class Expense extends React.Component {
             onChange={expense => this.handleChange({ expense })}
             mode={mode}
           />
+          <br />
           {this.state.showUnapproveModal && (
             <ConfirmationModal
               show={this.state.showUnapproveModal}
@@ -639,6 +645,12 @@ const editExpense = graphql(
         description
         amount
         attachment
+        attachments {
+          id
+          url
+          description
+          amount
+        }
         category
         type
         privateMessage

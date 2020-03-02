@@ -605,6 +605,7 @@
   "expense.approved": "承認済み",
   "Expense.Attachment": "Attachment",
   "expense.attachment.description": "請求書か領収書をアップロード (写真か PDF)",
+  "Expense.Attachments": "Attachments",
   "expense.category": "カテゴリー",
   "Expense.Category.Communications": "コミュニケーション",
   "Expense.Category.Design": "デザイン",

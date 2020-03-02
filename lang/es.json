@@ -605,6 +605,7 @@
   "expense.approved": "aprobado",
   "Expense.Attachment": "Attachment",
   "expense.attachment.description": "Cargar recibo o factura (foto o PDF)",
+  "Expense.Attachments": "Attachments",
   "expense.category": "categoría",
   "Expense.Category.Communications": "Communications",
   "Expense.Category.Design": "Design",
