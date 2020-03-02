@@ -9,8 +9,9 @@ import { H1 } from '../../Text';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import Link from '../../Link';
+import ExternalLink from '../../ExternalLink';
 
-const ExamplesLink = styled.a`
+const ExamplesLink = styled(ExternalLink)`
   color: ${themeGet('colors.blue.500')};
   font-size: ${themeGet('fontSizes.Caption')}px;
 
@@ -72,7 +73,7 @@ class CollectiveCategoryPicker extends React.Component {
 
     return (
       <div>
-        <Box my={4}>
+        <Box mb={4} mt={5}>
           <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             {intl.formatMessage(this.messages.header)}
           </H1>
@@ -95,11 +96,10 @@ class CollectiveCategoryPicker extends React.Component {
                     }}
                   >
                     <StyledButton
-                      buttonSize="small"
-                      height="35px"
+                      fontSize="13px"
                       buttonStyle="primary"
                       mt={[2, 3]}
-                      mb={2}
+                      mb={3}
                       px={3}
                       onClick={() => {
                         this.handleChange('category', 'opensource');
@@ -108,7 +108,9 @@ class CollectiveCategoryPicker extends React.Component {
                       {intl.formatMessage(this.messages.opensource)}
                     </StyledButton>
                   </Link>
-                  <ExamplesLink href="#">{intl.formatMessage(this.messages.examples)}</ExamplesLink>
+                  <ExamplesLink href="/discover?show=opensource" openInNewTab>
+                    {intl.formatMessage(this.messages.examples)}
+                  </ExamplesLink>
                 </Flex>
               </Container>
               <Container
@@ -132,11 +134,10 @@ class CollectiveCategoryPicker extends React.Component {
                     }}
                   >
                     <StyledButton
-                      buttonSize="small"
-                      height="35px"
+                      fontSize="13px"
                       buttonStyle="primary"
                       mt={[2, 3]}
-                      mb={2}
+                      mb={3}
                       px={3}
                       onClick={() => {
                         this.handleChange('category', 'community');
@@ -145,7 +146,9 @@ class CollectiveCategoryPicker extends React.Component {
                       {intl.formatMessage(this.messages.community)}
                     </StyledButton>
                   </Link>
-                  <ExamplesLink href="#">{intl.formatMessage(this.messages.examples)}</ExamplesLink>
+                  <ExamplesLink href="/discover?show=community" openInNewTab>
+                    {intl.formatMessage(this.messages.examples)}
+                  </ExamplesLink>
                 </Flex>
               </Container>
               <Container
@@ -168,11 +171,10 @@ class CollectiveCategoryPicker extends React.Component {
                     }}
                   >
                     <StyledButton
-                      buttonSize="small"
-                      height="35px"
+                      fontSize="13px"
                       buttonStyle="primary"
                       mt={[2, 3]}
-                      mb={2}
+                      mb={3}
                       px={3}
                       onClick={() => {
                         this.handleChange('category', 'climate');
@@ -181,7 +183,9 @@ class CollectiveCategoryPicker extends React.Component {
                       {intl.formatMessage(this.messages.climate)}
                     </StyledButton>
                   </Link>
-                  <ExamplesLink href="#">{intl.formatMessage(this.messages.examples)}</ExamplesLink>
+                  <ExamplesLink href="/discover?show=climate" openInNewTab>
+                    {intl.formatMessage(this.messages.examples)}
+                  </ExamplesLink>
                 </Flex>
               </Container>
             </Flex>

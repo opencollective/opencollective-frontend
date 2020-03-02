@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { URLSearchParams } from 'universal-url';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import themeGet from '@styled-system/theme-get';
+import styled from 'styled-components';
 
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
@@ -20,6 +22,11 @@ import { Router } from '../../../server/pages';
 import { getGithubRepos } from '../../../lib/api';
 import { getWebsiteUrl } from '../../../lib/utils';
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../../../lib/local-storage';
+
+const BackButton = styled(StyledButton)`
+  color: ${themeGet('colors.black.600')};
+  font-size: ${themeGet('fontSizes.Paragraph')}px;
+`;
 
 class ConnectGithub extends React.Component {
   static propTypes = {
@@ -113,23 +120,21 @@ class ConnectGithub extends React.Component {
   }
 
   render() {
-    const { token, intl, query } = this.props;
+    const { token, intl } = this.props;
     const { repositories, loadingRepos, error } = this.state;
 
+    const FISCAL_SPONSOR_TERMS =
+      'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
+
     return (
-      <Flex flexDirection="column" m={[3, 4]} mb={[4]}>
+      <Flex flexDirection="column" m={[3, 0]} mb={[4]}>
         {token && (
           <Fragment>
             <Flex flexDirection="column" my={[2, 4]}>
               <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
-                <Link
-                  fontSize="Paragraph"
-                  color="black.600"
-                  route="new-create-collective"
-                  params={{ hostCollectiveSlug: query.hostCollectiveSlug, verb: query.verb, category: 'opensource' }}
-                >
+                <BackButton asLink onClick={() => window && window.history.back()}>
                   ←&nbsp;{intl.formatMessage(this.messages.back)}
-                </Link>
+                </BackButton>
               </Box>
               <Box mb={[2, 3]}>
                 <H1
@@ -143,7 +148,7 @@ class ConnectGithub extends React.Component {
                 </H1>
               </Box>
               <Box textAlign="center" minHeight={['24px']}>
-                <P fontSize="Paragraph" color="black.600" mb={2}>
+                <P fontSize="LeadParagraph" color="black.600" mb={2}>
                   <FormattedMessage
                     id="collective.subtitle.seeRepo"
                     defaultMessage="Don't see the repository you're looking for? {helplink}."
@@ -159,18 +164,21 @@ class ConnectGithub extends React.Component {
                     }}
                   />
                 </P>
-                <P fontSize="Paragraph" color="black.600" mb={2}>
+                <P fontSize="LeadParagraph" color="black.600" mb={2}>
                   <FormattedMessage
                     id="collective.subtitle.altVerification"
                     defaultMessage="Want to apply using {altverification}? {applylink}."
                     values={{
                       applylink: (
-                        <ExternalLink
-                          href="https://docs.opencollective.com/help/collectives/osc-verification#applying-for-manual-verification"
-                          openInNewTab
+                        <Link
+                          route="new-create-collective"
+                          params={{
+                            hostCollectiveSlug: 'opensource',
+                            verb: 'apply',
+                          }}
                         >
                           <FormattedMessage id="clickHere" defaultMessage="Click here" />
-                        </ExternalLink>
+                        </Link>
                       ),
                       altverification: (
                         <ExternalLink href="https://www.oscollective.org/#criteria" openInNewTab>
@@ -219,7 +227,7 @@ class ConnectGithub extends React.Component {
                   ml={4}
                   display={['block', null, 'block']}
                   width={1 / 5}
-                  minWidth={[200, 335]}
+                  maxWidth={[200, null, 335]}
                 />
               </Flex>
             )}
@@ -229,14 +237,9 @@ class ConnectGithub extends React.Component {
           <Fragment>
             <Flex flexDirection="column" my={[2, 4]}>
               <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
-                <Link
-                  fontSize="Paragraph"
-                  color="black.600"
-                  route="new-create-collective"
-                  params={{ hostCollectiveSlug: query.hostCollectiveSlug, verb: query.verb }}
-                >
+                <BackButton asLink onClick={() => window && window.history.back()}>
                   ←&nbsp;{intl.formatMessage(this.messages.back)}
-                </Link>
+                </BackButton>
               </Box>
               <Box mb={[2, 3]}>
                 <H1
@@ -250,7 +253,7 @@ class ConnectGithub extends React.Component {
                 </H1>
               </Box>
               <Box textAlign="center" minHeight={['24px']}>
-                <P fontSize="Paragraph" color="black.600" mb={2}>
+                <P fontSize="LeadParagraph" color="black.600" mb={2}>
                   {intl.formatMessage(this.messages.openSourceSubtitle)}
                 </P>
               </Box>
@@ -313,7 +316,7 @@ class ConnectGithub extends React.Component {
                         defaultMessage="I agree with the {toslink}."
                         values={{
                           toslink: (
-                            <ExternalLink href="/tos" openInNewTab>
+                            <ExternalLink href={FISCAL_SPONSOR_TERMS} openInNewTab>
                               <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
                             </ExternalLink>
                           ),
@@ -334,7 +337,7 @@ class ConnectGithub extends React.Component {
                     mb={[3, 0]}
                     px={[2, 3]}
                     textAlign="center"
-                    buttonSize="medium"
+                    fontSize="13px"
                     height="36px"
                     width="196px"
                     buttonStyle="primary"
@@ -356,15 +359,13 @@ class ConnectGithub extends React.Component {
                   <Link
                     route="new-create-collective"
                     params={{
-                      hostCollectiveSlug: query.hostCollectiveSlug,
-                      verb: query.verb,
-                      category: 'opensource',
-                      step: 'form',
+                      hostCollectiveSlug: 'opensource',
+                      verb: 'apply',
                     }}
                   >
                     <StyledButton
                       textAlign="center"
-                      buttonSize="medium"
+                      fontSize="13px"
                       height="36px"
                       width="213px"
                       buttonStyle="secondary"

@@ -4,6 +4,8 @@ import { Formik, Field, Form } from 'formik';
 import { Flex, Box } from '@rebass/grid';
 import { assign, get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import themeGet from '@styled-system/theme-get';
+import styled from 'styled-components';
 
 import { H1, P } from '../../Text';
 import Container from '../../Container';
@@ -14,8 +16,18 @@ import StyledInputField from '../../StyledInputField';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledButton from '../../StyledButton';
 import MessageBox from '../../MessageBox';
-import Link from '../../Link';
 import ExternalLink from '../../ExternalLink';
+import CreateCollectiveCover from '../../CreateCollectiveCover';
+
+const BackButton = styled(StyledButton)`
+  color: ${themeGet('colors.black.600')};
+  font-size: ${themeGet('fontSizes.Paragraph')}px;
+`;
+
+const placeholders = {
+  name: 'Agora Collective',
+  slug: 'agora',
+};
 
 class CreateCollectiveForm extends React.Component {
   static propTypes = {
@@ -27,11 +39,13 @@ class CreateCollectiveForm extends React.Component {
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    github: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.githubRepoHelper = this.githubRepoHelper.bind(this);
 
     const collective = { ...props.collective }; // {}
 
@@ -61,39 +75,62 @@ class CreateCollectiveForm extends React.Component {
         id: 'collective.create.button',
         defaultMessage: 'Create Collective',
       },
+      descriptionPlaceholder: {
+        id: 'create.collective.placeholder',
+        defaultMessage: 'Making the world a better place',
+      },
+      errorName: {
+        id: 'createCollective.form.error.name',
+        defaultMessage: 'Please use fewer than 50 characters',
+      },
+      errorDescription: {
+        id: 'createCollective.form.error.description',
+        defaultMessage: 'Please use fewer than 160 characters',
+      },
+      errorSlug: {
+        id: 'createCollective.form.error.slug',
+        defaultMessage: 'Please use fewer than 30 characters',
+      },
     });
   }
 
   handleChange(fieldname, value) {
-    const collective = {};
+    this.setState(state => ({
+      collective: {
+        ...state.collective,
+        [fieldname]: value,
+      },
+    }));
+  }
 
-    collective[fieldname] = value;
-
-    this.setState({ collective });
+  githubRepoHelper(repoName) {
+    // replaces dash and underscore with space, then capitalises the words
+    const formattedName = repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
+    return formattedName;
   }
 
   render() {
-    const { intl, error, query, host } = this.props;
+    const { intl, error, host, loading, github } = this.props;
 
     const initialValues = {
-      name: '',
+      name: github ? this.githubRepoHelper(github.repo) : '',
       description: '',
-      slug: '',
+      slug: github ? github.repo : '',
     };
 
     const validate = values => {
       const errors = {};
 
       if (values.name.length > 50) {
-        errors.name = 'Please use fewer than 50 characters';
+        errors.name = intl.formatMessage(this.messages.errorName);
       }
 
       if (values.slug.length > 30) {
-        errors.slug = 'Please use fewer than 30 characters';
+        errors.slug = intl.formatMessage(this.messages.errorSlug);
       }
 
-      if (values.description.length > 50) {
-        errors.description = 'Please use fewer than 30 characters';
+      if (values.description.length > 160) {
+        errors.description = intl.formatMessage(this.messages.errorDescription);
       }
 
       return errors;
@@ -111,17 +148,13 @@ class CreateCollectiveForm extends React.Component {
     };
 
     return (
-      <Flex flexDirection="column" m={[3, 4]}>
+      <Flex flexDirection="column" m={[3, 0]}>
+        {host && <CreateCollectiveCover host={host} />}
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight={['32px']} width={[null, 832, 950, 1024]}>
-            <Link
-              fontSize="Paragraph"
-              color="black.600"
-              route="new-create-collective"
-              params={{ hostCollectiveSlug: query.hostCollectiveSlug, verb: query.verb }}
-            >
+          <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
+            <BackButton asLink onClick={() => window && window.history.back()}>
               ←&nbsp;{intl.formatMessage(this.messages.back)}
-            </Link>
+            </BackButton>
           </Box>
           <Box mb={[2, 3]}>
             <H1
@@ -135,7 +168,7 @@ class CreateCollectiveForm extends React.Component {
             </H1>
           </Box>
           <Box textAlign="center" minHeight={['24px']}>
-            <P fontSize="Paragraph" color="black.600" mb={2}>
+            <P fontSize="LeadParagraph" color="black.600" mb={2}>
               {intl.formatMessage(this.messages.introduceSubtitle)}
             </P>
           </Box>
@@ -170,7 +203,7 @@ class CreateCollectiveForm extends React.Component {
                       required
                       my={4}
                     >
-                      {inputProps => <Field as={StyledInput} {...inputProps} placeholder="Guinea Pigs United" />}
+                      {inputProps => <Field as={StyledInput} {...inputProps} placeholder={placeholders.name} />}
                     </StyledInputField>
                     <StyledInputField
                       name="slug"
@@ -186,7 +219,7 @@ class CreateCollectiveForm extends React.Component {
                           as={StyledInputGroup}
                           {...inputProps}
                           prepend="opencollective.com"
-                          placeholder="guineapigs"
+                          placeholder={placeholders.slug}
                         />
                       )}
                     </StyledInputField>
@@ -203,7 +236,7 @@ class CreateCollectiveForm extends React.Component {
                         <Field
                           as={StyledInput}
                           {...inputProps}
-                          placeholder="We advocate for tiny piggies everywhere!"
+                          placeholder={intl.formatMessage(this.messages.descriptionPlaceholder)}
                         />
                       )}
                     </StyledInputField>
@@ -259,11 +292,12 @@ class CreateCollectiveForm extends React.Component {
 
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton
-                        buttonSize="small"
+                        fontSize="13px"
                         height="36px"
                         width="148px"
                         buttonStyle="primary"
                         type="submit"
+                        loading={loading}
                         onSubmit={handleSubmit}
                       >
                         {intl.formatMessage(this.messages.createButton)}
