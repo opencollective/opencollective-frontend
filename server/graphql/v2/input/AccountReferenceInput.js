@@ -4,8 +4,8 @@ import models from '../../../models';
 import { idDecode } from '../identifiers';
 import { NotFound } from '../../errors';
 
-const AccountInput = new GraphQLInputObjectType({
-  name: 'AccountInput',
+export const AccountReferenceInput = new GraphQLInputObjectType({
+  name: 'AccountReferenceInput',
   fields: () => ({
     id: {
       type: GraphQLString,
@@ -23,7 +23,7 @@ const AccountInput = new GraphQLInputObjectType({
   }),
 });
 
-const fetchAccountWithInput = async (input, { loaders, throwIfMissing } = {}) => {
+export const fetchAccountWithReference = async (input, { loaders, throwIfMissing } = {}) => {
   let collective;
   if (input.id) {
     const id = idDecode(input.id, 'account');
@@ -40,5 +40,3 @@ const fetchAccountWithInput = async (input, { loaders, throwIfMissing } = {}) =>
   }
   return collective;
 };
-
-export { AccountInput, fetchAccountWithInput };

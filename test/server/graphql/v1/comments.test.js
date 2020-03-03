@@ -408,7 +408,7 @@ describe('server/graphql/v1/comments', () => {
 
   describe('V2 - edit a comment', () => {
     const editCommentQuery = `
-      mutation editComment($comment: CommentEdit!) {
+      mutation editComment($comment: CommentUpdateInput!) {
         editComment(comment: $comment) {
           id
           markdown
@@ -457,7 +457,7 @@ describe('server/graphql/v1/comments', () => {
 
   describe('V2 - create a comment', () => {
     const createCommentQuery = `
-      mutation createComment($comment: CommentCreate!) {
+      mutation createComment($comment: CommentCreateInput!) {
         createComment(comment: $comment) {
           id
           markdown

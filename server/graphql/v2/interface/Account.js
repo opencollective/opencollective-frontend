@@ -23,7 +23,7 @@ import {
   TransactionType,
 } from '../enum';
 
-import { ChronologicalOrder } from '../input/ChronologicalOrder';
+import { ChronologicalOrderInput } from '../input/ChronologicalOrderInput';
 
 import { NotFound } from '../../errors';
 
@@ -129,7 +129,7 @@ const accountFieldsDefinition = () => ({
         description: 'Type of transaction (DEBIT/CREDIT)',
       },
       orderBy: {
-        type: ChronologicalOrder,
+        type: ChronologicalOrderInput,
       },
     },
   },
@@ -142,7 +142,7 @@ const accountFieldsDefinition = () => ({
       status: { type: new GraphQLList(OrderStatus) },
       tierSlug: { type: GraphQLString },
       orderBy: {
-        type: ChronologicalOrder,
+        type: ChronologicalOrderInput,
       },
     },
   },
@@ -203,8 +203,8 @@ const accountTransactions = {
     limit: { type: GraphQLInt, defaultValue: 100 },
     offset: { type: GraphQLInt, defaultValue: 0 },
     orderBy: {
-      type: ChronologicalOrder,
-      defaultValue: ChronologicalOrder.defaultValue,
+      type: ChronologicalOrderInput,
+      defaultValue: ChronologicalOrderInput.defaultValue,
     },
   },
   async resolve(collective, args) {
@@ -234,8 +234,8 @@ const accountOrders = {
     status: { type: new GraphQLList(OrderStatus) },
     tierSlug: { type: GraphQLString },
     orderBy: {
-      type: ChronologicalOrder,
-      defaultValue: ChronologicalOrder.defaultValue,
+      type: ChronologicalOrderInput,
+      defaultValue: ChronologicalOrderInput.defaultValue,
     },
   },
   async resolve(collective, args) {

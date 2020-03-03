@@ -3,8 +3,8 @@ import { GraphQLString, GraphQLInt, GraphQLInputObjectType } from 'graphql';
 /**
  * Input type to use as the type for the comment input in createComment mutation.
  */
-const CommentCreate = new GraphQLInputObjectType({
-  name: 'CommentCreate',
+export const CommentCreateInput = new GraphQLInputObjectType({
+  name: 'CommentCreateInput',
   fields: () => ({
     markdown: { type: GraphQLString },
     html: { type: GraphQLString },
@@ -13,5 +13,3 @@ const CommentCreate = new GraphQLInputObjectType({
     ConversationId: { type: GraphQLString },
   }),
 });
-
-export { CommentCreate };

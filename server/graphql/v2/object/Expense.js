@@ -8,7 +8,7 @@ import { Account } from '../interface/Account';
 import { CollectionArgs } from '../interface/Collection';
 import { getIdEncodeResolver, IDENTIFIER_TYPES } from '../identifiers';
 
-import { ChronologicalOrder } from '../input/ChronologicalOrder';
+import { ChronologicalOrderInput } from '../input/ChronologicalOrderInput';
 
 const Expense = new GraphQLObjectType({
   name: 'Expense',
@@ -31,8 +31,8 @@ const Expense = new GraphQLObjectType({
         args: {
           ...CollectionArgs,
           orderBy: {
-            type: ChronologicalOrder,
-            defaultValue: ChronologicalOrder.defaultValue,
+            type: ChronologicalOrderInput,
+            defaultValue: ChronologicalOrderInput.defaultValue,
           },
         },
         async resolve(expense, { limit, offset, orderBy }) {

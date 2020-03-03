@@ -1,14 +1,14 @@
 import { GraphQLString, GraphQLInputObjectType, GraphQLList, GraphQLNonNull } from 'graphql';
 import { ExpenseType } from '../enum/ExpenseType';
-import { ExpenseAttachmentCreate } from './ExpenseAttachmentCreate';
+import { ExpenseAttachmentCreateInput } from './ExpenseAttachmentCreateInput';
 import { PayoutMethodInput } from './PayoutMethodInput';
-import { AccountInput } from './AccountInput';
+import { AccountReferenceInput } from './AccountReferenceInput';
 
 /**
  * Input type to use as the type for the expense input in createExpense mutation.
  */
-const ExpenseCreate = new GraphQLInputObjectType({
-  name: 'ExpenseCreate',
+export const ExpenseCreateInput = new GraphQLInputObjectType({
+  name: 'ExpenseCreateInput',
   fields: {
     description: { type: new GraphQLNonNull(GraphQLString) },
     tags: { type: new GraphQLList(GraphQLString) },
@@ -26,14 +26,12 @@ const ExpenseCreate = new GraphQLInputObjectType({
       description: 'The payout method that will be used to reimburse the expense',
     },
     attachments: {
-      type: new GraphQLNonNull(new GraphQLList(ExpenseAttachmentCreate)),
+      type: new GraphQLNonNull(new GraphQLList(ExpenseAttachmentCreateInput)),
       description: 'The list of attachments for this expense. Total amount will be computed from them.',
     },
     payee: {
-      type: new GraphQLNonNull(AccountInput),
+      type: new GraphQLNonNull(AccountReferenceInput),
       description: 'Account to reimburse',
     },
   },
 });
-
-export { ExpenseCreate };

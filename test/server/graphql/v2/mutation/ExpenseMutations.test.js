@@ -4,7 +4,7 @@ import { fakeCollective, fakeUser } from '../../../../test-helpers/fake-data';
 import { randEmail } from '../../../../stores';
 
 const createExpenseMutation = `
-mutation createExpense($expense: ExpenseCreate!, $account: AccountInput!) {
+mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
   createExpense(expense: $expense, account: $account) {
     id
     legacyId
@@ -32,6 +32,7 @@ describe('server/graphql/v2/mutation/ExpenseMutations', () => {
         user,
       );
 
+      result.errors && console.error(result.errors);
       expect(result.errors).to.not.exist;
       expect(result.data).to.exist;
       expect(result.data.createExpense).to.exist;

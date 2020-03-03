@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLString } from 'graphql';
 import { Comment } from '../object/Comment';
-import { CommentEdit } from '../input/CommentEdit';
-import { CommentCreate } from '../input/CommentCreate';
+import { CommentCreateInput } from '../input/CommentCreateInput';
+import { CommentUpdateInput } from '../input/CommentUpdateInput';
 import { editComment, deleteComment, createCommentResolver } from '../../common/comment';
 import { getDecodedId, idDecode, IDENTIFIER_TYPES } from '../identifiers';
 
@@ -10,7 +10,7 @@ const commentMutations = {
     type: Comment,
     args: {
       comment: {
-        type: new GraphQLNonNull(CommentEdit),
+        type: new GraphQLNonNull(CommentUpdateInput),
       },
     },
     resolve(_, { comment }, { remoteUser }) {
@@ -34,7 +34,7 @@ const commentMutations = {
     type: Comment,
     args: {
       comment: {
-        type: new GraphQLNonNull(CommentCreate),
+        type: new GraphQLNonNull(CommentCreateInput),
       },
     },
     resolve: (entity, args, req) => {

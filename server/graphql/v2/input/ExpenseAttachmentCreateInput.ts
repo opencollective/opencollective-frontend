@@ -4,8 +4,8 @@ import { DateString } from '../../v1/types';
 /**
  * Input type to use as the type for the expense input in createExpense mutation.
  */
-const ExpenseAttachmentCreate = new GraphQLInputObjectType({
-  name: 'ExpenseAttachmentCreate',
+export const ExpenseAttachmentCreateInput = new GraphQLInputObjectType({
+  name: 'ExpenseAttachmentCreateInput',
   fields: {
     amount: {
       type: new GraphQLNonNull(GraphQLInt),
@@ -25,5 +25,3 @@ const ExpenseAttachmentCreate = new GraphQLInputObjectType({
     },
   },
 });
-
-export { ExpenseAttachmentCreate };
