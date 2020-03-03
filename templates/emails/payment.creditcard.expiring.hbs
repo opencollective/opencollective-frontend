@@ -1,4 +1,8 @@
+{{#if reminder}}
+Subject: Reminder: your {{brand}} ending in {{name}} is about to expire
+{{else}}
 Subject: Your {{brand}} ending in {{name}} is about to expire
+{{/if}}
 
 <style>
   code {
@@ -18,10 +22,18 @@ Subject: Your {{brand}} ending in {{name}} is about to expire
 <p>Hello,</p>
 {{/if}}
 
+
+{{#if reminder}}
 <p>
-  Your {{brand}} ending in {{name}} is about to expire. To continue your subscriptions without interruption, you should
-  update this card before the end of the month.
+  Just a quick reminder: your {{brand}} ending in {{name}} is about to expire.
 </p>
+{{else}}
+<p>
+  Your {{brand}} ending in {{name}} is about to expire.
+</p>
+{{/if}}
+
+<p>To continue your subscriptions without interruption, you should update this card before the end of the month.</p>
 
 <p>Add a new credit card <a href="{{updateDetailsLink}}">here</a> to keep your subscriptions going.</p>
 

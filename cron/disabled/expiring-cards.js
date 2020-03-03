@@ -5,14 +5,14 @@ import logger from '../../server/lib/logger';
 import models from '../../server/models';
 import * as libPayments from '../../server/lib/payments';
 
-// Only run on the first of the month
+// Run on the 7th and 21st of the month
 const today = new Date();
 const date = today.getDate();
 const month = today.getMonth() + 1;
 const year = today.getFullYear();
 
-if (process.env.NODE_ENV === 'production' && date !== 1 && !process.env.OFFCYCLE) {
-  console.log('NODE_ENV is production and today is not the first of month, script aborted!');
+if (process.env.NODE_ENV === 'production' && date !== 7 && date !== 21 && !process.env.OFFCYCLE) {
+  console.log('NODE_ENV is production and today is not the 7th or 21st of month, script aborted!');
   process.exit();
 }
 
@@ -40,6 +40,7 @@ const fetchExpiringCreditCards = async (month, year) => {
 
 const run = async () => {
   const cards = await fetchExpiringCreditCards(month, year);
+  const reminder = date === 21 ? true : false;
 
   for (const card of cards) {
     try {
@@ -74,10 +75,11 @@ const run = async () => {
           collectiveName,
           slug,
           email,
+          reminder,
         };
 
         logger.info(
-          `Payment method ${data.id} for collective '${data.slug}' is expiring, sending an email to ${data.email}`,
+          `Payment method ${data.id} for collective '${data.slug}' is expiring, sending an email to ${data.email}, reminder = ${reminder}`,
         );
         if (!process.env.DRY_RUN) {
           await libPayments.sendExpiringCreditCardUpdateEmail(data);
