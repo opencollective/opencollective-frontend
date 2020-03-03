@@ -9,6 +9,7 @@ import { Router } from '../../server/pages';
 import Container from '../../components/Container';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
+import OnboardingContentBox from './OnboardingContentBox';
 
 const StepsProgressBox = styled(Box)`
   min-height: 95px;
@@ -81,13 +82,7 @@ class OnboardingModal extends React.Component {
           <OnboardingStepsProgress />
         </StepsProgressBox>
         <Image src="/static/images/createcollective-anycommunity.png" alt="Welcome!" />
-        {/* <OnboardingContentBox step={step}/> */}
-        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
-          The {collective.name} Collective has been created!
-        </H1>
-        <P fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']}>
-          🎉
-        </P>
+        <OnboardingContentBox step={step} collective={collective} />
         <StyledHr my={4} borderColor="black.300" width="100%" />
         <OnboardingNavButtons step={step} slug={collective.slug} />
       </Flex>
