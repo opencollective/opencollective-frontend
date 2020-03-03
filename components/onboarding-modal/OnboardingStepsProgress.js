@@ -5,6 +5,7 @@ import { Box, Flex } from '@rebass/grid';
 
 import { H1, H3, Span, P } from '../Text';
 import StepsProgress from '../StepsProgress';
+import { Router } from '../../server/pages';
 
 const StepLabel = styled(Span)`
   text-transform: uppercase;
@@ -19,37 +20,53 @@ StepLabel.defaultProps = {
 
 const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
 
+const params = {
+  0: {
+    routerStep: undefined,
+  },
+  1: {
+    routerStep: 'administrators',
+  },
+  2: {
+    routerStep: 'contact',
+  },
+};
+
 class OnboardingStepsProgress extends React.Component {
   static propTypes = {
     step: PropTypes.number,
+    handleStep: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
+    this.setParams = this.setParams.bind(this);
 
     this.state = {
       focus: steps[this.props.step],
     };
   }
 
+  setParams = (step, param) => {
+    return params[step][param];
+  };
+
   render() {
-    const { step } = this.props;
+    const { step, slug } = this.props;
     const { focus } = this.state;
-
-    console.log('step', step);
-
-    console.log('focus', focus);
-
-    console.log(steps[this.props.step]);
 
     return (
       <Fragment>
         <StepsProgress
           steps={steps}
-          focus={focus}
-          onStepSelect={focus => {
-            this.setState({ focus });
-            console.log(focus);
+          focus={steps[this.props.step]}
+          onStepSelect={step => {
+            const newStep = steps.findIndex(element => element.name === step.name);
+            //this.props.handleStep(newStep);
+            Router.pushRoute('new-collective-onboarding-modal', {
+              slug,
+              step: this.setParams(newStep, 'routerStep'),
+            });
           }}
         >
           {({ step }) => {
