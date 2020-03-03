@@ -32,32 +32,7 @@ module.exports = {
       name: 'Atoms',
       components: 'components/Styled*.js',
       description: 'Base design atoms.',
-    },
-    {
-      name: 'UI',
-      content: 'styleguide/pages/UI.md',
-      components: 'components/*.js',
-      ignore: ['components/Contribute*.js', 'components/Styled*.js', 'components/collective-page/*.js'],
-    },
-    {
-      name: 'FAQs',
-      components: 'components/faqs/*.js',
-      description: 'FAQs.',
-    },
-    {
-      name: 'Expenses',
-      components: 'components/expenses/*.js',
-      description: 'Expense flow',
-    },
-    {
-      name: 'Collective Page',
-      components: 'components/collective-page/*.js',
-      description: 'These components are used collective page.',
-    },
-    {
-      name: 'Contribution Flow',
-      components: 'components/contribution-flow/*.js',
-      description: 'These components are used on the donate/contribute flow.',
+      sectionDepth: 1,
     },
     {
       name: 'Grid',
@@ -70,6 +45,34 @@ module.exports = {
         {
           name: 'Flex',
           content: 'styleguide/examples/Flex.md',
+        },
+      ],
+    },
+    {
+      name: 'Master components',
+      content: 'styleguide/pages/UI.md',
+      components: ['components/*.js', 'components/faqs/*.js'],
+      ignore: ['components/Contribute*.js', 'components/Styled*.js'],
+      sectionDepth: 1,
+    },
+    {
+      name: 'Projects',
+      sectionDepth: 2,
+      sections: [
+        {
+          name: 'Expenses',
+          components: 'components/expenses/*.js',
+          description: 'Expense flow',
+        },
+        {
+          name: 'Collective Page',
+          components: 'components/collective-page/*.js',
+          description: 'These components are used collective page.',
+        },
+        {
+          name: 'Contribution Flow',
+          components: 'components/contribution-flow/*.js',
+          description: 'These components are used on the donate/contribute flow.',
         },
       ],
     },
@@ -95,6 +98,9 @@ module.exports = {
   webpackConfig: {
     resolve: { extensions: ['.js', '.json'] },
     stats: { children: false, chunks: false, modules: false, reasons: false },
+    optimization: {
+      minimize: false, // See https://github.com/terser/terser/issues/567
+    },
     module: {
       rules: [
         {
