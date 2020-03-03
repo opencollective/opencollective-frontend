@@ -9,6 +9,7 @@ import models from '../../../../server/models';
 import twitter from '../../../../server/lib/twitter';
 import emailLib from '../../../../server/lib/email';
 import { maxInteger } from '../../../../server/constants/math';
+import { fakeTier } from '../../../test-helpers/fake-data';
 
 import * as utils from '../../../utils';
 import * as store from '../../../stores';
@@ -380,7 +381,16 @@ describe('server/graphql/v1/createOrder', () => {
     // Given an order request
     const user = (await store.newUser('John Appleseed')).user;
     const newOrder = cloneDeep(baseOrder);
+    const tier = await fakeTier({
+      CollectiveId: event.id,
+      name: 'tier-name',
+      type: 'TICKET',
+      amount: 0,
+      amountType: 'FLEXIBLE',
+      presets: [0, 500, 1000],
+    });
     newOrder.collective = { id: event.id };
+    newOrder.tier = { id: tier.id };
     newOrder.totalAmount = 1000;
 
     // When the GraphQL query is executed
@@ -410,7 +420,7 @@ describe('server/graphql/v1/createOrder', () => {
 
     // Make sure the order's status is PAID
     expect(res.data.createOrder.status).to.equal('PAID');
-    expect(res.data.createOrder.description).to.equal('Registration to Sustain OSS London 2019');
+    expect(res.data.createOrder.description).to.equal('Registration to Sustain OSS London 2019 (tier-name)');
 
     // Then there should be no errors
     res.errors && console.error(res.errors);
