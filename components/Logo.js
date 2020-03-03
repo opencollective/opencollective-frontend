@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { getCollectiveImage } from '../lib/utils';
+import { getCollectiveImage } from '../lib/image-utils';
 
 const Logo = ({ collective, src, style = {}, height, width, className }) => {
   style.maxHeight = style.height || height;

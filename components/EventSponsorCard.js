@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { get } from 'lodash';
 
-import { getCollectiveImage } from '../lib/utils';
+import { getCollectiveImage } from '../lib/image-utils';
 
 const EventSponsorCard = ({ sponsor }) => (
   <a href={`/${sponsor.slug}`}>

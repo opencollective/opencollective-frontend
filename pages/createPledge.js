@@ -11,7 +11,8 @@ import themeGet from '@styled-system/theme-get';
 import { getCollectiveQuery } from '../lib/graphql/queries';
 import { withUser } from '../components/UserProvider';
 import { Router } from '../server/pages';
-import { compose, imagePreview } from '../lib/utils';
+import { compose } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import { defaultImage } from '../lib/constants/collectives';
 
 import Header from '../components/Header';

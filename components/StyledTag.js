@@ -5,8 +5,8 @@ import { background, border, color, space, typography, layout, position } from '
 
 import { Times } from '@styled-icons/fa-solid/Times';
 
-import { textTransform } from '../lib/styled_system_custom';
-import { messageType } from '../lib/theme';
+import { textTransform } from '../lib/styled-system-custom-properties';
+import { messageType } from '../lib/theme/variants/message';
 import { Span } from './Text';
 
 const StyledTagBase = styled.div`
