@@ -983,8 +983,6 @@ class CreateOrderPage extends React.Component {
   renderContent(step, goNext, goBack, isValidating) {
     const { LoggedInUser, intl } = this.props;
 
-    console.log('we in here!!!!', step);
-
     if (!LoggedInUser) {
       return (
         <SignInOrJoinFree
