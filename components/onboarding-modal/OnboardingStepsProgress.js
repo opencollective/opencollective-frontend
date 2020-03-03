@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
+import { Flex } from '@rebass/grid';
 
-import { H1, H3, Span, P } from '../Text';
+import { Span } from '../Text';
 import StepsProgress from '../StepsProgress';
 import { Router } from '../../server/pages';
 
@@ -35,7 +35,7 @@ const params = {
 class OnboardingStepsProgress extends React.Component {
   static propTypes = {
     step: PropTypes.number,
-    handleStep: PropTypes.func,
+    slug: PropTypes.string,
   };
 
   constructor(props) {
@@ -52,8 +52,7 @@ class OnboardingStepsProgress extends React.Component {
   };
 
   render() {
-    const { step, slug } = this.props;
-    const { focus } = this.state;
+    const { slug } = this.props;
 
     return (
       <Fragment>
@@ -62,7 +61,6 @@ class OnboardingStepsProgress extends React.Component {
           focus={steps[this.props.step]}
           onStepSelect={step => {
             const newStep = steps.findIndex(element => element.name === step.name);
-            //this.props.handleStep(newStep);
             Router.pushRoute('new-collective-onboarding-modal', {
               slug,
               step: this.setParams(newStep, 'routerStep'),

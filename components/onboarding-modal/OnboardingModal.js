@@ -1,9 +1,8 @@
-import React, { setState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 
-import { H1, H3, Span, P } from '../../components/Text';
 import StyledHr from '../../components/StyledHr';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';

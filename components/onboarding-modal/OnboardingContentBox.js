@@ -4,7 +4,6 @@ import { Box, Flex } from '@rebass/grid';
 
 import Container from '../../components/Container';
 import { H1, H3, Span, P } from '../../components/Text';
-import { Router } from '../../server/pages';
 
 const params = {
   0: {},
