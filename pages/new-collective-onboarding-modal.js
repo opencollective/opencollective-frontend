@@ -37,10 +37,6 @@ class NewCollectiveOnboardingPage extends React.Component {
     const { data, LoggedInUser, query } = this.props;
     const collective = data && data.Collective;
 
-    if (data.error) {
-      return <ErrorPage data={data} />;
-    }
-
     if (!LoggedInUser) {
       return (
         <Page>
@@ -71,6 +67,10 @@ class NewCollectiveOnboardingPage extends React.Component {
           </Container>
         </Page>
       );
+    }
+
+    if (data.error) {
+      return <ErrorPage data={data} />;
     }
 
     return (

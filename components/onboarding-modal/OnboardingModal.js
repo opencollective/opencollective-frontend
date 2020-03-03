@@ -4,13 +4,11 @@ import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 
 import { H1, H3, Span, P } from '../../components/Text';
-import StepsProgress from '../../components/StepsProgress';
 import StyledHr from '../../components/StyledHr';
-import StyledRoundButton from '../../components/StyledRoundButton';
 import { Router } from '../../server/pages';
-import Loading from '../../components/Loading';
 import Container from '../../components/Container';
 import OnboardingNavButtons from './OnboardingNavButtons';
+import OnboardingStepsProgress from './OnboardingStepsProgress';
 
 const StepsProgressBox = styled(Box)`
   min-height: 95px;
@@ -21,17 +19,6 @@ const StepsProgressBox = styled(Box)`
     max-width: 100%;
   }
 `;
-
-const StepLabel = styled(Span)`
-  text-transform: uppercase;
-  text-align: center;
-`;
-
-StepLabel.defaultProps = {
-  color: 'black.400',
-  fontSize: 'Tiny',
-  mt: 1,
-};
 
 const Image = styled.img`
   @media screen and (min-width: 52em) {
@@ -48,7 +35,7 @@ const Image = styled.img`
   }
 `;
 
-const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
+//const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
 
 class OnboardingModal extends React.Component {
   static propTypes = {
@@ -58,44 +45,51 @@ class OnboardingModal extends React.Component {
 
   constructor(props) {
     super(props);
+    this.setStep = this.setStep.bind(this);
 
     this.state = {
-      focus: steps[0],
-      disabledStepNames: ['Administrators', 'Contact'],
-      touchedStepNames: [],
-      backButton: false,
+      step: 0,
     };
   }
 
-  render() {
-    const { query, collective } = this.props;
-    const { focus, disabledStepNames, backButton, touchedStepNames } = this.state;
+  componentDidUpdate(oldProps) {
+    if (oldProps.query.step !== this.props.query.step) {
+      console.log('setting step');
+      this.setStep(this.props.query.step);
+    }
+  }
 
-    console.log(this.state);
+  setStep = queryStep => {
+    if (queryStep === undefined) {
+      this.setState({ step: 0 });
+    } else if (queryStep === 'administrators') {
+      this.setState({ step: 1 });
+    } else if (queryStep === 'contact') {
+      this.setState({ step: 2 });
+    }
+  };
+
+  render() {
+    const { collective } = this.props;
+    const { step } = this.state;
+
+    console.log('state', this.state);
 
     return (
-      <Flex flexDirection="column" alignItems="center" py={[5, 6]}>
+      <Flex flexDirection="column" alignItems="center" py={[4]}>
         <StepsProgressBox mb={[3, null, 4]} width={0.8}>
-          <StepsProgress
-            steps={steps}
-            focus={focus}
-            disabledStepNames={disabledStepNames}
-            onStepSelect={focus => this.setState({ focus })}
-          >
-            {({ step }) => {
-              return (
-                <Flex flexDirection="column" alignItems="center">
-                  <StepLabel>{step.name}</StepLabel>
-                </Flex>
-              );
-            }}
-          </StepsProgress>
+          <OnboardingStepsProgress />
         </StepsProgressBox>
         <Image src="/static/images/createcollective-anycommunity.png" alt="Welcome!" />
-        <H3>The {collective.name} Collective has been created!</H3>
-        <H3>🎉</H3>
+        {/* <OnboardingContentBox step={step}/> */}
+        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+          The {collective.name} Collective has been created!
+        </H1>
+        <P fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']}>
+          🎉
+        </P>
         <StyledHr my={4} borderColor="black.300" width="100%" />
-        <OnboardingNavButtons step={2} slug={collective.slug} />
+        <OnboardingNavButtons step={step} slug={collective.slug} />
       </Flex>
     );
   }

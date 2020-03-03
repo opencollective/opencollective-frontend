@@ -35,6 +35,9 @@ class OnboardingNavButtons extends React.Component {
   render() {
     const { step, slug } = this.props;
 
+    console.log(step);
+    console.log('yo');
+
     return (
       <Flex>
         {step === 2 ? (
