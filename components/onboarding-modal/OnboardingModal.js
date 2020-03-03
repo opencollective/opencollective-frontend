@@ -5,8 +5,6 @@ import { Box, Flex } from '@rebass/grid';
 
 import { H1, H3, Span, P } from '../../components/Text';
 import StyledHr from '../../components/StyledHr';
-import { Router } from '../../server/pages';
-import Container from '../../components/Container';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
 import OnboardingContentBox from './OnboardingContentBox';
@@ -36,8 +34,6 @@ const Image = styled.img`
   }
 `;
 
-//const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
-
 class OnboardingModal extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -55,7 +51,6 @@ class OnboardingModal extends React.Component {
 
   componentDidUpdate(oldProps) {
     if (oldProps.query.step !== this.props.query.step) {
-      console.log('setting step');
       this.setStep(this.props.query.step);
     }
   }
@@ -74,12 +69,10 @@ class OnboardingModal extends React.Component {
     const { collective } = this.props;
     const { step } = this.state;
 
-    console.log('state', this.state);
-
     return (
       <Flex flexDirection="column" alignItems="center" py={[4]}>
         <StepsProgressBox mb={[3, null, 4]} width={0.8}>
-          <OnboardingStepsProgress />
+          <OnboardingStepsProgress step={step} />
         </StepsProgressBox>
         <Image src="/static/images/createcollective-anycommunity.png" alt="Welcome!" />
         <OnboardingContentBox step={step} collective={collective} />

@@ -21,30 +21,36 @@ const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact
 
 class OnboardingStepsProgress extends React.Component {
   static propTypes = {
-    query: PropTypes.object,
-    collective: PropTypes.object,
+    step: PropTypes.number,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      focus: steps[0],
-      disabledStepNames: ['Administrators', 'Contact'],
+      focus: steps[this.props.step],
     };
   }
 
   render() {
-    const { query, collective } = this.props;
-    const { focus, disabledStepNames } = this.state;
+    const { step } = this.props;
+    const { focus } = this.state;
+
+    console.log('step', step);
+
+    console.log('focus', focus);
+
+    console.log(steps[this.props.step]);
 
     return (
       <Fragment>
         <StepsProgress
           steps={steps}
           focus={focus}
-          disabledStepNames={disabledStepNames}
-          onStepSelect={focus => this.setState({ focus })}
+          onStepSelect={focus => {
+            this.setState({ focus });
+            console.log(focus);
+          }}
         >
           {({ step }) => {
             return (
