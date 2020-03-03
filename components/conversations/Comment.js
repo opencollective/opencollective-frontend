@@ -43,7 +43,7 @@ const deleteCommentMutation = gqlV2`
 `;
 
 const editCommentMutation = gqlV2`
-  mutation editComment($comment: CommentEdit!) {
+  mutation editComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       ...CommentFields
     }

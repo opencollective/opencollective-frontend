@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Feb 26 2020 12:07:20 GMT+0100 (GMT+01:00)
+# timestamp: Fri Feb 28 2020 17:03:19 GMT+0100 (Central European Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -66,7 +66,7 @@ interface Account {
     Type of transaction (DEBIT/CREDIT)
     """
     type: TransactionType
-    orderBy: ChronologicalOrder
+    orderBy: ChronologicalOrderInput
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -74,7 +74,7 @@ interface Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder
+    orderBy: ChronologicalOrderInput
   ): OrderCollection
   settings: JSON
   conversations(
@@ -114,7 +114,15 @@ type AccountCollection implements Collection {
   nodes: [Account]
 }
 
-input AccountInput {
+"""
+Account orders filter (INCOMING or OUTGOING)
+"""
+enum AccountOrdersFilter {
+  INCOMING
+  OUTGOING
+}
+
+input AccountReferenceInput {
   """
   The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
@@ -129,14 +137,6 @@ input AccountInput {
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
   """
   slug: String
-}
-
-"""
-Account orders filter (INCOMING or OUTGOING)
-"""
-enum AccountOrdersFilter {
-  INCOMING
-  OUTGOING
 }
 
 """
@@ -194,7 +194,7 @@ type Bot implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -202,7 +202,7 @@ type Bot implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -235,7 +235,7 @@ type Bot implements Account {
 """
 Input to order results chronologically
 """
-input ChronologicalOrder {
+input ChronologicalOrderInput {
   """
   Field to chronologically order by.
   """
@@ -292,7 +292,7 @@ type Collective implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -300,7 +300,7 @@ type Collective implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -345,6 +345,14 @@ type Collective implements Account {
   isApproved: Boolean
 }
 
+input CollectiveCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  githubHandle: String
+}
+
 """
 This represents an Comment
 """
@@ -367,7 +375,7 @@ type CommentCollection implements Collection {
   nodes: [Comment]
 }
 
-input CommentCreate {
+input CommentCreateInput {
   markdown: String
   html: String
   ExpenseId: Int
@@ -375,7 +383,7 @@ input CommentCreate {
   ConversationId: String
 }
 
-input CommentEdit {
+input CommentUpdateInput {
   id: String!
   markdown: String
   html: String
@@ -425,14 +433,6 @@ type ConversationStats {
   Total number of comments for this conversation
   """
   commentsCount: Int
-}
-
-input CreateCollectiveInput {
-  name: String!
-  slug: String!
-  description: String!
-  tags: [String]
-  githubHandle: String
 }
 
 """
@@ -588,7 +588,7 @@ type Event implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -596,7 +596,7 @@ type Event implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -654,7 +654,7 @@ type Expense {
   comments(
     limit: Int
     offset: Int
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): CommentCollection
 
   """
@@ -668,7 +668,7 @@ type Expense {
   invoiceInfo: String
 }
 
-input ExpenseAttachmentCreate {
+input ExpenseAttachmentCreateInput {
   """
   Amount in cents
   """
@@ -690,7 +690,7 @@ input ExpenseAttachmentCreate {
   incurredAt: DateString
 }
 
-input ExpenseCreate {
+input ExpenseCreateInput {
   description: String!
   tags: [String]
   type: ExpenseType!
@@ -713,12 +713,12 @@ input ExpenseCreate {
   """
   The list of attachments for this expense. Total amount will be computed from them.
   """
-  attachments: [ExpenseAttachmentCreate]!
+  attachments: [ExpenseAttachmentCreateInput]!
 
   """
   Account to reimburse
   """
-  payee: AccountInput!
+  payee: AccountReferenceInput!
 }
 
 """
@@ -780,7 +780,7 @@ type Individual implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -788,7 +788,7 @@ type Individual implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -931,9 +931,9 @@ enum MemberRole {
 This is the root mutation
 """
 type Mutation {
-  editComment(comment: CommentEdit!): Comment
+  editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
-  createComment(comment: CommentCreate!): Comment
+  createComment(comment: CommentCreateInput!): Comment
 
   """
   Create a conversation
@@ -994,12 +994,12 @@ type Mutation {
     """
     Information about the collective to create (name, slug, description, tags, ...)
     """
-    collective: CreateCollectiveInput!
+    collective: CollectiveCreateInput!
 
     """
     Reference to the host to apply on creation.
     """
-    host: AccountInput
+    host: AccountReferenceInput
 
     """
     Wether to trigger the automated approval for Open Source collectives with GitHub.
@@ -1014,12 +1014,12 @@ type Mutation {
     """
     Expense data
     """
-    expense: ExpenseCreate!
+    expense: ExpenseCreateInput!
 
     """
     Account where the expense will be created
     """
-    account: AccountInput!
+    account: AccountReferenceInput!
   ): Expense
 }
 
@@ -1116,7 +1116,7 @@ type Organization implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -1124,7 +1124,7 @@ type Organization implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
