@@ -48,6 +48,10 @@ class OnboardingModal extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.setStep(this.props.query.step);
+  }
+
   componentDidUpdate(oldProps) {
     if (oldProps.query.step !== this.props.query.step) {
       this.setStep(this.props.query.step);

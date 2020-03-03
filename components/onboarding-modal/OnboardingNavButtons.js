@@ -56,7 +56,7 @@ class OnboardingNavButtons extends React.Component {
                 });
               }}
             >
-              ->
+              →
             </StyledRoundButton>
           </React.Fragment>
         )}
