@@ -26,7 +26,7 @@
     "axios": "0.19.2",
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-lodash": "3.3.4",
-    "bcrypt": "4.0.0",
+    "bcrypt": "4.0.1",
     "bluebird": "3.7.2",
     "body-parser": "1.19.0",
     "burner-email-providers": "1.0.13",
