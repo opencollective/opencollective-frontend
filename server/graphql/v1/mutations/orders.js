@@ -226,8 +226,11 @@ export async function createOrder(order, loaders, remoteUser, reqIp) {
     }
     if (paymentRequired && order.paymentMethod && order.paymentMethod.type === 'manual') {
       const hostPlan = await host.getPlan();
-      if (hostPlan.bankTransfersLimit && hostPlan.bankTransfers + order.totalAmount > hostPlan.bankTransfersLimit) {
-        throw new Error("Donation exceeds the host's current plan limit for bank transfers.");
+      if (hostPlan.bankTransfersLimit && hostPlan.bankTransfers > hostPlan.bankTransfersLimit) {
+        throw new errors.PlanLimit({
+          message:
+            'The limit of "Bank Transfers" for the host has been reached. Please contact support@opencollective.com if you think this is an error.',
+        });
       }
     }
 
@@ -979,7 +982,7 @@ export async function addFundsToCollective(order, remoteUser) {
 
   // Check limits
   const hostPlan = await host.getPlan();
-  if (hostPlan.addedFundsLimit && hostPlan.addedFundsLimit <= hostPlan.addedFunds) {
+  if (hostPlan.addedFundsLimit && hostPlan.addedFunds > hostPlan.addedFundsLimit) {
     throw new errors.PlanLimit({
       message:
         'The limit of "Added Funds" for the host has been reached. Please contact support@opencollective.com if you think this is an error.',

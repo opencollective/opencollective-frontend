@@ -28,7 +28,8 @@ module.exports = {
       UPDATE "Collectives"
         SET "data" = jsonb_set("data"::jsonb, '{plan}', '{}'::jsonb)
         FROM "HostWithAddedFunds"
-        WHERE "Collectives"."id" = "HostWithAddedFunds"."id";
+        WHERE "Collectives"."id" = "HostWithAddedFunds"."id"
+        AND data->>'plan' IS NULL;
       UPDATE "Collectives"
         SET "data" = jsonb_set("data"::jsonb, '{plan, addedFundsLimit}', 'null'::jsonb)
         FROM "HostWithAddedFunds"
@@ -66,7 +67,8 @@ module.exports = {
       UPDATE "Collectives"
         SET "data" = jsonb_set("data"::jsonb, '{plan}', '{}'::jsonb)
         FROM "HostsWithBankTransfers"
-        WHERE "Collectives"."id" = "HostsWithBankTransfers"."id";
+        WHERE "Collectives"."id" = "HostsWithBankTransfers"."id"
+        AND data->>'plan' IS NULL;
       UPDATE "Collectives"
         SET "data" = jsonb_set("data"::jsonb, '{plan, bankTransfersLimit}', 'null'::jsonb)
         FROM "HostsWithBankTransfers"
