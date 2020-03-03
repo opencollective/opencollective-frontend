@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 
 import Container from '../../components/Container';
-import { H1, P } from '../../components/Text';
+import { H1, P, Span } from '../../components/Text';
 import StyledInput from '../../components/StyledInput';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
+import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 
 class OnboardingContentBox extends React.Component {
   static propTypes = {
@@ -52,9 +53,29 @@ class OnboardingContentBox extends React.Component {
           </Fragment>
         )}
         {step === 1 && (
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
-            Add administrators
-          </H1>
+          <Fragment>
+            <H1
+              fontSize={['H5', 'H3']}
+              lineHeight={['H5', 'H3']}
+              fontWeight="bold"
+              color="black.900"
+              textAlign="center"
+            >
+              Add administrators
+            </H1>
+            <P fontSize="Caption" textTransform="uppercase" color="black.700">
+              Administrators
+            </P>
+            <P fontSize="Caption" textTransform="uppercase" color="black.700">
+              Invite administrators
+            </P>
+            <Flex flexDirection="column">
+              <CollectivePickerAsync types={['USER']} onChange={option => console.log(option.value)} />
+            </Flex>
+            <Span fontSize="Caption" color="black.500">
+              Admins can modify the Collective page and approve expenses.
+            </Span>
+          </Fragment>
         )}
         {step === 2 && (
           <Fragment>
