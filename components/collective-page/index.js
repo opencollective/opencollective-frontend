@@ -57,6 +57,7 @@ class CollectivePage extends Component {
       updates: PropTypes.number.isRequired,
       backers: PropTypes.object,
     }),
+    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
   };
 
   constructor(props) {
@@ -159,6 +160,7 @@ class CollectivePage extends Component {
       case Sections.CONTRIBUTE:
         return (
           <SectionContribute
+            query={this.props.query}
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
