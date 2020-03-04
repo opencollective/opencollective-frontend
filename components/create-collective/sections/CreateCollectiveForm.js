@@ -24,6 +24,13 @@ const BackButton = styled(StyledButton)`
   font-size: ${themeGet('fontSizes.Paragraph')}px;
 `;
 
+const ContainerWithImage = styled(Container)`
+  background: url('/static/images/create-collective/formIllustration.png');
+  background-repeat: no-repeat;
+  background-size: 40%;
+  background-position: right bottom;
+`;
+
 const placeholders = {
   name: 'Agora Collective',
   slug: 'agora',
@@ -181,7 +188,7 @@ class CreateCollectiveForm extends React.Component {
           </Flex>
         )}
         <Flex alignItems="center" justifyContent="center">
-          <Container
+          <ContainerWithImage
             mb={[1, 5]}
             width={[320, 512, 576]}
             border={['none', '1px solid #E6E8EB']}
@@ -317,7 +324,7 @@ class CreateCollectiveForm extends React.Component {
                 height="200px"
               />
             </Flex>
-          </Container>
+          </ContainerWithImage>
         </Flex>
       </Flex>
     );
