@@ -95,7 +95,7 @@ class OnboardingContentBox extends React.Component {
                   <StyledInput
                     type="text"
                     onBlur={({ target }) => this.handleValue(target.name, target.value, values)}
-                    placeholder="https://guineapi.gs"
+                    placeholder="agora.com"
                     {...inputProps}
                   />
                 )}
@@ -105,7 +105,7 @@ class OnboardingContentBox extends React.Component {
                   <StyledInputGroup
                     type="text"
                     onBlur={({ target }) => this.handleValue(target.name, target.value, values)}
-                    placeholder="sbinlondon"
+                    placeholder="agora"
                     prepend="@"
                     {...inputProps}
                   />
@@ -116,7 +116,7 @@ class OnboardingContentBox extends React.Component {
                   <StyledInputGroup
                     type="text"
                     onBlur={({ target }) => this.handleValue(target.name, target.value, values)}
-                    placeholder="sbinlondon"
+                    placeholder="agoraos"
                     prepend="github.com/"
                     {...inputProps}
                   />
