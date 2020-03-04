@@ -201,7 +201,8 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.nameLabel)}
                       value={values.name}
                       required
-                      my={4}
+                      mt={4}
+                      mb={3}
                     >
                       {inputProps => <Field as={StyledInput} {...inputProps} placeholder={placeholders.name} />}
                     </StyledInputField>
@@ -212,7 +213,7 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.slugLabel)}
                       value={values.slug}
                       required
-                      my={4}
+                      my={3}
                     >
                       {inputProps => (
                         <Field
@@ -230,7 +231,8 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.descriptionLabel)}
                       value={values.description}
                       required
-                      my={4}
+                      mt={3}
+                      mb={4}
                     >
                       {inputProps => (
                         <Field
