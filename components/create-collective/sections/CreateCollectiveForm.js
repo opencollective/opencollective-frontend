@@ -25,10 +25,12 @@ const BackButton = styled(StyledButton)`
 `;
 
 const ContainerWithImage = styled(Container)`
-  background: url('/static/images/create-collective/formIllustration.png');
-  background-repeat: no-repeat;
-  background-size: 40%;
-  background-position: right bottom;
+  @media screen and (min-width: 40em) {
+    background: url('/static/images/create-collective/formIllustration.png');
+    background-repeat: no-repeat;
+    background-size: 40%;
+    background-position: right bottom;
+  }
 `;
 
 const placeholders = {
