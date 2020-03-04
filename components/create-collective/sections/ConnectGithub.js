@@ -338,7 +338,6 @@ class ConnectGithub extends React.Component {
                     px={[2, 3]}
                     textAlign="center"
                     fontSize="13px"
-                    height="36px"
                     width="196px"
                     buttonStyle="primary"
                     onClick={() => {
@@ -366,7 +365,6 @@ class ConnectGithub extends React.Component {
                     <StyledButton
                       textAlign="center"
                       fontSize="13px"
-                      height="36px"
                       width="213px"
                       buttonStyle="secondary"
                       onClick={() => {
