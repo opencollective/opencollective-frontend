@@ -203,8 +203,8 @@ class ConnectGithub extends React.Component {
             {loadingRepos && <Loading />}
             {repositories.length !== 0 && (
               <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
-                <Box width={[0, null, null, '24em']} />
-                <Box maxWidth={[300, 500]} minWidth={[200, 400]}>
+                <Box width={1 / 5} display={['none', null, 'block']} />
+                <Box maxWidth={[400, 500]} minWidth={[300, 400]} alignSelf={['center', 'none']}>
                   <StyledInputField htmlFor="collective">
                     {fieldProps => (
                       <GithubRepositories
@@ -224,10 +224,11 @@ class ConnectGithub extends React.Component {
                 </Box>
                 <GithubRepositoriesFAQ
                   mt={4}
-                  ml={4}
+                  ml={[0, 4]}
                   display={['block', null, 'block']}
-                  width={1 / 5}
-                  maxWidth={[200, null, 335]}
+                  width={[1, 1 / 5]}
+                  maxWidth={[250, null, 335]}
+                  alignSelf={['center', 'none']}
                 />
               </Flex>
             )}
