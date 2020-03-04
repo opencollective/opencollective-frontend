@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
+import { injectIntl, defineMessages } from 'react-intl';
 import NotificationBar from '../NotificationBar';
-import Link from '../Link';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 const messages = defineMessages({
