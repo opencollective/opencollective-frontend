@@ -160,7 +160,7 @@ class CollectivePage extends Component {
       case Sections.CONTRIBUTE:
         return (
           <SectionContribute
-            query={this.props.query}
+            status={this.props.status}
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}

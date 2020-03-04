@@ -16,10 +16,6 @@ const messages = defineMessages({
     defaultMessage:
       'While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.',
   },
-  collectiveCreatedAcceptContributions: {
-    id: 'collective.created.accept.contributions',
-    defaultMessage: '{contributionslink} to start accepting financial contributions.',
-  },
   collectiveApprovedDescription: {
     id: 'collective.githubflow.created.description',
     defaultMessage:
@@ -71,21 +67,7 @@ const getNotification = (intl, status, collective, host) => {
         }
         return {
           title: intl.formatMessage(messages.collectiveCreated),
-          description: host
-            ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name })
-            : intl.formatMessage(messages.collectiveCreatedAcceptContributions, {
-                contributionslink: (
-                  <Link
-                    route="editCollective"
-                    params={{
-                      slug: collective.slug,
-                      section: 'host',
-                    }}
-                  >
-                    <FormattedMessage id="clickHere" defaultMessage="Click here" />
-                  </Link>
-                ),
-              }),
+          description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
         };
     }
   } else if (status === 'collectiveArchived' || collective.isArchived) {
