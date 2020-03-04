@@ -310,7 +310,7 @@ class CreateCollectiveForm extends React.Component {
             <Flex justifyContent="center" mb={4} display={['flex', 'none']}>
               <Illustration
                 display={['block', 'none']}
-                src="/static/images/createcollective-mobile-form.png"
+                src="/static/images/create-collective/mobileForm.png"
                 width="320px"
                 height="200px"
               />
