@@ -17,6 +17,8 @@ const getCollectiveType = type => {
       return 'Organization';
     case 'COLLECTIVE':
       return 'Collective';
+    case 'EVENT':
+      return 'Event';
     default:
       return 'Account';
   }
