@@ -130,6 +130,7 @@
   "collective.create.join": "Join Open Collective",
   "collective.create.title": "Crear un Open Collective",
   "collective.created": "Tu colecta ha sido registrada con éxito.",
+  "collective.created.accept.contributions": "{contributionslink} to start accepting financial contributions.",
   "collective.created.description": "Mientras esperas la aprobación de tu anfitrión ({host}), puedes comenzar a personalizar tu colecta, la hoja de gastos e incluso registrar eventos.",
   "Collective.CreateNew": "Crear nuevo Colectivo",
   "collective.delete.description": "Este {type} será borrado, junto con todos los datos relacionados como los roles de los Contribuyentes principales y métodos de pago.",

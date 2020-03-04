@@ -130,6 +130,7 @@
   "collective.create.join": "Join Open Collective",
   "collective.create.title": "Maak een Open Collective aan",
   "collective.created": "Jouw collectief is succesvol aangemaakt.",
+  "collective.created.accept.contributions": "{contributionslink} to start accepting financial contributions.",
   "collective.created.description": "Terwijl je wacht op goedkeuring van je beheerder ({host}) kan je al je collectief aanpassen, onkostennota's indienen en evenementen aanmaken.",
   "Collective.CreateNew": "Nieuw Collective aanmaken",
   "collective.delete.description": "Deze {type} zal verwijderd worden, samen met alle gerelateerde data zoals rollen van Essentiële Bijdragers en betaalmogelijkheden.",

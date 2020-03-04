@@ -130,6 +130,7 @@
   "collective.create.join": "Join Open Collective",
   "collective.create.title": "Создать открытй коллектив",
   "collective.created": "Ваш коллектив успешно создан.",
+  "collective.created.accept.contributions": "{contributionslink} to start accepting financial contributions.",
   "collective.created.description": "Пока вы ждёте подтверждения от вашего представителя ({host}), вы уже можете задать настройки для своего коллектива, расходов и даже создавать события.",
   "Collective.CreateNew": "Создать новый коллектив",
   "collective.delete.description": "Этот {type} будет удален, наряду со всеми связанными данными, такими как основные роли и методы оплаты.",

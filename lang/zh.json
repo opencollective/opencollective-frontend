@@ -130,6 +130,7 @@
   "collective.create.join": "Join Open Collective",
   "collective.create.title": "创建一个开放的集体",
   "collective.created": "你们的集体已经创造成功了。",
+  "collective.created.accept.contributions": "{contributionslink} to start accepting financial contributions.",
   "collective.created.description": "While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.",
   "Collective.CreateNew": "Create new Collective",
   "collective.delete.description": "This {type} will be deleted, along with all related data like Core Contributor roles and payment methods.",
