@@ -110,7 +110,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, host, loading, github } = this.props;
+    const { intl, error, host, loading, github, query } = this.props;
 
     const initialValues = {
       name: github ? this.githubRepoHelper(github.repo) : '',
@@ -149,7 +149,7 @@ class CreateCollectiveForm extends React.Component {
 
     return (
       <Flex flexDirection="column" m={[3, 0]}>
-        {host && <CreateCollectiveCover host={host} />}
+        {host && query.hostCollectiveSlug !== 'opensource' && <CreateCollectiveCover host={host} />}
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
