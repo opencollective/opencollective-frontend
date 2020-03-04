@@ -296,6 +296,7 @@ class CreateCollectiveForm extends React.Component {
                       <StyledButton
                         fontSize="13px"
                         width="148px"
+                        minHeight="36px"
                         buttonStyle="primary"
                         type="submit"
                         loading={loading}

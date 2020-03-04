@@ -98,6 +98,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}
@@ -136,6 +137,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}
@@ -173,6 +175,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}

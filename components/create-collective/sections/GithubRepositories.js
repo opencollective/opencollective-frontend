@@ -122,6 +122,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
         <StyledButton
           textAlign="center"
           buttonSize="small"
+          minHeight="36px"
           maxWidth="97px"
           buttonStyle="primary"
           disabled={state.disabled}
