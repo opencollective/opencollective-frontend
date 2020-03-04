@@ -103,6 +103,12 @@ class CreateCollectiveForm extends React.Component {
     });
   }
 
+  componentDidMount() {
+    if (this.props.query.hostTos) {
+      this.setState({ hostTosChecked: true });
+    }
+  }
+
   handleChange(fieldname, value) {
     this.setState(state => ({
       collective: {

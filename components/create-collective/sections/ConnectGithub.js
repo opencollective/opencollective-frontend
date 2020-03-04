@@ -359,8 +359,15 @@ class ConnectGithub extends React.Component {
                   <Link
                     route="new-create-collective"
                     params={{
-                      hostCollectiveSlug: 'opensource',
+                      hostCollectiveSlug: 'opensourceorg',
                       verb: 'apply',
+                      hostTos: true,
+                    }}
+                    onClick={e => {
+                      if (!this.state.checked) {
+                        e.preventDefault();
+                        this.setState({ error: 'Please accept the terms of service' });
+                      }
                     }}
                   >
                     <StyledButton
@@ -368,9 +375,6 @@ class ConnectGithub extends React.Component {
                       fontSize="13px"
                       width="213px"
                       buttonStyle="secondary"
-                      onClick={() => {
-                        this.handleChange('category', 'opensource');
-                      }}
                       mx={2}
                       px={[2, 3]}
                     >

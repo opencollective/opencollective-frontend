@@ -71,7 +71,7 @@ class NewCreateCollective extends Component {
     } else if (query.category === 'climate') {
       this.setState({ category: 'climate' });
     } else if (!query.category) {
-      this.setState({ category: null });
+      this.setState({ category: null, tos: null });
     }
   }
 
@@ -92,7 +92,7 @@ class NewCreateCollective extends Component {
       } else if (query.category === 'climate') {
         this.setState({ category: 'climate' });
       } else if (!query.category) {
-        this.setState({ category: null });
+        this.setState({ category: null, tos: null });
       }
     }
   }
