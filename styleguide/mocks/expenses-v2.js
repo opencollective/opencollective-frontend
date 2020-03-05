@@ -7,7 +7,7 @@ import { payoutMethodPaypal } from './payout-methods';
 export const expenseInvoice = {
   description: 'March invoice',
   payoutMethod: payoutMethodPaypal,
-  privateInfo: 'Please pay the money fast',
+  privateMessage: 'Please pay the money fast',
   currency: 'USD',
   type: 'INVOICE',
   attachments: [
@@ -47,7 +47,7 @@ export const expenseInvoice = {
 export const expenseReceipt = {
   description: 'Brussels January team retreat',
   payoutMethod: payoutMethodPaypal,
-  privateInfo: '',
+  privateMessage: '',
   currency: 'USD',
   type: 'RECEIPT',
   attachments: [

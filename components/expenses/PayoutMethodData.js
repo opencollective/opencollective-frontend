@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { get, isObject, startCase } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-
-import { P } from '../Text';
+import { Span, P } from '../Text';
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, next) => {
@@ -27,16 +27,38 @@ const renderObject = object =>
   }, []);
 
 /**
+ * @returns boolean: True if the payout method has displayable data
+ */
+export const payoutMethodHasData = payoutMethod => {
+  switch (payoutMethod.type) {
+    case PayoutMethodType.PAYPAL:
+      return Boolean(get(payoutMethod, 'data.email'));
+    case PayoutMethodType.OTHER:
+      return Boolean(get(payoutMethod, 'data.content'));
+    case PayoutMethodType.BANK_ACCOUNT:
+      return Boolean(get(payoutMethod, 'data.details'));
+    default:
+      return false;
+  }
+};
+
+const PrivateFallback = () => (
+  <Span color="black.500" fontStyle="italic">
+    <FormattedMessage id="Private" defaultMessage="Private" />
+  </Span>
+);
+
+/**
  * Shows the data of the given payout method
  */
 const PayoutMethodData = ({ payoutMethod }) => {
   switch (payoutMethod.type) {
     case PayoutMethodType.PAYPAL:
-      return get(payoutMethod, 'data.email');
+      return get(payoutMethod, 'data.email') || <PrivateFallback />;
     case PayoutMethodType.OTHER:
-      return get(payoutMethod, 'data.content');
+      return get(payoutMethod, 'data.content') || <PrivateFallback />;
     case PayoutMethodType.BANK_ACCOUNT:
-      return payoutMethod.data?.details ? renderObject(payoutMethod.data) : null;
+      return payoutMethodHasData(payoutMethod) ? renderObject(payoutMethod.data) : <PrivateFallback />;
     default:
       return null;
   }

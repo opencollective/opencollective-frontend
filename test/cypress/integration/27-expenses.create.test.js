@@ -87,7 +87,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-attachments').should('contain', 'Potatoes for the giant raclette');
 
       cy.getByDataCy('submit-expense-btn').click();
-      cy.contains('[data-cy="expense-pending"]', 'Brussels January team retreat');
+      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
     });
 
     // This can happen if you start with an invoice then switch to receipts

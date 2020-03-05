@@ -84,7 +84,9 @@ const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, o
           onClose={() => setDeleting(false)}
           continueHandler={async () => {
             await deleteComment({ variables: { id: comment.id } });
-            await onDelete(comment);
+            if (onDelete) {
+              await onDelete(comment);
+            }
           }}
           header={
             isConversationRoot ? (
