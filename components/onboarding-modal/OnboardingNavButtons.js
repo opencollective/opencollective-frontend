@@ -9,11 +9,12 @@ import { Router } from '../../server/pages';
 const params = {
   0: {
     disabled: true,
-    routerStep: 'administrators',
+    routerStepForward: 'administrators',
   },
   1: {
     disabled: false,
-    routerStep: 'contact',
+    routerStepBack: undefined,
+    routerStepForward: 'contact',
   },
 };
 
@@ -25,7 +26,6 @@ class OnboardingNavButtons extends React.Component {
 
   constructor(props) {
     super(props);
-    this.setParams = this.setParams.bind(this);
   }
 
   setParams = (step, param) => {
@@ -44,7 +44,12 @@ class OnboardingNavButtons extends React.Component {
             <StyledRoundButton
               mr={3}
               disabled={this.setParams(step, 'disabled')}
-              onClick={() => window && window.history.back()}
+              onClick={() => {
+                Router.pushRoute('new-collective-onboarding-modal', {
+                  slug,
+                  step: this.setParams(step, 'routerStepBack'),
+                });
+              }}
             >
               ←
             </StyledRoundButton>
@@ -52,7 +57,7 @@ class OnboardingNavButtons extends React.Component {
               onClick={() => {
                 Router.pushRoute('new-collective-onboarding-modal', {
                   slug,
-                  step: this.setParams(step, 'routerStep'),
+                  step: this.setParams(step, 'routerStepForward'),
                 });
               }}
             >

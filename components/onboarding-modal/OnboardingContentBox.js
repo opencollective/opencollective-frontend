@@ -17,7 +17,6 @@ class OnboardingContentBox extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleValue = this.handleValue.bind(this);
   }
 
   handleValue = (name, value, values) => {

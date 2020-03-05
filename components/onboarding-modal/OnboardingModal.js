@@ -41,7 +41,6 @@ class OnboardingModal extends React.Component {
 
   constructor(props) {
     super(props);
-    this.setStep = this.setStep.bind(this);
 
     this.state = {
       step: 0,

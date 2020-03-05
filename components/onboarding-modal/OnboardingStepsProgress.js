@@ -40,11 +40,6 @@ class OnboardingStepsProgress extends React.Component {
 
   constructor(props) {
     super(props);
-    this.setParams = this.setParams.bind(this);
-
-    this.state = {
-      focus: steps[this.props.step],
-    };
   }
 
   setParams = (step, param) => {
