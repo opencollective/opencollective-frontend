@@ -374,7 +374,6 @@
   "ContributionFlow.CreateUserLabel": "Contribuer en tant qu'individu",
   "contributions": "Contributions",
   "Contributions": "Contributions",
-  "contributions.chooseHost": "Choose a fiscal host",
   "contributions.startAccepting": "Start accepting contributions",
   "contributions.subtitle": "There are no contributions yet. To start accepting financial contributions, please choose a fiscal host.",
   "ContributionType.ChildCollective": "Collectif membre",

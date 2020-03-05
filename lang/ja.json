@@ -374,7 +374,6 @@
   "ContributionFlow.CreateUserLabel": "個人として貢献する",
   "contributions": "Contributions",
   "Contributions": "貢献",
-  "contributions.chooseHost": "Choose a fiscal host",
   "contributions.startAccepting": "Start accepting contributions",
   "contributions.subtitle": "There are no contributions yet. To start accepting financial contributions, please choose a fiscal host.",
   "ContributionType.ChildCollective": "メンバーになっているコレクティブ",
