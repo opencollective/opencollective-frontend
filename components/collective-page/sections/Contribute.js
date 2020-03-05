@@ -150,14 +150,8 @@ class SectionContribute extends React.PureComponent {
     const isEvent = collective.type === CollectiveType.EVENT;
     const hasContribute = collective.isActive || isAdmin;
     const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || subCollectives.length > 0);
-
     const isActive = collective.isActive;
     const hasHost = collective.host;
-
-    console.log('case 1 admin and no host', isAdmin && !hasHost);
-    console.log('case 2 admin and host', isAdmin && hasHost);
-    console.log('case 2 not admin and active', !isAdmin && isActive);
-    console.log('case 3 not admin and not active', isAdmin && !isActive);
 
     /*
     cases
