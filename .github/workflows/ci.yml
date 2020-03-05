@@ -122,7 +122,7 @@ jobs:
         if: steps.node-modules.outputs.cache-hit != 'true'
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
-      - run: ./scripts/check_translations.sh
+      - run: npm run langs:check
 
   build:
     runs-on: ubuntu-latest

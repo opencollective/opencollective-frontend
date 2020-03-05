@@ -136,6 +136,7 @@
     "graphql:updateV1": "npx graphql-cli get-schema -p opencollective -e dev && prettier lib/graphql/schema.graphql --write",
     "graphql:updateV2": "npx graphql-cli get-schema -p opencollective_v2 -e dev && prettier lib/graphql/schemaV2.graphql --write",
     "langs:build": "babel . --only \"components/*,lib/*,pages/*\" --out-dir dist --delete-dir-on-start",
+    "langs:check": "cross-env scripts/check_translations.sh",
     "langs:translate": "babel-node scripts/translate.js",
     "langs:update": "npm-run-all build:clean langs:build langs:translate",
     "lint": "eslint . --ignore-path .gitignore",
