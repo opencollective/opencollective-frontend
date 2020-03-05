@@ -239,6 +239,7 @@ class Expense extends React.Component {
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
+        expense.status === 'ERROR' ||
         (expense.status === 'APPROVED' &&
           (Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
             LoggedInUser.canEditCollective(collective.host))));
@@ -247,6 +248,7 @@ class Expense extends React.Component {
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
+        expense.status === 'ERROR' ||
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
     const canDelete = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'REJECTED';
