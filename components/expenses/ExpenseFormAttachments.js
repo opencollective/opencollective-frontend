@@ -2,7 +2,7 @@ import { Box, Flex } from '@rebass/grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { isEmpty } from 'lodash';
 
 import Container from '../Container';
