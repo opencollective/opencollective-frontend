@@ -75,7 +75,7 @@ class NewCollectiveOnboardingPage extends React.Component {
 
     return (
       <Page>
-        <OnboardingModal query={query} collective={collective} />
+        <OnboardingModal query={query} collective={collective} LoggedInUser={LoggedInUser} />
       </Page>
     );
   }

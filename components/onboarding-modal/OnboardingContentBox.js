@@ -8,6 +8,7 @@ import StyledInput from '../../components/StyledInput';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
+import OnboardingProfileCard from './OnboardingProfileCard';
 
 class OnboardingContentBox extends React.Component {
   static propTypes = {
@@ -17,6 +18,10 @@ class OnboardingContentBox extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      admins: [],
+    };
   }
 
   handleValue = (name, value, values) => {
@@ -26,6 +31,9 @@ class OnboardingContentBox extends React.Component {
 
   render() {
     const { step, collective } = this.props;
+    const { admins } = this.state;
+
+    console.log('admins', admins);
 
     const values = {
       website: '',
@@ -65,11 +73,25 @@ class OnboardingContentBox extends React.Component {
             <P fontSize="Caption" textTransform="uppercase" color="black.700">
               Administrators
             </P>
+            {admins.length > 0 && (
+              <Flex flexDirection="column">
+                {admins.map((admin, i) => (
+                  <OnboardingProfileCard key={i} user={admin} />
+                ))}
+              </Flex>
+            )}
             <P fontSize="Caption" textTransform="uppercase" color="black.700">
               Invite administrators
             </P>
             <Flex flexDirection="column">
-              <CollectivePickerAsync types={['USER']} onChange={option => console.log(option.value)} />
+              <CollectivePickerAsync
+                types={['USER']}
+                onChange={option => {
+                  this.setState(state => ({
+                    admins: [...state.admins, option.value],
+                  }));
+                }}
+              />
             </Flex>
             <Span fontSize="Caption" color="black.500">
               Admins can modify the Collective page and approve expenses.

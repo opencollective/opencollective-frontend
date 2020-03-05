@@ -37,6 +37,7 @@ class OnboardingModal extends React.Component {
   static propTypes = {
     query: PropTypes.object,
     collective: PropTypes.object,
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -68,8 +69,12 @@ class OnboardingModal extends React.Component {
   };
 
   render() {
-    const { collective } = this.props;
+    const { collective, LoggedInUser } = this.props;
     const { step } = this.state;
+
+    console.log('collective', collective);
+    console.log('admins', collective.coreContributors);
+    console.log('user', LoggedInUser);
 
     return (
       <Flex flexDirection="column" alignItems="center" py={[4]}>
