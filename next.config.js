@@ -48,34 +48,34 @@ const nextConfig = {
             limit: 8192,
             fallback: 'file-loader',
             publicPath: '/_next/static/fonts/',
-            outputPath: 'static/fonts/',
+            outputPath: 'public/static/fonts/',
             name: '[name]-[hash].[ext]',
           },
         },
       ],
     });
 
+    // Configuration for images
+    config.module.rules.unshift({
+      test: /images[\\/].*\.(jpg|gif|png|svg)$/,
+      use: {
+        loader: 'file-loader',
+        options: {
+          publicPath: '/_next/static/images/',
+          outputPath: 'public/static/images/',
+          name: '[name]-[hash].[ext]',
+          esModule: false,
+        },
+      },
+    });
+
     // Configuration for static/marketing pages
-    config.module.rules.unshift(
-      {
-        test: /static[\\/].*\.(html)$/,
-        use: {
-          loader: 'html-loader',
-        },
+    config.module.rules.unshift({
+      test: /public[\\/].*\.(html)$/,
+      use: {
+        loader: 'html-loader',
       },
-      {
-        test: /static[\\/].*\.(jpg|gif|png|svg)$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next/static/img/',
-            outputPath: 'static/img/',
-            name: '[name]-[hash].[ext]',
-            esModule: false,
-          },
-        },
-      },
-    );
+    });
 
     // Load SVGs in base64
     config.module.rules.push({

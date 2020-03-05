@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import NewsletterContainer from '../components/NewsletterContainer';
 import Link from '../components/Link';
 
-import staticPages from '../static/staticPages';
+import staticPages from '../components/static-pages';
 import { withUser } from '../components/UserProvider';
 
 const getContent = (path, pageSlug) => {

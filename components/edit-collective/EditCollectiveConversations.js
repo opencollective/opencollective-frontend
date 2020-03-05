@@ -6,8 +6,8 @@ import { useMutation } from 'react-apollo';
 import { useIntl, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 
-import imgPreviewThread from '../../static/images/conversations/conversations-list-preview.png';
-import imgPreviewReplies from '../../static/images/conversations/conversation-replies-preview.png';
+import imgPreviewThread from '../../public/static/images/conversations/conversations-list-preview.png';
+import imgPreviewReplies from '../../public/static/images/conversations/conversation-replies-preview.png';
 
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';

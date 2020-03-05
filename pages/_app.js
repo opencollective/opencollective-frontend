@@ -29,8 +29,8 @@ import 'react-quill/dist/quill.snow.css';
 import 'react-mde/lib/styles/css/react-mde-all.css';
 import 'trix/dist/trix.css';
 
-import '../static/styles/app.css';
-import '../static/styles/react-tags.css';
+import '../public/static/styles/app.css';
+import '../public/static/styles/react-tags.css';
 
 Router.onRouteChangeStart = () => NProgress.start();
 
