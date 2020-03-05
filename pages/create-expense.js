@@ -32,7 +32,9 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { getErrorFromGraphqlException } from '../lib/utils';
+import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
+import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -130,6 +132,7 @@ class CreateExpensePage extends React.Component {
     try {
       this.setState({ isLoading: true, error: null });
       const { expense, tags } = this.state;
+      const attachmentFieldsToOmit = expense.type === expenseTypes.INVOICE ? ['id', 'url'] : ['id'];
       const result = await this.props.createExpense({
         account: { id: this.props.data.account.id },
         expense: {
@@ -137,19 +140,19 @@ class CreateExpensePage extends React.Component {
           payee: pick(expense.payee, ['id']),
           payoutMethod: pick(expense.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
           // Omit attachment's ids that were created for keying purposes
-          attachments: expense.attachments.map(a => omit(a, ['id'])),
+          attachments: expense.attachments.map(a => omit(a, attachmentFieldsToOmit)),
           tags: tags,
         },
       });
 
       const legacyExpenseId = result.data.createExpense.legacyId;
-      Router.pushRoute(`/${this.props.collectiveSlug}/expenses/${legacyExpenseId}/?createSuccess=true`);
+      Router.pushRoute(`/${this.props.collectiveSlug}/expenses/${legacyExpenseId}/v2`);
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isLoading: false });
     }
   };
 
-  onSummaryChange = e => {
+  onNotesChanges = e => {
     const name = e.target.name;
     const value = e.target.value;
     this.setState(state => ({
@@ -235,13 +238,13 @@ class CreateExpensePage extends React.Component {
                           <div>
                             <ExpenseSummary
                               host={collective.host}
-                              onChange={this.onSummaryChange}
                               expense={{
                                 ...this.state.expense,
                                 tags: this.state.tags,
                                 createdByAccount: this.props.data.loggedInAccount,
                               }}
                             />
+                            <ExpenseNotesForm onChange={this.onNotesChanges} />
                             {this.state.error && (
                               <MessageBox type="error" withIcon mt={3}>
                                 {this.state.error.message}

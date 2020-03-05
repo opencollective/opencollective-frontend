@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Fri Feb 28 2020 17:03:19 GMT+0100 (Central European Standard Time)
+# timestamp: Thu Mar 05 2020 16:53:37 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -361,8 +361,10 @@ type Comment {
   createdAt: DateTime
   html: String
   markdown: String
-  fromCollective: Account
-  collective: Account
+  fromAccount: Account
+  account: Account
+  fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
+  collective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
 }
 
 """
@@ -378,8 +380,12 @@ type CommentCollection implements Collection {
 input CommentCreateInput {
   markdown: String
   html: String
+
+  """
+  If your comment is linked to an expense, set it here
+  """
+  expense: ExpenseReferenceInput
   ExpenseId: Int
-  UpdateId: Int
   ConversationId: String
 }
 
@@ -645,27 +651,109 @@ type Event implements Account {
 This represents an Expense
 """
 type Expense {
-  id: String
+  id: String!
 
   """
   Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future.
   """
-  legacyId: Int
+  legacyId: Int!
+
+  """
+  Title/main description for this expense
+  """
+  description: String!
+
+  """
+  Currency that should be used for the payout
+  """
+  currency: Currency!
+
+  """
+  Whether this expense is a receipt or an invoice
+  """
+  type: ExpenseType!
+
+  """
+  The state of the expense (pending, approved, paid, rejected...etc)
+  """
+  status: ExpenseStatus!
   comments(
     limit: Int
     offset: Int
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): CommentCollection
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection!
+
+  """
+  The account where the expense was submitted
+  """
+  account: Account!
 
   """
   The account being paid by this expense
   """
-  payee: Account
+  payee: Account!
+
+  """
+  The account who created this expense
+  """
+  createdByAccount: Account
+
+  """
+  The payout method to use for this expense
+  """
+  payoutMethod: PayoutMethod
+  attachments: [ExpenseAttachment]
+
+  """
+  Additional information about the payment. Only visible to user and admins.
+  """
+  privateMessage: String
 
   """
   Information to display on the invoice. Only visible to user and admins.
   """
   invoiceInfo: String
+
+  """
+  The permissions given to current logged in user for this expense
+  """
+  permissions: ExpensePermissions!
+}
+
+"""
+Fields for an expense attachment
+"""
+type ExpenseAttachment {
+  """
+  Unique identifier for this expense attachment
+  """
+  id: String!
+
+  """
+  Amount of this attachment
+  """
+  amount: Int!
+
+  """
+  The date on which the attachment was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the attachment was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The date on which the expense took place
+  """
+  incurredAt: DateTime!
+
+  """
+  A description for this attachment. Enforced for new items, but old expenses may not have one.
+  """
+  description: String
+  url: String
 }
 
 input ExpenseAttachmentCreateInput {
@@ -722,6 +810,47 @@ input ExpenseCreateInput {
 }
 
 """
+Fields for an expense attachment
+"""
+type ExpensePermissions {
+  """
+  Whether the current user can edit the expense
+  """
+  canEdit: Boolean!
+
+  """
+  Whether the current user can edit the expense
+  """
+  canDelete: Boolean!
+
+  """
+  Whether the current user can the the invoice info for this expense
+  """
+  canSeeInvoiceInfo: Boolean!
+}
+
+input ExpenseReferenceInput {
+  """
+  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the expense (ie: 580)
+  """
+  legacyId: Int
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+}
+
+"""
 All supported expense types
 """
 enum ExpenseType {
@@ -734,6 +863,11 @@ enum ExpenseType {
   Receipt: Charge for your time or get paid in advance
   """
   RECEIPT
+
+  """
+  Unclassified expense
+  """
+  UNCLASSIFIED
 }
 
 enum ImageFormat {
@@ -1161,10 +1295,29 @@ type Organization implements Account {
 A payout method
 """
 type PayoutMethod {
+  """
+  Unique identifier for this payout method
+  """
   id: String!
+
+  """
+  The type of this payout method (usually the payment provider)
+  """
   type: PayoutMethodType
+
+  """
+  A friendly name for users to easily find their payout methods
+  """
   name: String
+
+  """
+  Whether this payout method has been saved to be used for future payouts
+  """
   isSaved: Boolean
+
+  """
+  The actual data for this payout method. Content depends on the type.
+  """
   data: JSON
 }
 
@@ -1238,7 +1391,12 @@ type Query {
     """
     Public expense identifier
     """
-    id: String!
+    id: String
+
+    """
+    Identifiers to retrieve the expense.
+    """
+    expense: ExpenseReferenceInput
   ): Expense
   loggedInAccount: Account
 }

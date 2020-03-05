@@ -54,6 +54,11 @@ const pages = routes()
   .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
   .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new-v2')
   .add(
+    'expense-v2',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/v2',
+    'expense',
+  )
+  .add(
     'expense',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     'expense-legacy',

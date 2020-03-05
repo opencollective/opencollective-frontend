@@ -21,7 +21,7 @@ AttachmentsTotalAmount.propTypes = {
   /** Attachments */
   attachments: PropTypes.arrayOf(
     PropTypes.shape({
-      amount: PropTypes.string,
+      amount: PropTypes.number,
     }),
   ).isRequired,
 };

@@ -11,9 +11,9 @@ import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 
 import { i18nPaymentMethodType } from '../lib/i18n-payment-method-type';
 import { TransactionTypes } from '../lib/constants/transactions';
-import ExpenseStatus from '../lib/constants/expense-status';
 import { formatCurrency } from './../lib/utils';
 import { i18nExpenseCategory, i18nExpenseType } from '../lib/i18n-expense';
+import ExpenseStatusTag from './expenses/ExpenseStatusTag';
 import InvoiceDownloadLink from './expenses/InvoiceDownloadLink';
 import { P, Span } from './Text';
 import Container from './Container';
@@ -23,7 +23,6 @@ import LinkCollective from './LinkCollective';
 import Avatar from './Avatar';
 import StyledLink from './StyledLink';
 import StyledButton from './StyledButton';
-import StyledTag from './StyledTag';
 import Link from './Link';
 
 /** A fragment to use for `ExpenseType` items */
@@ -250,19 +249,6 @@ const getItemInfo = (item, isInverted) => {
   }
 };
 
-const getExpenseStatusMsgType = status => {
-  switch (status) {
-    case ExpenseStatus.REJECTED:
-      return 'error';
-    case ExpenseStatus.PENDING:
-      return 'warning';
-    case ExpenseStatus.APPROVED:
-      return 'info';
-    case ExpenseStatus.PAID:
-      return 'success';
-  }
-};
-
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' | ';
 
@@ -308,7 +294,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
     </P>
   ) : (
     <P color="black.500" fontStyle="italic" fontWeight="600" fontSize="Paragraph">
-      <FormattedMessage id="BudgetItemsList.NoDescription" defaultMessage="No description provided" />
+      <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
     </P>
   );
 
@@ -337,11 +323,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
           >
             <Flex data-cy="transaction-description" alignItems="center" flexWrap="wrap">
               {route ? <Link route={route}>{formattedDescription}</Link> : formattedDescription}
-              {isExpense && (
-                <StyledTag type={getExpenseStatusMsgType(item.status)} ml={3} py="6px">
-                  {item.status}
-                </StyledTag>
-              )}
+              {isExpense && <ExpenseStatusTag status={item.status} ml={3} py="6px" />}
             </Flex>
             <Container data-cy="transaction-details" fontSize="Caption" color="black.500" mt={2}>
               <StyledLink as={LinkCollective} collective={collective} />

@@ -63,7 +63,7 @@ const TextArea = styled.textarea`
  */
 export default class StyledTextarea extends React.PureComponent {
   static propTypes = {
-    onChange: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
     /** If true, the component will update its size based on its content */
     autoSize: PropTypes.bool,
     /** styled-system prop: accepts any css 'border' value */
