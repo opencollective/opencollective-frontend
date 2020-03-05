@@ -94,6 +94,7 @@ class CreateExpensePage extends React.Component {
       step: STEPS.FORM,
       expense: null,
       tags: null,
+      isSubmitting: false,
     };
   }
 
@@ -130,7 +131,7 @@ class CreateExpensePage extends React.Component {
 
   onSummarySubmit = async () => {
     try {
-      this.setState({ isLoading: true, error: null });
+      this.setState({ isSubmitting: true, error: null });
       const { expense, tags } = this.state;
       const attachmentFieldsToOmit = expense.type === expenseTypes.INVOICE ? ['id', 'url'] : ['id'];
       const result = await this.props.createExpense({
@@ -148,7 +149,7 @@ class CreateExpensePage extends React.Component {
       const legacyExpenseId = result.data.createExpense.legacyId;
       Router.pushRoute(`/${this.props.collectiveSlug}/expenses/${legacyExpenseId}/v2`);
     } catch (e) {
-      this.setState({ error: getErrorFromGraphqlException(e), isLoading: false });
+      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }
   };
 
@@ -255,6 +256,8 @@ class CreateExpensePage extends React.Component {
                               mt={3}
                               data-cy="submit-expense-btn"
                               onClick={this.onSummarySubmit}
+                              loading={this.state.isSubmitting}
+                              minWidth={150}
                             >
                               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                             </StyledButton>

@@ -677,6 +677,7 @@
   "ExpenseForm.ReceiptLabel": "Receipt(s)",
   "ExpenseForm.SavePayout": "Save this info for future payouts",
   "ExpenseForm.Step1": "1. Upload one or multiple receipts",
+  "ExpenseForm.Step1Invoice": "1. Set invoice details",
   "ExpenseForm.Step2": "2. Payee & payout information",
   "ExpenseForm.Submit": "Submit expense",
   "ExpenseForm.Type": "Which type of expense is it? ",

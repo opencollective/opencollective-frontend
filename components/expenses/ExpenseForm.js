@@ -123,7 +123,11 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective }) => {
           )}
           <StyledHr mt={3} borderColor="black.300" />
           <P color={hasBaseFormFieldsCompleted ? 'black.900' : 'black.300'} fontSize="LeadParagraph" my={24}>
-            <FormattedMessage id="ExpenseForm.Step1" defaultMessage="1. Upload one or multiple receipts" />
+            {values.type === expenseTypes.RECEIPT ? (
+              <FormattedMessage id="ExpenseForm.Step1" defaultMessage="1. Upload one or multiple receipts" />
+            ) : (
+              <FormattedMessage id="ExpenseForm.Step1Invoice" defaultMessage="1. Set invoice details" />
+            )}
           </P>
           {hasBaseFormFieldsCompleted && (
             <Box>
