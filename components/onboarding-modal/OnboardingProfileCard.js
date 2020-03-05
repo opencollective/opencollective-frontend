@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 
-import Container from '../../components/Container';
-import { H1, P, Span } from '../../components/Text';
+import { P } from '../../components/Text';
 import Avatar from '../../components/Avatar';
 
 class OnboardingProfileCard extends React.Component {

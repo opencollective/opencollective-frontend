@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 
 import Container from '../../components/Container';
-import { H1, P, Span } from '../../components/Text';
+import { H1, P } from '../../components/Text';
 import StyledInput from '../../components/StyledInput';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
@@ -16,13 +16,14 @@ class OnboardingContentBox extends React.Component {
     step: PropTypes.number,
     collective: PropTypes.object,
     adminUser: PropTypes.object,
+    addAdmins: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      admins: [this.props.adminUser],
+      admins: [{ role: 'ADMIN', member: this.props.adminUser }],
     };
   }
 
@@ -32,10 +33,8 @@ class OnboardingContentBox extends React.Component {
   };
 
   render() {
-    const { step, collective, adminUser } = this.props;
+    const { step, collective, adminUser, addAdmins } = this.props;
     const { admins } = this.state;
-
-    console.log(admins);
 
     const values = {
       website: '',
@@ -85,7 +84,7 @@ class OnboardingContentBox extends React.Component {
             {admins.length > 0 && (
               <Flex flexDirection="column">
                 {admins.map((admin, i) => (
-                  <OnboardingProfileCard key={i} user={admin} adminUser={adminUser} />
+                  <OnboardingProfileCard key={i} user={admin.member} adminUser={adminUser} />
                 ))}
               </Flex>
             )}
@@ -104,9 +103,12 @@ class OnboardingContentBox extends React.Component {
                 onChange={option => {
                   // only assign admins if they are not in the list already
                   const duplicates = admins.filter(admin => admin.id === option.value.id);
-                  this.setState(state => ({
-                    admins: duplicates.length ? admins : [...state.admins, option.value],
-                  }));
+                  this.setState(
+                    state => ({
+                      admins: duplicates.length ? admins : [...state.admins, { role: 'ADMIN', member: option.value }],
+                    }),
+                    () => addAdmins(this.state.admins),
+                  );
                 }}
                 placeholder="Write the name of who you want to invite"
               />
@@ -130,7 +132,7 @@ class OnboardingContentBox extends React.Component {
             </H1>
 
             <Flex flexDirection="column">
-              <StyledInputField label="Do you have a website?" htmlFor="website">
+              <StyledInputField my={2} label="Do you have a website?" htmlFor="website">
                 {inputProps => (
                   <StyledInput
                     type="text"
@@ -140,7 +142,7 @@ class OnboardingContentBox extends React.Component {
                   />
                 )}
               </StyledInputField>
-              <StyledInputField label="Connect your social platforms" htmlFor="twitter">
+              <StyledInputField my={2} label="Connect your social platforms" htmlFor="twitter">
                 {inputProps => (
                   <StyledInputGroup
                     type="text"
@@ -151,7 +153,7 @@ class OnboardingContentBox extends React.Component {
                   />
                 )}
               </StyledInputField>
-              <StyledInputField htmlFor="github">
+              <StyledInputField my={2} htmlFor="github">
                 {inputProps => (
                   <StyledInputGroup
                     type="text"

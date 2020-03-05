@@ -22,6 +22,7 @@ class OnboardingNavButtons extends React.Component {
   static propTypes = {
     step: PropTypes.number,
     slug: PropTypes.string,
+    submitAdmins: PropTypes.func,
   };
 
   constructor(props) {
@@ -33,12 +34,14 @@ class OnboardingNavButtons extends React.Component {
   };
 
   render() {
-    const { step, slug } = this.props;
+    const { step, slug, submitAdmins } = this.props;
 
     return (
       <Flex>
         {step === 2 ? (
-          <StyledButton buttonStyle="primary">Finish</StyledButton>
+          <StyledButton buttonStyle="primary" onClick={submitAdmins}>
+            Finish
+          </StyledButton>
         ) : (
           <React.Fragment>
             <StyledRoundButton
