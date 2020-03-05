@@ -359,7 +359,7 @@ class ConnectGithub extends React.Component {
                   <Link
                     route="new-create-collective"
                     params={{
-                      hostCollectiveSlug: 'opensourceorg',
+                      hostCollectiveSlug: 'opensource',
                       verb: 'apply',
                       hostTos: true,
                     }}
