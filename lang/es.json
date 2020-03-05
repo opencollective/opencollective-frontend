@@ -636,6 +636,8 @@
   "expense.pay.btn": "Pagar con {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Saldo insuficiente",
   "expense.pay.manual.btn": "Record as paid",
+  "expense.pay.paypal.success": "Expense was paid using PayPal, the money should already be avaialable for the payee.",
+  "expense.pay.transferwise.success": "Transfer was created and funded using TransferWise. This expense is be marked as Processing until the money leaves the Host account, after that the money should arrive its destination shortly. If it doesn't, this expense will be updated and marked as Error and you'll be able to try it again.",
   "Expense.Payee": "Payee",
   "expense.paymentProcessorFeeInCollectiveCurrency": "payment processor fee",
   "expense.payoutMethod": "método de pago",
