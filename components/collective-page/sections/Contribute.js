@@ -58,6 +58,7 @@ class SectionContribute extends React.PureComponent {
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       isActive: PropTypes.bool,
+      host: PropTypes.object,
       currency: PropTypes.string,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string.isRequired,
@@ -72,7 +73,6 @@ class SectionContribute extends React.PureComponent {
       }),
     ),
     isAdmin: PropTypes.bool,
-    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
   };
 
   getTopContributors = memoizeOne(contributors => {
@@ -141,7 +141,7 @@ class SectionContribute extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, events, subCollectives, contributors, contributorsStats, isAdmin, status } = this.props;
+    const { collective, tiers, events, subCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
@@ -151,17 +151,34 @@ class SectionContribute extends React.PureComponent {
     const hasContribute = collective.isActive || isAdmin;
     const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || subCollectives.length > 0);
 
+    const isActive = collective.isActive;
+    const hasHost = collective.host;
+
+    console.log('case 1 admin and no host', isAdmin && !hasHost);
+    console.log('case 2 admin and host', isAdmin && hasHost);
+    console.log('case 2 not admin and active', !isAdmin && isActive);
+    console.log('case 3 not admin and not active', isAdmin && !isActive);
+
+    /*
+    cases
+
+    1. admin + no host = Contribute Section and 'Start accepting financial contributions' ✅
+    2a. admin + host = normal Contribute section ✅
+    2b. not admin + Collective active = normal Contribute section ???
+    3. not admin + Collective not active = display nothing ✅
+    */
+
     const createContributionTierRoute = isEvent
       ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
       : `/${collective.slug}/edit/tiers`;
 
-    if (!hasContribute && !hasOtherWaysToContribute) {
+    if (!isAdmin && !isActive) {
       return null;
     }
 
     return (
       <Box pt={[4, 5]}>
-        {status === 'collectiveCreated' && hasContribute ? (
+        {isAdmin && !hasHost && (
           <ContainerSectionContent pt={5} pb={3}>
             <SectionTitle mb={24}>
               <FormattedMessage id="contributions" defaultMessage="Contributions" />
@@ -173,17 +190,6 @@ class SectionContribute extends React.PureComponent {
                   defaultMessage="There are no contributions yet. To start accepting financial contributions, please choose a fiscal host."
                 />
               </P>
-              <Link
-                route="editCollective"
-                params={{
-                  slug: collective.slug,
-                  section: 'host',
-                }}
-              >
-                <StyledButton buttonStyle="primary">
-                  <FormattedMessage id="contributions.chooseHost" defaultMessage="Choose a fiscal host" />
-                </StyledButton>
-              </Link>
             </Flex>
             <Box my={5}>
               <Link
@@ -199,7 +205,9 @@ class SectionContribute extends React.PureComponent {
               </Link>
             </Box>
           </ContainerSectionContent>
-        ) : (
+        )}
+
+        {((isAdmin && hasHost) || (!isAdmin && isActive)) && (
           <Fragment>
             <ContainerSectionContent>
               <SectionTitle>
