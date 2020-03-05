@@ -5,7 +5,7 @@ describe('host dashboard', () => {
 
   it('mark pending application approved', () => {
     cy.wait(2000);
-    cy.get('[data-cy="host-apply-btn"]:visible').click();
+    cy.contains('[data-cy="host-apply-btn"]', 'Apply').click({ force: true });
     cy.wait(1000);
     cy.fillInputField('name', 'Cavies United');
     cy.fillInputField('description', 'We will rule the world with our cute squeaks');
