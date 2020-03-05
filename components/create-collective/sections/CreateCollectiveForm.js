@@ -104,8 +104,11 @@ class CreateCollectiveForm extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.query.hostTos) {
+    const { category, step, hostTos } = this.props.query;
+    // first condition is if they are coming from Github stars, second is if they are coming from request manual verification
+    if ((category === 'opensource' && step === 'form') || hostTos) {
       this.setState({ hostTosChecked: true });
+      this.handleChange('hostTos', true);
     }
   }
 
@@ -281,7 +284,7 @@ class CreateCollectiveForm extends React.Component {
                           this.setState({ tosChecked: checked });
                         }}
                       />
-                      {get(host, 'settings.tos') && (
+                      {!query.hostTos && get(host, 'settings.tos') && (
                         <StyledCheckbox
                           name="hostTos"
                           label={

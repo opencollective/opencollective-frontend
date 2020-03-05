@@ -327,7 +327,6 @@ class ConnectGithub extends React.Component {
                     required
                     checked={this.state.checked}
                     onChange={({ checked }) => {
-                      this.handleChange('tos', checked);
                       this.setState({ checked });
                     }}
                   />
@@ -343,7 +342,7 @@ class ConnectGithub extends React.Component {
                     buttonStyle="primary"
                     onClick={() => {
                       if (!this.state.checked) {
-                        this.setState({ error: 'Please accept the terms of service' });
+                        this.setState({ error: 'Please accept the terms of fiscal sponsorship' });
                       } else {
                         window.location.replace(this.getGithubConnectUrl());
                       }
@@ -366,7 +365,7 @@ class ConnectGithub extends React.Component {
                     onClick={e => {
                       if (!this.state.checked) {
                         e.preventDefault();
-                        this.setState({ error: 'Please accept the terms of service' });
+                        this.setState({ error: 'Please accept the terms of fiscal sponsorship' });
                       }
                     }}
                   >
