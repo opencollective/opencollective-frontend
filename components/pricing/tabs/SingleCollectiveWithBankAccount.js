@@ -94,6 +94,18 @@ const rows = [
     { type: 'html', html: 'Up to <strong>$1,000</strong>' },
     { type: 'check' },
   ],
+  [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedHTMLMessage id="pricingTable.row.bankTransfer" defaultMessage="Make payments with Transferwise" />
+        );
+      },
+    },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
+    { type: 'check' },
+  ],
 ];
 
 const footings = [
