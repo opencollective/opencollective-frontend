@@ -15,7 +15,7 @@ class OnboardingContentBox extends React.Component {
   static propTypes = {
     step: PropTypes.number,
     collective: PropTypes.object,
-    adminUser: PropTypes.object,
+    LoggedInUser: PropTypes.object,
     addAdmins: PropTypes.func,
   };
 
@@ -23,8 +23,15 @@ class OnboardingContentBox extends React.Component {
     super(props);
 
     this.state = {
-      admins: [{ role: 'ADMIN', member: this.props.adminUser }],
+      admins: [],
     };
+  }
+
+  componentDidMount() {
+    const member = this.props.LoggedInUser.memberOf.filter(member => member.collective.id === this.props.collective.id);
+    this.setState({
+      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
+    });
   }
 
   handleValue = (name, value, values) => {
@@ -33,7 +40,7 @@ class OnboardingContentBox extends React.Component {
   };
 
   render() {
-    const { step, collective, adminUser, addAdmins } = this.props;
+    const { step, collective, LoggedInUser, addAdmins } = this.props;
     const { admins } = this.state;
 
     const values = {
@@ -84,7 +91,7 @@ class OnboardingContentBox extends React.Component {
             {admins.length > 0 && (
               <Flex flexDirection="column">
                 {admins.map((admin, i) => (
-                  <OnboardingProfileCard key={i} user={admin.member} adminUser={adminUser} />
+                  <OnboardingProfileCard key={i} user={admin.member} adminUser={LoggedInUser.collective} />
                 ))}
               </Flex>
             )}

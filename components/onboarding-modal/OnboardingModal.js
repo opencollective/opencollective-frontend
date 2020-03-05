@@ -12,6 +12,7 @@ import OnboardingContentBox from './OnboardingContentBox';
 
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
+import { Router } from '../../server/pages';
 
 const StepsProgressBox = styled(Box)`
   min-height: 95px;
@@ -43,6 +44,7 @@ class OnboardingModal extends React.Component {
     query: PropTypes.object,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    //refetchLoggedInUser: PropTypes.func,
     EditCollectiveMembers: PropTypes.func,
   };
 
@@ -76,27 +78,23 @@ class OnboardingModal extends React.Component {
   };
 
   submitAdmins = async () => {
-    const now = new Date();
     try {
       this.setState({ isSubmitting: true, error: null });
-      const res = await this.props.EditCollectiveMembers({
+      await this.props.EditCollectiveMembers({
         collectiveId: this.props.collective.id,
         members: this.state.members.map(member => ({
           id: member.id,
-          description: member.description,
           role: member.role,
-          since: now,
           member: {
             id: member.member.id,
             name: member.member.name,
-            email: member.member.email,
           },
         })),
       });
-      const response = res.data;
-      await this.props.refetchLoggedInUser();
-      console.log(response);
+      //await this.props.refetchLoggedInUser();
+      Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'members' });
     } catch (e) {
+      console.log(e);
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
     }
   };
@@ -107,7 +105,7 @@ class OnboardingModal extends React.Component {
 
   render() {
     const { collective, LoggedInUser } = this.props;
-    const { step } = this.state;
+    const { step, isSubmitting } = this.state;
 
     return (
       <Flex flexDirection="column" alignItems="center" py={[4]}>
@@ -118,11 +116,16 @@ class OnboardingModal extends React.Component {
         <OnboardingContentBox
           step={step}
           collective={collective}
-          adminUser={LoggedInUser.collective}
+          LoggedInUser={LoggedInUser}
           addAdmins={this.addAdmins}
         />
         <StyledHr my={4} borderColor="black.300" width="100%" />
-        <OnboardingNavButtons step={step} slug={collective.slug} submitAdmins={this.submitAdmins} />
+        <OnboardingNavButtons
+          step={step}
+          slug={collective.slug}
+          submitAdmins={this.submitAdmins}
+          loading={isSubmitting}
+        />
       </Flex>
     );
   }
@@ -132,18 +135,9 @@ const MemberFieldsFragment = gql`
   fragment MemberFieldsFragment on Member {
     id
     role
-    since
-    createdAt
-    description
     member {
       id
       name
-      slug
-      type
-      imageUrl(height: 64)
-      ... on User {
-        email
-      }
     }
   }
 `;
@@ -163,6 +157,8 @@ const editCoreContributorsQuery = gql`
 const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {
   props: ({ mutate }) => ({
     EditCollectiveMembers: async ({ collectiveId, members }) => {
+      console.log(members);
+      console.log(members[1]);
       return await mutate({
         variables: { collectiveId, members },
         awaitRefetchQueries: true,
