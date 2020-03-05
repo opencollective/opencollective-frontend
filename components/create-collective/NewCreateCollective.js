@@ -153,8 +153,6 @@ class NewCreateCollective extends Component {
     const { category, form, error } = this.state;
     const { token } = query;
 
-    console.log(this.state.tos);
-
     if (host && !host.canApply) {
       return (
         <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
