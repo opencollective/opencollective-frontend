@@ -82,7 +82,7 @@ class OnboardingModal extends React.Component {
           <OnboardingStepsProgress step={step} handleStep={step => this.setState({ step })} slug={collective.slug} />
         </StepsProgressBox>
         <Image src="/static/images/createcollective-anycommunity.png" alt="Welcome!" />
-        <OnboardingContentBox step={step} collective={collective} />
+        <OnboardingContentBox step={step} collective={collective} adminUser={LoggedInUser.collective} />
         <StyledHr my={4} borderColor="black.300" width="100%" />
         <OnboardingNavButtons step={step} slug={collective.slug} />
       </Flex>

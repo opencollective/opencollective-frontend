@@ -7,6 +7,7 @@ import { H1, P, Span } from '../../components/Text';
 import StyledInput from '../../components/StyledInput';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
+import StyledHr from '../../components/StyledHr';
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 import OnboardingProfileCard from './OnboardingProfileCard';
 
@@ -14,13 +15,14 @@ class OnboardingContentBox extends React.Component {
   static propTypes = {
     step: PropTypes.number,
     collective: PropTypes.object,
+    adminUser: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      admins: [],
+      admins: [this.props.adminUser],
     };
   }
 
@@ -30,10 +32,10 @@ class OnboardingContentBox extends React.Component {
   };
 
   render() {
-    const { step, collective } = this.props;
+    const { step, collective, adminUser } = this.props;
     const { admins } = this.state;
 
-    console.log('admins', admins);
+    console.log(admins);
 
     const values = {
       website: '',
@@ -42,7 +44,7 @@ class OnboardingContentBox extends React.Component {
     };
 
     return (
-      <Container>
+      <Container minWidth={[500]}>
         {step === 0 && (
           <Fragment>
             <H1
@@ -51,6 +53,7 @@ class OnboardingContentBox extends React.Component {
               fontWeight="bold"
               color="black.900"
               textAlign="center"
+              mb={4}
             >
               The {collective.name} Collective has been created!
             </H1>
@@ -67,35 +70,50 @@ class OnboardingContentBox extends React.Component {
               fontWeight="bold"
               color="black.900"
               textAlign="center"
+              mb={4}
             >
               Add administrators
             </H1>
-            <P fontSize="Caption" textTransform="uppercase" color="black.700">
-              Administrators
-            </P>
+            <Flex px={3}>
+              <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+                Administrators
+              </P>
+              <Flex flexGrow={1} alignItems="center">
+                <StyledHr width="100%" ml={2} />
+              </Flex>
+            </Flex>
             {admins.length > 0 && (
               <Flex flexDirection="column">
                 {admins.map((admin, i) => (
-                  <OnboardingProfileCard key={i} user={admin} />
+                  <OnboardingProfileCard key={i} user={admin} adminUser={adminUser} />
                 ))}
               </Flex>
             )}
-            <P fontSize="Caption" textTransform="uppercase" color="black.700">
-              Invite administrators
-            </P>
-            <Flex flexDirection="column">
+            <Flex px={3}>
+              <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+                Invite administrators
+              </P>
+              <Flex flexGrow={1} alignItems="center">
+                <StyledHr width="100%" ml={2} />
+              </Flex>
+            </Flex>
+
+            <Flex my={2} px={3} flexDirection="column">
               <CollectivePickerAsync
                 types={['USER']}
                 onChange={option => {
+                  // only assign admins if they are not in the list already
+                  const duplicates = admins.filter(admin => admin.id === option.value.id);
                   this.setState(state => ({
-                    admins: [...state.admins, option.value],
+                    admins: duplicates.length ? admins : [...state.admins, option.value],
                   }));
                 }}
+                placeholder="Write the name of who you want to invite"
               />
             </Flex>
-            <Span fontSize="Caption" color="black.500">
+            <P my={2} fontSize="Caption" color="black.500" textAlign="center">
               Admins can modify the Collective page and approve expenses.
-            </Span>
+            </P>
           </Fragment>
         )}
         {step === 2 && (
@@ -106,6 +124,7 @@ class OnboardingContentBox extends React.Component {
               fontWeight="bold"
               color="black.900"
               textAlign="center"
+              mb={4}
             >
               Links and contact info
             </H1>
