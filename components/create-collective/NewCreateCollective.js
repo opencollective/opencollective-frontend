@@ -39,6 +39,7 @@ class NewCreateCollective extends Component {
       error: null,
       status: null,
       creating: false,
+      tos: null,
     };
 
     this.createCollective = this.createCollective.bind(this);
@@ -71,7 +72,7 @@ class NewCreateCollective extends Component {
     } else if (query.category === 'climate') {
       this.setState({ category: 'climate' });
     } else if (!query.category) {
-      this.setState({ category: null, tos: null });
+      this.setState({ category: null });
     }
   }
 
@@ -151,6 +152,8 @@ class NewCreateCollective extends Component {
     const { LoggedInUser, query, intl, host } = this.props;
     const { category, form, error } = this.state;
     const { token } = query;
+
+    console.log(this.state.tos);
 
     if (host && !host.canApply) {
       return (
