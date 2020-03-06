@@ -80,7 +80,7 @@ class NotificationBar extends React.Component {
               }
             }
             .NotificationLine {
-              background: #009e4a;
+              background: #1769f4;
               padding: 1rem;
               color: white;
               display: flex;
