@@ -3,24 +3,77 @@ import PropTypes from 'prop-types';
 import { find } from 'lodash';
 
 import { Box } from '@rebass/grid';
-import { getItems, getKeyExtractor } from './DeprecatedStyledSelect';
 import Container from './Container';
+
+/**
+ * Returns a function that will return a unique key from iteratee. As we rely on
+ * <input/> only a string key is valid.
+ *
+ * @param {array|object} options: an options iterable
+ * @param {string|function} keyGetter: a key to get value from, or an extract func
+ */
+export const getKeyExtractor = (options, keyGetter) => {
+  if (typeof keyGetter === 'function') {
+    return item => keyGetter(item).toString();
+  } else if (typeof keyGetter === 'string') {
+    return item => item[keyGetter].toString();
+  } else if (Array.isArray(options)) {
+    return item => item.toString();
+  } else {
+    return (_item, key) => key.toString();
+  }
+};
+
+/**
+ * Convert a list of items to an object like {key, value} to be used in selects
+ * and other lists.
+ *
+ * @param {object[] | string[]} options a list of items to transform to be used in list
+ * @param {string | func} key a string to get the unique key from objects, or
+ *  a function that get passed the object and returns a key. If not passed, the
+ *  JSON representation of the item will be used. This can have very bad performances
+ *  impact, so we should avoid using it.
+ */
+export const getItems = (options, keyGetter) => {
+  const keyExtractor = getKeyExtractor(options, keyGetter);
+
+  return Object.keys(options).reduce(
+    (items, key) =>
+      items.concat({
+        key: keyExtractor(options[key], key),
+        value: options[key],
+      }),
+    [],
+  );
+};
 
 /**
  * Component for controlling a list of radio inputs
  */
-const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, disabled, ...props }) => {
+const StyledRadioList = ({
+  children,
+  id,
+  name,
+  onChange,
+  options,
+  keyGetter,
+  disabled,
+  containerProps,
+  labelProps,
+  ...props
+}) => {
   const [selected, setSelected] = useState(props.defaultValue);
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
   const defaultValueStr = props.defaultValue !== undefined && props.defaultValue.toString();
-
   return (
     <Container
+      id={id}
       as="fieldset"
       border="none"
       m={0}
       p={0}
+      {...containerProps}
       onChange={event => {
         event.stopPropagation();
         const target = event.target;
@@ -28,10 +81,9 @@ const StyledRadioList = ({ children, id, name, onChange, options, keyGetter, dis
         onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
         setSelected(target.value);
       }}
-      id={id}
     >
       {items.map(({ value, key }, index) => (
-        <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0}>
+        <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0} {...labelProps}>
           {children({
             checked: selected && key === selected,
             index,
@@ -79,6 +131,10 @@ StyledRadioList.propTypes = {
   ]).isRequired,
   /** A key name of a getter function to extract the unique key from option */
   keyGetter: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  /** To pass to the fieldset container */
+  containerProps: PropTypes.object,
+  /** To pass to the label container */
+  labelProps: PropTypes.object,
   /** If true, user won't be able to interact with the element */
   disabled: PropTypes.bool,
 };

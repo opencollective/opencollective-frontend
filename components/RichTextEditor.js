@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import css from '@styled-system/css';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';

@@ -19,7 +19,7 @@ import MessageBox from '../MessageBox';
 import { CommentFieldsFragment } from './graphql';
 
 const createCommentMutation = gqlV2`
-  mutation CreateComment($comment: CommentCreate!) {
+  mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       ...CommentFields
     }
@@ -49,6 +49,22 @@ const isAutoFocused = id => {
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
+/** A small helper to make the form work with params from both API V1 & V2 */
+const prepareExpenseParams = (values, conversationId, expenseId) => {
+  const expense = { ...values };
+  if (conversationId) {
+    expense.ConversationId = conversationId;
+  } else if (expenseId) {
+    expense.expense = {};
+    if (typeof expenseId === 'string') {
+      expense.expense.id = expenseId;
+    } else {
+      expense.expense.legacyId = expenseId;
+    }
+  }
+  return expense;
+};
+
 /**
  * Form for users to post comments on either expenses, conversations or updates.
  * If user is not logged in, the form will default to a sign in/up form.
@@ -57,11 +73,11 @@ const CommentForm = ({
   id,
   ConversationId,
   ExpenseId,
-  UpdateId,
   onSuccess,
   router,
   loadingLoggedInUser,
   LoggedInUser,
+  isDisabled,
 }) => {
   const [createComment, { error, data }] = useMutation(createCommentMutation, mutationOptions);
   const { register, triggerValidation, setValue, formState, handleSubmit } = useForm({ mode: 'onChange' });
@@ -74,7 +90,7 @@ const CommentForm = ({
 
   // Called by react-hook-form when submitting the form
   const submit = async values => {
-    const comment = { ...values, ConversationId, ExpenseId, UpdateId };
+    const comment = prepareExpenseParams(values, ConversationId, ExpenseId);
     const response = await createComment({ variables: { comment } });
     if (onSuccess) {
       return onSuccess(response.data.createComment);
@@ -98,7 +114,7 @@ const CommentForm = ({
             editorMinHeight={150}
             placeholder={formatMessage(messages.placeholder)}
             autoFocus={isAutoFocused(id)}
-            disabled={!LoggedInUser || formState.isSubmitting}
+            disabled={isDisabled || !LoggedInUser || formState.isSubmitting}
             reset={get(data, 'createComment.id')}
             fontSize="13px"
             onChange={e => {
@@ -117,7 +133,7 @@ const CommentForm = ({
           mt={3}
           minWidth={150}
           buttonStyle="primary"
-          disabled={!LoggedInUser || !formState.isValid}
+          disabled={isDisabled || !LoggedInUser || !formState.isValid}
           loading={formState.isSubmitting}
           data-cy="submit-comment-btn"
         >
@@ -134,11 +150,11 @@ CommentForm.propTypes = {
   /** If commenting on a conversation */
   ConversationId: PropTypes.string,
   /** If commenting on an expense */
-  ExpenseId: PropTypes.number,
-  /** If commenting on an update */
-  UpdateId: PropTypes.number,
+  ExpenseId: PropTypes.string,
   /** Called when the comment is created successfully */
   onSuccess: PropTypes.func,
+  /** disable the inputs */
+  isDisabled: PropTypes.bool,
   /** @ignore from withUser */
   loadingLoggedInUser: PropTypes.bool,
   /** @ignore from withUser */

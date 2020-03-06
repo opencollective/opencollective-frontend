@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from 'react-apollo';
 import { Flex } from '@rebass/grid';
+import { get } from 'lodash';
 
 import { capitalize, formatCurrency, compose } from '../../lib/utils';
 import colors from '../../lib/constants/colors';
@@ -80,6 +81,7 @@ class Expense extends React.Component {
       showUnapproveModal: false,
       showDeleteExpenseModal: false,
       error: null,
+      success: null,
     };
 
     this.save = this.save.bind(this);
@@ -87,12 +89,15 @@ class Expense extends React.Component {
     this.toggleDetails = this.toggleDetails.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
     this.handleErrorMessage = this.handleErrorMessage.bind(this);
+    this.handleSuccessMessage = this.handleSuccessMessage.bind(this);
 
     this.messages = defineMessages({
       pending: { id: 'expense.pending', defaultMessage: 'pending' },
       paid: { id: 'expense.paid', defaultMessage: 'paid' },
       approved: { id: 'expense.approved', defaultMessage: 'approved' },
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
+      processing: { id: 'expense.processing', defaultMessage: 'processing' },
+      error: { id: 'expense.error', defaultMessage: 'error' },
       expenseTypeMissing: {
         id: 'expense.error.expenseTypeMissing',
         defaultMessage: 'Please pick the type of this expense',
@@ -192,6 +197,12 @@ class Expense extends React.Component {
     });
   }
 
+  handleSuccessMessage(success) {
+    this.setState({
+      success,
+    });
+  }
+
   render() {
     const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
 
@@ -228,6 +239,7 @@ class Expense extends React.Component {
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
+        expense.status === 'ERROR' ||
         (expense.status === 'APPROVED' &&
           (Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15 || // admin of collective can reject the expense for up to 10mn after approving it
             LoggedInUser.canEditCollective(collective.host))));
@@ -236,6 +248,7 @@ class Expense extends React.Component {
       LoggedInUser &&
       LoggedInUser.canApproveExpense(expense) &&
       (expense.status === 'PENDING' ||
+        expense.status === 'ERROR' ||
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
     const canDelete = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'REJECTED';
@@ -467,6 +480,11 @@ class Expense extends React.Component {
               continueHandler={() => this.handleDeleteExpense(expense.id)}
             />
           )}
+          {this.state.success && (
+            <MessageBox type="success" withIcon my={2}>
+              {this.state.success}
+            </MessageBox>
+          )}
           {editable && (
             <div className="actions">
               {mode === 'edit' && this.state.modified && this.state.expense['type'] !== 'UNCLASSIFIED' && (
@@ -511,7 +529,7 @@ class Expense extends React.Component {
                           unlock={this.props.unlockPayAction}
                           onError={this.handleErrorMessage}
                         />
-                        {expense.payoutMethod !== 'other' && (
+                        {(get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT' || expense.payoutMethod !== 'other') && (
                           <PayExpenseBtn
                             expense={expense}
                             collective={collective}
@@ -522,6 +540,7 @@ class Expense extends React.Component {
                             lock={this.props.lockPayAction}
                             unlock={this.props.unlockPayAction}
                             onError={this.handleErrorMessage}
+                            onSuccess={this.handleSuccessMessage}
                           />
                         )}
                         <StyledButton

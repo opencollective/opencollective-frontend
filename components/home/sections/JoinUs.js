@@ -11,7 +11,7 @@ import SectionSubtitle from '../SectionSubtitle';
 import Link from '../../Link';
 
 const SectionWrapper = styled(Container)`
-  background: url('/static/images/joinus-bg-sm.png');
+  background: url('/static/images/home/joinus-bg-sm.png');
   background-size: 100% 100%;
 
   a {
@@ -27,12 +27,12 @@ const SectionWrapper = styled(Container)`
   }
 
   @media screen and (min-width: 64em) {
-    background: url('/static/images/joinus-bg-md.png');
+    background: url('/static/images/home/joinus-bg-md.png');
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background: url('/static/images/joinus-bg-lg.png');
+    background: url('/static/images/home/joinus-bg-lg.png');
     background-size: 100% 100%;
   }
 `;
@@ -94,7 +94,7 @@ const JoinUs = () => (
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </H1>
               <P fontSize={['Caption', null, '15px']} lineHeight={['19px', null, '25px']} letterSpacing="-0.016em">
-                <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now !" />
+                <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />
               </P>
             </Box>
             <Box className="arrowWrapper" color="black.500">

@@ -84,7 +84,7 @@ class Expenses extends React.Component {
               text-align: center;
             }
             .filter {
-              max-width: 500px;
+              max-width: 600px;
               width: 100%;
               margin: 0 auto;
               margin-bottom: 20px;
@@ -154,6 +154,22 @@ class Expenses extends React.Component {
                 onClick={() => updateVariables({ status: 'READY' })}
               >
                 <FormattedMessage id="expenses.ready" defaultMessage="ready to pay" />
+              </Button>
+              <Button
+                className="filterBtn processing"
+                bsSize="small"
+                bsStyle={status === 'PROCESSING' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'PROCESSING' })}
+              >
+                <FormattedMessage id="expenses.processing" defaultMessage="processing" />
+              </Button>
+              <Button
+                className="filterBtn error"
+                bsSize="small"
+                bsStyle={status === 'ERROR' ? 'primary' : 'default'}
+                onClick={() => updateVariables({ status: 'ERROR' })}
+              >
+                <FormattedMessage id="expenses.error" defaultMessage="error" />
               </Button>
               <Button
                 className="filterBtn paid"

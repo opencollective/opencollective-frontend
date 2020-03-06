@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 const StyledTooltipContainer = styled(ReactTooltip)`
   max-width: 320px;
@@ -22,7 +22,7 @@ const StyledTooltipContainer = styled(ReactTooltip)`
   }
 `;
 
-const InlineDiv = styled.div`
+const ChildrenContainer = styled.div`
   display: ${props => props.display};
   cursor: help;
 `;
@@ -47,6 +47,8 @@ class StyledTooltip extends React.Component {
     delayUpdate: PropTypes.number,
     /** If using a node children, this defines the parent display type */
     display: PropTypes.string,
+    /** The component that will be used as a container for the children */
+    childrenContainer: PropTypes.any,
     /** The trigger. Either:
      *  - A render func, that gets passed props to set on the trigger
      *  - A React node, rendered inside an div
@@ -81,9 +83,9 @@ class StyledTooltip extends React.Component {
         {typeof this.props.children === 'function' ? (
           this.props.children(triggerProps)
         ) : (
-          <InlineDiv display={this.props.display} {...triggerProps}>
+          <ChildrenContainer as={this.props.childrenContainer} display={this.props.display} {...triggerProps}>
             {this.props.children}
-          </InlineDiv>
+          </ChildrenContainer>
         )}
         {isMounted && (
           <StyledTooltipContainer

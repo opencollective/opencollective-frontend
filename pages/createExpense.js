@@ -4,16 +4,15 @@ import { FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Box, Flex } from '@rebass/grid';
-import { pick } from 'lodash';
 
 import { compose } from '../lib/utils';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
-import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
+import CreateExpenseForm from '../components/expenses/CreateExpenseFormLegacy';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -34,19 +33,25 @@ class CreateExpensePage extends React.Component {
     LoggedInUser: PropTypes.object,
   };
 
+  getPayoutMethod = expenseData => {
+    if (expenseData.PayoutMethod) {
+      return expenseData.PayoutMethod;
+    } else if (expenseData.payoutMethod === 'paypal') {
+      return { type: 'PAYPAL', data: { email: expenseData.paypalEmail } };
+    } else {
+      return null;
+    }
+  };
+
   createExpense = async expense => {
-    const { LoggedInUser } = this.props;
     const collective = this.props.data.Collective;
 
     try {
       expense.collective = { id: collective.id };
       expense.currency = collective.currency;
-      expense.user = pick(expense, ['paypalEmail']);
+      expense.PayoutMethod = this.getPayoutMethod(expense);
       delete expense.paypalEmail;
-
-      if (LoggedInUser) {
-        expense.user.id = LoggedInUser.id;
-      }
+      delete expense.payoutMethod;
       const res = await this.props.createExpense(expense);
       const expenseCreated = res.data.createExpense;
       Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/?createSuccess=true`);
@@ -64,18 +69,13 @@ class CreateExpensePage extends React.Component {
     }
 
     const collective = data.Collective;
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     return (
       <div className="ExpensesPage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
-            collective={collective}
-            href={`/${collective.slug}`}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
-          />
+          <CollectiveNavbar collective={collective} isAdmin={canEdit} showEdit />
 
           <Flex flexDirection={['column', null, 'row']}>
             <Box width={[1, null, 3 / 4]}>
@@ -183,6 +183,12 @@ const getCollectiveQuery = gql`
         name
         image
         expensePolicy
+        connectedAccounts {
+          id
+          service
+          createdAt
+          updatedAt
+        }
       }
       parentCollective {
         id

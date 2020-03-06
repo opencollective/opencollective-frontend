@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { Box, Flex } from '@rebass/grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
@@ -278,7 +278,7 @@ class EditTiers extends React.Component {
 
   addTier(tier) {
     const tiers = this.state.tiers;
-    tiers.push({ ...(tier || {}), __uuid: uuidv4() });
+    tiers.push({ ...(tier || {}), __uuid: uuid() });
     this.setState({ tiers });
   }
 

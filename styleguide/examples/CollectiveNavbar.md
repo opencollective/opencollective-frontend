@@ -1,15 +1,30 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { webpackCollective, openSourceHost } from '../mocks/collectives';
-```
+## Default
 
-```js
+```jsx
 import { webpackCollective } from '../mocks/collectives';
 initialState = { selected: 'contribute' };
 <CollectiveNavbar
   collective={webpackCollective}
   selected={state.selected}
   onSectionClick={selected => setState({ selected })}
-  LinkComponent={({ label }) => label}
+/>;
+```
+
+## Loading state
+
+```jsx
+<CollectiveNavbar isLoading />
+```
+
+## Customize CTAs
+
+```jsx
+import { webpackCollective } from '../mocks/collectives';
+initialState = { selected: 'contribute' };
+<CollectiveNavbar
+  collective={webpackCollective}
+  selected={state.selected}
+  onSectionClick={selected => setState({ selected })}
+  callsToAction={{ hasContact: true, hasSubmitExpense: true }}
 />;
 ```

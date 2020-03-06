@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { width } from 'styled-system';
 import { FormattedMessage, FormattedDate, injectIntl, defineMessages } from 'react-intl';
 import Currency from './Currency';
 import Link from './Link';
@@ -7,6 +9,25 @@ import Logo from './Logo';
 import { get } from 'lodash';
 import { firstSentence, imagePreview } from '../lib/utils';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
+import Container from './Container';
+
+const CardWrapper = styled(Container)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  vertical-align: top;
+  position: relative;
+  box-sizing: border-box;
+  width: 215px;
+  min-height: 380px;
+  border-radius: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
+  overflow: hidden;
+  text-decoration: none !important;
+  ${width}
+`;
 
 class CollectiveCard extends React.Component {
   static propTypes = {
@@ -108,26 +129,9 @@ class CollectiveCard extends React.Component {
 
     return (
       <Link route={route} target="_top" params={params}>
-        <div className={`CollectiveCard ${collective.type}`}>
+        <CardWrapper className={`CollectiveCard ${collective.type}`} {...this.props}>
           <style jsx>
             {`
-              .CollectiveCard {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                cursor: pointer;
-                vertical-align: top;
-                position: relative;
-                box-sizing: border-box;
-                width: 215px;
-                min-height: 380px;
-                border-radius: 15px;
-                background-color: #ffffff;
-                box-shadow: 0 1px 3px 0 rgba(45, 77, 97, 0.2);
-                overflow: hidden;
-                text-decoration: none !important;
-              }
-
               .head {
                 position: relative;
                 overflow: hidden;
@@ -186,6 +190,7 @@ class CollectiveCard extends React.Component {
                 font-size: 1.2rem;
                 line-height: 1.3;
                 margin: 0 5px;
+                min-height: 50px;
               }
 
               .footer {
@@ -390,7 +395,7 @@ class CollectiveCard extends React.Component {
                 ),
             )}
           </div>
-        </div>
+        </CardWrapper>
       </Link>
     );
   }

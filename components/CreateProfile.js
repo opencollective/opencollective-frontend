@@ -6,7 +6,7 @@ import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
 import Container from './Container';
-import { P } from './Text';
+import { P, Span } from './Text';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledInputField from './StyledInputField';
@@ -364,13 +364,15 @@ const CreateProfile = ({
       )}
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="center" px={4} py={3}>
-        <P color="black.700" mr={2}>
+        <Span color="black.700" mr={1} fontSize="Paragraph">
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
-        </P>
-        <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
-          <FormattedMessage id="signIn" defaultMessage="Sign In" />
-          &nbsp;→
-        </SecondaryAction>
+        </Span>{' '}
+        <Span fontSize="Paragraph">
+          <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
+            <FormattedMessage id="signIn" defaultMessage="Sign In" />
+            &nbsp;→
+          </SecondaryAction>
+        </Span>
       </Container>
     </StyledCard>
   );

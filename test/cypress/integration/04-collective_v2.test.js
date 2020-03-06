@@ -4,7 +4,7 @@ import mockRecaptcha from '../mocks/recaptcha';
 
 const scrollToSection = section => {
   // Wait for new collective page to load before disabling smooth scroll
-  cy.contains('Become a financial contributor');
+  cy.get('[data-cy=collective-page-main]');
   disableSmoothScroll();
   cy.get(`#section-${section}`).scrollIntoView();
 };
@@ -61,7 +61,7 @@ describe('New collective page', () => {
     it('Can edit primary color', () => {
       let color = null;
 
-      cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click({ force: true });
+      cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click();
       cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]').then($colorBtn => {
         const randomPick = Math.round(Math.random() * $colorBtn.length);
         const withFailSafe = $colorBtn[randomPick] || $colorBtn[0];
@@ -77,7 +77,7 @@ describe('New collective page', () => {
     });
 
     it('Can change cover background image', () => {
-      cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-cover-btn]').click({ force: true });
+      cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-cover-btn]').click();
       uploadImage({
         dropzone: '[data-cy=heroBackgroundDropzone]',
         fileName: 'gopherBack.png',

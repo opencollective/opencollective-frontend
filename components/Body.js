@@ -8,12 +8,6 @@ const Main = styled.main`
     css`
       border-top: 1px solid rgb(232, 233, 235);
     `}
-
-  ${props =>
-    props.withSmoothScroll &&
-    css`
-      scroll-behavior: smooth;
-    `}
 `;
 
 export default class Body extends React.Component {
@@ -21,21 +15,19 @@ export default class Body extends React.Component {
     children: PropTypes.node,
     withoutGlobalStyles: PropTypes.bool,
     withBorderTop: PropTypes.bool,
-    withSmoothScroll: PropTypes.bool,
   };
 
   static defaultProps = {
     withoutGlobalStyles: false,
     withBorderTop: true,
-    withSmoothScroll: false,
   };
 
   render() {
-    const { children, withBorderTop, withoutGlobalStyles, withSmoothScroll } = this.props;
+    const { children, withBorderTop, withoutGlobalStyles } = this.props;
     return withoutGlobalStyles ? (
       <Main withBorderTop={withBorderTop}>{children}</Main>
     ) : (
-      <Main withBorderTop={withBorderTop} withSmoothScroll={withSmoothScroll}>
+      <Main withBorderTop={withBorderTop}>
         <style jsx global>
           {`
             main {

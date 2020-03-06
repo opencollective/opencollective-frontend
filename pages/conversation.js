@@ -235,14 +235,12 @@ class ConversationPage extends React.Component {
     return tagsStats && tagsStats.map(({ tag }) => tag);
   }
 
-  getDefaultValue = tags => {
-    if (isEmpty(tags)) return [];
-    return tags.map(label => ({ label, value: label }));
-  };
-
   handleTagsChange = (options, setValue) => {
-    if (isEmpty(options)) setValue([]);
-    else setValue(options.map(i => i.value));
+    if (isEmpty(options)) {
+      setValue([]);
+    } else {
+      setValue(options.map(i => i.value));
+    }
   };
 
   render() {
@@ -401,7 +399,7 @@ class ConversationPage extends React.Component {
                                   ) : (
                                     <StyledInputTags
                                       suggestedTags={this.getSuggestedTags(collective)}
-                                      defaultValue={this.getDefaultValue(conversation.tags)}
+                                      defaultValue={conversation.tags}
                                       onChange={options => this.handleTagsChange(options, setValue)}
                                     />
                                   )}

@@ -44,11 +44,9 @@ const Block = styled(Box)`
   border: 1px solid black;
 `;
 
-<React.Fragment>
-  <Block width={200} mx="auto" p={2}>
-    <P>width: 200px; margin: 0 auto;</P>
-  </Block>
-</React.Fragment>;
+<Block width={200} mx="auto" p={2}>
+  <P>width: 200px; margin: 0 auto;</P>
+</Block>;
 ```
 
 Using relative unit widths:
@@ -61,11 +59,9 @@ const Block = styled(Box)`
   border: 1px solid black;
 `;
 
-<React.Fragment>
-  <Block width="20rem" mx="auto" p={2}>
-    <P>width: 20rem; margin: 0 auto;</P>
-  </Block>
-</React.Fragment>;
+<Block width="20rem" mx="auto" p={2}>
+  <P>width: 20rem; margin: 0 auto;</P>
+</Block>;
 ```
 
 Set responsive width using an array of values, works for padding and margin props as well:
@@ -78,9 +74,7 @@ const Block = styled(Box)`
   border: 1px solid black;
 `;
 
-<React.Fragment>
-  <Block width={[1, 1 / 2, 1 / 4]} mx="auto" p={2}>
-    <P>width: responsive; margin: 0 auto;</P>
-  </Block>
-</React.Fragment>;
+<Block width={[1, 1 / 2, 1 / 4]} mx="auto" p={2}>
+  <P>width: responsive; margin: 0 auto;</P>
+</Block>;
 ```

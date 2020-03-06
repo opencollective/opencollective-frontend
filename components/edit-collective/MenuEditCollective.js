@@ -124,7 +124,7 @@ const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveT
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
@@ -173,8 +173,7 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
       {collective.isHost && (
         <React.Fragment>
           <MenuDivider />
-          {collective.type === CollectiveType.COLLECTIVE &&
-            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
         </React.Fragment>

@@ -7,11 +7,12 @@
 const routes = require('next-routes');
 
 const pages = routes()
-  .add('home', '/', 'home')
-  .add('previous-home', '/v1', 'index')
-  .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring|pricing)', 'staticPage')
+  .add('home', '/', 'index')
+  .add('static', '/:pageSlug(widgets|tos|privacypolicy|support|hiring)', 'staticPage')
+  .add('pricing', '/pricing', 'pricing')
   .add('redeem', '/:collectiveSlug?/redeem/:code?')
   .add('redeemed', '/:collectiveSlug?/redeemed/:code?')
+  .add('updatePaymentMethod', '/:collectiveSlug/paymentmethod/:id/update')
   .add('signinLinkSent', '/signin/sent')
   .add('confirmCollectiveDeletion', '/deleteCollective/confirmed')
   .add('signin', '/signin/:token?')
@@ -51,7 +52,17 @@ const pages = routes()
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
   .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
-  .add('expense', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)')
+  .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new-v2')
+  .add(
+    'expense-v2',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/v2',
+    'expense',
+  )
+  .add(
+    'expense',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    'expense-legacy',
+  )
   .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
@@ -62,6 +73,12 @@ const pages = routes()
   .add('markOrderAsPaid', '/orders/:id([0-9]+)/mark-as-paid')
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
+
+// New Create Collective Flow
+pages.add(
+  'new-create-collective',
+  '/:hostCollectiveSlug?/:verb(apply|create)/v2/:category(opensource|community|climate)?/:step(form)?',
+);
 
 // Events using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');

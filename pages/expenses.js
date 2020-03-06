@@ -8,7 +8,7 @@ import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData'
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import ErrorPage, { generateError } from '../components/ErrorPage';
 import SectionTitle from '../components/SectionTitle';
 
@@ -46,6 +46,7 @@ class ExpensesPage extends React.Component {
     }
 
     const collective = data.Collective;
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     let action, subtitle, filter;
     if (this.props.value) {
@@ -105,11 +106,10 @@ class ExpensesPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
+          <CollectiveNavbar
             collective={collective}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
+            isAdmin={canEdit}
+            showEdit
             callsToAction={{ hasContact: collective.canContact, hasSubmitExpense: !collective.isArchived }}
           />
 

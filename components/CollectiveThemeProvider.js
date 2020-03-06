@@ -62,7 +62,11 @@ export default class CollectiveThemeProvider extends React.PureComponent {
     const primaryColor = this.state.newPrimaryColor || get(collective, 'settings.collectivePage.primaryColor');
     return (
       <ThemeProvider theme={this.getTheme(primaryColor)}>
-        {typeof children === 'function' ? children({ onPrimaryColorChange: this.onPrimaryColorChange }) : children}
+        {typeof children === 'function' ? (
+          children({ onPrimaryColorChange: this.onPrimaryColorChange })
+        ) : (
+          <React.Fragment>{children}</React.Fragment>
+        )}
       </ThemeProvider>
     );
   }

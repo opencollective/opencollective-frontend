@@ -220,6 +220,8 @@ class StepPayment extends React.Component {
           paymentMethod: { type: 'manual' },
           icon: getPaymentMethodIcon({ type: 'manual' }, collective),
           data: this.props.manual,
+          disabled: this.props.manual.disabled,
+          subtitle: this.props.manual.subtitle,
         });
       }
     }
@@ -359,7 +361,12 @@ StepPayment.propTypes = {
    */
   withPaypal: PropTypes.bool,
   /** Manual payment method instruction. Should be null if an interval is set */
-  manual: PropTypes.shape({ title: PropTypes.string, instructions: PropTypes.string }),
+  manual: PropTypes.shape({
+    title: PropTypes.string,
+    instructions: PropTypes.string,
+    disabled: PropTypes.bool,
+    subtitle: PropTypes.string,
+  }),
   /** Default value */
   defaultValue: PropTypes.object,
   /** Called with an object like {stripe} when new card form is mounted */

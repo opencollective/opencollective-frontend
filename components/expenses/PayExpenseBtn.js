@@ -26,6 +26,7 @@ class PayExpenseBtn extends React.Component {
     refetch: PropTypes.func,
     intl: PropTypes.object.isRequired,
     onError: PropTypes.func,
+    onSuccess: PropTypes.func,
   };
 
   constructor(props) {
@@ -40,10 +41,19 @@ class PayExpenseBtn extends React.Component {
         id: 'expense.pay.error.insufficientBalance',
         defaultMessage: 'Insufficient balance',
       },
+      paypalSuccessMessage: {
+        id: 'expense.pay.paypal.success',
+        defaultMessage: 'Expense was paid using PayPal, the money should already be avaialable for the payee.',
+      },
+      transferwiseSuccessMessage: {
+        id: 'expense.pay.transferwise.success',
+        defaultMessage:
+          "Transfer was created and funded using TransferWise. This expense is be marked as Processing until the money leaves the Host account, after that the money should arrive its destination shortly. If it doesn't, this expense will be updated and marked as Error and you'll be able to try it again.",
+      },
     });
   }
 
-  async handleOnClickPay(forceManual = false) {
+  async handleOnClickPay(forceManual = false, successMessage) {
     const { expense, lock, unlock } = this.props;
 
     lock();
@@ -62,6 +72,9 @@ class PayExpenseBtn extends React.Component {
       this.setState({ loading: false });
       await this.props.refetch();
       unlock();
+      if (this.props.onSuccess) {
+        this.props.onSuccess(successMessage);
+      }
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
       this.props.onError(error);
@@ -75,7 +88,8 @@ class PayExpenseBtn extends React.Component {
     const { loading } = this.state;
     let disabled = this.state.loading || this.props.disabled,
       selectedPayoutMethod = expense.payoutMethod,
-      disabledMessage;
+      disabledMessage,
+      successMessage;
 
     if (expense.payoutMethod === 'paypal') {
       if (!isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
@@ -85,12 +99,14 @@ class PayExpenseBtn extends React.Component {
         const paypalPaymentMethod =
           get(host, 'paymentMethods') && host.paymentMethods.find(pm => pm.service === 'paypal');
         if (get(expense, 'user.paypalEmail') === get(paypalPaymentMethod, 'name')) {
-          selectedPayoutMethod = 'other';
+          return null;
         }
       }
-    }
-
-    if (selectedPayoutMethod === 'other') {
+      successMessage = intl.formatMessage(this.messages['paypalSuccessMessage']);
+    } else if (get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT') {
+      selectedPayoutMethod = 'Transferwise';
+      successMessage = intl.formatMessage(this.messages['transferwiseSuccessMessage']);
+    } else if (selectedPayoutMethod === 'other') {
       return null;
     }
 
@@ -104,7 +120,7 @@ class PayExpenseBtn extends React.Component {
         className="pay"
         data-cy="pay-expense-btn"
         buttonStyle="success"
-        onClick={() => this.handleOnClickPay()}
+        onClick={() => this.handleOnClickPay(false, successMessage)}
         disabled={this.props.disabled || disabled}
         mr={2}
         my={1}
@@ -117,7 +133,7 @@ class PayExpenseBtn extends React.Component {
           <FormattedMessage
             id="expense.pay.btn"
             defaultMessage="Pay with {paymentMethod}"
-            values={{ paymentMethod: expense.payoutMethod }}
+            values={{ paymentMethod: selectedPayoutMethod }}
           />
         )}
       </StyledButton>

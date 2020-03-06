@@ -7,7 +7,7 @@ import { debounce, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import * as LibTaxes from '@opencollective/taxes';
 import { URLSearchParams } from 'universal-url';
 
@@ -84,6 +84,11 @@ const messages = defineMessages({
     defaultMessage:
       'Instructions to make the payment of {amount} will be sent to your email address {email}. Your order will be pending until the funds have been received by the host ({host}).',
   },
+  manualPaymentLimitWarning: {
+    id: 'host.paymentMethod.manual.limitWarning',
+    defaultMessage:
+      "{host} can't receive Bank Transfers right now via Open Collective because they've reached their free plan limit. Once they upgrade to a paid plan, Bank Transfers will be available again.",
+  },
   createUserLabel: {
     id: 'ContributionFlow.CreateUserLabel',
     defaultMessage: 'Contribute as an individual',
@@ -121,6 +126,7 @@ class CreateOrderPage extends React.Component {
       name: PropTypes.string.isRequired,
       location: PropTypes.shape({ country: PropTypes.string }),
       settings: PropTypes.object,
+      plan: PropTypes.object,
       connectedAccounts: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     skipStepDetails: PropTypes.bool,
@@ -722,8 +728,18 @@ class CreateOrderPage extends React.Component {
       return null;
     }
 
+    const plan = this.props.host.plan;
+    const disabled = plan && plan.bankTransfersLimit !== null && plan.bankTransfers > plan.bankTransfersLimit;
+    const subtitle = disabled
+      ? this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
+          host: this.props.host.name,
+        })
+      : null;
+
     return {
       ...pm,
+      disabled,
+      subtitle,
       instructions: this.props.intl.formatMessage(messages.manualPm, {
         amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
         email: get(this.props, 'LoggedInUser.email', ''),

@@ -3,6 +3,12 @@ export const openSourceHost = {
   slug: 'opensource',
   name: 'Open Source Collective 501c6 (Non Profit)',
   image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5f4a3920-11b6-11e8-b28d-b359f3c5ca14.png',
+  imageUrl: 'https://images-staging.opencollective.com/opensource/cd1565e/logo/256.png',
+  type: 'ORGANIZATION',
+  location: {
+    address: 'EIN 82-2037583\n340 S LEMON AVE #3717\nWalnut, CA 91789 USA',
+    country: 'US',
+  },
   __typename: 'Organization',
 };
 
@@ -127,7 +133,9 @@ export const webpackCollective = {
   name: 'webpack',
   company: null,
   tags: ['open source'],
+  isApproved: true,
   image: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
+  imageUrl: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
   backgroundImage: 'https://cl.ly/2b1k0P030J3o/webpack-background-image.jpg',
   description: 'webpack is THE build solution for modern web applications.',
   longDescription:

@@ -60,12 +60,20 @@ const StyledInput = styled.input`
     cursor: not-allowed;
   }
 
-  &:focus, &:hover:not(:disabled) {
+  &:hover:not(:disabled) {
     border-color: ${themeGet('colors.primary.300')};
+  }
+
+  &:focus:not(:disabled) {
+    border-color: ${themeGet('colors.primary.500')};
   }
 
   &::placeholder {
     color: ${themeGet('colors.black.400')};
+  }
+
+  &[type="date"] {
+    font-family: inherit;
   }
 `;
 

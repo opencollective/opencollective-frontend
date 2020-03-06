@@ -190,7 +190,13 @@ class CollectivePage extends Component {
       case Sections.CONVERSATIONS:
         return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
       case Sections.TRANSACTIONS:
-        return <SectionTransactions collective={this.props.collective} isAdmin={this.props.isAdmin} />;
+        return (
+          <SectionTransactions
+            collective={this.props.collective}
+            isAdmin={this.props.isAdmin}
+            isRoot={this.props.isRoot}
+          />
+        );
       case Sections.GOALS:
         return <SectionGoals collective={this.props.collective} />;
       case Sections.TICKETS:
@@ -227,7 +233,11 @@ class CollectivePage extends Component {
     );
 
     return (
-      <Container position="relative" css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}>
+      <Container
+        position="relative"
+        css={collective.isArchived ? 'filter: grayscale(100%);' : undefined}
+        data-cy="collective-page-main"
+      >
         <Hero
           collective={collective}
           host={host}
