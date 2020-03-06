@@ -176,7 +176,7 @@
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "codecov": "^3.6.5",
     "commitizen": "^4.0.3",
-    "cross-env": "^7.0.1",
+    "cross-env": "^7.0.2",
     "css-loader": "^3.4.2",
     "cypress": "^3.8.3",
     "cypress-file-upload": "^3.5.3",
