@@ -141,7 +141,9 @@ class NewCreateCollective extends Component {
         result: { success: 'Collective created successfully' },
       });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', { slug: newCollective.slug, status: 'collectiveCreated' });
+      Router.pushRoute('collective', { slug: newCollective.slug, status: 'collectiveCreated' }).then(() =>
+        window.scrollTo(0, 0),
+      );
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', error: errorMsg, creating: false });
