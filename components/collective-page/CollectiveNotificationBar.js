@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
 import NotificationBar from '../NotificationBar';
 import { CollectiveType } from '../../lib/constants/collectives';
+import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
+import { moneyCanMoveFromEvent } from '../../lib/events';
+import { get } from 'lodash';
 
 const messages = defineMessages({
   // Created
@@ -47,9 +50,22 @@ const messages = defineMessages({
     id: 'collective.pending.description',
     defaultMessage: 'This collective is pending approval from the host ({host}).',
   },
+  'event.over.sendMoneyToParent.title': {
+    id: 'event.over.sendMoneyToParent.title',
+    defaultMessage: 'Event is over and still has a positive balance',
+  },
+  'event.over.sendMoneyToParent.description': {
+    id: 'event.over.sendMoneyToParent.description',
+    defaultMessage:
+      'If you still have expenses related to this event, please file them. Otherwise consider moving the money to your collective {collective}',
+  },
+  'event.over.sendMoneyToParent.transaction.description': {
+    id: 'event.over.sendMoneyToParent.transaction.description',
+    defaultMessage: 'Balance of {event}',
+  },
 });
 
-const getNotification = (intl, status, collective, host) => {
+const getNotification = (intl, status, collective, host, LoggedInUser) => {
   if (status === 'collectiveCreated') {
     switch (collective.type) {
       case CollectiveType.ORGANIZATION:
@@ -81,6 +97,24 @@ const getNotification = (intl, status, collective, host) => {
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
       status: 'collectivePending',
     };
+  } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
+    return {
+      title: intl.formatMessage(messages['event.over.sendMoneyToParent.title']),
+      description: intl.formatMessage(messages['event.over.sendMoneyToParent.description']),
+      actions: [
+        <SendMoneyToCollectiveBtn
+          key="SendMoneyToCollectiveBtn"
+          fromCollective={collective}
+          toCollective={collective.parentCollective}
+          LoggedInUser={LoggedInUser}
+          description={intl.formatMessage(messages['event.over.sendMoneyToParent.transaction.description'], {
+            event: collective.name,
+          })}
+          amount={collective.stats.balance}
+          currency={collective.currency}
+        />,
+      ],
+    };
   }
 };
 
@@ -91,7 +125,12 @@ const CollectiveNotificationBar = ({ intl, status, collective, host }) => {
   const notification = getNotification(intl, status, collective, host);
 
   return !notification ? null : (
-    <NotificationBar status={notification.status} title={notification.title} description={notification.description} />
+    <NotificationBar
+      status={status}
+      title={notification.title}
+      description={notification.description}
+      actions={notification.actions}
+    />
   );
 };
 
@@ -107,9 +146,11 @@ CollectiveNotificationBar.propTypes = {
     name: PropTypes.string,
   }),
   /** A special status to show the notification bar (collective created, archived...etc) */
-  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'eventConcludedWithBalance']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+  /** from withUser */
+  LoggedInUser: PropTypes.object,
 };
 
 export default injectIntl(CollectiveNotificationBar);

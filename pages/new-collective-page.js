@@ -141,7 +141,12 @@ class NewCollectivePage extends React.Component {
           </Container>
         ) : (
           <React.Fragment>
-            <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
+            <CollectiveNotificationBar
+              collective={collective}
+              host={collective.host}
+              status={status}
+              LoggedInUser={LoggedInUser}
+            />
             <CollectiveThemeProvider collective={collective}>
               {({ onPrimaryColorChange }) => (
                 <CollectivePage
@@ -160,7 +165,6 @@ class NewCollectivePage extends React.Component {
                   LoggedInUser={LoggedInUser}
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
-                  status={status}
                   onPrimaryColorChange={onPrimaryColorChange}
                 />
               )}
