@@ -498,6 +498,15 @@ class EditCollectiveForm extends React.Component {
           type: 'select',
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
+          when: () => {
+            if (get(this.state.collective, 'isHost')) {
+              return false;
+            }
+            if (get(this.state.collective, 'type') === CollectiveType.COLLECTIVE) {
+              return false;
+            }
+            return true;
+          },
         },
         {
           name: 'VAT',
