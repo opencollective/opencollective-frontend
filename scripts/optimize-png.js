@@ -18,7 +18,7 @@ options.plugins.push(
   }),
 );
 
-const baseDirectory = `static/images`;
+const baseDirectory = `public/static/images`;
 
 const directories = [
   // 'home',
