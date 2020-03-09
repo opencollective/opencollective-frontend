@@ -261,7 +261,7 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
 
-                    <Box mx={1} my={4}>
+                    <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox
                         name="tos"
                         label={
@@ -286,6 +286,7 @@ class CreateCollectiveForm extends React.Component {
                       />
                       {!query.hostTos && get(host, 'settings.tos') && (
                         <StyledCheckbox
+                          alignItems="flex-start"
                           name="hostTos"
                           label={
                             <FormattedMessage
@@ -308,7 +309,7 @@ class CreateCollectiveForm extends React.Component {
                           }}
                         />
                       )}
-                    </Box>
+                    </Flex>
 
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton

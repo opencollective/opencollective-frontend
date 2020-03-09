@@ -42,10 +42,9 @@ const CustomCheckbox = styled.span`
 
 const CheckboxContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: ${props => props.alignItems};
   line-height: 1.4em;
   ${typography}
-  align-items: center;
   width: ${props => props.width};
 
   /* Hide the default checkbox */
@@ -138,11 +137,17 @@ class StyledCheckbox extends React.Component {
   }
 
   render() {
-    const { name, checked, label, disabled, size, inputId, width, isLoading } = this.props;
+    const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading } = this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
 
     return (
-      <CheckboxContainer onClick={() => this.onChange(!realChecked)} fontSize={size} size={size} width={width}>
+      <CheckboxContainer
+        onClick={() => this.onChange(!realChecked)}
+        fontSize={size}
+        size={size}
+        width={width}
+        alignItems={alignItems}
+      >
         <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
         <CustomCheckbox data-cy="custom-checkbox">
           {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
@@ -157,6 +162,7 @@ StyledCheckbox.defaultProps = {
   size: '14px',
   defaultChecked: false,
   width: 'auto',
+  alignItems: 'center',
 };
 
 StyledCheckbox.propTypes = {
@@ -180,6 +186,8 @@ StyledCheckbox.propTypes = {
   width: PropTypes.string,
   /** If true, the checkbox will be replaced by a spinner */
   isLoading: PropTypes.bool,
+  /** Default to center */
+  alignItems: PropTypes.string,
 };
 
 export default StyledCheckbox;
