@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-
+import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
+
 import Container from '../components/Container';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
@@ -43,6 +44,8 @@ class ConfirmCollectiveDeletion extends Component {
         return 'organization';
       case 'COLLECTIVE':
         return 'collective';
+      case 'EVENT':
+        return 'event';
       default:
         return 'account';
     }
@@ -59,16 +62,29 @@ class ConfirmCollectiveDeletion extends Component {
             <Icon size="60" />
           </Flex>
           <H3 as="h1" fontWeight="800">
-            Your {collectiveType} has been deleted.
+            <FormattedMessage
+              values={{
+                collectiveType,
+              }}
+              id="confirmCollective.deletion.title"
+              defaultMessage="Your {collectiveType} has been deleted."
+            />
           </H3>
           {type === 'USER' ? (
             <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
-              We&apos;ve deleted your user account, expenses, payment methods, and connected accounts.
+              <FormattedMessage
+                id="confirmCollective.user.deletion.description"
+                defaultMessage="We've deleted your user account, expenses, payment methods, and connected accounts."
+              />
             </P>
           ) : (
             <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
-              We&apos;ve deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this{' '}
-              {collectiveType}.
+              <FormattedMessage
+                id="confirmCollective.other.deletion.description"
+                values={{ collectiveType }}
+                defaultMessage="We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this 
+                {collectiveType}."
+              />
             </P>
           )}
         </Container>

@@ -85,7 +85,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.description"
             defaultMessage={
-              'Archiving a {type} means it will visually appear inactive and no new activity will be allowed.'
+              'Archiving {type} means it will visually appear inactive and no new activity will be allowed.'
             }
           />
           &nbsp;
@@ -152,7 +152,11 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
 
       <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
         <ModalHeader>
-          <FormattedMessage id="collective.archive.modal.header" defaultMessage={'Archive collective'} />
+          <FormattedMessage
+            values={{ type: collectiveType.toLowerCase() }}
+            id="collective.archive.modal.header"
+            defaultMessage={'Archive {type}'}
+          />
         </ModalHeader>
         <ModalBody>
           <P>
