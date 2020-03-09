@@ -499,11 +499,10 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
           when: () => {
-            const _type = get(this.state.collective, 'type');
             if (get(this.state.collective, 'isHost')) {
               return false;
             }
-            if (_type === CollectiveType.ORGANIZATION || _type === CollectiveType.USER) {
+            if ([CollectiveType.ORGANIZATION, CollectiveType.USER].includes(get(this.state.collective, 'type'))) {
               return true;
             }
             return false;
