@@ -84,7 +84,7 @@ class CollectiveCategoryPicker extends React.Component {
               <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/create-collective/opensource.png"
+                    src="/static/images/create-collective/openSourceIllustration.png"
                     alt={intl.formatMessage(this.messages.opensource)}
                   />
                   <Link
@@ -98,6 +98,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}
@@ -122,7 +123,7 @@ class CollectiveCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/create-collective/anycommunity.png"
+                    src="/static/images/create-collective/communityIllustration.png"
                     alt={intl.formatMessage(this.messages.community)}
                   />
                   <Link
@@ -136,6 +137,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}
@@ -159,7 +161,7 @@ class CollectiveCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/create-collective/climateinitiative.png"
+                    src="/static/images/create-collective/climateIllustration.png"
                     alt={intl.formatMessage(this.messages.climate)}
                   />
                   <Link
@@ -173,6 +175,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}

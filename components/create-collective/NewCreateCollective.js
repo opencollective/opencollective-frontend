@@ -39,6 +39,7 @@ class NewCreateCollective extends Component {
       error: null,
       status: null,
       creating: false,
+      tos: null,
     };
 
     this.createCollective = this.createCollective.bind(this);
@@ -92,7 +93,7 @@ class NewCreateCollective extends Component {
       } else if (query.category === 'climate') {
         this.setState({ category: 'climate' });
       } else if (!query.category) {
-        this.setState({ category: null });
+        this.setState({ category: null, tos: null });
       }
     }
   }
@@ -140,7 +141,9 @@ class NewCreateCollective extends Component {
         result: { success: 'Collective created successfully' },
       });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', { slug: newCollective.slug, status: 'collectiveCreated' });
+      Router.pushRoute('collective', { slug: newCollective.slug, status: 'collectiveCreated' }).then(() =>
+        window.scrollTo(0, 0),
+      );
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', error: errorMsg, creating: false });
