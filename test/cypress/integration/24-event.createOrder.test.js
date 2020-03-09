@@ -80,6 +80,18 @@ describe('event.createOrder page', () => {
       // Create event
       cy.visit(`${slug}/events/new`);
       cy.get('.inputs input[name="name"]').type('Test Event with VAT');
+      cy.get('.inputs .startsAt input[type="text"]')
+        .clear()
+        .type(`${Cypress.moment().format('MM/DD/YYYY')} 7:00 PM`)
+        .blur();
+      cy.get('.inputs .endsAt input[type="text"]')
+        .clear()
+        .type(
+          `${Cypress.moment()
+            .add(1, 'day')
+            .format('MM/DD/YYYY')} 7:00 PM`,
+        )
+        .blur();
       cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');
       cy.get('.EditTiers input[name="amount"]').type('10');
       cy.contains('button', 'Create Event').click();
