@@ -7,7 +7,8 @@ import { get, pick } from 'lodash';
 
 import { compose, formatCurrency } from '../lib/utils';
 
-import SmallButton from './SmallButton';
+import StyledButton from './StyledButton';
+import { Flex } from '@rebass/grid';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -80,19 +81,21 @@ class SendMoneyToCollectiveBtn extends React.Component {
             }
           `}
         </style>
-        <SmallButton className="approve" onClick={this.props.confirmTransfer || this.onClick}>
-          {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-          {!this.state.loading && (
-            <FormattedMessage
-              id="SendMoneyToCollective.btn"
-              defaultMessage="Send {amount} to {collective}"
-              values={{
-                amount: formatCurrency(amount, currency),
-                collective: toCollective.name,
-              }}
-            />
-          )}
-        </SmallButton>
+        <Flex justifyContent="center" mb={1}>
+          <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
+            {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+            {!this.state.loading && (
+              <FormattedMessage
+                id="SendMoneyToCollective.btn"
+                defaultMessage="Send {amount} to {collective}"
+                values={{
+                  amount: formatCurrency(amount, currency),
+                  collective: toCollective.name,
+                }}
+              />
+            )}
+          </StyledButton>
+        </Flex>
         {this.state.error && <div className="error">{this.state.error}</div>}
       </div>
     );
