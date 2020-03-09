@@ -8,11 +8,11 @@ import { Box, Flex } from '@rebass/grid';
 import { compose } from '../lib/utils';
 
 import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
-import CreateExpenseForm from '../components/expenses/CreateExpenseForm';
+import CreateExpenseForm from '../components/expenses/CreateExpenseFormLegacy';
 
 import ErrorPage from '../components/ErrorPage';
 import Button from '../components/Button';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
@@ -69,18 +69,13 @@ class CreateExpensePage extends React.Component {
     }
 
     const collective = data.Collective;
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
     return (
       <div className="ExpensesPage">
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
-            collective={collective}
-            href={`/${collective.slug}`}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
-          />
+          <CollectiveNavbar collective={collective} isAdmin={canEdit} showEdit />
 
           <Flex flexDirection={['column', null, 'row']}>
             <Box width={[1, null, 3 / 4]}>

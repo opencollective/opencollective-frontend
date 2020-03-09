@@ -19,6 +19,7 @@ import Link from './Link';
 import StyledRoundButton from './StyledRoundButton';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import LoadingPlaceholder from './LoadingPlaceholder';
 
 /** Main container for the entire component */
 const MainContainer = styled.div`
@@ -246,6 +247,10 @@ const DEFAULT_SECTIONS = {
   ],
 };
 
+const getDefaultSections = collective => {
+  return get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[get(collective, 'type')] || [];
+};
+
 /**
  * Get the sections for a collective.
  *
@@ -258,8 +263,9 @@ const DEFAULT_SECTIONS = {
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
 export const getSectionsForCollective = (collective, isAdmin) => {
-  const sections = get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[collective.type] || [];
+  const sections = getDefaultSections(collective);
   const toRemove = new Set();
+  collective = collective || {};
 
   // Can't contribute anymore if the collective is archived or has no host
   if (!collective.isApproved && !isAdmin) {
@@ -285,7 +291,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     if (!updates) {
       toRemove.add(Sections.UPDATES);
     }
-    if (!balance && !(transactions && transactions.all)) {
+    if (!collective.balance && !balance && !(transactions && transactions.all)) {
       toRemove.add(Sections.BUDGET);
     }
     if (!collective.hasLongDescription && !collective.longDescription) {
@@ -331,6 +337,7 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
 const CollectiveNavbar = ({
   collective,
   isAdmin,
+  isLoading,
   showEdit,
   sections,
   selected,
@@ -357,7 +364,11 @@ const CollectiveNavbar = ({
             </Container>
           </LinkCollective>
           <CollectiveName>
-            <LinkCollective collective={collective} onClick={onCollectiveClick} />
+            {isLoading ? (
+              <LoadingPlaceholder height={22} minWidth={100} />
+            ) : (
+              <LinkCollective collective={collective} onClick={onCollectiveClick} />
+            )}
           </CollectiveName>
           {isAdmin && showEdit && (
             <Link route="editCollective" params={{ slug: collective.slug }} title="Settings">
@@ -379,58 +390,62 @@ const CollectiveNavbar = ({
         width="100%"
         background="white"
       >
-        <Container
-          flex="2 1 600px"
-          display={isExpended ? 'flex' : ['none', null, 'flex']}
-          css={{ overflowX: 'auto' }}
-          data-cy="CollectivePage.NavBar"
-          flexDirection={['column', null, 'row']}
-          height="100%"
-          borderBottom={['1px solid #e6e8eb', 'none']}
-        >
-          {sections.map(section => (
-            <MenuLinkContainer
-              key={section}
-              isSelected={section === selected}
-              onClick={() => {
-                if (isExpended) {
-                  setExpended(false);
-                }
-                if (onSectionClick) {
-                  onSectionClick(section);
-                }
-              }}
-            >
-              <MenuLink
-                as={LinkComponent}
-                collectivePath={collective.path || `/${collective.slug}`}
-                section={section}
-                label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
-              />
-            </MenuLinkContainer>
-          ))}
-          {callsToAction.hasSubmitExpense && (
-            <MenuLinkContainer mobileOnly>
-              <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-              </MenuLink>
-            </MenuLinkContainer>
-          )}
-          {callsToAction.hasContact && (
-            <MenuLinkContainer mobileOnly>
-              <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
-                <FormattedMessage id="Contact" defaultMessage="Contact" />
-              </MenuLink>
-            </MenuLinkContainer>
-          )}
-          {callsToAction.hasDashboard && collective.plan.hostDashboard && (
-            <MenuLinkContainer mobileOnly>
-              <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-                <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
-              </MenuLink>
-            </MenuLinkContainer>
-          )}
-        </Container>
+        {isLoading ? (
+          <LoadingPlaceholder height={43} minWidth={150} mb={2} />
+        ) : (
+          <Container
+            flex="2 1 600px"
+            display={isExpended ? 'flex' : ['none', null, 'flex']}
+            css={{ overflowX: 'auto' }}
+            data-cy="CollectivePage.NavBar"
+            flexDirection={['column', null, 'row']}
+            height="100%"
+            borderBottom={['1px solid #e6e8eb', 'none']}
+          >
+            {sections.map(section => (
+              <MenuLinkContainer
+                key={section}
+                isSelected={section === selected}
+                onClick={() => {
+                  if (isExpended) {
+                    setExpended(false);
+                  }
+                  if (onSectionClick) {
+                    onSectionClick(section);
+                  }
+                }}
+              >
+                <MenuLink
+                  as={LinkComponent}
+                  collectivePath={collective.path || `/${collective.slug}`}
+                  section={section}
+                  label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
+                />
+              </MenuLinkContainer>
+            ))}
+            {callsToAction.hasSubmitExpense && (
+              <MenuLinkContainer mobileOnly>
+                <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                  <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+                </MenuLink>
+              </MenuLinkContainer>
+            )}
+            {callsToAction.hasContact && (
+              <MenuLinkContainer mobileOnly>
+                <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
+                  <FormattedMessage id="Contact" defaultMessage="Contact" />
+                </MenuLink>
+              </MenuLinkContainer>
+            )}
+            {callsToAction.hasDashboard && collective.plan.hostDashboard && (
+              <MenuLinkContainer mobileOnly>
+                <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+                  <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                </MenuLink>
+              </MenuLinkContainer>
+            )}
+          </Container>
+        )}
         <div>
           <CollectiveCallsToAction
             display={['none', null, 'flex']}
@@ -455,7 +470,7 @@ CollectiveNavbar.propTypes = {
     canApply: PropTypes.bool,
     host: PropTypes.object,
     plan: PropTypes.object,
-  }).isRequired,
+  }),
   /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
   callsToAction: PropTypes.shape({
     hasContact: PropTypes.bool,
@@ -466,6 +481,8 @@ CollectiveNavbar.propTypes = {
   }),
   /** Used to check what sections can be used */
   isAdmin: PropTypes.bool,
+  /** Will show loading state */
+  isLoading: PropTypes.bool,
   /** Wether we want to display the "/edit" button */
   showEdit: PropTypes.bool,
   /** Called with the new section name when it changes */

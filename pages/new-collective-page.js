@@ -32,9 +32,8 @@ const IncognitoUserCollective = dynamic(
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: ${prop => prop.smooth && 'smooth'};
   }
-
   section {
     margin: 0;
   }
@@ -90,6 +89,16 @@ class NewCollectivePage extends React.Component {
     }).isRequired, // from withData
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      smooth: false,
+    };
+  }
+
+  componentDidMount() {
+    this.setState({ smooth: true });
+  }
   getPageMetaData(collective) {
     if (collective) {
       return {
@@ -125,7 +134,7 @@ class NewCollectivePage extends React.Component {
     const collective = data && data.Collective;
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
-        <GlobalStyles />
+        <GlobalStyles smooth={this.state.smooth} />
         {data.loading ? (
           <Container py={[5, 6]}>
             <Loading />

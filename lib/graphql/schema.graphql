@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Feb 18 2020 09:12:12 GMT+0100 (Central European Standard Time)
+# timestamp: Thu Mar 05 2020 16:53:10 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -1257,7 +1257,7 @@ Fields for creating or editing an expense attachment
 """
 input ExpenseAttachmentInputType {
   id: Int
-  url: DateString!
+  url: String
   amount: Int!
   incurredAt: DateString
   description: String
@@ -1347,9 +1347,9 @@ type ExpenseType {
   PayoutMethod: PayoutMethod
 
   """
-  Returns true if current user is allowed to see expense's private info, such as attachment's URLS or payout methods.
+  Informs the frontend about what fields are accessible in the expense for current user
   """
-  canSeePrivateInfo: Boolean
+  canSeePrivateInfo: ExpenseViewPermissions
   privateMessage: String
   attachment: String
     @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
@@ -1364,6 +1364,16 @@ type ExpenseType {
   Returns the DEBIT transaction to pay out this expense
   """
   transaction: Transaction
+}
+
+"""
+Returns info about whether user is allowed to see expense's private info, such as attachment's URLS or payout methods.
+"""
+type ExpenseViewPermissions {
+  attachments: Boolean
+  payoutMethod: Boolean
+  userLocation: Boolean
+  invoiceInfo: Boolean
 }
 
 """

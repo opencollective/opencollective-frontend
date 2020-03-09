@@ -2,103 +2,91 @@
 
 ### Standard
 
-```js
-<React.Fragment>
-  <StyledButton mr={3} buttonSize="large" disabled>
-    Disabled
-  </StyledButton>
-  <StyledButton mr={3} buttonSize="large">
-    Default
-  </StyledButton>
-  <StyledButton mr={3} buttonSize="large" loading>
-    Loading
-  </StyledButton>
-</React.Fragment>
+```jsx padded
+<StyledButton  buttonSize="large" disabled>
+  Disabled
+</StyledButton>
+<StyledButton buttonSize="large">
+  Default
+</StyledButton>
+<StyledButton buttonSize="large" loading>
+  Loading
+</StyledButton>
 ```
 
 ### Primary
 
-```js
-<React.Fragment>
-  <StyledButton mr={3} buttonStyle="primary" buttonSize="large" disabled>
-    Disabled
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="primary" buttonSize="large">
-    Default
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="primary" buttonSize="large" loading>
-    Loading
-  </StyledButton>
-</React.Fragment>
+```jsx padded
+<StyledButton buttonStyle="primary" buttonSize="large" disabled>
+  Disabled
+</StyledButton>
+<StyledButton buttonStyle="primary" buttonSize="large">
+  Default
+</StyledButton>
+<StyledButton buttonStyle="primary" buttonSize="large" loading>
+  Loading
+</StyledButton>
 ```
 
 ### Secondary
 
-```js
-<React.Fragment>
-  <StyledButton mr={3} buttonStyle="secondary" buttonSize="large" disabled>
-    Disabled
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="secondary" buttonSize="large">
-    Default
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="secondary" buttonSize="large" loading>
-    Loading
-  </StyledButton>
-</React.Fragment>
+```jsx padded
+<StyledButton buttonStyle="secondary" buttonSize="large" disabled>
+  Disabled
+</StyledButton>
+<StyledButton buttonStyle="secondary" buttonSize="large">
+  Default
+</StyledButton>
+<StyledButton buttonStyle="secondary" buttonSize="large" loading>
+  Loading
+</StyledButton>
 ```
 
 ### Dark
 
-```js
-<React.Fragment>
-  <StyledButton mr={3} buttonStyle="dark" buttonSize="large" disabled>
-    Disabled
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="dark" buttonSize="large">
-    Default
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="dark" buttonSize="large" loading>
-    Loading
-  </StyledButton>
-</React.Fragment>
+```jsx padded
+<StyledButton buttonStyle="dark" buttonSize="large" disabled>
+  Disabled
+</StyledButton>
+<StyledButton buttonStyle="dark" buttonSize="large">
+  Default
+</StyledButton>
+<StyledButton buttonStyle="dark" buttonSize="large" loading>
+  Loading
+</StyledButton>
 ```
 
 ### Danger
 
-```js
-<React.Fragment>
-  <StyledButton mr={3} buttonStyle="danger" buttonSize="large" disabled>
-    Disabled
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="danger" buttonSize="large">
-    Default
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="danger" buttonSize="large" loading>
-    Loading
-  </StyledButton>
-</React.Fragment>
+```jsx padded
+<StyledButton buttonStyle="danger" buttonSize="large" disabled>
+  Disabled
+</StyledButton>
+<StyledButton buttonStyle="danger" buttonSize="large">
+  Default
+</StyledButton>
+<StyledButton buttonStyle="danger" buttonSize="large" loading>
+  Loading
+</StyledButton>
 ```
 
 ### Success
 
-```js
-<React.Fragment>
-  <StyledButton mr={3} buttonStyle="success" buttonSize="large" disabled>
-    Disabled
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="success" buttonSize="large">
-    Default
-  </StyledButton>
-  <StyledButton mr={3} buttonStyle="success" buttonSize="large" loading>
-    Loading
-  </StyledButton>
-</React.Fragment>
+```jsx padded
+<StyledButton buttonStyle="success" buttonSize="large" disabled>
+  Disabled
+</StyledButton>
+<StyledButton buttonStyle="success" buttonSize="large">
+  Default
+</StyledButton>
+<StyledButton buttonStyle="success" buttonSize="large" loading>
+  Loading
+</StyledButton>
 ```
 
 ### Defaults to the `medium` button size
 
-```js
+```jsx
 initialState = { buttonSize: 'medium' };
 <React.Fragment>
   <StyledButton buttonSize={state.buttonSize} mb={4} mx="auto" display="block">
@@ -144,7 +132,7 @@ initialState = { buttonSize: 'medium' };
 
 ### Advanced customization
 
-```js
+```jsx padded
 <StyledButton buttonStyle="primary" bg="green.700">
   A green button
 </StyledButton>
@@ -152,7 +140,7 @@ initialState = { buttonSize: 'medium' };
 
 ### Button is not clickable when loading
 
-```js
+```jsx padded
 initialState = { loading: false, nbClicks: 0 };
 
 <StyledButton
@@ -166,4 +154,11 @@ initialState = { loading: false, nbClicks: 0 };
 >
   Clicked {state.nbClicks} times
 </StyledButton>;
+```
+
+### As link
+
+```jsx
+<StyledButton asLink>I'm a link!</StyledButton>
+<StyledButton asLink>I'm a link!</StyledButton>
 ```

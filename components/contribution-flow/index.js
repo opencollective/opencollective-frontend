@@ -7,7 +7,7 @@ import { debounce, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import * as LibTaxes from '@opencollective/taxes';
 import { URLSearchParams } from 'universal-url';
 
@@ -729,17 +729,17 @@ class CreateOrderPage extends React.Component {
     }
 
     const plan = this.props.host.plan;
-    const isOverLimit =
-      plan && Boolean(plan.bankTransfers + get(this.state, 'stepDetails.totalAmount') > plan.bankTransfersLimit);
-    const disabledMessage =
-      isOverLimit &&
-      this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
-        host: this.props.host.name,
-      });
+    const disabled = plan && plan.bankTransfersLimit !== null && plan.bankTransfers > plan.bankTransfersLimit;
+    const subtitle = disabled
+      ? this.props.intl.formatMessage(messages.manualPaymentLimitWarning, {
+          host: this.props.host.name,
+        })
+      : null;
 
     return {
       ...pm,
-      disabledMessage,
+      disabled,
+      subtitle,
       instructions: this.props.intl.formatMessage(messages.manualPm, {
         amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
         email: get(this.props, 'LoggedInUser.email', ''),

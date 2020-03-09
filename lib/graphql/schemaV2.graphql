@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Feb 12 2020 15:34:50 GMT-0300 (Brasilia Standard Time)
+# timestamp: Thu Mar 05 2020 16:53:37 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -21,6 +21,7 @@ interface Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -65,7 +66,7 @@ interface Account {
     Type of transaction (DEBIT/CREDIT)
     """
     type: TransactionType
-    orderBy: ChronologicalOrder
+    orderBy: ChronologicalOrderInput
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -73,7 +74,7 @@ interface Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder
+    orderBy: ChronologicalOrderInput
   ): OrderCollection
   settings: JSON
   conversations(
@@ -90,6 +91,17 @@ interface Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 }
 
 """
@@ -108,6 +120,23 @@ Account orders filter (INCOMING or OUTGOING)
 enum AccountOrdersFilter {
   INCOMING
   OUTGOING
+}
+
+input AccountReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
 }
 
 """
@@ -142,6 +171,7 @@ type Bot implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -164,7 +194,7 @@ type Bot implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -172,7 +202,7 @@ type Bot implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -189,12 +219,23 @@ type Bot implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 }
 
 """
 Input to order results chronologically
 """
-input ChronologicalOrder {
+input ChronologicalOrderInput {
   """
   Field to chronologically order by.
   """
@@ -228,6 +269,7 @@ type Collective implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -250,7 +292,7 @@ type Collective implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -258,7 +300,7 @@ type Collective implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -275,6 +317,17 @@ type Collective implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -292,6 +345,14 @@ type Collective implements Account {
   isApproved: Boolean
 }
 
+input CollectiveCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  githubHandle: String
+}
+
 """
 This represents an Comment
 """
@@ -300,8 +361,10 @@ type Comment {
   createdAt: DateTime
   html: String
   markdown: String
-  fromCollective: Account
-  collective: Account
+  fromAccount: Account
+  account: Account
+  fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
+  collective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
 }
 
 """
@@ -314,15 +377,19 @@ type CommentCollection implements Collection {
   nodes: [Comment]
 }
 
-input CommentCreate {
+input CommentCreateInput {
   markdown: String
   html: String
+
+  """
+  If your comment is linked to an expense, set it here
+  """
+  expense: ExpenseReferenceInput
   ExpenseId: Int
-  UpdateId: Int
   ConversationId: String
 }
 
-input CommentEdit {
+input CommentUpdateInput {
   id: String!
   markdown: String
   html: String
@@ -408,7 +475,7 @@ enum Currency {
   EUR
 
   """
-  British Pound
+  Pound Sterling
   """
   GBP
 
@@ -428,7 +495,7 @@ enum Currency {
   CHF
 
   """
-  Uruguayan Peso
+  Peso Uruguayo
   """
   UYU
 
@@ -443,7 +510,7 @@ enum Currency {
   INR
 
   """
-  Japanese Yen
+  Yen
   """
   JPY
 
@@ -452,6 +519,8 @@ enum Currency {
   """
   NZD
 }
+
+scalar DateString
 
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
@@ -502,6 +571,7 @@ type Event implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -524,7 +594,7 @@ type Event implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -532,7 +602,7 @@ type Event implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -549,6 +619,17 @@ type Event implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -570,12 +651,223 @@ type Event implements Account {
 This represents an Expense
 """
 type Expense {
-  id: String
+  id: String!
+
+  """
+  Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future.
+  """
+  legacyId: Int!
+
+  """
+  Title/main description for this expense
+  """
+  description: String!
+
+  """
+  Currency that should be used for the payout
+  """
+  currency: Currency!
+
+  """
+  Whether this expense is a receipt or an invoice
+  """
+  type: ExpenseType!
+
+  """
+  The state of the expense (pending, approved, paid, rejected...etc)
+  """
+  status: ExpenseStatus!
   comments(
     limit: Int
     offset: Int
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
-  ): CommentCollection
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection!
+
+  """
+  The account where the expense was submitted
+  """
+  account: Account!
+
+  """
+  The account being paid by this expense
+  """
+  payee: Account!
+
+  """
+  The account who created this expense
+  """
+  createdByAccount: Account
+
+  """
+  The payout method to use for this expense
+  """
+  payoutMethod: PayoutMethod
+  attachments: [ExpenseAttachment]
+
+  """
+  Additional information about the payment. Only visible to user and admins.
+  """
+  privateMessage: String
+
+  """
+  Information to display on the invoice. Only visible to user and admins.
+  """
+  invoiceInfo: String
+
+  """
+  The permissions given to current logged in user for this expense
+  """
+  permissions: ExpensePermissions!
+}
+
+"""
+Fields for an expense attachment
+"""
+type ExpenseAttachment {
+  """
+  Unique identifier for this expense attachment
+  """
+  id: String!
+
+  """
+  Amount of this attachment
+  """
+  amount: Int!
+
+  """
+  The date on which the attachment was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the attachment was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The date on which the expense took place
+  """
+  incurredAt: DateTime!
+
+  """
+  A description for this attachment. Enforced for new items, but old expenses may not have one.
+  """
+  description: String
+  url: String
+}
+
+input ExpenseAttachmentCreateInput {
+  """
+  Amount in cents
+  """
+  amount: Int!
+
+  """
+  What is this attachment about?
+  """
+  description: String!
+
+  """
+  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
+  """
+  url: String
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
+input ExpenseCreateInput {
+  description: String!
+  tags: [String]
+  type: ExpenseType!
+
+  """
+  A private note that will be attached to your invoice
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput!
+
+  """
+  The list of attachments for this expense. Total amount will be computed from them.
+  """
+  attachments: [ExpenseAttachmentCreateInput]!
+
+  """
+  Account to reimburse
+  """
+  payee: AccountReferenceInput!
+}
+
+"""
+Fields for an expense attachment
+"""
+type ExpensePermissions {
+  """
+  Whether the current user can edit the expense
+  """
+  canEdit: Boolean!
+
+  """
+  Whether the current user can edit the expense
+  """
+  canDelete: Boolean!
+
+  """
+  Whether the current user can the the invoice info for this expense
+  """
+  canSeeInvoiceInfo: Boolean!
+}
+
+input ExpenseReferenceInput {
+  """
+  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the expense (ie: 580)
+  """
+  legacyId: Int
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseType {
+  """
+  Invoice: Get paid back for a purchase already made.
+  """
+  INVOICE
+
+  """
+  Receipt: Charge for your time or get paid in advance
+  """
+  RECEIPT
+
+  """
+  Unclassified expense
+  """
+  UNCLASSIFIED
 }
 
 enum ImageFormat {
@@ -599,6 +891,7 @@ type Individual implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -621,7 +914,7 @@ type Individual implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -629,7 +922,7 @@ type Individual implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -646,6 +939,19 @@ type Individual implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
+  location: Location
   firstName: String
   lastName: String
   email: String
@@ -656,6 +962,36 @@ type Individual implements Account {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+Type for Geographic location
+"""
+type Location {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+}
 
 """
 This represents a Member relationship (ie: Organization backing a Collective)
@@ -729,9 +1065,9 @@ enum MemberRole {
 This is the root mutation
 """
 type Mutation {
-  editComment(comment: CommentEdit!): Comment
+  editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
-  createComment(comment: CommentCreate!): Comment
+  createComment(comment: CommentCreateInput!): Comment
 
   """
   Create a conversation
@@ -788,6 +1124,37 @@ type Mutation {
     """
     isActive: Boolean = true
   ): Boolean
+  createCollective(
+    """
+    Information about the collective to create (name, slug, description, tags, ...)
+    """
+    collective: CollectiveCreateInput!
+
+    """
+    Reference to the host to apply on creation.
+    """
+    host: AccountReferenceInput
+
+    """
+    Wether to trigger the automated approval for Open Source collectives with GitHub.
+    """
+    automateApprovalWithGithub: Boolean = false
+  ): Collective
+
+  """
+  Submit an expense to a collective
+  """
+  createExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseCreateInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+  ): Expense
 }
 
 """
@@ -860,6 +1227,7 @@ type Organization implements Account {
   type: AccountType
   name: String
   description: String
+  tags: [String]
   website: String
   twitterHandle: String
   githubHandle: String
@@ -882,7 +1250,7 @@ type Organization implements Account {
     type: TransactionType
     limit: Int = 100
     offset: Int = 0
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): TransactionCollection
   orders(
     limit: Int = 100
@@ -890,7 +1258,7 @@ type Organization implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
-    orderBy: ChronologicalOrder = { field: CREATED_AT, direction: DESC }
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
   settings: JSON
   conversations(
@@ -907,7 +1275,64 @@ type Organization implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of
+    - Hosts can see the address of organizations submitting expenses to their collectives
+  """
+  location: Location
   email: String
+}
+
+"""
+A payout method
+"""
+type PayoutMethod {
+  """
+  Unique identifier for this payout method
+  """
+  id: String!
+
+  """
+  The type of this payout method (usually the payment provider)
+  """
+  type: PayoutMethodType
+
+  """
+  A friendly name for users to easily find their payout methods
+  """
+  name: String
+
+  """
+  Whether this payout method has been saved to be used for future payouts
+  """
+  isSaved: Boolean
+
+  """
+  The actual data for this payout method. Content depends on the type.
+  """
+  data: JSON
+}
+
+input PayoutMethodInput {
+  id: String
+  data: JSON
+  name: String
+  isSaved: Boolean
+  type: PayoutMethodType
+}
+
+enum PayoutMethodType {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
 }
 
 """
@@ -966,7 +1391,12 @@ type Query {
     """
     Public expense identifier
     """
-    id: String!
+    id: String
+
+    """
+    Identifiers to retrieve the expense.
+    """
+    expense: ExpenseReferenceInput
   ): Expense
   loggedInAccount: Account
 }
@@ -1039,4 +1469,327 @@ All transaction types
 enum TransactionType {
   DEBIT
   CREDIT
+}
+
+"""
+TransferWise related properties for bank transfer.
+"""
+type TransferWise {
+  requiredFields(
+    """
+    The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
+    """
+    currency: TransferWiseCurrency!
+  ): [TransferWiseRequiredField]
+  availableCurrencies: [TransferWiseCurrency]
+}
+
+"""
+All currencies supported by TransferWise
+"""
+enum TransferWiseCurrency {
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Indian Rupee
+  """
+  INR
+
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  UAE Dirham
+  """
+  AED
+
+  """
+  Argentine Peso
+  """
+  ARS
+
+  """
+  Australian Dollar
+  """
+  AUD
+
+  """
+  Taka
+  """
+  BDT
+
+  """
+  Bulgarian Lev
+  """
+  BGN
+
+  """
+  Brazilian Real
+  """
+  BRL
+
+  """
+  Pula
+  """
+  BWP
+
+  """
+  Canadian Dollar
+  """
+  CAD
+
+  """
+  Swiss Franc
+  """
+  CHF
+
+  """
+  Chilean Peso
+  """
+  CLP
+
+  """
+  Yuan Renminbi
+  """
+  CNY
+
+  """
+  Costa Rican Colon
+  """
+  CRC
+
+  """
+  Czech Koruna
+  """
+  CZK
+
+  """
+  Danish Krone
+  """
+  DKK
+
+  """
+  Egyptian Pound
+  """
+  EGP
+
+  """
+  Lari
+  """
+  GEL
+
+  """
+  Ghana Cedi
+  """
+  GHS
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Forint
+  """
+  HUF
+
+  """
+  Rupiah
+  """
+  IDR
+
+  """
+  New Israeli Sheqel
+  """
+  ILS
+
+  """
+  Yen
+  """
+  JPY
+
+  """
+  Kenyan Shilling
+  """
+  KES
+
+  """
+  Won
+  """
+  KRW
+
+  """
+  Sri Lanka Rupee
+  """
+  LKR
+
+  """
+  Moroccan Dirham
+  """
+  MAD
+
+  """
+  Mexican Peso
+  """
+  MXN
+
+  """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Norwegian Krone
+  """
+  NOK
+
+  """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
+  New Zealand Dollar
+  """
+  NZD
+
+  """
+  Nuevo Sol
+  """
+  PEN
+
+  """
+  Philippine Peso
+  """
+  PHP
+
+  """
+  Pakistan Rupee
+  """
+  PKR
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Russian Ruble
+  """
+  RUB
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  Singapore Dollar
+  """
+  SGD
+
+  """
+  Baht
+  """
+  THB
+
+  """
+  Turkish Lira
+  """
+  TRY
+
+  """
+  Tanzanian Shilling
+  """
+  TZS
+
+  """
+  Hryvnia
+  """
+  UAH
+
+  """
+  Uganda Shilling
+  """
+  UGX
+
+  """
+  Peso Uruguayo
+  """
+  UYU
+
+  """
+  Dong
+  """
+  VND
+
+  """
+  CFA Franc BCEAO
+  """
+  XOF
+
+  """
+  Rand
+  """
+  ZAR
+
+  """
+  Zambian Kwacha
+  """
+  ZMW
+}
+
+type TransferWiseField {
+  name: String
+  group: [TransferWiseFieldGroup]
+}
+
+type TransferWiseFieldGroup {
+  key: String
+  name: String
+  type: String
+  required: Boolean
+  displayFormat: String
+  example: String
+  minLength: Int
+  maxLength: Int
+  validationRegexp: String
+  validationAsync: String
+  valuesAllowed: [TransferWiseFieldVatvkluesAllowed]
+}
+
+type TransferWiseFieldVatvkluesAllowed {
+  key: String
+  name: String
+}
+
+type TransferWiseRequiredField {
+  type: String
+  title: String
+  fields: [TransferWiseField]
 }

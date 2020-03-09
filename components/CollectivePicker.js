@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
-import { groupBy, sortBy, last } from 'lodash';
+import { groupBy, sortBy, last, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { Flex } from '@rebass/grid';
 
@@ -45,7 +45,7 @@ const DefaultCollectiveLabel = ({ value: collective }) => (
     <Avatar collective={collective} radius={28} />
     <Flex flexDirection="column" ml={2}>
       <Span fontSize="Caption" lineHeight={1.2} color="black.700">
-        {collective.name}
+        {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="Caption" lineHeight={1.2} color="black.500">
         @{collective.slug}
@@ -259,7 +259,7 @@ CollectivePicker.propTypes = {
   /** The list of collectives to display */
   collectives: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       type: PropTypes.string,
       name: PropTypes.string,
     }),

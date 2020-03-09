@@ -220,8 +220,8 @@ class StepPayment extends React.Component {
           paymentMethod: { type: 'manual' },
           icon: getPaymentMethodIcon({ type: 'manual' }, collective),
           data: this.props.manual,
-          disabled: Boolean(this.props.manual.disabledMessage),
-          subtitle: this.props.manual.disabledMessage,
+          disabled: this.props.manual.disabled,
+          subtitle: this.props.manual.subtitle,
         });
       }
     }
@@ -364,7 +364,8 @@ StepPayment.propTypes = {
   manual: PropTypes.shape({
     title: PropTypes.string,
     instructions: PropTypes.string,
-    disabledMessage: PropTypes.string,
+    disabled: PropTypes.bool,
+    subtitle: PropTypes.string,
   }),
   /** Default value */
   defaultValue: PropTypes.object,

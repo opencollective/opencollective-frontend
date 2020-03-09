@@ -43,7 +43,7 @@ const deleteCommentMutation = gqlV2`
 `;
 
 const editCommentMutation = gqlV2`
-  mutation editComment($comment: CommentEdit!) {
+  mutation editComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       ...CommentFields
     }
@@ -84,7 +84,9 @@ const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, o
           onClose={() => setDeleting(false)}
           continueHandler={async () => {
             await deleteComment({ variables: { id: comment.id } });
-            await onDelete(comment);
+            if (onDelete) {
+              await onDelete(comment);
+            }
           }}
           header={
             isConversationRoot ? (
