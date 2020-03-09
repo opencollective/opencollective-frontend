@@ -20,10 +20,10 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   EXPENSES: 'expenses',
   EXPORT: 'export',
   HOST: 'host',
-  IMAGES: 'images',
   MEMBERS: 'members',
   PAYMENT_METHODS: 'payment-methods',
   TIERS: 'tiers',
+  TICKETS: 'tickets',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced', // Last on purpose
@@ -65,10 +65,6 @@ const SECTION_LABELS = defineMessages({
     id: 'Host Plan',
     defaultMessage: 'Host Plan',
   },
-  [EDIT_COLLECTIVE_SECTIONS.IMAGES]: {
-    id: 'editCollective.menu.images',
-    defaultMessage: 'Images',
-  },
   [EDIT_COLLECTIVE_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
     defaultMessage: 'Info',
@@ -96,6 +92,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: {
     id: 'editCollective.menu.webhooks',
     defaultMessage: 'Webhooks',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: {
+    id: 'editCollective.menu.tickets',
+    defaultMessage: 'Tickets',
   },
 });
 
@@ -128,13 +128,18 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.IMAGES]: isType(CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
+  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: isOneOfTypes(
+    CollectiveType.COLLECTIVE,
+    CollectiveType.ORGANIZATION,
+    CollectiveType.USER,
+  ),
+  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: isOneOfTypes(
     CollectiveType.COLLECTIVE,
     CollectiveType.ORGANIZATION,
     CollectiveType.USER,

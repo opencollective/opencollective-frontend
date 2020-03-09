@@ -76,7 +76,6 @@ class EditCollectiveForm extends React.Component {
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditImages = collective.type === CollectiveType.EVENT;
     this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
@@ -389,6 +388,18 @@ class EditCollectiveForm extends React.Component {
           defaultType={this.defaultTierType}
         />
       );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
+      return (
+        <EditTiers
+          title="Tickets"
+          types={['TICKET']}
+          tiers={this.state.tiers}
+          collective={collective}
+          currency={collective.currency}
+          onChange={this.handleObjectChange}
+          defaultType={this.defaultTierType}
+        />
+      );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS) {
       return <EditGoals collective={collective} currency={collective.currency} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST) {
@@ -643,22 +654,6 @@ class EditCollectiveForm extends React.Component {
           when: () => get(this.state.collective, 'isHost'),
         },
       ],
-      images: [
-        {
-          name: 'image',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images',
-        },
-        {
-          name: 'backgroundImage',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images',
-        },
-      ],
       expenses: [
         {
           name: 'expensePolicy',
@@ -808,9 +803,9 @@ class EditCollectiveForm extends React.Component {
             {[
               EDIT_COLLECTIVE_SECTIONS.ADVANCED,
               EDIT_COLLECTIVE_SECTIONS.EXPENSES,
-              EDIT_COLLECTIVE_SECTIONS.IMAGES,
               EDIT_COLLECTIVE_SECTIONS.INFO,
               EDIT_COLLECTIVE_SECTIONS.TIERS,
+              EDIT_COLLECTIVE_SECTIONS.TICKETS,
             ].includes(this.state.section) && (
               <div className="actions">
                 <Button
