@@ -9,10 +9,10 @@ echo "> Copying lang"
 cp -R $SRC/lang $DIST
 
 echo "> Copying static"
-shx mkdir -p $DIST/static
-cp -R $SRC/static/fonts $DIST/static
-cp -R $SRC/static/icons $DIST/static
-cp -R $SRC/static/images $DIST/static
-cp -R $SRC/static/styles $DIST/static
-cp -R $SRC/static/scripts $DIST/static
-cp -R $SRC/static/.well-known $DIST/static
+shx mkdir -p $DIST/public/static
+cp -R $SRC/public/.well-known $DIST/static
+cp -R $SRC/public/static/fonts $DIST/public/static
+cp -R $SRC/public/static/icons $DIST/public/static
+cp -R $SRC/public/static/images $DIST/public/static
+cp -R $SRC/public/static/styles $DIST/public/static
+cp -R $SRC/public/static/scripts $DIST/public/static

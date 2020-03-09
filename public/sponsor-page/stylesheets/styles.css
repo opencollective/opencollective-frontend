@@ -221,13 +221,13 @@ input[type='search']::-webkit-search-cancel-button {
   -webkit-appearance: none;
   height: 32px;
   width: 32px;
-  background: url('../img/spinner.gif') center center no-repeat;
+  background: url('../images/spinner.gif') center center no-repeat;
 }
 .banner {
   margin-top: 0;
   width: 100%;
   height: 648px;
-  background-image: url('../img/background.svg');
+  background-image: url('../images/background.svg');
   background-position: center bottom;
   background-repeat: no-repeat;
   position: relative;
@@ -477,7 +477,7 @@ input[type='search']::-webkit-search-cancel-button {
 .sponsors__sustainers__links ul li {
   padding: 8px 0px;
   list-style-type: none;
-  background: url('../img/bullet.svg') left 17px no-repeat;
+  background: url('../images/bullet.svg') left 17px no-repeat;
   padding-left: 20px;
 }
 .sponsors__sustainers__links ul li a {
@@ -493,7 +493,7 @@ input[type='search']::-webkit-search-cancel-button {
   color: #145ecc;
 }
 .sponsors__join {
-  background-image: url('../img/pre-footer-background.svg');
+  background-image: url('../images/pre-footer-background.svg');
   background-position: center top;
   background-repeat: no-repeat;
   min-height: 528px;

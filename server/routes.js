@@ -50,15 +50,12 @@ module.exports = (server, app) => {
   });
 
   // Support older assets from website
-  server.use('/public/images', express.static(path.join(__dirname, '../static/images')));
-  server.use('/.well-known', express.static(path.join(__dirname, '../static/.well-known')));
+  server.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 
   server.get('/static/*', maxAge(7200));
 
-  // Security policy, following the standard from https://securitytxt.org/
-
   server.get('/favicon.*', maxAge(300000), (req, res) => {
-    return res.sendFile(path.join(__dirname, '../static/images/favicon.ico.png'));
+    return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
   });
 
   // NOTE: in production and staging environment, this is currently not used
