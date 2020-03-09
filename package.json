@@ -35,7 +35,7 @@
     "apollo-link-error": "1.1.12",
     "apollo-link-http": "1.5.16",
     "bootstrap": "3.4.1",
-    "canvas-confetti": "1.1.1",
+    "canvas-confetti": "1.1.2",
     "classnames": "2.2.6",
     "cloudflare-ip": "0.0.7",
     "cookie-parser": "1.4.4",
