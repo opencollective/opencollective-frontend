@@ -39,7 +39,7 @@ class OnboardingContentBox extends React.Component {
     const { admins } = this.state;
 
     return (
-      <Container minWidth={[500]}>
+      <Container minWidth={[300, 500]}>
         {step === 0 && (
           <Fragment>
             <H1
@@ -48,13 +48,11 @@ class OnboardingContentBox extends React.Component {
               fontWeight="bold"
               color="black.900"
               textAlign="center"
-              mb={4}
+              mb={[2, 4]}
+              mx={[2, null]}
             >
-              The {collective.name} Collective has been created!
+              The {collective.name} Collective has been created! 🎉
             </H1>
-            <P fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} textAlign="center">
-              🎉
-            </P>
           </Fragment>
         )}
         {step === 1 && (

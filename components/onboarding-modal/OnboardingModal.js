@@ -4,12 +4,12 @@ import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { pick } from 'lodash';
 
 import StyledHr from '../../components/StyledHr';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
 import OnboardingContentBox from './OnboardingContentBox';
+import MessageBox from '../../components/MessageBox';
 
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
@@ -56,6 +56,7 @@ class OnboardingModal extends React.Component {
     this.state = {
       step: 0,
       members: [],
+      error: null,
     };
   }
 
@@ -94,7 +95,7 @@ class OnboardingModal extends React.Component {
 
   submitAdmins = async () => {
     try {
-      this.setState({ isSubmitting: true, error: null });
+      this.setState({ isSubmitting: true });
       await this.props.EditCollectiveMembers({
         collectiveId: this.props.collective.id,
         members: this.state.members.map(member => ({
@@ -117,7 +118,7 @@ class OnboardingModal extends React.Component {
       id: this.props.collective.id,
     };
     try {
-      this.setState({ isSubmitting: true, error: null });
+      this.setState({ isSubmitting: true });
       await this.props.EditCollectiveContact({
         collective,
       });
@@ -134,10 +135,10 @@ class OnboardingModal extends React.Component {
 
   render() {
     const { collective, LoggedInUser } = this.props;
-    const { step, isSubmitting } = this.state;
+    const { step, isSubmitting, error } = this.state;
 
     return (
-      <Flex flexDirection="column" alignItems="center" py={[4]}>
+      <Flex flexDirection="column" alignItems="center" py={[0, 4]}>
         <StepsProgressBox mb={[3, null, 4]} width={0.8}>
           <OnboardingStepsProgress step={step} handleStep={step => this.setState({ step })} slug={collective.slug} />
         </StepsProgressBox>
@@ -149,6 +150,11 @@ class OnboardingModal extends React.Component {
           addAdmins={this.addAdmins}
           addContact={this.addContact}
         />
+        {error && (
+          <MessageBox type="error" withIcon mt={2}>
+            {error.replace('GraphQL error: ', 'Error: ')}
+          </MessageBox>
+        )}
         <StyledHr my={4} borderColor="black.300" width="100%" />
         <OnboardingNavButtons
           step={step}
