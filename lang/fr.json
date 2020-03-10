@@ -1100,7 +1100,7 @@
   "pricing.back.btn": "Retour",
   "pricing.fiscalHost.applyOpenSource": "Si vous êtes un projet open source, vous pouvez demander à rejoindre le Collectif Open Source.",
   "pricing.fiscalHost.description": "Un Hôte Fiscal est une organisation <strong>qui fournit le service de gérer vos fonds</strong>. Ils gardent votre argent dans leurs comptes bancaires et <strong>s'occupent de la comptabilité, des taxes, de l'administration et des paiements</strong> pour que vous n'ayez pas à le faire!",
-  "pricing.fiscalHost.featured": "Voici quelques-uns de nos hôtes les plus populaires ou <a href='/hosts'>parcourez les tous</a>.",
+  "pricing.fiscalHost.featured": "Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>.",
   "pricing.fiscalHost.learnMore": "Apprenez-en davantage sur la façon de devenir un Hôte Fiscal.",
   "pricing.fiscalHost.more": "Voir plus d'hôtes fiscaux",
   "pricing.fiscalHost.reasonToJoin": "Si vous rejoignez un Hôte Fiscal, <strong>vous n'avez pas besoin d'un forfait Open Collective payant</strong> car votre Collectif est déjà inclus. Chaque Hôte Fiscal établit ses propres frais et critères d'acceptation pour les Collectifs. Open Collective conserve 5% des dons que vous avez collectés par carte de crédit (Stripe). Toutes les autres méthodes de paiement telles que PayPal et les virements bancaires sont inclus dans le forfait de votre hôte.",
