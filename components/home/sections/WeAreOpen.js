@@ -84,7 +84,7 @@ const messsages = defineMessages({
 const openFeatures = [
   {
     id: 'openData',
-    url: 'https://docs.opencollective.com/help/collectives/data-export',
+    url: 'https://docs.opencollective.com/help/product/privacy-policy#your-choices',
   },
   {
     id: 'openSource',

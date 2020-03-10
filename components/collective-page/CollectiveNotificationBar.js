@@ -73,11 +73,13 @@ const getNotification = (intl, status, collective, host) => {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
       description: intl.formatMessage(messages.collectiveArchivedDescription),
+      status: 'collectiveArchived',
     };
   } else if (!collective.isApproved && collective.host) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
+      status: 'collectivePending',
     };
   }
 };
@@ -89,7 +91,7 @@ const CollectiveNotificationBar = ({ intl, status, collective, host }) => {
   const notification = getNotification(intl, status, collective, host);
 
   return !notification ? null : (
-    <NotificationBar status={status} title={notification.title} description={notification.description} />
+    <NotificationBar status={notification.status} title={notification.title} description={notification.description} />
   );
 };
 

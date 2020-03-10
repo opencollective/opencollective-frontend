@@ -5,7 +5,7 @@ import React from 'react';
 import { useMutation } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import imgInvoiceTitlePreview from '../../static/images/invoice-title-preview.jpg';
+import imgInvoiceTitlePreview from '../../public/static/images/invoice-title-preview.jpg';
 
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import Container from '../Container';

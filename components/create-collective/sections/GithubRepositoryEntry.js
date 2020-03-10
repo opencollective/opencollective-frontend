@@ -25,22 +25,27 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
           <Span mr={3} color="black.300">
             <Github size={[40]} />
           </Span>
-          <span>
+          <Flex flexDirection="column">
             <P fontWeight={500} fontSize="1.4rem">
               {value.full_name}
             </P>
-          </span>
+            <Flex>
+              <P textTransform="uppercase" color="black.400" fontSize="1rem">
+                {repositoryTypeName}
+              </P>
+              <Box display={['block', null, 'none']} ml={3}>
+                <P fontWeight={300} fontSize="1.2rem">
+                  {value.stargazers_count} <Star size={12} />
+                </P>
+              </Box>
+            </Flex>
+          </Flex>
         </Flex>
-        <Flex>
-          <P textTransform="uppercase" color="black.400" fontSize="1rem">
-            {repositoryTypeName}
+        <Box display={['none', null, 'block']}>
+          <P fontWeight={300} fontSize="1.2rem">
+            {value.stargazers_count} <Star size={12} />
           </P>
-          <Box>
-            <P fontWeight={300} fontSize="1.2rem">
-              {value.stargazers_count} <Star size={12} />
-            </P>
-          </Box>
-        </Flex>
+        </Box>
       </Container>
       <Container width={1} mx={3} my={2} px={2}>
         {value.description && (

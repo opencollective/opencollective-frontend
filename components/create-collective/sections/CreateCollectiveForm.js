@@ -24,6 +24,15 @@ const BackButton = styled(StyledButton)`
   font-size: ${themeGet('fontSizes.Paragraph')}px;
 `;
 
+const ContainerWithImage = styled(Container)`
+  @media screen and (min-width: 40em) {
+    background: url('/static/images/create-collective/formIllustration.png');
+    background-repeat: no-repeat;
+    background-size: 40%;
+    background-position: right bottom;
+  }
+`;
+
 const placeholders = {
   name: 'Agora Collective',
   slug: 'agora',
@@ -94,6 +103,15 @@ class CreateCollectiveForm extends React.Component {
     });
   }
 
+  componentDidMount() {
+    const { category, step, hostTos } = this.props.query;
+    // first condition is if they are coming from Github stars, second is if they are coming from request manual verification
+    if ((category === 'opensource' && step === 'form') || hostTos) {
+      this.setState({ hostTosChecked: true });
+      this.handleChange('hostTos', true);
+    }
+  }
+
   handleChange(fieldname, value) {
     this.setState(state => ({
       collective: {
@@ -110,7 +128,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, host, loading, github } = this.props;
+    const { intl, error, host, loading, github, query } = this.props;
 
     const initialValues = {
       name: github ? this.githubRepoHelper(github.repo) : '',
@@ -149,7 +167,7 @@ class CreateCollectiveForm extends React.Component {
 
     return (
       <Flex flexDirection="column" m={[3, 0]}>
-        {host && <CreateCollectiveCover host={host} />}
+        {host && query.hostCollectiveSlug !== 'opensource' && <CreateCollectiveCover host={host} />}
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
@@ -181,7 +199,7 @@ class CreateCollectiveForm extends React.Component {
           </Flex>
         )}
         <Flex alignItems="center" justifyContent="center">
-          <Container
+          <ContainerWithImage
             mb={[1, 5]}
             width={[320, 512, 576]}
             border={['none', '1px solid #E6E8EB']}
@@ -201,7 +219,8 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.nameLabel)}
                       value={values.name}
                       required
-                      my={4}
+                      mt={4}
+                      mb={3}
                     >
                       {inputProps => <Field as={StyledInput} {...inputProps} placeholder={placeholders.name} />}
                     </StyledInputField>
@@ -212,7 +231,7 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.slugLabel)}
                       value={values.slug}
                       required
-                      my={4}
+                      my={3}
                     >
                       {inputProps => (
                         <Field
@@ -230,7 +249,8 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.descriptionLabel)}
                       value={values.description}
                       required
-                      my={4}
+                      mt={3}
+                      mb={4}
                     >
                       {inputProps => (
                         <Field
@@ -241,7 +261,7 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
 
-                    <Box mx={1} my={4}>
+                    <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox
                         name="tos"
                         label={
@@ -264,8 +284,9 @@ class CreateCollectiveForm extends React.Component {
                           this.setState({ tosChecked: checked });
                         }}
                       />
-                      {get(host, 'settings.tos') && (
+                      {!query.hostTos && get(host, 'settings.tos') && (
                         <StyledCheckbox
+                          alignItems="flex-start"
                           name="hostTos"
                           label={
                             <FormattedMessage
@@ -288,13 +309,13 @@ class CreateCollectiveForm extends React.Component {
                           }}
                         />
                       )}
-                    </Box>
+                    </Flex>
 
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton
                         fontSize="13px"
-                        height="36px"
                         width="148px"
+                        minHeight="36px"
                         buttonStyle="primary"
                         type="submit"
                         loading={loading}
@@ -310,12 +331,12 @@ class CreateCollectiveForm extends React.Component {
             <Flex justifyContent="center" mb={4} display={['flex', 'none']}>
               <Illustration
                 display={['block', 'none']}
-                src="/static/images/createcollective-mobile-form.png"
+                src="/static/images/create-collective/mobileForm.png"
                 width="320px"
                 height="200px"
               />
             </Flex>
-          </Container>
+          </ContainerWithImage>
         </Flex>
       </Flex>
     );

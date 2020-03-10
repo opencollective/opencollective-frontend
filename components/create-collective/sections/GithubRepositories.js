@@ -96,7 +96,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
                         disabled: false,
                         repoInfo: {
                           type,
-                          handle: `{value.owner.login}/{value.name}`,
+                          handle: `${value.owner.login}/${value.name}`,
                           repo: value.name,
                         },
                       }));
@@ -122,7 +122,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
         <StyledButton
           textAlign="center"
           buttonSize="small"
-          height="36px"
+          minHeight="36px"
           maxWidth="97px"
           buttonStyle="primary"
           disabled={state.disabled}

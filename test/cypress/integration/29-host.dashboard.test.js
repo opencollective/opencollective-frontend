@@ -3,7 +3,7 @@ describe('host dashboard', () => {
     cy.signup({ redirect: '/brusselstogetherasbl' });
   });
 
-  it('mark pending application approved', () => {
+  it.skip('mark pending application approved', () => {
     cy.wait(2000);
     cy.contains('[data-cy="host-apply-btn"]', 'Apply').click({ force: true });
     cy.wait(1000);

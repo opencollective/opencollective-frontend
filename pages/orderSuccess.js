@@ -11,7 +11,7 @@ import confetti from 'canvas-confetti';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 
-import orderSuccessBackgroundUrl from '../static/images/order-success-background.svg';
+import orderSuccessBackgroundUrl from '../public/static/images/order-success-background.svg';
 
 import { tweetURL, facebooKShareURL } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';
