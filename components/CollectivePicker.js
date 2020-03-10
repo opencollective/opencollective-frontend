@@ -34,6 +34,10 @@ const Messages = defineMessages({
     id: 'CollectivePicker.CreateNew',
     defaultMessage: 'Create new',
   },
+  inviteNew: {
+    id: 'CollectivePicker.InviteNew',
+    defaultMessage: 'Invite new',
+  },
 });
 
 /**
@@ -119,7 +123,7 @@ class CollectivePicker extends React.PureComponent {
     });
   });
 
-  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives, creatable, intl) => {
+  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives, creatable, intl, types) => {
     let options = collectivesOptions;
 
     if (createdCollectives.length > 0) {
@@ -134,7 +138,9 @@ class CollectivePicker extends React.PureComponent {
       options = [
         ...options,
         {
-          label: intl.formatMessage(Messages.createNew).toUpperCase(),
+          label: this.props.types.includes('USER')
+            ? intl.formatMessage(Messages.inviteNew).toUpperCase()
+            : intl.formatMessage(Messages.createNew).toUpperCase(),
           options: [
             {
               label: null,

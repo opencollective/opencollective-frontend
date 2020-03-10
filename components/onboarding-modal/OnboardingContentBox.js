@@ -96,6 +96,7 @@ class OnboardingContentBox extends React.Component {
 
             <Flex my={2} px={3} flexDirection="column">
               <CollectivePickerAsync
+                creatable
                 types={['USER']}
                 onChange={option => {
                   // only assign admins if they are not in the list already
