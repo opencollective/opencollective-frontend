@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Mar 05 2020 16:53:10 GMT+0100 (GMT+01:00)
+# timestamp: Tue Mar 10 2020 17:12:00 GMT+0100 (West Africa Standard Time)
 
 """
 Application model
@@ -1901,6 +1901,21 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
+
+  """
+  Endpoint to accept or reject an invitation to become a member
+  """
+  replyToMemberInvitation(
+    """
+    The ID of the invitation to accept or decline
+    """
+    invitationId: Int!
+
+    """
+    Wether this invitation should be accepted or declined
+    """
+    accept: Boolean!
+  ): Boolean
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """
@@ -2831,6 +2846,11 @@ type Query {
     limit: Int
     offset: Int
   ): [Member]
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(CollectiveId: Int, MemberCollectiveId: Int): [MemberInvitation]
   allEvents(
     """
     Slug of the parent collective

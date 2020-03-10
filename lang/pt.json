@@ -310,6 +310,7 @@
   "contribute.nextStep": "Próximo passo",
   "contribute.noPaymentMethod": "O saldo deste coletivo é muito baixo para fazer ordens com ele. Adicione fundos a {collectiveName} ao fazer uma doação primeiro.",
   "contribute.payment.label": "Escolha um método de pagamento:",
+  "contribute.paymentMethodExpired": "Expired",
   "contribute.prevStep": "Passo anterior",
   "contribute.profile.label": "Contribua como:",
   "contribute.publicMessage": "Deixe uma mensagem pública (Opcional)",

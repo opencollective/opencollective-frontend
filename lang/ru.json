@@ -310,6 +310,7 @@
   "contribute.nextStep": "Следующий шаг",
   "contribute.noPaymentMethod": "Баланс этого коллектива слишком мал, чтобы сделать заказы от него. Пополните счет {collectiveName}, сделав пожертвование первым/первой.",
   "contribute.payment.label": "Выберите метод оплаты:",
+  "contribute.paymentMethodExpired": "Expired",
   "contribute.prevStep": "Предыдущий шаг",
   "contribute.profile.label": "Сделать вклад как:",
   "contribute.publicMessage": "Оставьте публичное сообщение (Не обязательно)",

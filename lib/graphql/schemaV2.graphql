@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Mar 05 2020 16:53:37 GMT+0100 (GMT+01:00)
+# timestamp: Tue Mar 10 2020 17:12:39 GMT+0100 (West Africa Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)

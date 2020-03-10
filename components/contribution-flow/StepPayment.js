@@ -337,12 +337,9 @@ class StepPayment extends React.Component {
                     </P>
                     {isExpired && (
                       <StyledTag display="inline">
-                        <FormattedMessage
-                          id="contribute.paymentMethodExpired"
-                          defaultMessage="Expired"
-                        />
+                        <FormattedMessage id="contribute.paymentMethodExpired" defaultMessage="Expired" />
                       </StyledTag>
-                  )}
+                    )}
                   </div>
                   {subtitle && (
                     <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
