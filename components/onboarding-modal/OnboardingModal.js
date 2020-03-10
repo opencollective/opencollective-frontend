@@ -45,7 +45,7 @@ class OnboardingModal extends React.Component {
     query: PropTypes.object,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    //refetchLoggedInUser: PropTypes.func,
+    // refetchLoggedInUser: PropTypes.func,
     EditCollectiveMembers: PropTypes.func,
     EditCollectiveContact: PropTypes.func,
   };
@@ -106,10 +106,7 @@ class OnboardingModal extends React.Component {
           },
         })),
       });
-      //await this.props.refetchLoggedInUser();
-      //Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'members' });
     } catch (e) {
-      console.log(e);
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
     }
   };
