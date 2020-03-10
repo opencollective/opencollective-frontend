@@ -142,9 +142,7 @@ class CreateCollective extends Component {
   render() {
     const { LoggedInUser, query, intl, host } = this.props;
     const { category, error } = this.state;
-    const { token } = query;
-
-    const form = get(query, 'step') === 'form';
+    const { step, token } = query;
 
     if (host && !host.canApply) {
       return (
@@ -192,7 +190,7 @@ class CreateCollective extends Component {
       return <CollectiveCategoryPicker query={query} onChange={this.handleChange} />;
     }
 
-    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && !form) {
+    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
       return <ConnectGithub token={token} query={query} onChange={this.handleChange} />;
     }
 
