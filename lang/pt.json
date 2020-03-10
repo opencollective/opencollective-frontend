@@ -1100,7 +1100,7 @@
   "pricing.back.btn": "Voltar",
   "pricing.fiscalHost.applyOpenSource": "Se você é um projeto de código aberto, você pode se inscrever para fazer parte do Open Source Collective.",
   "pricing.fiscalHost.description": "Um Anfitrião Fiscal é uma <strong>organização que oferece como serviço a retenção de fundos</strong>. Eles mantêm o seu dinheiro na sua conta bancária e <strong>tratam de coisas como contabilidade, impostos, administração, pagamentos e responsabilidade</strong> - para que você não tenha de o fazer!",
-  "pricing.fiscalHost.featured": "Abaixo estão alguns dos nossos anfitriões mais populares ou <a href='/hosts'>navegar por todos eles</a>.",
+  "pricing.fiscalHost.featured": "Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>.",
   "pricing.fiscalHost.learnMore": "Saiba mais sobre como se tornar um Host Fiscal.",
   "pricing.fiscalHost.more": "Ver mais anfitriões fiscais",
   "pricing.fiscalHost.reasonToJoin": "Se você se juntar a um Host Fiscal, <strong> você não precisa ir em um Open Collective pago plano</strong>, pois o seu Colectivo já está incluído. Cada Host Fiscal estabelece suas próprias taxas e critérios de aceitação para os Colectivos. O Open Collective mantém 5% das doações que você angariar através de pagamentos com cartão de crédito (Stripe). Todos os outros métodos de pagamento como PayPal e transferências bancárias estão incluídos no plano do seu Anfitrião.",
