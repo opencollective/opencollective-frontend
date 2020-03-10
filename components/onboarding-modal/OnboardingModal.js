@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { pick } from 'lodash';
 
 import StyledHr from '../../components/StyledHr';
 import OnboardingNavButtons from './OnboardingNavButtons';
@@ -46,6 +47,7 @@ class OnboardingModal extends React.Component {
     LoggedInUser: PropTypes.object,
     //refetchLoggedInUser: PropTypes.func,
     EditCollectiveMembers: PropTypes.func,
+    EditCollectiveContact: PropTypes.func,
   };
 
   constructor(props) {
@@ -77,6 +79,19 @@ class OnboardingModal extends React.Component {
     }
   };
 
+  addAdmins = members => {
+    this.setState({ members });
+  };
+
+  addContact = (name, value) => {
+    this.setState(state => ({
+      collective: {
+        ...state.collective,
+        [name]: value,
+      },
+    }));
+  };
+
   submitAdmins = async () => {
     try {
       this.setState({ isSubmitting: true, error: null });
@@ -92,20 +107,50 @@ class OnboardingModal extends React.Component {
         })),
       });
       //await this.props.refetchLoggedInUser();
-      Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'members' });
+      //Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'members' });
     } catch (e) {
       console.log(e);
       this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
     }
   };
 
-  addAdmins = members => {
-    this.setState({ members });
-  };
+  // submitContact = async () => {
+  //   try {
+  //     this.setState({ isSubmitting: true, error: null });
+  //     await this.props.EditCollectiveContact({
+  //       collective:
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //     this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
+  //   }
+  // };
+
+  // async editCollective(CollectiveInputType) {
+  //   console.log('COLLECTIVE INPUT TYPE', CollectiveInputType);
+  //   CollectiveInputType = this.validate(CollectiveInputType);
+  //   if (!CollectiveInputType) {
+  //     return false;
+  //   }
+
+  //   this.setState({ status: 'loading' });
+  //   try {
+  //     await this.props.editCollective(CollectiveInputType);
+  //     this.setState({ status: 'saved', result: { error: null } });
+  //     setTimeout(() => {
+  //       this.setState({ status: null });
+  //     }, 3000);
+  //   } catch (err) {
+  //     const errorMsg = getErrorFromGraphqlException(err).message;
+  //     this.setState({ status: null, result: { error: errorMsg } });
+  //   }
+  // }
 
   render() {
     const { collective, LoggedInUser } = this.props;
     const { step, isSubmitting } = this.state;
+
+    console.log(this.state);
 
     return (
       <Flex flexDirection="column" alignItems="center" py={[4]}>
@@ -118,6 +163,7 @@ class OnboardingModal extends React.Component {
           collective={collective}
           LoggedInUser={LoggedInUser}
           addAdmins={this.addAdmins}
+          addContact={this.addContact}
         />
         <StyledHr my={4} borderColor="black.300" width="100%" />
         <OnboardingNavButtons
@@ -131,6 +177,7 @@ class OnboardingModal extends React.Component {
   }
 }
 
+// GraphQL for editing Collective admins info
 const MemberFieldsFragment = gql`
   fragment MemberFieldsFragment on Member {
     id
@@ -168,4 +215,37 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {
   }),
 });
 
-export default addEditCoreContributorsMutation(OnboardingModal);
+// GraphQL for editing Collective contact info
+// const getCollectiveContactFieldsFragment = gql`
+//   fragment getCollectiveContactFieldsFragment on Collective {
+
+//   }
+// `;
+
+const editCollectiveContactQuery = gql`
+  mutation EditCollectiveContact($collective: CollectiveInputType!) {
+    editCollective(collective: $collective) {
+      id
+      website
+      twitterHandle
+      githubHandle
+    }
+  }
+`;
+
+const addEditCollectiveContactMutation = graphql(editCollectiveContactQuery, {
+  props: ({ mutate }) => ({
+    EditCollectiveContact: async ({ collective }) => {
+      // const CollectiveInputType = pick(collective, ['id', 'website', 'twitterHandle', 'githubHandle']);
+
+      return await mutate({
+        // variables: { collective: CollectiveInputType },
+        variables: { collective },
+        awaitRefetchQueries: true,
+        refetchQueries: [{ query: getLoggedInUserQuery }],
+      });
+    },
+  }),
+});
+
+export default addEditCollectiveContactMutation(addEditCoreContributorsMutation(OnboardingModal));

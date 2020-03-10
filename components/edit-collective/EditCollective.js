@@ -76,6 +76,7 @@ class EditCollective extends React.Component {
   }
 
   async editCollective(CollectiveInputType) {
+    console.log('COLLECTIVE INPUT TYPE', CollectiveInputType);
     CollectiveInputType = this.validate(CollectiveInputType);
     if (!CollectiveInputType) {
       return false;

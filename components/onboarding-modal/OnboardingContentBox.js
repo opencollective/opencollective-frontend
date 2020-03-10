@@ -17,6 +17,7 @@ class OnboardingContentBox extends React.Component {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     addAdmins: PropTypes.func,
+    addContact: PropTypes.func,
   };
 
   constructor(props) {
@@ -34,20 +35,9 @@ class OnboardingContentBox extends React.Component {
     });
   }
 
-  handleValue = (name, value, values) => {
-    values[name] = value;
-    return values;
-  };
-
   render() {
-    const { step, collective, LoggedInUser, addAdmins } = this.props;
+    const { step, collective, LoggedInUser, addAdmins, addContact } = this.props;
     const { admins } = this.state;
-
-    const values = {
-      website: '',
-      github: '',
-      twitter: '',
-    };
 
     return (
       <Container minWidth={[500]}>
@@ -143,28 +133,28 @@ class OnboardingContentBox extends React.Component {
                 {inputProps => (
                   <StyledInput
                     type="text"
-                    onBlur={({ target }) => this.handleValue(target.name, target.value, values)}
+                    onBlur={({ target }) => addContact(target.name, target.value)}
                     placeholder="agora.com"
                     {...inputProps}
                   />
                 )}
               </StyledInputField>
-              <StyledInputField my={2} label="Connect your social platforms" htmlFor="twitter">
+              <StyledInputField my={2} label="Connect your social platforms" htmlFor="twitterHandle">
                 {inputProps => (
                   <StyledInputGroup
                     type="text"
-                    onBlur={({ target }) => this.handleValue(target.name, target.value, values)}
+                    onBlur={({ target }) => addContact(target.name, target.value)}
                     placeholder="agora"
                     prepend="@"
                     {...inputProps}
                   />
                 )}
               </StyledInputField>
-              <StyledInputField my={2} htmlFor="github">
+              <StyledInputField my={2} htmlFor="githubHandle">
                 {inputProps => (
                   <StyledInputGroup
                     type="text"
-                    onBlur={({ target }) => this.handleValue(target.name, target.value, values)}
+                    onBlur={({ target }) => addContact(target.name, target.value)}
                     placeholder="agoraos"
                     prepend="github.com/"
                     {...inputProps}
