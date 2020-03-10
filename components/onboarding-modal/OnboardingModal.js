@@ -114,43 +114,30 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  // submitContact = async () => {
-  //   try {
-  //     this.setState({ isSubmitting: true, error: null });
-  //     await this.props.EditCollectiveContact({
-  //       collective:
-  //     });
-  //   } catch (e) {
-  //     console.log(e);
-  //     this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
-  //   }
-  // };
+  submitContact = async () => {
+    const collective = {
+      ...this.state.collective,
+      id: this.props.collective.id,
+    };
+    try {
+      this.setState({ isSubmitting: true, error: null });
+      await this.props.EditCollectiveContact({
+        collective,
+      });
+    } catch (e) {
+      this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
+    }
+  };
 
-  // async editCollective(CollectiveInputType) {
-  //   console.log('COLLECTIVE INPUT TYPE', CollectiveInputType);
-  //   CollectiveInputType = this.validate(CollectiveInputType);
-  //   if (!CollectiveInputType) {
-  //     return false;
-  //   }
-
-  //   this.setState({ status: 'loading' });
-  //   try {
-  //     await this.props.editCollective(CollectiveInputType);
-  //     this.setState({ status: 'saved', result: { error: null } });
-  //     setTimeout(() => {
-  //       this.setState({ status: null });
-  //     }, 3000);
-  //   } catch (err) {
-  //     const errorMsg = getErrorFromGraphqlException(err).message;
-  //     this.setState({ status: null, result: { error: errorMsg } });
-  //   }
-  // }
+  submitCollectiveInfo = async () => {
+    await this.submitContact();
+    await this.submitAdmins();
+    Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'info' });
+  };
 
   render() {
     const { collective, LoggedInUser } = this.props;
     const { step, isSubmitting } = this.state;
-
-    console.log(this.state);
 
     return (
       <Flex flexDirection="column" alignItems="center" py={[4]}>
@@ -169,7 +156,7 @@ class OnboardingModal extends React.Component {
         <OnboardingNavButtons
           step={step}
           slug={collective.slug}
-          submitAdmins={this.submitAdmins}
+          submitCollectiveInfo={this.submitCollectiveInfo}
           loading={isSubmitting}
         />
       </Flex>
@@ -204,8 +191,6 @@ const editCoreContributorsQuery = gql`
 const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {
   props: ({ mutate }) => ({
     EditCollectiveMembers: async ({ collectiveId, members }) => {
-      console.log(members);
-      console.log(members[1]);
       return await mutate({
         variables: { collectiveId, members },
         awaitRefetchQueries: true,
@@ -216,12 +201,6 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {
 });
 
 // GraphQL for editing Collective contact info
-// const getCollectiveContactFieldsFragment = gql`
-//   fragment getCollectiveContactFieldsFragment on Collective {
-
-//   }
-// `;
-
 const editCollectiveContactQuery = gql`
   mutation EditCollectiveContact($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
@@ -236,10 +215,7 @@ const editCollectiveContactQuery = gql`
 const addEditCollectiveContactMutation = graphql(editCollectiveContactQuery, {
   props: ({ mutate }) => ({
     EditCollectiveContact: async ({ collective }) => {
-      // const CollectiveInputType = pick(collective, ['id', 'website', 'twitterHandle', 'githubHandle']);
-
       return await mutate({
-        // variables: { collective: CollectiveInputType },
         variables: { collective },
         awaitRefetchQueries: true,
         refetchQueries: [{ query: getLoggedInUserQuery }],

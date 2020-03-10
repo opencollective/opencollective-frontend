@@ -22,7 +22,7 @@ class OnboardingNavButtons extends React.Component {
   static propTypes = {
     step: PropTypes.number,
     slug: PropTypes.string,
-    submitAdmins: PropTypes.func,
+    submitCollectiveInfo: PropTypes.func,
     loading: PropTypes.bool,
   };
 
@@ -35,12 +35,12 @@ class OnboardingNavButtons extends React.Component {
   };
 
   render() {
-    const { step, slug, submitAdmins, loading } = this.props;
+    const { step, slug, submitCollectiveInfo, loading } = this.props;
 
     return (
       <Flex>
         {step === 2 ? (
-          <StyledButton buttonStyle="primary" onClick={submitAdmins} loading={loading}>
+          <StyledButton buttonStyle="primary" onClick={submitCollectiveInfo} loading={loading}>
             Finish
           </StyledButton>
         ) : (
