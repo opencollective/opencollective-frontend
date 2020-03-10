@@ -6,22 +6,22 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 import styled from 'styled-components';
 
-import StyledButton from '../../StyledButton';
-import StyledCheckbox from '../../StyledCheckbox';
-import { P, H1 } from '../../Text';
+import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
+import { P, H1 } from '../Text';
 import GithubRepositories from './GithubRepositories';
-import StyledInputField from '../../StyledInputField';
-import Loading from '../../Loading';
-import GithubRepositoriesFAQ from '../../faqs/GithubRepositoriesFAQ';
-import { withUser } from '../../UserProvider';
-import MessageBox from '../../MessageBox';
-import Link from '../../Link';
-import ExternalLink from '../../ExternalLink';
+import StyledInputField from '../StyledInputField';
+import Loading from '../Loading';
+import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
+import { withUser } from '../UserProvider';
+import MessageBox from '../MessageBox';
+import Link from '../Link';
+import ExternalLink from '../ExternalLink';
 
-import { Router } from '../../../server/pages';
-import { getGithubRepos } from '../../../lib/api';
-import { getWebsiteUrl } from '../../../lib/utils';
-import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../../../lib/local-storage';
+import { Router } from '../../server/pages';
+import { getGithubRepos } from '../../lib/api';
+import { getWebsiteUrl } from '../../lib/utils';
+import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../../lib/local-storage';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
@@ -360,6 +360,7 @@ class ConnectGithub extends React.Component {
                     params={{
                       hostCollectiveSlug: 'opensource',
                       verb: 'apply',
+                      step: 'form',
                       hostTos: true,
                     }}
                     onClick={e => {

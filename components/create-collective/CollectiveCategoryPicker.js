@@ -5,11 +5,11 @@ import styled from 'styled-components';
 import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 
-import { H1 } from '../../Text';
-import StyledButton from '../../StyledButton';
-import Container from '../../Container';
-import Link from '../../Link';
-import ExternalLink from '../../ExternalLink';
+import { H1 } from '../Text';
+import StyledButton from '../StyledButton';
+import Container from '../Container';
+import Link from '../Link';
+import ExternalLink from '../ExternalLink';
 
 const ExamplesLink = styled(ExternalLink)`
   color: ${themeGet('colors.blue.500')};
