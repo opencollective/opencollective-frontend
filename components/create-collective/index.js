@@ -34,13 +34,11 @@ class CreateCollective extends Component {
     this.state = {
       collective: {},
       result: {},
-      category: null,
       github: null,
       form: false,
       error: null,
       status: null,
       creating: false,
-      tos: null,
     };
 
     this.createCollective = this.createCollective.bind(this);
@@ -56,35 +54,6 @@ class CreateCollective extends Component {
         defaultMessage: 'Create an account (or sign in) to start a collective.',
       },
     });
-  }
-
-  componentDidMount() {
-    const { query } = this.props;
-    if (query.category === 'opensource' || query.token) {
-      this.setState({ category: 'opensource' });
-    } else if (query.category === 'community') {
-      this.setState({ category: 'community' });
-    } else if (query.category === 'climate') {
-      this.setState({ category: 'climate' });
-    } else if (!query.category) {
-      this.setState({ category: null });
-    }
-  }
-
-  componentDidUpdate(oldProps) {
-    const { query } = this.props;
-
-    if (oldProps.query.category !== query.category) {
-      if (query.category === 'opensource' || query.token) {
-        this.setState({ category: 'opensource' });
-      } else if (query.category === 'community') {
-        this.setState({ category: 'community' });
-      } else if (query.category === 'climate') {
-        this.setState({ category: 'climate' });
-      } else if (!query.category) {
-        this.setState({ category: null, tos: null });
-      }
-    }
   }
 
   handleChange(key, value) {
@@ -110,7 +79,8 @@ class CreateCollective extends Component {
     this.setState({ creating: true });
 
     // prepare object
-    collective.tags = [this.state.category];
+
+    collective.tags = [this.props.query.category];
     if (this.state.github) {
       collective.githubHandle = this.state.github.handle;
     }
@@ -141,8 +111,8 @@ class CreateCollective extends Component {
 
   render() {
     const { LoggedInUser, query, intl, host } = this.props;
-    const { category, error } = this.state;
-    const { step, token } = query;
+    const { error } = this.state;
+    const { category, step, token } = query;
 
     if (host && !host.canApply) {
       return (
