@@ -4,7 +4,6 @@ import { Flex } from '@rebass/grid';
 
 import Container from '../../components/Container';
 import { H1, P } from '../../components/Text';
-import StyledInput from '../../components/StyledInput';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
 import StyledHr from '../../components/StyledHr';
@@ -132,10 +131,11 @@ class OnboardingContentBox extends React.Component {
             <Flex flexDirection="column">
               <StyledInputField my={2} label="Do you have a website?" htmlFor="website">
                 {inputProps => (
-                  <StyledInput
+                  <StyledInputGroup
                     type="text"
                     onBlur={({ target }) => addContact(target.name, target.value)}
-                    placeholder="agora.com"
+                    prepend="http://"
+                    placeholder="www.agora.com"
                     {...inputProps}
                   />
                 )}
