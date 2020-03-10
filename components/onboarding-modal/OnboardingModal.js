@@ -141,7 +141,7 @@ class OnboardingModal extends React.Component {
         <StepsProgressBox mb={[3, null, 4]} width={0.8}>
           <OnboardingStepsProgress step={step} handleStep={step => this.setState({ step })} slug={collective.slug} />
         </StepsProgressBox>
-        <Image src="/static/images/createcollective-anycommunity.png" alt="Welcome!" />
+        <Image src="/static/images/create-collective/communityIllustration.png" alt="Welcome!" />
         <OnboardingContentBox
           step={step}
           collective={collective}
