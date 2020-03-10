@@ -5,6 +5,18 @@
   "rules": {
     "no-console": "warn",
     "require-atomic-updates": "warn",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-intl",
+            "importNames": ["FormattedHTMLMessage"],
+            "message": "FormattedHTMLMessage is not allowed, please rely on the standard FormattedMessage."
+          }
+        ]
+      }
+    ],
     // To lint multiple schemas each one needs a different tagName.
     // https://github.com/apollographql/eslint-plugin-graphql#additional-schemas-or-tags
     "graphql/template-strings": [

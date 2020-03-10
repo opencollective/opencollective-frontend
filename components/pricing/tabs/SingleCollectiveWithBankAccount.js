@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { Router } from '../../../server/pages';
 import Container from '../../Container';
 import BackButton from '../BackButton';
 import { H1, P, H3, Span } from '../../Text';
 import PricingTable from '../PricingTable';
+import I18nFormatters from '../../I18nFormatters';
 
 const headings = ['', 'starter', 'singleCollective'];
 
@@ -16,7 +17,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return <FormattedHTMLMessage id="pricingTable.row.price" defaultMessage="Price" />;
+        return <FormattedMessage id="pricingTable.row.price" defaultMessage="Price" />;
       },
     },
     {
@@ -24,7 +25,7 @@ const rows = [
       render() {
         return (
           <Span className="price">
-            <FormattedHTMLMessage id="pricingTable.cell.free" defaultMessage="Free" />
+            <FormattedMessage id="pricingTable.cell.free" defaultMessage="Free" />
           </Span>
         );
       },
@@ -39,9 +40,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return (
-          <FormattedHTMLMessage id="pricingTable.row.fundraise" defaultMessage="Fundraise via credit card payments" />
-        );
+        return <FormattedMessage id="pricingTable.row.fundraise" defaultMessage="Fundraise via credit card payments" />;
       },
     },
     {
@@ -57,9 +56,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return (
-          <FormattedHTMLMessage id="pricingTable.row.collectivePage" defaultMessage="All Collective page features" />
-        );
+        return <FormattedMessage id="pricingTable.row.collectivePage" defaultMessage="All Collective page features" />;
       },
     },
     { type: 'check' },
@@ -70,10 +67,7 @@ const rows = [
       type: 'component',
       render() {
         return (
-          <FormattedHTMLMessage
-            id="pricingTable.row.addFunds"
-            defaultMessage="Add funds received through other channels"
-          />
+          <FormattedMessage id="pricingTable.row.addFunds" defaultMessage="Add funds received through other channels" />
         );
       },
     },
@@ -86,9 +80,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return (
-          <FormattedHTMLMessage id="pricingTable.row.bankTransfer" defaultMessage="Enable bank transfer payments" />
-        );
+        return <FormattedMessage id="pricingTable.row.bankTransfer" defaultMessage="Enable bank transfer payments" />;
       },
     },
     { type: 'html', html: 'Up to <strong>$1,000</strong>' },
@@ -123,9 +115,10 @@ const SingleCollectiveWithBankAccount = () => (
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
         <P color="black.700" fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
-          <FormattedHTMLMessage
+          <FormattedMessage
             id="pricing.tab.description"
             defaultMessage="You will begin with the <strong>STARTER PLAN</strong>. This plan is <strong>FREE</strong> to set up!"
+            values={I18nFormatters}
           />
         </P>
       </Box>
@@ -152,33 +145,38 @@ const SingleCollectiveWithBankAccount = () => (
           </H3>
           <Box as="ul" color="black.800" mt={3} px={3} fontSize="13px" lineHeight="21px" letterSpacing="-0.012em">
             <Box as="li" my={2}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.collective"
                 defaultMessage="Collective - a page to <strong>coordinate your community and budget.</strong>"
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.communication"
                 defaultMessage="Communication tools: <strong>post updates, start conversations,</strong> and <strong>a contact form</strong> for your group."
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.transparency"
                 defaultMessage="Show your budget and expenses <strong>transparently.</strong> "
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.fundraise"
                 defaultMessage="<strong>Fundraise</strong> through credit card payments (cost: 5% plus Stripe payment processor fees)."
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.addFunds"
                 defaultMessage="Manually <strong>add funds raised</strong> through other channels (e.g. bank transfers) to your transparent budget (free up to $1,000, then you’ll need to upgrade to a paid plan)."
+                values={I18nFormatters}
               />
             </Box>
           </Box>
