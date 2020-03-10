@@ -18,7 +18,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
-class NewCreateCollective extends Component {
+class CreateCollective extends Component {
   static propTypes = {
     host: PropTypes.object,
     query: PropTypes.object,
@@ -242,4 +242,4 @@ const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
   }),
 });
 
-export default injectIntl(withUser(addCreateCollectiveMutation(NewCreateCollective)));
+export default injectIntl(withUser(addCreateCollectiveMutation(CreateCollective)));

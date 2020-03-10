@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import NewCreateCollective from '../components/create-collective/NewCreateCollective';
+import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 
 import { withUser } from '../components/UserProvider';
 
-class NewCreateCollectivePage extends React.Component {
+class CreateCollectivePage extends React.Component {
   static async getInitialProps({ query }) {
     return {
       query,
@@ -33,7 +33,7 @@ class NewCreateCollectivePage extends React.Component {
 
     return (
       <Page>
-        <NewCreateCollective host={data.Collective} query={query} />
+        <CreateCollective host={data.Collective} query={query} />
       </Page>
     );
   }
@@ -55,4 +55,4 @@ const getHostQuery = gql`
 
 const addHostData = graphql(getHostQuery, { skip: props => !props.slug });
 
-export default withUser(addHostData(NewCreateCollectivePage));
+export default withUser(addHostData(CreateCollectivePage));
