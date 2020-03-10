@@ -167,7 +167,7 @@ class CreateCollectiveForm extends React.Component {
 
     return (
       <Flex flexDirection="column" m={[3, 0]}>
-        {host && query.hostCollectiveSlug !== 'opensource' && <CreateCollectiveCover host={host} />}
+        {host && host.slug !== 'opensource' && <CreateCollectiveCover host={host} />}
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>

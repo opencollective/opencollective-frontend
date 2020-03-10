@@ -360,6 +360,7 @@ class ConnectGithub extends React.Component {
                     params={{
                       hostCollectiveSlug: 'opensource',
                       verb: 'apply',
+                      step: 'form',
                       hostTos: true,
                     }}
                     onClick={e => {

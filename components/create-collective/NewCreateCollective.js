@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
+import { get } from 'lodash';
 
 import { H1, P } from '../Text';
 import CreateCollectiveForm from './sections/CreateCollectiveForm';
@@ -61,12 +62,6 @@ class NewCreateCollective extends Component {
     const { query } = this.props;
     if (query.category === 'opensource' || query.token) {
       this.setState({ category: 'opensource' });
-      if (query.step === 'form') {
-        this.setState({ form: true });
-      }
-      if (!query.step) {
-        this.setState({ form: false });
-      }
     } else if (query.category === 'community') {
       this.setState({ category: 'community' });
     } else if (query.category === 'climate') {
@@ -78,13 +73,7 @@ class NewCreateCollective extends Component {
 
   componentDidUpdate(oldProps) {
     const { query } = this.props;
-    if (oldProps.query.step !== query.step) {
-      if (query.step === 'form') {
-        this.setState({ form: true });
-      } else {
-        this.setState({ form: false });
-      }
-    }
+
     if (oldProps.query.category !== query.category) {
       if (query.category === 'opensource' || query.token) {
         this.setState({ category: 'opensource' });
@@ -152,8 +141,10 @@ class NewCreateCollective extends Component {
 
   render() {
     const { LoggedInUser, query, intl, host } = this.props;
-    const { category, form, error } = this.state;
+    const { category, error } = this.state;
     const { token } = query;
+
+    const form = get(query, 'step') === 'form';
 
     if (host && !host.canApply) {
       return (
@@ -201,7 +192,7 @@ class NewCreateCollective extends Component {
       return <CollectiveCategoryPicker query={query} onChange={this.handleChange} />;
     }
 
-    if (category === 'opensource' && !form) {
+    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && !form) {
       return <ConnectGithub token={token} query={query} onChange={this.handleChange} />;
     }
 
