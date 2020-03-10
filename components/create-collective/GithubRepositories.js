@@ -6,15 +6,15 @@ import { Flex } from '@rebass/grid';
 import { Search } from '@styled-icons/octicons/Search';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 
-import { H4 } from '../../Text';
-import Container from '../../Container';
-import StyledCard from '../../StyledCard';
-import StyledRadioList from '../../StyledRadioList';
-import StyledInput from '../../StyledInput';
-import StyledButton from '../../StyledButton';
+import { H4 } from '../Text';
+import Container from '../Container';
+import StyledCard from '../StyledCard';
+import StyledRadioList from '../StyledRadioList';
+import StyledInput from '../StyledInput';
+import StyledButton from '../StyledButton';
 import GithubRepositoryEntry from './GithubRepositoryEntry';
 
-import { escapeInput } from '../../../lib/utils';
+import { escapeInput } from '../../lib/utils';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};

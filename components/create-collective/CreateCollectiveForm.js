@@ -7,17 +7,17 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 import styled from 'styled-components';
 
-import { H1, P } from '../../Text';
-import Container from '../../Container';
-import Illustration from '../../home/HomeIllustration';
-import StyledCheckbox from '../../StyledCheckbox';
-import StyledInput from '../../StyledInput';
-import StyledInputField from '../../StyledInputField';
-import StyledInputGroup from '../../StyledInputGroup';
-import StyledButton from '../../StyledButton';
-import MessageBox from '../../MessageBox';
-import ExternalLink from '../../ExternalLink';
-import CreateCollectiveCover from '../../CreateCollectiveCover';
+import { H1, P } from '../Text';
+import Container from '../Container';
+import Illustration from '../home/HomeIllustration';
+import StyledCheckbox from '../StyledCheckbox';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledInputGroup from '../StyledInputGroup';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
+import ExternalLink from '../ExternalLink';
+import CreateCollectiveCover from '../CreateCollectiveCover';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};

@@ -4,9 +4,9 @@ import { Box, Flex } from '@rebass/grid';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Star } from '@styled-icons/fa-solid/Star';
 
-import Container from '../../Container';
-import { P, Span } from '../../Text';
-import StyledRadioList from '../../StyledRadioList';
+import Container from '../Container';
+import { P, Span } from '../Text';
+import StyledRadioList from '../StyledRadioList';
 
 const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
   const { type, login } = value.owner;

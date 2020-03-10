@@ -6,9 +6,9 @@ import { graphql } from 'react-apollo';
 import { get } from 'lodash';
 
 import { H1, P } from '../Text';
-import CreateCollectiveForm from './sections/CreateCollectiveForm';
-import CollectiveCategoryPicker from './sections/CollectiveCategoryPicker';
-import ConnectGithub from './sections/ConnectGithub';
+import CreateCollectiveForm from './CreateCollectiveForm';
+import CollectiveCategoryPicker from './CollectiveCategoryPicker';
+import ConnectGithub from './ConnectGithub';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import MessageBox from '../MessageBox';
 import { withUser } from '../UserProvider';
