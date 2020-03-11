@@ -143,7 +143,7 @@ export default class RichTextEditor extends React.Component {
     inputName: PropTypes.string,
     /** Change this prop to reset the value */
     reset: PropTypes.any,
-    /** A ref for the input. Useful to plug react-hook-form */
+    /** @deprecated A ref for the input. Useful to plug react-hook-form */
     inputRef: PropTypes.func,
     /** Wether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,

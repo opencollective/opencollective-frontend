@@ -177,7 +177,7 @@ RequiredFields.propTypes = {
 };
 
 /**
- * Form for a single attachment. Must be used with react-hook-form.
+ * Form for payout bank information. Must be used with Formik.
  */
 const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
   const formik = useFormikContext();
