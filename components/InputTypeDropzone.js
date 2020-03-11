@@ -195,7 +195,7 @@ const InputTypeDropzone = props => {
         <input {...getInputProps()} />
         {renderContainer(isDragActive, isDragReject)}
       </div>
-      {value && (
+      {value && option.canRemove !== false && (
         <span
           className="removeImage"
           tabIndex="0"
