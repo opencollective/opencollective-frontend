@@ -76,6 +76,7 @@ class Overlay extends React.Component {
       </div>
     );
   }
+
   renderYear(year) {
     const invoices = this.props.data.allInvoices.filter(i => Number(i.year) === Number(year));
     const invoicesByHost = groupBy(invoices, 'host.slug');

@@ -19,6 +19,7 @@ export const withMockRouterContext = mockRouter => {
         router: Object.assign(mockedRouter, mockRouter),
       };
     }
+
     render() {
       return this.props.children;
     }

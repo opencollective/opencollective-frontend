@@ -14,6 +14,7 @@ class WarnIfUnsavedChanges extends React.Component {
     children: PropTypes.node,
     intl: PropTypes.object,
   };
+
   componentDidMount() {
     window.addEventListener('beforeunload', this.beforeunload);
     Router.router.events.on('routeChangeStart', this.routeChangeStart);

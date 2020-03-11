@@ -99,6 +99,7 @@ class NewCollectivePage extends React.Component {
   componentDidMount() {
     this.setState({ smooth: true });
   }
+
   getPageMetaData(collective) {
     if (collective) {
       return {
