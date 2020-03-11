@@ -1,10 +1,3 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { Flex, Box } from '@rebass/grid';
-import { P } from 'components/Text';
-import styled from 'styled-components';
-```
-
 [See `@rebass/grid` docs for more info](https://www.npmjs.com/package/@rebass/grid#flex)
 
 The `<Flex />` component extends the `<Box />` with `display: flex` on by default;

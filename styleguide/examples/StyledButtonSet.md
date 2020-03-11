@@ -1,12 +1,8 @@
 ### Default styling example with changing state
 
 ```js
-initialState = { selected: null };
-<StyledButtonSet
-  items={['hello', 'world', 'wow']}
-  selected={state.selected}
-  onChange={item => setState({ selected: item })}
->
+const [selected, setSelected] = React.useState(null);
+<StyledButtonSet items={['hello', 'world', 'wow']} selected={selected} onChange={setSelected}>
   {({ item }) => item}
 </StyledButtonSet>;
 ```
