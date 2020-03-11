@@ -90,9 +90,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return (
-          <FormattedHTMLMessage id="pricingTable.row.bankTransfer" defaultMessage="Make payments with Transferwise" />
-        );
+        return <FormattedMessage id="pricingTable.row.transferwise" defaultMessage="Make payments with Transferwise" />;
       },
     },
     { type: 'html', html: 'Up to <strong>$1,000</strong>' },

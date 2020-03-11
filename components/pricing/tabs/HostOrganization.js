@@ -164,6 +164,19 @@ const rows = [
     {
       type: 'component',
       render() {
+        return <FormattedMessage id="pricingTable.row.transferwise" defaultMessage="Make payments with Transferwise" />;
+      },
+    },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
+    { type: 'check' },
+    { type: 'check' },
+    { type: 'check' },
+    { type: 'check' },
+  ],
+  [
+    {
+      type: 'component',
+      render() {
         return (
           <FormattedMessage
             id="pricingTable.row.hostFeature"
