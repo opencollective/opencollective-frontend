@@ -29,6 +29,7 @@ import { withUser } from '../components/UserProvider';
 import { H5, Span, P } from '../components/Text';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import StyledHr from '../components/StyledHr';
+import { generateNotFoundError } from '../lib/errors';
 
 const messages = defineMessages({
   title: {
@@ -229,8 +230,7 @@ class ExpensePage extends React.Component {
         ssrNotFoundError(); // Force 404 when rendered server side
         return null; // TODO: page for expense not found
       } else if (!data.expense.account) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       } else if (this.props.collectiveSlug !== data.expense.account.slug) {
         // TODO Error: Not on the righ URL
         return null;
