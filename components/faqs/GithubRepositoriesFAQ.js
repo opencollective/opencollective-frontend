@@ -42,7 +42,7 @@ const GithubRepositoriesFAQ = props => (
       <Content>
         <FormattedMessage
           id="GithubRepositories.faq.repoStar.content"
-          defaultMessage="In order to provide fiscal sponsorship to a project, we need to ensure that there is a community around that repo. If you already have a legal entity (or know a legal entity that could host your collective), then you could directly host your collective independently. Please use this form to create a self hosted collective: opencollective.com/create and select 'Other'. Note that in that case you will be responsible for doing the accounting as well as facilitating payments from sponsors."
+          defaultMessage="In order to provide fiscal sponsorship to a project, we need to ensure that there is a community around it. If you don’t fit 100 GitHub stars requirement, we will consider your application on a case by case basis, <a href="https://www.oscollective.org#criteria">using this criteria.</a> If you already have a legal entity (or know a legal entity that could host your collective), then you could directly host your collective independently. Please use the 'For any Community' option when creating a collective. Note that in that case you will be responsible for doing the accounting as well as facilitating payments from sponsors. If you have a project with an existing community but don't use github, apply via the Open Source option and select 'Request manual verification'."
         />
       </Content>
     </Entry>
