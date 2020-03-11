@@ -47,6 +47,7 @@ class OnboardingNavButtons extends React.Component {
           <React.Fragment>
             <StyledRoundButton
               mr={3}
+              size={48}
               disabled={this.setParams(step, 'disabled')}
               onClick={() => {
                 Router.pushRoute('new-collective-onboarding-modal', {
@@ -58,6 +59,7 @@ class OnboardingNavButtons extends React.Component {
               ←
             </StyledRoundButton>
             <StyledRoundButton
+              size={48}
               onClick={() => {
                 Router.pushRoute('new-collective-onboarding-modal', {
                   slug,

@@ -5,6 +5,7 @@ import { Box, Flex } from '@rebass/grid';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../components/StyledModal';
 import StyledHr from '../../components/StyledHr';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
@@ -25,21 +26,6 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
-const Image = styled.img`
-  @media screen and (min-width: 52em) {
-    height: 256px;
-    width: 256px;
-  }
-  @media screen and (max-width: 40em) {
-    height: 192px;
-    width: 192px;
-  }
-  @media screen and (min-width: 40em) and (max-width: 52em) {
-    height: 208px;
-    width: 208px;
-  }
-`;
-
 class OnboardingModal extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -48,6 +34,8 @@ class OnboardingModal extends React.Component {
     // refetchLoggedInUser: PropTypes.func,
     EditCollectiveMembers: PropTypes.func,
     EditCollectiveContact: PropTypes.func,
+    show: PropTypes.bool,
+    setShow: PropTypes.func,
   };
 
   constructor(props) {
@@ -130,39 +118,62 @@ class OnboardingModal extends React.Component {
   submitCollectiveInfo = async () => {
     await this.submitContact();
     await this.submitAdmins();
+    this.props.setShow(false);
     Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'info' });
   };
 
   render() {
-    const { collective, LoggedInUser } = this.props;
+    const { collective, LoggedInUser, show, setShow } = this.props;
     const { step, isSubmitting, error } = this.state;
 
     return (
-      <Flex flexDirection="column" alignItems="center" py={[0, 4]}>
-        <StepsProgressBox mb={[3, null, 4]} width={0.8}>
-          <OnboardingStepsProgress step={step} handleStep={step => this.setState({ step })} slug={collective.slug} />
-        </StepsProgressBox>
-        <Image src="/static/images/create-collective/communityIllustration.png" alt="Welcome!" />
-        <OnboardingContentBox
-          step={step}
-          collective={collective}
-          LoggedInUser={LoggedInUser}
-          addAdmins={this.addAdmins}
-          addContact={this.addContact}
-        />
-        {error && (
-          <MessageBox type="error" withIcon mt={2}>
-            {error.replace('GraphQL error: ', 'Error: ')}
-          </MessageBox>
-        )}
-        <StyledHr my={4} borderColor="black.300" width="100%" />
-        <OnboardingNavButtons
-          step={step}
-          slug={collective.slug}
-          submitCollectiveInfo={this.submitCollectiveInfo}
-          loading={isSubmitting}
-        />
-      </Flex>
+      <Modal width="576px" minHeight="456px" show={show} onClose={() => setShow(false)}>
+        {/* <Flex flexDirection="column" alignItems="center" py={[0, 4]}> */}
+        <ModalHeader onClose={() => setShow(false)}>
+          <Flex flexDirection="column" alignItems="center" width="100%">
+            <StepsProgressBox ml={'15px'} mb={[3, null, 4]} width={0.8}>
+              <OnboardingStepsProgress
+                step={step}
+                handleStep={step => this.setState({ step })}
+                slug={collective.slug}
+              />
+            </StepsProgressBox>
+          </Flex>
+        </ModalHeader>
+        <ModalBody>
+          <Flex flexDirection="column" alignItems="center">
+            <img
+              height={'112px'}
+              width={'160px'}
+              src="/static/images/create-collective/communityIllustration.png"
+              alt="Welcome!"
+            />
+            <OnboardingContentBox
+              step={step}
+              collective={collective}
+              LoggedInUser={LoggedInUser}
+              addAdmins={this.addAdmins}
+              addContact={this.addContact}
+            />
+            {error && (
+              <MessageBox type="error" withIcon mt={2}>
+                {error.replace('GraphQL error: ', 'Error: ')}
+              </MessageBox>
+            )}
+          </Flex>
+        </ModalBody>
+        <ModalFooter>
+          <Flex flexDirection="column" alignItems="center">
+            <OnboardingNavButtons
+              step={step}
+              slug={collective.slug}
+              submitCollectiveInfo={this.submitCollectiveInfo}
+              loading={isSubmitting}
+            />
+          </Flex>
+        </ModalFooter>
+        {/* </Flex> */}
+      </Modal>
     );
   }
 }

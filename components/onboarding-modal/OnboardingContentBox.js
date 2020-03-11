@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 
 import Container from '../../components/Container';
 import { H1, P } from '../../components/Text';
@@ -39,12 +39,12 @@ class OnboardingContentBox extends React.Component {
     const { admins } = this.state;
 
     return (
-      <Container minWidth={[300, 500]}>
+      <Container>
         {step === 0 && (
-          <Fragment>
+          <Box maxWidth={['336px']}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['H5']}
+              lineHeight={['H5']}
               fontWeight="bold"
               color="black.900"
               textAlign="center"
@@ -53,20 +53,15 @@ class OnboardingContentBox extends React.Component {
             >
               The {collective.name} Collective has been created! 🎉
             </H1>
-          </Fragment>
+          </Box>
         )}
         {step === 1 && (
           <Fragment>
-            <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
-              fontWeight="bold"
-              color="black.900"
-              textAlign="center"
-              mb={4}
-            >
-              Add administrators
-            </H1>
+            <Box maxWidth={['336px']}>
+              <H1 fontSize={['H5']} lineHeight={['H5']} fontWeight="bold" color="black.900" textAlign="center" mb={4}>
+                Add administrators
+              </H1>
+            </Box>
             <Flex px={3}>
               <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
                 Administrators
@@ -115,16 +110,11 @@ class OnboardingContentBox extends React.Component {
         )}
         {step === 2 && (
           <Fragment>
-            <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
-              fontWeight="bold"
-              color="black.900"
-              textAlign="center"
-              mb={4}
-            >
-              Links and contact info
-            </H1>
+            <Box maxWidth={['336px']}>
+              <H1 fontSize={['H5']} lineHeight={['H5']} fontWeight="bold" color="black.900" textAlign="center" mb={4}>
+                Links and contact info
+              </H1>
+            </Box>
 
             <Flex flexDirection="column">
               <StyledInputField my={2} label="Do you have a website?" htmlFor="website">
