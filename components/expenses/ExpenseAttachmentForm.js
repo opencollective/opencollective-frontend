@@ -81,7 +81,7 @@ const AttachmentLabel = () => (
 );
 
 /**
- * Form for a single attachment. Must be used with react-hook-form.
+ * Form for a single attachment. Must be used with Formik.
  */
 const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, requireFile, name }) => {
   const intl = useIntl();
