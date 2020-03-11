@@ -273,7 +273,8 @@ export default class RichTextEditor extends React.Component {
       const url = match[1];
       if (isURL(url)) {
         const position = match.index;
-        const range = [position, position + url.length];
+        const url_length = this.autolink_delim(url);
+        const range = [position, position + url_length];
         const hrefAtRange = editor.getDocument().getCommonAttributesAtRange(range).href;
         if (hrefAtRange !== url) {
           this.updateInRange(editor, range, 0, () => {
@@ -285,6 +286,57 @@ export default class RichTextEditor extends React.Component {
       }
     }
   }
+
+  /** A helper used by autolink to find where the url actually ends */
+  autolink_delim = url => {
+    let link_end = url.length;
+
+    while (link_end > 0) {
+      const cclose = url[link_end - 1];
+
+      let copen;
+      switch (cclose) {
+        case '"':
+          copen = '"';
+          break;
+        case "'":
+          copen = "'";
+          break;
+        case ')':
+          copen = '(';
+          break;
+        case ']':
+          copen = '[';
+          break;
+        case '}':
+          copen = '{';
+          break;
+      }
+
+      if ('?!.,:;*_~\'"'.includes(url[link_end - 1])) {
+        link_end--;
+      } else if (copen) {
+        let unclosed = 0;
+
+        for (let i = 0; i < link_end; i++) {
+          if (url[i] === copen) {
+            unclosed++;
+          } else if (url[i] === cclose) {
+            unclosed--;
+          }
+        }
+
+        if (unclosed >= 0) {
+          break;
+        }
+        link_end--;
+      } else {
+        break;
+      }
+    }
+
+    return link_end;
+  };
 
   /** A trix helper that will apply func in range then restore base range when it's done */
   updateInRange(editor, range, offset = 0, updateFunc) {
