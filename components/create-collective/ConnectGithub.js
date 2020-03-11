@@ -175,6 +175,8 @@ class ConnectGithub extends React.Component {
                           params={{
                             hostCollectiveSlug: 'opensource',
                             verb: 'apply',
+                            step: 'form',
+                            hostTos: true,
                           }}
                         >
                           <FormattedMessage id="clickHere" defaultMessage="Click here" />
