@@ -605,6 +605,7 @@
   "expense.approved": "approved",
   "Expense.Attachment": "Attachment",
   "expense.attachment.description": "Upload receipt or invoice (photo or PDF)",
+  "Expense.Attachments": "Attachments",
   "expense.category": "Kategorie",
   "Expense.Category.Communications": "Kommunikationen",
   "Expense.Category.Design": "Darstellung",
