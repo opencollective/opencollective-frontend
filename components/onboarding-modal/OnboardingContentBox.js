@@ -39,9 +39,9 @@ class OnboardingContentBox extends React.Component {
     const { admins } = this.state;
 
     return (
-      <Container>
+      <Container display="flex" flexDirection="column" width="80%" alignItems="center">
         {step === 0 && (
-          <Box maxWidth={['336px']}>
+          <Flex maxWidth={['336px']}>
             <H1
               fontSize={['H5']}
               lineHeight={['H5']}
@@ -53,16 +53,16 @@ class OnboardingContentBox extends React.Component {
             >
               The {collective.name} Collective has been created! 🎉
             </H1>
-          </Box>
+          </Flex>
         )}
         {step === 1 && (
           <Fragment>
-            <Box maxWidth={['336px']}>
+            <Flex maxWidth={['336px']}>
               <H1 fontSize={['H5']} lineHeight={['H5']} fontWeight="bold" color="black.900" textAlign="center" mb={4}>
                 Add administrators
               </H1>
-            </Box>
-            <Flex px={3}>
+            </Flex>
+            <Flex px={3} width="100%">
               <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
                 Administrators
               </P>
@@ -71,13 +71,13 @@ class OnboardingContentBox extends React.Component {
               </Flex>
             </Flex>
             {admins.length > 0 && (
-              <Flex flexDirection="column">
+              <Flex flexDirection="column" width="100%">
                 {admins.map((admin, i) => (
                   <OnboardingProfileCard key={i} user={admin.member} adminUser={LoggedInUser.collective} />
                 ))}
               </Flex>
             )}
-            <Flex px={3}>
+            <Flex px={3} width="100%">
               <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
                 Invite administrators
               </P>
@@ -86,7 +86,7 @@ class OnboardingContentBox extends React.Component {
               </Flex>
             </Flex>
 
-            <Flex my={2} px={3} flexDirection="column">
+            <Flex my={2} px={3} flexDirection="column" width="100%">
               <CollectivePickerAsync
                 creatable
                 types={['USER']}
@@ -116,7 +116,7 @@ class OnboardingContentBox extends React.Component {
               </H1>
             </Box>
 
-            <Flex flexDirection="column">
+            <Flex flexDirection="column" width="100%">
               <StyledInputField my={2} label="Do you have a website?" htmlFor="website">
                 {inputProps => (
                   <StyledInputGroup
