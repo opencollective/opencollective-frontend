@@ -11,7 +11,7 @@ import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import CommentForm from '../components/conversations/CommentForm';
 import { CommentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import CommentIcon from '../components/icons/CommentIcon';

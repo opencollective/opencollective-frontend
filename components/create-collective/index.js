@@ -15,7 +15,7 @@ import { withUser } from '../UserProvider';
 
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { Router } from '../../server/pages';
 
 class CreateCollective extends Component {

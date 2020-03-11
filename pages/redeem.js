@@ -22,7 +22,8 @@ import { P, H1, H5 } from '../components/Text';
 import LinkCollective from '../components/LinkCollective';
 
 import { getLoggedInUserQuery } from '../lib/graphql/queries';
-import { isValidEmail, getErrorFromGraphqlException } from '../lib/utils';
+import { isValidEmail } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 import StyledButton from '../components/StyledButton';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';

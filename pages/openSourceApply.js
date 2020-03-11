@@ -20,7 +20,8 @@ import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
 import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
-import { getWebsiteUrl, getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { getWebsiteUrl } from '../lib/utils';
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../lib/local-storage';
 
 class OpenSourceApplyPage extends Component {

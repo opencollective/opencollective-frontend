@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { withUser } from '../UserProvider';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../../lib/graphql/mutations';
 import { H2, P } from '../Text';
 import Container from '../Container';

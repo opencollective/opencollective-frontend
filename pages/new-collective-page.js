@@ -5,9 +5,8 @@ import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';

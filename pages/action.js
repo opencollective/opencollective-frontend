@@ -5,7 +5,8 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { capitalize, compose, getErrorFromGraphqlException } from '../lib/utils';
+import { capitalize, compose } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 import Header from '../components/Header';
 import Body from '../components/Body';

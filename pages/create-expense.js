@@ -7,7 +7,7 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import { generateNotFoundError } from '../lib/errors';
+import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -31,7 +31,6 @@ import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../lib/utils';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';

@@ -7,7 +7,8 @@ import styled from 'styled-components';
 import { Field, FastField } from 'formik';
 import { isURL } from 'validator';
 
-import { createError, FORM_ERROR, requireFields, formatErrorMessage } from '../../lib/form-utils';
+import { requireFields, formatFormErrorMessage } from '../../lib/form-utils';
+import { createError, ERROR } from '../../lib/errors';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
@@ -63,9 +64,9 @@ export const validateAttachment = (expense, attachment) => {
   // Attachment URL
   if (attachmentRequiresFile(expense.type)) {
     if (!attachment.url) {
-      errors.url = createError(FORM_ERROR.REQUIRED);
+      errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(attachment.url)) {
-      errors.url = createError(FORM_ERROR.BAD_PATTERN);
+      errors.url = createError(ERROR.FORM_FIELD_BAD_PATTERN);
     }
   }
 
@@ -88,7 +89,7 @@ const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, require
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
   const getFieldName = field => `${name}.${field}`;
-  const getError = field => formatErrorMessage(intl, get(errors, getFieldName(field)));
+  const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
 
   return (
     <FormFieldsContainer data-cy="expense-attachment-form">
@@ -101,7 +102,7 @@ const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, require
                 mr={4}
                 htmlFor={attachmentKey}
                 label={<AttachmentLabel />}
-                error={formatErrorMessage(intl, meta.error)}
+                error={formatFormErrorMessage(intl, meta.error)}
                 data-cy="attachment-url-field"
                 required
               >

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
 import CollectiveCover from './CollectiveCover';

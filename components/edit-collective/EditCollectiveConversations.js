@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import imgPreviewThread from '../../public/static/images/conversations/conversations-list-preview.png';
 import imgPreviewReplies from '../../public/static/images/conversations/conversation-replies-preview.png';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import Container from '../Container';

@@ -10,7 +10,7 @@ import Body from './Body';
 import Footer from './Footer';
 import EditEventForm from './EditEventForm';
 import CollectiveNavbar from './CollectiveNavbar';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 class EditEvent extends React.Component {
   static propTypes = {

@@ -8,7 +8,7 @@ import { Router } from '../server/pages';
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
 
-import { ERROR } from '../lib/constants/errors';
+import { ERROR } from '../lib/errors';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -26,7 +26,7 @@ import { withUser } from './UserProvider';
  */
 class ErrorPage extends React.Component {
   static propTypes = {
-    /** Customize the error type. Check `generateError.*` functions for more info */
+    /** Customize the error type. Check `createError.*` functions for more info */
     error: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(ERROR)),
       payload: PropTypes.object,
@@ -37,9 +37,9 @@ class ErrorPage extends React.Component {
     log: PropTypes.bool,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
-    /** @deprecated please generate errors with the `generateError` helper  */
+    /** @deprecated please generate errors with the `createError` helper  */
     message: PropTypes.string,
-    /** @deprecated please generate errors with the `generateError` helper */
+    /** @deprecated please generate errors with the `createError` helper */
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
   };
 
