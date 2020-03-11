@@ -1,9 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
+import styled from 'styled-components';
 
-import { P } from '../../components/Text';
 import Avatar from '../../components/Avatar';
+import StyledTag from '../../components/StyledTag';
+
+const Admin = styled(StyledTag)`
+  font-size: 14px;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+`;
 
 class OnboardingProfileCard extends React.Component {
   static propTypes = {
@@ -16,18 +23,19 @@ class OnboardingProfileCard extends React.Component {
   }
 
   render() {
-    const { user, adminUser } = this.props;
-    const { id, imageUrl, name, slug, type } = user;
+    const { user } = this.props;
+    const { imageUrl, name, type } = user;
 
     return (
-      <Flex my={1}>
-        <Flex alignItems="center" justifyContent="center">
-          <Avatar src={imageUrl ? imageUrl : null} radius={32} name={name} type={type} />
-        </Flex>
-        <Flex flexDirection="column" ml={3}>
-          <P color="black.800">{name}</P>
-          <P color="black.600">{adminUser.id === id ? 'You' : `@${slug}`}</P>
-        </Flex>
+      <Flex my={1} ml={2}>
+        <Admin textTransform="none" type="dark">
+          <Flex alignItems="center">
+            <Avatar src={imageUrl ? imageUrl : null} radius={15} name={name} type={type} />
+            <Box fontSize="Caption" ml={2}>
+              {name}
+            </Box>
+          </Flex>
+        </Admin>
       </Flex>
     );
   }

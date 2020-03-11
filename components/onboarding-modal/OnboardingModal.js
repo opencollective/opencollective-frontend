@@ -179,27 +179,20 @@ class OnboardingModal extends React.Component {
 }
 
 // GraphQL for editing Collective admins info
-const MemberFieldsFragment = gql`
-  fragment MemberFieldsFragment on Member {
-    id
-    role
-    member {
-      id
-      name
-    }
-  }
-`;
-
 const editCoreContributorsQuery = gql`
   mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
       members(roles: ["ADMIN"]) {
-        ...MemberFieldsFragment
+        id
+        role
+        member {
+          id
+          name
+        }
       }
     }
   }
-  ${MemberFieldsFragment}
 `;
 
 const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {

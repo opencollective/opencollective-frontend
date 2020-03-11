@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
 
@@ -15,6 +15,10 @@ const params = {
     disabled: false,
     routerStepBack: undefined,
     routerStepForward: 'contact',
+  },
+  2: {
+    disabled: false,
+    routerStepBack: 'administrators',
   },
 };
 
@@ -40,11 +44,26 @@ class OnboardingNavButtons extends React.Component {
     return (
       <Flex>
         {step === 2 ? (
-          <StyledButton buttonStyle="primary" onClick={submitCollectiveInfo} loading={loading}>
-            Finish
-          </StyledButton>
+          <Fragment>
+            <StyledRoundButton
+              mr={3}
+              size={48}
+              disabled={this.setParams(step, 'disabled')}
+              onClick={() => {
+                Router.pushRoute('new-collective-onboarding-modal', {
+                  slug,
+                  step: this.setParams(step, 'routerStepBack'),
+                });
+              }}
+            >
+              ←
+            </StyledRoundButton>
+            <StyledButton buttonStyle="primary" onClick={submitCollectiveInfo} loading={loading}>
+              Finish
+            </StyledButton>
+          </Fragment>
         ) : (
-          <React.Fragment>
+          <Fragment>
             <StyledRoundButton
               mr={3}
               size={48}
@@ -69,7 +88,7 @@ class OnboardingNavButtons extends React.Component {
             >
               →
             </StyledRoundButton>
-          </React.Fragment>
+          </Fragment>
         )}
       </Flex>
     );
