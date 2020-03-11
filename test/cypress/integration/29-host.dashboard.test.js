@@ -3,11 +3,9 @@ describe('host dashboard', () => {
     cy.signup({ redirect: '/brusselstogetherasbl' });
   });
 
-  it.skip('mark pending application approved', () => {
-    cy.wait(2000);
-    cy.contains('[data-cy="host-apply-btn"]', 'Apply').click({ force: true });
-    cy.wait(1000);
-    cy.fillInputField('name', 'Cavies United');
+  it('mark pending application approved', () => {
+    cy.get('[data-cy="host-apply-btn"]:not([disabled]):visible', { timeout: 30000 }).click();
+    cy.fillInputField('name', 'Cavies United', { timeout: 30000 });
     cy.fillInputField('description', 'We will rule the world with our cute squeaks');
     cy.fillInputField('website', 'https://guineapi.gs');
     cy.get('.tos input[type="checkbox"]').click();
