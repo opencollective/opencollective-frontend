@@ -98,9 +98,14 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       status: 'collectivePending',
     };
   } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
+    if (!LoggedInUser || !LoggedInUser.canEditCollective(collective)) {
+      return;
+    }
     return {
       title: intl.formatMessage(messages['event.over.sendMoneyToParent.title']),
-      description: intl.formatMessage(messages['event.over.sendMoneyToParent.description']),
+      description: intl.formatMessage(messages['event.over.sendMoneyToParent.description'], {
+        collective: collective.parentCollective.name,
+      }),
       actions: [
         <SendMoneyToCollectiveBtn
           key="SendMoneyToCollectiveBtn"
@@ -121,8 +126,8 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
 /**
  * Adds a notification bar for the collective.
  */
-const CollectiveNotificationBar = ({ intl, status, collective, host }) => {
-  const notification = getNotification(intl, status, collective, host);
+const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUser }) => {
+  const notification = getNotification(intl, status, collective, host, LoggedInUser);
 
   return !notification ? null : (
     <NotificationBar

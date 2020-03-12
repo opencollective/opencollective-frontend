@@ -37,16 +37,11 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 
   async onClick() {
-    const {
-      currency,
-      amount,
-      fromCollective,
-      toCollective,
-      description,
-      data: {
-        Collective: { paymentMethods },
-      },
-    } = this.props;
+    const { currency, amount, fromCollective, toCollective, description, data, LoggedInUser } = this.props;
+    if (!LoggedInUser || !LoggedInUser.canEditCollective(fromCollective) || !get(data, 'Collective')) {
+      return;
+    }
+    const paymentMethods = get(data, 'Collective.paymentMethods');
     if (!paymentMethods || paymentMethods.length === 0) {
       const error = "We couldn't find a payment method to make this transaction";
       this.setState({ error });
@@ -123,6 +118,9 @@ const addPaymentMethods = graphql(addPaymentMethodsQuery, {
         slug: get(props, 'fromCollective.slug'),
       },
     };
+  },
+  skip: props => {
+    return !props.LoggedInUser;
   },
 });
 
