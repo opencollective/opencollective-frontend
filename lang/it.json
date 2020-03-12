@@ -164,6 +164,7 @@
   "collective.editHost.withdrawApp": "Sei sicuro di voler ritirare la sottoscrizione da {name}?",
   "collective.emptyBalance.body": "Sei sicuro di voler {action} a {collective}?",
   "collective.emptyBalance.header": "{action} Saldo",
+  "collective.event.delete.isNotDeletable-message": "Events with transactions, orders or paid expenses cannot be deleted. Please archive it instead.",
   "collective.expensePolicy.description": "Può essere scoraggiante inserire una spesa se non sei sicuro di ciò che è consentito. Fornisci un regolamento chiaro per guidare gli autori delle spese.",
   "collective.expensePolicy.label": "Regolamento per le spese del collettivo",
   "collective.expensePolicy.placeholder": "Ad esempio: quale tipo di spesa sarà approvato, se ci sono limitazioni degli importi, quale documentazione è richiesta e a chi rivolgersi per eventuali domande.",
