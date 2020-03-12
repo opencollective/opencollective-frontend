@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { get, set } from 'lodash';
+import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -10,6 +10,7 @@ import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Currency } from '../../lib/constants/currency';
@@ -17,6 +18,7 @@ import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
 import EditTiers from './EditTiers';
+import EditTickets from './EditTicket';
 import EditGoals from './EditGoals';
 import EditHost from './EditHost';
 import EditMembers from './EditMembers';
@@ -67,11 +69,14 @@ class EditCollectiveForm extends React.Component {
     collective.application = get(collective, 'settings.apply');
     collective.markdown = get(collective, 'settings.markdown');
 
+    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
     this.state = {
       modified: false,
       section: 'info',
       collective,
-      tiers: collective.tiers || [{}],
+      tiers: tiers.length === 0 ? [{}] : tiers,
+      tickets: tickets.length === 0 ? [{}] : tickets,
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
@@ -275,9 +280,12 @@ class EditCollectiveForm extends React.Component {
   componentDidUpdate(oldProps) {
     const { collective, router } = this.props;
     if (oldProps.collective !== collective) {
+      const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+      const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
       this.setState({
-        collective: collective,
-        tiers: collective.tiers,
+        collective,
+        tiers,
+        tickets,
       });
     } else if (oldProps.router.query.section !== router.query.section) {
       this.setState({ section: router.query.section });
@@ -323,12 +331,20 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
-    this.setState({ ...obj, modified: true });
+    const { section } = this.state;
+    if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
+      this.setState({ tickets: obj.tiers, modified: true });
+    } else {
+      this.setState({ ...obj, modified: true });
+    }
     window.state = this.state;
   }
 
   async handleSubmit() {
     const collective = { ...this.state.collective, tiers: this.state.tiers };
+    if (collective.type === CollectiveType.EVENT && find(this.state.tickets, 'name')) {
+      collective.tiers = [...this.state.tiers, ...this.state.tickets];
+    }
     this.props.onSubmit(collective);
     this.setState({ modified: false });
   }
@@ -380,24 +396,24 @@ class EditCollectiveForm extends React.Component {
       return (
         <EditTiers
           title="Tiers"
-          types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION', 'TICKET']}
+          types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
           tiers={this.state.tiers}
           collective={collective}
           currency={collective.currency}
           onChange={this.handleObjectChange}
-          defaultType={this.defaultTierType}
+          defaultType="TIER"
         />
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
       return (
-        <EditTiers
+        <EditTickets
           title="Tickets"
           types={['TICKET']}
-          tiers={this.state.tiers}
+          tiers={this.state.tickets}
           collective={collective}
           currency={collective.currency}
           onChange={this.handleObjectChange}
-          defaultType={this.defaultTierType}
+          defaultType="TICKET"
         />
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS) {

@@ -22,8 +22,8 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   HOST: 'host',
   MEMBERS: 'members',
   PAYMENT_METHODS: 'payment-methods',
-  TIERS: 'tiers',
   TICKETS: 'tickets',
+  TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced', // Last on purpose
@@ -131,7 +131,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: isOneOfTypes(
