@@ -283,10 +283,7 @@ class ConnectGithub extends React.Component {
                     values={{
                       osclink: (
                         <ExternalLink href="https://opencollective.com/opensource" openInNewTab>
-                          <FormattedMessage
-                            id="OpenSourceCollective501c6"
-                            defaultMessage="Open Source Collective 501c6"
-                          />
+                          Open Source Collective 501c6
                         </ExternalLink>
                       ),
                       criterialink: (
