@@ -1,7 +1,3 @@
-```jsx noeditor
-import DebitCreditList, { DebitItem, CreditItem } from 'components/DebitCreditList';
-```
-
 ```jsx
 import DebitCreditList, { DebitItem, CreditItem } from 'components/DebitCreditList';
 

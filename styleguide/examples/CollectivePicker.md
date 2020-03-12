@@ -1,8 +1,3 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { randomCollectivesList } from '../mocks/collectives';
-```
-
 ## Default
 
 ```jsx
@@ -48,16 +43,20 @@ const searchCollectives = search => {
     }, 1000);
   });
 };
-initialState = { collectives: [], loading: false };
+const [collectives, setCollectives] = React.useState([]);
+const [loading, setLoading] = React.useState(false);
 <CollectivePicker
-  isLoading={state.loading}
-  collectives={state.collectives}
+  isLoading={loading}
+  collectives={collectives}
   onInputChange={(search, { action }) => {
     if (action !== 'input-change') {
       return;
     }
-    setState({ loading: true });
-    searchCollectives(search).then(collectives => setState({ collectives, loading: false }));
+    setLoading(true);
+    searchCollectives(search).then(collectives => {
+      setCollectives(collectives);
+      setLoading(false);
+    });
   }}
 />;
 ```

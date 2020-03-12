@@ -1,10 +1,3 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { Box } from '@rebass/grid';
-import { P } from 'components/Text';
-import styled from 'styled-components';
-```
-
 [See `@rebass/grid` docs for more info](https://www.npmjs.com/package/@rebass/grid#box)
 
 Using fractions to set percentage width:
