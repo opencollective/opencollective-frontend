@@ -343,7 +343,13 @@ class EditCollectiveForm extends React.Component {
   async handleSubmit() {
     const collective = { ...this.state.collective, tiers: this.state.tiers };
     if (collective.type === CollectiveType.EVENT && find(this.state.tickets, 'name')) {
-      collective.tiers = [...this.state.tiers, ...this.state.tickets];
+      // Ensure tiers state contains a tier before being saved
+      // this is to prevent default tiers = [{}]
+      if (find(this.state.tiers, 'name') === undefined) {
+        collective.tiers = [...this.state.tickets];
+      } else {
+        collective.tiers = [...this.state.tiers, ...this.state.tickets];
+      }
     }
     this.props.onSubmit(collective);
     this.setState({ modified: false });
