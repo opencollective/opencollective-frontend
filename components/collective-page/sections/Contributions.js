@@ -24,18 +24,25 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 import { Dimensions } from '../_constants';
 
-const FILTERS = { ALL: 'ALL', HOST: 'HOST', EVENT: 'EVENT', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
+const FILTERS = {
+  ALL: 'ALL',
+  HOSTED_COLLECTIVES: 'HOST',
+  HOSTED_EVENTS: 'EVENT',
+  CORE: 'CORE',
+  FINANCIAL: 'FINANCIAL',
+  EVENTS: 'EVENTS',
+};
 const FILTERS_LIST = Object.values(FILTERS);
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
     id: 'SectionContributions.All',
     defaultMessage: 'All Contributions',
   },
-  [FILTERS.HOST]: {
-    id: 'Hosted',
+  [FILTERS.HOSTED_COLLECTIVES]: {
+    id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
   },
-  [FILTERS.EVENT]: {
+  [FILTERS.HOSTED_EVENTS]: {
     id: 'HostedEvents',
     defaultMessage: 'Hosted Events',
   },
@@ -64,8 +71,8 @@ const ROLES_WEIGHT = {
 
 /** All filters except `ALL` */
 const filterFuncs = {
-  [FILTERS.HOST]: ({ role, collective }) => role === roles.HOST && collective.type === 'COLLECTIVE',
-  [FILTERS.EVENT]: ({ role, collective }) => role === roles.HOST && collective.type === 'EVENT',
+  [FILTERS.HOSTED_COLLECTIVES]: ({ role, collective }) => role === roles.HOST && collective.type === 'COLLECTIVE',
+  [FILTERS.HOSTED_EVENTS]: ({ role, collective }) => role === roles.HOST && collective.type === 'EVENT',
   [FILTERS.FINANCIAL]: ({ role }) => role === roles.BACKER,
   [FILTERS.CORE]: ({ role }) => role === roles.ADMIN || role === roles.MEMBER,
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
