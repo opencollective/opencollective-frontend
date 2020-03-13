@@ -101,7 +101,7 @@
     "rehype-sanitize": "3.0.0",
     "remark-parse": "7.0.2",
     "remark-rehype": "5.0.0",
-    "sanitize-html": "1.22.0",
+    "sanitize-html": "1.22.1",
     "showdown": "1.9.1",
     "slugify": "1.4.0",
     "styled-components": "5.0.1",
