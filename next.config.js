@@ -1,9 +1,9 @@
 require('./env');
 
-const withSourceMaps = require('@zeit/next-source-maps');
+const withSourceMaps = require('@zeit/next-source-maps')();
 
 const nextConfig = {
-  webpack: (config, { webpack }) => {
+  webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin(/[\\/]__tests__[\\/]/),
@@ -18,8 +18,34 @@ const nextConfig = {
         GIFTCARDS_GENERATOR_URL: null,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
+        SENTRY_DSN: null,
       }),
     );
+
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        'process.env.SENTRY_RELEASE': JSON.stringify(buildId),
+      }),
+    );
+
+    // XXX See https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/next.config.js
+    // In `pages/_app.js`, Sentry is imported from @sentry/node. While
+    // @sentry/browser will run in a Node.js environment, @sentry/node will use
+    // Node.js-only APIs to catch even more unhandled exceptions.
+    //
+    // This works well when Next.js is SSRing your page on a server with
+    // Node.js, but it is not what we want when your client-side bundle is being
+    // executed by a browser.
+    //
+    // Luckily, Next.js will call this webpack function twice, once for the
+    // server and once for the client. Read more:
+    // https://nextjs.org/docs#customizing-webpack-config
+    //
+    // So ask Webpack to replace @sentry/node imports with @sentry/browser when
+    // building the browser's bundle
+    if (!isServer) {
+      config.resolve.alias['@sentry/node'] = '@sentry/browser';
+    }
 
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
       // eslint-disable-next-line node/no-unpublished-require
