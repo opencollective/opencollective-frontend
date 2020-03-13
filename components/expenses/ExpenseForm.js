@@ -40,7 +40,7 @@ const msg = defineMessages({
   },
   invoiceInfoPlaceholder: {
     id: 'ExpenseForm.InvoiceInfoPlaceholder',
-    defaultMessage: 'Tax ID, VAT number...etc This information will be printed on your invoice.',
+    defaultMessage: 'Tax ID, VAT number, etc. This information will be printed on your invoice.',
   },
 });
 
