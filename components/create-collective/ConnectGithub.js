@@ -101,7 +101,7 @@ class ConnectGithub extends React.Component {
       verb: this.props.query.verb,
       hostCollectiveSlug: this.props.query.hostCollectiveSlug || undefined,
     };
-    await Router.pushRoute('new-create-collective', params);
+    await Router.pushRoute('create-collective', params);
     window.scrollTo(0, 0);
   };
 
@@ -171,7 +171,7 @@ class ConnectGithub extends React.Component {
                     values={{
                       applylink: (
                         <Link
-                          route="new-create-collective"
+                          route="create-collective"
                           params={{
                             hostCollectiveSlug: 'opensource',
                             verb: 'apply',
@@ -355,7 +355,7 @@ class ConnectGithub extends React.Component {
                     />
                   </StyledButton>
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: 'opensource',
                       verb: 'apply',
