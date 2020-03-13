@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
@@ -15,6 +15,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { P, H4 } from '../Text';
 import StyledInputTags from '../StyledInputTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
+import FormPersister from '../../lib/form-persister';
 
 const CreateConversationMutation = gqlV2`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
@@ -48,21 +49,50 @@ const messages = defineMessages({
  *
  * /!\ Can only be used with data from API V2.
  */
-const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabled, loading }) => {
+const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled, loading }) => {
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation, mutationOptions);
-  const { register, handleSubmit, errors, formState, setValue } = useForm();
+  const { register, watch, handleSubmit, errors, formState, setValue } = useForm();
+
+  const [formPersister] = React.useState(new FormPersister());
+  const conversationText = watch('html', '');
+  const conversationTags = watch('tags', []);
+  const conversationTitle = watch('title', '');
+
+  const { id: collectiveId, slug: collectiveSlug } = collective;
 
   // Manually register custom fields
-  React.useEffect(() => {
+  useEffect(() => {
     register('html', { required: true });
     register('tags');
+    register('title');
   }, []);
+
+  useEffect(() => {
+    if (!loading && LoggedInUser && !conversationTitle.length && !conversationText.length && !conversationTags.length) {
+      const id = `conversation-${collectiveSlug}-${LoggedInUser.username}`;
+      formPersister.setFormId(id);
+    }
+
+    const formValues = formPersister.loadValues();
+    if (formValues && !conversationTitle.length && !conversationText.length && !conversationText.length) {
+      setValue('title', formValues['title']);
+      setValue('html', formValues['html']);
+      setValue('tags', formValues['tags']);
+    }
+  });
+
+  useEffect(() => {
+    if (conversationTitle.length || conversationText.length || conversationTags.length || !formPersister.loadValues()) {
+      formPersister.saveValues({ html: conversationText, tags: conversationTags, title: conversationTitle });
+    }
+  }, [conversationTitle, conversationText, conversationTags]);
 
   return (
     <form
       onSubmit={handleSubmit(async values => {
         const response = await createConversation({ variables: { ...values, CollectiveId: collectiveId } });
+        formPersister.clearValues();
         return onSuccess(response.data.createConversation);
       })}
     >
@@ -83,6 +113,8 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
               maxLength={255}
               px={0}
               py={0}
+              value={conversationTitle}
+              onChange={e => setValue('title', e.target.value)}
               placeholder={formatMessage(messages.titlePlaceholder)}
               ref={register({ required: true, minLength: 3, maxLength: 255 })}
             />
@@ -112,6 +144,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
                 editorMinHeight={225}
                 inputName="html"
                 fontSize="13px"
+                defaultValue={conversationText}
                 onChange={e => setValue('html', e.target.value)}
                 error={errors.title}
               />
@@ -135,6 +168,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
                 <StyledInputTags
                   maxWidth={300}
                   suggestedTags={suggestedTags}
+                  value={conversationTags}
                   onChange={options =>
                     setValue('tags', options && options.length > 0 ? options.map(option => option.value) : null)
                   }
@@ -171,8 +205,8 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
 };
 
 CreateConversationForm.propTypes = {
-  /** ID of the collective where the conversation will be created */
-  collectiveId: PropTypes.string.isRequired,
+  /** the collective where the conversation will be created */
+  collective: PropTypes.object.isRequired,
   /** Called when the conversation gets successfully created. Return a promise if you want to keep the submitting state active. */
   onSuccess: PropTypes.func.isRequired,
   /** Will disable the form */
@@ -181,6 +215,7 @@ CreateConversationForm.propTypes = {
   loading: PropTypes.bool,
   /** Tags suggested for this new conversation */
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
+  LoggedInUser: PropTypes.object.isRequired,
 };
 
 export default CreateConversationForm;
