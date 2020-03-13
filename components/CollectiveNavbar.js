@@ -296,7 +296,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
 
   if (collective.type === CollectiveType.EVENT) {
     // Should not see tickets section if you can't order them
-    if ((!collective.isApproved && !isAdmin) || !canOrderTicketsFromEvent(collective)) {
+    if ((!collective.isApproved && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
       toRemove.add(Sections.TICKETS);
     }
 
