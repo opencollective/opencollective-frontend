@@ -98,7 +98,7 @@
     "react-tooltip": "4.1.2",
     "react-window": "1.8.5",
     "rehype-react": "4.0.1",
-    "rehype-sanitize": "3.0.0",
+    "rehype-sanitize": "3.0.1",
     "remark-parse": "7.0.2",
     "remark-rehype": "5.0.0",
     "sanitize-html": "1.22.1",
