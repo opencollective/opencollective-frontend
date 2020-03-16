@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
 import { Router } from '../server/pages';
+import { IgnorableError } from '../lib/errors';
 
 /**
  * A component to warn users if they try to leave with unsaved data. Just set
@@ -41,7 +42,7 @@ class WarnIfUnsavedChanges extends React.Component {
     if (hasUnsavedChanges && !confirm(intl.formatMessage(this.messages.warning))) {
       Router.router.abortComponentLoad();
       Router.router.events.emit('routeChangeError'); // For NProgress to stop the loading indicator
-      throw new Error('Abort page navigation, please ignore this error');
+      throw new IgnorableError('Abort page navigation');
     }
   };
 
