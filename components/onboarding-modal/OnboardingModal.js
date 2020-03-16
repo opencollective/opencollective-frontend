@@ -6,7 +6,6 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../components/StyledModal';
-import StyledHr from '../../components/StyledHr';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
 import OnboardingContentBox from './OnboardingContentBox';

@@ -123,7 +123,7 @@ class CollectivePicker extends React.PureComponent {
     });
   });
 
-  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives, creatable, intl, types) => {
+  getAllOptions = memoizeOne((collectivesOptions, customOptions, createdCollectives, creatable, intl) => {
     let options = collectivesOptions;
 
     if (createdCollectives.length > 0) {
