@@ -25,8 +25,8 @@ const pages = routes()
   .add('hosts', '/hosts')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
-  .add('openSourceApply', '/opensource/(apply|create)')
-  .add('createCollective', '/:hostCollectiveSlug?/(apply|create)')
+  .add('openSourceApply', '/opensource/(apply|create)/:version(v1|legacy)')
+  .add('createCollective', '/:hostCollectiveSlug?/(apply|create)/:version(v1|legacy)')
   .add('createOrganization', '/organizations/new')
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
@@ -78,7 +78,7 @@ const pages = routes()
 // New Create Collective Flow
 pages.add(
   'create-collective',
-  '/:hostCollectiveSlug?/:verb(apply|create)/v2/:category(opensource|community|climate)?/:step(form)?',
+  '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate)?/:step(form)?',
   'new-create-collective',
 );
 
