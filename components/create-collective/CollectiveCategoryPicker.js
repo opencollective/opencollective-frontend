@@ -88,7 +88,7 @@ class CollectiveCategoryPicker extends React.Component {
                     alt={intl.formatMessage(this.messages.opensource)}
                   />
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
@@ -127,7 +127,7 @@ class CollectiveCategoryPicker extends React.Component {
                     alt={intl.formatMessage(this.messages.community)}
                   />
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
@@ -165,7 +165,7 @@ class CollectiveCategoryPicker extends React.Component {
                     alt={intl.formatMessage(this.messages.climate)}
                   />
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
