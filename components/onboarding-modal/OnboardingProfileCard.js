@@ -15,7 +15,6 @@ const Admin = styled(StyledTag)`
 class OnboardingProfileCard extends React.Component {
   static propTypes = {
     user: PropTypes.object,
-    adminUser: PropTypes.object,
   };
 
   render() {
@@ -24,7 +23,7 @@ class OnboardingProfileCard extends React.Component {
 
     return (
       <Flex my={1} ml={2}>
-        <Admin textTransform="none" type="dark">
+        <Admin textTransform="none">
           <Flex alignItems="center">
             <Avatar src={imageUrl ? imageUrl : null} radius={15} name={name} type={type} />
             <Box fontSize="Caption" ml={2}>

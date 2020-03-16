@@ -46,7 +46,7 @@ class OnboardingContentBox extends React.Component {
   }
 
   render() {
-    const { step, collective, LoggedInUser, addAdmins, addContact, intl } = this.props;
+    const { step, collective, addAdmins, addContact, intl } = this.props;
     const { admins } = this.state;
 
     return (
@@ -89,11 +89,7 @@ class OnboardingContentBox extends React.Component {
             {admins.length > 0 && (
               <Flex px={3} width="100%" flexWrap="wrap">
                 {admins.map(admin => (
-                  <OnboardingProfileCard
-                    key={admin.member.id}
-                    user={admin.member}
-                    adminUser={LoggedInUser.collective}
-                  />
+                  <OnboardingProfileCard key={admin.member.id} user={admin.member} />
                 ))}
               </Flex>
             )}
