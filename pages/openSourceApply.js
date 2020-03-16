@@ -151,7 +151,7 @@ class OpenSourceApplyPage extends Component {
   }
 
   getGithubConnectUrl() {
-    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/opensource/apply` });
+    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/opensource/apply/legacy` });
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
     if (accessToken) {

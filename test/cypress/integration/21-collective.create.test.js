@@ -2,7 +2,7 @@ const collectiveName = 'New collective';
 
 describe('create a collective', () => {
   it('edit info', () => {
-    cy.signup({ redirect: '/create' });
+    cy.signup({ redirect: '/create/legacy' });
     cy.get('.CollectiveCategoryPicker .category')
       .first()
       .click();

@@ -24,7 +24,7 @@ describe('Create collective from Github', () => {
         },
       ],
     });
-    cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/create?token=foofoo' });
+    cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/create/legacy?token=foofoo' });
     cy.contains('Pick a repository');
     cy.get('[type="radio"]')
       .first()
