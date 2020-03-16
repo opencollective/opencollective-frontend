@@ -674,7 +674,7 @@
   "ExpenseForm.DescriptionPlaceholder": "Enter expense title",
   "ExpenseForm.InvoiceDescription": "Get paid back for a purchase already made.",
   "ExpenseForm.InvoiceInfo": "Additional invoice information",
-  "ExpenseForm.InvoiceInfoPlaceholder": "Tax ID, VAT number...etc This information will be printed on your invoice.",
+  "ExpenseForm.InvoiceInfoPlaceholder": "Tax ID, VAT number, etc. This information will be printed on your invoice.",
   "ExpenseForm.payeeLabel": "Who is being paid for this expense?",
   "ExpenseForm.PayoutOptionLabel": "Choose payout option",
   "ExpenseForm.ReceiptDescription": "Charge for your time or get paid in advance.",

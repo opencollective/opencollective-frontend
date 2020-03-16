@@ -674,7 +674,7 @@
   "ExpenseForm.DescriptionPlaceholder": "Entrez le titre de la dépense",
   "ExpenseForm.InvoiceDescription": "Pour être remboursé d'un achat déjà effectué.",
   "ExpenseForm.InvoiceInfo": "Informations de facturation additionnelle",
-  "ExpenseForm.InvoiceInfoPlaceholder": "Numéro de TVA, mentions légales...etc Ces informations seront imprimées sur votre facture.",
+  "ExpenseForm.InvoiceInfoPlaceholder": "Tax ID, VAT number, etc. This information will be printed on your invoice.",
   "ExpenseForm.payeeLabel": "Qui recevra l'argent pour cette dépense ?",
   "ExpenseForm.PayoutOptionLabel": "Choisissez un mode de paiement",
   "ExpenseForm.ReceiptDescription": "Facturez votre temps ou soyez payé à l'avance.",
