@@ -887,6 +887,8 @@
   "host.types.organization.label": "organización",
   "host.types.user.description": "You will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income.",
   "host.types.user.label": "un individuo",
+  "HostedCollectives": "Hosted Collectives",
+  "HostedEvents": "Hosted Events",
   "HostFee": "Host fee",
   "hosts.description": "Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services.",
   "hosts.description.findOutMoreLink": "Obtenga más información sobre cómo convertirse en un anfitrión colectivo abierto.",

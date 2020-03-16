@@ -887,6 +887,8 @@
   "host.types.organization.label": "組織",
   "host.types.user.description": "You will receive the funds on behalf of the collective under your own name. Please check with your local fiscal authorities the allowance below which you don't have to report the donations as taxable income.",
   "host.types.user.label": "個人",
+  "HostedCollectives": "Hosted Collectives",
+  "HostedEvents": "Hosted Events",
   "HostFee": "Host fee",
   "hosts.description": "ホストはオープンコレクティブの代わりにお金を集める法人です。経理や税金などについて心配する必要はありません。追加のサービスを提供する人もいます。{findOutMoreLink}",
   "hosts.description.findOutMoreLink": "Find out more about becoming an Open Collective Host.",
