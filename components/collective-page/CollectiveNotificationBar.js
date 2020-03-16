@@ -151,7 +151,7 @@ CollectiveNotificationBar.propTypes = {
     name: PropTypes.string,
   }),
   /** A special status to show the notification bar (collective created, archived...etc) */
-  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'eventConcludedWithBalance']),
+  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   /** from withUser */
