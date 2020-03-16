@@ -25,6 +25,21 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
+const params = {
+  0: {
+    height: '114px',
+    src: '/static/images/create-collective/onboardingWelcomeIllustration.png',
+  },
+  1: {
+    height: '112px',
+    src: '/static/images/create-collective/onboardingAdminsIllustration.png',
+  },
+  2: {
+    height: '119px',
+    src: '/static/images/create-collective/onboardingContactIllustration.png',
+  },
+};
+
 class OnboardingModal extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -121,6 +136,10 @@ class OnboardingModal extends React.Component {
     Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'info' });
   };
 
+  setParams = (step, param) => {
+    return params[step][param];
+  };
+
   render() {
     const { collective, LoggedInUser, show, setShow } = this.props;
     const { step, isSubmitting, error } = this.state;
@@ -142,9 +161,9 @@ class OnboardingModal extends React.Component {
         <ModalBody>
           <Flex flexDirection="column" alignItems="center">
             <img
-              height={'112px'}
               width={'160px'}
-              src="/static/images/create-collective/communityIllustration.png"
+              height={this.setParams(step, 'height')}
+              src={this.setParams(step, 'src')}
               alt="Welcome!"
             />
             <OnboardingContentBox
