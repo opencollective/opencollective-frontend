@@ -96,7 +96,7 @@ class OnboardingContentBox extends React.Component {
                 types={['USER']}
                 onChange={option => {
                   // only assign admins if they are not in the list already
-                  const duplicates = admins.filter(admin => admin.id === option.value.id);
+                  const duplicates = admins.filter(admin => admin.member.id === option.value.id);
                   this.setState(
                     state => ({
                       admins: duplicates.length ? admins : [...state.admins, { role: 'ADMIN', member: option.value }],
