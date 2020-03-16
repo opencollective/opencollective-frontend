@@ -91,7 +91,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages.collectiveArchivedDescription),
       status: 'collectiveArchived',
     };
-  } else if (!collective.isApproved && collective.host) {
+  } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
@@ -131,7 +131,7 @@ const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUse
 
   return !notification ? null : (
     <NotificationBar
-      status={status}
+      status={notification.status}
       title={notification.title}
       description={notification.description}
       actions={notification.actions}
