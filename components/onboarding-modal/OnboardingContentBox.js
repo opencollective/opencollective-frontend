@@ -152,7 +152,7 @@ class OnboardingContentBox extends React.Component {
               <P>
                 <FormattedMessage id="onboarding.contact.connect" defaultMessage="Connect your social platforms" />
               </P>
-              <P>
+              <P my={2} fontSize="Caption" color="black.500">
                 <FormattedMessage
                   id="onboarding.contact.social"
                   defaultMessage="Tell your contributors how to reach your Collective through social media."
