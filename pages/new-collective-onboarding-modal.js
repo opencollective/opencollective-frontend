@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { Box, Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
 
 import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import ErrorPage from '../components/ErrorPage';
@@ -53,12 +54,12 @@ class NewCollectiveOnboardingPage extends React.Component {
             <Flex flexDirection="column" p={4} mt={2}>
               <Box mb={3}>
                 <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                  Join Open Collective
+                  <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
                 </H1>
               </Box>
               <Box textAlign="center">
                 <P fontSize="Paragraph" color="black.600" mb={1}>
-                  Create or sign in
+                  <FormattedMessage id="signIn" defaultMessage="Sign In" />
                 </P>
               </Box>
             </Flex>

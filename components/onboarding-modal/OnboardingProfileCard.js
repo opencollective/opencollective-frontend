@@ -18,10 +18,6 @@ class OnboardingProfileCard extends React.Component {
     adminUser: PropTypes.object,
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { user } = this.props;
     const { imageUrl, name, type } = user;

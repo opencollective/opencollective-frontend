@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
 
 import { Span } from '../Text';
 import StepsProgress from '../StepsProgress';
@@ -38,10 +39,6 @@ class OnboardingStepsProgress extends React.Component {
     slug: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   setParams = (step, param) => {
     return params[step][param];
   };
@@ -63,9 +60,19 @@ class OnboardingStepsProgress extends React.Component {
           }}
         >
           {({ step }) => {
+            let label = null;
+            if (step.name === 'Welcome') {
+              label = <FormattedMessage id="welcome" defaultMessage="Welcome" />;
+            }
+            if (step.name === 'Administrators') {
+              label = <FormattedMessage id="administrators" defaultMessage="Administrators" />;
+            }
+            if (step.name === 'Contact') {
+              label = <FormattedMessage id="contact" defaultMessage="Contact" />;
+            }
             return (
               <Flex flexDirection="column" alignItems="center">
-                <StepLabel>{step.name}</StepLabel>
+                <StepLabel>{label}</StepLabel>
               </Flex>
             );
           }}

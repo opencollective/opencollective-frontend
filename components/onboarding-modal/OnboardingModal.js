@@ -45,7 +45,6 @@ class OnboardingModal extends React.Component {
     query: PropTypes.object,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    // refetchLoggedInUser: PropTypes.func,
     EditCollectiveMembers: PropTypes.func,
     EditCollectiveContact: PropTypes.func,
     show: PropTypes.bool,
@@ -146,7 +145,6 @@ class OnboardingModal extends React.Component {
 
     return (
       <Modal width="576px" minHeight="456px" show={show} onClose={() => setShow(false)}>
-        {/* <Flex flexDirection="column" alignItems="center" py={[0, 4]}> */}
         <ModalHeader onClose={() => setShow(false)}>
           <Flex flexDirection="column" alignItems="center" width="100%">
             <StepsProgressBox ml={'15px'} mb={[3, null, 4]} width={0.8}>
@@ -160,12 +158,7 @@ class OnboardingModal extends React.Component {
         </ModalHeader>
         <ModalBody>
           <Flex flexDirection="column" alignItems="center">
-            <img
-              width={'160px'}
-              height={this.setParams(step, 'height')}
-              src={this.setParams(step, 'src')}
-              alt="Welcome!"
-            />
+            <img width={'160px'} height={this.setParams(step, 'height')} src={this.setParams(step, 'src')} />
             <OnboardingContentBox
               step={step}
               collective={collective}
@@ -190,14 +183,13 @@ class OnboardingModal extends React.Component {
             />
           </Flex>
         </ModalFooter>
-        {/* </Flex> */}
       </Modal>
     );
   }
 }
 
 // GraphQL for editing Collective admins info
-const editCoreContributorsQuery = gql`
+const editCoreContributorsMutation = gql`
   mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
@@ -213,7 +205,7 @@ const editCoreContributorsQuery = gql`
   }
 `;
 
-const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {
+const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
   props: ({ mutate }) => ({
     EditCollectiveMembers: async ({ collectiveId, members }) => {
       return await mutate({
@@ -226,7 +218,7 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsQuery, {
 });
 
 // GraphQL for editing Collective contact info
-const editCollectiveContactQuery = gql`
+const editCollectiveContactMutation = gql`
   mutation EditCollectiveContact($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
@@ -237,7 +229,7 @@ const editCollectiveContactQuery = gql`
   }
 `;
 
-const addEditCollectiveContactMutation = graphql(editCollectiveContactQuery, {
+const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
   props: ({ mutate }) => ({
     EditCollectiveContact: async ({ collective }) => {
       return await mutate({

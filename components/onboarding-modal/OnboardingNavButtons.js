@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
 
 import StyledRoundButton from '../../components/StyledRoundButton';
 import StyledButton from '../../components/StyledButton';
@@ -30,10 +31,6 @@ class OnboardingNavButtons extends React.Component {
     loading: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   setParams = (step, param) => {
     return params[step][param];
   };
@@ -59,7 +56,7 @@ class OnboardingNavButtons extends React.Component {
               ←
             </StyledRoundButton>
             <StyledButton buttonStyle="primary" onClick={submitCollectiveInfo} loading={loading}>
-              Finish
+              <FormattedMessage id="Finish" defaultMessage="Finish" />
             </StyledButton>
           </Fragment>
         ) : (
