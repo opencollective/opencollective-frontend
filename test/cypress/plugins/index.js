@@ -5,10 +5,9 @@ module.exports = (on, config) => {
   // eslint-disable-next-line node/no-unpublished-require
   on('task', require('@cypress/code-coverage/task'));
 
-  on('before:browser:launch', (browser = {}, args) => {
+  on('before:browser:launch', (browser = {}, launchOptions) => {
     if (browser.name === 'chrome') {
-      args.push('--lang=en-US');
-      return args;
+      launchOptions.args.push('--lang=en-US');
     }
   });
 

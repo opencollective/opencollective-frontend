@@ -1,3 +1,5 @@
+import { randomSlug } from '../support/faker';
+
 describe('host dashboard', () => {
   before(() => {
     cy.signup({ redirect: '/brusselstogetherasbl' });
@@ -5,12 +7,14 @@ describe('host dashboard', () => {
 
   it('mark pending application approved', () => {
     cy.get('[data-cy="host-apply-btn"]:not([disabled]):visible', { timeout: 30000 }).click();
-    cy.fillInputField('name', 'Cavies United', { timeout: 30000 });
-    cy.fillInputField('description', 'We will rule the world with our cute squeaks');
-    cy.fillInputField('website', 'https://guineapi.gs');
-    cy.get('.tos input[type="checkbox"]').click();
+    cy.get(`input[name="name"]`).type('Cavies United');
+    cy.get(`input[name="slug"]`).type(randomSlug());
+    cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
+    // FIXME: more precise selector such as
+    // cy.get('input[name="tos"] [data-cy="custom-checkbox"]').click();
+    cy.get('[data-cy="custom-checkbox"]').click();
     cy.wait(300);
-    cy.get('.actions button').click();
+    cy.get('button[type="submit"]').click();
     cy.wait(1000);
     cy.url().then(currentUrl => {
       // positive lookbehind regex to get the collective slug from the url
