@@ -13,9 +13,9 @@ import StyledSpinner from '../StyledSpinner';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 
-import { formatErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { formatFormErrorMessage } from '../../lib/form-utils';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
@@ -191,7 +191,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
         {({ field, meta }) => (
           <StyledInputField
             name={field.name}
-            error={meta.error && formatErrorMessage(meta.error)}
+            error={meta.error && formatFormErrorMessage(meta.error)}
             label={formatMessage(msg.currency)}
           >
             {({ id }) => (

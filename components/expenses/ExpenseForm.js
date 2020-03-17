@@ -18,7 +18,8 @@ import StyledButton from '../StyledButton';
 import PayoutMethodSelect from './PayoutMethodSelect';
 import StyledTextarea from '../StyledTextarea';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
-import { requireFields, formatErrorMessage, FORM_ERROR, isErrorType } from '../../lib/form-utils';
+import { requireFields, formatFormErrorMessage } from '../../lib/form-utils';
+import { ERROR, isErrorType } from '../../lib/errors';
 import { validateAttachment } from './ExpenseAttachmentForm';
 
 const msg = defineMessages({
@@ -118,7 +119,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective }) => {
           />
           {errors.description && (
             <P color="red.500" mt={2}>
-              {formatErrorMessage(intl, errors.description)}
+              {formatFormErrorMessage(intl, errors.description)}
             </P>
           )}
           <StyledHr mt={3} borderColor="black.300" />
@@ -177,8 +178,8 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective }) => {
                       minWidth={250}
                       label={formatMessage(msg.payoutOptionLabel)}
                       error={
-                        isErrorType(errors.payoutMethod, FORM_ERROR.REQUIRED)
-                          ? formatErrorMessage(intl, errors.payoutMethod)
+                        isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                          ? formatFormErrorMessage(intl, errors.payoutMethod)
                           : null
                       }
                     >

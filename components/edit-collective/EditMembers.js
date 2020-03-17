@@ -10,7 +10,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import InputField from '../InputField';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import StyledButton from '../StyledButton';

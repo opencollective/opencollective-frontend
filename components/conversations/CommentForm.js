@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-apollo';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import { withUser } from '../UserProvider';

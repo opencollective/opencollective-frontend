@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 
 import StyledButton from '../StyledButton';
 import StyledCheckBox from '../StyledCheckbox';

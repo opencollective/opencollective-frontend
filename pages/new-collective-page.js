@@ -5,9 +5,8 @@ import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
@@ -16,6 +15,7 @@ import CollectivePage from '../components/collective-page';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
+import { generateNotFoundError } from '../lib/errors';
 
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(
@@ -123,8 +123,7 @@ class NewCollectivePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {

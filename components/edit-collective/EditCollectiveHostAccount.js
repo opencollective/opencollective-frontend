@@ -9,7 +9,7 @@ import Container from '../Container';
 import StyledButton from '../StyledButton';
 // import MessageBox from '../MessageBox';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { GraphQLContext } from '../../lib/graphql/context';
 
 const activateCollectiveAsHostQuery = gql`

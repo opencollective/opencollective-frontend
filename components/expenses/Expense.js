@@ -6,7 +6,8 @@ import { graphql } from 'react-apollo';
 import { Flex } from '@rebass/grid';
 import { get } from 'lodash';
 
-import { capitalize, formatCurrency, compose, getErrorFromGraphqlException } from '../../lib/utils';
+import { capitalize, formatCurrency, compose } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';

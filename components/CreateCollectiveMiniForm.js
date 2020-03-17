@@ -7,7 +7,7 @@ import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { useForm } from 'react-hook-form';
 
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { H5 } from './Text';

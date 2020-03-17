@@ -12,7 +12,7 @@ import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Router } from '../server/pages';
 import { withUser } from './UserProvider';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 class CreateCollective extends React.Component {
   static propTypes = {
