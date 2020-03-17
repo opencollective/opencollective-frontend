@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import { themeGet } from '@styled-system/theme-get';
 
-import { imagePreview } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import { upload } from '../lib/api';
 
 const messages = defineMessages({

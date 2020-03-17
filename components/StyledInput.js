@@ -3,8 +3,8 @@ import styled, { css } from 'styled-components';
 import { background, border, color, layout, flexbox, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import propTypes from '@styled-system/prop-types';
-import { overflow } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/theme';
+import { overflow } from '../lib/styled-system-custom-properties';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
 const getBorderColor = ({ error, success }) => {
   if (error) {

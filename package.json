@@ -242,5 +242,12 @@
     "*.{js,json,md,graphql}": [
       "prettier --write"
     ]
+  },
+  "bit": {
+    "env": {
+      "compiler": "bit.envs/compilers/react@1.0.14"
+    },
+    "componentsDefaultDirectory": "components/{name}",
+    "packageManager": "npm"
   }
 }

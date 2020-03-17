@@ -9,7 +9,8 @@ import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 
-import { formatCurrency, getCollectiveImage } from '../../lib/utils';
+import { formatCurrency } from '../../lib/utils';
+import { getCollectiveImage } from '../../lib/image-utils';
 
 import InputField from '../InputField';
 import InvoiceDownloadLink from './InvoiceDownloadLink';

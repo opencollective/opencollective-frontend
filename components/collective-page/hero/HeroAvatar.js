@@ -9,7 +9,7 @@ import { Camera } from '@styled-icons/feather/Camera';
 import { Settings } from '@styled-icons/feather/Settings';
 
 import { upload } from '../../../lib/api';
-import { getAvatarBorderRadius } from '../../../lib/utils';
+import { getAvatarBorderRadius } from '../../../lib/image-utils';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import Avatar from '../../Avatar';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
