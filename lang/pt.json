@@ -888,6 +888,8 @@
   "host.types.organization.label": "uma organização",
   "host.types.user.description": "Você receberá os fundos em nome do coletivo em seu próprio nome. Verifique com as autoridades fiscais locais o limite a partir do qual você não precisa declarar as doações como receita tributável.",
   "host.types.user.label": "um indivíduo",
+  "HostedCollectives": "Hosted Collectives",
+  "HostedEvents": "Hosted Events",
   "HostFee": "Comissão ao organizador",
   "hosts.description": "Os hosts são entidades legais que coletam dinheiro em nome de coletivos abertos, para que eles não precisem se preocupar com contabilidade, impostos, etc. Alguns também fornecem serviços extras. {findOutMoreLink}",
   "hosts.description.findOutMoreLink": "Descubra mais sobre como se tornar um Organizador do Open Collective.",

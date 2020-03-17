@@ -888,6 +888,8 @@
   "host.types.organization.label": "une entreprise",
   "host.types.user.description": "Vous recevrez les fonds du collectif sous votre propre nom. Merci de vérifier avec les autorités fiscales locales que vous n’avez pas à déclarer les dons comme revenu imposable.",
   "host.types.user.label": "un individu",
+  "HostedCollectives": "Hosted Collectives",
+  "HostedEvents": "Hosted Events",
   "HostFee": "Commission de l’hôte",
   "hosts.description": "Les hôtes sont des entités légales qui récoltent l'argent au nom des collectifs, leur permettant ainsi d'opérer en toute légalité sans devoir se soucier de toute la paperasse administrative, de la comptabilité, etc. Certains hôtes offrent également des services complémentaires. {findOutMoreLink}",
   "hosts.description.findOutMoreLink": "Plus d'information sur comment devenir un hôte de collectifs ouverts.",
