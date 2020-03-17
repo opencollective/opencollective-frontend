@@ -1,6 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { Github } from '@styled-icons/fa-brands/Github';
+import { Twitter } from '@styled-icons/fa-brands/Twitter';
+import { isURL, matches } from 'validator';
 
 import Container from '../../components/Container';
 import { H1, P } from '../../components/Text';
@@ -9,18 +13,19 @@ import StyledInputGroup from '../../components/StyledInputGroup';
 import StyledHr from '../../components/StyledHr';
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 import OnboardingProfileCard from './OnboardingProfileCard';
-import { Github } from '@styled-icons/fa-brands/Github';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import OnboardingSkipButton from './OnboardingSkipButton';
+
+import withViewport, { VIEWPORTS } from '../../lib/withViewport';
 
 class OnboardingContentBox extends React.Component {
   static propTypes = {
     step: PropTypes.number,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    addAdmins: PropTypes.func,
+    updateAdmins: PropTypes.func,
     addContact: PropTypes.func,
-    intl: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    viewport: PropTypes.object,
   };
 
   constructor(props) {
@@ -28,6 +33,9 @@ class OnboardingContentBox extends React.Component {
 
     this.state = {
       admins: [],
+      websiteError: null,
+      githubError: null,
+      twitterError: null,
     };
 
     this.messages = defineMessages({
@@ -35,6 +43,9 @@ class OnboardingContentBox extends React.Component {
         id: 'onboarding.contact.placeholder',
         defaultMessage: 'Write the name of who you want to invite',
       },
+      twitterError: { id: 'onboarding.error.twitter', defaultMessage: 'Please enter a valid Twitter handle.' },
+      githubError: { id: 'onboarding.error.github', defaultMessage: 'Please enter a valid Github handle.' },
+      websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
     });
   }
 
@@ -45,21 +56,53 @@ class OnboardingContentBox extends React.Component {
     });
   }
 
+  removeAdmin = collective => {
+    const filteredAdmins = this.state.admins.filter(admin => admin.member.id !== collective.id);
+    this.setState(
+      {
+        admins: filteredAdmins,
+      },
+      () => this.props.updateAdmins(this.state.admins),
+    );
+  };
+
+  validateField = (fieldName, fieldValue) => {
+    // fields aren't required so don't validate empty
+    if (fieldValue === '') {
+      return;
+    }
+    if (fieldName === 'website') {
+      isURL(fieldValue) === false
+        ? this.setState({ websiteError: this.props.intl.formatMessage(this.messages['websiteError']) })
+        : this.setState({ websiteError: null });
+    } else if (fieldName === 'githubHandle') {
+      // https://github.com/shinnn/github-username-regex
+      matches(fieldValue, /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i) === false
+        ? this.setState({ githubError: this.props.intl.formatMessage(this.messages['githubError']) })
+        : this.setState({ githubError: null });
+    } else if (fieldName === 'twitterHandle') {
+      // https://stackoverflow.com/questions/11361044/twitter-name-validation
+      matches(fieldValue, /^[a-zA-Z0-9_]{1,15}$/) === false
+        ? this.setState({ twitterError: this.props.intl.formatMessage(this.messages['twitterError']) })
+        : this.setState({ twitterError: null });
+    }
+  };
+
   render() {
-    const { step, collective, addAdmins, addContact, intl } = this.props;
-    const { admins } = this.state;
+    const { step, collective, updateAdmins, addContact, intl, LoggedInUser, viewport } = this.props;
+    const { admins, websiteError, twitterError, githubError } = this.state;
 
     return (
-      <Container display="flex" flexDirection="column" width="80%" alignItems="center">
+      <Container display="flex" flexDirection="column" width={['90%', '80%']} alignItems="center">
         {step === 0 && (
-          <Flex maxWidth={['336px']}>
+          <Flex flexDirection="column" alignItems="center" maxWidth={['336px']}>
             <H1
               fontSize={['H5']}
               lineHeight={['H5']}
               fontWeight="bold"
               color="black.900"
               textAlign="center"
-              mb={[2, 4]}
+              mb={[4]}
               mx={[2, null]}
             >
               <FormattedMessage
@@ -67,8 +110,13 @@ class OnboardingContentBox extends React.Component {
                 defaultMessage="The {collective} Collective has been created!"
                 values={{ collective: collective.name }}
               />
-              🎉
+              &nbsp;🎉
             </H1>
+            {viewport === VIEWPORTS.MOBILE && (
+              <Fragment>
+                <OnboardingSkipButton />
+              </Fragment>
+            )}
           </Flex>
         )}
         {step === 1 && (
@@ -89,7 +137,12 @@ class OnboardingContentBox extends React.Component {
             {admins.length > 0 && (
               <Flex px={3} width="100%" flexWrap="wrap">
                 {admins.map(admin => (
-                  <OnboardingProfileCard key={admin.member.id} collective={admin.member} />
+                  <OnboardingProfileCard
+                    key={admin.member.id}
+                    collective={admin.member}
+                    adminCollective={LoggedInUser.collective}
+                    removeAdmin={this.removeAdmin}
+                  />
                 ))}
               </Flex>
             )}
@@ -105,6 +158,8 @@ class OnboardingContentBox extends React.Component {
             <Flex my={2} px={3} flexDirection="column" width="100%">
               <CollectivePickerAsync
                 creatable
+                collective={null}
+                preload={true}
                 types={['USER']}
                 onChange={option => {
                   // only assign admins if they are not in the list already
@@ -113,7 +168,7 @@ class OnboardingContentBox extends React.Component {
                     state => ({
                       admins: duplicates.length ? admins : [...state.admins, { role: 'ADMIN', member: option.value }],
                     }),
-                    () => addAdmins(this.state.admins),
+                    () => updateAdmins(this.state.admins),
                   );
                 }}
                 placeholder={intl.formatMessage(this.messages['placeholder'])}
@@ -138,11 +193,14 @@ class OnboardingContentBox extends React.Component {
               <P>
                 <FormattedMessage id="onboarding.contact.website" defaultMessage="Do you have a website?" />
               </P>
-              <StyledInputField my={2} htmlFor="website">
+              <StyledInputField my={[3, 2]} htmlFor="website" error={websiteError}>
                 {inputProps => (
                   <StyledInputGroup
                     type="text"
-                    onBlur={({ target }) => addContact(target.name, target.value)}
+                    onBlur={({ target }) => {
+                      addContact(target.name, target.value);
+                      this.validateField(target.name, target.value);
+                    }}
                     prepend="http://"
                     placeholder="www.agora.com"
                     {...inputProps}
@@ -159,12 +217,15 @@ class OnboardingContentBox extends React.Component {
                 />
               </P>
               <Flex alignItems="center">
-                <Twitter size={[20]} color="black.500" />
-                <StyledInputField ml={2} my={2} htmlFor="twitterHandle" flexGrow={1}>
+                <Twitter size={20} color="black.500" />
+                <StyledInputField ml={2} my={2} htmlFor="twitterHandle" flexGrow={1} error={twitterError}>
                   {inputProps => (
                     <StyledInputGroup
                       type="text"
-                      onBlur={({ target }) => addContact(target.name, target.value)}
+                      onBlur={({ target }) => {
+                        addContact(target.name, target.value);
+                        this.validateField(target.name, target.value);
+                      }}
                       placeholder="agora"
                       prepend="@"
                       {...inputProps}
@@ -173,12 +234,15 @@ class OnboardingContentBox extends React.Component {
                 </StyledInputField>
               </Flex>
               <Flex alignItems="center">
-                <Github size={[20]} color="black.500" />
-                <StyledInputField ml={2} my={2} htmlFor="githubHandle" flexGrow={1}>
+                <Github size={20} color="black.500" />
+                <StyledInputField ml={2} my={2} htmlFor="githubHandle" flexGrow={1} error={githubError}>
                   {inputProps => (
                     <StyledInputGroup
                       type="text"
-                      onBlur={({ target }) => addContact(target.name, target.value)}
+                      onBlur={({ target }) => {
+                        addContact(target.name, target.value);
+                        this.validateField(target.name, target.value);
+                      }}
                       placeholder="agoraos"
                       prepend="github.com/"
                       {...inputProps}
@@ -194,4 +258,4 @@ class OnboardingContentBox extends React.Component {
   }
 }
 
-export default injectIntl(OnboardingContentBox);
+export default withViewport(injectIntl(OnboardingContentBox));

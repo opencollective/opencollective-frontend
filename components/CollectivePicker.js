@@ -88,7 +88,9 @@ class CollectivePicker extends React.PureComponent {
    * Function to generate a single select option
    */
   buildCollectiveOption(collective) {
-    return { value: collective, label: collective.name, __collective_picker_collective__: true };
+    return collective === null
+      ? null
+      : { value: collective, label: collective.name, __collective_picker_collective__: true };
   }
 
   /**
@@ -190,6 +192,16 @@ class CollectivePicker extends React.PureComponent {
     }
   };
 
+  getValue = () => {
+    if (this.props.collective !== undefined) {
+      return this.buildCollectiveOption(this.props.collective);
+    } else if (this.state.showCreatedCollective) {
+      return this.buildCollectiveOption(last(this.state.createdCollectives));
+    } else {
+      return this.props.getOptions(this.buildCollectiveOption);
+    }
+  };
+
   render() {
     const {
       intl,
@@ -198,7 +210,6 @@ class CollectivePicker extends React.PureComponent {
       customOptions,
       formatOptionLabel,
       getDefaultOptions,
-      getOptions,
       groupByType,
       onChange,
       sortFunc,
@@ -210,12 +221,9 @@ class CollectivePicker extends React.PureComponent {
       width,
       ...props
     } = this.props;
-    const { createFormCollectiveType, createdCollectives, showCreatedCollective } = this.state;
+    const { createFormCollectiveType, createdCollectives } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
     const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives, creatable, intl);
-    const value = showCreatedCollective
-      ? this.buildCollectiveOption(last(createdCollectives))
-      : getOptions(this.buildCollectiveOption);
 
     return (
       <Container position="relative" minWidth={minWidth} maxWidth={maxWidth} width={width}>
@@ -226,7 +234,7 @@ class CollectivePicker extends React.PureComponent {
           isDisabled={Boolean(createFormCollectiveType) || isDisabled}
           onMenuOpen={this.openMenu}
           onMenuClose={this.closeMenu}
-          value={value}
+          value={this.getValue()}
           onChange={this.onChange}
           formatOptionLabel={(option, context) => {
             if (option.__collective_picker_collective__) {
@@ -305,6 +313,12 @@ CollectivePicker.propTypes = {
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+  /** Use this to control the value of the component */
+  collective: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    type: PropTypes.string,
+    name: PropTypes.string,
+  }),
 };
 
 CollectivePicker.defaultProps = {

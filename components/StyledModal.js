@@ -35,7 +35,7 @@ const GlobalModalStyle = createGlobalStyle`
   }
 `;
 
-const ModalOverlay = styled.div`
+export const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -75,8 +75,8 @@ const CloseIcon = styled(Times)`
   cursor: pointer;
 `;
 
-export const ModalHeader = ({ children, onClose }) => (
-  <Header>
+export const ModalHeader = ({ children, onClose, ...props }) => (
+  <Header {...props}>
     {children}
     <CloseIcon onClick={onClose} />
   </Header>
@@ -91,11 +91,7 @@ ModalHeader.propTypes = {
 
 ModalHeader.displayName = 'Header';
 
-export const ModalBody = ({ children, width, height }) => (
-  <Body width={width} height={height}>
-    {children}
-  </Body>
-);
+export const ModalBody = ({ children, ...props }) => <Body {...props}>{children}</Body>;
 
 ModalBody.propTypes = {
   /** width of the modal component */
@@ -106,8 +102,8 @@ ModalBody.propTypes = {
   children: PropTypes.node,
 };
 
-export const ModalFooter = ({ children }) => (
-  <Container>
+export const ModalFooter = ({ children, ...props }) => (
+  <Container {...props}>
     <Divider />
     {children}
   </Container>
@@ -121,7 +117,22 @@ ModalFooter.propTypes = {
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
-const StyledModal = ({ children, show, onClose, ...props }) => {
+const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
+  if (show && usePortal === false) {
+    return (
+      <React.Fragment>
+        <GlobalModalStyle />
+        <ModalWrapper {...props}>
+          {React.Children.map(children, child => {
+            if (child.type.displayName === 'Header') {
+              return React.cloneElement(child, { onClose });
+            }
+            return child;
+          })}
+        </ModalWrapper>
+      </React.Fragment>
+    );
+  }
   if (show && typeof document !== 'undefined') {
     return createPortal(
       <React.Fragment>

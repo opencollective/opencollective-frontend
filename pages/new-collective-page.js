@@ -13,6 +13,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-c
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import CollectivePage from '../components/collective-page';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import Container from '../components/Container';
 import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
 import { generateNotFoundError } from '../lib/errors';
@@ -44,20 +45,22 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
-  static getInitialProps({ req, res, query: { slug, eventSlug, status } }) {
+  static getInitialProps({ req, res, query: { slug, eventSlug, status, step, mode } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
     /** If there is a eventSlug parameter, use that one as slug,
      * remove this and fix routes when feature flag NEW_EVENTS is gone */
-    return { slug: eventSlug ? eventSlug : slug, status };
+    return { slug: eventSlug ? eventSlug : slug, status, step, mode };
   }
 
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+    step: PropTypes.string,
+    mode: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -93,6 +96,7 @@ class NewCollectivePage extends React.Component {
     super(props);
     this.state = {
       smooth: false,
+      showOnboardingModal: true,
     };
   }
 
@@ -116,8 +120,13 @@ class NewCollectivePage extends React.Component {
     }
   }
 
+  setShowOnboardingModal = bool => {
+    this.setState({ showOnboardingModal: bool });
+  };
+
   render() {
-    const { slug, data, LoggedInUser, status } = this.props;
+    const { slug, data, LoggedInUser, status, step, mode } = this.props;
+    const { showOnboardingModal } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -132,6 +141,7 @@ class NewCollectivePage extends React.Component {
     }
 
     const collective = data && data.Collective;
+
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles smooth={this.state.smooth} />
@@ -166,9 +176,21 @@ class NewCollectivePage extends React.Component {
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
                   onPrimaryColorChange={onPrimaryColorChange}
+                  step={step}
+                  mode={mode}
                 />
               )}
             </CollectiveThemeProvider>
+            {LoggedInUser && mode === 'onboarding' && (
+              <OnboardingModal
+                showOnboardingModal={showOnboardingModal}
+                setShowOnboardingModal={this.setShowOnboardingModal}
+                step={step}
+                mode={mode}
+                collective={collective}
+                LoggedInUser={LoggedInUser}
+              />
+            )}
           </React.Fragment>
         )}
       </Page>
