@@ -14,18 +14,18 @@ const Admin = styled(StyledTag)`
 
 class OnboardingProfileCard extends React.Component {
   static propTypes = {
-    user: PropTypes.object,
+    collective: PropTypes.object,
   };
 
   render() {
-    const { user } = this.props;
-    const { imageUrl, name, type } = user;
+    const { collective } = this.props;
+    const { name } = collective;
 
     return (
       <Flex my={1} ml={2}>
         <Admin textTransform="none">
           <Flex alignItems="center">
-            <Avatar src={imageUrl ? imageUrl : null} radius={15} name={name} type={type} />
+            <Avatar radius={15} collective={collective} />
             <Box fontSize="Caption" ml={2}>
               {name}
             </Box>

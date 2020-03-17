@@ -89,7 +89,7 @@ class OnboardingContentBox extends React.Component {
             {admins.length > 0 && (
               <Flex px={3} width="100%" flexWrap="wrap">
                 {admins.map(admin => (
-                  <OnboardingProfileCard key={admin.member.id} user={admin.member} />
+                  <OnboardingProfileCard key={admin.member.id} collective={admin.member} />
                 ))}
               </Flex>
             )}
