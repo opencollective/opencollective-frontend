@@ -131,6 +131,8 @@
   "collective.created": "コレクティブの作成に成功しました。",
   "collective.created.description": "While you are waiting for approval from your host ({host}), you can already customize your collective, file expenses and even create events.",
   "Collective.CreateNew": "Create new Collective",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "This {type} will be deleted, along with all related data like Core Contributor roles and payment methods.",
   "collective.delete.isHost": "You can't delete your collective while being a Host, please deactivate as Host first.",
   "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",

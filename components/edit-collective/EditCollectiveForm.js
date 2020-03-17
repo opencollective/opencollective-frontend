@@ -12,6 +12,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { Currency } from '../../lib/constants/currency';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
@@ -184,6 +185,14 @@ class EditCollectiveForm extends React.Component {
       'country.label': {
         id: 'collective.country.label',
         defaultMessage: 'Country',
+      },
+      'currency.label': {
+        id: 'collective.currency.label',
+        defaultMessage: 'Currency',
+      },
+      'currency.placeholder': {
+        id: 'collective.currency.placeholder',
+        defaultMessage: 'Select currency',
       },
       'address.label': {
         id: 'collective.address.label',
@@ -420,6 +429,7 @@ class EditCollectiveForm extends React.Component {
       submitBtnMessageId = status;
     }
 
+    const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
     const type = collective.type.toLowerCase();
@@ -482,6 +492,21 @@ class EditCollectiveForm extends React.Component {
           name: 'country',
           type: 'country',
           placeholder: 'Select country',
+        },
+        {
+          name: 'currency',
+          type: 'select',
+          defaultValue: get(this.state.collective, 'currency'),
+          options: currencyOptions,
+          when: () => {
+            if (get(this.state.collective, 'isHost')) {
+              return false;
+            }
+            if ([CollectiveType.ORGANIZATION, CollectiveType.USER].includes(get(this.state.collective, 'type'))) {
+              return true;
+            }
+            return false;
+          },
         },
         {
           name: 'VAT',

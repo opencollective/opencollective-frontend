@@ -131,6 +131,8 @@
   "collective.created": "Seu coletivo foi criado com sucesso.",
   "collective.created.description": "Enquanto você aguarda por aprovação do seu organizador ({host}), você já pode personalizar seu coletivo, arquivar despesas e até criar eventos.",
   "Collective.CreateNew": "Crie um novo Coletivo",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "Este {type} será excluído, junto com todos os dados relacionados como cargos de Colaborador Central e métodos de pagamento.",
   "collective.delete.isHost": "Você não pode excluir seu Coletivo enquanto estiver sendo um Organizador, por favor desative como Organizador primeiro.",
   "collective.delete.isNotDeletable-message": "{type}s com transações, pedidos ou despesas pagas não podem ser excluídas. Por favor, arquive-as.",

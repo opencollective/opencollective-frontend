@@ -131,6 +131,8 @@
   "collective.created": "Tu colecta ha sido registrada con éxito.",
   "collective.created.description": "Mientras esperas la aprobación de tu anfitrión ({host}), puedes comenzar a personalizar tu colecta, la hoja de gastos e incluso registrar eventos.",
   "Collective.CreateNew": "Crear nuevo Colectivo",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "Este {type} será borrado, junto con todos los datos relacionados como los roles de los Contribuyentes principales y métodos de pago.",
   "collective.delete.isHost": "No puede borrar su colectivo mientras siga siendo un Anfitrión, por favor, desactive primero su rol como Anfitrión.",
   "collective.delete.isNotDeletable-message": "{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.",

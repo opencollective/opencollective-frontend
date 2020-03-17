@@ -131,6 +131,8 @@
   "collective.created": "Ваш коллектив успешно создан.",
   "collective.created.description": "Пока вы ждёте подтверждения от вашего представителя ({host}), вы уже можете задать настройки для своего коллектива, расходов и даже создавать события.",
   "Collective.CreateNew": "Создать новый коллектив",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "Этот {type} будет удален, наряду со всеми связанными данными, такими как основные роли и методы оплаты.",
   "collective.delete.isHost": "Вы не можете удалить ваш коллектив т. к. являетесь Хостом, пожалуйста, сначала отключите Хост.",
   "collective.delete.isNotDeletable-message": "{type} с транзакциями, заказами, событиями или оплаченными расходами не могут быть удалены. Пожалуйста, поместите их в архив.",

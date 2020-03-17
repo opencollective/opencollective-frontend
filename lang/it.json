@@ -131,6 +131,8 @@
   "collective.created": "Il tuo collettivo è stato creato con successo.",
   "collective.created.description": "Mentre sei in attesa di approvazione da parte del tuo host ({host}), puoi già personalizzare il tuo collettivo, registrare spese e persino creare eventi.",
   "Collective.CreateNew": "Crea un nuovo Collettivo",
+  "collective.currency.label": "Currency",
+  "collective.currency.placeholder": "Select currency",
   "collective.delete.description": "Questo {type} verrà eliminato, insieme a tutti i dati correlati come i ruoli di sostenitore e i metodi di pagamento.",
   "collective.delete.isHost": "Non puoi eliminare il tuo collettivo mentre sei un host, si prega di disattivarsi come host prima.",
   "collective.delete.isNotDeletable-message": "{type} con transazioni, ordini, eventi o spese a pagamento non possono essere eliminati. Si prega invece di archiviarlo.",
