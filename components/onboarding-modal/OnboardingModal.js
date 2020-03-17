@@ -11,7 +11,7 @@ import OnboardingStepsProgress from './OnboardingStepsProgress';
 import OnboardingContentBox from './OnboardingContentBox';
 import MessageBox from '../../components/MessageBox';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { Router } from '../../server/pages';
 
