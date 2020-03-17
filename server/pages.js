@@ -81,8 +81,6 @@ pages.add(
   '/:hostCollectiveSlug?/:verb(apply|create)/v2/:category(opensource|community|climate)?/:step(form)?',
   'new-create-collective',
 );
-// temporary onboarding modal page
-pages.add('new-collective-onboarding-modal', '/:slug/onboarding/:step(administrators|contact)?');
 
 // Events using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');

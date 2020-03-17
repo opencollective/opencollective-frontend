@@ -34,10 +34,6 @@ const Messages = defineMessages({
     id: 'CollectivePicker.CreateNew',
     defaultMessage: 'Create new',
   },
-  inviteNew: {
-    id: 'CollectivePicker.InviteNew',
-    defaultMessage: 'Invite new',
-  },
 });
 
 /**
@@ -138,9 +134,7 @@ class CollectivePicker extends React.PureComponent {
       options = [
         ...options,
         {
-          label: this.props.types.includes('USER')
-            ? intl.formatMessage(Messages.inviteNew).toUpperCase()
-            : intl.formatMessage(Messages.createNew).toUpperCase(),
+          label: intl.formatMessage(Messages.createNew).toUpperCase(),
           options: [
             {
               label: null,
