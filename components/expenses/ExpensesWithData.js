@@ -83,6 +83,7 @@ const getExpensesQuery = gql`
       includeHostedCollectives: $includeHostedCollectives
     ) {
       id
+      idV2
       description
       status
       createdAt

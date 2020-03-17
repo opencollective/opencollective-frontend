@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Mar 17 2020 09:00:45 GMT+0100 (Central European Standard Time)
+# timestamp: Tue Mar 17 2020 16:29:27 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -1334,6 +1334,7 @@ This represents an Expense
 """
 type ExpenseType {
   id: Int
+  idV2: String
   amount: Int
   currency: String
   createdAt: DateString

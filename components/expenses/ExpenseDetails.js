@@ -15,6 +15,11 @@ import { titleCase } from 'title-case';
 
 import TransactionDetails from './TransactionDetails';
 import { Box, Flex } from '@rebass/grid';
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+import StyledSpinner from '../StyledSpinner';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
+import { formatErrorMessage } from '../../lib/errors';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -141,6 +146,7 @@ class ExpenseDetails extends React.Component {
       return { [key]: titleCase(value) };
     });
     const attachmentsWithFiles = expense.attachments?.filter(attachment => Boolean(attachment.url)) || [];
+    const canDownloadAttachments = isAuthor || LoggedInUser?.canEditCollective(expense.collective);
 
     return (
       <div className={`ExpenseDetails ${this.props.mode}`}>
@@ -356,11 +362,32 @@ class ExpenseDetails extends React.Component {
             </div>
           )}
         </Flex>
-        {attachmentsWithFiles.length > 0 && (
+        {canDownloadAttachments && (
           <Box mt={2}>
             <label>
               <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
             </label>
+            {expense.type === expenseTypes.INVOICE && attachmentsWithFiles.length === 0 && (
+              <ExpenseInvoiceDownloadHelper
+                collective={expense.collective}
+                expense={{ id: expense.idV2, legacyId: expense.id }}
+              >
+                {({ downloadInvoice, error, isLoading, filename }) => (
+                  <div>
+                    {error && (
+                      <MessageBox type="error" withIcon>
+                        {formatErrorMessage(intl, error)}
+                      </MessageBox>
+                    )}
+                    <div className="frame">
+                      <StyledButton asLink title={filename} onClick={downloadInvoice}>
+                        {isLoading ? <StyledSpinner size={64} /> : <img src={this.getAttachmentPreview()} />}
+                      </StyledButton>
+                    </div>
+                  </div>
+                )}
+              </ExpenseInvoiceDownloadHelper>
+            )}
             {attachmentsWithFiles.map((attachment, idx) => (
               <div key={attachment.id}>
                 <div className="frame">
@@ -410,6 +437,7 @@ const getExpenseQuery = gql`
   query Expense($id: Int!) {
     Expense(id: $id) {
       id
+      idV2
       description
       createdAt
       category

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Mar 17 2020 09:01:03 GMT+0100 (Central European Standard Time)
+# timestamp: Tue Mar 17 2020 16:30:00 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
