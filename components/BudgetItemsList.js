@@ -118,6 +118,12 @@ export const BudgetItemExpenseFragment = gql`
         name
       }
     }
+    collective {
+      slug
+      name
+      type
+      isIncognito
+    }
     usingVirtualCardFromCollective {
       id
       slug
@@ -237,6 +243,7 @@ const getItemInfo = (item, isInverted) => {
         collective: item.fromCollective,
         paymentMethod: item.paymentMethod,
         transaction: item,
+        originCollective: item.type === TransactionTypes.CREDIT ? item.fromCollective : item.collective,
       };
     case 'Order':
       return {
@@ -282,7 +289,10 @@ const getAmountDetailsStr = (amount, currency, transaction) => {
 const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   const { description, createdAt, currency } = item;
-  const { isCredit, amount, paymentMethod, transaction, isExpense, collective, route } = getItemInfo(item, isInverted);
+  const { isCredit, amount, paymentMethod, transaction, isExpense, collective, route, originCollective } = getItemInfo(
+    item,
+    isInverted,
+  );
   const ItemContainer = isCredit ? CreditItem : DebitItem;
   const hasRefund = Boolean(transaction && transaction.refundTransaction);
   const hasAccessToInvoice = canDownloadInvoice && transaction && transaction.uuid;
@@ -326,7 +336,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
               {isExpense && <ExpenseStatusTag status={item.status} ml={3} py="6px" />}
             </Flex>
             <Container data-cy="transaction-details" fontSize="Caption" color="black.500" mt={2}>
-              <StyledLink as={LinkCollective} collective={collective} />
+              <StyledLink as={LinkCollective} collective={originCollective ? originCollective : collective} />
               {INFO_SEPARATOR}
               {item.usingVirtualCardFromCollective && (
                 <React.Fragment>
