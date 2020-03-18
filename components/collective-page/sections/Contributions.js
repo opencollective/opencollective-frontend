@@ -73,7 +73,7 @@ const ROLES_WEIGHT = {
 const filterFuncs = {
   [FILTERS.HOSTED_COLLECTIVES]: ({ role, collective }) => role === roles.HOST && collective.type === 'COLLECTIVE',
   [FILTERS.HOSTED_EVENTS]: ({ role, collective }) => role === roles.HOST && collective.type === 'EVENT',
-  [FILTERS.FINANCIAL]: ({ role }) => role === roles.BACKER,
+  [FILTERS.FINANCIAL]: ({ role, stats }) => role === roles.BACKER && stats.totalDonations > 0,
   [FILTERS.CORE]: ({ role }) => role === roles.ADMIN || role === roles.MEMBER,
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
