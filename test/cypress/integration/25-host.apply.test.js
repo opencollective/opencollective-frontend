@@ -1,3 +1,5 @@
+import { randomSlug } from '../support/faker';
+
 describe('apply to host', () => {
   it('as a new collective', () => {
     cy.visit('/brusselstogetherasbl');
@@ -6,15 +8,16 @@ describe('apply to host', () => {
     cy.get('#email').type('testuser@opencollective.com');
     cy.wait(500);
     cy.getByDataCy('signin-btn').click();
-    cy.fillInputField('name', 'New collective');
-    cy.fillInputField('description', 'short description for new collective');
-    cy.fillInputField('website', 'https://xdamman.com');
-    cy.get('.tos input[type="checkbox"]').click();
+    cy.get(`input[name="name"]`).type('New collective');
+    cy.get(`input[name="slug"]`).type(randomSlug());
+    cy.get(`input[name="description"]`).type('short description for new collective');
+    // FIXME: more precise selector such as
+    // cy.get('input[name="tos"] [data-cy="custom-checkbox"]').click();
+    cy.get('[data-cy="custom-checkbox"]').click();
     cy.wait(300);
-    cy.get('.actions button').click();
+    cy.get('button[type="submit"]').click();
     cy.wait(1000);
     cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
-    cy.get('[data-cy="collective-hero"] [title="Website"][href="https://xdamman.com"]');
     cy.get('.NotificationBar h1').contains('success');
     cy.get('.NotificationBar p').contains('BrusselsTogether ASBL');
     cy.url().then(currentUrl => {

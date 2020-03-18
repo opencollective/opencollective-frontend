@@ -1,27 +1,29 @@
+import { randomSlug } from '../support/faker';
+
 describe('host dashboard', () => {
   before(() => {
     cy.signup({ redirect: '/brusselstogetherasbl' });
   });
 
   it('mark pending application approved', () => {
+    const collectiveSlug = randomSlug();
+
     cy.get('[data-cy="host-apply-btn"]:not([disabled]):visible', { timeout: 30000 }).click();
-    cy.fillInputField('name', 'Cavies United', { timeout: 30000 });
-    cy.fillInputField('description', 'We will rule the world with our cute squeaks');
-    cy.fillInputField('website', 'https://guineapi.gs');
-    cy.get('.tos input[type="checkbox"]').click();
+    cy.get(`input[name="name"]`).type('Cavies United');
+    cy.get(`input[name="slug"]`).type(collectiveSlug);
+    cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
+    // FIXME: more precise selector such as
+    // cy.get('input[name="tos"] [data-cy="custom-checkbox"]').click();
+    cy.get('[data-cy="custom-checkbox"]').click();
     cy.wait(300);
-    cy.get('.actions button').click();
+    cy.get('button[type="submit"]').click();
     cy.wait(1000);
-    cy.url().then(currentUrl => {
-      // positive lookbehind regex to get the collective slug from the url
-      const CollectiveSlug = currentUrl.match(/(?<=CollectiveSlug=)([A-z-]+)/)[0];
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
-      cy.get('[data-cy="host-dashboard-menu-bar"]')
-        .contains('Pending applications')
-        .click();
-      cy.get(`[data-cy="${CollectiveSlug}-approve"]`).click();
-      cy.get(`[data-cy="${CollectiveSlug}-approved"]`).should('have.attr', 'color', 'green.700');
-    });
+    cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
+    cy.get('[data-cy="host-dashboard-menu-bar"]')
+      .contains('Pending applications')
+      .click();
+    cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
+    cy.get(`[data-cy="${collectiveSlug}-approved"]`).should('have.attr', 'color', 'green.700');
   });
 
   it('mark pending order as paid', () => {

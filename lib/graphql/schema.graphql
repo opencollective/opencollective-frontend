@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Mar 05 2020 16:53:10 GMT+0100 (GMT+01:00)
+# timestamp: Tue Mar 17 2020 09:00:45 GMT+0100 (Central European Standard Time)
 
 """
 Application model
@@ -2631,7 +2631,7 @@ type Query {
     Slug of the invoice. Format: :year:2digitMonth.:hostSlug.:fromCollectiveSlug
     """
     invoiceSlug: String!
-  ): InvoiceType
+  ): InvoiceType @deprecated(reason: "2020-03-09: This field was deprecated after introducing InvoiceByDateRange")
   InvoiceByDateRange(
     """
     Like the Slug of the invoice but spilt out into parts and includes dateFrom

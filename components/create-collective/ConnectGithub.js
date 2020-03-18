@@ -108,7 +108,8 @@ class ConnectGithub extends React.Component {
   getGithubConnectUrl() {
     const urlParams = new URLSearchParams({
       context: 'createCollective',
-      redirect: `${getWebsiteUrl()}/create/v2/opensource`,
+      // TODO: would be better if the path was generated dynamically
+      redirect: `${getWebsiteUrl()}/create/opensource`,
     });
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
