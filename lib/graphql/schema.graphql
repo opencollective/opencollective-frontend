@@ -703,9 +703,12 @@ Input type for CommentType
 """
 input CommentAttributesInputType {
   id: Int
+
+  """
+  Deprecated since 2020-03-18: Please use html.
+  """
   markdown: String
   html: String
-  UpdateId: Int
 }
 
 """

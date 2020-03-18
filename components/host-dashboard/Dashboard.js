@@ -212,7 +212,7 @@ const getDataQuery = gql`
       name
       isHost
       currency
-      paymentMethods(includeOrganizationCollectivePaymentMethod: true) {
+      paymentMethods(includeHostCollectivePaymentMethod: true) {
         id
         uuid
         service
