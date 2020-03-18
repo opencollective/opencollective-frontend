@@ -40,7 +40,7 @@ class StyledTooltip extends React.Component {
     /** Tooltip place */
     place: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
     /** The popup content */
-    content: PropTypes.func,
+    content: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
     /** See react-tooltip */
     delayHide: PropTypes.number,
     /** See react-tooltip */
