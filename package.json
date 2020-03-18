@@ -193,7 +193,7 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-react": "7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
-    "file-loader": "^5.1.0",
+    "file-loader": "^6.0.0",
     "html-loader": "^0.5.5",
     "husky": "^4.2.3",
     "istanbul-lib-coverage": "^3.0.0",
