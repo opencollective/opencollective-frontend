@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 import { capitalize } from '../../lib/utils';
 import EditConnectedAccount from '../EditConnectedAccount';
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 
 class EditConnectedAccounts extends React.Component {
   static propTypes = {
@@ -23,6 +24,9 @@ class EditConnectedAccounts extends React.Component {
     }
     if (collective.type === 'USER' || collective.type === 'ORGANIZATION') {
       this.state.services.push('stripe');
+    }
+    if (collective.isHost && hasFeature(collective, FEATURES.TRANSFERWISE)) {
+      this.state.services.push('transferwise');
     }
   }
 

@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { HelpBlock, Button } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { connectAccount, disconnectAccount } from '../lib/api';
+import { P } from './Text';
+import StyledButton from './StyledButton';
 import EditTwitterAccount from './edit-collective/EditTwitterAccount';
+import EditTransferWiseAccount from './edit-collective/EditTransferWiseAccount';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {
@@ -74,7 +76,7 @@ class EditConnectedAccount extends React.Component {
         defaultMessage: 'GitHub account {username} connected on {updatedAt, date, short}',
       },
     });
-    this.services = ['stripe', 'paypal', 'twitter', 'github'];
+    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise'];
   }
 
   connect(service) {
@@ -125,27 +127,32 @@ class EditConnectedAccount extends React.Component {
         updatedAt: new Date(connectedAccount.updatedAt),
       };
     }
+
+    if (service === 'transferwise') {
+      return <EditTransferWiseAccount collective={collective} connectedAccount={connectedAccount} intl={intl} />;
+    }
+
     return (
       <div className="EditConnectedAccount">
         {!connectedAccount && (
           <div>
-            <HelpBlock>
+            <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
-            </HelpBlock>
-            <Button onClick={() => this.connect(service)}>
+            </P>
+            <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}
-            </Button>
+            </StyledButton>
           </div>
         )}
         {connectedAccount && (
           <div>
             <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
-            <Button onClick={() => this.connect(service)}>
+            <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
               {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
-            </Button>{' '}
-            <Button onClick={() => this.disconnect(service)}>
+            </StyledButton>{' '}
+            <StyledButton buttonSize="small" onClick={() => this.disconnect(service)}>
               {intl.formatMessage(this.messages['collective.connectedAccounts.disconnect.button'])}
-            </Button>
+            </StyledButton>
           </div>
         )}
         {connectedAccount && connectedAccount.service === 'twitter' && collective.type === 'ORGANIZATION' && (
