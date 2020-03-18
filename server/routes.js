@@ -105,7 +105,7 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';
     res.sendFile(
-      path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
+      path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
     );
   });
 
