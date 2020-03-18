@@ -227,7 +227,7 @@ describe('Edit public message after contribution', () => {
         cy.contains('button', 'Make contribution').click();
         cy.wait(1000); // It takes a little bit of time to create the order.
         // Wait for the popup to appear before moving to the collective page.
-        cy.get('[data-cy=EditPublicMessagePopup]');
+        cy.getByDataCy('EditPublicMessagePopup');
 
         // SECTION: Go to the collective page and change the public message
         cy.visit(`/${slug}/v2`);
