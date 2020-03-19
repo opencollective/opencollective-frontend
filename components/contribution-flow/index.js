@@ -100,6 +100,25 @@ const messages = defineMessages({
   },
 });
 
+const stepsLabels = defineMessages({
+  contributeAs: {
+    id: 'contribute.step.contributeAs',
+    defaultMessage: 'Contribute as',
+  },
+  details: {
+    id: 'contribute.step.details',
+    defaultMessage: 'Details',
+  },
+  payment: {
+    id: 'contribute.step.payment',
+    defaultMessage: 'Payment info',
+  },
+  summary: {
+    id: 'contribute.step.summary',
+    defaultMessage: 'Summary',
+  },
+});
+
 /**
  * Main contribution flow entrypoint. Render all the steps from contributeAs
  * to payment.
@@ -665,7 +684,7 @@ class CreateOrderPage extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { skipStepDetails } = this.props;
+    const { skipStepDetails, intl } = this.props;
     const { stepDetails, stepPayment, stepSummary } = this.state;
     const tier = this.props.tier;
     const isFixedContribution = this.isFixedContribution();
@@ -675,7 +694,7 @@ class CreateOrderPage extends React.Component {
     const steps = [
       {
         name: 'contributeAs',
-        labelKey: 'contribute.step.contributeAs',
+        label: intl.formatMessage(stepsLabels.contributeAs),
         isCompleted: Boolean(this.state.stepProfile),
         validate: this.validateStepProfile,
       },
@@ -685,7 +704,7 @@ class CreateOrderPage extends React.Component {
     if (!skipStepDetails && (!isFixedContribution || (tier && tier.type === 'TICKET'))) {
       steps.push({
         name: 'details',
-        labelKey: 'contribute.step.details',
+        label: intl.formatMessage(stepsLabels.details),
         isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
         validate: () => {
           return stepDetails && reportValidityHTML5(this.activeFormRef.current);
@@ -697,7 +716,7 @@ class CreateOrderPage extends React.Component {
     if (!(minAmount === 0 && isFixedContribution)) {
       steps.push({
         name: 'payment',
-        labelKey: 'contribute.step.payment',
+        label: intl.formatMessage(stepsLabels.payment),
         isCompleted: Boolean(noPaymentRequired || stepPayment),
         validate: this.validateStepPayment,
       });
@@ -707,7 +726,7 @@ class CreateOrderPage extends React.Component {
     if (this.taxesMayApply()) {
       steps.push({
         name: 'summary',
-        labelKey: 'contribute.step.summary',
+        label: intl.formatMessage(stepsLabels.summary),
         isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
       });
     }
