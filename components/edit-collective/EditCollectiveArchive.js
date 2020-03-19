@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../lib/graphql/mutations';
@@ -10,6 +10,7 @@ import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { CollectiveType } from '../../lib/constants/collectives';
 
 const getCollectiveType = type => {
   switch (type) {
@@ -24,10 +25,49 @@ const getCollectiveType = type => {
   }
 };
 
+const archiveMessages = defineMessages({
+  [CollectiveType.EVENT]: {
+    id: 'archive.event.confirmation',
+    defaultMessage: 'Are you sure you want to archive this event?',
+  },
+  [CollectiveType.COLLECTIVE]: {
+    id: 'archive.collective.confirmation',
+    defaultMessage: 'Are you sure you want to archive this collective?',
+  },
+  [CollectiveType.ORGANIZATION]: {
+    id: 'archive.organization.confirmation',
+    defaultMessage: 'Are you sure you want to archive this organization?',
+  },
+  _default: {
+    id: 'archive.account.confirmation',
+    defaultMessage: 'Are you sure you want to archive this account?',
+  },
+});
+
+const unarchiveMessages = defineMessages({
+  [CollectiveType.EVENT]: {
+    id: 'unarchive.event.confirmation',
+    defaultMessage: 'Are you sure you want to unarchive this event?',
+  },
+  [CollectiveType.COLLECTIVE]: {
+    id: 'unarchive.collective.confirmation',
+    defaultMessage: 'Are you sure you want to unarchive this collective?',
+  },
+  [CollectiveType.ORGANIZATION]: {
+    id: 'unarchive.organization.confirmation',
+    defaultMessage: 'Are you sure you want to unarchive this organization?',
+  },
+  _default: {
+    id: 'unarchive.account.confirmation',
+    defaultMessage: 'Are you sure you want to unarchive this account?',
+  },
+});
+
 const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
   const collectiveType = getCollectiveType(collective.type);
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
+  const intl = useIntl();
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
     isArchived: collective.isArchived,
@@ -152,22 +192,25 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
 
       <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
         <ModalHeader>
-          <FormattedMessage
-            values={{
-              type: collectiveType.toLowerCase(),
-              actionType: modal.type,
-            }}
-            id="collective.archive.modal.header"
-            defaultMessage={'{actionType} {type}'}
-          />
+          {modal.type === 'Unarchive' ? (
+            <FormattedMessage
+              id="unarchive.modal.header"
+              defaultMessage="Unarchive {name}"
+              values={{ name: collective.name }}
+            />
+          ) : (
+            <FormattedMessage
+              id="archive.modal.header"
+              defaultMessage="Archive {name}"
+              values={{ name: collective.name }}
+            />
+          )}
         </ModalHeader>
         <ModalBody>
           <P>
-            <FormattedMessage
-              id="collective.archive.modal.body"
-              values={{ collectiveType: collectiveType.toLowerCase(), actionType: modal.type.toLowerCase() }}
-              defaultMessage={'Are you sure you want to {actionType} this {collectiveType}?'}
-            />
+            {modal.type === 'Unarchive'
+              ? intl.formatMessage(unarchiveMessages[collective.type] || unarchiveMessages._default)
+              : intl.formatMessage(archiveMessages[collective.type] || archiveMessages._default)}
           </P>
         </ModalBody>
         <ModalFooter>
