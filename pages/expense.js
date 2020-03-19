@@ -20,6 +20,7 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledLink from '../components/StyledLink';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { generateNotFoundError, formatErrorMessage } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
@@ -29,7 +30,7 @@ import { withUser } from '../components/UserProvider';
 import { H5, Span, P } from '../components/Text';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import StyledHr from '../components/StyledHr';
-import { generateNotFoundError } from '../lib/errors';
+import MessageBox from '../components/MessageBox';
 
 const messages = defineMessages({
   title: {
@@ -166,7 +167,7 @@ class ExpensePage extends React.Component {
     intl: PropTypes.object,
   };
 
-  state = { isRefetchingDataForUser: false };
+  state = { isRefetchingDataForUser: false, error: null };
 
   componentDidMount() {
     // LoggedInUser is not set during SSR, we refetch for permissions
@@ -220,8 +221,8 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, loadingLoggedInUser } = this.props;
-    const { isRefetchingDataForUser } = this.state;
+    const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
+    const { isRefetchingDataForUser, error } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -255,7 +256,12 @@ class ExpensePage extends React.Component {
               pt={55}
             >
               <Flex flexDirection="column" alignItems="center" width={90}>
-                <ExpenseAdminActions permissions={expense?.permissions} />
+                <ExpenseAdminActions
+                  expense={expense}
+                  collective={collective}
+                  permissions={expense?.permissions}
+                  onError={error => this.setState({ error })}
+                />
               </Flex>
             </Container>
             <Box flex="1 1 650px" minWidth={300} maxWidth={816} mr={[null, 3, 4, 5]} py={3} px={3}>
@@ -265,6 +271,11 @@ class ExpensePage extends React.Component {
                   <FormattedMessage id="Back" defaultMessage="Back" />
                 </StyledLink>
               </Box>
+              {error && (
+                <MessageBox type="error" withIcon mb={4}>
+                  {formatErrorMessage(intl, error)}
+                </MessageBox>
+              )}
               <Box mb={3}>
                 <ExpenseSummary
                   expense={expense}

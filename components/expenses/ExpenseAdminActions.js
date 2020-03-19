@@ -8,6 +8,8 @@ import styled from 'styled-components';
 
 import { fadeIn } from '../StyledKeyframes';
 import StyledRoundButton from '../StyledRoundButton';
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+import expenseTypes from '../../lib/constants/expenseTypes';
 
 const ButtonLabel = styled.div`
   position: absolute;
@@ -34,16 +36,20 @@ const ButtonWithLabel = styled(StyledRoundButton)`
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
  */
-const ExpenseAdminActions = ({ permissions }) => {
+const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
   return (
     <React.Fragment>
-      {permissions?.canSeeInvoiceInfo && (
-        <ButtonWithLabel size={40} m={2}>
-          <IconDownload size={18} />
-          <ButtonLabel>
-            <FormattedMessage id="actions.download" defaultMessage="Download" />
-          </ButtonLabel>
-        </ButtonWithLabel>
+      {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
+        <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
+          {({ isLoading, downloadInvoice }) => (
+            <ButtonWithLabel size={40} m={2} loading={isLoading} onClick={downloadInvoice}>
+              <IconDownload size={18} />
+              <ButtonLabel>
+                <FormattedMessage id="actions.download" defaultMessage="Download" />
+              </ButtonLabel>
+            </ButtonWithLabel>
+          )}
+        </ExpenseInvoiceDownloadHelper>
       )}
       <ButtonWithLabel size={40} m={2}>
         <IconLink size={18} />
@@ -64,10 +70,17 @@ const ExpenseAdminActions = ({ permissions }) => {
 };
 
 ExpenseAdminActions.propTypes = {
+  expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+  }),
+  collective: PropTypes.object,
   permissions: PropTypes.shape({
     canEdit: PropTypes.bool,
     canDelete: PropTypes.bool,
+    canSeeInvoiceInfo: PropTypes.bool,
   }),
+  /** Called with an error if anything wrong happens */
+  onError: PropTypes.func,
 };
 
 export default ExpenseAdminActions;

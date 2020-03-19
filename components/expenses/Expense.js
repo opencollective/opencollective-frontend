@@ -643,6 +643,7 @@ const editExpense = graphql(
     mutation editExpense($expense: ExpenseInputType!) {
       editExpense(expense: $expense) {
         id
+        idV2
         description
         amount
         attachment
