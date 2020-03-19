@@ -33,13 +33,15 @@ P.defaultProps = {
 
 export const Span = P.withComponent('span');
 
-export const Label = P.withComponent('label');
-
 Span.defaultProps = {
   ...P.defaultProps,
   fontSize: 'inherit',
   lineHeight: 'inherit',
 };
+
+export const Label = P.withComponent('label');
+
+export const Strong = P.withComponent('strong');
 
 export const H1 = P.withComponent('h1');
 
