@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import imgPreviewList from '../../static/images/updates/updates-list-preview.png';
 import imgPreviewNewUpdate from '../../static/images/updates/updates-new-preview.png';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';
 import CreateUpdateFAQ from '../faqs/CreateUpdateFAQ';
 import Container from '../Container';
