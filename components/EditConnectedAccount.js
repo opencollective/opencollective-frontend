@@ -139,7 +139,11 @@ class EditConnectedAccount extends React.Component {
             <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
             </P>
-            <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
+            <StyledButton
+              data-cy={`connect-${service}-button`}
+              buttonSize="small"
+              onClick={() => this.connect(service)}
+            >
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}
             </StyledButton>
           </div>
