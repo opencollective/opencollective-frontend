@@ -153,17 +153,20 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
       <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
         <ModalHeader>
           <FormattedMessage
-            values={{ type: collectiveType.toLowerCase() }}
+            values={{
+              type: collectiveType.toLowerCase(),
+              actionType: modal.type,
+            }}
             id="collective.archive.modal.header"
-            defaultMessage={'Archive {type}'}
+            defaultMessage={'{actionType} {type}'}
           />
         </ModalHeader>
         <ModalBody>
           <P>
             <FormattedMessage
               id="collective.archive.modal.body"
-              values={{ type: collectiveType.toLowerCase() }}
-              defaultMessage={'Are you sure you want to archive this {type}?'}
+              values={{ collectiveType: collectiveType.toLowerCase(), actionType: modal.type.toLowerCase() }}
+              defaultMessage={'Are you sure you want to {actionType} this {collectiveType}?'}
             />
           </P>
         </ModalBody>
@@ -183,7 +186,11 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
                 }
               }}
             >
-              <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+              {modal.type === 'Unarchive' ? (
+                <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage={'Unarchive'} />
+              ) : (
+                <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+              )}
             </StyledButton>
           </Container>
         </ModalFooter>
