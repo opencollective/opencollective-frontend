@@ -107,7 +107,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
             defaultMessage={
               'Events with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
             }
-          />{' '}
+          />
         </P>
       )}
       <Modal show={showModal} width="570px" onClose={() => setShowModal(false)}>
