@@ -125,7 +125,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
             values={{ type: collectiveType.toLowerCase() }}
             id="collective.archive.description"
             defaultMessage={
-              'Archiving {type} means it will visually appear inactive and no new activity will be allowed.'
+              'Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
             }
           />
           &nbsp;
