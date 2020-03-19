@@ -4,7 +4,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get, orderBy, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
+import { Query } from '@apollo/react-components';
 
 import { formatCurrency } from '../../../lib/utils';
 import { P, Span } from '../../Text';

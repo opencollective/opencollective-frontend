@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, times } from 'lodash';
-import { Query } from 'react-apollo';
+import { Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { withRouter } from 'next/router';

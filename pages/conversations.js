@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';

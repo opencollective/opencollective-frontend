@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/fa-solid';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 import ReactTooltip from 'react-tooltip';

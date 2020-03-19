@@ -5,7 +5,7 @@ import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { get, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 import { Lock } from '@styled-icons/fa-solid';
 

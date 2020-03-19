@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';

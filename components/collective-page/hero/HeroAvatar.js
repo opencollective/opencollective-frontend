@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Mutation } from 'react-apollo';
+import { Mutation } from '@apollo/react-components';
 
 import { Camera } from '@styled-icons/feather/Camera';
 import { Settings } from '@styled-icons/feather/Settings';

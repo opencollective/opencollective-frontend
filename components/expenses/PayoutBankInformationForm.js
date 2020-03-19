@@ -1,4 +1,4 @@
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import { Box, Flex } from '@rebass/grid';
 import { get } from 'lodash';
 import PropTypes from 'prop-types';

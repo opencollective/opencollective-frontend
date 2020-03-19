@@ -1,7 +1,7 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { createPortal } from 'react-dom';
-import { Mutation } from 'react-apollo';
+import { Mutation } from '@apollo/react-components';
 import { Times } from '@styled-icons/fa-solid/Times';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages } from 'react-intl';
