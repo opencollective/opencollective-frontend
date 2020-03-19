@@ -102,6 +102,12 @@ const getExpenseQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
+      attachments {
+        id
+        url
+        description
+        amount
+      }
       collective {
         id
         slug
