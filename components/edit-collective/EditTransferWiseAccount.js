@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from 'react-apollo';
 import { useFormik } from 'formik';
+import { defineMessages } from 'react-intl';
 
 import { GraphQLContext } from '../../lib/graphql/context';
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -33,7 +34,7 @@ const deleteConnectedAccountMutation = gqlV2`
 const mutationOptions = { context: API_V2_CONTEXT };
 
 const EditTransferWiseAccount = props => {
-  const messages = {
+  const messages = defineMessages({
     'collective.connectedAccounts.transferwise.button': {
       id: 'collective.connectedAccounts.transferwise.button',
       defaultMessage: 'Connect TransferWise',
@@ -50,7 +51,7 @@ const EditTransferWiseAccount = props => {
       id: 'collective.connectedAccounts.disconnect.button',
       defaultMessage: 'Disconnect',
     },
-  };
+  });
   const { refetch } = React.useContext(GraphQLContext);
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
   const [createConnectedAccount, { loading: createLoading }] = useMutation(
