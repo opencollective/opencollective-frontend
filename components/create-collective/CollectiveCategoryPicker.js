@@ -5,11 +5,11 @@ import styled from 'styled-components';
 import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 
-import { H1 } from '../../Text';
-import StyledButton from '../../StyledButton';
-import Container from '../../Container';
-import Link from '../../Link';
-import ExternalLink from '../../ExternalLink';
+import { H1 } from '../Text';
+import StyledButton from '../StyledButton';
+import Container from '../Container';
+import Link from '../Link';
+import ExternalLink from '../ExternalLink';
 
 const ExamplesLink = styled(ExternalLink)`
   color: ${themeGet('colors.blue.500')};
@@ -84,11 +84,11 @@ class CollectiveCategoryPicker extends React.Component {
               <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/create-collective/opensource.png"
+                    src="/static/images/create-collective/openSourceIllustration.png"
                     alt={intl.formatMessage(this.messages.opensource)}
                   />
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
@@ -98,6 +98,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}
@@ -122,11 +123,11 @@ class CollectiveCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/create-collective/anycommunity.png"
+                    src="/static/images/create-collective/communityIllustration.png"
                     alt={intl.formatMessage(this.messages.community)}
                   />
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
@@ -136,6 +137,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}
@@ -159,11 +161,11 @@ class CollectiveCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
-                    src="/static/images/create-collective/climateinitiative.png"
+                    src="/static/images/create-collective/climateIllustration.png"
                     alt={intl.formatMessage(this.messages.climate)}
                   />
                   <Link
-                    route="new-create-collective"
+                    route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
@@ -173,6 +175,7 @@ class CollectiveCategoryPicker extends React.Component {
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
+                      minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
                       px={3}

@@ -3,21 +3,22 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { graphql } from 'react-apollo';
+import { get } from 'lodash';
 
 import { H1, P } from '../Text';
-import CreateCollectiveForm from './sections/CreateCollectiveForm';
-import CollectiveCategoryPicker from './sections/CollectiveCategoryPicker';
-import ConnectGithub from './sections/ConnectGithub';
+import CreateCollectiveForm from './CreateCollectiveForm';
+import CollectiveCategoryPicker from './CollectiveCategoryPicker';
+import ConnectGithub from './ConnectGithub';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import MessageBox from '../MessageBox';
 import { withUser } from '../UserProvider';
 
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { Router } from '../../server/pages';
 
-class NewCreateCollective extends Component {
+class CreateCollective extends Component {
   static propTypes = {
     host: PropTypes.object,
     query: PropTypes.object,
@@ -33,7 +34,6 @@ class NewCreateCollective extends Component {
     this.state = {
       collective: {},
       result: {},
-      category: null,
       github: null,
       form: false,
       error: null,
@@ -54,47 +54,6 @@ class NewCreateCollective extends Component {
         defaultMessage: 'Create an account (or sign in) to start a collective.',
       },
     });
-  }
-
-  componentDidMount() {
-    const { query } = this.props;
-    if (query.category === 'opensource' || query.token) {
-      this.setState({ category: 'opensource' });
-      if (query.step === 'form') {
-        this.setState({ form: true });
-      }
-      if (!query.step) {
-        this.setState({ form: false });
-      }
-    } else if (query.category === 'community') {
-      this.setState({ category: 'community' });
-    } else if (query.category === 'climate') {
-      this.setState({ category: 'climate' });
-    } else if (!query.category) {
-      this.setState({ category: null });
-    }
-  }
-
-  componentDidUpdate(oldProps) {
-    const { query } = this.props;
-    if (oldProps.query.step !== query.step) {
-      if (query.step === 'form') {
-        this.setState({ form: true });
-      } else {
-        this.setState({ form: false });
-      }
-    }
-    if (oldProps.query.category !== query.category) {
-      if (query.category === 'opensource' || query.token) {
-        this.setState({ category: 'opensource' });
-      } else if (query.category === 'community') {
-        this.setState({ category: 'community' });
-      } else if (query.category === 'climate') {
-        this.setState({ category: 'climate' });
-      } else if (!query.category) {
-        this.setState({ category: null });
-      }
-    }
   }
 
   handleChange(key, value) {
@@ -120,7 +79,8 @@ class NewCreateCollective extends Component {
     this.setState({ creating: true });
 
     // prepare object
-    collective.tags = [this.state.category];
+
+    collective.tags = [this.props.query.category];
     if (this.state.github) {
       collective.githubHandle = this.state.github.handle;
     }
@@ -140,7 +100,12 @@ class NewCreateCollective extends Component {
         result: { success: 'Collective created successfully' },
       });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', { slug: newCollective.slug, status: 'collectiveCreated' });
+      Router.pushRoute('collective', {
+        slug: newCollective.slug,
+        status: 'collectiveCreated',
+        CollectiveId: newCollective.legacyId,
+        CollectiveSlug: newCollective.slug,
+      }).then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', error: errorMsg, creating: false });
@@ -149,8 +114,8 @@ class NewCreateCollective extends Component {
 
   render() {
     const { LoggedInUser, query, intl, host } = this.props;
-    const { category, form, error } = this.state;
-    const { token } = query;
+    const { error } = this.state;
+    const { category, step, token } = query;
 
     if (host && !host.canApply) {
       return (
@@ -198,7 +163,7 @@ class NewCreateCollective extends Component {
       return <CollectiveCategoryPicker query={query} onChange={this.handleChange} />;
     }
 
-    if (category === 'opensource' && !form) {
+    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
       return <ConnectGithub token={token} query={query} onChange={this.handleChange} />;
     }
 
@@ -229,6 +194,7 @@ const createCollectiveQuery = gqlV2`
       tags
       description
       githubHandle
+      legacyId
     }
   }
 `;
@@ -248,4 +214,4 @@ const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
   }),
 });
 
-export default injectIntl(withUser(addCreateCollectiveMutation(NewCreateCollective)));
+export default injectIntl(withUser(addCreateCollectiveMutation(CreateCollective)));

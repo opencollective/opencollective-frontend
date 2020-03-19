@@ -7,11 +7,12 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
+import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import ExpenseForm from '../components/expenses/ExpenseForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
@@ -26,15 +27,14 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
-import { H1, H5 } from '../components/Text';
+import { H1, H5, P, Strong } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
-import { getErrorFromGraphqlException } from '../lib/utils';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import LinkCollective from '../components/LinkCollective';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -185,8 +185,7 @@ class CreateExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.NEW_EXPENSE_FLOW)) {
         return <PageFeatureNotSupported />;
       }
@@ -281,6 +280,18 @@ class CreateExpensePage extends React.Component {
                         />
                       )}
                     </Container>
+                    {host && (
+                      <P fontSize="SmallCaption" color="black.600" mt={2}>
+                        <FormattedMessage
+                          id="withColon"
+                          defaultMessage="{item}:"
+                          values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
+                        />{' '}
+                        <LinkCollective collective={host}>
+                          <Strong color="black.600">{host.name}</Strong>
+                        </LinkCollective>
+                      </P>
+                    )}
                     <Box mt={50}>
                       <H5 mb={3}>
                         <FormattedMessage id="Tags" defaultMessage="Tags" />

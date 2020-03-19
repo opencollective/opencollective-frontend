@@ -105,7 +105,7 @@ module.exports = (server, app) => {
   server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';
     res.sendFile(
-      path.join(__dirname, `../static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
+      path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
     );
   });
 
@@ -113,6 +113,7 @@ module.exports = (server, app) => {
     const content = fs.readFileSync(path.join(__dirname, './templates/button.js'), 'utf8');
     const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
     res.setHeader('content-type', 'application/javascript');
+    res.removeHeader('X-Frame-Options');
     res.send(
       compiled({
         collectiveSlug: req.params.collectiveSlug,

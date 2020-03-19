@@ -9,7 +9,7 @@ import Container from '../Container';
 import StyledButton from '../StyledButton';
 // import MessageBox from '../MessageBox';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { GraphQLContext } from '../../lib/graphql/context';
 
 const activateCollectiveAsHostQuery = gql`
@@ -81,7 +81,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         ...activationStatus,
         processing: false,
         isHostAccount: true,
-        // confirmationMsg: 'The Host status was succesfully activated.',
+        // confirmationMsg: 'The Host status was successfully activated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -99,7 +99,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         ...activationStatus,
         processing: false,
         isHostAccount: false,
-        // confirmationMsg: 'The Host status was succesfully deactivated.',
+        // confirmationMsg: 'The Host status was successfully deactivated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;

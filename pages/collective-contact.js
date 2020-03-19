@@ -5,8 +5,9 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import { ssrNotFoundError } from '../lib/nextjs_utils';
+import { generateNotFoundError } from '../lib/errors';
 import { withUser } from '../components/UserProvider';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -94,7 +95,7 @@ class CollectiveContact extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
         ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       }
     }
 

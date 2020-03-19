@@ -5,7 +5,7 @@ import { graphql } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from '../StyledButton';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 
 class RejectExpenseBtn extends React.Component {
   static propTypes = {

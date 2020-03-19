@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';
 import StyledLink from '../../StyledLink';
@@ -8,6 +8,7 @@ import BackButton from '../BackButton';
 import PricingTable from '../PricingTable';
 import { H1, P, H3, Span } from '../../Text';
 import { Router } from '../../../server/pages';
+import I18nFormatters from '../../I18nFormatters';
 
 const headings = ['', 'starter', 'small', 'medium', 'large', 'network'];
 
@@ -16,7 +17,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return <FormattedHTMLMessage id="pricingTable.row.price" defaultMessage="Price" />;
+        return <FormattedMessage id="pricingTable.row.price" defaultMessage="Price" />;
       },
     },
     {
@@ -24,7 +25,7 @@ const rows = [
       render() {
         return (
           <Span fontSize={20} fontWeight="bold">
-            <FormattedHTMLMessage id="pricingTable.cell.free" defaultMessage="Free" />
+            <FormattedMessage id="pricingTable.cell.free" defaultMessage="Free" />
           </Span>
         );
       },
@@ -49,7 +50,7 @@ const rows = [
       render() {
         return (
           <Span fontSize={20} fontWeight="bold">
-            <FormattedHTMLMessage id="pricingTable.cell.talkToUs" defaultMessage="Talk to us" />
+            <FormattedMessage id="pricingTable.cell.talkToUs" defaultMessage="Talk to us" />
           </Span>
         );
       },
@@ -59,13 +60,13 @@ const rows = [
     {
       type: 'component',
       render() {
-        return <FormattedHTMLMessage id="pricingTable.row.collectives" defaultMessage="Collectives" />;
+        return <FormattedMessage id="pricingTable.row.collectives" defaultMessage="Collectives" />;
       },
     },
     {
       type: 'component',
       render() {
-        return <FormattedHTMLMessage id="pricingTable.cell.unlimited" defaultMessage="Unlimited" />;
+        return <FormattedMessage id="pricingTable.cell.unlimited" defaultMessage="Unlimited" />;
       },
     },
     {
@@ -90,7 +91,7 @@ const rows = [
       type: 'component',
       render() {
         return (
-          <FormattedHTMLMessage
+          <FormattedMessage
             id="pricingTable.row.directPayment"
             defaultMessage="Credit card payments direct to Collectives"
           />
@@ -122,9 +123,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return (
-          <FormattedHTMLMessage id="pricingTable.row.collectivePage" defaultMessage="All Collective page features" />
-        );
+        return <FormattedMessage id="pricingTable.row.collectivePage" defaultMessage="All Collective page features" />;
       },
     },
     { type: 'check' },
@@ -138,10 +137,7 @@ const rows = [
       type: 'component',
       render() {
         return (
-          <FormattedHTMLMessage
-            id="pricingTable.row.addFunds"
-            defaultMessage="Add funds received through other channels"
-          />
+          <FormattedMessage id="pricingTable.row.addFunds" defaultMessage="Add funds received through other channels" />
         );
       },
     },
@@ -155,9 +151,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return (
-          <FormattedHTMLMessage id="pricingTable.row.bankTransfer" defaultMessage="Enable bank transfer payments" />
-        );
+        return <FormattedMessage id="pricingTable.row.bankTransfer" defaultMessage="Enable bank transfer payments" />;
       },
     },
     { type: 'html', html: 'Up to <strong>$1,000</strong>' },
@@ -171,7 +165,7 @@ const rows = [
       type: 'component',
       render() {
         return (
-          <FormattedHTMLMessage
+          <FormattedMessage
             id="pricingTable.row.hostFeature"
             defaultMessage="Link for Collectives to discover and apply to your host"
           />
@@ -220,9 +214,10 @@ const HostOrganization = () => (
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
         <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
-          <FormattedHTMLMessage
+          <FormattedMessage
             id="pricing.tab.hostOrganization.description"
             defaultMessage="You will be a <strong>Fiscal Host</strong> on our platform. That means you hold funds on behalf of Collectives. You decide which Collectives to accept and what if any fees to charge them."
+            values={I18nFormatters}
           />
         </P>
       </Box>
@@ -234,7 +229,7 @@ const HostOrganization = () => (
       <Box textAlign="center" my={3}>
         <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
           <StyledLink href={'/become-a-fiscal-host'}>
-            <FormattedHTMLMessage
+            <FormattedMessage
               id="pricing.fiscalHost.learnMore"
               defaultMessage="Learn more about becoming a Fiscal Host."
             />
@@ -254,33 +249,38 @@ const HostOrganization = () => (
           </H3>
           <Box as="ul" color="black.800" mt={3} px={3} fontSize="13px" lineHeight="21px" letterSpacing="-0.012em">
             <Box as="li" my={2}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.collective"
                 defaultMessage="Collective - a page to <strong>coordinate your community and budget.</strong>"
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.communication"
                 defaultMessage="Communication tools: <strong>post updates, start conversations,</strong> and <strong>a contact form</strong> for your group."
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.transparency"
                 defaultMessage="Show your budget and expenses <strong>transparently.</strong> "
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.fundraise"
                 defaultMessage="<strong>Fundraise</strong> through credit card payments (cost: 5% plus Stripe payment processor fees)."
+                values={I18nFormatters}
               />
             </Box>
             <Box as="li" my={3}>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 id="pricing.starterPlans.addFunds"
                 defaultMessage="Manually <strong>add funds raised</strong> through other channels (e.g. bank transfers) to your transparent budget (free up to $1,000, then you’ll need to upgrade to a paid plan)."
+                values={I18nFormatters}
               />
             </Box>
           </Box>

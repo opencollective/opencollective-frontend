@@ -6,15 +6,15 @@ import { Flex } from '@rebass/grid';
 import { Search } from '@styled-icons/octicons/Search';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 
-import { H4 } from '../../Text';
-import Container from '../../Container';
-import StyledCard from '../../StyledCard';
-import StyledRadioList from '../../StyledRadioList';
-import StyledInput from '../../StyledInput';
-import StyledButton from '../../StyledButton';
+import { H4 } from '../Text';
+import Container from '../Container';
+import StyledCard from '../StyledCard';
+import StyledRadioList from '../StyledRadioList';
+import StyledInput from '../StyledInput';
+import StyledButton from '../StyledButton';
 import GithubRepositoryEntry from './GithubRepositoryEntry';
 
-import { escapeInput } from '../../../lib/utils';
+import { escapeInput } from '../../lib/utils';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};
@@ -96,7 +96,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
                         disabled: false,
                         repoInfo: {
                           type,
-                          handle: `{value.owner.login}/{value.name}`,
+                          handle: `${value.owner.login}/${value.name}`,
                           repo: value.name,
                         },
                       }));
@@ -122,7 +122,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
         <StyledButton
           textAlign="center"
           buttonSize="small"
-          height="36px"
+          minHeight="36px"
           maxWidth="97px"
           buttonStyle="primary"
           disabled={state.disabled}

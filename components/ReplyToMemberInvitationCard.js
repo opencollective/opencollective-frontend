@@ -7,7 +7,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n-member-role';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import Avatar from './Avatar';
 import LinkCollective from './LinkCollective';
 import MessageBox from './MessageBox';

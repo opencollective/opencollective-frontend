@@ -22,7 +22,7 @@ import Avatar from '../Avatar';
 import MessageBox from '../MessageBox';
 import AppRejectionReasonModal from './AppRejectionReasonModal';
 import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 
 const ApproveCollectiveMutation = gql`
   mutation approveCollective($id: Int!) {

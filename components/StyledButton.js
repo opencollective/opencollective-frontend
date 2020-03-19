@@ -5,8 +5,8 @@ import { border, color, layout, typography, space, flexbox } from 'styled-system
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 
-import { textTransform } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/theme';
+import { textTransform } from '../lib/styled-system-custom-properties';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 import StyledSpinner from './StyledSpinner';
 
 /**

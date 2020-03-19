@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import NewCreateCollective from '../components/create-collective/NewCreateCollective';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+
+import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-import { addCollectiveCoverData } from '../lib/graphql/queries';
+
 import { withUser } from '../components/UserProvider';
 
-class NewCreateCollectivePage extends React.Component {
+class CreateCollectivePage extends React.Component {
   static async getInitialProps({ query }) {
     return {
       query,
@@ -30,14 +33,26 @@ class NewCreateCollectivePage extends React.Component {
 
     return (
       <Page>
-        <NewCreateCollective host={data.Collective} query={query} />
+        <CreateCollective host={data.Collective} query={query} />
       </Page>
     );
   }
 }
 
-export default withUser(
-  addCollectiveCoverData(NewCreateCollectivePage, {
-    skip: props => !props.slug,
-  }),
-);
+const getHostQuery = gql`
+  query Host($slug: String) {
+    Collective(slug: $slug) {
+      id
+      type
+      slug
+      name
+      currency
+      settings
+      canApply
+    }
+  }
+`;
+
+const addHostData = graphql(getHostQuery, { skip: props => !props.slug });
+
+export default withUser(addHostData(CreateCollectivePage));

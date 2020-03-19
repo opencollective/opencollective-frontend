@@ -84,6 +84,7 @@ const getExpenseQuery = gql`
   query Expense($id: Int!) {
     Expense(id: $id) {
       id
+      idV2
       description
       status
       createdAt
@@ -101,6 +102,12 @@ const getExpenseQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
+      attachments {
+        id
+        url
+        description
+        amount
+      }
       collective {
         id
         slug

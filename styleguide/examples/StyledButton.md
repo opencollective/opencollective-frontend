@@ -87,21 +87,15 @@
 ### Defaults to the `medium` button size
 
 ```jsx
-initialState = { buttonSize: 'medium' };
+const [buttonSize, setButtonSize] = React.useState('medium');
 <React.Fragment>
-  <StyledButton buttonSize={state.buttonSize} mb={4} mx="auto" display="block">
-    {state.buttonSize}
+  <StyledButton buttonSize={buttonSize} mb={4} mx="auto" display="block">
+    {buttonSize}
   </StyledButton>
 
-  <fieldset onChange={event => setState({ buttonSize: event.target.value })}>
+  <fieldset onChange={event => setButtonSize(event.target.value)}>
     <label htmlFor="small-button">
-      <input
-        type="radio"
-        name="buttonSize"
-        value="small"
-        id="small-button"
-        defaultChecked={state.buttonSize === 'small'}
-      />
+      <input type="radio" name="buttonSize" value="small" id="small-button" defaultChecked={buttonSize === 'small'} />
       small
     </label>
 
@@ -111,19 +105,13 @@ initialState = { buttonSize: 'medium' };
         name="buttonSize"
         value="medium"
         id="medium-button"
-        defaultChecked={state.buttonSize === 'medium'}
+        defaultChecked={buttonSize === 'medium'}
       />
       medium
     </label>
 
     <label htmlFor="large-button">
-      <input
-        type="radio"
-        name="buttonSize"
-        value="large"
-        id="large-button"
-        defaultChecked={state.buttonSize === 'large'}
-      />
+      <input type="radio" name="buttonSize" value="large" id="large-button" defaultChecked={buttonSize === 'large'} />
       large
     </label>
   </fieldset>
@@ -141,24 +129,25 @@ initialState = { buttonSize: 'medium' };
 ### Button is not clickable when loading
 
 ```jsx padded
-initialState = { loading: false, nbClicks: 0 };
+const [loading, setLoading] = React.useState(false);
+const [nbClicks, setNbClicks] = React.useState(0);
 
 <StyledButton
   buttonSize="large"
   width={300}
-  loading={state.loading}
+  loading={loading}
   onClick={() => {
-    setState(state => ({ loading: true, nbClicks: state.nbClicks + 1 }));
-    setTimeout(() => setState({ loading: false }), 2000);
+    setLoading(true);
+    setNbClicks(nbClicks + 1);
+    setTimeout(() => setLoading(false), 2000);
   }}
 >
-  Clicked {state.nbClicks} times
+  Clicked {nbClicks} times
 </StyledButton>;
 ```
 
 ### As link
 
 ```jsx
-<StyledButton asLink>I'm a link!</StyledButton>
 <StyledButton asLink>I'm a link!</StyledButton>
 ```

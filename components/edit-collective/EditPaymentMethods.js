@@ -7,7 +7,8 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
 
-import { compose, getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 import { addEditCollectiveMutation } from '../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';

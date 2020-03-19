@@ -63,11 +63,7 @@ describe('New users profiles', () => {
     });
 
     it('Show transactions with all info and links', () => {
-      cy.get('[data-cy~="transactions"]')
-        .first()
-        .get('[data-cy=transaction-details] > a')
-        .should('have.attr', 'href', '/brusselstogether')
-        .contains('BrusselsTogether');
+      cy.get('[data-cy~="transactions"]:first a[href="/brusselstogether"]').should('exist');
       cy.get('[data-cy~="transactions"]')
         .first()
         .get('[data-cy=transaction-description]')

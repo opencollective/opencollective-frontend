@@ -12,7 +12,7 @@ import StyledTextarea from './StyledTextarea';
 import StyledButton from './StyledButton';
 import { H2, P } from './Text';
 import MessageBox from './MessageBox';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 const SendMessageMutation = gql`
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {

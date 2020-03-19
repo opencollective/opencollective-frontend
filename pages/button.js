@@ -29,7 +29,11 @@ const CollectButton = styled.a`
 `;
 
 class ButtonPage extends React.Component {
-  static getInitialProps({ query: { color, collectiveSlug, verb } }) {
+  static getInitialProps({ query: { color, collectiveSlug, verb }, res }) {
+    // Allow to be embeded as Iframe everywhere
+    if (res) {
+      res.removeHeader('X-Frame-Options');
+    }
     return { color, collectiveSlug, verb };
   }
 

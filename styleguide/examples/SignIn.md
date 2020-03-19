@@ -5,25 +5,28 @@ Uses the built-in browser email validation to block submission until valid.
 ### Base form
 
 ```js
-initialState = { action: null };
+const [action, setAction] = React.useState(null);
+const [email, setEmail] = React.useState('');
 
 <React.Fragment>
   <SignIn
-    onSubmit={value => setState({ action: `The form was submitted with a value of ${value}` })}
-    onSecondaryAction={() => setState({ action: 'Secondary action was clicked' })}
+    onSubmit={value => setAction(`The form was submitted with a value of ${value}`)}
+    onSecondaryAction={() => setAction('Secondary action was clicked')}
+    onEmailChange={setEmail}
+    email={email}
   />
-  <p>{state.action}</p>
+  <p>{action}</p>
 </React.Fragment>;
 ```
 
 ### Loading / submitting
 
 ```js
-<SignIn loading onSubmit={() => {}} onSecondaryAction={() => {}} />
+<SignIn loading onSubmit={() => {}} onSecondaryAction={() => {}} email="test+betree@opencollective.com" />
 ```
 
 ### With an unknown email
 
 ```js
-<SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unknownEmail />
+<SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unknownEmail email="test+betree@opencollective.com" />
 ```

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Mar 05 2020 16:53:37 GMT+0100 (GMT+01:00)
+# timestamp: Tue Mar 17 2020 16:30:00 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -9,6 +9,11 @@ interface Account {
   The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
   """
   id: String
+
+  """
+  The internal database identifier of the collective (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
 
   """
   The slug identifying the account (ie: babel)
@@ -163,6 +168,7 @@ This represents a Bot account
 """
 type Bot implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -261,6 +267,7 @@ This represents a Collective account
 """
 type Collective implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -563,6 +570,7 @@ This represents an Event account
 """
 type Event implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -662,6 +670,11 @@ type Expense {
   Title/main description for this expense
   """
   description: String!
+
+  """
+  Total amount of the expense (sum of the attachments).
+  """
+  amount: Int!
 
   """
   Currency that should be used for the payout
@@ -883,6 +896,7 @@ This represents an Individual account
 """
 type Individual implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -1219,6 +1233,7 @@ This represents an Organization account
 """
 type Organization implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)

@@ -11,7 +11,7 @@ import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import CommentForm from '../components/conversations/CommentForm';
 import { CommentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import CommentIcon from '../components/icons/CommentIcon';
@@ -20,15 +20,20 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledLink from '../components/StyledLink';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { generateNotFoundError, formatErrorMessage } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
-import { H5, Span, P } from '../components/Text';
+import { H5, Span, P, Strong } from '../components/Text';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import StyledHr from '../components/StyledHr';
+import MessageBox from '../components/MessageBox';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
+import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
+import LinkCollective from '../components/LinkCollective';
 
 const messages = defineMessages({
   title: {
@@ -165,7 +170,7 @@ class ExpensePage extends React.Component {
     intl: PropTypes.object,
   };
 
-  state = { isRefetchingDataForUser: false };
+  state = { isRefetchingDataForUser: false, error: null };
 
   componentDidMount() {
     // LoggedInUser is not set during SSR, we refetch for permissions
@@ -219,8 +224,8 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, loadingLoggedInUser } = this.props;
-    const { isRefetchingDataForUser } = this.state;
+    const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
+    const { isRefetchingDataForUser, error } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -229,8 +234,7 @@ class ExpensePage extends React.Component {
         ssrNotFoundError(); // Force 404 when rendered server side
         return null; // TODO: page for expense not found
       } else if (!data.expense.account) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       } else if (this.props.collectiveSlug !== data.expense.account.slug) {
         // TODO Error: Not on the righ URL
         return null;
@@ -255,7 +259,12 @@ class ExpensePage extends React.Component {
               pt={55}
             >
               <Flex flexDirection="column" alignItems="center" width={90}>
-                <ExpenseAdminActions permissions={expense?.permissions} />
+                <ExpenseAdminActions
+                  expense={expense}
+                  collective={collective}
+                  permissions={expense?.permissions}
+                  onError={error => this.setState({ error })}
+                />
               </Flex>
             </Container>
             <Box flex="1 1 650px" minWidth={300} maxWidth={816} mr={[null, 3, 4, 5]} py={3} px={3}>
@@ -265,6 +274,11 @@ class ExpensePage extends React.Component {
                   <FormattedMessage id="Back" defaultMessage="Back" />
                 </StyledLink>
               </Box>
+              {error && (
+                <MessageBox type="error" withIcon mb={4}>
+                  {formatErrorMessage(intl, error)}
+                </MessageBox>
+              )}
               <Box mb={3}>
                 <ExpenseSummary
                   expense={expense}
@@ -310,6 +324,32 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
+                <H5 mb={3}>
+                  <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
+                </H5>
+                <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
+                  {data.loading ? (
+                    <LoadingPlaceholder height={28} width={75} />
+                  ) : (
+                    <FormattedMoneyAmount
+                      currency={collective.currency}
+                      amount={collective.balance}
+                      amountStyles={{ color: 'black.800' }}
+                    />
+                  )}
+                </Container>
+                {host && (
+                  <P fontSize="SmallCaption" color="black.600" mt={2}>
+                    <FormattedMessage
+                      id="withColon"
+                      defaultMessage="{item}:"
+                      values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
+                    />{' '}
+                    <LinkCollective collective={host}>
+                      <Strong color="black.600">{host.name}</Strong>
+                    </LinkCollective>
+                  </P>
+                )}
                 <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
                 <Box mt={50}>
                   <CreateExpenseFAQ

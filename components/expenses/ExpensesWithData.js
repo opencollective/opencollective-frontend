@@ -83,6 +83,7 @@ const getExpensesQuery = gql`
       includeHostedCollectives: $includeHostedCollectives
     ) {
       id
+      idV2
       description
       status
       createdAt
@@ -100,6 +101,12 @@ const getExpensesQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
+      attachments {
+        id
+        url
+        description
+        amount
+      }
       collective {
         id
         slug

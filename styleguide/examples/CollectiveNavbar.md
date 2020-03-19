@@ -2,12 +2,8 @@
 
 ```jsx
 import { webpackCollective } from '../mocks/collectives';
-initialState = { selected: 'contribute' };
-<CollectiveNavbar
-  collective={webpackCollective}
-  selected={state.selected}
-  onSectionClick={selected => setState({ selected })}
-/>;
+const [selected, setSelected] = React.useState('contribute');
+<CollectiveNavbar collective={webpackCollective} selected={selected} onSectionClick={setSelected} />;
 ```
 
 ## Loading state
@@ -20,11 +16,11 @@ initialState = { selected: 'contribute' };
 
 ```jsx
 import { webpackCollective } from '../mocks/collectives';
-initialState = { selected: 'contribute' };
+const [selected, setSelected] = React.useState('contribute');
 <CollectiveNavbar
   collective={webpackCollective}
-  selected={state.selected}
-  onSectionClick={selected => setState({ selected })}
+  selected={selected}
+  onSectionClick={setSelected}
   callsToAction={{ hasContact: true, hasSubmitExpense: true }}
 />;
 ```

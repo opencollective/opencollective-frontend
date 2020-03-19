@@ -6,7 +6,7 @@ import { Flex, Box } from '@rebass/grid';
 import { useMutation } from 'react-apollo';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import StyledInput from '../StyledInput';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';

@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-apollo';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import { withUser } from '../UserProvider';
@@ -50,19 +50,19 @@ const isAutoFocused = id => {
 const mutationOptions = { context: API_V2_CONTEXT };
 
 /** A small helper to make the form work with params from both API V1 & V2 */
-const prepareExpenseParams = (values, conversationId, expenseId) => {
-  const expense = { ...values };
+const prepareCommentParams = (values, conversationId, expenseId) => {
+  const comment = { ...values };
   if (conversationId) {
-    expense.ConversationId = conversationId;
+    comment.ConversationId = conversationId;
   } else if (expenseId) {
-    expense.expense = {};
+    comment.expense = {};
     if (typeof expenseId === 'string') {
-      expense.expense.id = expenseId;
+      comment.expense.id = expenseId;
     } else {
-      expense.expense.legacyId = expenseId;
+      comment.expense.legacyId = expenseId;
     }
   }
-  return expense;
+  return comment;
 };
 
 /**
@@ -90,7 +90,7 @@ const CommentForm = ({
 
   // Called by react-hook-form when submitting the form
   const submit = async values => {
-    const comment = prepareExpenseParams(values, ConversationId, ExpenseId);
+    const comment = prepareCommentParams(values, ConversationId, ExpenseId);
     const response = await createComment({ variables: { comment } });
     if (onSuccess) {
       return onSuccess(response.data.createComment);

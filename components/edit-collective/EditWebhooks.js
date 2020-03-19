@@ -10,7 +10,8 @@ import memoizeOne from 'memoize-one';
 
 import events from '../../lib/constants/notificationEvents';
 
-import { compose, getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Loading from '../Loading';

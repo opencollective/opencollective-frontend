@@ -487,7 +487,7 @@ CollectiveNavbar.propTypes = {
   showEdit: PropTypes.bool,
   /** Called with the new section name when it changes */
   onSectionClick: PropTypes.func,
-  /** An optionnal function to build links URLs. Usefull to override behaviour in test/styleguide envs. */
+  /** An optionnal function to build links URLs. Useful to override behaviour in test/styleguide envs. */
   LinkComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
   sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
@@ -499,7 +499,7 @@ CollectiveNavbar.propTypes = {
   hideInfos: PropTypes.bool,
   /** If true, the CTAs will be hidden on mobile */
   hideButtonsOnMobile: PropTypes.bool,
-  /** If true, the collective infos will fadeInDown and fadeOutUp when transitionning */
+  /** If true, the collective infos will fadeInDown and fadeOutUp when transitioning */
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,

@@ -3,7 +3,7 @@ import React from 'react';
 import { Query } from 'react-apollo';
 import { FormattedMessage } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import Loading from '../components/Loading';

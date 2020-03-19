@@ -75,7 +75,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
     if (data.loading) {
       return (
-        <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} disabled data-cy="host-apply-btn">
+        <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} disabled data-cy="host-apply-btn-loading">
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
         </StyledButton>
       );

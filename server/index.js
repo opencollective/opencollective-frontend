@@ -13,6 +13,7 @@ const intl = require('./intl');
 const logger = require('./logger');
 const loggerMiddleware = require('./logger-middleware');
 const routes = require('./routes');
+const { Sentry } = require('./sentry');
 
 const server = express();
 
@@ -26,6 +27,9 @@ const app = next({ dev, dir: path.dirname(__dirname) });
 const port = process.env.PORT;
 
 app.prepare().then(() => {
+  // app.buildId is only available after app.prepare(), hence why we setup here
+  server.use(Sentry.Handlers.requestHandler());
+
   server.use(loggerMiddleware.logger);
 
   server.use(helmet());
@@ -35,6 +39,7 @@ app.prepare().then(() => {
   server.use(intl.middleware());
 
   server.use(routes(server, app));
+  server.use(Sentry.Handlers.errorHandler());
   server.use(loggerMiddleware.errorLogger);
 
   const httpServer = http.createServer(server);

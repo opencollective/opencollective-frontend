@@ -1,32 +1,34 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import Modal, { ModalBody, ModalHeader, ModalFooter } from 'components/StyledModal';
-import StyledButton from 'components/StyledButton';
-```
-
 ```js
 import Modal, { ModalBody, ModalHeader, ModalFooter } from 'components/StyledModal';
 import StyledButton from 'components/StyledButton';
 
-initialState = { show: false };
+const [show, setShow] = React.useState(false);
 
 <React.Fragment>
-  {state.show ? (
-    <Modal show onClose={() => setState({ show: false })}>
+  {show ? (
+    <Modal show onClose={() => setShow(false)}>
       <ModalHeader>Modal title goes here</ModalHeader>
       <ModalBody>
         Contents of the modal goes here. There will be different content types but for noew lerts use this simple
         version. Are you ok to use this version for now?
       </ModalBody>
       <ModalFooter>
-        <StyledButton mx={20} onClick={() => setState({ show: false })}>
+        <StyledButton mx={20} onClick={() => setShow(false)}>
           Cancel
         </StyledButton>
-        <StyledButton buttonStyle="primary">Go with this version</StyledButton>
+        <StyledButton
+          buttonStyle="primary"
+          onClick={() => {
+            alert('ok!');
+            setShow(false);
+          }}
+        >
+          Go with this version
+        </StyledButton>
       </ModalFooter>
     </Modal>
   ) : (
-    <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => setState({ show: true })}>
+    <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => setShow(true)}>
       Show modal
     </StyledButton>
   )}

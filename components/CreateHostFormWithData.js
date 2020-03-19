@@ -6,7 +6,8 @@ import gql from 'graphql-tag';
 
 import { Flex } from '@rebass/grid';
 
-import { compose, getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { compose } from '../lib/utils';
 
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';
