@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Solo i Collective con un saldo pari a zero possono essere archiviati. Per pagare i fondi, invia una spesa, dona a un altro Collective, o invia i fondi al tuo host fiscale utilizzando l'opzione 'saldo vuoto'.",
   "collective.archive.confirm.btn": "Archivia",
-  "collective.archive.description": "Archiving {type} means it will visually appear inactive and no new activity will be allowed.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "Non è possibile archiviare il tuo Collective mentre sei un Host: disattivati come tale prima di procede.",
   "collective.archive.subscriptions": "I contributi finanziari ricorrenti verranno automaticamente cancellati.",
   "collective.archive.title": "Archivia questo {type}",

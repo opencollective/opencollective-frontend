@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Только Коллекции с нулевым балансом могут быть архивированы. Для выплаты средств подайте заявку на перечисление средств другому коллективу или отправьте средства на фискальный хостинг, используя опцию «пустой баланс».",
   "collective.archive.confirm.btn": "Отправить в архив",
-  "collective.archive.description": "Archiving {type} means it will visually appear inactive and no new activity will be allowed.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "Вы не можете архивировать ваш коллектив являясь Организацией, пожалуйста, сначала отключите Организацию.",
   "collective.archive.subscriptions": "Повторные финансовые взносы будут автоматически отменены.",
   "collective.archive.title": "Архивировать этот {type}",

@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Solo se pueden archivar los Colectivos con balance igual a cero. Para pagar los fondos, envíe un gasto, done su remanente a otro Colectivo o envíe fondos a su anfitrión fiscal utilizando la opción 'saldo vacío'.",
   "collective.archive.confirm.btn": "Archivo",
-  "collective.archive.description": "Archivar una {type} significa que se vera inactiva y no se permitirán nuevas actividades.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "No puedes archivar tu colectivo siendo un Anfitrión, por favor desactiva tu rol como Anfitrión primero.",
   "collective.archive.subscriptions": "Las donaciones recurrentes serán automáticamente canceladas.",
   "collective.archive.title": "Archivar este {type}",

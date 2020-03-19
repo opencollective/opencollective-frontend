@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Seuls les collectifs avec un solde à zéro peuvent être archivés. Pour avoir un solde à zéro, soumettez une dépense, donnez à un autre collectif ou envoyez les fonds à votre hôte fiscal en utilisant la fonctionnalité \"Solder le compte\".",
   "collective.archive.confirm.btn": "Archiver",
-  "collective.archive.description": "Archiving {type} means it will visually appear inactive and no new activity will be allowed.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "En tant qu'Hôte, vous ne pouvez pas archiver votre collectif. Veuillez d'abord désactiver le mode Hôte.",
   "collective.archive.subscriptions": "Les contributions financières récurrentes seront automatiquement annulées.",
   "collective.archive.title": "Archiver ce {type}",

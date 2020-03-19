@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}。",
   "collective.archive.availableBalance": "Only Collectives with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option.",
   "collective.archive.confirm.btn": "アーカイブ",
-  "collective.archive.description": "Archiving {type} means it will visually appear inactive and no new activity will be allowed.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "You can't archive your collective while being a Host, please deactivate as Host first.",
   "collective.archive.subscriptions": "Recurring financial contributions will be automatically canceled.",
   "collective.archive.title": "{type} をアーカイブ",

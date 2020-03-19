@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Enkel Collectieven met een balans van nul kunnen gearchiveerd worden. Om het geld uit te betalen, dien een onkostennota in, doneer aan een ander Collectief of verzend het geld naar je fiscaal beheerder met behulp van een 'rekening leeghalen' optie.",
   "collective.archive.confirm.btn": "Archief",
-  "collective.archive.description": "Een {type} archiveren betekend dat het er inactief zal uitzien en geen nieuwe activiteit zal toegelaten zijn.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "Je kan je collectie niet archiveren terwijl je een host bent, deactiveer als Host eerst.",
   "collective.archive.subscriptions": "Terugkerende financiële bijdragen worden automatisch geannuleerd.",
   "collective.archive.title": "Archiveer deze {type}",

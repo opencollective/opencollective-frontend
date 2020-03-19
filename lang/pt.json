@@ -78,7 +78,7 @@
   "collective.archive.archivedConfirmMessage": "{message}.",
   "collective.archive.availableBalance": "Apenas coletivos com um balanço de zero podem ser arquivados. Para pagar os fundos, envie uma despesa, doe para outro coletivo, ou envie os fundos para o seu administrador fiscal usando a opção 'balanço vazio'.",
   "collective.archive.confirm.btn": "Arquivo",
-  "collective.archive.description": "Archiving {type} means it will visually appear inactive and no new activity will be allowed.",
+  "collective.archive.description": "Archiving {type, select, EVENT {this event}  COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "Você não pode arquivar seu Coletivo enquanto for um Organizador, por favor desative como Organizador primeiro.",
   "collective.archive.subscriptions": "Contribuições financeiras recorrentes serão automaticamente canceladas.",
   "collective.archive.title": "Arquive este {type}",
