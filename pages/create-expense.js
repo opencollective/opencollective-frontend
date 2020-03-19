@@ -27,13 +27,14 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
-import { H1, H5 } from '../components/Text';
+import { H1, H5, P, Strong } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import LinkCollective from '../components/LinkCollective';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -279,6 +280,18 @@ class CreateExpensePage extends React.Component {
                         />
                       )}
                     </Container>
+                    {host && (
+                      <P fontSize="SmallCaption" color="black.600" mt={2}>
+                        <FormattedMessage
+                          id="withColon"
+                          defaultMessage="{item}:"
+                          values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
+                        />{' '}
+                        <LinkCollective collective={host}>
+                          <Strong color="black.600">{host.name}</Strong>
+                        </LinkCollective>
+                      </P>
+                    )}
                     <Box mt={50}>
                       <H5 mb={3}>
                         <FormattedMessage id="Tags" defaultMessage="Tags" />
