@@ -26,7 +26,7 @@ const [countryISO, setCountryISO] = React.useState(null);
 
 ### Full breakdown
 
-Folowing example is resizable.
+Following example is resizable.
 
 ```js
 import { creditCard } from '../../mocks/payment_methods';

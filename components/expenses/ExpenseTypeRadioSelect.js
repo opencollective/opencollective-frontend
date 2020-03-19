@@ -87,7 +87,7 @@ const Fieldset = styled.fieldset`
 /**
  * To select expense's type.
  *
- * Using `StyledRadioList` should have been the default choice, but unfortunatelly
+ * Using `StyledRadioList` should have been the default choice, but unfortunately
  * IE & Chrome don't support using `flex` on fieldset yet, so we have to create a custom
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */

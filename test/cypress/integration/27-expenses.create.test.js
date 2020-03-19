@@ -67,7 +67,7 @@ describe('New expense flow', () => {
 
       // Try to submit with missing data
       cy.get('input:invalid').should('have.length', 3); // Previous incomplete fields + payout method email
-      cy.getByDataCy('expense-summary-btn').click(); // Sould not submit
+      cy.getByDataCy('expense-summary-btn').click(); // Should not submit
 
       // Fill missing info & submit
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
