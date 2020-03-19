@@ -274,7 +274,7 @@ class ConnectGithub extends React.Component {
                 <P mb={3}>
                   <FormattedMessage
                     id="createcollective.opensource.p1"
-                    defaultMessage="You're creating software. You don't want to worry about creating a legal entity or seperate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project."
+                    defaultMessage="You're creating software. You don't want to worry about creating a legal entity or separate bank account, paying taxes, or providing invoices to sponsors. Let us take care of all that, so you can stay focused on your project."
                   />
                 </P>
                 <P mb={3}>

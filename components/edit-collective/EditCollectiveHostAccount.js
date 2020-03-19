@@ -81,7 +81,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         ...activationStatus,
         processing: false,
         isHostAccount: true,
-        // confirmationMsg: 'The Host status was succesfully activated.',
+        // confirmationMsg: 'The Host status was successfully activated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -99,7 +99,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         ...activationStatus,
         processing: false,
         isHostAccount: false,
-        // confirmationMsg: 'The Host status was succesfully deactivated.',
+        // confirmationMsg: 'The Host status was successfully deactivated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;

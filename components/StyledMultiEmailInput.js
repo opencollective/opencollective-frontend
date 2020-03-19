@@ -42,7 +42,7 @@ export default class StyledMultiEmailInput extends Component {
     initialState: PropTypes.instanceOf(EditorState),
     /** Callback for state update like `({emails, invalids}) => void` */
     onChange: PropTypes.func,
-    /** Callback for when component is unmount. Usefull to save editor state. */
+    /** Callback for when component is unmount. Useful to save editor state. */
     onClose: PropTypes.func,
     /** On array of invalid emails */
     invalids: PropTypes.arrayOf(PropTypes.string),

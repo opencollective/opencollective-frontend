@@ -9,7 +9,7 @@ const [selected, setSelected] = React.useState(null);
 
 ### Using links inside of buttons
 
-This is just an exemple. The way you style the links is completely up to you.
+This is just an example. The way you style the links is completely up to you.
 
 You can use [StyledLink](#styledlink) for standard styles.
 

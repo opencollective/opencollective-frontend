@@ -6,7 +6,7 @@ import { CreditCards } from '../../stripe-helpers';
 import { disableSmoothScroll } from './helpers';
 
 /**
- * Login with an exising account. If not provided in `params`, the email used for
+ * Login with an existing account. If not provided in `params`, the email used for
  * authentication will be `defaultTestUserEmail`.
  *
  * @param {object} params:

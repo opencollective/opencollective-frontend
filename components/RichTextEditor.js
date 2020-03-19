@@ -153,7 +153,7 @@ export default class RichTextEditor extends React.Component {
     disabled: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
     toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** Usefull to compensate the height of the toolbar when editing inline */
+    /** Useful to compensate the height of the toolbar when editing inline */
     toolbarOffsetY: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** Min height for the full component */
     editorMinHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
