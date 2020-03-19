@@ -483,6 +483,7 @@ class EditCollectiveForm extends React.Component {
       submitBtnMessageId = status;
     }
 
+    const isEvent = collective.type === CollectiveType.EVENT;
     const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
@@ -839,7 +840,14 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </Button>
                 <div className="backToProfile">
-                  <Link route="collective" params={{ slug: collective.slug }}>
+                  <Link
+                    route={isEvent ? 'event' : 'collective'}
+                    params={
+                      isEvent
+                        ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                        : { slug: collective.slug }
+                    }
+                  >
                     <FormattedMessage
                       id="collective.edit.backToProfile"
                       defaultMessage="view {type} page"
