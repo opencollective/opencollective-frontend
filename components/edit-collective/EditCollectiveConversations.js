@@ -2,7 +2,7 @@ import { Flex } from '@rebass/grid';
 import { set, cloneDeep, pick } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { useIntl, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 

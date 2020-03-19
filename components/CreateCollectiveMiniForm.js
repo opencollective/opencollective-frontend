@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
 import { get, pick } from 'lodash';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useForm } from 'react-hook-form';
 

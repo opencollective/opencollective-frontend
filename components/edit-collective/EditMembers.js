@@ -6,7 +6,7 @@ import { get, update, omit } from 'lodash';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import memoizeOne from 'memoize-one';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
 import { CollectiveType } from '../../lib/constants/collectives';

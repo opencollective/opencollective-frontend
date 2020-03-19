@@ -4,7 +4,7 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
 import { orderBy } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import memoizeOne from 'memoize-one';
 
 import MessageBox from '../../MessageBox';

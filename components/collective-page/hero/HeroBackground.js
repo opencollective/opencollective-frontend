@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import { Mutation } from 'react-apollo';
+import { Mutation } from '@apollo/react-components';
 import { get, set, has } from 'lodash';
 
 import { Upload } from '@styled-icons/feather/Upload';

@@ -5,7 +5,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get, truncate } from 'lodash';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import moment from 'moment';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';

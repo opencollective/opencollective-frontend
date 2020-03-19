@@ -1,7 +1,7 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { set, get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';

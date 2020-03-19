@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Query, Mutation } from 'react-apollo';
+import { Query, Mutation } from '@apollo/react-components';
 import { Flex, Box } from '@rebass/grid';
 import { get, update, cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';

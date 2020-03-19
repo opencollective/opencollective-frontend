@@ -2,7 +2,7 @@ import { Flex } from '@rebass/grid';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';

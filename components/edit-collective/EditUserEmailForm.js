@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 import { Box, Flex } from '@rebass/grid';
 import { isNil } from 'lodash';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
 import { addUpdateUserEmailMutation } from '../../lib/graphql/mutations';

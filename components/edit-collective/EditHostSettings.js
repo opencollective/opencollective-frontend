@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
