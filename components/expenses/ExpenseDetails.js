@@ -11,7 +11,6 @@ import { imagePreview } from '../../lib/image-utils';
 import InputField from '../../components/InputField';
 import categories from '../../lib/constants/categories';
 import DefinedTerm, { Terms } from '../DefinedTerm';
-import { titleCase } from 'title-case';
 
 import TransactionDetails from './TransactionDetails';
 import { Box, Flex } from '@rebass/grid';
@@ -58,6 +57,14 @@ class ExpenseDetails extends React.Component {
       banktransfer: {
         id: 'expense.payoutMethod.banktransfer',
         defaultMessage: 'Bank Transfer',
+      },
+      expenseTypeReceipt: {
+        id: 'Expense.Type.Receipt',
+        defaultMessage: 'Receipt',
+      },
+      expenseTypeInvoice: {
+        id: 'Expense.Type.Invoice',
+        defaultMessage: 'Invoice',
       },
     });
 
@@ -142,9 +149,11 @@ class ExpenseDetails extends React.Component {
     if (this.state.expense['type'] === 'RECEIPT' || this.state.expense['type'] === 'INVOICE') {
       delete expenseTypes['DEFAULT'];
     }
-    const expenseTypesOptions = Object.entries(expenseTypes).map(([key, value]) => {
-      return { [key]: titleCase(value) };
-    });
+    const expenseTypesOptions = [
+      { [expenseTypes.DEFAULT]: '' },
+      { [expenseTypes.RECEIPT]: intl.formatMessage(this.messages.expenseTypeReceipt) },
+      { [expenseTypes.INVOICE]: intl.formatMessage(this.messages.expenseTypeInvoice) },
+    ];
     const attachmentsWithFiles = expense.attachments?.filter(attachment => Boolean(attachment.url)) || [];
     const canDownloadAttachments = isAuthor || LoggedInUser?.canEditCollective(expense.collective);
 
