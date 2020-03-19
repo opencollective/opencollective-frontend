@@ -1,6 +1,14 @@
 name: E2E
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 env:
   CI: true
