@@ -2,12 +2,12 @@ import { Flex } from '@rebass/grid';
 import { set, cloneDeep, pick } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { useIntl, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 
-import imgPreviewList from '../../static/images/updates/updates-list-preview.png';
-import imgPreviewNewUpdate from '../../static/images/updates/updates-new-preview.png';
+import imgPreviewList from '../../public/static/images/updates/updates-list-preview.png';
+import imgPreviewNewUpdate from '../../public/static/images/updates/updates-new-preview.png';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';
