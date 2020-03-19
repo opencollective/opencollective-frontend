@@ -155,7 +155,10 @@ class ExpenseDetails extends React.Component {
       { [expenseTypes.INVOICE]: intl.formatMessage(this.messages.expenseTypeInvoice) },
     ];
     const attachmentsWithFiles = expense.attachments?.filter(attachment => Boolean(attachment.url)) || [];
-    const canDownloadAttachments = isAuthor || LoggedInUser?.canEditCollective(expense.collective);
+    const canDownloadAttachments =
+      isAuthor ||
+      LoggedInUser?.canEditCollective(expense.collective) ||
+      LoggedInUser?.canEditCollective(expense.collective?.host);
 
     return (
       <div className={`ExpenseDetails ${this.props.mode}`}>
