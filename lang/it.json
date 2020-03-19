@@ -472,7 +472,7 @@
   "CreateExpenseFAQ.howAreApproved": "How are expenses approved?",
   "CreateExpenseFAQ.howAreApprovedDetails": "Collective admins are notified when an expense is submitted and they can approve or reject it.",
   "CreateExpenseFAQ.isItPublic": "Is my private data made public?",
-  "CreateExpenseFAQ.isItPublicDetails": "No. Only the expense amount and description are public. Attachments, payment info, and other private data is only visible to you and the admins.",
+  "CreateExpenseFAQ.isItPublicDetails": "No. Only the expense amount and description are public. Attachments, payment info, emails and addresses are only visible to you and the admins.",
   "CreateExpenseFAQ.whenPaid": "When will I get paid?",
   "CreateExpenseFAQ.whenPaidDetails": "Payments are processed by the Collective's fiscal host, the organization that hold funds on their behalf. Many fiscal hosts pay expenses weekly, but each one is different.",
   "createOrder.backToTier": "Vedi tutte gli altri modi di contribuire",
