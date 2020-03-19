@@ -14,7 +14,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', '
 // React components via the React Intl Babel plugin. An error will be thrown if
 // there are messages in different components that use the same `id`. The result
 // is a flat collection of `id: message` pairs for the app's default locale.
-const duplicateIds = [];
+const duplicates = [];
 const defaultMessages = globSync(MESSAGES_PATTERN)
   .map(filename => fs.readFileSync(filename, 'utf8'))
   .map(file => JSON.parse(file))
@@ -22,15 +22,19 @@ const defaultMessages = globSync(MESSAGES_PATTERN)
     descriptors.forEach(({ id, defaultMessage }) => {
       if (Object.prototype.hasOwnProperty.call(collection, id)) {
         if (collection[id] !== defaultMessage) {
-          duplicateIds.push(id);
+          duplicates.push({ id, base: collection[id], other: defaultMessage });
         }
         return;
       }
       collection[id] = defaultMessage;
     });
 
-    if (duplicateIds.length > 0) {
-      duplicateIds.forEach(id => console.error(`🛑 [Error] Duplicate message id with different messages: ${id}`));
+    if (duplicates.length > 0) {
+      duplicates.forEach(({ id, base, other }) => {
+        console.error(`🛑 [Error] Duplicate message id with different messages for "${id}"`);
+        console.error(`--- Base:  "${base}"`);
+        console.error(`--- Other: "${other}"`);
+      });
       throw new Error('The strings include duplicate IDs with different messages');
     }
 
