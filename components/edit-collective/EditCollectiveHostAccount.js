@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 import { H2, P } from '../Text';
 import Container from '../Container';

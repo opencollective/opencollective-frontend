@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { isEmpty, get } from 'lodash';
 
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 

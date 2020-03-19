@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';

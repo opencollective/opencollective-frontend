@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';

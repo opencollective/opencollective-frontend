@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
 import { Flex, Box } from '@rebass/grid';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/errors';

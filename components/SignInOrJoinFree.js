@@ -14,7 +14,7 @@ import CreateProfileFAQ from './faqs/CreateProfileFAQ';
 import { P } from './Text';
 import MessageBox from './MessageBox';
 import { createUserQuery } from '../lib/graphql/mutations';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It

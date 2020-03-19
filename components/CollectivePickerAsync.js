@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery } from 'react-apollo';
+import { useLazyQuery } from '@apollo/react-hooks';
 import { throttle } from 'lodash';
 import { useIntl, defineMessages } from 'react-intl';
 

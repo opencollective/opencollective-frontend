@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import Modal, { ModalHeader, ModalBody, ModalFooter } from '../StyledModal';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from '@apollo/react-components';
 
 import StripeProvider from '../components/StripeProvider';
 import theme from '../lib/theme';

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 
 import { Edit } from '@styled-icons/feather/Edit';
 import { X } from '@styled-icons/feather/X';

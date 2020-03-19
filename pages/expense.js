@@ -2,7 +2,7 @@ import { Box, Flex } from '@rebass/grid';
 import { cloneDeep, uniqBy, update } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { graphql, withApollo } from 'react-apollo';
+import { graphql, withApollo } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Sections } from '../components/collective-page/_constants';

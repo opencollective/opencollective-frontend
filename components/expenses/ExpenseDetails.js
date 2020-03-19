@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { get, set, cloneDeep, uniq, pick, omit } from 'lodash';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';

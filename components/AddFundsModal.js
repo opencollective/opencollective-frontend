@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Row, Col } from 'react-bootstrap';
 import gql from 'graphql-tag';
-import { Mutation } from 'react-apollo';
+import { Mutation } from '@apollo/react-components';
 import { pick } from 'lodash';
 
 import Button from './Button';

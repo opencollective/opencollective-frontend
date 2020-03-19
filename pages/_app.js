@@ -4,7 +4,7 @@ import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from '@apollo/react-components';
 
 // For old browsers without window.Intl
 import 'intl';

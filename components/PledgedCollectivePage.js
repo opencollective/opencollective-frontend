@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import { Box, Flex } from '@rebass/grid';
 import gql from 'graphql-tag';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
