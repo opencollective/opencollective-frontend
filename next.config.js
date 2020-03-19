@@ -83,7 +83,7 @@ const nextConfig = {
 
     // Configuration for images
     config.module.rules.unshift({
-      test: /images[\\/].*\.(jpg|gif|png|svg)$/,
+      test: /public\/.*\/images[\\/].*\.(jpg|gif|png|svg)$/,
       use: {
         loader: 'file-loader',
         options: {
