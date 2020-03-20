@@ -28,7 +28,7 @@ const messages = defineMessages({
   mainDescription: {
     id: 'EditCollective.Updates.description',
     defaultMessage:
-      'Updates is a way to keep your community posted on your progress. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
+      'Updates is a way to keep your community posted on your progress. They are sent by email to all you contributors and followers. Once enabled, a new "Updates" section will be added to your profile page and a dedicated page will be created on {updatesLink}.',
   },
   checkboxLabel: {
     id: 'EditCollective.Updates.checkbox',
