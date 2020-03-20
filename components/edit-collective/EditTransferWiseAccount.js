@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { useFormik } from 'formik';
 import { defineMessages } from 'react-intl';
 
@@ -53,7 +53,6 @@ const EditTransferWiseAccount = props => {
     },
   });
   const { refetch } = React.useContext(GraphQLContext);
-  const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
     mutationOptions,
@@ -67,13 +66,13 @@ const EditTransferWiseAccount = props => {
       token: '',
     },
     async onSubmit(values) {
-      const { data } = await createConnectedAccount({
+      await createConnectedAccount({
         variables: {
           connectedAccount: { token: values.token, service: 'transferwise' },
           account: { slug: props.collective.slug },
         },
       });
-      await refetch(data.createConnectedAccount);
+      await refetch();
     },
     validate(values) {
       const errors = {};
@@ -86,7 +85,7 @@ const EditTransferWiseAccount = props => {
 
   const handleDelete = async () => {
     await deleteConnectedAccount({ variables: { connectedAccount: { legacyId: props.connectedAccount.id } } });
-    setConnectedAccount(null);
+    await refetch();
   };
 
   if (!props.connectedAccount) {

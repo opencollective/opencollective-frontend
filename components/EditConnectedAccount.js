@@ -129,7 +129,12 @@ class EditConnectedAccount extends React.Component {
     }
 
     if (service === 'transferwise') {
-      return <EditTransferWiseAccount collective={collective} connectedAccount={connectedAccount} intl={intl} />;
+      // Notice we're passing props.connectedAccount to EditTransferWiseAccount
+      // This happens because the component will take care of refetching data from
+      // the DB to make sure it is displaying accurate information.
+      return (
+        <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
+      );
     }
 
     return (
