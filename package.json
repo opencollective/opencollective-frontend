@@ -78,7 +78,7 @@
     "payment": "2.3.0",
     "polished": "3.4.4",
     "prop-types": "15.7.2",
-    "react": "16.13.0",
+    "react": "16.13.1",
     "react-add-to-calendar": "0.1.5",
     "react-bootstrap": "0.33.1",
     "react-datetime": "2.16.3",
