@@ -35,30 +35,30 @@ const mutationOptions = { context: API_V2_CONTEXT };
 
 const EditTransferWiseAccount = props => {
   const messages = defineMessages({
-    'collective.connectedAccounts.transferwise.button': {
+    button: {
       id: 'collective.connectedAccounts.transferwise.button',
       defaultMessage: 'Connect TransferWise',
     },
-    'collective.connectedAccounts.transferwise.description': {
+    description: {
       id: 'collective.create.connectedAccounts.transferwise.description',
       defaultMessage: 'Connect a TransferWise account to pay expenses with one click.',
     },
-    'collective.connectedAccounts.transferwise.connected': {
+    connected: {
       id: 'collective.connectedAccounts.transferwise.connected',
       defaultMessage: 'TransferWise account connected on {updatedAt, date, short}',
     },
-    'collective.connectedAccounts.disconnect.button': {
+    disconnect: {
       id: 'collective.connectedAccounts.disconnect.button',
       defaultMessage: 'Disconnect',
     },
   });
   const { refetch } = React.useContext(GraphQLContext);
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
-  const [createConnectedAccount, { loading: createLoading }] = useMutation(
+  const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
     mutationOptions,
   );
-  const [deleteConnectedAccount, { loading: deleteLoading }] = useMutation(
+  const [deleteConnectedAccount, { loading: isDeleting }] = useMutation(
     deleteConnectedAccountMutation,
     mutationOptions,
   );
@@ -73,7 +73,6 @@ const EditTransferWiseAccount = props => {
           account: { slug: props.collective.slug },
         },
       });
-      console.log(data);
       await refetch(data.createConnectedAccount);
     },
     validate(values) {
@@ -90,24 +89,24 @@ const EditTransferWiseAccount = props => {
     setConnectedAccount(null);
   };
 
-  if (!connectedAccount) {
+  if (!props.connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
         <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
-          {props.intl.formatMessage(messages[`collective.connectedAccounts.transferwise.description`])}
+          {props.intl.formatMessage(messages.description)}
         </P>
         <StyledInputField
           name="token"
           label="Token"
-          error={formik.touched.token && formik.errors.token}
-          disabled={createLoading}
+          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
+          disabled={isCreating}
         >
           {inputProps => (
             <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
           )}
         </StyledInputField>
-        <StyledButton type="submit" buttonSize="small" loading={createLoading}>
-          {props.intl.formatMessage(messages['collective.connectedAccounts.transferwise.button'])}
+        <StyledButton type="submit" buttonSize="small" loading={isCreating}>
+          {props.intl.formatMessage(messages.button)}
         </StyledButton>
       </form>
     );
@@ -115,14 +114,14 @@ const EditTransferWiseAccount = props => {
     return (
       <React.Fragment>
         <P lineHeight="0">
-          {props.intl.formatMessage(messages[`collective.connectedAccounts.transferwise.connected`], {
-            username: connectedAccount.username,
-            updatedAt: new Date(connectedAccount.updatedAt),
+          {props.intl.formatMessage(messages.connected, {
+            username: props.connectedAccount.username,
+            updatedAt: new Date(props.connectedAccount.updatedAt || props.connectedAccount.createdAt),
           })}
         </P>
         <P lineHeight="0">
-          <StyledButton type="submit" buttonSize="small" loading={deleteLoading} onClick={handleDelete}>
-            {props.intl.formatMessage(messages['collective.connectedAccounts.disconnect.button'])}
+          <StyledButton type="submit" buttonSize="small" loading={isDeleting} onClick={handleDelete}>
+            {props.intl.formatMessage(messages.disconnect)}
           </StyledButton>
         </P>
       </React.Fragment>
