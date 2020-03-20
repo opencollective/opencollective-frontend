@@ -3,47 +3,42 @@ import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 import { capitalize } from '../../lib/utils';
 import EditConnectedAccount from '../EditConnectedAccount';
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 
-class EditConnectedAccounts extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    connectedAccounts: PropTypes.arrayOf(PropTypes.object),
-    editMode: PropTypes.bool,
-  };
+const EditConnectedAccounts = props => {
+  const services = ['twitter'];
+  const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
-  constructor(props) {
-    super(props);
-    const { collective } = props;
-
-    this.state = { services: ['twitter'], editMode: props.editMode || false };
-    this.connectedAccounts = groupBy(props.connectedAccounts, 'service');
-
-    if (collective.type === 'USER') {
-      this.state.services.push('github');
-    }
-    if (collective.type === 'USER' || collective.type === 'ORGANIZATION') {
-      this.state.services.push('stripe');
-    }
+  if (props.collective.type === 'USER') {
+    services.push('github');
+  }
+  if (props.collective.type === 'USER' || props.collective.type === 'ORGANIZATION') {
+    services.push('stripe');
+  }
+  if (props.collective.isHost && hasFeature(props.collective, FEATURES.TRANSFERWISE)) {
+    services.push('transferwise');
   }
 
-  render() {
-    const { collective } = this.props;
+  return (
+    <div className="EditConnectedAccounts">
+      {services.map(service => (
+        <div key={`connect-${service}`}>
+          <h2>{capitalize(service)}</h2>
+          <EditConnectedAccount
+            collective={props.collective}
+            service={service}
+            connectedAccount={connectedAccountsByService[service] && connectedAccountsByService[service][0]}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
 
-    return (
-      <div className="EditConnectedAccounts">
-        {this.state.services.map(service => (
-          <div key={`connect-${service}`}>
-            <h2>{capitalize(service)}</h2>
-            <EditConnectedAccount
-              collective={collective}
-              service={service}
-              connectedAccount={this.connectedAccounts[service] && this.connectedAccounts[service][0]}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
-}
+EditConnectedAccounts.propTypes = {
+  collective: PropTypes.object.isRequired,
+  connectedAccounts: PropTypes.arrayOf(PropTypes.object),
+  editMode: PropTypes.bool,
+};
 
 export default EditConnectedAccounts;

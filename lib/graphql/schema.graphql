@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Mar 17 2020 16:29:27 GMT+0100 (GMT+01:00)
+# timestamp: Thu Mar 19 2020 09:38:43 GMT-0300 (Brasilia Standard Time)
 
 """
 Application model
@@ -531,6 +531,11 @@ interface CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -688,11 +693,6 @@ type CollectiveStatsType {
   Net amount received
   """
   totalAmountReceived: Int
-
-  """
-  Total amount raised through referral
-  """
-  totalAmountRaised: Int @deprecated(reason: "2019-08-22: Referals are not supported anymore")
   yearlyBudget: Int
   topExpenses: JSON
   topFundingSources: JSON
@@ -705,17 +705,6 @@ input CommentAttributesInputType {
   id: Int
   markdown: String
   html: String
-
-  """
-  Deprecated since 2019-11-25: This field is not editable.
-  """
-  FromCollectiveId: Int
-
-  """
-  Deprecated since 2019-11-25: This field is not editable.
-  """
-  CollectiveId: Int
-  ExpenseId: Int
   UpdateId: Int
 }
 
@@ -2915,11 +2904,6 @@ type StatsMemberType {
   total amount donated by this member either directly or using a virtual card it has emitted
   """
   totalDonations: Int
-
-  """
-  total amount raised by this member
-  """
-  totalRaised: Int @deprecated(reason: "2019-08-22: Referals are not supported anymore")
 }
 
 """
@@ -3276,6 +3260,7 @@ type UpdateType {
   collective: CollectiveInterface
   tier: Tier
   comments(limit: Int, offset: Int): CommentListType
+    @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
 }
 
 """
