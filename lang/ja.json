@@ -269,6 +269,7 @@
   "Comment.PostedOn": "Posted on {createdAt, date, long}",
   "CommentForm.placeholder": "Type in your message...",
   "CommentForm.PostReply": "返信を投稿",
+  "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
   "completePledge.MissingOrder": "This pledge doesn't exist or has already been completed.",
   "completePledge.Title": "Complete your pledge",

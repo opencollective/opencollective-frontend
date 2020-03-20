@@ -269,6 +269,7 @@
   "Comment.PostedOn": "Posté le {createdAt, date, long}",
   "CommentForm.placeholder": "Tapez votre message...",
   "CommentForm.PostReply": "Poster en réponse",
+  "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# commentaire} other {# commentaires}}",
   "completePledge.MissingOrder": "Cette promesse de don n'existe pas ou a déjà été remplie.",
   "completePledge.Title": "Compléter votre promesse de don",
