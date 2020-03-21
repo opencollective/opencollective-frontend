@@ -27,7 +27,7 @@ describe('create a collective', () => {
     cy.get('#createHost .inputField.HostCollectiveId', {
       timeout: 10000,
     }).contains('new org');
-    cy.get('#createHost .EditConnectedAccount .btn').contains('Connect Stripe');
+    cy.get('#createHost .EditConnectedAccount [data-cy="connect-stripe-button"]').contains('Connect Stripe');
     cy.get('#findHost input[type="radio"]').click();
     cy.get('#findHost a[href="/hosts"]').click();
     cy.get('.CollectiveCard', { timeout: 10000 }).should('have.length', 11);

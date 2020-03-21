@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Mar 17 2020 16:30:00 GMT+0100 (GMT+01:00)
+# timestamp: Thu Mar 19 2020 09:39:10 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -371,7 +371,7 @@ type Comment {
   fromAccount: Account
   account: Account
   fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
-  collective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
+  collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
 
 """
@@ -385,7 +385,6 @@ type CommentCollection implements Collection {
 }
 
 input CommentCreateInput {
-  markdown: String
   html: String
 
   """
@@ -400,6 +399,89 @@ input CommentUpdateInput {
   id: String!
   markdown: String
   html: String
+}
+
+"""
+Fields for a connected account
+"""
+type ConnectedAccount {
+  """
+  Unique identifier for this connected account
+  """
+  id: String!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the ConnectedAccount was last updated
+  """
+  updatedAt: DateTime!
+  settings: JSON
+  service: ConnectedAccountService!
+}
+
+input ConnectedAccountCreateInput {
+  """
+  Optional Client ID for the token or secret
+  """
+  clientId: String
+
+  """
+  Private data related to the connected account
+  """
+  data: JSON
+
+  """
+  Refresh token for the connected account
+  """
+  refreshToken: String
+
+  """
+  Public data related to the connected account
+  """
+  settings: JSON
+
+  """
+  Secret token used to call service
+  """
+  token: String
+
+  """
+  Service which the connected account belongs to
+  """
+  service: ConnectedAccountService
+
+  """
+  Optional username for the connected account
+  """
+  username: String
+}
+
+input ConnectedAccountReferenceInput {
+  """
+  The public id identifying the connected account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+}
+
+"""
+All supported services a user can connect with
+"""
+enum ConnectedAccountService {
+  paypal
+  stripe
+  github
+  twitter
+  meetup
+  transferwise
 }
 
 """
@@ -1082,6 +1164,31 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
+
+  """
+  Connect external account to Open Collective Account
+  """
+  createConnectedAccount(
+    """
+    Connected Account data
+    """
+    connectedAccount: ConnectedAccountCreateInput!
+
+    """
+    Account where the external account will be connected
+    """
+    account: AccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Delete ConnectedAccount
+  """
+  deleteConnectedAccount(
+    """
+    ConnectedAccount reference containing either id or legacyId
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+  ): ConnectedAccount
 
   """
   Create a conversation
