@@ -159,14 +159,14 @@ class SectionContribute extends React.PureComponent {
     1. admin + no host = Contribute Section and 'Start accepting financial contributions' ✅
     2a. admin + host = normal Contribute section ✅
     2b. not admin + Collective active = normal Contribute section ???
-    3. not admin + Collective not active = display nothing ✅
+    3. not admin + Collective not active + no subcollectives/events = display nothing ✅
     */
 
     const createContributionTierRoute = isEvent
       ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
       : `/${collective.slug}/edit/tiers`;
 
-    if (!isAdmin && !isActive) {
+    if (!hasContribute && !hasOtherWaysToContribute) {
       return null;
     }
 

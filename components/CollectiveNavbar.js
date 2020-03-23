@@ -266,9 +266,12 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   const sections = getDefaultSections(collective);
   const toRemove = new Set();
   collective = collective || {};
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  if (!collective.isApproved && !isAdmin) {
+  const hasContribute = collective.isApproved;
+  const hasOtherWaysToContribute = !isEvent && (collective.events?.length > 0 || collective.subCollectives?.length > 0);
+  if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
@@ -299,7 +302,8 @@ export const getSectionsForCollective = (collective, isAdmin) => {
       toRemove.add(Sections.UPDATES);
     }
   }
-  if (collective.type === CollectiveType.EVENT) {
+
+  if (isEvent) {
     // Should not see tickets section if you can't order them
     if ((!collective.isApproved && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
       toRemove.add(Sections.TICKETS);
