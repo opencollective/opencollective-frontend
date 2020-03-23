@@ -31,6 +31,7 @@ export const getCollectivePageQuery = gql`
       isArchived
       isHost
       isIncognito
+      isSponsored
       hostFeePercent
       image
       imageUrl(height: 256)
@@ -176,6 +177,7 @@ export const getCollectivePageQuery = gql`
         hostedCollectives
         hostedCollectivesLimit
       }
+      sponsorshipValue
 
       ... on Event {
         timezone

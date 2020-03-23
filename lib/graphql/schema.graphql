@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Mar 19 2020 09:38:43 GMT-0300 (Brasilia Standard Time)
+# timestamp: Fri Mar 20 2020 14:54:55 GMT-0300 (Brasilia Standard Time)
 
 """
 Application model
@@ -130,6 +130,11 @@ type Collective implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is sponsored by the platform
+  """
+  isSponsored: Boolean
 
   """
   Returns whether this collective is archived
@@ -400,6 +405,7 @@ interface CollectiveInterface {
   path: String
   isHost: Boolean
   isIncognito: Boolean
+  isSponsored: Boolean
   canApply: Boolean
   canContact: Boolean
   isArchived: Boolean
@@ -1013,6 +1019,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is sponsored by the platform
+  """
+  isSponsored: Boolean
 
   """
   Returns whether this collective is archived
@@ -2265,6 +2276,11 @@ type Organization implements CollectiveInterface {
   isIncognito: Boolean
 
   """
+  Returns whether this collective is sponsored by the platform
+  """
+  isSponsored: Boolean
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3329,6 +3345,11 @@ type User implements CollectiveInterface {
   Returns whether this collective is incognito
   """
   isIncognito: Boolean
+
+  """
+  Returns whether this collective is sponsored by the platform
+  """
+  isSponsored: Boolean
 
   """
   Returns whether this collective is archived
