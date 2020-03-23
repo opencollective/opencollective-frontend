@@ -35,6 +35,8 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
 
+    timeout-minutes: 30
+
     strategy:
       matrix:
         files: ['0*.js', '1*.js', '2*.js', '3*.js']
