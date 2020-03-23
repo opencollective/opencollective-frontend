@@ -18,6 +18,7 @@ import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import ExternalLink from '../ExternalLink';
 import CreateCollectiveCover from '../CreateCollectiveCover';
+import slugify from 'slugify';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
@@ -220,11 +221,13 @@ class CreateCollectiveForm extends React.Component {
               {formik => {
                 const { values, handleSubmit, errors, touched } = formik;
                 const suggestedSlug = () => {
-                  return values.name
-                    .trim()
-                    .split(' ')
-                    .join('-')
-                    .toLowerCase();
+                  const slugOptions = {
+                    replacement: '-',
+                    lower: true,
+                    strict: true,
+                  };
+
+                  return slugify(values.name, slugOptions);
                 };
 
                 const changeSlug = () => {
