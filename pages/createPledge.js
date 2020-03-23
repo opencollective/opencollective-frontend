@@ -216,10 +216,7 @@ class CreatePledgePage extends React.Component {
       }
     } catch (error) {
       this.setState({
-        errorMessage: error
-          .toString()
-          .replace('GraphQL error:', '')
-          .trim(),
+        errorMessage: error.toString().replace('GraphQL error:', '').trim(),
       });
     } finally {
       this.setState({ submitting: false });

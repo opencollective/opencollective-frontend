@@ -383,10 +383,7 @@ function fillStripeInput(params) {
         return;
       }
 
-      return cy
-        .wrap(body)
-        .find(`input:eq(${index})`)
-        .type(`{selectall}${value}`);
+      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`);
     };
 
     fillInput(1, creditCardNumber);
