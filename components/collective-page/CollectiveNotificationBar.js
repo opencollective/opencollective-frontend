@@ -5,6 +5,7 @@ import NotificationBar from '../NotificationBar';
 import { CollectiveType } from '../../lib/constants/collectives';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 import { moneyCanMoveFromEvent } from '../../lib/events';
+import { formatCurrency } from '../../lib/utils';
 import { get } from 'lodash';
 
 const messages = defineMessages({
@@ -63,6 +64,14 @@ const messages = defineMessages({
     id: 'event.over.sendMoneyToParent.transaction.description',
     defaultMessage: 'Balance of {event}',
   },
+  'collective.sponsored': {
+    id: 'collective.sponsored',
+    defaultMessage: 'This collective is sponsored by Open Collective!',
+  },
+  'collective.sponsored.description': {
+    id: 'collective.sponsored.description',
+    defaultMessage: 'Sponsorship value: {value}',
+  },
 });
 
 const getNotification = (intl, status, collective, host, LoggedInUser) => {
@@ -119,6 +128,13 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
           currency={collective.currency}
         />,
       ],
+    };
+  } else if (collective.isSponsored) {
+    return {
+      title: intl.formatMessage(messages['collective.sponsored']),
+      description: intl.formatMessage(messages['collective.sponsored.description'], {
+        value: formatCurrency(collective.sponsorshipValue, collective.currency),
+      }),
     };
   }
 };
