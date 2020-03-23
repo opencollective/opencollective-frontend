@@ -33,6 +33,16 @@ const ContainerWithImage = styled(Container)`
   }
 `;
 
+const SubText = styled.p`
+  font-size: 1.1rem;
+`;
+
+const Span = styled.span`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const placeholders = {
   name: 'Agora Collective',
   slug: 'agora',
@@ -162,7 +172,7 @@ class CreateCollectiveForm extends React.Component {
         slug,
       };
       assign(collective, this.state.collective);
-      this.props.onSubmit(collective);
+      this.props.onSubmit({ ...collective, slug });
     };
 
     return (
@@ -209,6 +219,17 @@ class CreateCollectiveForm extends React.Component {
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
                 const { values, handleSubmit, errors, touched } = formik;
+                const suggestedSlug = () => {
+                  return values.name
+                    .split(' ')
+                    .join('-')
+                    .toLowerCase();
+                };
+
+                const changeSlug = () => {
+                  values.slug = suggestedSlug();
+                  this.setState(state => ({ ...state, collective: { ...state.collective, slug: values.slug } }));
+                };
 
                 return (
                   <Form>
@@ -229,7 +250,6 @@ class CreateCollectiveForm extends React.Component {
                       htmlFor="slug"
                       error={touched.slug && errors.slug}
                       label={intl.formatMessage(this.messages.slugLabel)}
-                      value={values.slug}
                       required
                       my={3}
                     >
@@ -242,6 +262,14 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
+                    {values.name.length > 0 && (
+                      <SubText>
+                        Suggested URL :{' '}
+                        <Span style={{}} onClick={changeSlug}>
+                          {`/${suggestedSlug()}`}
+                        </Span>
+                      </SubText>
+                    )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
