@@ -237,7 +237,7 @@ class CreateCollectiveForm extends React.Component {
                         <Field
                           as={StyledInputGroup}
                           {...inputProps}
-                          prepend="opencollective.com"
+                          prepend="opencollective.com/"
                           placeholder={placeholders.slug}
                         />
                       )}
