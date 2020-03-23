@@ -562,7 +562,7 @@
   "editCollective.menu.webhooks": "Вебхуки",
   "editCollective.notFound": "Нечего редактировать",
   "EditCollective.Updates.checkbox": "Enable updates",
-  "EditCollective.Updates.description": "Updates is a way to keep your community posted on your progress. Once enabled, a new \"Updates\" section will be added to your profile page and a dedicated page will be created on {updatesLink}.",
+  "EditCollective.Updates.description": "Updates is a way to keep your community posted on your progress. They are sent by email to all you contributors and followers. Once enabled, a new \"Updates\" section will be added to your profile page and a dedicated page will be created on {updatesLink}.",
   "EditCollective.VAT": "VAT settings",
   "EditCollective.VAT.Description": "European Value Added Tax",
   "EditCollective.VAT.Host": "Use the host VAT settings",
