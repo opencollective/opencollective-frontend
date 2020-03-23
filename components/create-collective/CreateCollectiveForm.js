@@ -221,6 +221,7 @@ class CreateCollectiveForm extends React.Component {
                 const { values, handleSubmit, errors, touched } = formik;
                 const suggestedSlug = () => {
                   return values.name
+                    .trim()
                     .split(' ')
                     .join('-')
                     .toLowerCase();
@@ -250,6 +251,7 @@ class CreateCollectiveForm extends React.Component {
                       htmlFor="slug"
                       error={touched.slug && errors.slug}
                       label={intl.formatMessage(this.messages.slugLabel)}
+                      value={values.slug}
                       required
                       my={3}
                     >
