@@ -59,6 +59,7 @@ class CollectiveCategoryPicker extends React.Component {
         defaultMessage: 'For open source projects',
       },
       climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
+      covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       examples: { id: 'createCollective.examples', defaultMessage: 'See examples' },
     });
@@ -162,14 +163,14 @@ class CollectiveCategoryPicker extends React.Component {
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
                     src="/static/images/create-collective/climateIllustration.png"
-                    alt={intl.formatMessage(this.messages.climate)}
+                    alt={intl.formatMessage(this.messages.covid)}
                   />
                   <Link
                     route="create-collective"
                     params={{
                       hostCollectiveSlug: query.hostCollectiveSlug,
                       verb: query.verb,
-                      category: 'climate',
+                      category: 'covid-19',
                     }}
                   >
                     <StyledButton
@@ -180,13 +181,13 @@ class CollectiveCategoryPicker extends React.Component {
                       mb={3}
                       px={3}
                       onClick={() => {
-                        this.handleChange('category', 'climate');
+                        this.handleChange('category', 'covid-19');
                       }}
                     >
-                      {intl.formatMessage(this.messages.climate)}
+                      {intl.formatMessage(this.messages.covid)}
                     </StyledButton>
                   </Link>
-                  <ExamplesLink href="/discover?show=climate" openInNewTab>
+                  <ExamplesLink href="/discover?show=covid-19" openInNewTab>
                     {intl.formatMessage(this.messages.examples)}
                   </ExamplesLink>
                 </Flex>
