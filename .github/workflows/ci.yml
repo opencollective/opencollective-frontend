@@ -177,7 +177,7 @@ jobs:
       - name: Cache build
         uses: actions/cache@v1
         with:
-          path: dist
+          path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
 
       - name: Build
