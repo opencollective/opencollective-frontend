@@ -449,6 +449,7 @@
   "createcollective.opensourcetos.label": "I agree with the {toslink}.",
   "createCollective.subtitle.introduce": "Introduce your Collective to the community.",
   "createcollective.tos.label": "I agree with the {toslink} of Open Collective.",
+  "createCollective.waivefees": "We are waiving our platform fees on COVID-19 related Collectives until the end of June. Take care of each other.",
   "CreateConversation.Body.Placeholder": "Puedes añadir enlaces, listas, fragmentos de código y más usando este editor de texto. Escribe y empieza a añadir contenido a tu conversación aquí.",
   "CreateConversation.Title.Placeholder": "Empieza con un título para tu conversación aquí",
   "CreateConversationFAQ.moderation": "¿Quién está moderando?",

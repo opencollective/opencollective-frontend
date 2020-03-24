@@ -8,7 +8,6 @@ import themeGet from '@styled-system/theme-get';
 
 import { H1, P } from '../Text';
 import StyledButton from '../StyledButton';
-import StyledTooltip from '../StyledTooltip';
 import Container from '../Container';
 import Link from '../Link';
 import ExternalLink from '../ExternalLink';
@@ -37,6 +36,10 @@ const Image = styled.img`
   }
 `;
 
+const RedInfo = styled(Info)`
+  color: ${themeGet('colors.red.500')};
+`;
+
 class CollectiveCategoryPicker extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -62,6 +65,11 @@ class CollectiveCategoryPicker extends React.Component {
       },
       climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
       covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
+      waivefees: {
+        id: 'createCollective.waivefees',
+        defaultMessage:
+          'We are waiving our platform fees on COVID-19 related Collectives until the end of June. Take care of each other.',
+      },
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       examples: { id: 'createCollective.examples', defaultMessage: 'See examples' },
     });
@@ -80,6 +88,10 @@ class CollectiveCategoryPicker extends React.Component {
           <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             {intl.formatMessage(this.messages.header)}
           </H1>
+          <P color="black.700" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+            <RedInfo size={14} />
+            {intl.formatMessage(this.messages.waivefees)}
+          </P>
         </Box>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
           <Box alignItems="center">
@@ -122,6 +134,7 @@ class CollectiveCategoryPicker extends React.Component {
                 borderTop={['1px solid #E6E8EB', 'none']}
                 alignItems="center"
                 width={[null, 280, 312]}
+                mb={[4, 0]}
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
@@ -136,29 +149,19 @@ class CollectiveCategoryPicker extends React.Component {
                       category: 'covid-19',
                     }}
                   >
-                    <StyledTooltip
-                      content={() => (
-                        <P>
-                          We are waiving our fees on COVID-19 related collectives until the end of June. Take care of
-                          each other.
-                        </P>
-                      )}
+                    <StyledButton
+                      fontSize="13px"
+                      buttonStyle="primary"
+                      minHeight="36px"
+                      mt={[2, 3]}
+                      mb={3}
+                      px={3}
+                      onClick={() => {
+                        this.handleChange('category', 'covid-19');
+                      }}
                     >
-                      <StyledButton
-                        fontSize="13px"
-                        buttonStyle="primary"
-                        minHeight="36px"
-                        mt={[2, 3]}
-                        mb={3}
-                        px={3}
-                        onClick={() => {
-                          this.handleChange('category', 'covid-19');
-                        }}
-                      >
-                        {intl.formatMessage(this.messages.covid)}&nbsp;
-                        <Info size={16} />
-                      </StyledButton>
-                    </StyledTooltip>
+                      {intl.formatMessage(this.messages.covid)}&nbsp;
+                    </StyledButton>
                   </Link>
                   <ExamplesLink href="/discover?show=covid-19" openInNewTab>
                     {intl.formatMessage(this.messages.examples)}
@@ -170,7 +173,6 @@ class CollectiveCategoryPicker extends React.Component {
                 borderTop={['1px solid #E6E8EB', 'none']}
                 alignItems="center"
                 width={[null, 280, 312]}
-                mb={[4, 0]}
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Image
