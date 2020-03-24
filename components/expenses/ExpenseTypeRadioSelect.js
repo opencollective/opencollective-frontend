@@ -5,9 +5,13 @@ import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import Container from '../Container';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
+
+import receiptIllustration from '../../public/static/images/receipt-animation.gif';
+import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
+import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
+import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
 
 const ExpenseTypeLabels = defineMessages({
   [expenseTypes.INVOICE]: {
@@ -31,6 +35,18 @@ const ExpenseTypeDescription = defineMessages({
   },
 });
 
+const TypeIllustration = styled.img.attrs({ alt: '' })`
+  width: 64px;
+  height: 64px;
+`;
+
+const StaticTypeIllustration = styled(TypeIllustration).attrs(props => ({
+  src: props.expenseType === expenseTypes.RECEIPT ? receiptIllustrationStatic : invoiceIllustrationStatic,
+}))`
+  position: absolute;
+  background: white;
+`;
+
 const ExpenseTypeOptionContainer = styled.label`
   display: flex;
   align-items: center;
@@ -42,16 +58,19 @@ const ExpenseTypeOptionContainer = styled.label`
   flex: 1 1 45%;
   min-width: 250px;
 
-  &:hover {
-    background: #f9f9f9;
-  }
-
   // The following adds a border on top and left to separate items. Because parent has overflow=hidden,
   // only the required one will actually be displayed
   border-top: 1px solid #dcdee0;
   border-left: 1px solid #dcdee0;
   margin-top: -1px;
   margin-left: -1px;
+
+  // Animate gif on hover by hidding the static illustration
+  &:hover {
+    ${StaticTypeIllustration} {
+      opacity: 0;
+    }
+  }
 `;
 
 const ExpenseTypeOption = ({ name, type, defaultChecked }) => {
@@ -59,7 +78,10 @@ const ExpenseTypeOption = ({ name, type, defaultChecked }) => {
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
       <input type="radio" name={name} value={type} defaultChecked={defaultChecked} />
-      <Container background="#F7F8FA" border="1px dashed #C4C7CC" flex="0 0 64px" height={64} borderRadius={8} mx={3} />
+      <Box mr={3}>
+        <StaticTypeIllustration expenseType={type} />
+        <TypeIllustration src={type === expenseTypes.RECEIPT ? receiptIllustration : invoiceIllustration} />
+      </Box>
       <Box maxWidth={250}>
         <P fontSize="LeadParagraph" fontWeight="bold" mb={2}>
           {formatMessage(ExpenseTypeLabels[type])}
