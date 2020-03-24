@@ -272,6 +272,7 @@
   "Comment.PostedOn": "Опубликовано {createdAt, date, long}",
   "CommentForm.placeholder": "Введите ваше сообщение...",
   "CommentForm.PostReply": "Опубликовать ответ",
+  "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# комментарий} few {# комментария} many {# комментариев} other {# комментариев}}",
   "completePledge.MissingOrder": "Обязательство не существует или уже было завершено.",
   "completePledge.Title": "Выполнить свое обязательство",

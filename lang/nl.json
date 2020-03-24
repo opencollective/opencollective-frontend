@@ -272,6 +272,7 @@
   "Comment.PostedOn": "Geplaatst op {createdAt, date, long}",
   "CommentForm.placeholder": "Typ hier je bericht...",
   "CommentForm.PostReply": "Plaats een reactie",
+  "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# reactie} other {# reacties}}",
   "completePledge.MissingOrder": "Deze belofte bestaat niet of is al voltooid.",
   "completePledge.Title": "Voltooi je belofte",

@@ -272,6 +272,7 @@
   "Comment.PostedOn": "Postado em {createdAt, date, long}",
   "CommentForm.placeholder": "Escreva sua mensagem...",
   "CommentForm.PostReply": "Enviar resposta",
+  "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# comentário} other {# comentários}}",
   "completePledge.MissingOrder": "Esta promessa não existe ou já foi completada.",
   "completePledge.Title": "Complete sua promessa",

@@ -36,6 +36,10 @@ const messages = defineMessages({
     id: 'CommentForm.PostReply',
     defaultMessage: 'Post reply',
   },
+  signInLabel: {
+    id: 'CommentForm.SignIn',
+    defaultMessage: 'Please sign in to comment:',
+  },
 });
 
 const getRedirectUrl = (router, id) => {
@@ -100,8 +104,12 @@ const CommentForm = ({
   return (
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
-        <ContainerOverlay>
-          <SignInOrJoinFree routes={{ join: getRedirectUrl(router, id) }} />
+        <ContainerOverlay background="rgba(255, 255, 255, 0.75)">
+          <SignInOrJoinFree
+            routes={{ join: getRedirectUrl(router, id) }}
+            signInLabel={formatMessage(messages.signInLabel)}
+            withShadow
+          />
         </ContainerOverlay>
       )}
       <form onSubmit={handleSubmit(submit)} data-cy="comment-form">

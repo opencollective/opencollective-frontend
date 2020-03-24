@@ -272,6 +272,7 @@
   "Comment.PostedOn": "Publicado el {createdAt, date, long}",
   "CommentForm.placeholder": "Escribe tu mensaje...",
   "CommentForm.PostReply": "Responder",
+  "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
   "completePledge.MissingOrder": "This pledge doesn't exist or has already been completed.",
   "completePledge.Title": "Completa tu promesa de donación",
