@@ -177,7 +177,7 @@
   "collective.hostAccount.modal.deactivate.body": "Are you sure you want to deactivate this account as Host?",
   "collective.hostAccount.modal.description": "A fiscal host is a legal company or individual who holds a Collective’s funds in their bank account, and can generate invoices and receipts for Financial Contributors.{br}You can think of a fiscal host as an umbrella organization for the Collectives in it.",
   "collective.hostFeePercent.description": "Commission on financial contributions to Collectives you fiscally host.",
-  "collective.hostSettings.currentPlan.title": "Limits and Usage",
+  "collective.hostSettings.currentPlan.title": "使用限额",
   "collective.hostSettings.help.fundsLimit": "The maximum amount of fund added, during any timeframe, across all collectives.",
   "collective.hostSettings.help.manualPayments": "Your contributors create a pending donation and receive email instructions with your bank details. You can reconcile the donation when you receive it.",
   "collective.hostSettings.unlimited": "不限",
