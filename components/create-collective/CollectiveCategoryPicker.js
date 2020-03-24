@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
+import { Info } from '@styled-icons/material/Info';
 import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 
-import { H1 } from '../Text';
+import { H1, P } from '../Text';
 import StyledButton from '../StyledButton';
+import StyledTooltip from '../StyledTooltip';
 import Container from '../Container';
 import Link from '../Link';
 import ExternalLink from '../ExternalLink';
@@ -134,19 +136,29 @@ class CollectiveCategoryPicker extends React.Component {
                       category: 'covid-19',
                     }}
                   >
-                    <StyledButton
-                      fontSize="13px"
-                      buttonStyle="primary"
-                      minHeight="36px"
-                      mt={[2, 3]}
-                      mb={3}
-                      px={3}
-                      onClick={() => {
-                        this.handleChange('category', 'covid-19');
-                      }}
+                    <StyledTooltip
+                      content={() => (
+                        <P>
+                          We are waiving our fees on COVID-19 related collectives until the end of June. Take care of
+                          each other.
+                        </P>
+                      )}
                     >
-                      {intl.formatMessage(this.messages.covid)}
-                    </StyledButton>
+                      <StyledButton
+                        fontSize="13px"
+                        buttonStyle="primary"
+                        minHeight="36px"
+                        mt={[2, 3]}
+                        mb={3}
+                        px={3}
+                        onClick={() => {
+                          this.handleChange('category', 'covid-19');
+                        }}
+                      >
+                        {intl.formatMessage(this.messages.covid)}&nbsp;
+                        <Info size={16} />
+                      </StyledButton>
+                    </StyledTooltip>
                   </Link>
                   <ExamplesLink href="/discover?show=covid-19" openInNewTab>
                     {intl.formatMessage(this.messages.examples)}
