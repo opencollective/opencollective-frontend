@@ -5,11 +5,12 @@ import { Box } from '@rebass/grid';
 import { get, pick } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { useForm } from 'react-hook-form';
+import { Formik, Field, Form } from 'formik';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
+import { isValidEmail } from '../lib/utils';
 import { H5 } from './Text';
 import StyledInputField from './StyledInputField';
 import StyledInput from './StyledInput';
@@ -145,100 +146,162 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
   const isOrganization = type === CollectiveType.ORGANIZATION;
   const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
-  const { handleSubmit, register, formState, errors } = useForm();
   const { formatMessage } = useIntl();
 
+  const initialValues = {
+    members: [{ member: { email: '', name: '' } }],
+    email: '',
+    name: '',
+    website: '',
+  };
+
+  const validate = values => {
+    const errors = {};
+
+    if (isOrganization) {
+      if (!get(values, 'members[0].member.email') || !isValidEmail(get(values, 'members[0].member.email'))) {
+        errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
+      }
+      if (!get(values, 'members[0].member.name')) {
+        errors.members
+          ? (errors.members[0].member.name = formatMessage(msg.invalidName))
+          : [{ member: { name: formatMessage(msg.invalidName) } }];
+      }
+    } else {
+      if (!values.email || !isValidEmail(values.email)) {
+        errors.email = formatMessage(msg.invalidEmail);
+      }
+    }
+    if (!values.name) {
+      errors.name = formatMessage(msg.invalidName);
+    }
+
+    return errors;
+  };
+
+  const submit = formValues => {
+    createCollective({ variables: prepareMutationVariables({ ...formValues, type }) }).then(({ data }) => {
+      return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
+    });
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit(formData =>
-        createCollective({ variables: prepareMutationVariables({ ...formData, type }) }).then(({ data }) => {
-          return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
-        }),
-      )}
-    >
-      <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
-      <Box mt={3}>
-        {(isUser || isOrganization) && (
-          <StyledInputField
-            htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
-            label={formatMessage(isOrganization ? msg.adminEmail : msg.emailTitle)}
-            error={(errors.email || get(errors, 'members.0.member.email')) && formatMessage(msg.invalidEmail)}
-            mt={3}
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                type="email"
-                width="100%"
-                placeholder="i.e. john-smith@youremail.com"
-                ref={register({ required: true })}
-              />
+    <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
+      {formik => {
+        const { values, handleSubmit, errors, touched, isSubmitting } = formik;
+
+        return (
+          <Form>
+            <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
+            <Box mt={3}>
+              {(isUser || isOrganization) && (
+                <StyledInputField
+                  name={isOrganization ? 'members[0].member.email' : 'email'}
+                  htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
+                  label={formatMessage(isOrganization ? msg.adminEmail : msg.emailTitle)}
+                  error={
+                    isOrganization
+                      ? get(touched, 'members[0].member.email') && get(errors, 'members[0].member.email')
+                      : touched.email && errors.email
+                  }
+                  mt={3}
+                  value={isOrganization ? get(values, 'members[0].member.email') : values.email}
+                >
+                  {inputProps => (
+                    <Field
+                      as={StyledInput}
+                      {...inputProps}
+                      type="email"
+                      width="100%"
+                      placeholder="i.e. john-smith@youremail.com"
+                    />
+                  )}
+                </StyledInputField>
+              )}
+              {isOrganization && (
+                <StyledInputField
+                  autoFocus
+                  name="members[0].member.name"
+                  htmlFor="members[0].member.name"
+                  label={formatMessage(msg.adminName)}
+                  error={get(touched, 'members[0].member.name') && get(errors, 'members[0].member.name')}
+                  mt={3}
+                  value={get(values, 'members[0].member.name')}
+                >
+                  {inputProps => (
+                    <Field as={StyledInput} {...inputProps} width="100%" placeholder="i.e. John Doe, Frank Zappa" />
+                  )}
+                </StyledInputField>
+              )}
+              <StyledInputField
+                autoFocus
+                name="name"
+                htmlFor="name"
+                label={formatMessage(isUser ? msg.fullName : isOrganization ? msg.organizationName : msg.name)}
+                error={touched.name && errors.name}
+                mt={3}
+                value={values.name}
+              >
+                {inputProps => (
+                  <Field
+                    as={StyledInput}
+                    {...inputProps}
+                    width="100%"
+                    placeholder={
+                      isUser
+                        ? 'i.e. John Doe, Frank Zappa'
+                        : isCollective
+                        ? 'i.e. Webpack, Babel'
+                        : 'i.e. AirBnb, TripleByte'
+                    }
+                  />
+                )}
+              </StyledInputField>
+              {!isUser && (
+                <StyledInputField
+                  name="website"
+                  htmlFor="website"
+                  label={formatMessage(msg.website)}
+                  error={errors.website}
+                  mt={3}
+                  value={values.website}
+                >
+                  {inputProps => (
+                    <Field as={StyledInput} {...inputProps} placeholder="i.e. opencollective.com" width="100%" />
+                  )}
+                </StyledInputField>
+              )}
+            </Box>
+            {submitError && (
+              <MessageBox type="error" withIcon mt={2}>
+                {getErrorFromGraphqlException(submitError).message}
+              </MessageBox>
             )}
-          </StyledInputField>
-        )}
-        {isOrganization && (
-          <StyledInputField
-            autoFocus
-            htmlFor="members[0].member.name"
-            label={formatMessage(msg.adminName)}
-            error={get(errors, 'members.0.member.name') && formatMessage(msg.invalidName)}
-            mt={3}
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                ref={register({ required: true })}
-                width="100%"
-                placeholder="i.e. John Doe, Frank Zappa"
-              />
-            )}
-          </StyledInputField>
-        )}
-        <StyledInputField
-          autoFocus
-          htmlFor="name"
-          label={formatMessage(isUser ? msg.fullName : isOrganization ? msg.organizationName : msg.name)}
-          error={errors.name && formatMessage(msg.invalidName)}
-          mt={3}
-        >
-          {inputProps => (
-            <StyledInput
-              {...inputProps}
-              ref={register({ required: true })}
-              width="100%"
-              placeholder={
-                isUser ? 'i.e. John Doe, Frank Zappa' : isCollective ? 'i.e. Webpack, Babel' : 'i.e. AirBnb, TripleByte'
-              }
-            />
-          )}
-        </StyledInputField>
-        {!isUser && (
-          <StyledInputField
-            htmlFor="website"
-            label={formatMessage(msg.website)}
-            error={errors.website && formatMessage(msg.invalidWebsite)}
-            mt={3}
-          >
-            {inputProps => (
-              <StyledInput {...inputProps} placeholder="i.e. opencollective.com" width="100%" ref={register} />
-            )}
-          </StyledInputField>
-        )}
-      </Box>
-      {submitError && (
-        <MessageBox type="error" withIcon mt={2}>
-          {getErrorFromGraphqlException(submitError).message}
-        </MessageBox>
-      )}
-      <Container display="flex" flexWrap="wrap" justifyContent="flex-end" borderTop="1px solid #D7DBE0" mt={4} pt={3}>
-        <StyledButton mr={2} minWidth={100} onClick={() => onCancel()} disabled={formState.isSubmitting}>
-          {formatMessage(msg.cancel)}
-        </StyledButton>
-        <StyledButton type="submit" buttonStyle="primary" minWidth={100} loading={formState.isSubmitting}>
-          {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
-        </StyledButton>
-      </Container>
-    </form>
+            <Container
+              display="flex"
+              flexWrap="wrap"
+              justifyContent="flex-end"
+              borderTop="1px solid #D7DBE0"
+              mt={4}
+              pt={3}
+            >
+              <StyledButton mr={2} minWidth={100} onClick={() => onCancel()} disabled={isSubmitting}>
+                {formatMessage(msg.cancel)}
+              </StyledButton>
+              <StyledButton
+                type="submit"
+                buttonStyle="primary"
+                minWidth={100}
+                loading={isSubmitting}
+                onSubmit={handleSubmit}
+              >
+                {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
+              </StyledButton>
+            </Container>
+          </Form>
+        );
+      }}
+    </Formik>
   );
 };
 

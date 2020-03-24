@@ -588,6 +588,7 @@
   "Error.FieldRequired": "This field is required",
   "error.goBack": "Vai indietro alla pagina precedente",
   "Error.MaxLength": "Length must be less than {length}",
+  "Error.MinLength": "Length must be more than {length}",
   "error.name.invalid": "Name is required",
   "Error.Network": "A network error occured, please try again",
   "error.reload": "Ricarica la pagina",

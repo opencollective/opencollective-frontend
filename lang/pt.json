@@ -588,6 +588,7 @@
   "Error.FieldRequired": "Este campo é obrigatório",
   "error.goBack": "Voltar à pagina anterior",
   "Error.MaxLength": "Comprimento deve ser menos que {length}",
+  "Error.MinLength": "Length must be more than {length}",
   "error.name.invalid": "Nome é obrigatório",
   "Error.Network": "Ocorreu um erro de rede, por favor tente novamente",
   "error.reload": "Recarregue a página",
