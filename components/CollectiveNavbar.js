@@ -222,6 +222,7 @@ const DEFAULT_SECTIONS = {
   [CollectiveType.ORGANIZATION]: [
     Sections.CONTRIBUTIONS,
     Sections.CONTRIBUTORS,
+    Sections.UPDATES,
     Sections.CONVERSATIONS,
     Sections.TRANSACTIONS,
     Sections.ABOUT,
@@ -293,7 +294,11 @@ export const getSectionsForCollective = (collective, isAdmin) => {
       toRemove.add(Sections.ABOUT);
     }
   }
-
+  if (collective.type === CollectiveType.ORGANIZATION) {
+    if (!hasFeature(collective, FEATURES.UPDATES)) {
+      toRemove.add(Sections.UPDATES);
+    }
+  }
   if (collective.type === CollectiveType.EVENT) {
     // Should not see tickets section if you can't order them
     if ((!collective.isApproved && !isAdmin) || !canOrderTicketsFromEvent(collective)) {

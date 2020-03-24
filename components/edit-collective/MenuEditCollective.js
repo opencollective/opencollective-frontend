@@ -16,6 +16,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INFO: 'info', // First on purpose
   COLLECTIVE_GOALS: 'goals',
   CONNECTED_ACCOUNTS: 'connected-accounts',
+  UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
   EXPENSES: 'expenses',
   EXPORT: 'export',
@@ -44,6 +45,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: {
     id: 'editCollective.menu.connectedAccounts',
     defaultMessage: 'Connected Accounts',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: {
+    id: 'updates',
+    defaultMessage: 'Updates',
   },
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: {
     id: 'conversations',
@@ -123,6 +128,7 @@ const isOneOfTypes = (...collectiveTypes) => ({ type }) => collectiveTypes.inclu
 const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveType(type, feature);
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: isFeatureAllowed(FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
