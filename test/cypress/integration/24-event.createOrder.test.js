@@ -86,11 +86,7 @@ describe('event.createOrder page', () => {
         .blur();
       cy.get('.inputs .endsAt input[type="text"]')
         .clear()
-        .type(
-          `${Cypress.moment()
-            .add(1, 'day')
-            .format('MM/DD/YYYY')} 7:00 PM`,
-        )
+        .type(`${Cypress.moment().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
         .blur();
       cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');
       cy.get('.EditTiers input[name="amount"]').type('10');

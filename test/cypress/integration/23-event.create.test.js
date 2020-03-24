@@ -19,9 +19,7 @@ describe('event.create.test.js', () => {
     cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
     cy.get('.inputField.endsAt input').focus();
     cy.get('.rdtNext span').click;
-    cy.get('.endsAt .rdtDay:not(.rdtOld):not(.rdtDisabled)')
-      .first()
-      .click();
+    cy.get('.endsAt .rdtDay:not(.rdtOld):not(.rdtDisabled)').first().click();
     cy.get('.geosuggest__input').type('Superfilles');
     cy.wait(100);
     cy.get('.geosuggest__suggests > :nth-child(1)').click();
@@ -31,15 +29,8 @@ describe('event.create.test.js', () => {
     cy.get('.EditTiers .tier .inputField.description textarea').type('Free ticket for students');
     cy.get('.EditTiers .tier .inputField.maxQuantity input').type('10');
     cy.get('.addTier').click();
-    cy.get('.EditTiers .tier')
-      .last()
-      .find('.inputField.name input')
-      .type('Paid ticket');
-    cy.get('.EditTiers .tier')
-      .last()
-      .find('.inputField.amount input')
-      .type(15)
-      .blur();
+    cy.get('.EditTiers .tier').last().find('.inputField.name input').type('Paid ticket');
+    cy.get('.EditTiers .tier').last().find('.inputField.amount input').type(15).blur();
     cy.get('.actions button.save').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');

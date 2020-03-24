@@ -26,18 +26,10 @@ describe('Create collective from Github', () => {
     });
     cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/create/legacy?token=foofoo' });
     cy.contains('Pick a repository');
-    cy.get('[type="radio"]')
-      .first()
-      .check();
-    cy.get('[name="name"]')
-      .first()
-      .type('Adblock plus');
-    cy.get('[name="slug"]')
-      .first()
-      .type('adblock');
-    cy.get('[type="submit"]')
-      .first()
-      .click();
+    cy.get('[type="radio"]').first().check();
+    cy.get('[name="name"]').first().type('Adblock plus');
+    cy.get('[name="slug"]').first().type('adblock');
+    cy.get('[type="submit"]').first().click();
     cy.location().should(location => {
       expect(location.search).to.eq('?status=collectiveCreated');
     });

@@ -9,13 +9,9 @@ import remarkRehype from 'remark-rehype';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeReact from 'rehype-react';
 
-const converter = unified()
-  .use(remarkParse)
-  .use(remarkRehype)
-  .use(rehypeSanitize)
-  .use(rehypeReact, {
-    createElement: React.createElement,
-  });
+const converter = unified().use(remarkParse).use(remarkRehype).use(rehypeSanitize).use(rehypeReact, {
+  createElement: React.createElement,
+});
 
 class LongDescription extends React.Component {
   static propTypes = {

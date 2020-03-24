@@ -1,4 +1,4 @@
-(function() {
+(function () {
   // Make sure we only load the script once.
   if (window.OC && window.OC.widgets) {
     window.OC.widgets['{{widget}}'] = window.OC.widgets['{{widget}}'] || [];

@@ -1,9 +1,7 @@
 describe('widgets', () => {
   it('shows the collectives hosted by the host', () => {
     cy.visit('/brusselstogetherasbl/collectives.html?role=host');
-    cy.get('.CollectiveCard')
-      .its('length')
-      .should('be.gt', 1);
+    cy.get('.CollectiveCard').its('length').should('be.gt', 1);
   });
 
   it('shows the collectives backed by a user', () => {

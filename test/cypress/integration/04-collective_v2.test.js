@@ -51,9 +51,7 @@ describe('New collective page', () => {
         fileName: 'gophercon.jpg',
       });
 
-      cy.get('[data-cy=collective-avatar-image-preview]')
-        .invoke('attr', 'src')
-        .should('not.be.empty');
+      cy.get('[data-cy=collective-avatar-image-preview]').invoke('attr', 'src').should('not.be.empty');
 
       cy.get('[data-cy=heroAvatarDropzoneSave]').click();
     });
@@ -84,9 +82,7 @@ describe('New collective page', () => {
       });
 
       cy.get('[data-cy=collective-background-image-styledBackground]').within(() => {
-        cy.get('img')
-          .invoke('attr', 'src')
-          .should('not.be.empty');
+        cy.get('img').invoke('attr', 'src').should('not.be.empty');
       });
 
       cy.get('[data-cy=heroBackgroundDropzoneSave]').click();
@@ -183,9 +179,7 @@ describe('New Collective page with euro currency', () => {
   });
 
   it('contributors amount in euro', () => {
-    cy.get('[data-cy=ContributorsGrid_ContributorCard]')
-      .first()
-      .contains('€5,140 EUR');
+    cy.get('[data-cy=ContributorsGrid_ContributorCard]').first().contains('€5,140 EUR');
   });
 
   it('Can filter contributors', () => {
