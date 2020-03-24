@@ -4,10 +4,10 @@ import { Box } from '@rebass/grid';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
 import { H3, P } from '../../Text';
-import { HomeStandardLink } from '../HomeLinks';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import Illustration from '../HomeIllustration';
+import StyledLink from '../../StyledLink';
 
 const IconWrapper = styled(Box)`
   display: flex;
@@ -121,9 +121,9 @@ const LearnMore = () => {
                 >
                   {intl.formatMessage(messages[`home.learnMore.${channel.id}`])}
                 </P>
-                <HomeStandardLink href={channel.link}>
+                <StyledLink href={channel.link} buttonStyle="standard" buttonSize="small">
                   {intl.formatMessage(messages[`home.learnMore.${channel.id}.buttonText`])}
-                </HomeStandardLink>
+                </StyledLink>
               </Box>
             </Container>
             <br></br>

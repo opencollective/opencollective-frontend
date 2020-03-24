@@ -5,7 +5,6 @@ import { Box } from '@rebass/grid';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import { P, H4 } from '../../Text';
-import { HomeStandardLink } from '../HomeLinks';
 import Hide from '../../Hide';
 import Illustration from '../HomeIllustration';
 import StyledCarousel from '../../StyledCarousel';
@@ -13,6 +12,7 @@ import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import SectionSubtitle from '../SectionSubtitle';
 import StyledCard from '../../StyledCard';
+import StyledLink from '../../StyledLink';
 
 const Wrapper = styled(Container)`
   background-image: ${props => props.openFeature && `url('/static/images/home/${props.openFeature}-bg-sm.png')`};
@@ -106,7 +106,7 @@ const OpenFeature = ({ id, url }) => {
   return (
     <StyledCard
       width={[1, null, '448px', null, '576px']}
-      height={['164px', null, '192px', null, '194px']}
+      minHeight={['164px', null, '192px', null, '194px']}
       py={3}
       px={[3, null, '24px', null, '32px']}
       my={[4, null, 0]}
@@ -133,9 +133,9 @@ const OpenFeature = ({ id, url }) => {
         ]}
         mb={2}
       >
-        <HomeStandardLink href={url}>
+        <StyledLink href={url} buttonStyle="standard" buttonSize="small">
           {intl.formatMessage(messsages[`home.weAreOpenSection.${id}.linkText`])}
-        </HomeStandardLink>
+        </StyledLink>
       </Box>
     </StyledCard>
   );

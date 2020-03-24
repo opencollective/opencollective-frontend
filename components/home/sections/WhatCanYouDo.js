@@ -8,10 +8,10 @@ import { FormattedMessage } from 'react-intl';
 import { Link } from '../../../server/pages';
 import { P, H3, H4 } from '../../Text';
 import Illustration from '../HomeIllustration';
-import { HomePrimaryLink } from '../HomeLinks';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import SectionSubTitle from '../SectionSubtitle';
+import StyledButton from '../../StyledButton';
 
 const Wrapper = styled(Box)`
   background-image: ${props =>
@@ -200,13 +200,14 @@ const WhatCanYouDo = () => {
         </Box>
         <Wrapper width={['288px', '380px']} height={['288px', '375px']} hovering={hoverCreateCollectiveButton}>
           <Link route="/create" passHref>
-            <HomePrimaryLink
-              border="none"
+            <StyledButton
+              buttonStyle="dark"
+              minWidth={232}
               onMouseEnter={() => setHoverCreateCollectiveButton(true)}
               onMouseLeave={() => setHoverCreateCollectiveButton(false)}
             >
               <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-            </HomePrimaryLink>
+            </StyledButton>
           </Link>
         </Wrapper>
       </Container>
