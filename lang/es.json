@@ -429,6 +429,7 @@
   "createAccount.alreadyLoggedIn": "Parece que ya ha iniciado sesión como \"{email}\". Si desea crear una nueva cuenta, cierre la sesión primero.",
   "createCollective.category.climate": "For climate initiatives",
   "createCollective.category.community": "For any community",
+  "createCollective.category.covid": "For COVID-19 initiatives",
   "createCollective.category.newOpenSource": "Para proyectos de código abierto",
   "createCollective.examples": "Ver ejemplos",
   "createCollective.form.descriptionLabel": "What does your collective do?",

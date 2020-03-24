@@ -429,6 +429,7 @@
   "createAccount.alreadyLoggedIn": "Il semble que vous soyez déjà connecté en tant que « {email} ». Pour créer un nouveau compte, veuillez d'abord vous déconnecter.",
   "createCollective.category.climate": "Pour les initiatives en matière de climat",
   "createCollective.category.community": "Pour toutes les communautés",
+  "createCollective.category.covid": "For COVID-19 initiatives",
   "createCollective.category.newOpenSource": "Pour les projets open source",
   "createCollective.examples": "Voir les exemples",
   "createCollective.form.descriptionLabel": "Que fait votre collectif ?",
