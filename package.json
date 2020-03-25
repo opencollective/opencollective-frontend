@@ -59,7 +59,7 @@
     "glob": "7.1.6",
     "graphql": "14.6.0",
     "graphql-tag": "2.10.3",
-    "helmet": "3.21.3",
+    "helmet": "3.22.0",
     "i18n-iso-countries": "5.1.0",
     "intl": "1.2.5",
     "intl-pluralrules": "1.1.2",
