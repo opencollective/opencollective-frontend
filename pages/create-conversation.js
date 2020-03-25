@@ -112,7 +112,8 @@ class CreateConversationPage extends React.Component {
                   </StyledLink>
                   <Box mt={4}>
                     <CreateConversationForm
-                      collectiveId={collective.id}
+                      collective={collective}
+                      LoggedInUser={LoggedInUser}
                       loading={loadingLoggedInUser}
                       onSuccess={this.onCreateSuccess}
                       suggestedTags={this.getSuggestedTags(collective)}
