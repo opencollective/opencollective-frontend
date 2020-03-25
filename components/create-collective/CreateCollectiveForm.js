@@ -36,12 +36,7 @@ const ContainerWithImage = styled(Container)`
 
 const SubText = styled.p`
   font-size: 1.1rem;
-`;
-
-const Span = styled.span`
-  &:hover {
-    cursor: pointer;
-  }
+  margin-left: 150px;
 `;
 
 const placeholders = {
@@ -71,6 +66,7 @@ class CreateCollectiveForm extends React.Component {
 
     this.state = {
       collective,
+      isURLFieldTouched: false,
       tosChecked: false,
       hostTosChecked: false,
     };
@@ -232,8 +228,13 @@ class CreateCollectiveForm extends React.Component {
 
                 const changeSlug = () => {
                   values.slug = suggestedSlug();
-                  this.setState(state => ({ ...state, collective: { ...state.collective, slug: values.slug } }));
+                  // placeholders.slug = suggestedSlug();
+                  // this.setState(state => ({ ...state, collective: { ...state.collective, slug: values.slug } }));
                 };
+
+                if (!this.state.isURLFieldTouched) {
+                  changeSlug();
+                }
 
                 return (
                   <Form>
@@ -260,6 +261,7 @@ class CreateCollectiveForm extends React.Component {
                     >
                       {inputProps => (
                         <Field
+                          onClick={() => this.setState({ isURLFieldTouched: true })}
                           as={StyledInputGroup}
                           {...inputProps}
                           prepend="opencollective.com/"
@@ -267,14 +269,7 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    {values.name.length > 0 && (
-                      <SubText>
-                        Suggested URL :{' '}
-                        <Span style={{}} onClick={changeSlug}>
-                          {`/${suggestedSlug()}`}
-                        </Span>
-                      </SubText>
-                    )}
+                    {values.name.length > 0 && !this.state.isURLFieldTouched && <SubText>Suggested</SubText>}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
