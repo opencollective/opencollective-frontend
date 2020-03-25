@@ -80,7 +80,7 @@
     "prop-types": "15.7.2",
     "react": "16.13.1",
     "react-add-to-calendar": "0.1.5",
-    "react-bootstrap": "0.33.1",
+    "react-bootstrap": "1.0.0",
     "react-datetime": "2.16.3",
     "react-dnd": "5.0.0",
     "react-dnd-html5-backend": "3.0.2",
