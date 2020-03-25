@@ -25,7 +25,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -151,7 +151,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -277,7 +277,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -403,7 +403,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
