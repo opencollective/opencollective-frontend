@@ -169,7 +169,7 @@ class CreateCollectiveForm extends React.Component {
         slug,
       };
       assign(collective, this.state.collective);
-      this.props.onSubmit({ ...collective, slug });
+      this.props.onSubmit(collective);
     };
 
     return (
@@ -226,14 +226,8 @@ class CreateCollectiveForm extends React.Component {
                   return slugify(values.name, slugOptions);
                 };
 
-                const changeSlug = () => {
-                  values.slug = suggestedSlug();
-                  // placeholders.slug = suggestedSlug();
-                  // this.setState(state => ({ ...state, collective: { ...state.collective, slug: values.slug } }));
-                };
-
                 if (!this.state.isURLFieldTouched) {
-                  changeSlug();
+                  values.slug = suggestedSlug();
                 }
 
                 return (
