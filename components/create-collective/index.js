@@ -16,6 +16,7 @@ import { withUser } from '../UserProvider';
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { parseToBoolean } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 class CreateCollective extends Component {
@@ -100,12 +101,22 @@ class CreateCollective extends Component {
         result: { success: 'Collective created successfully' },
       });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        slug: newCollective.slug,
-        status: 'collectiveCreated',
-        CollectiveId: newCollective.legacyId,
-        CollectiveSlug: newCollective.slug,
-      }).then(() => window.scrollTo(0, 0));
+      // don't show banner if we show the modal and vice versa
+      if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
+        Router.pushRoute('collective-with-onboarding', {
+          slug: newCollective.slug,
+          mode: 'onboarding',
+          CollectiveId: newCollective.legacyId,
+          CollectiveSlug: newCollective.slug,
+        }).then(() => window.scrollTo(0, 0));
+      } else {
+        Router.pushRoute('collective', {
+          slug: newCollective.slug,
+          status: 'collectiveCreated',
+          CollectiveId: newCollective.legacyId,
+          CollectiveSlug: newCollective.slug,
+        }).then(() => window.scrollTo(0, 0));
+      }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: 'idle', error: errorMsg, creating: false });

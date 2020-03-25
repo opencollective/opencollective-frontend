@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../components/StyledModal';
+import Modal, { ModalBody, ModalHeader, ModalFooter, ModalOverlay } from '../../components/StyledModal';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
 import OnboardingContentBox from './OnboardingContentBox';
@@ -22,6 +22,50 @@ const StepsProgressBox = styled(Box)`
   @media screen and (max-width: 640px) {
     width: 100%;
     max-width: 100%;
+  }
+`;
+
+const ResponsiveModal = styled(Modal)`
+  @media screen and (max-width: 40em) {
+    transform: translate(0%, 0%);
+    position: fixed;
+    top: 69px;
+    left: 0px;
+    height: calc(100vh - 70px);
+    background: white;
+    max-width: 100%;
+    border: none;
+    border-radius: 0;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+`;
+
+const ResponsiveModalHeader = styled(ModalHeader)`
+  @media screen and (max-width: 40em) {
+    padding: 0px;
+    svg {
+      display: none;
+    }
+  }
+`;
+
+const ResponsiveModalFooter = styled(ModalFooter)`
+  @media screen and (max-width: 40em) {
+    padding-bottom: 20px;
+  }
+`;
+
+const ResponsiveModalOverlay = styled(ModalOverlay)`
+  ${overlay =>
+    overlay.noOverlay &&
+    css`
+      display: none;
+    `}
+  @media screen and (max-width: 40em) {
+    display: none;
   }
 `;
 
@@ -42,13 +86,14 @@ const params = {
 
 class OnboardingModal extends React.Component {
   static propTypes = {
-    query: PropTypes.object,
+    step: PropTypes.string,
+    mode: PropTypes.string,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     EditCollectiveMembers: PropTypes.func,
     EditCollectiveContact: PropTypes.func,
-    show: PropTypes.bool,
-    setShow: PropTypes.func,
+    showOnboardingModal: PropTypes.bool,
+    setShowOnboardingModal: PropTypes.func,
   };
 
   constructor(props) {
@@ -58,16 +103,17 @@ class OnboardingModal extends React.Component {
       step: 0,
       members: [],
       error: null,
+      noOverlay: false,
     };
   }
 
   componentDidMount() {
-    this.setStep(this.props.query.step);
+    this.setStep(this.props.step);
   }
 
   componentDidUpdate(oldProps) {
-    if (oldProps.query.step !== this.props.query.step) {
-      this.setStep(this.props.query.step);
+    if (oldProps.step !== this.props.step) {
+      this.setStep(this.props.step);
     }
   }
 
@@ -81,7 +127,7 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  addAdmins = members => {
+  updateAdmins = members => {
     this.setState({ members });
   };
 
@@ -109,7 +155,8 @@ class OnboardingModal extends React.Component {
         })),
       });
     } catch (e) {
-      this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
+      const errorMsg = getErrorFromGraphqlException(e).message;
+      throw new Error(errorMsg);
     }
   };
 
@@ -124,66 +171,87 @@ class OnboardingModal extends React.Component {
         collective,
       });
     } catch (e) {
-      this.setState({ isSubmitting: false, error: getErrorFromGraphqlException(e) });
+      const errorMsg = getErrorFromGraphqlException(e).message;
+      throw new Error(errorMsg);
     }
   };
 
   submitCollectiveInfo = async () => {
-    await this.submitContact();
-    await this.submitAdmins();
-    this.props.setShow(false);
-    Router.pushRoute('editCollective', { slug: this.props.collective.slug, section: 'info' });
+    try {
+      await this.submitContact();
+      await this.submitAdmins();
+      Router.pushRoute('collective', { slug: this.props.collective.slug });
+    } catch (e) {
+      this.setState({ isSubmitting: false, error: e });
+    }
   };
 
-  setParams = (step, param) => {
+  getStepParams = (step, param) => {
     return params[step][param];
   };
 
+  onClose = () => {
+    this.setState({ noOverlay: true });
+    this.props.setShowOnboardingModal(false);
+    Router.pushRoute('collective', { slug: this.props.collective.slug });
+  };
+
   render() {
-    const { collective, LoggedInUser, show, setShow } = this.props;
-    const { step, isSubmitting, error } = this.state;
+    const { collective, LoggedInUser, showOnboardingModal, mode } = this.props;
+    const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
-      <Modal width="576px" minHeight="456px" show={show} onClose={() => setShow(false)}>
-        <ModalHeader onClose={() => setShow(false)}>
-          <Flex flexDirection="column" alignItems="center" width="100%">
-            <StepsProgressBox ml={'15px'} mb={[3, null, 4]} width={0.8}>
-              <OnboardingStepsProgress
+      <React.Fragment>
+        <ResponsiveModal
+          usePortal={false}
+          width="576px"
+          minHeight="456px"
+          onClose={this.onClose}
+          show={showOnboardingModal}
+        >
+          <ResponsiveModalHeader onClose={this.onClose}>
+            <Flex flexDirection="column" alignItems="center" width="100%">
+              <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
+                <OnboardingStepsProgress
+                  step={step}
+                  mode={mode}
+                  handleStep={step => this.setState({ step })}
+                  slug={collective.slug}
+                />
+              </StepsProgressBox>
+            </Flex>
+          </ResponsiveModalHeader>
+          <ModalBody>
+            <Flex flexDirection="column" alignItems="center">
+              <img width={'160px'} height={this.getStepParams(step, 'height')} src={this.getStepParams(step, 'src')} />
+              <OnboardingContentBox
                 step={step}
-                handleStep={step => this.setState({ step })}
-                slug={collective.slug}
+                collective={collective}
+                LoggedInUser={LoggedInUser}
+                updateAdmins={this.updateAdmins}
+                addContact={this.addContact}
               />
-            </StepsProgressBox>
-          </Flex>
-        </ModalHeader>
-        <ModalBody>
-          <Flex flexDirection="column" alignItems="center">
-            <img width={'160px'} height={this.setParams(step, 'height')} src={this.setParams(step, 'src')} />
-            <OnboardingContentBox
-              step={step}
-              collective={collective}
-              LoggedInUser={LoggedInUser}
-              addAdmins={this.addAdmins}
-              addContact={this.addContact}
-            />
-            {error && (
-              <MessageBox type="error" withIcon mt={2}>
-                {error.replace('GraphQL error: ', 'Error: ')}
-              </MessageBox>
-            )}
-          </Flex>
-        </ModalBody>
-        <ModalFooter>
-          <Flex flexDirection="column" alignItems="center">
-            <OnboardingNavButtons
-              step={step}
-              slug={collective.slug}
-              submitCollectiveInfo={this.submitCollectiveInfo}
-              loading={isSubmitting}
-            />
-          </Flex>
-        </ModalFooter>
-      </Modal>
+              {error && (
+                <MessageBox type="error" withIcon mt={2}>
+                  {error.message}
+                </MessageBox>
+              )}
+            </Flex>
+          </ModalBody>
+          <ResponsiveModalFooter>
+            <Flex flexDirection="column" alignItems="center">
+              <OnboardingNavButtons
+                step={step}
+                mode={mode}
+                slug={collective.slug}
+                submitCollectiveInfo={this.submitCollectiveInfo}
+                loading={isSubmitting}
+              />
+            </Flex>
+          </ResponsiveModalFooter>
+        </ResponsiveModal>
+        <ResponsiveModalOverlay onClick={this.onClose} noOverlay={noOverlay} />
+      </React.Fragment>
     );
   }
 }

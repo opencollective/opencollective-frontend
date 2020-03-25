@@ -37,16 +37,18 @@ const StyledTagBase = styled.div`
 
 const CloseButton = styled.button`
   border-radius: 50%;
-  background: #212121;
-  color: white;
+  background: ${closeButtonProps => closeButtonProps.iconBackgroundColor};
+  color: ${closeButtonProps => closeButtonProps.iconColor};
   mix-blend-mode: color-burn;
   cursor: pointer;
   margin: 0px;
   text-align: center;
   line-height: 1;
   padding: 4px;
-  width: 2.5em;
-  height: 2.5em;
+  width: ${closeButtonProps => closeButtonProps.iconWidth};
+  height: ${closeButtonProps => closeButtonProps.iconHeight};
+  display: ${closeButtonProps => closeButtonProps.iconDisplay};
+  align-items: ${closeButtonProps => closeButtonProps.iconAlign};
   &:hover {
     opacity: 0.8;
     transform: scale(1.05);
@@ -70,13 +72,24 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
 };
 
 StyledTag.propTypes = {
-  /** If defined, a close button will be displayed on the tag */
   closeButtonProps: PropTypes.object,
+  /** If defined, a close button will be displayed on the tag */
+  onClose: PropTypes.func,
+  iconWidth: PropTypes.string,
+  iconHeight: PropTypes.string,
+  backgroundColor: PropTypes.string,
+  iconColor: PropTypes.string,
+  iconDisplay: PropTypes.string,
+  iconAlign: PropTypes.string,
   children: PropTypes.node,
 };
 
 StyledTag.defaultProps = {
   textTransform: 'uppercase',
+  iconHeight: '2.5em',
+  iconWidth: '2.5em',
+  iconBackgroundColor: 'rgba(33, 33, 33, 1)',
+  iconColor: 'white',
 };
 
 export default StyledTag;
