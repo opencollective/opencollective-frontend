@@ -1,4 +1,3 @@
-const collectiveTitle = 'Test Collective';
 const title = `New event ${Math.round(Math.random() * 10000)}`;
 const updatedTitle = `New event updated ${Math.round(Math.random() * 10000)}`;
 
@@ -38,16 +37,37 @@ describe('event.create.test.js', () => {
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier] [data-cy=amount]').contains(15);
     cy.get('#top').scrollIntoView();
     cy.get('a[title=Settings]').click();
+    // edit event info
     cy.get('.inputs .inputField.name input').type(`{selectall}${updatedTitle}`);
+    cy.get('.actions > .btn').click();
+    cy.get('.actions > .btn').contains('Saved');
+    // edit event tickets
+    cy.getByDataCy('menu-item-tickets').click();
     cy.get('.EditTiers .tier:nth-child(2) .removeTier').click();
-    cy.get('.actions button.save').click();
+    cy.get('.actions > .btn').click();
+    cy.get('.actions > .btn').contains('Saved');
+    // edit event tiers
+    cy.getByDataCy('menu-item-tiers').click();
+    cy.get('.addTier').click();
+    cy.get('.EditTiers .tier .inputField.name input').type('Sponsor');
+    cy.get('.EditTiers .tier .inputField.description textarea').type('Become a sponsor');
+    cy.get('.EditTiers .tier .inputField.amount input').type(200);
+    cy.get('.actions > .btn').click();
+    cy.get('.actions > .btn').contains('Saved');
+    // verify update
     cy.get('h1 a').click();
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
+    cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.get('h1[data-cy=collective-title]').contains(updatedTitle);
-    // testing delete
+    // delete event tiers
     cy.get('a[title=Settings]').click();
-    cy.get('.actions button.delete').click();
-    cy.get('button.confirmDelete').click();
-    cy.get('h1[data-cy=collective-title]').contains(collectiveTitle);
+    cy.getByDataCy('menu-item-advanced').click();
+    cy.contains('button', 'Delete this event').click();
+    cy.get('[data-cy=delete]').click();
+    cy.wait(1000);
+    cy.location().should(location => {
+      expect(location.search).to.eq('?type=EVENT');
+    });
+    cy.contains('h1', 'Your event has been deleted.');
   });
 });
