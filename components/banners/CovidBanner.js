@@ -123,24 +123,11 @@ const Virus = styled.div`
   img:nth-child(1) {
     left: 20px;
     position: absolute;
-    animation: wiggle 3s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.2s infinite;
   }
+
   img:nth-child(2) {
     bottom: 15px;
     position: absolute;
-    animation: wiggle 3s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
-  }
-
-  @keyframes wiggle {
-    0% {
-      transform: translate(0, 6px);
-    }
-    50% {
-      transform: translate(0, -6px);
-    }
-    100% {
-      transform: translate(0, 6px);
-    }
   }
 `;
 
