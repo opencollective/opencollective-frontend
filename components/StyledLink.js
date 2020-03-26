@@ -56,10 +56,6 @@ const StyledLink = styled.a`
       &:disabled {
         cursor: not-allowed;
       }
-
-      &:focus {
-        box-shadow: 0px 0px 0px 2px #83ebb4;
-      }
     `}
 `;
 
