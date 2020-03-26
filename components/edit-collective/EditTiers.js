@@ -12,6 +12,7 @@ import InputField from '../InputField';
 import InputFieldPresets from '../InputFieldPresets';
 import { Span } from '../Text';
 import MessageBox from '../MessageBox';
+import StyledCheckbox from '../StyledCheckbox';
 
 class EditTiers extends React.Component {
   static propTypes = {
@@ -148,6 +149,10 @@ class EditTiers extends React.Component {
       'maxQuantity.description': {
         id: 'tier.maxQuantity.description',
         defaultMessage: 'Leave it empty for unlimited',
+      },
+      'customContributions.label': {
+        id: 'tier.customContributions.label',
+        defaultMessage: 'Enable custom contributions',
       },
       forceLongDescription: {
         id: 'tier.forceLongDescription',
@@ -386,7 +391,7 @@ class EditTiers extends React.Component {
 
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
-
+    const defaultIsChecked = true;
     return (
       <div className="EditTiers">
         <style jsx>
@@ -410,6 +415,14 @@ class EditTiers extends React.Component {
 
         <div className="tiers">
           <h2>{this.props.title}</h2>
+          <Flex flexDirection="column" alignItems="center" justifyContent="center" minWidth={300}>
+            <StyledCheckbox
+              name="custom-contributions"
+              label={intl.formatMessage(this.messages['customContributions.label'])}
+              defaultChecked={defaultIsChecked}
+              width="auto"
+            />
+          </Flex>
           {this.state.tiers.map(this.renderTier)}
         </div>
         <div className="editTiersActions">
