@@ -40,6 +40,8 @@ class EditPaymentMethods extends React.Component {
     editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
+    receivingSection: PropTypes.bool,
+    sendingSection: PropTypes.bool,
   };
 
   constructor(props) {
@@ -225,7 +227,7 @@ class EditPaymentMethods extends React.Component {
             {this.renderError(error)}
           </MessageBox>
         )}
-        {!showManualPaymentMethodForm && (
+        {this.props.sendingSection && !showManualPaymentMethodForm && (
           <Flex className="paymentMethods" flexDirection="column" my={2}>
             <H2>
               <FormattedMessage id="paymentMethods.send.title" defaultMessage="Sending money" />
@@ -254,7 +256,7 @@ class EditPaymentMethods extends React.Component {
             ))}
           </Flex>
         )}
-        {!showCreditCardForm && !showManualPaymentMethodForm && (
+        {this.props.sendingSection && !showCreditCardForm && !showManualPaymentMethodForm && (
           <Flex alignItems="center" mx={3} my={4} flexDirection="column">
             <StyledButton
               buttonStyle="standard"
@@ -274,7 +276,7 @@ class EditPaymentMethods extends React.Component {
             </Span>
           </Flex>
         )}
-        {showEditManualPaymentMethod && (
+        {this.props.receivingSection && showEditManualPaymentMethod && (
           <React.Fragment>
             <H2>
               <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />

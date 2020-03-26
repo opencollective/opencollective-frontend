@@ -4,6 +4,7 @@ import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
+import { H2, P } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
@@ -42,6 +43,7 @@ import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
 import EditCollectiveUpdates from './EditCollectiveUpdates';
 import EditHostSettings from './EditHostSettings';
+import EditReceivingMoney from './EditReceivingMoney';
 
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
 
@@ -435,13 +437,43 @@ class EditCollectiveForm extends React.Component {
     } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS) {
       return <EditHostSettings collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS) {
-      return <EditPaymentMethods collectiveSlug={collective.slug} />;
+      return <EditPaymentMethods collectiveSlug={collective.slug} sendingSection="true" />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS) {
       return <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS) {
       return <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.EXPORT) {
       return <ExportData collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY) {
+      return (
+        <Flex mt={3} flexDirection="column">
+          <H2>
+            <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'Paypal'} />
+          </H2>
+          <P>
+            <FormattedMessage
+              id="collective.sendMoney.description"
+              defaultMessage={'Paypal is activated by default.'}
+            />
+          </P>
+          <EditReceivingMoney
+            collective={collective}
+            connectedAccounts={collective.connectedAccounts}
+            sendingMoney={true}
+          />
+        </Flex>
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY) {
+      return (
+        <Flex mt={3} flexDirection="column">
+          <EditReceivingMoney
+            collective={collective}
+            connectedAccounts={collective.connectedAccounts}
+            sendingMoney={false}
+          />
+          <EditPaymentMethods collectiveSlug={collective.slug} receivingSection={true} />
+        </Flex>
+      );
     } else if (['gift-cards-create', 'gift-cards-send'].includes(this.state.section)) {
       return (
         <Flex mt={3} flexDirection="column">

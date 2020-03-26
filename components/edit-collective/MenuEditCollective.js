@@ -31,6 +31,8 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   // Host Specific
   HOST_SETTINGS: 'hostSettings',
   INVOICES: 'invoices',
+  RECEIVING_MONEY: 'receiving-money',
+  SENDING_MONEY: 'sending-money',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -77,6 +79,14 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: {
     id: 'editCollective.menu.invoicesAndReceipts',
     defaultMessage: 'Invoices & Receipts',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
+    id: 'editCollective.menu.receivingMoney',
+    defaultMessage: 'Receiving Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
+    id: 'editCollective.menu.sendingMoney',
+    defaultMessage: 'Sending Money',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
     id: 'editCollective.menu.members',
@@ -135,6 +145,8 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
@@ -197,6 +209,8 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
         </React.Fragment>
       )}
     </Flex>
