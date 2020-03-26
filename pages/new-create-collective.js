@@ -2,13 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import dynamic from 'next/dynamic';
 
-import CovidBanner from '../components/banners/CovidBanner';
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 
 import { withUser } from '../components/UserProvider';
+
+const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
+  ssr: false,
+});
 
 class CreateCollectivePage extends React.Component {
   static async getInitialProps({ query }) {

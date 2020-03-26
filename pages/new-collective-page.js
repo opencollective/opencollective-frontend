@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import CovidBanner from '../components/banners/CovidBanner';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -30,6 +29,10 @@ const IncognitoUserCollective = dynamic(
   () => import(/* webpackChunkName: 'IncognitoUserCollective' */ '../components/IncognitoUserCollective'),
   { loading: Loading },
 );
+
+const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
+  ssr: false,
+});
 
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`

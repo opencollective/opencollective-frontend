@@ -16,7 +16,7 @@ const Wrapper = styled(Flex)`
   width: 100%;
   position: -webkit-sticky;
   position: sticky;
-  bottom: ${props => props.bottom};
+  bottom: 0px;
 `;
 
 const Banner = styled(Container)`
@@ -26,6 +26,7 @@ const Banner = styled(Container)`
   background: #fff;
   box-shadow: 0px 0px 10px RGBA(0, 0, 0, 0.1);
   z-index: 50;
+  border-bottom: none;
 
   h1,
   h2 {
@@ -132,11 +133,8 @@ const Virus = styled.div`
 `;
 
 const CovidBanner = props => {
-  const footerPosition =
-    typeof window !== 'undefined' && window.document.getElementById('footer').getBoundingClientRect();
-
   return (
-    <Wrapper bottom={footerPosition ? footerPosition.height - 1 : 0}>
+    <Wrapper>
       <Banner
         width={[300, 992]}
         border="1px solid #E6E8EB"
