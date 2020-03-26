@@ -34,11 +34,6 @@ const ContainerWithImage = styled(Container)`
   }
 `;
 
-const SubText = styled.p`
-  font-size: 1.1rem;
-  margin-left: 150px;
-`;
-
 const placeholders = {
   name: 'Agora Collective',
   slug: 'agora',
@@ -83,6 +78,7 @@ class CreateCollectiveForm extends React.Component {
       header: { id: 'home.create', defaultMessage: 'Create a Collective' },
       nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
       slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+      suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
       descriptionLabel: {
         id: 'createCollective.form.descriptionLabel',
         defaultMessage: 'What does your collective do?',
@@ -216,6 +212,7 @@ class CreateCollectiveForm extends React.Component {
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
                 const { values, handleSubmit, errors, touched } = formik;
+
                 const suggestedSlug = () => {
                   const slugOptions = {
                     replacement: '-',
@@ -229,6 +226,11 @@ class CreateCollectiveForm extends React.Component {
                 if (!this.state.isURLFieldTouched) {
                   values.slug = suggestedSlug();
                 }
+
+                const handleSlugChange = e => {
+                  values.slug = e.target.value;
+                  this.setState({ isURLFieldTouched: true });
+                };
 
                 return (
                   <Form>
@@ -255,7 +257,7 @@ class CreateCollectiveForm extends React.Component {
                     >
                       {inputProps => (
                         <Field
-                          onClick={() => this.setState({ isURLFieldTouched: true })}
+                          onChange={handleSlugChange}
                           as={StyledInputGroup}
                           {...inputProps}
                           prepend="opencollective.com/"
@@ -263,7 +265,11 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    {values.name.length > 0 && !this.state.isURLFieldTouched && <SubText>Suggested</SubText>}
+                    {values.name.length > 0 && !this.state.isURLFieldTouched && (
+                      <P fontSize="Tiny" ml={150} fontStyle="italic" color="black.500">
+                        {intl.formatMessage(this.messages.suggestedLabel)}
+                      </P>
+                    )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"

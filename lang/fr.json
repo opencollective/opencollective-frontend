@@ -436,6 +436,7 @@
   "createCollective.form.error.slug": "Veuillez utiliser moins de 30 caractères",
   "createCollective.form.nameLabel": "Quel est le nom de votre collectif ?",
   "createCollective.form.slugLabel": "Quelle URL aimeriez-vous ?",
+  "createCollective.form.suggestedLabel": "Suggested",
   "createCollective.header.create": "Créer un Collectif",
   "createcollective.hosttos.label": "Je suis d'accord avec les {hosttoslink} de l'hôte qui collectera l'argent au nom de notre collectif.",
   "createcollective.opensource.ManualVerification": "Demander une vérification manuelle",
