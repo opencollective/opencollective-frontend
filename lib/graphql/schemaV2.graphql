@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Mar 19 2020 09:39:10 GMT-0300 (Brasilia Standard Time)
+# timestamp: Fri Mar 20 2020 12:11:19 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -143,6 +143,11 @@ input AccountReferenceInput {
   """
   slug: String
 }
+
+"""
+Values that can be edited in Account's settings
+"""
+scalar AccountSettingsKey
 
 """
 All account types
@@ -1276,6 +1281,26 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Expense
+
+  """
+  Edit the settings for the given account
+  """
+  editAccountSetting(
+    """
+    Account where the settings will be updated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The key that you want to edit in settings
+    """
+    key: AccountSettingsKey!
+
+    """
+    The value to set for this key
+    """
+    value: JSON!
+  ): Account!
 }
 
 """

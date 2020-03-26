@@ -41,6 +41,17 @@ describe('New expense flow', () => {
       cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new-v2` });
     });
 
+    it('has a dismissible help message', () => {
+      cy.getByDataCy('expense-create-help').should('exist');
+      cy.getByDataCy('dismiss-expense-create-help').click();
+      cy.getByDataCy('expense-create-help').should('not.exist');
+      cy.wait(250); // Give some time for the GQL request
+      cy.reload();
+      cy.waitForLoggedIn();
+      cy.wait(200); // Give some time to make sure frontend can fully refresh after logged in
+      cy.getByDataCy('expense-create-help').should('not.exist');
+    });
+
     it('submits new expense ', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.get('input[name="description"]').type('Brussels January team retreat');
