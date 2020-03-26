@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 import StyledButton from '../StyledButton';
 import DismissibleMessage from '../DismissibleMessage';
 import { BANNER } from '../../lib/constants/dismissable-help-message';
-import { Link } from '../../server/pages';
 
 import Container from '../Container';
 
@@ -161,22 +160,24 @@ const CovidBanner = props => {
           <Desktop>
             <FormattedMessage
               id="banners.covid.title.sponsored.desktop"
-              defaultMessage="In support of this collective's urgent mission we are waiving our platform fees for three months."
+              defaultMessage="To support this collective's mission we are waiving our platform fees until the end of June."
             />
           </Desktop>
           <Mobile>
             <FormattedMessage
               id="banners.covid.title.sponsored.mobile"
-              defaultMessage="In support of this collective's mission we are waiving our platform fees."
+              defaultMessage="To support this collective's mission we are waiving our platform fees."
             />
           </Mobile>
         </h1>
-        <h2>
-          <FormattedMessage
-            id="banners.covid.sponsored.description"
-            defaultMessage="Create a COVID-19 related collectives, we'll waive our fees until the end of June."
-          />
-        </h2>
+        <Mobile>
+          <h2>
+            <FormattedMessage
+              id="banners.covid.sponsored.description"
+              defaultMessage="Create a COVID-19 a related collective, we'll waive our fees until the end of June."
+            />
+          </h2>
+        </Mobile>
       </Box>
     ) : (
       <Box>
