@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Close as _Close } from '@styled-icons/material/Close';
 import { Box, Flex } from '@rebass/grid';
-import { useScrollPosition } from '@n8tb1t/use-scroll-position';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from '../StyledButton';
@@ -15,7 +14,9 @@ import Container from '../Container';
 
 const Wrapper = styled(Flex)`
   width: 100%;
-  ${props => (props.docked ? `bottom: ${props.docked}px; position: absolute;` : 'bottom: 0px; position: fixed;')};
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: ${props => props.bottom};
 `;
 
 const Banner = styled(Container)`
@@ -144,20 +145,11 @@ const Virus = styled.div`
 `;
 
 const CovidBanner = props => {
-  const [isDocked, setDocked] = React.useState(false);
-
-  const scrollCallback = () => {
-    const footerPosition =
-      typeof window !== 'undefined' && window.document.getElementById('footer').getBoundingClientRect();
-    const isFooterDisplayed = footerPosition.y < window.innerHeight;
-    setDocked(isFooterDisplayed && footerPosition.height - 1);
-  };
-
-  React.useEffect(scrollCallback, []);
-  useScrollPosition(scrollCallback, undefined, undefined, undefined, 16.67);
+  const footerPosition =
+    typeof window !== 'undefined' && window.document.getElementById('footer').getBoundingClientRect();
 
   return (
-    <Wrapper docked={isDocked}>
+    <Wrapper bottom={footerPosition ? footerPosition.height - 1 : 0}>
       <Banner
         width={[300, 992]}
         border="1px solid #E6E8EB"
