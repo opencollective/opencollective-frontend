@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
+import CovidBanner from '../components/banners/CovidBanner';
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -34,6 +35,7 @@ class CreateCollectivePage extends React.Component {
     return (
       <Page>
         <CreateCollective host={data.Collective} query={query} />
+        <CovidBanner showLink={false} />
       </Page>
     );
   }

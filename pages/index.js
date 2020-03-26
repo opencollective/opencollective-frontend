@@ -10,6 +10,7 @@ import WeAreOpenSection from '../components/home/sections/WeAreOpen';
 import LearnMoreSection from '../components/home/sections/LearnMore';
 import JoinUsSection from '../components/home/sections/JoinUs';
 import { useIntl, defineMessages } from 'react-intl';
+import CovidBanner from '../components/banners/CovidBanner';
 
 const menuItems = { pricing: true, howItWorks: true };
 
@@ -32,6 +33,7 @@ const HomePage = () => {
       <WeAreOpenSection />
       <LearnMoreSection />
       <JoinUsSection />
+      <CovidBanner showLink={true} />
     </Page>
   );
 };

@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
+import CovidBanner from '../components/banners/CovidBanner';
 import { withUser } from '../components/UserProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
@@ -193,6 +194,7 @@ class NewCollectivePage extends React.Component {
             )}
           </React.Fragment>
         )}
+        <CovidBanner showLink={true} />
       </Page>
     );
   }
