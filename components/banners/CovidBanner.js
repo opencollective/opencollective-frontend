@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Close as _Close } from '@styled-icons/material/Close';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
+import { useRouter } from 'next/router';
 
 import StyledButton from '../StyledButton';
 import DismissibleMessage from '../DismissibleMessage';
@@ -146,6 +147,13 @@ const Virus = styled.div`
 `;
 
 const CovidBanner = props => {
+  const router = useRouter();
+  const dismissAndRedirect = e => {
+    e.preventDefault();
+    props.dismiss();
+    router.push('/create');
+  };
+
   const content =
     props.variant === SPONSORED_COLLECTIVE ? (
       <Box>
@@ -211,11 +219,9 @@ const CovidBanner = props => {
           {content}
           {props.showLink && (
             <Flex alignItems="center" mt={[16, 0]}>
-              <Link route="create" passHref>
-                <Button buttonStyle="standard">
-                  <FormattedMessage id="banners.covid.button" defaultMessage="Create a COVID-19 Initiative" />
-                </Button>
-              </Link>
+              <Button buttonStyle="standard" onClick={dismissAndRedirect}>
+                <FormattedMessage id="banners.covid.button" defaultMessage="Create a COVID-19 Initiative" />
+              </Button>
             </Flex>
           )}
         </Flex>
