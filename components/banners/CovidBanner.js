@@ -215,7 +215,7 @@ CovidBanner.propTypes = {
 };
 
 const WrappedBanner = props => (
-  <DismissibleMessage messageId={BANNER.COVID}>
+  <DismissibleMessage displayForLoggedOutUser={true} messageId={BANNER.COVID}>
     {({ dismiss }) => <CovidBanner {...{ dismiss, ...props }} />}
   </DismissibleMessage>
 );

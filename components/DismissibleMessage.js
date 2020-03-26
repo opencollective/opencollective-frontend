@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { withUser } from './UserProvider';
-import { HELP_MESSAGE, DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
+import { HELP_MESSAGE, BANNER, DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
+import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
 
 const accountSettingsQuery = gqlV2`
   query AccountSettings {
@@ -30,9 +31,9 @@ const editAccountSettingsMutation = gqlV2`
  *
  * Messages will never be displayed if user is not logged in.
  */
-const DismissibleMessage = ({ LoggedInUser, messageId, children }) => {
+const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, children }) => {
   const settingsKey = `${DISMISSABLE_HELP_MESSAGE_KEY}.${messageId}`;
-  const [isDismissedLocally, setDismissedLocally] = React.useState(false);
+  const [isDismissedLocally, setDismissedLocally] = React.useState(getFromLocalStorage(settingsKey));
   const [editAccountSettings] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
   });
@@ -43,7 +44,11 @@ const DismissibleMessage = ({ LoggedInUser, messageId, children }) => {
   });
 
   const loggedInAccount = data?.loggedInAccount;
-  if (isDismissedLocally || !loggedInAccount || get(loggedInAccount, `settings.${settingsKey}`)) {
+  if (
+    isDismissedLocally ||
+    (!loggedInAccount && !displayForLoggedOutUser) ||
+    get(loggedInAccount, `settings.${settingsKey}`)
+  ) {
     // Don't show message if user is not logged in or if dismissed
     return null;
   }
@@ -51,15 +56,20 @@ const DismissibleMessage = ({ LoggedInUser, messageId, children }) => {
   return children({
     dismiss: () => {
       setDismissedLocally(true);
-      return editAccountSettings({
-        variables: { account: { id: loggedInAccount.id }, key: settingsKey },
-      });
+      setLocalStorage(settingsKey, 'true');
+      return (
+        loggedInAccount &&
+        editAccountSettings({
+          variables: { account: { id: loggedInAccount.id }, key: settingsKey },
+        })
+      );
     },
   });
 };
 
 DismissibleMessage.propTypes = {
-  messageId: PropTypes.oneOf(Object.values(HELP_MESSAGE)).isRequired,
+  messageId: PropTypes.oneOf([...Object.values(HELP_MESSAGE), ...Object.values(BANNER)]).isRequired,
+  displayForLoggedOutUser: PropTypes.bool,
   /** A function to render the actual message */
   children: PropTypes.func.isRequired,
   /** @ignore from withUser */
