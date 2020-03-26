@@ -12,11 +12,15 @@ import { Link } from '../../server/pages';
 
 import Container from '../Container';
 
+const SPONSORED_COLLECTIVE = 'SPONSORED_COLLECTIVE';
+
 const Wrapper = styled(Flex)`
   width: 100%;
   position: -webkit-sticky;
   position: sticky;
   bottom: 0px;
+  z-index: 1000;
+  margin-top: 5em;
 `;
 
 const Banner = styled(Container)`
@@ -25,7 +29,6 @@ const Banner = styled(Container)`
   margin: auto;
   background: #fff;
   box-shadow: 0px 0px 10px RGBA(0, 0, 0, 0.1);
-  z-index: 50;
   border-bottom: none;
 
   h1,
@@ -33,24 +36,34 @@ const Banner = styled(Container)`
     font-weight: bold;
     margin: 0px;
     text-align: left;
-  }
-
-  h2 {
-    font-size: 20px;
-    line-height: 28px;
-    padding-bottom: 4px;
+    &:first-child {
+      padding-bottom: 4px;
+    }
   }
 
   h1 {
-    font-size: 28px;
-    line-height: 36px;
+    ${props =>
+      props.variant === SPONSORED_COLLECTIVE
+        ? `font-size: 24px; line-height: 32px;`
+        : `font-size: 28px; line-height: 36px;`}
+  }
+
+  h2 {
+    ${props =>
+      props.variant === SPONSORED_COLLECTIVE
+        ? `font-size: 16px; line-height: 24px;`
+        : `font-size: 20px; line-height: 28px;`}
   }
 
   @media screen and (max-width: 40em) {
+    h1,
+    h2 &:first-child {
+      padding-bottom: 9px;
+    }
+
     h2 {
       font-size: 15px;
       line-height: 23px;
-      padding-bottom: 9px;
     }
 
     h1 {
@@ -133,6 +146,52 @@ const Virus = styled.div`
 `;
 
 const CovidBanner = props => {
+  const content =
+    props.variant === SPONSORED_COLLECTIVE ? (
+      <Box>
+        <h1>
+          <Desktop>
+            <FormattedMessage
+              id="banners.covid.title.sponsored.desktop"
+              defaultMessage="In support of this collective's urgent mission we are waiving our platform fees for three months."
+            />
+          </Desktop>
+          <Mobile>
+            <FormattedMessage
+              id="banners.covid.title.sponsored.mobile"
+              defaultMessage="In support of this collective's mission we are waiving our platform fees."
+            />
+          </Mobile>
+        </h1>
+        <h2>
+          <FormattedMessage
+            id="banners.covid.sponsored.description"
+            defaultMessage="Create a COVID-19 related collectives, we'll waive our fees until the end of June."
+          />
+        </h2>
+      </Box>
+    ) : (
+      <Box>
+        <h2>
+          <Desktop>
+            <FormattedMessage
+              id="banners.covid.title.desktop"
+              defaultMessage="Let's work together to support each other. We are apart but not alone."
+            />
+          </Desktop>
+          <Mobile>
+            <FormattedMessage id="banners.covid.title.mobile" defaultMessage="Let's support each other." />
+          </Mobile>
+        </h2>
+        <h1>
+          <FormattedMessage
+            id="banners.covid.description"
+            defaultMessage="We are waiving our platform fees on COVID-19 related Collectives until the end of June."
+          />
+        </h1>
+      </Box>
+    );
+
   return (
     <Wrapper>
       <Banner
@@ -149,27 +208,7 @@ const CovidBanner = props => {
           <img src="/static/images/virus-2.png" width="38px" />
         </Virus>
         <Flex flexDirection={['column', 'row']}>
-          <Box>
-            <Desktop>
-              <h2>
-                <FormattedMessage
-                  id="banners.covid.title.desktop"
-                  defaultMessage="Let's work together to support each other. We are apart but not alone."
-                />
-              </h2>
-            </Desktop>
-            <Mobile>
-              <h2>
-                <FormattedMessage id="banners.covid.title.mobile" defaultMessage="Let's support each other." />
-              </h2>
-            </Mobile>
-            <h1>
-              <FormattedMessage
-                id="banners.covid.description"
-                defaultMessage="We are waiving our platform fees on COVID-19 related Collectives until the end of June."
-              />
-            </h1>
-          </Box>
+          {content}
           {props.showLink && (
             <Flex alignItems="center" mt={[16, 0]}>
               <Link route="create" passHref>
@@ -189,6 +228,7 @@ const CovidBanner = props => {
 CovidBanner.propTypes = {
   showLink: PropTypes.bool,
   dismiss: PropTypes.func,
+  variant: PropTypes.oneOf([SPONSORED_COLLECTIVE]),
 };
 
 const WrappedBanner = props => (

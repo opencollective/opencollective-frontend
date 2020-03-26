@@ -197,7 +197,12 @@ class NewCollectivePage extends React.Component {
             )}
           </React.Fragment>
         )}
-        <CovidBanner showLink={true} />
+        <CovidBanner
+          variant={
+            collective?.tags?.some(tag => tag == 'covid' || tag == 'covid-19') ? 'SPONSORED_COLLECTIVE' : undefined
+          }
+          showLink={true}
+        />
       </Page>
     );
   }
