@@ -46,12 +46,8 @@ class CollectiveCover extends React.Component {
       hasApply: PropTypes.bool,
       hasDashboard: PropTypes.bool,
     }),
-    href: PropTypes.string,
-    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     style: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    cta: PropTypes.object, // { href, label }
-    displayContributeLink: PropTypes.bool,
     selectedSection: PropTypes.oneOf(AllSectionsNames),
   };
 
