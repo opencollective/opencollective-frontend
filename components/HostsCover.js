@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import CollectiveCover from './CollectiveCover';
+
+import Container from './Container';
+import { H2, P } from './Text';
 import Link from './Link';
 
-const CoverSmallCTA = styled.div`
+const CoverSmallCTA = styled.span`
   a:hover {
     text-decoration: underline !important;
   }
@@ -21,16 +23,11 @@ class HostsCover extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      'host.create.title': {
-        id: 'host.create.title',
-        defaultMessage: 'Become a host',
-      },
       'hosts.findOutMoreLink': {
         id: 'hosts.description.findOutMoreLink',
         defaultMessage: 'Find out more about becoming an Open Collective Host.',
       },
     });
-    this.collective = { type: 'COLLECTIVE' };
   }
 
   error(msg) {
@@ -49,7 +46,7 @@ class HostsCover extends React.Component {
         <Link route="https://docs.opencollective.com/help/hosts/become-host">{findOutMoreMessage}</Link>
       </CoverSmallCTA>
     );
-    const descriptionNode = (
+    const description = (
       <FormattedMessage
         id="hosts.description"
         defaultMessage="Hosts are legal entities that collect money on behalf of open collectives so that they don't have to worry about accounting, taxes, etc. Some also provide extra services. {findOutMoreLink}"
@@ -58,7 +55,14 @@ class HostsCover extends React.Component {
     );
 
     return (
-      <CollectiveCover title={title} description={descriptionNode} collective={this.collective} className="small" />
+      <React.Fragment>
+        <Container mt={4} mb={4} display="flex" justifyContent="center">
+          <H2>{title}</H2>
+        </Container>
+        <Container display="flex" justifyContent="center">
+          <P>{description}</P>
+        </Container>
+      </React.Fragment>
     );
   }
 }
