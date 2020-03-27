@@ -32,6 +32,11 @@ module.exports = {
       content: 'styleguide/pages/index.md',
     },
     {
+      name: 'Typography',
+      content: 'styleguide/pages/typography.md',
+      components: 'components/Text.js',
+    },
+    {
       name: 'Atoms',
       components: 'components/Styled*.js',
       description: 'Base design atoms.',
@@ -117,6 +122,19 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 1000000,
+            },
+          },
+        },
+        // Configuration for images
+        {
+          test: /public\/.*\/images[\\/].*\.(jpg|gif|png)$/,
+          use: {
+            loader: 'file-loader',
+            options: {
+              publicPath: '/_next/static/images/',
+              outputPath: 'static/images/',
+              name: '[name]-[hash].[ext]',
+              esModule: false,
             },
           },
         },
