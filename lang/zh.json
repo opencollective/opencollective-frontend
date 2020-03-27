@@ -816,6 +816,8 @@
   "ExportContributors.Description": "Export your contributors data in {format} format",
   "ExportContributors.OnlyIndividuals": "Only individuals: {link}",
   "ExportContributors.OnlyOrganizations": "Only organizations: {link}",
+  "ExportHostedCollectives.All": "All Hosted Collectives: {link}",
+  "ExportHostedCollectives.Description": "Export your hosted collectives data in {format} format",
   "ExportImages.AllFinancial": "All financial contributors badge",
   "ExportImages.Title": "You can export images showing the financial contributors to each tier.",
   "FAQ": "FAQ",

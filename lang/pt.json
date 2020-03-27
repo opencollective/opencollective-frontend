@@ -816,6 +816,8 @@
   "ExportContributors.Description": "Exportar os dados dos colaboradores no formato {format}",
   "ExportContributors.OnlyIndividuals": "Apenas indivíduos: {link}",
   "ExportContributors.OnlyOrganizations": "Apenas organizações: {link}",
+  "ExportHostedCollectives.All": "All Hosted Collectives: {link}",
+  "ExportHostedCollectives.Description": "Export your hosted collectives data in {format} format",
   "ExportImages.AllFinancial": "Todos os distintivos de colaboradores financeiros",
   "ExportImages.Title": "Você pode exportar imagens mostrando os colaboradores financeiros de cada nível.",
   "FAQ": "Perguntas frequentes",
