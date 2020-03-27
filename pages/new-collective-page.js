@@ -201,7 +201,7 @@ class NewCollectivePage extends React.Component {
           variant={
             collective?.tags?.some(tag => tag == 'covid' || tag == 'covid-19') ? 'SPONSORED_COLLECTIVE' : undefined
           }
-          showLink={true}
+          showLink
         />
       </Page>
     );

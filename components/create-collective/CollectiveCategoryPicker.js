@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
-import { Info } from '@styled-icons/material/Info';
 import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 
-import { H1, P } from '../Text';
+import { H1 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
@@ -34,10 +33,6 @@ const Image = styled.img`
     height: 208px;
     width: 208px;
   }
-`;
-
-const RedInfo = styled(Info)`
-  color: ${themeGet('colors.red.500')};
 `;
 
 class CollectiveCategoryPicker extends React.Component {
@@ -88,10 +83,6 @@ class CollectiveCategoryPicker extends React.Component {
           <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             {intl.formatMessage(this.messages.header)}
           </H1>
-          <P color="black.700" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
-            <RedInfo size={14} />
-            {intl.formatMessage(this.messages.waivefees)}
-          </P>
         </Box>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
           <Box alignItems="center">
