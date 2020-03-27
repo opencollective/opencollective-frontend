@@ -6,7 +6,7 @@ import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { useRouter } from 'next/router';
 
-import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import DismissibleMessage from '../DismissibleMessage';
 import { BANNER } from '../../lib/constants/dismissable-help-message';
 
@@ -73,11 +73,16 @@ const Banner = styled(Container)`
   }
 `;
 
-const Button = styled(StyledButton)`
+const Button = styled(StyledLink)`
   width: 212px;
   font-size: 13px;
   color: #fff;
   z-index: 100;
+  line-height: 21px;
+  padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
 
   background: linear-gradient(180deg, #313233 0%, #141414 100%);
   &:hover {
