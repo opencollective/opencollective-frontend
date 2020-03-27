@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+// eslint-disable-next-line node/no-unpublished-require
+const CopyPlugin = require('copy-webpack-plugin');
 
 // eslint-disable-next-line  node/no-unpublished-require
 const { default: fileExistsCaseInsensitive } = require('react-styleguidist/lib/scripts/utils/findFileCaseInsensitive');
@@ -104,6 +106,7 @@ module.exports = {
     optimization: {
       minimize: false, // See https://github.com/terser/terser/issues/567
     },
+    plugins: [new CopyPlugin([{ from: 'public/static/fonts', to: 'static/fonts' }])],
     module: {
       rules: [
         {
@@ -117,6 +120,18 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 1000000,
+            },
+          },
+        },
+        {
+          test: /public\/.*\/images[\\/].*\.(jpg|gif|png|svg)$/,
+          use: {
+            loader: 'file-loader',
+            options: {
+              publicPath: '/_next/static/images/',
+              outputPath: 'static/images/',
+              name: '[name]-[hash].[ext]',
+              esModule: false,
             },
           },
         },

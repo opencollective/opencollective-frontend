@@ -1,3 +1,23 @@
+## Sizes
+
+```js padded
+<StyledButton buttonSize="xLarge">
+  Extra Large
+</StyledButton>
+<StyledButton buttonSize="large">
+  Large
+</StyledButton>
+<StyledButton buttonSize="medium">
+  Medium
+</StyledButton>
+<StyledButton buttonSize="small">
+  Small
+</StyledButton>
+<StyledButton buttonSize="tiny">
+  Tiny
+</StyledButton>
+```
+
 ## Styles
 
 ### Standard
