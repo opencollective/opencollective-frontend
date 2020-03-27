@@ -193,7 +193,7 @@ pages.add('new-collective-page', '/:slug/v2');
 pages.add('collective', '/:slug', 'new-collective-page');
 pages.add(
   'collective-with-onboarding',
-  '/:slug/:mode(onboarding)?/:step(administrators|contact)?',
+  '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
   'new-collective-page',
 );
 pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
