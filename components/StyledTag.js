@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { background, border, color, space, typography, layout, position } from 'styled-system';
+import { background, border, color, space, typography, layout, position, variant } from 'styled-system';
 
 import { Times } from '@styled-icons/fa-solid/Times';
 
 import { textTransform } from '../lib/styled-system-custom-properties';
-import { messageType } from '../lib/theme/variants/message';
 import { Span } from './Text';
 
 const StyledTagBase = styled.div`
@@ -32,7 +31,40 @@ const StyledTagBase = styled.div`
   ${position}
   ${textTransform}
 
-  ${messageType}
+  ${variant({
+    prop: 'type',
+    variants: {
+      white: {
+        backgroundColor: 'white.full',
+        borderColor: 'black.200',
+      },
+      dark: {
+        backgroundColor: 'black.800',
+        borderColor: 'black.900',
+        color: 'white.full',
+      },
+      info: {
+        backgroundColor: 'blue.100',
+        borderColor: 'blue.400',
+        color: 'blue.600',
+      },
+      success: {
+        backgroundColor: 'green.100',
+        borderColor: 'green.500',
+        color: 'green.700',
+      },
+      warning: {
+        backgroundColor: 'yellow.200',
+        borderColor: 'yellow.500',
+        color: 'yellow.800',
+      },
+      error: {
+        backgroundColor: 'red.100',
+        borderColor: 'red.500',
+        color: 'red.500',
+      },
+    },
+  })}
 `;
 
 const CloseButton = styled.button`
