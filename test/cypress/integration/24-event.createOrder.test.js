@@ -1,4 +1,5 @@
-describe('event.createOrder page', () => {
+// This needs to be converted to the new Page
+describe.skip('event.createOrder page', () => {
   it("can't order if the event is over", () => {
     cy.visit('/opensource/events/webpack-webinar/legacy');
     cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
