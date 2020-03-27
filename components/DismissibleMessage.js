@@ -45,6 +45,7 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
 
   const loggedInAccount = data?.loggedInAccount;
   if (
+    typeof window === 'undefined' || // never render message during SSR
     isDismissedLocally ||
     (!loggedInAccount && !displayForLoggedOutUser) ||
     get(loggedInAccount, `settings.${settingsKey}`)
