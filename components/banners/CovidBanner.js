@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Close as _Close } from '@styled-icons/material/Close';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import { useRouter } from 'next/router';
 
 import StyledLink from '../StyledLink';
 import DismissibleMessage from '../DismissibleMessage';
@@ -16,11 +15,17 @@ const SPONSORED_COLLECTIVE = 'SPONSORED_COLLECTIVE';
 
 const Wrapper = styled(Flex)`
   width: 100%;
-  position: -webkit-sticky;
-  position: sticky;
-  bottom: 0px;
-  z-index: 1000;
   margin-top: 5em;
+
+  ${props =>
+    props.docked
+      ? `position: relative;`
+      : `
+          position: -webkit-sticky;
+          position: sticky;
+          bottom: 0px;
+          z-index: 1000;
+        `}
 `;
 
 const Banner = styled(Container)`
@@ -130,7 +135,7 @@ const Desktop = styled.div`
 
 const Virus = styled.div`
   position: absolute;
-  bottom: 0px;
+  bottom: ${props => (props.variant === SPONSORED_COLLECTIVE ? '-20px' : '0px')};
   right: 10px;
   width: 80px;
   height: 80px;
@@ -151,13 +156,6 @@ const Virus = styled.div`
 `;
 
 const CovidBanner = props => {
-  const router = useRouter();
-  const dismissAndRedirect = e => {
-    e.preventDefault();
-    props.dismiss();
-    router.push('/create');
-  };
-
   const content =
     props.variant === SPONSORED_COLLECTIVE ? (
       <Box>
@@ -207,7 +205,7 @@ const CovidBanner = props => {
     );
 
   return (
-    <Wrapper>
+    <Wrapper docked={props.docked}>
       <Banner
         width={[300, 992]}
         border="1px solid #E6E8EB"
@@ -217,7 +215,7 @@ const CovidBanner = props => {
         pt={[24, 16]}
         pb={24}
       >
-        <Virus>
+        <Virus variant={props.variant}>
           <img src="/static/images/virus-1.png" width="54px" />
           <img src="/static/images/virus-2.png" width="38px" />
         </Virus>
@@ -225,26 +223,31 @@ const CovidBanner = props => {
           {content}
           {props.showLink && (
             <Flex alignItems="center" mt={[16, 0]}>
-              <Button buttonStyle="standard" onClick={dismissAndRedirect}>
+              <Button buttonStyle="standard" href="/create" onClick={() => props.dismiss?.()}>
                 <FormattedMessage id="banners.covid.button" defaultMessage="Create a COVID-19 Initiative" />
               </Button>
             </Flex>
           )}
         </Flex>
-        <Close onClick={props.dismiss} />
+        {!props.docked && <Close onClick={props.dismiss} />}
       </Banner>
     </Wrapper>
   );
 };
 
 CovidBanner.propTypes = {
-  showLink: PropTypes.bool,
   dismiss: PropTypes.func,
+  docked: PropTypes.bool,
+  showLink: PropTypes.bool,
   variant: PropTypes.oneOf([SPONSORED_COLLECTIVE]),
 };
 
 const WrappedBanner = props => (
-  <DismissibleMessage displayForLoggedOutUser={true} messageId={BANNER.COVID}>
+  <DismissibleMessage
+    displayForLoggedOutUser={true}
+    messageId={BANNER.COVID}
+    dismissedComponent={<CovidBanner {...props} docked />}
+  >
     {({ dismiss }) => <CovidBanner {...{ dismiss, ...props }} />}
   </DismissibleMessage>
 );

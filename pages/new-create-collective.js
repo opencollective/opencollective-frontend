@@ -39,7 +39,7 @@ class CreateCollectivePage extends React.Component {
     return (
       <Page>
         <CreateCollective host={data.Collective} query={query} />
-        <CovidBanner showLink={false} />
+        <CovidBanner />
       </Page>
     );
   }

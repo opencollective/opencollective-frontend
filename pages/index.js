@@ -37,7 +37,7 @@ const HomePage = () => {
       <WeAreOpenSection />
       <LearnMoreSection />
       <JoinUsSection />
-      <CovidBanner showLink={true} />
+      <CovidBanner showLink />
     </Page>
   );
 };
