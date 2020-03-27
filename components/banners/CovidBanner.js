@@ -174,7 +174,7 @@ const CovidBanner = props => {
           <h2>
             <FormattedMessage
               id="banners.covid.sponsored.description"
-              defaultMessage="Create a COVID-19 a related collective, we'll waive our fees until the end of June."
+              defaultMessage="Create a COVID-19 related collective, we'll waive our fees until the end of June."
             />
           </h2>
         </Mobile>
