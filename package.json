@@ -195,7 +195,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-react": "7.19.0",
-    "eslint-plugin-react-hooks": "^2.5.1",
+    "eslint-plugin-react-hooks": "^3.0.0",
     "file-loader": "^6.0.0",
     "html-loader": "^1.0.0",
     "husky": "^4.2.3",
