@@ -51,7 +51,7 @@
   "ApplyToHostBtnLoggedIn.TOS": "Ich stimme den <tos-link>Bedingungen für die steuerliche Förderung des Hosts</tos-link> ({hostName}) zu, die im Namen unseres Kollektivs Geld sammeln werden.",
   "appRejectionReason.modal.header": "Ablehnungsgrund",
   "appRejectionReason.placeholder": "Warum wird dieser Antrag abgelehnt?",
-  "archive.account.confirmation": "Are you sure you want to archive this account?",
+  "archive.account.confirmation": "Bist du sicher, dass du dieses Konto archivieren willst?",
   "archive.collective.confirmation": "Are you sure you want to archive this collective?",
   "archive.event.confirmation": "Are you sure you want to archive this event?",
   "archive.modal.header": "Archive {name}",
