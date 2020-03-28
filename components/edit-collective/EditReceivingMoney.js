@@ -8,9 +8,7 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 const EditReceivingMoney = props => {
   const services = [];
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
-  console.log('PROPS IS', props.sendingMoney, props.collective.type);
   if (!props.sendingMoney && (props.collective.type === 'USER' || props.collective.type === 'ORGANIZATION')) {
-    console.log('TRUE IS INSIDE STRIPE');
     services.push('stripe');
   }
   if (props.sendingMoney && props.collective.isHost && hasFeature(props.collective, FEATURES.TRANSFERWISE)) {

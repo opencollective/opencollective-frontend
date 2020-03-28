@@ -33,6 +33,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INVOICES: 'invoices',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
+  FISCALHOSTING: 'fiscalhosting',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -87,6 +88,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.menu.sendingMoney',
     defaultMessage: 'Sending Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING]: {
+    id: 'editCollective.menu.fiscalHosting',
+    defaultMessage: 'Fiscal Hosting',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
     id: 'editCollective.menu.members',
@@ -146,6 +151,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),

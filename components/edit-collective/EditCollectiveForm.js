@@ -383,9 +383,6 @@ class EditCollectiveForm extends React.Component {
       return (
         <Box>
           {collective.type === CollectiveType.USER && <EditUserEmailForm />}
-          {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
-            <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
-          )}
           {collective.type === CollectiveType.COLLECTIVE && (
             <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
           )}
@@ -444,6 +441,14 @@ class EditCollectiveForm extends React.Component {
       return <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.EXPORT) {
       return <ExportData collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING) {
+      return (
+        <Box>
+          {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
+            <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
+          )}
+        </Box>
+      );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY) {
       return (
         <Flex mt={3} flexDirection="column">
@@ -705,13 +710,6 @@ class EditCollectiveForm extends React.Component {
           placeholder: 'meetup, javascript',
           when: () => collective.type !== CollectiveType.EVENT,
         },
-        {
-          name: 'tos',
-          type: 'text',
-          placeholder: '',
-          defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => get(this.state.collective, 'isHost'),
-        },
       ],
       expenses: [
         {
@@ -719,21 +717,13 @@ class EditCollectiveForm extends React.Component {
           type: 'textarea',
         },
       ],
-      advanced: [
+      fiscalhosting: [
         {
           name: 'application',
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.apply'),
-          when: () => this.state.section === 'advanced' && collective.isHost,
-        },
-        {
-          name: 'sendInvoiceByEmail',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
-          when: () =>
-            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
+          when: () => collective.isHost,
         },
         {
           name: 'hostFeePercent',
@@ -741,7 +731,25 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           post: '%',
           defaultValue: get(this.state.collective, 'settings.hostFeePercent'),
-          when: () => this.state.section === 'advanced' && collective.isHost,
+          when: () => collective.isHost,
+        },
+        {
+          name: 'tos',
+          type: 'text',
+          placeholder: '',
+          className: 'horizontal',
+          defaultValue: get(this.state.collective, 'settings.tos'),
+          when: () => get(this.state.collective, 'isHost'),
+        },
+      ],
+      advanced: [
+        {
+          name: 'sendInvoiceByEmail',
+          className: 'horizontal',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
+          when: () =>
+            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
       ],
     };
