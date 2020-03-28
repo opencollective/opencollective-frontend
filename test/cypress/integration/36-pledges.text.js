@@ -13,7 +13,7 @@ describe('Pledges', () => {
       cy.get('span', { timeout: 200000 })
         .should('have.class', 'Text__P-sc-3suny7-0-span')
         .and('have.class', 'kTfuAH')
-        .contains('$');
+        .should('contain', '$');
     });
 
     it('join an existing pledge individual pledge', () => {
@@ -25,7 +25,25 @@ describe('Pledges', () => {
       cy.get('span', { timeout: 200000 })
         .should('have.class', 'Text__P-sc-3suny7-0-span')
         .and('have.class', 'kTfuAH')
-        .contains('$');
+        .should('contain', '$');
+    });
+
+    it('creating a pledge unable to verify the organization', () => {
+      cy.get('[id=name]', { timeout: 200000 }).clear().type('samcaspus3');
+      cy.get('[id=slug]', { timeout: 200000 }).clear().type('demoslug');
+      cy.get('[id=githubHandle]', { timeout: 200000 }).clear().type('demo');
+      cy.get('[id=publicMessage]', { timeout: 200000 }).clear().type('publicMessage');
+      cy.get('[type="submit"]', { timeout: 200000 }).click();
+      cy.url().should('contain', '/pledges/new');
+    });
+
+    it('creating a pledge unable to verify the repository', () => {
+      cy.get('[id=name]', { timeout: 200000 }).clear().type('samcaspus4');
+      cy.get('[id=slug]', { timeout: 200000 }).clear().type('demoslug');
+      cy.get('[id=githubHandle]', { timeout: 200000 }).clear().type('demo/dummy');
+      cy.get('[id=publicMessage]', { timeout: 200000 }).clear().type('publicMessage');
+      cy.get('[type="submit"]', { timeout: 200000 }).click();
+      cy.url().should('contain', '/pledges/new');
     });
   });
 
