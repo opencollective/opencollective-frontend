@@ -84,6 +84,7 @@ const WordCountTextarea = () => {
         as="textarea"
         id="publicMessage"
         name="publicMessage"
+        data-cy="publicMessage"
         placeholder="This will be public and it is also optional"
         onChange={({ target }) => setWordCount(() => 140 - target.value.length)}
         px={2}
@@ -379,7 +380,8 @@ class CreatePledgePage extends React.Component {
                           <P {...labelStyles} htmlFor="name">
                             <FormattedMessage id="Fields.name" defaultMessage="Name" />
                           </P>
-                          <TextInput name="name" id="name" defaultValue={name} />
+                          {/* <TextInput name="name" id="name" defaultValue={name} /> */}
+                          <StyledInputGroup data-cy="name" id="name" name="name" defaultValue={name} />
                         </Flex>
 
                         <Flex flexDirection="column" mb={3}>
@@ -391,6 +393,7 @@ class CreatePledgePage extends React.Component {
                             id="slug"
                             name="slug"
                             defaultValue={slugify(name || '').toLowerCase()}
+                            data-cy="slug"
                           />
                         </Flex>
                       </Flex>
@@ -408,6 +411,7 @@ class CreatePledgePage extends React.Component {
                           name="githubHandle"
                           placeholder="i.e. babel/babel"
                           defaultValue={githubHandle || ''}
+                          data-cy="githubHandle"
                         />
                       </Flex>
                     </Box>
@@ -467,12 +471,13 @@ class CreatePledgePage extends React.Component {
                     mx={['auto', null, 0]}
                     display="block"
                     disabled={!LoggedInUser || submitting}
+                    data-cy="submit"
                   />
                 </form>
               )}
 
               {errorMessage && (
-                <P color="red.500" mt={3}>
+                <P color="red.500" data-cy="errorMessage" mt={3}>
                   {errorMessage}
                 </P>
               )}
@@ -583,7 +588,7 @@ class CreatePledgePage extends React.Component {
                 FAQs
               </H4>
 
-              <Details>
+              <Details data-cy="whatIsAPledge">
                 <summary>
                   <FormattedMessage id="createPledge.faq.whatSummary" defaultMessage="What is a pledge?" />
                 </summary>
@@ -595,7 +600,7 @@ class CreatePledgePage extends React.Component {
                 />
               </Details>
 
-              <Details>
+              <Details data-cy="WHAIP">
                 <summary>
                   <FormattedMessage
                     id="createPledge.faq.whatHappensSummary"
@@ -609,7 +614,7 @@ class CreatePledgePage extends React.Component {
                 />
               </Details>
 
-              <Details>
+              <Details data-cy="whenDoIPay">
                 <summary>
                   <FormattedMessage id="createPledge.faq.paySummary" defaultMessage="When do I pay?" />
                 </summary>
@@ -619,7 +624,7 @@ class CreatePledgePage extends React.Component {
                 />
               </Details>
 
-              <Details>
+              <Details data-cy="howDoIClaimPledge">
                 <summary>
                   <FormattedMessage
                     id="createPledge.faq.howToClaimSummary"

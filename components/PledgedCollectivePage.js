@@ -115,7 +115,16 @@ const PledgedCollectivePage = ({ collective }) => {
         </Link>
       </Container>
 
-      <Container display="flex" alignItems="center" flexDirection="column" maxWidth={800} mx="auto" mt={4} px={3}>
+      <Container
+        display="flex"
+        alignItems="center"
+        flexDirection="column"
+        maxWidth={800}
+        mx="auto"
+        mt={4}
+        px={3}
+        data-cy="pledgeStats"
+      >
         <H3 fontWeight="normal">
           <FormattedMessage
             id="pledge.stats"
