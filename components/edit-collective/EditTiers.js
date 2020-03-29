@@ -262,6 +262,7 @@ const EditTiers = props => {
   const addTier = tier => {
     tiers.push({ ...(tier || {}), __uuid: uuid() });
     setTiers(tiers);
+    props.onChange({ tiers });
   };
 
   const removeTier = index => {
