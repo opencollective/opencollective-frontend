@@ -20,6 +20,8 @@ const StyledButtonContent = styled.button`
   outline: 0;
   border: 1px solid;
   border-radius: 100px;
+  letter-spacing: -0.4px;
+  font-weight: 500;
   
   &:disabled {
     cursor: not-allowed;

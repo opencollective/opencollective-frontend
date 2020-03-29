@@ -390,13 +390,15 @@ type CommentCollection implements Collection {
 }
 
 input CommentCreateInput {
+  """
+  Thr HTML content of your comment
+  """
   html: String
 
   """
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
-  ExpenseId: Int
   ConversationId: String
 }
 

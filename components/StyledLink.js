@@ -27,6 +27,21 @@ const StyledLink = styled.a`
   ${textDecoration}
   ${whiteSpace}
 
+  ${props =>
+    props.buttonStyle &&
+    css`
+      outline: 0;
+      border: 1px solid;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 100px;
+      text-align: center;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+    `}
+
   ${buttonStyle}
   ${buttonSize}
 
@@ -43,19 +58,6 @@ const StyledLink = styled.a`
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-    `}
-
-  ${props =>
-    props.buttonStyle &&
-    css`
-      outline: 0;
-      border-style: solid;
-      border-width: 1px;
-      border-radius: 100px;
-
-      &:disabled {
-        cursor: not-allowed;
-      }
     `}
 `;
 
