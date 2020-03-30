@@ -16,6 +16,7 @@ stage
 *.swp
 styleguide/index.html
 styleguide/build/
+styleguide/static/fonts
 .vimrc
 
 # VSCode & VSCode's extensions

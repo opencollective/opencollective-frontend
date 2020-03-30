@@ -5,7 +5,6 @@ import Body from './Body';
 import Footer from './Footer';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateCollectiveCover from './CreateCollectiveCover';
 import ErrorPage from './ErrorPage';
 import SignInOrJoinFree from './SignInOrJoinFree';
 import { get } from 'lodash';
@@ -200,8 +199,6 @@ class CreateCollective extends React.Component {
         />
 
         <Body>
-          <CreateCollectiveCover host={this.host} />
-
           <div className="content">
             {!canApply && (
               <div className="error">

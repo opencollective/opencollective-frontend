@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, throttle } from 'lodash';
+import { get, throttle, clamp } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { darken, lighten } from 'polished';
+import { setLightness, getLuminance, getContrast, darken } from 'polished';
 import { ThemeProvider } from 'styled-components';
 import { isHexColor } from 'validator';
 
@@ -26,6 +26,14 @@ export default class CollectiveThemeProvider extends React.PureComponent {
 
   state = { newPrimaryColor: null };
 
+  /**
+   * Ensures that the constrast is at least 7/1, as recommended by the [W3c](https://webaim.org/articles/contrast)
+   */
+  adjustColorContrast = color => {
+    const contrastAdjustment = (getContrast(color, '#fff') - 7) / 21;
+    return contrastAdjustment > 0 ? darken(contrastAdjustment, color) : color;
+  };
+
   getTheme = memoizeOne(primaryColor => {
     if (!primaryColor) {
       return defaultTheme;
@@ -33,20 +41,24 @@ export default class CollectiveThemeProvider extends React.PureComponent {
       console.warn(`Invalid custom color: ${primaryColor}`);
       return defaultTheme;
     } else {
+      const adjustedPrimary = this.adjustColorContrast(primaryColor);
+      // Allow a deviation to up to 20% of the default luminance
+      const luminance = getLuminance(adjustedPrimary) / 5;
+      const adjustLuminance = value => setLightness(clamp(value + luminance, 0, 0.97), adjustedPrimary);
       return generateTheme({
         colors: {
           ...defaultTheme.colors,
           primary: {
-            900: darken(0.15, primaryColor),
-            800: darken(0.1, primaryColor),
-            700: darken(0.05, primaryColor),
-            600: darken(0.025, primaryColor),
-            500: primaryColor,
-            400: lighten(0.1, primaryColor),
-            300: lighten(0.15, primaryColor),
-            200: lighten(0.2, primaryColor),
-            100: lighten(0.25, primaryColor),
-            50: lighten(0.3, primaryColor),
+            900: adjustLuminance(0.1),
+            800: adjustLuminance(0.2),
+            700: adjustLuminance(0.3),
+            600: adjustLuminance(0.42),
+            500: adjustLuminance(0.5),
+            400: adjustLuminance(0.6),
+            300: adjustLuminance(0.65),
+            200: adjustLuminance(0.72),
+            100: adjustLuminance(0.78),
+            50: adjustLuminance(0.97),
           },
         },
       });

@@ -69,7 +69,7 @@ const getBorderColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  return 'black.300';
+  return 'black.400';
 };
 
 /**

@@ -184,7 +184,7 @@ class SectionTransactions extends React.Component {
         <ContainerSectionContent>
           <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin || isRoot} isInverted />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton mt={3} width="100%">
+            <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
             </StyledButton>
           </Link>

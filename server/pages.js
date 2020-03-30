@@ -84,7 +84,6 @@ pages.add(
 
 // Events using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
-pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
 
 // Tier page
 // ---------------
@@ -193,9 +192,8 @@ pages.add('new-collective-page', '/:slug/v2');
 pages.add('collective', '/:slug', 'new-collective-page');
 pages.add(
   'collective-with-onboarding',
-  '/:slug/:mode(onboarding)?/:step(administrators|contact)?',
+  '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
   'new-collective-page',
 );
-pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
 
 module.exports = pages;

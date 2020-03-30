@@ -81,7 +81,24 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
           </Container>
         )}
 
-        <StyledRadioList {...fieldProps} options={repositories} keyGetter="name">
+        <StyledRadioList
+          {...fieldProps}
+          options={repositories}
+          onChange={({ value }) => {
+            if (value.owner.type === 'User') {
+              setState(state => ({
+                ...state,
+                disabled: false,
+                repoInfo: {
+                  ...state.repoInfo,
+                  handle: `${value.owner.login}/${value.name}`,
+                  repo: value.name,
+                },
+              }));
+            }
+          }}
+          keyGetter="name"
+        >
           {({ value, radio, checked }) => {
             return (
               <RepositoryEntryContainer px={[2, 4]} py={3}>

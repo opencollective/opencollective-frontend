@@ -4,12 +4,17 @@ import styled, { css } from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
+import confetti from 'canvas-confetti';
 
 import Modal, { ModalBody, ModalHeader, ModalFooter, ModalOverlay } from '../../components/StyledModal';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
 import OnboardingContentBox from './OnboardingContentBox';
 import MessageBox from '../../components/MessageBox';
+import Container from '../../components/Container';
+import { H1, P } from '../../components/Text';
+import StyledButton from '../../components/StyledButton';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { getLoggedInUserQuery } from '../../lib/graphql/queries';
@@ -69,6 +74,14 @@ const ResponsiveModalOverlay = styled(ModalOverlay)`
   }
 `;
 
+const ModalWithImage = styled(ResponsiveModal)`
+  @media screen and (min-width: 40em) {
+    background: white url('/static/images/create-collective/original/onboardingSuccessIllustration.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+  }
+`;
+
 const params = {
   0: {
     height: '114px',
@@ -124,6 +137,8 @@ class OnboardingModal extends React.Component {
       this.setState({ step: 1 });
     } else if (queryStep === 'contact') {
       this.setState({ step: 2 });
+    } else if (queryStep === 'success') {
+      this.setState({ step: 3 });
     }
   };
 
@@ -180,7 +195,11 @@ class OnboardingModal extends React.Component {
     try {
       await this.submitContact();
       await this.submitAdmins();
-      Router.pushRoute('collective', { slug: this.props.collective.slug });
+      Router.pushRoute('collective-with-onboarding', {
+        mode: this.props.mode,
+        slug: this.props.collective.slug,
+        step: 'success',
+      }).then(() => this.confetti());
     } catch (e) {
       this.setState({ isSubmitting: false, error: e });
     }
@@ -196,60 +215,143 @@ class OnboardingModal extends React.Component {
     Router.pushRoute('collective', { slug: this.props.collective.slug });
   };
 
+  confetti = () => {
+    const durationInSeconds = 5 * 1000;
+    const animationEnd = Date.now() + durationInSeconds;
+    const randomInRange = (min, max) => Math.random() * (max - min) + min;
+    const confettisParams = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      } else {
+        const particleCount = 50 * (timeLeft / durationInSeconds);
+        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0, 0.3), y: Math.random() - 0.2 } });
+        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0.7, 1), y: Math.random() - 0.2 } });
+      }
+    }, 250);
+  };
+
   render() {
     const { collective, LoggedInUser, showOnboardingModal, mode } = this.props;
     const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
       <React.Fragment>
-        <ResponsiveModal
-          usePortal={false}
-          width="576px"
-          minHeight="456px"
-          onClose={this.onClose}
-          show={showOnboardingModal}
-        >
-          <ResponsiveModalHeader onClose={this.onClose}>
-            <Flex flexDirection="column" alignItems="center" width="100%">
-              <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
-                <OnboardingStepsProgress
-                  step={step}
-                  mode={mode}
-                  handleStep={step => this.setState({ step })}
-                  slug={collective.slug}
-                />
-              </StepsProgressBox>
-            </Flex>
-          </ResponsiveModalHeader>
-          <ModalBody>
-            <Flex flexDirection="column" alignItems="center">
-              <img width={'160px'} height={this.getStepParams(step, 'height')} src={this.getStepParams(step, 'src')} />
-              <OnboardingContentBox
-                step={step}
-                collective={collective}
-                LoggedInUser={LoggedInUser}
-                updateAdmins={this.updateAdmins}
-                addContact={this.addContact}
-              />
-              {error && (
-                <MessageBox type="error" withIcon mt={2}>
-                  {error.message}
-                </MessageBox>
-              )}
-            </Flex>
-          </ModalBody>
-          <ResponsiveModalFooter>
-            <Flex flexDirection="column" alignItems="center">
-              <OnboardingNavButtons
-                step={step}
-                mode={mode}
-                slug={collective.slug}
-                submitCollectiveInfo={this.submitCollectiveInfo}
-                loading={isSubmitting}
-              />
-            </Flex>
-          </ResponsiveModalFooter>
-        </ResponsiveModal>
+        {step === 3 ? (
+          <React.Fragment>
+            <ModalWithImage
+              usePortal={false}
+              width="576px"
+              minHeight="456px"
+              onClose={this.onClose}
+              show={showOnboardingModal}
+            >
+              <ModalBody>
+                <Flex flexDirection="column" alignItems="center">
+                  <Container display="flex" flexDirection="column" alignItems="center">
+                    <Box maxWidth={['336px']}>
+                      <H1
+                        fontSize={['H2']}
+                        lineHeight={['H2']}
+                        fontWeight="bold"
+                        color="black.900"
+                        textAlign="center"
+                        mt={[6]}
+                        mb={[4]}
+                        mx={[2, null]}
+                      >
+                        <FormattedMessage
+                          id="onboarding.success.header"
+                          defaultMessage="Welcome to your new Collective!"
+                        />
+                      </H1>
+                    </Box>
+                    <Box maxWidth={['450px']}>
+                      <P
+                        fontSize={['LeadParagraph']}
+                        lineHeight={['LeadParagraph']}
+                        color="black.900"
+                        textAlign="center"
+                        mb={[4]}
+                        mx={[2, null]}
+                      >
+                        <FormattedMessage
+                          id="onboarding.success.text"
+                          defaultMessage="You're all set! Now you can make this space your own by customizing the look, start
+                        accepting contributions, and interacting with your community."
+                        />
+                      </P>
+                    </Box>
+                  </Container>
+                </Flex>
+              </ModalBody>
+              <ResponsiveModalFooter>
+                <Flex flexDirection="column" alignItems="center">
+                  <StyledButton buttonStyle="primary" onClick={this.onClose}>
+                    <FormattedMessage id="Close" defaultMessage="Close" />
+                  </StyledButton>
+                </Flex>
+              </ResponsiveModalFooter>
+            </ModalWithImage>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <ResponsiveModal
+              usePortal={false}
+              width="576px"
+              minHeight="456px"
+              onClose={this.onClose}
+              show={showOnboardingModal}
+            >
+              <ResponsiveModalHeader onClose={this.onClose}>
+                <Flex flexDirection="column" alignItems="center" width="100%">
+                  <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
+                    <OnboardingStepsProgress
+                      step={step}
+                      mode={mode}
+                      handleStep={step => this.setState({ step })}
+                      slug={collective.slug}
+                    />
+                  </StepsProgressBox>
+                </Flex>
+              </ResponsiveModalHeader>
+              <ModalBody>
+                <Flex flexDirection="column" alignItems="center">
+                  <img
+                    width={'160px'}
+                    height={this.getStepParams(step, 'height')}
+                    src={this.getStepParams(step, 'src')}
+                  />
+                  <OnboardingContentBox
+                    step={step}
+                    collective={collective}
+                    LoggedInUser={LoggedInUser}
+                    updateAdmins={this.updateAdmins}
+                    addContact={this.addContact}
+                  />
+                  {error && (
+                    <MessageBox type="error" withIcon mt={2}>
+                      {error.message}
+                    </MessageBox>
+                  )}
+                </Flex>
+              </ModalBody>
+              <ResponsiveModalFooter>
+                <Flex flexDirection="column" alignItems="center">
+                  <OnboardingNavButtons
+                    step={step}
+                    mode={mode}
+                    slug={collective.slug}
+                    submitCollectiveInfo={this.submitCollectiveInfo}
+                    loading={isSubmitting}
+                  />
+                </Flex>
+              </ResponsiveModalFooter>
+            </ResponsiveModal>
+          </React.Fragment>
+        )}
         <ResponsiveModalOverlay onClick={this.onClose} noOverlay={noOverlay} />
       </React.Fragment>
     );
