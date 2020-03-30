@@ -20,7 +20,7 @@
     "@opencollective/taxes": "2.3.0",
     "@rebass/grid": "6.1.0",
     "@sentry/browser": "5.15.2",
-    "@sentry/node": "5.15.2",
+    "@sentry/node": "5.15.4",
     "@styled-icons/boxicons-regular": "10.0.0",
     "@styled-icons/fa-brands": "10.0.0",
     "@styled-icons/fa-solid": "10.0.0",
