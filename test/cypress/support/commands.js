@@ -306,6 +306,14 @@ Cypress.Commands.add('containsInDataCy', (query, content, params) => {
 });
 
 /**
+ * Waits for user to be logged in (or timeout)
+ * @param {object} params: passed to `cy.get`
+ */
+Cypress.Commands.add('waitForLoggedIn', params => {
+  return cy.getByDataCy('user-menu-trigger', params);
+});
+
+/**
  * Helper to disable smooth scroll on page to help prevent cypress from missing elements
  * that may be hidden from view.
  */
@@ -383,10 +391,7 @@ function fillStripeInput(params) {
         return;
       }
 
-      return cy
-        .wrap(body)
-        .find(`input:eq(${index})`)
-        .type(`{selectall}${value}`);
+      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`);
     };
 
     fillInput(1, creditCardNumber);

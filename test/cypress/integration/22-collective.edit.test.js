@@ -80,25 +80,11 @@ describe('edit collective', () => {
     const tierCardSelector = '[data-cy="financial-contributions"] [data-cy="contribute-card-tier"]';
     cy.disableSmoothScroll();
     cy.get(tierCardSelector, { timeout: 5000 });
-    cy.get(tierCardSelector)
-      .first()
-      .find('[data-cy="contribute-title"]')
-      .contains('Backer edited');
-    cy.get(tierCardSelector)
-      .first()
-      .find('[data-cy="contribute-description"]')
-      .contains('New description for backers');
-    cy.get(tierCardSelector)
-      .first()
-      .contains('$5 USD / month');
-    cy.get(tierCardSelector)
-      .should('have.length', 4)
-      .last()
-      .should('contain', 'Priority Support');
-    cy.get(tierCardSelector)
-      .first()
-      .find('[data-cy="contribute-btn"]')
-      .click();
+    cy.get(tierCardSelector).first().find('[data-cy="contribute-title"]').contains('Backer edited');
+    cy.get(tierCardSelector).first().find('[data-cy="contribute-description"]').contains('New description for backers');
+    cy.get(tierCardSelector).first().contains('$5 USD / month');
+    cy.get(tierCardSelector).should('have.length', 4).last().should('contain', 'Priority Support');
+    cy.get(tierCardSelector).first().find('[data-cy="contribute-btn"]').click();
 
     // Ensure the new tiers are properly displayed on order form
     cy.contains('button', 'Next step', { timeout: 20000 }).click();
@@ -106,18 +92,9 @@ describe('edit collective', () => {
     cy.get('#amount > button').should('have.length', 3);
 
     cy.visit(`/${collectiveSlug}/edit/tiers`);
-    cy.get('.EditTiers .tier')
-      .first()
-      .find('.amountType select')
-      .select('FIXED');
-    cy.get('.EditTiers .tier')
-      .last()
-      .find('.removeTier')
-      .click();
-    cy.get('.EditTiers .tier')
-      .last()
-      .find('.removeTier')
-      .click();
+    cy.get('.EditTiers .tier').first().find('.amountType select').select('FIXED');
+    cy.get('.EditTiers .tier').last().find('.removeTier').click();
+    cy.get('.EditTiers .tier').last().find('.removeTier').click();
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile

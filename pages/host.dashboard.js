@@ -13,7 +13,7 @@ import { addCollectiveCoverData } from '../lib/graphql/queries';
 import { withUser } from '../components/UserProvider';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
-import CollectiveCover from '../components/CollectiveCover';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import { FormattedMessage } from 'react-intl';
 import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
@@ -124,22 +124,14 @@ class HostDashboardPage extends React.Component {
     const { LoggedInUser, loadingLoggedInUser, data, view, slug } = this.props;
     const host = data.Collective || {};
 
+    const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
+
     return (
       <Page collective={host} title={host.name || 'Host Dashboard'} LoggedInUser={LoggedInUser}>
         {data.Collective && (
-          <CollectiveCover
-            collective={host}
-            href={`/${host.slug}/dashboard`}
-            className="small"
-            forceLegacy
-            title={
-              <FormattedMessage
-                id="host.dashboard.title"
-                defaultMessage="{collective} - Host Dashboard"
-                values={{ collective: host.name }}
-              />
-            }
-          />
+          <Container mb={4}>
+            <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
+          </Container>
         )}
         {loadingLoggedInUser || data.loading ? (
           <Flex px={2} py={5} justifyContent="center">

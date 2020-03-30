@@ -22,8 +22,12 @@ export default class SignIn extends React.Component {
     onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
     /** When set to true, will show a spinner in Sign In button and will disable all actions */
     loading: PropTypes.bool,
+    /** To display a box shadow below the card */
+    withShadow: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
+    /** Label, defaults to "Sign in using your email address:" */
+    label: PropTypes.node,
     /** Set the value of email input */
     email: PropTypes.string.isRequired,
     /** handles changes in the email input */
@@ -48,13 +52,13 @@ export default class SignIn extends React.Component {
   }
 
   render() {
-    const { onSubmit, loading, unknownEmail, email, onEmailChange } = this.props;
+    const { onSubmit, loading, unknownEmail, email, onEmailChange, withShadow, label } = this.props;
     const { error, showError } = this.state;
     return (
-      <StyledCard maxWidth={480} width={1}>
+      <StyledCard maxWidth={480} width={1} boxShadow={withShadow ? '0px 9px 14px 1px #dedede' : undefined}>
         <Box py={4} px={[3, 4]}>
           <H5 as="label" fontWeight="bold" htmlFor="email" mb={3} textAlign="left" display="block">
-            <FormattedMessage id="signin.usingEmail" defaultMessage="Sign in using your email address:" />
+            {label || <FormattedMessage id="signin.usingEmail" defaultMessage="Sign in using your email address:" />}
           </H5>
           <Flex
             as="form"

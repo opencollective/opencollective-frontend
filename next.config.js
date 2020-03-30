@@ -19,6 +19,7 @@ const nextConfig = {
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         SENTRY_DSN: null,
+        ONBOARDING_MODAL: null,
       }),
     );
 

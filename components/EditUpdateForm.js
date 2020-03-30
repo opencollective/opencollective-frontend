@@ -260,7 +260,7 @@ class EditUpdateForm extends React.Component {
               disabled={this.state.loading}
             >
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-              {!this.state.loading && <FormattedMessage id="update.new.post" defaultMessage="Post Update" />}
+              {!this.state.loading && <FormattedMessage id="update.new.preview" defaultMessage="Preview Update" />}
             </StyledButton>
           </ActionButtonWrapper>
 

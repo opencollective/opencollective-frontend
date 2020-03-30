@@ -66,9 +66,7 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
           <FormattedTime {...FormattedTimeProps(endsAt, timezone)} />{' '}
         </Fragment>
       )}
-      {moment()
-        .tz(timezone)
-        .zoneAbbr()}
+      {moment().tz(timezone).zoneAbbr()}
     </Fragment>
   );
 };
@@ -93,12 +91,8 @@ class HeroEventDetails extends React.Component {
 
   isNotLocalTimeZone() {
     if (this.props.collective.timezone) {
-      const eventTimezone = moment()
-        .tz(this.props.collective.timezone)
-        .format('Z');
-      const browserTimezone = moment()
-        .tz(momentTimezone.tz.guess())
-        .format('Z');
+      const eventTimezone = moment().tz(this.props.collective.timezone).format('Z');
+      const browserTimezone = moment().tz(momentTimezone.tz.guess()).format('Z');
       return eventTimezone !== browserTimezone;
     }
   }

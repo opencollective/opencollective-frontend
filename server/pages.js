@@ -31,7 +31,7 @@ const pages = routes()
   .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
-  .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit')
+  .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
   .add('editCollective', '/:slug/edit/:section?')
   .add('events', '/:collectiveSlug/events')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/contact')
@@ -78,15 +78,12 @@ const pages = routes()
 // New Create Collective Flow
 pages.add(
   'create-collective',
-  '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate)?/:step(form)?',
+  '/:hostCollectiveSlug?/:verb(apply|create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
   'new-create-collective',
 );
-// temporary onboarding modal page
-pages.add('new-collective-onboarding-modal', '/:slug/onboarding/:step(administrators|contact)?');
 
 // Events using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
-pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
 
 // Tier page
 // ---------------
@@ -193,6 +190,10 @@ pages.add('new-collective-page', '/:slug/v2');
 
 // Collective page
 pages.add('collective', '/:slug', 'new-collective-page');
-pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
+pages.add(
+  'collective-with-onboarding',
+  '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
+  'new-collective-page',
+);
 
 module.exports = pages;

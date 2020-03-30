@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import EditEvent from '../components/EditEvent';
+import EditCollective from '../components/edit-collective/EditCollective';
 import ErrorPage from '../components/ErrorPage';
 
 import { addEventCollectiveData } from '../lib/graphql/queries';
-
+import { addEditCollectiveMutation } from '../lib/graphql/mutations';
+import { compose } from '../lib/utils';
 import { withUser } from '../components/UserProvider';
 
 class EditEventPage extends React.Component {
@@ -20,6 +21,7 @@ class EditEventPage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    editCollective: PropTypes.func.isRequired, // from addEditCollectiveMutation
   };
 
   constructor(props) {
@@ -27,16 +29,24 @@ class EditEventPage extends React.Component {
   }
 
   render() {
-    const { data, loadingLoggedInUser, LoggedInUser } = this.props;
+    const { data, loadingLoggedInUser, LoggedInUser, editCollective } = this.props;
 
     if (loadingLoggedInUser || !data.Collective) {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
     const event = data.Collective;
-
-    return <EditEvent event={event} LoggedInUser={LoggedInUser} />;
+    return (
+      <EditCollective
+        editCollective={editCollective}
+        collective={event}
+        LoggedInUser={LoggedInUser}
+        loggedInEditDataLoaded
+      />
+    );
   }
 }
 
-export default withUser(addEventCollectiveData(EditEventPage));
+const addGraphQL = compose(addEventCollectiveData, addEditCollectiveMutation);
+
+export default withUser(addGraphQL(EditEventPage));

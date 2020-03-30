@@ -1,16 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
+
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { Router } from '../server/pages';
+
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
-import { getErrorFromGraphqlException } from '../lib/errors';
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CollectiveCover from './CollectiveCover';
 import SignInOrJoinFree from './SignInOrJoinFree';
-import { FormattedMessage } from 'react-intl';
-import { Router } from '../server/pages';
-import { get } from 'lodash';
+import Container from './Container';
+import { H1, P } from './Text';
 
 class CreateOrganization extends React.Component {
   static propTypes = {
@@ -120,16 +123,17 @@ class CreateOrganization extends React.Component {
         />
 
         <Body>
-          <CollectiveCover
-            title={title}
-            description={
+          <Container mt={2} mb={2}>
+            <H1 fontSize={['H4', 'H2']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
+              {title}
+            </H1>
+            <P textAlign="center">
               <FormattedMessage
                 id="collectives.create.description"
                 defaultMessage="An Organization allows you to make financial contributions as a company or team. You can also add a credit card with a monthly limit that team members can use to make contributions."
               />
-            }
-            collective={this.state.collective}
-          />
+            </P>
+          </Container>
 
           <div className="content">
             {!LoggedInUser && (

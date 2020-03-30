@@ -83,10 +83,7 @@ describe('Expenses component', () => {
       expect(component.find('[data-cy="expense-actions"] button[disabled]').lenght).toEqual(undefined);
 
       // click on the first one
-      component
-        .find('[data-cy="expense-actions"] button')
-        .first()
-        .simulate('click');
+      component.find('[data-cy="expense-actions"] button').first().simulate('click');
 
       // expect two disabled buttons again
       expect(component.find('[data-cy="expense-actions"] button[disabled]').length).toEqual(4);

@@ -159,14 +159,14 @@ class SectionContribute extends React.PureComponent {
     1. admin + no host = Contribute Section and 'Start accepting financial contributions' ✅
     2a. admin + host = normal Contribute section ✅
     2b. not admin + Collective active = normal Contribute section ???
-    3. not admin + Collective not active = display nothing ✅
+    3. not admin + Collective not active + no subcollectives/events = display nothing ✅
     */
 
     const createContributionTierRoute = isEvent
       ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
       : `/${collective.slug}/edit/tiers`;
 
-    if (!isAdmin && !isActive) {
+    if (!hasContribute && !hasOtherWaysToContribute) {
       return null;
     }
 
@@ -311,7 +311,7 @@ class SectionContribute extends React.PureComponent {
             {!isEvent && (
               <ContainerSectionContent>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-                  <StyledButton buttonSize="large" mt={3} width={1} p="10px">
+                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="Paragraph">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
                   </StyledButton>
                 </Link>

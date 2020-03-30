@@ -1,14 +1,6 @@
 name: E2E
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+on: [push]
 
 env:
   CI: true
@@ -34,6 +26,8 @@ env:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 30
 
     strategy:
       matrix:

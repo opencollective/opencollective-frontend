@@ -17,8 +17,8 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import ExternalLink from '../ExternalLink';
-import CreateCollectiveCover from '../CreateCollectiveCover';
 import slugify from 'slugify';
+import CollectiveNavbar from '../CollectiveNavbar';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
@@ -169,7 +169,11 @@ class CreateCollectiveForm extends React.Component {
 
     return (
       <Flex flexDirection="column" m={[3, 0]}>
-        {host && host.slug !== 'opensource' && <CreateCollectiveCover host={host} />}
+        {host && host.slug !== 'opensource' && (
+          <Container mb={4}>
+            <CollectiveNavbar collective={host} />
+          </Container>
+        )}
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>

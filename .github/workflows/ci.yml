@@ -22,6 +22,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
 
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
@@ -56,6 +58,8 @@ jobs:
 
   prettier:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -92,6 +96,8 @@ jobs:
   check-langs:
     runs-on: ubuntu-latest
 
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
@@ -126,6 +132,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -169,7 +177,7 @@ jobs:
       - name: Cache build
         uses: actions/cache@v1
         with:
-          path: dist
+          path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
 
       - name: Build
@@ -177,6 +185,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 15
 
     steps:
       - name: Checkout

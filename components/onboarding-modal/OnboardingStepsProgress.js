@@ -36,15 +36,16 @@ const params = {
 class OnboardingStepsProgress extends React.Component {
   static propTypes = {
     step: PropTypes.number,
+    mode: PropTypes.string,
     slug: PropTypes.string,
   };
 
-  setParams = (step, param) => {
+  getStepParams = (step, param) => {
     return params[step][param];
   };
 
   render() {
-    const { slug } = this.props;
+    const { slug, mode } = this.props;
 
     return (
       <Fragment>
@@ -53,9 +54,10 @@ class OnboardingStepsProgress extends React.Component {
           focus={steps[this.props.step]}
           onStepSelect={step => {
             const newStep = steps.findIndex(element => element.name === step.name);
-            Router.pushRoute('new-collective-onboarding-modal', {
+            Router.pushRoute('collective-with-onboarding', {
               slug,
-              step: this.setParams(newStep, 'routerStep'),
+              mode,
+              step: this.getStepParams(newStep, 'routerStep'),
             });
           }}
         >

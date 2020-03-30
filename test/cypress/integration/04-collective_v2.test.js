@@ -51,27 +51,16 @@ describe('New collective page', () => {
         fileName: 'gophercon.jpg',
       });
 
-      cy.get('[data-cy=collective-avatar-image-preview]')
-        .invoke('attr', 'src')
-        .should('not.be.empty');
+      cy.get('[data-cy=collective-avatar-image-preview]').invoke('attr', 'src').should('not.be.empty');
 
       cy.get('[data-cy=heroAvatarDropzoneSave]').click();
     });
 
     it('Can edit primary color', () => {
-      let color = null;
-
       cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click();
-      cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]').then($colorBtn => {
-        const randomPick = Math.round(Math.random() * $colorBtn.length);
-        const withFailSafe = $colorBtn[randomPick] || $colorBtn[0];
-
-        cy.wrap(withFailSafe).click();
-        color = withFailSafe.style.backgroundColor;
-      });
-
+      cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]:first').click();
       cy.get('[data-cy=collective-color-picker-save-btn]').then($saveBtn => {
-        cy.wrap($saveBtn).should('have.css', 'background-color', color);
+        cy.wrap($saveBtn).should('have.css', 'background-color', 'rgb(193, 40, 34)');
         cy.wrap($saveBtn).click();
       });
     });
@@ -84,9 +73,7 @@ describe('New collective page', () => {
       });
 
       cy.get('[data-cy=collective-background-image-styledBackground]').within(() => {
-        cy.get('img')
-          .invoke('attr', 'src')
-          .should('not.be.empty');
+        cy.get('img').invoke('attr', 'src').should('not.be.empty');
       });
 
       cy.get('[data-cy=heroBackgroundDropzoneSave]').click();
@@ -183,9 +170,7 @@ describe('New Collective page with euro currency', () => {
   });
 
   it('contributors amount in euro', () => {
-    cy.get('[data-cy=ContributorsGrid_ContributorCard]')
-      .first()
-      .contains('€5,140 EUR');
+    cy.get('[data-cy=ContributorsGrid_ContributorCard]').first().contains('€5,140 EUR');
   });
 
   it('Can filter contributors', () => {

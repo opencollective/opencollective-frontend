@@ -10,6 +10,7 @@ import Container from '../Container';
 import StyledButton from '../StyledButton';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { Router } from '../../server/pages';
+import { CollectiveType } from '../../lib/constants/collectives';
 
 const getCollectiveType = type => {
   switch (type) {
@@ -17,6 +18,8 @@ const getCollectiveType = type => {
       return 'Organization';
     case 'COLLECTIVE':
       return 'Collective';
+    case 'EVENT':
+      return 'Event';
     default:
       return 'Account';
   }
@@ -86,7 +89,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           />{' '}
         </P>
       )}
-      {!collective.isDeletable && (
+      {!collective.isDeletable && collective.type !== CollectiveType.EVENT && (
         <P color="rgb(224, 183, 0)">
           <FormattedMessage
             values={{ type: collectiveType }}
@@ -95,6 +98,16 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
               '{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.'
             }
           />{' '}
+        </P>
+      )}
+      {!collective.isDeletable && collective.type === CollectiveType.EVENT && (
+        <P color="rgb(224, 183, 0)">
+          <FormattedMessage
+            id="collective.event.delete.isNotDeletable-message"
+            defaultMessage={
+              'Events with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
+            }
+          />
         </P>
       )}
       <Modal show={showModal} width="570px" onClose={() => setShowModal(false)}>
