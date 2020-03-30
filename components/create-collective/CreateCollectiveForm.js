@@ -17,6 +17,7 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import ExternalLink from '../ExternalLink';
+import slugify from 'slugify';
 import CollectiveNavbar from '../CollectiveNavbar';
 
 const BackButton = styled(StyledButton)`
@@ -76,6 +77,7 @@ class CreateCollectiveForm extends React.Component {
       header: { id: 'home.create', defaultMessage: 'Create a Collective' },
       nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
       slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+      suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
       descriptionLabel: {
         id: 'createCollective.form.descriptionLabel',
         defaultMessage: 'What does your collective do?',
@@ -212,7 +214,21 @@ class CreateCollectiveForm extends React.Component {
           >
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
-                const { values, handleSubmit, errors, touched } = formik;
+                const { values, handleSubmit, errors, touched, setFieldValue } = formik;
+
+                const suggestedSlug = value => {
+                  const slugOptions = {
+                    replacement: '-',
+                    lower: true,
+                    strict: true,
+                  };
+
+                  return slugify(value, slugOptions);
+                };
+
+                const handleSlugChange = e => {
+                  if (!touched.slug) setFieldValue('slug', suggestedSlug(e.target.value));
+                };
 
                 return (
                   <Form>
@@ -222,6 +238,7 @@ class CreateCollectiveForm extends React.Component {
                       error={touched.name && errors.name}
                       label={intl.formatMessage(this.messages.nameLabel)}
                       value={values.name}
+                      onChange={handleSlugChange}
                       required
                       mt={4}
                       mb={3}
@@ -239,13 +256,21 @@ class CreateCollectiveForm extends React.Component {
                     >
                       {inputProps => (
                         <Field
+                          onChange={e => {
+                            setFieldValue('slug', e.target.value);
+                          }}
                           as={StyledInputGroup}
                           {...inputProps}
-                          prepend="opencollective.com"
+                          prepend="opencollective.com/"
                           placeholder={placeholders.slug}
                         />
                       )}
                     </StyledInputField>
+                    {values.name.length > 0 && !touched.slug && (
+                      <P fontSize="Tiny" ml={150}>
+                        {intl.formatMessage(this.messages.suggestedLabel)}
+                      </P>
+                    )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"

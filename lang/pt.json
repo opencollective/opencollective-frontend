@@ -432,6 +432,7 @@
   "createCollective.form.error.slug": "Por favor, não use mais do que 30 caracteres",
   "createCollective.form.nameLabel": "Qual é o nome do seu Coletivo?",
   "createCollective.form.slugLabel": "Que URL gostaria de usar?",
+  "createCollective.form.suggestedLabel": "Suggested",
   "createCollective.header.create": "Crie um Coletivo",
   "createcollective.hosttos.label": "Eu concordo com os {hosttoslink} do administrador que irá receber dinheiro em nome do nosso Coletivo.",
   "createcollective.opensource.ManualVerification": "Requisitar verificação manual",
