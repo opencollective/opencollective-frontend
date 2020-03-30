@@ -61,7 +61,6 @@ class CreateCollectiveForm extends React.Component {
 
     this.state = {
       collective,
-      isURLFieldTouched: false,
       tosChecked: false,
       hostTosChecked: false,
     };
@@ -211,8 +210,7 @@ class CreateCollectiveForm extends React.Component {
           >
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
-                const { values, handleSubmit, errors, touched } = formik;
-
+                const { values, handleSubmit, errors, touched, setFieldValue } = formik;
                 const suggestedSlug = () => {
                   const slugOptions = {
                     replacement: '-',
@@ -223,13 +221,8 @@ class CreateCollectiveForm extends React.Component {
                   return slugify(values.name, slugOptions);
                 };
 
-                if (!this.state.isURLFieldTouched) {
-                  values.slug = suggestedSlug();
-                }
-
                 const handleSlugChange = e => {
-                  values.slug = e.target.value;
-                  this.setState({ isURLFieldTouched: true });
+                  if (!touched.slug) setFieldValue('slug', suggestedSlug(e.target.value));
                 };
 
                 return (
@@ -240,6 +233,7 @@ class CreateCollectiveForm extends React.Component {
                       error={touched.name && errors.name}
                       label={intl.formatMessage(this.messages.nameLabel)}
                       value={values.name}
+                      onChange={handleSlugChange}
                       required
                       mt={4}
                       mb={3}
@@ -257,7 +251,9 @@ class CreateCollectiveForm extends React.Component {
                     >
                       {inputProps => (
                         <Field
-                          onChange={handleSlugChange}
+                          onChange={e => {
+                            setFieldValue('slug', e.target.value);
+                          }}
                           as={StyledInputGroup}
                           {...inputProps}
                           prepend="opencollective.com/"
@@ -265,8 +261,8 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    {values.name.length > 0 && !this.state.isURLFieldTouched && (
-                      <P fontSize="Tiny" ml={150} fontStyle="italic" color="black.500">
+                    {values.name.length > 0 && !touched.slug && (
+                      <P fontSize="Tiny" ml={150}>
                         {intl.formatMessage(this.messages.suggestedLabel)}
                       </P>
                     )}
