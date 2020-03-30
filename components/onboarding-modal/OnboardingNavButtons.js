@@ -30,9 +30,9 @@ class OnboardingNavButtons extends React.Component {
     step: PropTypes.number,
     slug: PropTypes.string,
     mode: PropTypes.string,
-    submitCollectiveInfo: PropTypes.func,
     loading: PropTypes.bool,
     viewport: PropTypes.object,
+    handleSubmit: PropTypes.func,
   };
 
   getStepParams = (step, param) => {
@@ -40,7 +40,7 @@ class OnboardingNavButtons extends React.Component {
   };
 
   render() {
-    const { step, mode, slug, submitCollectiveInfo, loading, viewport } = this.props;
+    const { step, mode, slug, loading, viewport, handleSubmit } = this.props;
 
     return (
       <Flex>
@@ -78,7 +78,7 @@ class OnboardingNavButtons extends React.Component {
               </StyledRoundButton>
             )}
 
-            <StyledButton buttonStyle="primary" onClick={submitCollectiveInfo} loading={loading}>
+            <StyledButton buttonStyle="primary" onClick={handleSubmit} loading={loading}>
               <FormattedMessage id="Finish" defaultMessage="Finish" />
             </StyledButton>
           </Fragment>
