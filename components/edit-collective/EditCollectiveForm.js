@@ -872,6 +872,7 @@ class EditCollectiveForm extends React.Component {
               EDIT_COLLECTIVE_SECTIONS.EXPENSES,
               EDIT_COLLECTIVE_SECTIONS.INFO,
               EDIT_COLLECTIVE_SECTIONS.TIERS,
+              EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING,
               EDIT_COLLECTIVE_SECTIONS.TICKETS,
             ].includes(this.state.section) && (
               <div className="actions">
