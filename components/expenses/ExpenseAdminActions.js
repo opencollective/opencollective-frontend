@@ -2,6 +2,7 @@ import React from 'react';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
+import { Check } from '@styled-icons/feather/Check';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -10,6 +11,7 @@ import { fadeIn } from '../StyledKeyframes';
 import StyledRoundButton from '../StyledRoundButton';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import useClipboard from '../../lib/hooks/useClipboard';
 
 const ButtonLabel = styled.div`
   position: absolute;
@@ -24,7 +26,7 @@ const ButtonLabel = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
 
-const ButtonWithLabel = styled(StyledRoundButton)`
+const ButtonWithLabel = styled(StyledRoundButton).attrs({ size: 40, m: 2 })`
   position: relative;
 
   &:hover ${ButtonLabel} {
@@ -37,12 +39,13 @@ const ButtonWithLabel = styled(StyledRoundButton)`
  * in control of the layout.
  */
 const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
+  const { isCopied, copy } = useClipboard();
   return (
     <React.Fragment>
       {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
         <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
           {({ isLoading, downloadInvoice }) => (
-            <ButtonWithLabel size={40} m={2} loading={isLoading} onClick={downloadInvoice}>
+            <ButtonWithLabel loading={isLoading} onClick={downloadInvoice}>
               <IconDownload size={18} />
               <ButtonLabel>
                 <FormattedMessage id="actions.download" defaultMessage="Download" />
@@ -51,14 +54,18 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
           )}
         </ExpenseInvoiceDownloadHelper>
       )}
-      <ButtonWithLabel size={40} m={2}>
-        <IconLink size={18} />
+      <ButtonWithLabel onClick={() => copy(window.location.href)}>
+        {isCopied ? <Check size={18} /> : <IconLink size={18} />}
         <ButtonLabel>
-          <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
+          {isCopied ? (
+            <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
+          ) : (
+            <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
+          )}
         </ButtonLabel>
       </ButtonWithLabel>
       {permissions?.canDelete && (
-        <ButtonWithLabel size={40} m={2} buttonStyle="danger">
+        <ButtonWithLabel buttonStyle="danger">
           <IconTrash size={18} />
           <ButtonLabel>
             <FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />
