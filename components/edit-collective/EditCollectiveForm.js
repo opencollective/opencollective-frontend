@@ -107,8 +107,8 @@ class EditCollectiveForm extends React.Component {
       'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
-        id: 'collective.tos.label',
-        defaultMessage: 'Terms of Service',
+        id: 'host.tos',
+        defaultMessage: 'Terms of fiscal sponsorship',
       },
       'tos.description': {
         id: 'collective.tos.description',
@@ -135,8 +135,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Short description',
       },
       'expensePolicy.label': {
-        id: 'collective.expensePolicy.label',
-        defaultMessage: 'Collective expense policy',
+        id: 'editCollective.menu.expenses',
+        defaultMessage: 'Expenses Policy',
       },
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
@@ -471,12 +471,7 @@ class EditCollectiveForm extends React.Component {
     } else if (section === EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY) {
       return (
         <Flex mt={3} flexDirection="column">
-          <EditReceivingMoney
-            collective={collective}
-            connectedAccounts={collective.connectedAccounts}
-            sendingMoney={false}
-          />
-          <EditPaymentMethods collectiveSlug={collective.slug} receivingSection={true} />
+          <EditPaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />
         </Flex>
       );
     } else if (['gift-cards-create', 'gift-cards-send'].includes(this.state.section)) {
