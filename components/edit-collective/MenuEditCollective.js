@@ -152,7 +152,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
@@ -209,9 +209,14 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
-      {collective.isHost && (
+      {isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION) && (
         <React.Fragment>
           <MenuDivider />
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING))}
+        </React.Fragment>
+      )}
+      {collective.isHost && (
+        <React.Fragment>
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
