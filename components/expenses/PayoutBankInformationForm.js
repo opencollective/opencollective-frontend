@@ -60,6 +60,7 @@ const requiredFieldsQuery = gqlV2`
                 type
                 required
                 example
+                validationRegexp
                 valuesAllowed {
                   key
                   name
@@ -93,7 +94,6 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
   }
 
   const { fields, title } = data.collective.host.transferwise.requiredFields[0];
-
   const renderField = (field, i) => {
     const hasMultipleInputs = field.group.length > 1;
     const required = field.group.some(f => f.required);
@@ -106,13 +106,16 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
         input.key === 'accountHolderName'
           ? getFieldName(`data.${input.key}`)
           : getFieldName(`data.details.${input.key}`);
-
+      let validate;
       switch (input.type) {
         case 'text':
+          validate = input.validationRegexp
+            ? value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`)
+            : undefined;
           return (
-            <FastField key={input.key} name={fieldName}>
-              {({ field }) => (
-                <StyledInputField label={input.name}>
+            <FastField key={input.key} name={fieldName} validate={validate}>
+              {({ field, meta }) => (
+                <StyledInputField label={input.name} required error={meta.touched && meta.error}>
                   {() => <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} />}
                 </StyledInputField>
               )}
@@ -120,10 +123,12 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
           );
         case 'radio':
         case 'select':
+          validate = value =>
+            input.valuesAllowed.some(v => v.key === value) ? undefined : 'This value is not accepted.';
           return (
-            <FastField key={input.key} name={fieldName}>
-              {({ field }) => (
-                <StyledInputField label={input.name}>
+            <FastField key={input.key} name={fieldName} validate={validate}>
+              {({ field, meta }) => (
+                <StyledInputField label={input.name} required error={meta.touched && meta.error}>
                   {() => {
                     const options = formatTransferWiseSelectOptions(input.valuesAllowed);
                     return (
