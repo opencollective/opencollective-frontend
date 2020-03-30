@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Mar 05 2020 16:53:10 GMT+0100 (GMT+01:00)
+# timestamp: Fri Mar 20 2020 12:10:52 GMT+0100 (GMT+01:00)
 
 """
 Application model
@@ -531,6 +531,11 @@ interface CollectiveInterface {
     Defines if the organization "collective" payment method should be returned
     """
     includeOrganizationCollectivePaymentMethod: Boolean = false
+
+    """
+    Defines if the host "collective" payment method should be returned
+    """
+    includeHostCollectivePaymentMethod: Boolean = false
   ): [PaymentMethodType]
 
   """
@@ -688,11 +693,6 @@ type CollectiveStatsType {
   Net amount received
   """
   totalAmountReceived: Int
-
-  """
-  Total amount raised through referral
-  """
-  totalAmountRaised: Int @deprecated(reason: "2019-08-22: Referals are not supported anymore")
   yearlyBudget: Int
   topExpenses: JSON
   topFundingSources: JSON
@@ -703,20 +703,12 @@ Input type for CommentType
 """
 input CommentAttributesInputType {
   id: Int
+
+  """
+  Deprecated since 2020-03-18: Please use html.
+  """
   markdown: String
   html: String
-
-  """
-  Deprecated since 2019-11-25: This field is not editable.
-  """
-  FromCollectiveId: Int
-
-  """
-  Deprecated since 2019-11-25: This field is not editable.
-  """
-  CollectiveId: Int
-  ExpenseId: Int
-  UpdateId: Int
 }
 
 """
@@ -1334,6 +1326,7 @@ This represents an Expense
 """
 type ExpenseType {
   id: Int
+  idV2: String
   amount: Int
   currency: String
   createdAt: DateString
@@ -2631,7 +2624,7 @@ type Query {
     Slug of the invoice. Format: :year:2digitMonth.:hostSlug.:fromCollectiveSlug
     """
     invoiceSlug: String!
-  ): InvoiceType
+  ): InvoiceType @deprecated(reason: "2020-03-09: This field was deprecated after introducing InvoiceByDateRange")
   InvoiceByDateRange(
     """
     Like the Slug of the invoice but spilt out into parts and includes dateFrom
@@ -2914,11 +2907,6 @@ type StatsMemberType {
   total amount donated by this member either directly or using a virtual card it has emitted
   """
   totalDonations: Int
-
-  """
-  total amount raised by this member
-  """
-  totalRaised: Int @deprecated(reason: "2019-08-22: Referals are not supported anymore")
 }
 
 """
@@ -3275,6 +3263,7 @@ type UpdateType {
   collective: CollectiveInterface
   tier: Tier
   comments(limit: Int, offset: Int): CommentListType
+    @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
 }
 
 """

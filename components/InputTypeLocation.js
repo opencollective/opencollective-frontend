@@ -29,10 +29,7 @@ class InputTypeLocation extends React.Component {
   }
 
   removeCountryFromAddress(address) {
-    return address
-      .split(', ')
-      .slice(0, -1)
-      .join(', ');
+    return address.split(', ').slice(0, -1).join(', ');
   }
 
   handleChange(value) {

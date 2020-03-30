@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 
 import { Edit } from '@styled-icons/feather/Edit';
 import { X } from '@styled-icons/feather/X';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import RichTextEditor from '../RichTextEditor';
 import HTMLContent from '../HTMLContent';
 import LinkCollective from '../LinkCollective';

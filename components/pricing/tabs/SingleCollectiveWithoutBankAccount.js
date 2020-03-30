@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import styled from 'styled-components';
 import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 import Container from '../../Container';
 import BackButton from '../BackButton';

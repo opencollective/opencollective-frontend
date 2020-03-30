@@ -20,7 +20,8 @@ import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
 import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
-import { getWebsiteUrl, getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { getWebsiteUrl } from '../lib/utils';
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../lib/local-storage';
 
 class OpenSourceApplyPage extends Component {
@@ -151,7 +152,7 @@ class OpenSourceApplyPage extends Component {
   }
 
   getGithubConnectUrl() {
-    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/opensource/apply` });
+    const urlParams = new URLSearchParams({ redirect: `${getWebsiteUrl()}/opensource/apply/legacy` });
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
     if (accessToken) {

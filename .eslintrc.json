@@ -5,6 +5,7 @@
   "rules": {
     "no-console": "warn",
     "require-atomic-updates": "warn",
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-restricted-imports": [
       "error",
       {

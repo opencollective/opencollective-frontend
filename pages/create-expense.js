@@ -4,14 +4,16 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
+import { HELP_MESSAGE } from '../lib/constants/dismissable-help-message';
+import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import ExpenseForm from '../components/expenses/ExpenseForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
@@ -26,15 +28,15 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
-import { H1, H5 } from '../components/Text';
+import { H1, H5, P, Strong } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
-import { getErrorFromGraphqlException } from '../lib/utils';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import LinkCollective from '../components/LinkCollective';
+import DismissibleMessage from '../components/DismissibleMessage';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -185,8 +187,7 @@ class CreateExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.NEW_EXPENSE_FLOW)) {
         return <PageFeatureNotSupported />;
       }
@@ -215,7 +216,7 @@ class CreateExpensePage extends React.Component {
                 )}
                 <Flex justifyContent="space-between" flexWrap="wrap">
                   <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]}>
-                    <H1 fontSize="H4" mb={24} py={2} ref={this.stepTitleRef}>
+                    <H1 fontSize="H4" lineHeight="H4" mb={24} py={2} ref={this.stepTitleRef}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
                       ) : (
@@ -226,6 +227,31 @@ class CreateExpensePage extends React.Component {
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
+                        <DismissibleMessage messageId={HELP_MESSAGE.EXPENSE_CREATE_INFO}>
+                          {({ dismiss }) => (
+                            <MessageBox type="info" mb={4}>
+                              <P fontSize="Caption" color="black.800" data-cy="expense-create-help">
+                                <FormattedMessage
+                                  id="CreateExpense.HelpCreateInfo"
+                                  defaultMessage="Request payment from {collective} for work you’ve done or to be reimbursed for purchases. Expenses will be processed for payment once approved by a Collective admin. Only the amount and description are public in the Collective’s transparent budget—attachments, payment details, and other personal info is kept private."
+                                  values={{ collective: <strong>{collective.name}</strong> }}
+                                />
+                              </P>
+                              <br />
+                              <StyledButton
+                                asLink
+                                onClick={dismiss}
+                                fontSize="Caption"
+                                data-cy="dismiss-expense-create-help"
+                              >
+                                <FormattedMessage
+                                  id="DismissableHelp.DontShowAgain"
+                                  defaultMessage="Ok, don’t show me again"
+                                />
+                              </StyledButton>
+                            </MessageBox>
+                          )}
+                        </DismissibleMessage>
                         {step === STEPS.FORM && (
                           <ExpenseForm
                             collective={collective}
@@ -281,6 +307,18 @@ class CreateExpensePage extends React.Component {
                         />
                       )}
                     </Container>
+                    {host && (
+                      <P fontSize="SmallCaption" color="black.600" mt={2}>
+                        <FormattedMessage
+                          id="withColon"
+                          defaultMessage="{item}:"
+                          values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
+                        />{' '}
+                        <LinkCollective collective={host}>
+                          <Strong color="black.600">{host.name}</Strong>
+                        </LinkCollective>
+                      </P>
+                    )}
                     <Box mt={50}>
                       <H5 mb={3}>
                         <FormattedMessage id="Tags" defaultMessage="Tags" />

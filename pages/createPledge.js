@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import slugify from 'slugify';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -11,7 +11,8 @@ import themeGet from '@styled-system/theme-get';
 import { getCollectiveQuery } from '../lib/graphql/queries';
 import { withUser } from '../components/UserProvider';
 import { Router } from '../server/pages';
-import { compose, imagePreview } from '../lib/utils';
+import { compose } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import { defaultImage } from '../lib/constants/collectives';
 
 import Header from '../components/Header';
@@ -215,10 +216,7 @@ class CreatePledgePage extends React.Component {
       }
     } catch (error) {
       this.setState({
-        errorMessage: error
-          .toString()
-          .replace('GraphQL error:', '')
-          .trim(),
+        errorMessage: error.toString().replace('GraphQL error:', '').trim(),
       });
     } finally {
       this.setState({ submitting: false });

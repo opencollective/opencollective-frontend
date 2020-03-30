@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import { themeGet } from '@styled-system/theme-get';
 
-import { imagePreview } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import { upload } from '../lib/api';
 
 const messages = defineMessages({
@@ -195,7 +195,7 @@ const InputTypeDropzone = props => {
         <input {...getInputProps()} />
         {renderContainer(isDragActive, isDragReject)}
       </div>
-      {value && (
+      {value && option.canRemove !== false && (
         <span
           className="removeImage"
           tabIndex="0"

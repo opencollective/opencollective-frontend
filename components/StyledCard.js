@@ -13,7 +13,7 @@ import {
   position,
 } from 'styled-system';
 import styledPropTypes from '@styled-system/prop-types';
-import { overflow } from '../lib/styled_system_custom';
+import { overflow } from '../lib/styled-system-custom-properties';
 
 /**
  * A simple styled-component to contain content in a card UI using styled-system.

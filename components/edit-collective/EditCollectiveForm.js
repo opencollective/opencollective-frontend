@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { get, set } from 'lodash';
+import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -10,12 +10,15 @@ import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { Currency } from '../../lib/constants/currency';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
 import EditTiers from './EditTiers';
+import EditTickets from './EditTicket';
 import EditGoals from './EditGoals';
 import EditHost from './EditHost';
 import EditMembers from './EditMembers';
@@ -37,6 +40,7 @@ import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
+import EditCollectiveUpdates from './EditCollectiveUpdates';
 import EditHostSettings from './EditHostSettings';
 
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
@@ -66,16 +70,18 @@ class EditCollectiveForm extends React.Component {
     collective.application = get(collective, 'settings.apply');
     collective.markdown = get(collective, 'settings.markdown');
 
+    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
     this.state = {
       modified: false,
       section: 'info',
       collective,
-      tiers: collective.tiers || [{}],
+      tiers: tiers.length === 0 ? [{}] : tiers,
+      tickets: tickets.length === 0 ? [{}] : tickets,
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditImages = collective.type === CollectiveType.EVENT;
     this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
@@ -144,6 +150,10 @@ class EditCollectiveForm extends React.Component {
         id: 'startDateAndTime',
         defaultMessage: 'start date and time',
       },
+      'endsAt.label': {
+        id: 'event.endsAt.label',
+        defaultMessage: 'end date and time',
+      },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
       'backgroundImage.label': {
         id: 'collective.backgroundImage.label',
@@ -184,6 +194,14 @@ class EditCollectiveForm extends React.Component {
       'country.label': {
         id: 'collective.country.label',
         defaultMessage: 'Country',
+      },
+      'currency.label': {
+        id: 'collective.currency.label',
+        defaultMessage: 'Currency',
+      },
+      'currency.placeholder': {
+        id: 'collective.currency.placeholder',
+        defaultMessage: 'Select currency',
       },
       'address.label': {
         id: 'collective.address.label',
@@ -263,9 +281,12 @@ class EditCollectiveForm extends React.Component {
   componentDidUpdate(oldProps) {
     const { collective, router } = this.props;
     if (oldProps.collective !== collective) {
+      const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+      const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
       this.setState({
-        collective: collective,
-        tiers: collective.tiers,
+        collective,
+        tiers,
+        tickets,
       });
     } else if (oldProps.router.query.section !== router.query.section) {
       this.setState({ section: router.query.section });
@@ -284,6 +305,23 @@ class EditCollectiveForm extends React.Component {
       set(collective, 'settings.VAT.type', value);
     } else if (fieldname === 'VAT-number') {
       set(collective, 'settings.VAT.number', value);
+    } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
+      collective[fieldname] = value;
+      const endsAt = collective.endsAt;
+      if (!endsAt || new Date(endsAt) < new Date(value)) {
+        let newEndDate = new Date(value);
+        if (!endsAt) {
+          newEndDate.setHours(newEndDate.getHours() + 2);
+        } else {
+          // https://github.com/opencollπective/opencollective/issues/1232
+          const endsAtDate = new Date(endsAt);
+          newEndDate = new Date(value);
+          newEndDate.setHours(endsAtDate.getHours());
+          newEndDate.setMinutes(endsAtDate.getMinutes());
+        }
+        const endsAtValue = newEndDate.toString();
+        collective['endsAt'] = endsAtValue;
+      }
     } else {
       collective[fieldname] = value;
     }
@@ -294,12 +332,27 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
-    this.setState({ ...obj, modified: true });
+    const { section } = this.state;
+    if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
+      this.setState({ tickets: obj.tiers, modified: true });
+    } else {
+      this.setState({ ...obj, modified: true });
+    }
     window.state = this.state;
   }
 
   async handleSubmit() {
     const collective = { ...this.state.collective, tiers: this.state.tiers };
+    if (collective.type === CollectiveType.EVENT) {
+      collective.tiers = [];
+      if (find(this.state.tickets, 'name')) {
+        collective.tiers = [...this.state.tickets];
+      }
+
+      if (find(this.state.tiers, 'name')) {
+        collective.tiers = [...collective.tiers, ...this.state.tiers];
+      }
+    }
     this.props.onSubmit(collective);
     this.setState({ modified: false });
   }
@@ -335,7 +388,7 @@ class EditCollectiveForm extends React.Component {
             <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
           )}
           <EditCollectiveArchive collective={collective} />
-          {collective.type !== CollectiveType.EVENT && <EditCollectiveDelete collective={collective} />}
+          <EditCollectiveDelete collective={collective} />
           <hr />
         </Box>
       );
@@ -343,6 +396,8 @@ class EditCollectiveForm extends React.Component {
       return <EditMembers collective={collective} LoggedInUser={LoggedInUser} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.INVOICES) {
       return <EditHostInvoice collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.UPDATES) {
+      return <EditCollectiveUpdates collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS) {
       return <EditCollectiveConversations collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.WEBHOOKS) {
@@ -356,7 +411,19 @@ class EditCollectiveForm extends React.Component {
           collective={collective}
           currency={collective.currency}
           onChange={this.handleObjectChange}
-          defaultType={this.defaultTierType}
+          defaultType="TIER"
+        />
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
+      return (
+        <EditTickets
+          title="Tickets"
+          types={['TICKET']}
+          tiers={this.state.tickets}
+          collective={collective}
+          currency={collective.currency}
+          onChange={this.handleObjectChange}
+          defaultType="TICKET"
         />
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS) {
@@ -420,6 +487,8 @@ class EditCollectiveForm extends React.Component {
       submitBtnMessageId = status;
     }
 
+    const isEvent = collective.type === CollectiveType.EVENT;
+    const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
     const type = collective.type.toLowerCase();
@@ -449,6 +518,7 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: 'https://opencollective.com/',
           placeholder: '',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'twitterHandle',
@@ -457,6 +527,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           placeholder: '',
           label: 'Twitter',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'githubHandle',
@@ -465,23 +536,77 @@ class EditCollectiveForm extends React.Component {
           maxLength: 39,
           placeholder: '',
           label: 'Github',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'website',
           type: 'text',
           maxLength: 255,
           placeholder: '',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'address',
           placeholder: '',
           maxLength: 255,
           type: 'textarea',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'country',
           type: 'country',
           placeholder: 'Select country',
+          when: () => collective.type !== CollectiveType.EVENT,
+        },
+        {
+          name: 'startsAt',
+          type: 'datetime',
+          placeholder: '',
+          defaultValue: collective.startsAt || defaultStartsAt,
+          validate: date => {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return date.isAfter(yesterday);
+          },
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'endsAt',
+          type: 'datetime',
+          options: { timezone: collective.timezone },
+          placeholder: '',
+          validate: date => {
+            const yesterday = new Date(collective.startsAt || defaultStartsAt);
+            yesterday.setDate(yesterday.getDate() - 1);
+            return date.isAfter(yesterday);
+          },
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'timezone',
+          type: 'TimezonePicker',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'location',
+          placeholder: '',
+          type: 'location',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'currency',
+          type: 'select',
+          defaultValue: get(this.state.collective, 'currency'),
+          options: currencyOptions,
+          when: () => {
+            if (get(this.state.collective, 'isHost')) {
+              return false;
+            }
+            if ([CollectiveType.ORGANIZATION, CollectiveType.USER].includes(get(this.state.collective, 'type'))) {
+              return true;
+            }
+            return false;
+          },
         },
         {
           name: 'VAT',
@@ -520,6 +645,10 @@ class EditCollectiveForm extends React.Component {
           placeholder: 'FRXX999999999',
           defaultValue: get(this.state.collective, 'settings.VAT.number'),
           when: () => {
+            if (collective.type === CollectiveType.EVENT) {
+              return false;
+            }
+
             if (this.state.collective.type === CollectiveType.COLLECTIVE) {
               // Collectives can set a VAT number if configured
               const collectiveCountry = get(this.state.collective, 'location.country');
@@ -542,6 +671,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 128,
           type: 'tags',
           placeholder: 'meetup, javascript',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'tos',
@@ -549,22 +679,6 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           defaultValue: get(this.state.collective, 'settings.tos'),
           when: () => get(this.state.collective, 'isHost'),
-        },
-      ],
-      images: [
-        {
-          name: 'image',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images',
-        },
-        {
-          name: 'backgroundImage',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images',
         },
       ],
       expenses: [
@@ -716,9 +830,9 @@ class EditCollectiveForm extends React.Component {
             {[
               EDIT_COLLECTIVE_SECTIONS.ADVANCED,
               EDIT_COLLECTIVE_SECTIONS.EXPENSES,
-              EDIT_COLLECTIVE_SECTIONS.IMAGES,
               EDIT_COLLECTIVE_SECTIONS.INFO,
               EDIT_COLLECTIVE_SECTIONS.TIERS,
+              EDIT_COLLECTIVE_SECTIONS.TICKETS,
             ].includes(this.state.section) && (
               <div className="actions">
                 <Button
@@ -730,7 +844,14 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </Button>
                 <div className="backToProfile">
-                  <Link route="collective" params={{ slug: collective.slug }}>
+                  <Link
+                    route={isEvent ? 'event' : 'collective'}
+                    params={
+                      isEvent
+                        ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                        : { slug: collective.slug }
+                    }
+                  >
                     <FormattedMessage
                       id="collective.edit.backToProfile"
                       defaultMessage="view {type} page"

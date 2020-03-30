@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
 
@@ -24,16 +24,27 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 import { Dimensions } from '../_constants';
 
-const FILTERS = { ALL: 'ALL', HOST: 'HOST', CORE: 'CORE', FINANCIAL: 'FINANCIAL', EVENTS: 'EVENTS' };
+const FILTERS = {
+  ALL: 'ALL',
+  HOSTED_COLLECTIVES: 'HOST',
+  HOSTED_EVENTS: 'EVENT',
+  CORE: 'CORE',
+  FINANCIAL: 'FINANCIAL',
+  EVENTS: 'EVENTS',
+};
 const FILTERS_LIST = Object.values(FILTERS);
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
     id: 'SectionContributions.All',
     defaultMessage: 'All Contributions',
   },
-  [FILTERS.HOST]: {
-    id: 'Fiscalhost',
-    defaultMessage: 'Fiscal Host',
+  [FILTERS.HOSTED_COLLECTIVES]: {
+    id: 'HostedCollectives',
+    defaultMessage: 'Hosted Collectives',
+  },
+  [FILTERS.HOSTED_EVENTS]: {
+    id: 'HostedEvents',
+    defaultMessage: 'Hosted Events',
   },
   [FILTERS.FINANCIAL]: {
     id: 'Member.Role.BACKER',
@@ -60,8 +71,9 @@ const ROLES_WEIGHT = {
 
 /** All filters except `ALL` */
 const filterFuncs = {
-  [FILTERS.HOST]: ({ role }) => role === roles.HOST,
-  [FILTERS.FINANCIAL]: ({ role }) => role === roles.BACKER,
+  [FILTERS.HOSTED_COLLECTIVES]: ({ role, collective }) => role === roles.HOST && collective.type === 'COLLECTIVE',
+  [FILTERS.HOSTED_EVENTS]: ({ role, collective }) => role === roles.HOST && collective.type === 'EVENT',
+  [FILTERS.FINANCIAL]: ({ role, stats }) => role === roles.BACKER && stats.totalDonations > 0,
   [FILTERS.CORE]: ({ role }) => role === roles.ADMIN || role === roles.MEMBER,
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };

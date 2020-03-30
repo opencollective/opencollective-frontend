@@ -2,12 +2,12 @@ import { Flex, Box } from '@rebass/grid';
 import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { FormattedMessage } from 'react-intl';
 
 import imgInvoiceTitlePreview from '../../public/static/images/invoice-title-preview.jpg';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import Container from '../Container';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';

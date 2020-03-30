@@ -1,13 +1,14 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { set, get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
 
-import { compose, getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 import { addEditCollectiveMutation } from '../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';

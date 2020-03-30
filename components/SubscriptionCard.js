@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import Currency from './Currency';
 import { get, cloneDeep } from 'lodash';
 import Link from './Link';
-import { firstSentence, getCurrencySymbol, imagePreview, getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { firstSentence, getCurrencySymbol } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import { getStripe } from '../lib/stripe';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import colors from '../lib/constants/colors';

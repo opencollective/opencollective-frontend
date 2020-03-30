@@ -222,6 +222,7 @@ const DEFAULT_SECTIONS = {
   [CollectiveType.ORGANIZATION]: [
     Sections.CONTRIBUTIONS,
     Sections.CONTRIBUTORS,
+    Sections.UPDATES,
     Sections.CONVERSATIONS,
     Sections.TRANSACTIONS,
     Sections.ABOUT,
@@ -265,9 +266,12 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   const sections = getDefaultSections(collective);
   const toRemove = new Set();
   collective = collective || {};
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  if (!collective.isApproved && !isAdmin) {
+  const hasContribute = collective.isApproved;
+  const hasOtherWaysToContribute = !isEvent && (collective.events?.length > 0 || collective.subCollectives?.length > 0);
+  if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
@@ -293,10 +297,15 @@ export const getSectionsForCollective = (collective, isAdmin) => {
       toRemove.add(Sections.ABOUT);
     }
   }
+  if (collective.type === CollectiveType.ORGANIZATION) {
+    if (!hasFeature(collective, FEATURES.UPDATES)) {
+      toRemove.add(Sections.UPDATES);
+    }
+  }
 
-  if (collective.type === CollectiveType.EVENT) {
+  if (isEvent) {
     // Should not see tickets section if you can't order them
-    if ((!collective.isApproved && !isAdmin) || !canOrderTicketsFromEvent(collective)) {
+    if ((!collective.isApproved && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
       toRemove.add(Sections.TICKETS);
     }
 
@@ -482,7 +491,7 @@ CollectiveNavbar.propTypes = {
   showEdit: PropTypes.bool,
   /** Called with the new section name when it changes */
   onSectionClick: PropTypes.func,
-  /** An optionnal function to build links URLs. Usefull to override behaviour in test/styleguide envs. */
+  /** An optionnal function to build links URLs. Useful to override behaviour in test/styleguide envs. */
   LinkComponent: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
   sections: PropTypes.arrayOf(PropTypes.oneOf(AllSectionsNames)),
@@ -494,7 +503,7 @@ CollectiveNavbar.propTypes = {
   hideInfos: PropTypes.bool,
   /** If true, the CTAs will be hidden on mobile */
   hideButtonsOnMobile: PropTypes.bool,
-  /** If true, the collective infos will fadeInDown and fadeOutUp when transitionning */
+  /** If true, the collective infos will fadeInDown and fadeOutUp when transitioning */
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
   isSmall: PropTypes.bool,

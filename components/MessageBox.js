@@ -9,7 +9,7 @@ import { CheckCircle } from '@styled-icons/fa-solid/CheckCircle';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 
-import { messageType } from '../lib/theme';
+import { messageType } from '../lib/theme/variants/message';
 import { Span } from './Text';
 import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';

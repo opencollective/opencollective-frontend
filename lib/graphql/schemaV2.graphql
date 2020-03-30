@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Mar 05 2020 16:53:37 GMT+0100 (GMT+01:00)
+# timestamp: Fri Mar 20 2020 12:11:19 GMT+0100 (GMT+01:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -9,6 +9,11 @@ interface Account {
   The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
   """
   id: String
+
+  """
+  The internal database identifier of the collective (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
 
   """
   The slug identifying the account (ie: babel)
@@ -140,6 +145,11 @@ input AccountReferenceInput {
 }
 
 """
+Values that can be edited in Account's settings
+"""
+scalar AccountSettingsKey
+
+"""
 All account types
 """
 enum AccountType {
@@ -163,6 +173,7 @@ This represents a Bot account
 """
 type Bot implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -261,6 +272,7 @@ This represents a Collective account
 """
 type Collective implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -364,7 +376,7 @@ type Comment {
   fromAccount: Account
   account: Account
   fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
-  collective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
+  collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
 
 """
@@ -378,14 +390,15 @@ type CommentCollection implements Collection {
 }
 
 input CommentCreateInput {
-  markdown: String
+  """
+  Thr HTML content of your comment
+  """
   html: String
 
   """
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
-  ExpenseId: Int
   ConversationId: String
 }
 
@@ -393,6 +406,89 @@ input CommentUpdateInput {
   id: String!
   markdown: String
   html: String
+}
+
+"""
+Fields for a connected account
+"""
+type ConnectedAccount {
+  """
+  Unique identifier for this connected account
+  """
+  id: String!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the ConnectedAccount was last updated
+  """
+  updatedAt: DateTime!
+  settings: JSON
+  service: ConnectedAccountService!
+}
+
+input ConnectedAccountCreateInput {
+  """
+  Optional Client ID for the token or secret
+  """
+  clientId: String
+
+  """
+  Private data related to the connected account
+  """
+  data: JSON
+
+  """
+  Refresh token for the connected account
+  """
+  refreshToken: String
+
+  """
+  Public data related to the connected account
+  """
+  settings: JSON
+
+  """
+  Secret token used to call service
+  """
+  token: String
+
+  """
+  Service which the connected account belongs to
+  """
+  service: ConnectedAccountService
+
+  """
+  Optional username for the connected account
+  """
+  username: String
+}
+
+input ConnectedAccountReferenceInput {
+  """
+  The public id identifying the connected account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+}
+
+"""
+All supported services a user can connect with
+"""
+enum ConnectedAccountService {
+  paypal
+  stripe
+  github
+  twitter
+  meetup
+  transferwise
 }
 
 """
@@ -563,6 +659,7 @@ This represents an Event account
 """
 type Event implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -662,6 +759,11 @@ type Expense {
   Title/main description for this expense
   """
   description: String!
+
+  """
+  Total amount of the expense (sum of the attachments).
+  """
+  amount: Int!
 
   """
   Currency that should be used for the payout
@@ -883,6 +985,7 @@ This represents an Individual account
 """
 type Individual implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)
@@ -1070,6 +1173,31 @@ type Mutation {
   createComment(comment: CommentCreateInput!): Comment
 
   """
+  Connect external account to Open Collective Account
+  """
+  createConnectedAccount(
+    """
+    Connected Account data
+    """
+    connectedAccount: ConnectedAccountCreateInput!
+
+    """
+    Account where the external account will be connected
+    """
+    account: AccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Delete ConnectedAccount
+  """
+  deleteConnectedAccount(
+    """
+    ConnectedAccount reference containing either id or legacyId
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+  ): ConnectedAccount
+
+  """
   Create a conversation
   """
   createConversation(
@@ -1155,6 +1283,26 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Expense
+
+  """
+  Edit the settings for the given account
+  """
+  editAccountSetting(
+    """
+    Account where the settings will be updated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The key that you want to edit in settings
+    """
+    key: AccountSettingsKey!
+
+    """
+    The value to set for this key
+    """
+    value: JSON!
+  ): Account!
 }
 
 """
@@ -1219,6 +1367,7 @@ This represents an Organization account
 """
 type Organization implements Account {
   id: String
+  legacyId: Int
 
   """
   The slug identifying the account (ie: babel)

@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { background, border, color, space, typography, layout, position } from 'styled-system';
+import { background, border, color, space, typography, layout, position, variant } from 'styled-system';
 
 import { Times } from '@styled-icons/fa-solid/Times';
 
-import { textTransform } from '../lib/styled_system_custom';
-import { messageType } from '../lib/theme';
+import { textTransform } from '../lib/styled-system-custom-properties';
 import { Span } from './Text';
 
 const StyledTagBase = styled.div`
@@ -32,21 +31,56 @@ const StyledTagBase = styled.div`
   ${position}
   ${textTransform}
 
-  ${messageType}
+  ${variant({
+    prop: 'type',
+    variants: {
+      white: {
+        backgroundColor: 'white.full',
+        borderColor: 'black.200',
+      },
+      dark: {
+        backgroundColor: 'black.800',
+        borderColor: 'black.900',
+        color: 'white.full',
+      },
+      info: {
+        backgroundColor: 'blue.100',
+        borderColor: 'blue.400',
+        color: 'blue.600',
+      },
+      success: {
+        backgroundColor: 'green.100',
+        borderColor: 'green.500',
+        color: 'green.700',
+      },
+      warning: {
+        backgroundColor: 'yellow.200',
+        borderColor: 'yellow.500',
+        color: 'yellow.800',
+      },
+      error: {
+        backgroundColor: 'red.100',
+        borderColor: 'red.500',
+        color: 'red.500',
+      },
+    },
+  })}
 `;
 
 const CloseButton = styled.button`
   border-radius: 50%;
-  background: #212121;
-  color: white;
+  background: ${closeButtonProps => closeButtonProps.iconBackgroundColor};
+  color: ${closeButtonProps => closeButtonProps.iconColor};
   mix-blend-mode: color-burn;
   cursor: pointer;
   margin: 0px;
   text-align: center;
   line-height: 1;
   padding: 4px;
-  width: 2.5em;
-  height: 2.5em;
+  width: ${closeButtonProps => closeButtonProps.iconWidth};
+  height: ${closeButtonProps => closeButtonProps.iconHeight};
+  display: ${closeButtonProps => closeButtonProps.iconDisplay};
+  align-items: ${closeButtonProps => closeButtonProps.iconAlign};
   &:hover {
     opacity: 0.8;
     transform: scale(1.05);
@@ -70,13 +104,24 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
 };
 
 StyledTag.propTypes = {
-  /** If defined, a close button will be displayed on the tag */
   closeButtonProps: PropTypes.object,
+  /** If defined, a close button will be displayed on the tag */
+  onClose: PropTypes.func,
+  iconWidth: PropTypes.string,
+  iconHeight: PropTypes.string,
+  backgroundColor: PropTypes.string,
+  iconColor: PropTypes.string,
+  iconDisplay: PropTypes.string,
+  iconAlign: PropTypes.string,
   children: PropTypes.node,
 };
 
 StyledTag.defaultProps = {
   textTransform: 'uppercase',
+  iconHeight: '2.5em',
+  iconWidth: '2.5em',
+  iconBackgroundColor: 'rgba(33, 33, 33, 1)',
+  iconColor: 'white',
 };
 
 export default StyledTag;

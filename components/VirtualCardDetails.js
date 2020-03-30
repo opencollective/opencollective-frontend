@@ -102,7 +102,7 @@ class VirtualCardDetails extends React.Component {
         )}
         <Flex flexDirection="column" mr="2em">
           <DetailsColumnHeader>
-            <FormattedMessage id="virtualCards.emmited" defaultMessage="Emmited" />
+            <FormattedMessage id="virtualCards.emmited" defaultMessage="Emitted" />
           </DetailsColumnHeader>
           <FormattedDate value={virtualCard.createdAt} />
         </Flex>

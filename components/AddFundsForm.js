@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { withApollo } from 'react-apollo';
+import { withApollo } from '@apollo/react-hoc';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';

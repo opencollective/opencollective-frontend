@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Markdown from 'react-markdown';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get, omit } from 'lodash';
-import { titleCase } from 'title-case';
 
 import { getCurrencySymbol } from '../../lib/utils';
 import categories from '../../lib/constants/categories';
@@ -74,14 +73,18 @@ class CreateExpenseForm extends React.Component {
         id: 'expense.error.expenseTypeMissing',
         defaultMessage: 'Please pick the type of this expense',
       },
+      expenseTypeReceipt: {
+        id: 'Expense.Type.Receipt',
+        defaultMessage: 'Receipt',
+      },
+      expenseTypeInvoice: {
+        id: 'Expense.Type.Invoice',
+        defaultMessage: 'Invoice',
+      },
     });
 
     this.categoriesOptions = categories(props.collective.slug).map(category => {
       return { [category]: category };
-    });
-
-    this.expenseTypes = Object.entries(expenseTypes).map(([key, value]) => {
-      return { [key]: titleCase(value) };
     });
 
     this.state = {
@@ -234,10 +237,15 @@ class CreateExpenseForm extends React.Component {
   }
 
   renderForm() {
-    const { LoggedInUser, collective } = this.props;
+    const { LoggedInUser, collective, intl } = this.props;
     const { expense } = this.state;
 
     const payoutMethodOptions = this.getOptions();
+    const expenseTypesOptions = [
+      { [expenseTypes.DEFAULT]: '' },
+      { [expenseTypes.RECEIPT]: intl.formatMessage(this.messages.expenseTypeReceipt) },
+      { [expenseTypes.INVOICE]: intl.formatMessage(this.messages.expenseTypeInvoice) },
+    ];
 
     return (
       <div className={`CreateExpenseForm ${this.props.mode}`}>
@@ -499,7 +507,7 @@ class CreateExpenseForm extends React.Component {
                 <span className="expenseType">
                   <InputField
                     type="select"
-                    options={this.expenseTypes}
+                    options={expenseTypesOptions}
                     defaultValue={expenseTypes.DEFAULT}
                     name="type"
                     className="expenseField"

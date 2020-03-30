@@ -2,14 +2,14 @@ import { Flex } from '@rebass/grid';
 import { set, cloneDeep, pick } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import { useIntl, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 
 import imgPreviewThread from '../../public/static/images/conversations/conversations-list-preview.png';
 import imgPreviewReplies from '../../public/static/images/conversations/conversation-replies-preview.png';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import Container from '../Container';

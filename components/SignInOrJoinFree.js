@@ -14,7 +14,7 @@ import CreateProfileFAQ from './faqs/CreateProfileFAQ';
 import { P } from './Text';
 import MessageBox from './MessageBox';
 import { createUserQuery } from '../lib/graphql/mutations';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
@@ -39,6 +39,10 @@ class SignInOrJoinFree extends React.Component {
     createPersonalProfileLabel: PropTypes.node,
     /** A label to use instead of the default `Create Organization profile` */
     createOrganizationProfileLabel: PropTypes.node,
+    /** To display a box shadow below the card */
+    withShadow: PropTypes.bool,
+    /** Label for signIn, defaults to "Sign in using your email address:" */
+    signInLabel: PropTypes.node,
   };
 
   state = {
@@ -136,6 +140,8 @@ class SignInOrJoinFree extends React.Component {
             onSubmit={this.signIn}
             loading={submitting}
             unknownEmail={unknownEmailError}
+            withShadow={this.props.withShadow}
+            label={this.props.signInLabel}
           />
         ) : (
           <Flex flexDirection="column" width={1} alignItems="center">

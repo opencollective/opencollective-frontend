@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import { whiteSpace, textDecoration } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/theme';
+import { whiteSpace, textDecoration } from '../lib/styled-system-custom-properties';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
 /**
  * styled-component anchor tag using styled-system
@@ -13,6 +13,7 @@ import { buttonSize, buttonStyle } from '../lib/theme';
 const StyledLink = styled.a`
   color: ${themeGet('colors.primary.500')};
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     color: ${themeGet('colors.primary.300')};
@@ -25,6 +26,21 @@ const StyledLink = styled.a`
   ${typography}
   ${textDecoration}
   ${whiteSpace}
+
+  ${props =>
+    props.buttonStyle &&
+    css`
+      outline: 0;
+      border: 1px solid;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 100px;
+      text-align: center;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+    `}
 
   ${buttonStyle}
   ${buttonSize}
@@ -42,23 +58,6 @@ const StyledLink = styled.a`
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-    `}
-
-  ${props =>
-    props.buttonStyle &&
-    css`
-      outline: 0;
-      border-style: solid;
-      border-width: 1px;
-      border-radius: 100px;
-
-      &:disabled {
-        cursor: not-allowed;
-      }
-
-      &:focus {
-        box-shadow: 0px 0px 0px 2px #83ebb4;
-      }
     `}
 `;
 

@@ -1,20 +1,15 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { creditCard } from '../../mocks/payment_methods';
-```
-
 ### Don't show payment method fees (contribution flow's default)
 
 ```js
-initialState = { countryISO: null };
+const [countryISO, setCountryISO] = React.useState(null);
 <div>
   <StepBreakdown
     amount={500000}
     currency="USD"
     hostFeePercent={5}
     showFees={false}
-    onChange={setState}
-    userTaxInfo={state}
+    onChange={({ countryISO }) => setCountryISO(countryISO)}
+    userTaxInfo={{ countryISO }}
     tierType="PRODUCT"
     hostCountry="FR"
     applyTaxes
@@ -31,11 +26,11 @@ initialState = { countryISO: null };
 
 ### Full breakdown
 
-Folowing example is resizable.
+Following example is resizable.
 
 ```js
 import { creditCard } from '../../mocks/payment_methods';
-initialState = { countryISO: 'BE' };
+const [countryISO, setCountryISO] = React.useState('BE');
 <div
   style={{ resize: 'horizontal', padding: '15px', overflow: 'auto', width: '80%', minWidth: '100px', maxWidth: '95%' }}
 >
@@ -45,10 +40,10 @@ initialState = { countryISO: 'BE' };
     currency="USD"
     hostFeePercent={5}
     paymentMethod={creditCard}
-    collectiveTaxInfo={state}
-    onChange={setState}
+    onChange={({ countryISO }) => setCountryISO(countryISO)}
+    userTaxInfo={{ countryISO }}
+    collectiveTaxInfo={{ countryISO }}
     applyTaxes
-    userTaxInfo={state}
   />
 </div>;
 ```

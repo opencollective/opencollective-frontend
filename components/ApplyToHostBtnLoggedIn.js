@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get, truncate } from 'lodash';
@@ -75,7 +75,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
     if (data.loading) {
       return (
-        <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} disabled data-cy="host-apply-btn">
+        <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} disabled data-cy="host-apply-btn-loading">
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
         </StyledButton>
       );

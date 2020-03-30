@@ -5,7 +5,8 @@ import { get } from 'lodash';
 
 import TopBar from './TopBar';
 
-import { truncate, getCollectiveImage } from '../lib/utils';
+import { truncate } from '../lib/utils';
+import { getCollectiveImage } from '../lib/image-utils';
 import UserWarnings from './UserWarnings';
 
 import { defineMessages, injectIntl } from 'react-intl';

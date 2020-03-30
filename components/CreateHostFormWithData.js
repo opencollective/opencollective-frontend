@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
 import { Flex } from '@rebass/grid';
 
-import { compose, getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
+import { compose } from '../lib/utils';
 
 import LoadingGrid from './LoadingGrid';
 import CreateHostForm from './CreateHostForm';

@@ -37,7 +37,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
       <Content>
         <FormattedMessage
           id="CreateExpenseFAQ.isItPublicDetails"
-          defaultMessage="No. Only the expense amount and description are public. Attachments, payment info, and other private data is only visible to you and the admins."
+          defaultMessage="No. Only the expense amount and description are public. Attachments, payment info, emails and addresses are only visible to you and the admins."
         />
       </Content>
     </Entry>

@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { uniq, omit, groupBy } from 'lodash';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 
-import { formatCurrency, getCollectiveImage } from '../../lib/utils';
+import { formatCurrency } from '../../lib/utils';
+import { getCollectiveImage } from '../../lib/image-utils';
 
 import InputField from '../InputField';
 import InvoiceDownloadLink from './InvoiceDownloadLink';
@@ -76,6 +77,7 @@ class Overlay extends React.Component {
       </div>
     );
   }
+
   renderYear(year) {
     const invoices = this.props.data.allInvoices.filter(i => Number(i.year) === Number(year));
     const invoicesByHost = groupBy(invoices, 'host.slug');

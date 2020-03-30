@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 
@@ -12,7 +12,7 @@ import StyledTextarea from './StyledTextarea';
 import StyledButton from './StyledButton';
 import { H2, P } from './Text';
 import MessageBox from './MessageBox';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 const SendMessageMutation = gql`
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {

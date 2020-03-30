@@ -16,13 +16,14 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INFO: 'info', // First on purpose
   COLLECTIVE_GOALS: 'goals',
   CONNECTED_ACCOUNTS: 'connected-accounts',
+  UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
   EXPENSES: 'expenses',
   EXPORT: 'export',
   HOST: 'host',
-  IMAGES: 'images',
   MEMBERS: 'members',
   PAYMENT_METHODS: 'payment-methods',
+  TICKETS: 'tickets',
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
@@ -45,6 +46,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.connectedAccounts',
     defaultMessage: 'Connected Accounts',
   },
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: {
+    id: 'updates',
+    defaultMessage: 'Updates',
+  },
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: {
     id: 'conversations',
     defaultMessage: 'Conversations',
@@ -64,10 +69,6 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: {
     id: 'Host Plan',
     defaultMessage: 'Host Plan',
-  },
-  [EDIT_COLLECTIVE_SECTIONS.IMAGES]: {
-    id: 'editCollective.menu.images',
-    defaultMessage: 'Images',
   },
   [EDIT_COLLECTIVE_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
@@ -97,6 +98,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.webhooks',
     defaultMessage: 'Webhooks',
   },
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: {
+    id: 'editCollective.menu.tickets',
+    defaultMessage: 'Tickets',
+  },
 });
 
 const MenuItem = styled(Link)`
@@ -123,17 +128,28 @@ const isOneOfTypes = (...collectiveTypes) => ({ type }) => collectiveTypes.inclu
 const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveType(type, feature);
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: isFeatureAllowed(FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.IMAGES]: isType(CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isType(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
+  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: isOneOfTypes(
+    CollectiveType.COLLECTIVE,
+    CollectiveType.ORGANIZATION,
+    CollectiveType.USER,
+  ),
+  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: isOneOfTypes(
+    CollectiveType.COLLECTIVE,
+    CollectiveType.ORGANIZATION,
+    CollectiveType.USER,
+  ),
 };
 
 const shouldDisplaySection = (collective, section) => {
@@ -153,14 +169,19 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
     section,
   });
   const displayedSectionsInfos = displayedSections.map(getSectionInfo);
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   // eslint-disable-next-line react/prop-types
   const renderMenuItem = ({ section, label, isSelected }) => (
     <MenuItem
       key={section}
       selected={isSelected}
-      route="editCollective"
-      params={{ slug: collective.slug, section }}
+      route={isEvent ? 'editEvent' : 'editCollective'}
+      params={
+        isEvent
+          ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug, section }
+          : { slug: collective.slug, section }
+      }
       data-cy={`menu-item-${section}`}
     >
       {label}
@@ -188,6 +209,9 @@ MenuEditCollective.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
     isHost: PropTypes.bool,
+    parentCollective: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
   }).isRequired,
 };
 

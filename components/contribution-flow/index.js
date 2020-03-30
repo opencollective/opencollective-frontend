@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { debounce, findIndex, get, pick, isNil } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
@@ -16,7 +16,8 @@ import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Router } from '../../server/pages';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { compose, formatCurrency, getEnvVar, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
+import { getEnvVar } from '../../lib/env-utils';
+import { compose, formatCurrency, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
 import { getPaypal } from '../../lib/paypal';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
@@ -96,6 +97,25 @@ const messages = defineMessages({
   createOrgLabel: {
     id: 'ContributionFlow.CreateOrganizationLabel',
     defaultMessage: 'Contribute as an organization',
+  },
+});
+
+const stepsLabels = defineMessages({
+  contributeAs: {
+    id: 'contribute.step.contributeAs',
+    defaultMessage: 'Contribute as',
+  },
+  details: {
+    id: 'contribute.step.details',
+    defaultMessage: 'Details',
+  },
+  payment: {
+    id: 'contribute.step.payment',
+    defaultMessage: 'Payment info',
+  },
+  summary: {
+    id: 'contribute.step.summary',
+    defaultMessage: 'Summary',
   },
 });
 
@@ -664,7 +684,7 @@ class CreateOrderPage extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { skipStepDetails } = this.props;
+    const { skipStepDetails, intl } = this.props;
     const { stepDetails, stepPayment, stepSummary } = this.state;
     const tier = this.props.tier;
     const isFixedContribution = this.isFixedContribution();
@@ -674,7 +694,7 @@ class CreateOrderPage extends React.Component {
     const steps = [
       {
         name: 'contributeAs',
-        labelKey: 'contribute.step.contributeAs',
+        label: intl.formatMessage(stepsLabels.contributeAs),
         isCompleted: Boolean(this.state.stepProfile),
         validate: this.validateStepProfile,
       },
@@ -684,7 +704,7 @@ class CreateOrderPage extends React.Component {
     if (!skipStepDetails && (!isFixedContribution || (tier && tier.type === 'TICKET'))) {
       steps.push({
         name: 'details',
-        labelKey: 'contribute.step.details',
+        label: intl.formatMessage(stepsLabels.details),
         isCompleted: Boolean(stepDetails && stepDetails.totalAmount >= minAmount),
         validate: () => {
           return stepDetails && reportValidityHTML5(this.activeFormRef.current);
@@ -696,7 +716,7 @@ class CreateOrderPage extends React.Component {
     if (!(minAmount === 0 && isFixedContribution)) {
       steps.push({
         name: 'payment',
-        labelKey: 'contribute.step.payment',
+        label: intl.formatMessage(stepsLabels.payment),
         isCompleted: Boolean(noPaymentRequired || stepPayment),
         validate: this.validateStepPayment,
       });
@@ -706,7 +726,7 @@ class CreateOrderPage extends React.Component {
     if (this.taxesMayApply()) {
       steps.push({
         name: 'summary',
-        labelKey: 'contribute.step.summary',
+        label: intl.formatMessage(stepsLabels.summary),
         isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
       });
     }

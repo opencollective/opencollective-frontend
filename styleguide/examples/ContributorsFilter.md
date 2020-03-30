@@ -1,4 +1,4 @@
 ```jsx
-initialState = { selected: 'ALL' };
-<ContributorsFilter selected={state.selected} onChange={selected => setState({ selected })} />;
+const [selected, setSelected] = React.useState('ALL');
+<ContributorsFilter selected={selected} onChange={setSelected} />;
 ```

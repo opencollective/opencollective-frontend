@@ -8,6 +8,7 @@ import { Router } from '../server/pages';
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
 
+import { ERROR } from '../lib/errors';
 import Header from './Header';
 import Body from './Body';
 import Footer from './Footer';
@@ -20,33 +21,14 @@ import StyledLink from './StyledLink';
 import MessageBox from './MessageBox';
 import { withUser } from './UserProvider';
 
-const ErrorTypes = {
-  NOT_FOUND: 'NOT_FOUND',
-  BAD_COLLECTIVE_TYPE: 'BAD_COLLECTIVE_TYPE',
-};
-
-/** Error generators to be passed with the `error` prop of `ErrorPage` */
-export const generateError = {
-  /**
-   * Generate a error for when an entity is not found. If a search term is provided, it will
-   * be used to show a button to propose user to search the item.
-   * */
-  notFound: searchTerm => {
-    return { type: ErrorTypes.NOT_FOUND, payload: { searchTerm } };
-  },
-  badCollectiveType: () => {
-    return { type: ErrorTypes.BAD_COLLECTIVE_TYPE };
-  },
-};
-
 /**
  * A flexible error page
  */
 class ErrorPage extends React.Component {
   static propTypes = {
-    /** Customize the error type. Check `generateError.*` functions for more info */
+    /** Customize the error type. Check `createError.*` functions for more info */
     error: PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(ErrorTypes)),
+      type: PropTypes.oneOf(Object.values(ERROR)),
       payload: PropTypes.object,
     }),
     /** If true, a loading indicator will be displayed instad of an error */
@@ -55,9 +37,9 @@ class ErrorPage extends React.Component {
     log: PropTypes.bool,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
-    /** @deprecated please generate errors with the `generateError` helper  */
+    /** @deprecated please generate errors with the `createError` helper  */
     message: PropTypes.string,
-    /** @deprecated please generate errors with the `generateError` helper */
+    /** @deprecated please generate errors with the `createError` helper */
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
   };
 
@@ -81,9 +63,9 @@ class ErrorPage extends React.Component {
 
     if (error) {
       switch (error.type) {
-        case ErrorTypes.NOT_FOUND:
+        case ERROR.NOT_FOUND:
           return <NotFound searchTerm={get(error.payload, 'searchTerm')} />;
-        case ErrorTypes.BAD_COLLECTIVE_TYPE:
+        case ERROR.BAD_COLLECTIVE_TYPE:
           return this.renderErrorMessage(
             <FormattedMessage id="Error.BadCollectiveType" defaultMessage="This profile type is not supported" />,
           );

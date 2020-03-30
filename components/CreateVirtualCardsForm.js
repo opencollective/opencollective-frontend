@@ -5,7 +5,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get, truncate } from 'lodash';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import moment from 'moment';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
@@ -207,9 +207,7 @@ class CreateVirtualCardsForm extends Component {
         numberOfVirtualCards: 1,
         limitedToHosts: [],
         limitedToCollectives: [],
-        expiryDate: moment()
-          .add(12, 'months')
-          .format('YYYY-MM-DD'),
+        expiryDate: moment().add(12, 'months').format('YYYY-MM-DD'),
       },
       errors: { emails: [] },
       multiEmailsInitialState: null,
@@ -511,9 +509,7 @@ class CreateVirtualCardsForm extends Component {
               onChange={e => this.onChange('expiryDate', e.target.value)}
               type="date"
               required
-              min={moment()
-                .add(1, 'day')
-                .format('YYYY-MM-DD')}
+              min={moment().add(1, 'day').format('YYYY-MM-DD')}
             />
           </InlineField>
 

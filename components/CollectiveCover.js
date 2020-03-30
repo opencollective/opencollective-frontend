@@ -11,7 +11,8 @@ import momentTimezone from 'moment-timezone';
 import moment from 'moment';
 import { get } from 'lodash';
 import { withUser } from './UserProvider';
-import { prettyUrl, imagePreview } from '../lib/utils';
+import { prettyUrl } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import Currency from './Currency';
 import Avatar from './Avatar';
 import Logo from './Logo';
@@ -152,11 +153,8 @@ class CollectiveCover extends React.Component {
                 />
                 , &nbsp;
                 <FormattedTime value={props.collective.endsAt} timeZone={props.collective.timezone} />
-                &nbsp;{' '}
-                {moment()
-                  .tz(props.collective.timezone)
-                  .zoneAbbr()}{' '}
-                (<FormattedMessage id="EventCover.EventTime" defaultMessage="Event Time" />)
+                &nbsp; {moment().tz(props.collective.timezone).zoneAbbr()} (
+                <FormattedMessage id="EventCover.EventTime" defaultMessage="Event Time" />)
               </React.Fragment>
             )}
             <br />
@@ -189,11 +187,8 @@ class CollectiveCover extends React.Component {
                     />
                     , &nbsp;
                     <FormattedTime value={props.collective.endsAt} timeZone={momentTimezone.tz.guess()} />
-                    &nbsp;{' '}
-                    {moment()
-                      .tz(momentTimezone.tz.guess())
-                      .zoneAbbr()}{' '}
-                    (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
+                    &nbsp; {moment().tz(momentTimezone.tz.guess()).zoneAbbr()} (
+                    <FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
                   </React.Fragment>
                 )}
                 <br />
@@ -229,12 +224,8 @@ ${description}`;
 
   checkTimeDiff() {
     if (this.props.collective.timezone) {
-      const eventTimezone = moment()
-        .tz(this.props.collective.timezone)
-        .format('Z');
-      const browserTimezone = moment()
-        .tz(momentTimezone.tz.guess())
-        .format('Z');
+      const eventTimezone = moment().tz(this.props.collective.timezone).format('Z');
+      const browserTimezone = moment().tz(momentTimezone.tz.guess()).format('Z');
       return eventTimezone !== browserTimezone;
     }
   }

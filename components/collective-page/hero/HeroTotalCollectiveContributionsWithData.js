@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import { get } from 'lodash';
 import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';

@@ -185,7 +185,7 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
           <div data-cy="expense-summary-attachments">
             {expense.attachments.map((attachment, idx) => (
               <React.Fragment key={attachment.id}>
-                <Flex justifyContent="space-between" my={24}>
+                <Flex justifyContent="space-between" alignItems="center" my={24}>
                   {expense.type === expenseTypes.RECEIPT ? (
                     <Flex>
                       {attachment.url ? (

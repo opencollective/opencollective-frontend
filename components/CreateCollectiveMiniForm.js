@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
 import { get, pick } from 'lodash';
-import { useMutation } from 'react-apollo';
+import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useForm } from 'react-hook-form';
 
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { H5 } from './Text';
@@ -23,8 +23,8 @@ const CreateNewMessages = defineMessages({
     defaultMessage: 'Create new Collective',
   },
   [CollectiveType.USER]: {
-    id: 'User.CreateNew',
-    defaultMessage: 'Create new user',
+    id: 'User.InviteNew',
+    defaultMessage: 'Invite new user',
   },
   [CollectiveType.EVENT]: {
     id: 'Event.CreateNew',

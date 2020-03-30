@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box, Flex } from '@rebass/grid';
 
+import I18nFormatters from '../I18nFormatters';
 import StyledInputField from '../StyledInputField';
 import StyledCard from '../StyledCard';
 import StyledRadioList from '../StyledRadioList';
@@ -73,27 +74,17 @@ const TabEndLines = styled(Span)`
 const messages = defineMessages({
   'tabs.singleCollectiveWithAccount': {
     id: 'tabs.singleCollectiveWithAccount',
-    defaultMessage: 'A single Collective and I DO',
-  },
-  'tabs.singleCollectiveWithAccount.description': {
-    id: 'tabs.singleCollectiveWithAccount.description',
-    defaultMessage: 'have a bank account to receive money for my community',
+    defaultMessage:
+      '<strong>A single Collective and I DO</strong> have a bank account to receive money for my community',
   },
   'tabs.singleCollectiveWithoutAccount': {
     id: 'tabs.singleCollectiveWithoutAccount',
-    defaultMessage: 'A single Collective and I DON’T',
-  },
-  'tabs.singleCollectiveWithoutAccount.description': {
-    id: 'tabs.singleCollectiveWithoutAccount.description',
-    defaultMessage: 'have a bank account to receive money for my community',
+    defaultMessage:
+      '<strong>A single Collective and I DON’T</strong> have a bank account to receive money for my community',
   },
   'tabs.organization': {
     id: 'tabs.organization',
-    defaultMessage: 'An organization',
-  },
-  'tabs.organization.description': {
-    id: 'tabs.organization.description',
-    defaultMessage: 'to host multiple Collectives ',
+    defaultMessage: '<strong>An organization</strong> to host multiple Collectives',
   },
 });
 
@@ -140,24 +131,25 @@ const PricingTabs = ({ onChange, activeTab }) => {
                       p={3}
                       borderBottom="1px solid"
                       borderColor="black.300"
+                      fontSize="13px"
+                      lineHeight="19px"
+                      fontWeight="normal"
+                      color="black.600"
                     >
                       <Box as="span" mr={3}>
                         {radio}
                       </Box>
-                      <Box as="div" display="flex" flexDirection="column">
-                        <Span fontSize="13px" lineHeight="19px" letterSpacing="-0.008em">
-                          {intl.formatMessage(messages[`tabs.${value}`])}...
-                        </Span>
-                        <Span
-                          color="black.600"
-                          fontSize="13px"
-                          fontWeight="300"
-                          lineHeight="19px"
-                          letterSpacing="-0.012em"
-                        >
-                          {intl.formatMessage(messages[`tabs.${value}.description`])}
-                        </Span>
-                      </Box>
+                      <Flex flexDirection="column">
+                        {intl.formatMessage(messages[`tabs.${value}`], {
+                          strong: function StrongTitle(msg) {
+                            return (
+                              <Span fontWeight="bold" color="black.800" letterSpacing="-0.008em">
+                                {msg}...
+                              </Span>
+                            );
+                          },
+                        })}
+                      </Flex>
                     </Container>
                   )}
                 </StyledRadioList>
@@ -178,8 +170,7 @@ const PricingTabs = ({ onChange, activeTab }) => {
           {tabs.map(tab => {
             return (
               <TabBox as="button" key={tab} active={tab === activeTab} onClick={() => onChange(tab)}>
-                <Span fontWeight="bold">{intl.formatMessage(messages[`tabs.${tab}`])}</Span>{' '}
-                <Span>{intl.formatMessage(messages[`tabs.${tab}.description`])}</Span>
+                <Span letterSpacing="-0.4px">{intl.formatMessage(messages[`tabs.${tab}`], I18nFormatters)}</Span>
               </TabBox>
             );
           })}

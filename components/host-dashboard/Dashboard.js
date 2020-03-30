@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
@@ -212,7 +212,7 @@ const getDataQuery = gql`
       name
       isHost
       currency
-      paymentMethods(includeOrganizationCollectivePaymentMethod: true) {
+      paymentMethods(includeHostCollectivePaymentMethod: true) {
         id
         uuid
         service
