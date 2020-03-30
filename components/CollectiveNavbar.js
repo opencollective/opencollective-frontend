@@ -42,7 +42,7 @@ const MenuLink = styled.a`
   letter-spacing: -0.2px;
   text-decoration: none;
   white-space: nowrap;
-  padding: 8px 16px 16px;
+  padding: 12px 16px 16px;
 
   &:focus {
     color: ${themeGet('colors.primary.700')};
