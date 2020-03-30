@@ -160,9 +160,17 @@ const PledgedCollectivePage = ({ collective }) => {
         </P>
       </Container>
 
-      <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3}>
+      <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3} data-cy="contributersGrouped">
         {pledges.map((pledge, index) => (
-          <Container width={[0.5, null, 0.25]} mb={2} position="relative" px={1} minWidth={160} key={pledge.id}>
+          <Container
+            width={[0.5, null, 0.25]}
+            mb={2}
+            position="relative"
+            px={1}
+            minWidth={160}
+            key={pledge.id}
+            data-cy="contributers"
+          >
             {index === 0 && (
               <Container position="absolute" right={15} top={-10}>
                 <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />

@@ -326,7 +326,13 @@ class CreatePledgePage extends React.Component {
               )}
 
               {!loadingLoggedInUser && !LoggedInUser && (
-                <P mt={[5, null, 4]} color="black.700" fontSize="LeadParagraph" lineHeight="LeadParagraph">
+                <P
+                  mt={[5, null, 4]}
+                  color="black.700"
+                  fontSize="LeadParagraph"
+                  lineHeight="LeadParagraph"
+                  data-cy="signupOrLogin"
+                >
                   <FormattedMessage
                     id="createPledge.signinToCreate"
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
@@ -506,7 +512,7 @@ class CreatePledgePage extends React.Component {
                 </Container>
 
                 <Container float={['none', null, 'right']} px={[3, null, 5]} order={3} mt={5} width={[1, null, 0.5]}>
-                  <H5 textAlign="left" fontWeight="normal" mb={2}>
+                  <H5 textAlign="left" fontWeight="normal" mb={2} data-cy="amountPledgedTotal">
                     <Currency
                       fontWeight="bold"
                       value={pledgeStats.total}
