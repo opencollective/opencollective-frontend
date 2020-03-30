@@ -16,7 +16,7 @@ describe('Pledges', () => {
 
     it('join an existing pledge individual pledge', () => {
       cy.visit('/opencollective');
-      var value1 = '';
+      let value1 = '';
       cy.get('[data-cy="currencyAmount"]', { timeout: 600000 }).then($val => {
         value1 = $val.text();
       });
@@ -27,7 +27,7 @@ describe('Pledges', () => {
       cy.get('[data-cy="currencyAmount"]', { timeout: 600000 }).should('contain', '$');
       cy.reload();
       cy.get('[data-cy="currencyAmount"]', { timeout: 600000 }).then($val => {
-        var value2 = $val.text();
+        const value2 = $val.text();
         expect(value1).not.to.eq(value2);
       });
     });
