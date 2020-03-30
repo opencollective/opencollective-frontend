@@ -93,6 +93,7 @@ const SectionBudget = ({ collective, stats }) => {
                         my={2}
                         minWidth={290}
                         width="100%"
+                        fontSize="Paragraph"
                         py="10px"
                       >
                         <FormattedMessage
@@ -110,6 +111,7 @@ const SectionBudget = ({ collective, stats }) => {
                         my={2}
                         minWidth={290}
                         width="100%"
+                        fontSize="Paragraph"
                         py="10px"
                       >
                         <FormattedMessage

@@ -229,7 +229,14 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton data-cy="view-all-updates-btn" buttonSize="large" mt={4} width={1} p="10px">
+            <StyledButton
+              data-cy="view-all-updates-btn"
+              buttonSize="large"
+              mt={4}
+              width={1}
+              p="10px"
+              fontSize="Paragraph"
+            >
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>
