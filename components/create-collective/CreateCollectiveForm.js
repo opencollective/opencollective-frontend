@@ -215,14 +215,15 @@ class CreateCollectiveForm extends React.Component {
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
                 const { values, handleSubmit, errors, touched, setFieldValue } = formik;
-                const suggestedSlug = () => {
+
+                const suggestedSlug = value => {
                   const slugOptions = {
                     replacement: '-',
                     lower: true,
                     strict: true,
                   };
 
-                  return slugify(values.name, slugOptions);
+                  return slugify(value, slugOptions);
                 };
 
                 const handleSlugChange = e => {
