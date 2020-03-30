@@ -380,8 +380,7 @@ class CreatePledgePage extends React.Component {
                           <P {...labelStyles} htmlFor="name">
                             <FormattedMessage id="Fields.name" defaultMessage="Name" />
                           </P>
-                          {/* <TextInput name="name" id="name" defaultValue={name} /> */}
-                          <StyledInputGroup data-cy="name" id="name" name="name" defaultValue={name} />
+                          <TextInput data-cy="nameInput" name="name" id="name" defaultValue={name} />
                         </Flex>
 
                         <Flex flexDirection="column" mb={3}>
@@ -393,7 +392,7 @@ class CreatePledgePage extends React.Component {
                             id="slug"
                             name="slug"
                             defaultValue={slugify(name || '').toLowerCase()}
-                            data-cy="slug"
+                            data-cy="slugInput"
                           />
                         </Flex>
                       </Flex>
@@ -411,7 +410,7 @@ class CreatePledgePage extends React.Component {
                           name="githubHandle"
                           placeholder="i.e. babel/babel"
                           defaultValue={githubHandle || ''}
-                          data-cy="githubHandle"
+                          data-cy="githubHandleInput"
                         />
                       </Flex>
                     </Box>

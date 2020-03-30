@@ -109,7 +109,7 @@ const PledgedCollectivePage = ({ collective }) => {
 
       <Container display="flex" justifyContent="center" position="relative" top={-30}>
         <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
-          <StyledLink buttonStyle="primary" buttonSize="large">
+          <StyledLink buttonStyle="primary" buttonSize="large" data-cy="makeAPledgeButton">
             <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
           </StyledLink>
         </Link>
@@ -135,7 +135,13 @@ const PledgedCollectivePage = ({ collective }) => {
               totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
               currency: collective.currency,
               amount: (
-                <Currency fontWeight="bold" value={pledgeStats.total} currency={collective.currency} precision={0} />
+                <Currency
+                  data-cy="currencyAmount"
+                  fontWeight="bold"
+                  value={pledgeStats.total}
+                  currency={collective.currency}
+                  precision={0}
+                />
               ),
             }}
             defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
