@@ -407,6 +407,8 @@ const CollectiveNavbar = ({
               flexDirection={['column', null, 'row']}
               height="100%"
               borderBottom={['1px solid #e6e8eb', 'none']}
+              backgroundColor="#fff"
+              zIndex={1}
             >
               {sections.map(section => (
                 <MenuLinkContainer
