@@ -37,28 +37,35 @@ const CollectiveCallsToAction = ({
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
         <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
+          <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="Contact" defaultMessage="Contact" />
           </StyledButton>
         </Link>
       )}
       {hasSubmitExpense && (
         <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} buttonStyle="secondary" data-cy="submit-expense-btn">
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            buttonStyle="secondary"
+            data-cy="submit-expense-btn"
+          >
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </StyledButton>
         </Link>
       )}
       {hasManageSubscriptions && (
         <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
+          <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
           </StyledButton>
         </Link>
       )}
       {hasDashboard && collective.plan.hostDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
+          <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
           </StyledButton>
         </Link>
@@ -90,7 +97,13 @@ const CollectiveCallsToAction = ({
       )}
       {addFunds && (
         <Fragment>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} onClick={() => showAddFundsModal(true)}>
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            onClick={() => showAddFundsModal(true)}
+          >
             <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
           </StyledButton>
           <AddFundsModal collective={collective} show={hasAddFundsModal} setShow={showAddFundsModal} />
