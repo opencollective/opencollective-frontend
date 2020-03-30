@@ -9,7 +9,7 @@ import { Span } from './Text';
  */
 const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
   return (
-    <Flex data-cy="filters" css={{ overflowX: 'auto' }} {...flexProps}>
+    <Flex data-cy="filters" py={1} css={{ overflowX: 'auto' }} {...flexProps}>
       {filters.map((filter, idx) => {
         const isSelected = filter === selected;
         return (

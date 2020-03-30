@@ -311,7 +311,7 @@ class SectionContribute extends React.PureComponent {
             {!isEvent && (
               <ContainerSectionContent>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-                  <StyledButton buttonSize="large" mt={3} width={1} p="10px">
+                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="Paragraph">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
                   </StyledButton>
                 </Link>
