@@ -22,7 +22,7 @@ import { withStripeLoader } from '../StripeProvider';
 import NewCreditCardForm from '../NewCreditCardForm';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 import MessageBox from '../MessageBox';
-import EditReceivingMoney from './EditReceivingMoney';
+import EditReceivingSendingMoney from './EditReceivingSendingMoney';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -283,7 +283,7 @@ class EditPaymentMethods extends React.Component {
             <H2>
               <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />
             </H2>
-            <EditReceivingMoney
+            <EditReceivingSendingMoney
               collective={this.props.collective}
               connectedAccounts={this.props.collective.connectedAccounts}
               sendingMoney={false}

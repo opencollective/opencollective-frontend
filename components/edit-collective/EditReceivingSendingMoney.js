@@ -5,7 +5,7 @@ import { capitalize } from '../../lib/utils';
 import EditConnectedAccount from '../EditConnectedAccount';
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 
-const EditReceivingMoney = props => {
+const EditReceivingSendingMoney = props => {
   const services = [];
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
   if (!props.sendingMoney && (props.collective.type === 'USER' || props.collective.type === 'ORGANIZATION')) {
@@ -31,11 +31,11 @@ const EditReceivingMoney = props => {
   );
 };
 
-EditReceivingMoney.propTypes = {
+EditReceivingSendingMoney.propTypes = {
   collective: PropTypes.object.isRequired,
   connectedAccounts: PropTypes.arrayOf(PropTypes.object),
   editMode: PropTypes.bool,
   sendingMoney: PropTypes.bool,
 };
 
-export default EditReceivingMoney;
+export default EditReceivingSendingMoney;

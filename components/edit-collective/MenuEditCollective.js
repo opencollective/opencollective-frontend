@@ -33,7 +33,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INVOICES: 'invoices',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
-  FISCALHOSTING: 'fiscalhosting',
+  FISCAL_HOSTING: 'fiscal-hosting',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -62,8 +62,8 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Export',
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
-    id: 'editCollective.menu.expenses',
-    defaultMessage: 'Expenses Policy',
+    id: 'editCollective.menu.sexpenses',
+    defaultMessage: 'Expenses & Payouts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
@@ -89,7 +89,7 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.sendingMoney',
     defaultMessage: 'Sending Money',
   },
-  [EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING]: {
+  [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: {
     id: 'editCollective.menu.fiscalHosting',
     defaultMessage: 'Fiscal Hosting',
   },
@@ -152,7 +152,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
@@ -212,13 +212,13 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
       {isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION) && (
         <React.Fragment>
           <MenuDivider />
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING))}
         </React.Fragment>
       )}
       {collective.isHost && (
         <React.Fragment>
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}

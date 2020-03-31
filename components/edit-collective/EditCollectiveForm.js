@@ -44,7 +44,7 @@ import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
 import EditCollectiveUpdates from './EditCollectiveUpdates';
 import EditHostSettings from './EditHostSettings';
-import EditReceivingMoney from './EditReceivingMoney';
+import EditReceivingSendingMoney from './EditReceivingSendingMoney';
 
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
 
@@ -136,8 +136,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Short description',
       },
       'expensePolicy.label': {
-        id: 'editCollective.menu.expenses',
-        defaultMessage: 'Expenses Policy',
+        id: 'editCollective.menus.expenses',
+        defaultMessage: 'Expenses & Payouts',
       },
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
@@ -442,7 +442,7 @@ class EditCollectiveForm extends React.Component {
       return <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.EXPORT) {
       return <ExportData collective={collective} />;
-    } else if (section === EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING) {
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING) {
       return (
         <Box>
           {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
@@ -465,7 +465,7 @@ class EditCollectiveForm extends React.Component {
                   defaultMessage={'Paypal is activated by default.'}
                 />
               </P>
-              <EditReceivingMoney
+              <EditReceivingSendingMoney
                 collective={collective}
                 connectedAccounts={collective.connectedAccounts}
                 sendingMoney={true}
@@ -718,7 +718,7 @@ class EditCollectiveForm extends React.Component {
           type: 'textarea',
         },
       ],
-      fiscalhosting: [
+      'fiscal-hosting': [
         {
           name: 'application',
           className: 'horizontal',
@@ -835,74 +835,82 @@ class EditCollectiveForm extends React.Component {
         <Flex flexWrap="wrap">
           <MenuEditCollective collective={collective} selectedSection={this.getMenuSelectedSection()} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
-            {this.renderSection(this.state.section)}
-            <div className="FormInputs">
-              {Object.keys(this.fields).map(
-                section =>
-                  this.state.section === section && (
-                    <div className="inputs" key={section}>
-                      {this.fields[section].map(
-                        field =>
-                          (!field.when || field.when()) && (
-                            <InputField
-                              key={field.name}
-                              className={field.className}
-                              defaultValue={this.getFieldDefaultValue(field)}
-                              validate={field.validate}
-                              ref={field.name}
-                              name={field.name}
-                              label={field.label}
-                              description={field.description}
-                              options={field.options}
-                              placeholder={field.placeholder}
-                              type={field.type}
-                              pre={field.pre}
-                              post={field.post}
-                              context={this.state.collective}
-                              onChange={value => this.handleChange(field.name, value)}
-                            />
-                          ),
-                      )}
-                    </div>
-                  ),
-              )}
-            </div>
-
-            {[
-              EDIT_COLLECTIVE_SECTIONS.ADVANCED,
-              EDIT_COLLECTIVE_SECTIONS.EXPENSES,
-              EDIT_COLLECTIVE_SECTIONS.INFO,
-              EDIT_COLLECTIVE_SECTIONS.TIERS,
-              EDIT_COLLECTIVE_SECTIONS.FISCALHOSTING,
-              EDIT_COLLECTIVE_SECTIONS.TICKETS,
-            ].includes(this.state.section) && (
-              <div className="actions">
-                <Button
-                  bsStyle="primary"
-                  type="submit"
-                  onClick={this.handleSubmit}
-                  disabled={status === 'loading' || !this.state.modified}
-                >
-                  {submitBtnLabel}
-                </Button>
-                <div className="backToProfile">
-                  <Link
-                    route={isEvent ? 'event' : 'collective'}
-                    params={
-                      isEvent
-                        ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
-                        : { slug: collective.slug }
-                    }
-                  >
-                    <FormattedMessage
-                      id="collective.edit.backToProfile"
-                      defaultMessage="view {type} page"
-                      values={{ type }}
-                    />
-                  </Link>
-                </div>
+            {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
+            {collective.isHost && (
+              <div className="FormInputs">
+                {Object.keys(this.fields).map(
+                  section =>
+                    this.state.section === section && (
+                      <div className="inputs" key={section}>
+                        {this.fields[section].map(
+                          field =>
+                            (!field.when || field.when()) && (
+                              <InputField
+                                key={field.name}
+                                className={field.className}
+                                defaultValue={this.getFieldDefaultValue(field)}
+                                validate={field.validate}
+                                ref={field.name}
+                                name={field.name}
+                                label={field.label}
+                                description={field.description}
+                                options={field.options}
+                                placeholder={field.placeholder}
+                                type={field.type}
+                                pre={field.pre}
+                                post={field.post}
+                                context={this.state.collective}
+                                onChange={value => this.handleChange(field.name, value)}
+                              />
+                            ),
+                        )}
+                      </div>
+                    ),
+                )}
               </div>
             )}
+
+            {collective.isHost &&
+              [
+                EDIT_COLLECTIVE_SECTIONS.ADVANCED,
+                EDIT_COLLECTIVE_SECTIONS.EXPENSES,
+                EDIT_COLLECTIVE_SECTIONS.INFO,
+                EDIT_COLLECTIVE_SECTIONS.TIERS,
+                EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING,
+                EDIT_COLLECTIVE_SECTIONS.TICKETS,
+              ].includes(this.state.section) && (
+                <div className="actions">
+                  {collective.isHost && (
+                    <Button
+                      bsStyle="primary"
+                      type="submit"
+                      onClick={this.handleSubmit}
+                      disabled={status === 'loading' || !this.state.modified}
+                    >
+                      {submitBtnLabel}
+                    </Button>
+                  )}
+                  {collective.isHost && (
+                    <div className="backToProfile">
+                      <Link
+                        route={isEvent ? 'event' : 'collective'}
+                        params={
+                          isEvent
+                            ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                            : { slug: collective.slug }
+                        }
+                      >
+                        <FormattedMessage
+                          id="collective.edit.backToProfile"
+                          defaultMessage="view {type} page"
+                          values={{ type }}
+                        />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
           </Flex>
         </Flex>
       </div>
