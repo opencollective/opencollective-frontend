@@ -280,7 +280,7 @@ class ConnectGithub extends React.Component {
                 <P mb={3}>
                   <FormattedMessage
                     id="createcollective.opensource.p2"
-                    defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on Github or meet our {criterialink}."
+                    defaultMessage="We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need at least 100 stars on GitHub or meet our {criterialink}."
                     values={{
                       osclink: (
                         <ExternalLink href="https://opencollective.com/opensource" openInNewTab>
