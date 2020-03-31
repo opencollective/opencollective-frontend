@@ -82,6 +82,10 @@ class CreateCollectiveForm extends React.Component {
         id: 'createCollective.form.descriptionLabel',
         defaultMessage: 'What does your collective do?',
       },
+      descriptionHint: {
+        id: 'createCollective.form.descriptionHint',
+        defaultMessage: 'Write a short description of your Collective (150 characters max)',
+      },
       createButton: {
         id: 'collective.create.button',
         defaultMessage: 'Create Collective',
@@ -227,7 +231,9 @@ class CreateCollectiveForm extends React.Component {
                 };
 
                 const handleSlugChange = e => {
-                  if (!touched.slug) setFieldValue('slug', suggestedSlug(e.target.value));
+                  if (!touched.slug) {
+                    setFieldValue('slug', suggestedSlug(e.target.value));
+                  }
                 };
 
                 return (
@@ -252,7 +258,8 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.slugLabel)}
                       value={values.slug}
                       required
-                      my={3}
+                      mt={3}
+                      mb={2}
                     >
                       {inputProps => (
                         <Field
@@ -267,9 +274,7 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
                     {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny" ml={150}>
-                        {intl.formatMessage(this.messages.suggestedLabel)}
-                      </P>
+                      <P fontSize="Tiny">{intl.formatMessage(this.messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
                       name="description"
@@ -279,7 +284,7 @@ class CreateCollectiveForm extends React.Component {
                       value={values.description}
                       required
                       mt={3}
-                      mb={4}
+                      mb={2}
                     >
                       {inputProps => (
                         <Field
@@ -289,6 +294,7 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
+                    <P fontSize="SmallCaption">{intl.formatMessage(this.messages.descriptionHint)}</P>
 
                     <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox

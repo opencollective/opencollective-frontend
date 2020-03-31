@@ -60,11 +60,6 @@ class CollectiveCategoryPicker extends React.Component {
       },
       climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
       covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
-      waivefees: {
-        id: 'createCollective.waivefees',
-        defaultMessage:
-          'We are waiving our platform fees on COVID-19 related Collectives until the end of June. Take care of each other.',
-      },
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       examples: { id: 'createCollective.examples', defaultMessage: 'See examples' },
     });
