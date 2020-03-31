@@ -15,6 +15,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Currency } from '../../lib/constants/currency';
+import { capitalize } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
@@ -452,20 +453,25 @@ class EditCollectiveForm extends React.Component {
     } else if (section === EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY) {
       return (
         <Flex mt={3} flexDirection="column">
-          <H2>
-            <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'Paypal'} />
-          </H2>
-          <P>
-            <FormattedMessage
-              id="collective.sendMoney.description"
-              defaultMessage={'Paypal is activated by default.'}
-            />
-          </P>
-          <EditReceivingMoney
-            collective={collective}
-            connectedAccounts={collective.connectedAccounts}
-            sendingMoney={true}
-          />
+          <H2>{capitalize('Sending Money')}</H2>
+          <Box>
+            <Container fontSize="Caption" mt={2}>
+              <H2>
+                <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'Paypal'} />
+              </H2>
+              <P>
+                <FormattedMessage
+                  id="collective.sendMoney.description"
+                  defaultMessage={'Paypal is activated by default.'}
+                />
+              </P>
+              <EditReceivingMoney
+                collective={collective}
+                connectedAccounts={collective.connectedAccounts}
+                sendingMoney={true}
+              />
+            </Container>
+          </Box>
         </Flex>
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY) {
