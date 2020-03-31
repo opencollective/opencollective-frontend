@@ -10,7 +10,6 @@ describe('Pledges', () => {
       cy.get('[data-cy=githubHandleInput]').clear().type('opencollective/opencollective-frontend');
       cy.get('[id=publicMessage]').clear().type('publicMessage');
       cy.get('[data-cy="submit"]').click();
-      cy.get('[data-cy="pledgeStats"]', { timeout: 600000 }).contains('$');
       cy.get('[data-cy="currencyAmount"]', { timeout: 600000 }).should('contain', '$');
     });
 
@@ -23,7 +22,6 @@ describe('Pledges', () => {
       cy.get('[data-cy=makeAPledgeButton]').click();
       cy.get('[data-cy=publicMessage]').clear().type('publicMessage');
       cy.get('[data-cy="submit"]').click();
-      cy.get('[data-cy="pledgeStats"]', { timeout: 600000 }).contains('$');
       cy.get('[data-cy="currencyAmount"]', { timeout: 600000 }).should('contain', '$');
       cy.reload();
       cy.get('[data-cy="currencyAmount"]', { timeout: 600000 }).then($val => {
