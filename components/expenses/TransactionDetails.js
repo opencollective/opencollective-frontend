@@ -49,6 +49,7 @@ class TransactionDetails extends React.Component {
     intl: PropTypes.object.isRequired,
     mode: PropTypes.string, // open or closed
     fromCollective: PropTypes.object,
+    createdAt: PropTypes.string,
   };
 
   constructor(props) {
@@ -174,6 +175,7 @@ class TransactionDetails extends React.Component {
       isRefund,
       uuid,
       expense,
+      createdAt,
     } = this.props;
 
     const amountDetailsStr = this.formatAmountDetails();
@@ -271,7 +273,12 @@ class TransactionDetails extends React.Component {
                   <FormattedMessage id="actions.download" defaultMessage="Download" />
                 </ExternalLink>
               ) : (
-                <InvoiceDownloadLink type="transaction" transactionUuid={uuid}>
+                <InvoiceDownloadLink
+                  type="transaction"
+                  transactionUuid={uuid}
+                  recipient={recipient.name}
+                  createdAt={createdAt}
+                >
                   {({ loading, download }) => (
                     <a onClick={download}>
                       {loading ? (
