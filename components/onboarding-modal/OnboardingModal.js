@@ -355,6 +355,7 @@ class OnboardingModal extends React.Component {
                   this.submitCollectiveInfo(values);
                 }}
                 validate={this.validateFormik}
+                validateOnBlur={true}
               >
                 {({ values, handleSubmit, errors, touched }) => (
                   <FormWithStyles>
