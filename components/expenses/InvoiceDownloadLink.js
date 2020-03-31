@@ -63,7 +63,6 @@ export default class InvoiceDownloadLink extends Component {
 
     this.setState({ loading: true });
     const invoiceUrl = this.getInvoiceUrl();
-    console.log(invoiceUrl);
     const getParams = { format: 'blob', allowExternal: invoiceServiceURL };
     try {
       const file = await fetch(invoiceUrl, getParams);
