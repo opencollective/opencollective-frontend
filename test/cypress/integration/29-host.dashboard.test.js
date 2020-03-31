@@ -10,8 +10,7 @@ describe('host dashboard', () => {
 
     cy.get('[data-cy="host-apply-btn"]:not([disabled]):visible', { timeout: 30000 }).click();
     cy.get(`input[name="name"]`).type('Cavies United');
-    cy.get(`input[name="slug"]`).clear();
-    cy.get(`input[name="slug"]`).type(collectiveSlug);
+    cy.get(`input[name="slug"]`).type(`{selectall}${collectiveSlug}`);
     cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
     // FIXME: more precise selector such as
     // cy.get('input[name="tos"] [data-cy="custom-checkbox"]').click();

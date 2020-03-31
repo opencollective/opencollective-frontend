@@ -76,7 +76,7 @@ DismissibleMessage.propTypes = {
   /** A function to render the actual message */
   children: PropTypes.func.isRequired,
   /** A component we can display if the message was already dismissed once */
-  dismissedComponent: PropTypes.func,
+  dismissedComponent: PropTypes.object,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
 };
