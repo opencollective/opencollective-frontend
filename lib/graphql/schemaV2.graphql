@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Mar 31 2020 17:06:21 GMT+0200 (GMT+02:00)
+# timestamp: Fri Apr 03 2020 12:11:13 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -740,6 +740,11 @@ type Event implements Account {
   Returns whether this collective is approved
   """
   isApproved: Boolean
+
+  """
+  The collective hosting this event
+  """
+  parentCollective: Collective
 }
 
 """
@@ -1365,7 +1370,7 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
-  ): Expense
+  ): Expense!
 
   """
   To update an existing expense
@@ -1375,6 +1380,16 @@ type Mutation {
     Expense data
     """
     expense: ExpenseUpdateInput!
+  ): Expense!
+
+  """
+  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
+  """
+  deleteExpense(
+    """
+    Reference of the expense to delete
+    """
+    expense: ExpenseReferenceInput!
   ): Expense!
 
   """

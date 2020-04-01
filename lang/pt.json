@@ -646,6 +646,7 @@
   "expense.created": "Sua despesa foi enviada com sucesso. Agora está pendente de aprovação de um dos colaboradores centrais do coletivo. Você será notificado por e-mail assim que for aprovado. Em seguida, o organizador ({host}) procederá com o reembolso de suas despesas.",
   "expense.created.noHost": "Sua despesa foi enviada com sucesso. Agora está pendente de aprovação de um dos colaboradores centrais do coletivo. Você será notificado por e-mail assim que for aprovado.",
   "Expense.delete": "Excluir despesa",
+  "Expense.DeleteDetails": "This will permanently delete this expense and all attached comments.",
   "expense.disclaimer": "Você deve enviar um recibo ou fatura válida mostrando claramente o valor total, data, endereço oficial, e qual o motivo do pagamento.",
   "Expense.edit": "Edit expense",
   "expense.error": "erro",
