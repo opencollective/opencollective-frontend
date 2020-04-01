@@ -10,6 +10,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import StyledTooltip from '../StyledTooltip';
 import Button from '../Button';
 import Loading from '../Loading';
+import { H3 } from '../Text';
 import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
 
 const LimitsInfoCircle = styled(InfoCircle)`
@@ -115,9 +116,9 @@ const EditHostSettings = props => {
 
   return (
     <div className="ExportData">
-      <h3>
+      <H3>
         <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
-      </h3>
+      </H3>
 
       <PlanGrid>
         <Plan active={collective.plan.name === 'default'}>

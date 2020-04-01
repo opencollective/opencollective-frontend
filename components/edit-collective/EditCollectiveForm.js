@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
-import { H2, P } from '../Text';
+import { H2, H3, P } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
@@ -835,6 +835,12 @@ class EditCollectiveForm extends React.Component {
         <Flex flexWrap="wrap">
           <MenuEditCollective collective={collective} selectedSection={this.getMenuSelectedSection()} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
+              <H3>
+                {' '}
+                <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />{' '}
+              </H3>
+            )}
             {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
             {collective.isHost && (
               <div className="FormInputs">
