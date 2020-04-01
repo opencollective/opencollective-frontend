@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import Link from '../Link';
 import { isFeatureAllowedForCollectiveType, FEATURES } from '../../lib/allowed-features';
+import { Col } from 'react-bootstrap';
 
 const MenuDivider = styled.div`
   margin-top: 34px;
@@ -62,8 +63,8 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Export',
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
-    id: 'editCollective.menu.sexpenses',
-    defaultMessage: 'Expenses & Payouts',
+    id: 'editCollective.menu.expenses',
+    defaultMessage: 'Expenses Policy',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
@@ -205,11 +206,11 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
       {label}
     </MenuItem>
   );
-
+  console.log('OPTIONS ARE ', collective.type === 'COLLECTIVE');
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
-      {isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION) && (
+      {collective.type !== 'COLLECTIVE' && (
         <React.Fragment>
           <MenuDivider />
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING))}
