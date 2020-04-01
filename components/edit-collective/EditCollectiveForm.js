@@ -879,10 +879,14 @@ class EditCollectiveForm extends React.Component {
             )}
 
             {/* special coniditon to handle collective expenses */}
-            {collective.type === 'COLLECTIVE' &&
-              [EDIT_COLLECTIVE_SECTIONS.EXPENSES, EDIT_COLLECTIVE_SECTIONS.INFO].includes(this.state.section) && (
+            {(collective.type === 'COLLECTIVE' || collective.type === 'EVENT') &&
+              [
+                EDIT_COLLECTIVE_SECTIONS.EXPENSES,
+                EDIT_COLLECTIVE_SECTIONS.TIERS,
+                EDIT_COLLECTIVE_SECTIONS.INFO,
+              ].includes(this.state.section) && (
                 <div className="actions">
-                  {collective.type === 'COLLECTIVE' && (
+                  {(collective.type === 'COLLECTIVE' || collective.type === 'EVENT') && (
                     <Button
                       bsStyle="primary"
                       type="submit"
@@ -892,7 +896,7 @@ class EditCollectiveForm extends React.Component {
                       {submitBtnLabel}
                     </Button>
                   )}
-                  {collective.type === 'COLLECTIVE' && (
+                  {(collective.type === 'COLLECTIVE' || collective.type === 'EVENT') && (
                     <div className="backToProfile">
                       <Link
                         route={isEvent ? 'event' : 'collective'}
@@ -918,7 +922,6 @@ class EditCollectiveForm extends React.Component {
                 EDIT_COLLECTIVE_SECTIONS.ADVANCED,
                 EDIT_COLLECTIVE_SECTIONS.EXPENSES,
                 EDIT_COLLECTIVE_SECTIONS.INFO,
-                EDIT_COLLECTIVE_SECTIONS.TIERS,
                 EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING,
                 EDIT_COLLECTIVE_SECTIONS.TICKETS,
               ].includes(this.state.section) && (
