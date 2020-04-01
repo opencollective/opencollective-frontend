@@ -9,6 +9,7 @@ import { Flex } from '@rebass/grid';
 import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
 
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Link from '../components/Link';
@@ -197,10 +198,10 @@ class CreateOrderPage extends React.Component {
               <Loading />
             </Container>
           ) : (
-            <React.Fragment>
+            <CollectiveThemeProvider collective={data.collective}>
               <ContributionFlowCover collective={data.Collective} tier={data.Tier} />
               {this.renderPageContent()}
-            </React.Fragment>
+            </CollectiveThemeProvider>
           )}
         </Page>
       );
