@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
 import { P } from '../../Text';
 import { Link } from '../../../server/pages';
 import Container from '../../Container';
-import { HomePrimaryLink } from '../HomeLinks';
+import StyledButton from '../../StyledButton';
 import SectionTitle from '../SectionTitle';
 import Illustration from '../HomeIllustration';
+import StyledLink from '../../StyledLink';
 
 const Wrapper = styled(Container)`
   background-image: url('/static/images/home/fiscalhost-bg-sm.png');
@@ -26,7 +26,7 @@ const Wrapper = styled(Container)`
   }
 `;
 
-const JoinHostLink = styled(HomePrimaryLink)`
+const JoinHostLink = styled(StyledLink)`
   color: #fff;
   background: transparent;
   border-color: #fff;
@@ -68,33 +68,12 @@ const FiscalHost = () => (
         </Box>
         <Box my={5} display="flex" flexDirection={['column', 'row']} alignItems="center">
           <Link route="/become-a-fiscal-host" passHref>
-            <HomePrimaryLink
-              mb={[3, 0]}
-              fontSize={['Paragraph', '13px']}
-              lineHeight={['Caption', '16px']}
-              width={'197px'}
-              mr={[null, 3]}
-              border="none"
-              background="#fff"
-              color="black.700"
-              fontWeight="500"
-              css={`
-                &:hover {
-                  border-color: 1px solid #8fc7ff;
-                  background: #fff;
-                  color: ${themeGet('colors.black.700')};
-                }
-                &:visited {
-                  background: #fff;
-                  color: ${themeGet('colors.black.700')};
-                }
-              `}
-            >
+            <StyledButton mb={[3, 0]} minWidth={232} mr={[null, 3]}>
               <FormattedMessage id="home.fiscalHost.becomeHostBtn" defaultMessage="Become a fiscal host" />
-            </HomePrimaryLink>
+            </StyledButton>
           </Link>
           <Link route="/hosts" passHref>
-            <JoinHostLink buttonStyle="standard">
+            <JoinHostLink buttonStyle="standard" buttonSize="medium" minWidth={232}>
               <FormattedMessage id="home.joinHost" defaultMessage="Join a fiscal host" />
             </JoinHostLink>
           </Link>

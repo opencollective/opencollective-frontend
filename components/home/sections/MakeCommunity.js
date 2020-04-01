@@ -1,14 +1,12 @@
 import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
 
 import { P, Span, H1, H4 } from '../../Text';
-import { Link } from '../../../server/pages';
+import Link from '../../Link';
 import Illustration from '../HomeIllustration';
-import { HomePrimaryLink } from '../HomeLinks';
 import StyledButton from '../../StyledButton';
 import Modal from '../../StyledModal';
 import Container from '../../Container';
@@ -27,30 +25,6 @@ const SustainTextWrapper = styled(Span)`
     background-size: 100% 100%;
     background-position-y: 16px;
     background-position-x: -12px;
-  }
-`;
-
-const WatchVideoButtons = styled(StyledButton)`
-  padding: 15px 20px;
-  color: ${themeGet('colors.black.700')};
-  border-color: ${themeGet('colors.black.400')};
-  &:hover {
-    color: ${themeGet('colors.black.700')};
-    border-color: ${themeGet('colors.blue.300')};
-
-    .arrowIcon {
-      color: ${themeGet('colors.blue.300')};
-    }
-  }
-
-  &:focus {
-    color: ${themeGet('colors.white.full')};
-    border-color: ${themeGet('colors.white.full')};
-    background: #434566;
-
-    .arrowIcon {
-      color: ${themeGet('colors.white.full')};
-    }
   }
 `;
 
@@ -117,19 +91,19 @@ const MakeCommunity = () => {
             </P>
           </Box>
           <Box display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, null]}>
-            <Link route="create" passHref>
-              <HomePrimaryLink border="none" width="175px" my={[2, null, 0]} mr={[0, null, 3]} py="15px" px="24px">
+            <Link route="create">
+              <StyledButton minWidth={175} my={[2, null, 0]} mr={[0, null, 3]} buttonStyle="dark">
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-              </HomePrimaryLink>
+              </StyledButton>
             </Link>
-            <WatchVideoButtons onClick={() => setShowModal(true)} my={[2, null, 0]}>
-              <Span mr={2} fontSize="Paragraph" lineHeight="Caption" fontWeight="500">
+            <StyledButton onClick={() => setShowModal(true)} my={[2, null, 0]} minWidth={155}>
+              <Span mr={2}>
                 <FormattedMessage id="home.makeCommunitySection.watchVideo" defaultMessage="Watch Video" />
               </Span>
               <Span className="arrowIcon">
                 <RightArrow size="14" />
               </Span>
-            </WatchVideoButtons>
+            </StyledButton>
           </Box>
         </Flex>
         <Flex mt={5} width={[1, null, '672px']} justifyContent="center" alignItems="center">
@@ -152,14 +126,16 @@ const MakeCommunity = () => {
         width={[1, null, '670px', null, '770px']}
         onClose={() => setShowModal(false)}
       >
-        <Container
-          display="flex"
-          width={1}
-          dangerouslySetInnerHTML={{
-            __html:
-              '<iframe width="100%" height="400px" src="https://www.youtube.com/embed/IBU5fSILAe8" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />',
-          }}
-        ></Container>
+        <Container display="flex" width={1} height={400} maxWidth={712} background="black">
+          <iframe
+            width="100%"
+            height="400px"
+            src="https://www.youtube.com/embed/IBU5fSILAe8"
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </Container>
       </Modal>
     </Fragment>
   );
