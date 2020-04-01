@@ -36,7 +36,7 @@ const learningChannels = [
   {
     id: 'slack',
     name: 'Slack channel',
-    link: 'https://opencollective.slack.com',
+    link: 'https://slack.opencollective.com',
   },
 ];
 
