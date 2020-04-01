@@ -64,7 +64,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
     id: 'editCollective.menu.expenses',
-    defaultMessage: 'Expenses Policy',
+    defaultMessage: 'Expenses & Payouts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',

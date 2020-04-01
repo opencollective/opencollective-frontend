@@ -842,7 +842,9 @@ class EditCollectiveForm extends React.Component {
               </H3>
             )}
             {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
-            {collective.isHost && (
+            {(this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES ||
+              this.state.section === EDIT_COLLECTIVE_SECTIONS.INFO ||
+              collective.isHost) && (
               <div className="FormInputs">
                 {Object.keys(this.fields).map(
                   section =>
@@ -875,6 +877,41 @@ class EditCollectiveForm extends React.Component {
                 )}
               </div>
             )}
+
+            {/* special coniditon to handle collective expenses */}
+            {collective.type === 'COLLECTIVE' &&
+              [EDIT_COLLECTIVE_SECTIONS.EXPENSES, EDIT_COLLECTIVE_SECTIONS.INFO].includes(this.state.section) && (
+                <div className="actions">
+                  {collective.type === 'COLLECTIVE' && (
+                    <Button
+                      bsStyle="primary"
+                      type="submit"
+                      onClick={this.handleSubmit}
+                      disabled={status === 'loading' || !this.state.modified}
+                    >
+                      {submitBtnLabel}
+                    </Button>
+                  )}
+                  {collective.type === 'COLLECTIVE' && (
+                    <div className="backToProfile">
+                      <Link
+                        route={isEvent ? 'event' : 'collective'}
+                        params={
+                          isEvent
+                            ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                            : { slug: collective.slug }
+                        }
+                      >
+                        <FormattedMessage
+                          id="collective.edit.backToProfile"
+                          defaultMessage="view {type} page"
+                          values={{ type }}
+                        />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
 
             {collective.isHost &&
               [
