@@ -240,7 +240,6 @@ class ExpensePage extends React.Component {
                   collective={collective}
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
-                  onEdit={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
                   isDisabled={status !== PAGE_STATUS.VIEW}
                 />
               </Flex>
@@ -315,15 +314,17 @@ class ExpensePage extends React.Component {
                 </Box>
               )}
               {status === PAGE_STATUS.EDIT && (
-                <ExpenseForm
-                  collective={collective}
-                  loading={loadingLoggedInUser}
-                  expense={editedExpense}
-                  onSubmit={expense => this.setState({ editedExpense: expense, status: PAGE_STATUS.EDIT_SUMMARY })}
-                  payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
-                  onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
-                  validateOnChange
-                />
+                <Box mb={3}>
+                  <ExpenseForm
+                    collective={collective}
+                    loading={loadingLoggedInUser}
+                    expense={editedExpense}
+                    onSubmit={expense => this.setState({ editedExpense: expense, status: PAGE_STATUS.EDIT_SUMMARY })}
+                    payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                    onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
+                    validateOnChange
+                  />
+                </Box>
               )}
               {expense && (
                 <Box mb={3} pt={3}>
@@ -350,6 +351,16 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
+                <Flex mb={60}>
+                  <StyledButton
+                    buttonStyle="secondary"
+                    buttonSize="small"
+                    onClick={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
+                    disabled={status !== PAGE_STATUS.VIEW}
+                  >
+                    <FormattedMessage id="Edit" defaultMessage="Edit" />
+                  </StyledButton>
+                </Flex>
                 <H5 mb={3}>
                   <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
                 </H5>
