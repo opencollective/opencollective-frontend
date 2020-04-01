@@ -248,17 +248,20 @@ class OnboardingModal extends React.Component {
   validateFormik = values => {
     const errors = {};
 
-    if (isURL(values.website) === false) {
+    if (values.website !== '' && isURL(values.website) === false) {
       errors.website = this.props.intl.formatMessage(this.messages['websiteError']);
     }
 
     // https://github.com/shinnn/github-username-regex
-    if (matches(values.githubHandle, /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i) === false) {
+    if (
+      values.githubHandle !== '' &&
+      matches(values.githubHandle, /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i) === false
+    ) {
       errors.githubHandle = this.props.intl.formatMessage(this.messages['githubError']);
     }
 
     // https://stackoverflow.com/questions/11361044/twitter-name-validation
-    if (matches(values.twitterHandle, /^[a-zA-Z0-9_]{1,15}$/) === false) {
+    if (values.twitterHandle !== '' && matches(values.twitterHandle, /^[a-zA-Z0-9_]{1,15}$/) === false) {
       errors.twitterHandle = this.props.intl.formatMessage(this.messages['twitterError']);
     }
 
