@@ -23,14 +23,12 @@ import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
-import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
 import { H1, H5, P, Strong } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
@@ -62,7 +60,7 @@ class CreateExpensePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      refetch: PropTypes.func.isRequired,
+      refetch: PropTypes.func,
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
@@ -188,8 +186,6 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
-      } else if (!hasFeature(data.account, FEATURES.NEW_EXPENSE_FLOW)) {
-        return <PageFeatureNotSupported />;
       }
     }
 
