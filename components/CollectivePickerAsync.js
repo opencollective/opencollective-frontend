@@ -79,7 +79,7 @@ const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filte
   const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery);
   const [term, setTerm] = React.useState(null);
   const { formatMessage } = useIntl();
-  const collectives = (data && data.search && data.search.collectives) || [];
+  const collectives = term === '' ? [] : (data && data.search && data.search.collectives) || [];
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
   const placeholder = getPlaceholder(formatMessage, types);
 
