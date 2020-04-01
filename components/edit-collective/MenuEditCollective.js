@@ -7,7 +7,6 @@ import styled, { css } from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import Link from '../Link';
 import { isFeatureAllowedForCollectiveType, FEATURES } from '../../lib/allowed-features';
-import { Col } from 'react-bootstrap';
 
 const MenuDivider = styled.div`
   margin-top: 34px;
@@ -206,7 +205,7 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
       {label}
     </MenuItem>
   );
-  console.log('OPTIONS ARE ', collective.type === 'COLLECTIVE');
+
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
