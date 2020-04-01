@@ -1,5 +1,5 @@
 import { Box, Flex } from '@rebass/grid';
-import { get, omit, pick } from 'lodash';
+import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -15,7 +15,7 @@ import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
-import ExpenseForm from '../components/expenses/ExpenseForm';
+import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
@@ -30,11 +30,14 @@ import StyledLink from '../components/StyledLink';
 import { H1, H5, P, Strong } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import LinkCollective from '../components/LinkCollective';
 import DismissibleMessage from '../components/DismissibleMessage';
+import {
+  loggedInAccountExpensePayoutFieldsFragment,
+  expensePageExpenseFieldsFragment,
+} from '../components/expenses/graphql/fragments';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -133,17 +136,9 @@ class CreateExpensePage extends React.Component {
     try {
       this.setState({ isSubmitting: true, error: null });
       const { expense, tags } = this.state;
-      const attachmentFieldsToOmit = expense.type === expenseTypes.INVOICE ? ['id', 'url'] : ['id'];
       const result = await this.props.createExpense({
         account: { id: this.props.data.account.id },
-        expense: {
-          ...pick(expense, ['description', 'type', 'privateMessage']),
-          payee: pick(expense.payee, ['id']),
-          payoutMethod: pick(expense.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-          // Omit attachment's ids that were created for keying purposes
-          attachments: expense.attachments.map(a => omit(a, attachmentFieldsToOmit)),
-          tags: tags,
-        },
+        expense: { ...prepareExpenseForSubmit(expense), tags: tags },
       });
 
       const legacyExpenseId = result.data.createExpense.legacyId;
@@ -261,6 +256,7 @@ class CreateExpensePage extends React.Component {
                             onSubmit={this.onFormSubmit}
                             expense={this.state.expense}
                             payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                            autoFocusTitle
                           />
                         )}
                         {step === STEPS.SUMMARY && (
@@ -361,12 +357,6 @@ const getData = graphql(
         twitterHandle
         currency
         expensePolicy
-        payoutMethods {
-          id
-          type
-          name
-          data
-        }
         ... on Collective {
           id
           isApproved
@@ -404,41 +394,11 @@ const getData = graphql(
         }
       }
       loggedInAccount {
-        id
-        slug
-        imageUrl
-        type
-        name
-        payoutMethods {
-          id
-          type
-          name
-          data
-        }
-        adminMemberships: memberOf(role: ADMIN) {
-          nodes {
-            id
-            account {
-              id
-              slug
-              imageUrl
-              type
-              name
-              location {
-                address
-                country
-              }
-              payoutMethods {
-                id
-                type
-                name
-                data
-              }
-            }
-          }
-        }
+        ...loggedInAccountExpensePayoutFieldsFragment
       }
     }
+
+    ${loggedInAccountExpensePayoutFieldsFragment}
   `,
   {
     options: {
@@ -451,10 +411,10 @@ const withCreateExpenseMutation = graphql(
   gqlV2`
   mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
     createExpense(expense: $expense, account: $account) {
-      id
-      legacyId
+      ...expensePageExpenseFieldsFragment
     }
   }
+  ${expensePageExpenseFieldsFragment}
 `,
   {
     options: { context: API_V2_CONTEXT },

@@ -111,7 +111,7 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
                   &nbsp;&nbsp;
                   <PrivateInfoIcon color="#969BA3" />
                 </Span>
-                <P whiteSpace="pre-wrap" fontSize="Caption" color="black.600">
+                <P whiteSpace="pre-wrap" fontSize="Caption" lineHeight="SmallParagraph" color="black.600">
                   {payee.location.address}
                 </P>
               </React.Fragment>
@@ -249,8 +249,8 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
       )}
       <StyledHr borderColor="black.300" />
       <Flex justifyContent="flex-end" my={3}>
-        <Flex width={220} justifyContent="space-between" alignItems="center">
-          <Container fontSize="Caption" fontWeight="bold" mr={2}>
+        <Flex alignItems="center">
+          <Container fontSize="Caption" fontWeight="bold" mr={3} whiteSpace="nowrap">
             <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
           </Container>
           {isLoading ? (

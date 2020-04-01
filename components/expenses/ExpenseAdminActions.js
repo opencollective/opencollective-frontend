@@ -2,6 +2,7 @@ import React from 'react';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
+import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { Check } from '@styled-icons/feather/Check';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
@@ -38,14 +39,14 @@ const ButtonWithLabel = styled(StyledRoundButton).attrs({ size: 40, m: 2 })`
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
  */
-const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
+const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit, isDisabled }) => {
   const { isCopied, copy } = useClipboard();
   return (
     <React.Fragment>
       {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
         <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
           {({ isLoading, downloadInvoice }) => (
-            <ButtonWithLabel loading={isLoading} onClick={downloadInvoice}>
+            <ButtonWithLabel loading={isLoading} onClick={downloadInvoice} disabled={isDisabled}>
               <IconDownload size={18} />
               <ButtonLabel>
                 <FormattedMessage id="actions.download" defaultMessage="Download" />
@@ -54,7 +55,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
           )}
         </ExpenseInvoiceDownloadHelper>
       )}
-      <ButtonWithLabel onClick={() => copy(window.location.href)}>
+      <ButtonWithLabel onClick={() => copy(window.location.href)} disabled={isDisabled}>
         {isCopied ? <Check size={18} /> : <IconLink size={18} />}
         <ButtonLabel>
           {isCopied ? (
@@ -64,8 +65,16 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
           )}
         </ButtonLabel>
       </ButtonWithLabel>
+      {permissions?.canEdit && (
+        <ButtonWithLabel onClick={onEdit} disabled={isDisabled}>
+          <PencilAlt size={16} />
+          <ButtonLabel>
+            <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+          </ButtonLabel>
+        </ButtonWithLabel>
+      )}
       {permissions?.canDelete && (
-        <ButtonWithLabel buttonStyle="danger">
+        <ButtonWithLabel buttonStyle="danger" disabled={isDisabled}>
           <IconTrash size={18} />
           <ButtonLabel>
             <FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />
@@ -77,6 +86,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
 };
 
 ExpenseAdminActions.propTypes = {
+  isDisabled: PropTypes.bool,
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
   }),
@@ -86,6 +96,8 @@ ExpenseAdminActions.propTypes = {
     canDelete: PropTypes.bool,
     canSeeInvoiceInfo: PropTypes.bool,
   }),
+  /** Callback when edit button is clicked */
+  onEdit: PropTypes.func,
   /** Called with an error if anything wrong happens */
   onError: PropTypes.func,
 };

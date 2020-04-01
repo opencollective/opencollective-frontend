@@ -23,6 +23,7 @@ const newAttachment = attrs => ({
   description: '',
   amount: null,
   url: '',
+  __isNew: true,
   ...attrs,
 });
 
@@ -127,8 +128,8 @@ export default class ExpenseFormAttachments extends React.PureComponent {
           <Span fontWeight="bold">+</Span>
         </StyledButton>
         <Container display="flex" borderTop="1px dashed #eaeaea" my={3} pt={3} justifyContent="flex-end">
-          <Flex width={220} justifyContent="space-between" alignItems="center">
-            <Container fontSize="Caption" fontWeight="bold" mr={2}>
+          <Flex alignItems="center">
+            <Container fontSize="Caption" fontWeight="bold" mr={3} whiteSpace="nowrap">
               <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
             </Container>
             <AttachmentsTotalAmount name={name} currency={values.currency} attachments={attachments} />

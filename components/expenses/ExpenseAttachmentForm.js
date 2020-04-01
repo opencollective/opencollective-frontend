@@ -96,7 +96,7 @@ const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, require
       {requireFile && (
         <FastField name={getFieldName('url')}>
           {({ field, form, meta }) => {
-            const hasValidUrl = isURL(field.value);
+            const hasValidUrl = field.value && isURL(field.value);
             return (
               <StyledInputField
                 mr={4}
@@ -147,7 +147,17 @@ const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, require
             mt={3}
             mr={[null, 3]}
           >
-            {inputProps => <Field as={StyledInput} maxHeight={39} {...inputProps} />}
+            {inputProps => (
+              <Field as={StyledInput} maxHeight={39} {...inputProps}>
+                {({ field }) => (
+                  <StyledInput
+                    {...inputProps}
+                    {...field}
+                    value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                  />
+                )}
+              </Field>
+            )}
           </StyledInputField>
           <StyledInputField
             name={getFieldName('amount')}

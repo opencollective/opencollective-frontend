@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Fri Mar 20 2020 12:11:19 GMT+0100 (GMT+01:00)
+# timestamp: Tue Mar 31 2020 17:06:21 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -390,15 +390,13 @@ type CommentCollection implements Collection {
 }
 
 input CommentCreateInput {
-  """
-  Thr HTML content of your comment
-  """
   html: String
 
   """
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
+  ExpenseId: Int
   ConversationId: String
 }
 
@@ -880,9 +878,47 @@ input ExpenseAttachmentCreateInput {
   incurredAt: DateString
 }
 
+input ExpenseAttachmentInput {
+  """
+  ID of the attachment
+  """
+  id: String
+
+  """
+  Amount in cents
+  """
+  amount: Int
+
+  """
+  What is this attachment about?
+  """
+  description: String
+
+  """
+  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
+  """
+  url: String
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
 input ExpenseCreateInput {
+  """
+  Main title of the expense
+  """
   description: String!
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
   tags: [String]
+
+  """
+  The type of the expense
+  """
   type: ExpenseType!
 
   """
@@ -970,6 +1006,53 @@ enum ExpenseType {
   Unclassified expense
   """
   UNCLASSIFIED
+}
+
+input ExpenseUpdateInput {
+  """
+  ID of the expense that you are trying to edit
+  """
+  id: String!
+
+  """
+  Main title of the expense
+  """
+  description: String
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
+  tags: [String]
+
+  """
+  The type of the expense
+  """
+  type: ExpenseType
+
+  """
+  A private note that will be attached to your invoice
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput
+
+  """
+  The list of attachments for this expense. Total amount will be computed from them.
+  """
+  attachments: [ExpenseAttachmentInput]
+
+  """
+  Account to reimburse
+  """
+  payee: AccountReferenceInput
 }
 
 enum ImageFormat {
@@ -1283,6 +1366,16 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Expense
+
+  """
+  To update an existing expense
+  """
+  editExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseUpdateInput!
+  ): Expense!
 
   """
   Edit the settings for the given account
