@@ -175,7 +175,7 @@ class CreateCollectiveForm extends React.Component {
       <Flex flexDirection="column" m={[3, 0]}>
         {host && host.slug !== 'opensource' && (
           <Container mb={4}>
-            <CollectiveNavbar collective={host} />
+            <CollectiveNavbar collective={host} onlyInfos={true} />
           </Container>
         )}
         <Flex flexDirection="column" my={[2, 4]}>
