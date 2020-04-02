@@ -43,8 +43,8 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
     fetchPolicy: 'network-only',
   });
 
-  const loggedInAccount = data?.loggedInAccount;
-  // Still loading or SSR
+  const loggedInAccount = data?.loggedInAccount || LoggedInUser?.collective;
+  // Hide it if SSR or still loading user
   if (typeof window === 'undefined' || (!LoggedInUser && loading)) {
     null;
   } else if (
@@ -76,7 +76,7 @@ DismissibleMessage.propTypes = {
   /** A function to render the actual message */
   children: PropTypes.func.isRequired,
   /** A component we can display if the message was already dismissed once */
-  dismissedComponent: PropTypes.func,
+  dismissedComponent: PropTypes.object,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
 };

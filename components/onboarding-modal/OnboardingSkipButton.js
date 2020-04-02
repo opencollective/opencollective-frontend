@@ -16,6 +16,7 @@ class OnboardingSkipButton extends React.Component {
 
     return (
       <StyledButton
+        type="button"
         width="fit-content"
         buttonStyle="primary"
         onClick={() => {

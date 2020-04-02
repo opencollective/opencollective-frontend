@@ -456,15 +456,11 @@ class EditCollectiveForm extends React.Component {
           <H3>{capitalize('Sending Money')}</H3>
           <Box>
             <Container fontSize="Caption" mt={2}>
-              {/* <H3> */}
-
               <H2>
                 <h2>
                   <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'Paypal'} />
                 </h2>
               </H2>
-
-              {/* </H3> */}
               <P>
                 <FormattedMessage
                   id="collective.sendMoney.description"
