@@ -16,6 +16,7 @@ import { P, H4 } from '../Text';
 import StyledInputTags from '../StyledInputTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import FormPersister from '../../lib/form-persister';
+import { formatFormErrorMessage } from '../../lib/form-utils';
 
 const CreateConversationMutation = gqlV2`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
@@ -69,12 +70,13 @@ const validate = values => {
  * /!\ Can only be used with data from API V2.
  */
 const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled, loading }) => {
+  const intl = useIntl();
   const { id: collectiveId, slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
 
-  const formik = useFormik({
+  const { values, errors, getFieldProps, handleSubmit, setFieldValue, setValues, isSubmitting, touched } = useFormik({
     initialValues: {
       title: '',
       html: '',
@@ -88,30 +90,28 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
     },
   });
 
-  let { title, html, tags } = formik.values;
-
+  // Load values from localstorage
   useEffect(() => {
-    if (!loading && LoggedInUser && !title && !html && !tags.length) {
+    if (!loading && LoggedInUser && !values.title && !values.html && !values.tags.length) {
       const id = `conversation-${collectiveSlug}-${LoggedInUser.id}`;
       formPersister.setFormId(id);
     }
 
     const formValues = formPersister.loadValues();
-    if (formValues && !title && !html && !tags.length) {
-      title = formValues['title'];
-      html = formValues['html'];
-      tags = formValues['tags'];
+    if (formValues && !values.title && !values.html && !values.tags.length) {
+      setValues(formValues);
     }
   }, [loading, LoggedInUser]);
 
+  // Save values in localstorage
   useEffect(() => {
-    if (title || html || tags.length || !formPersister.loadValues()) {
-      formPersister.saveValues({ html: html, tags: tags, title: title });
+    if (values.title || values.html || values.tags.length || !formPersister.loadValues()) {
+      formPersister.saveValues({ html: values.html, tags: values.tags, title: values.title });
     }
-  }, [title, html, tags]);
+  }, [values.title, values.html, values.tags]);
 
   return (
-    <form onSubmit={formik.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Flex flexWrap="wrap">
         <Box flex={['1 1 100%', null, null, '1 1']}>
           {loading ? (
@@ -119,10 +119,10 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
           ) : (
             <StyledInput
               name="title"
-              {...formik.getFieldProps('title')}
+              {...getFieldProps('title')}
               bare
               data-cy="conversation-title-input"
-              error={formik.errors.title}
+              error={touched.title && errors.title}
               withOutline
               width="100%"
               fontSize="H4"
@@ -133,25 +133,9 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               placeholder={formatMessage(messages.titlePlaceholder)}
             />
           )}
-          {formik.errors.title && (
+          {errors.title && touched.title && (
             <P color="red.500" mt={3}>
-              {formik.errors.title.type === ERROR.FORM_FIELD_REQUIRED && (
-                <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
-              )}
-              {formik.errors.title.type === ERROR.FORM_FIELD_MIN_LENGTH && (
-                <FormattedMessage
-                  id="Error.MinLength"
-                  defaultMessage="Length must be more than {length}"
-                  values={{ length: 2 }}
-                />
-              )}
-              {formik.errors.title.type === ERROR.FORM_FIELD_MAX_LENGTH && (
-                <FormattedMessage
-                  id="Error.MaxLength"
-                  defaultMessage="Length must be less than {length}"
-                  values={{ length: 256 }}
-                />
-              )}
+              {formatFormErrorMessage(intl, errors.title)}
             </P>
           )}
           <Box my={3}>
@@ -160,19 +144,20 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
             ) : (
               <RichTextEditor
                 inputName="html"
-                {...formik.getFieldProps('html')}
+                {...getFieldProps('html')}
                 withStickyToolbar
                 toolbarOffsetY={0}
                 placeholder={formatMessage(messages.bodyPlaceholder)}
                 editorMinHeight={225}
                 fontSize="13px"
-                error={formik.errors.html}
+                error={touched.html && errors.html}
+                defaultValue={values.html}
               />
             )}
           </Box>
-          {formik.errors.html && (
+          {errors.html && touched.html && (
             <P color="red.500" mt={3}>
-              {formik.errors.html.type === ERROR.FORM_FIELD_REQUIRED && (
+              {errors.html.type === ERROR.FORM_FIELD_REQUIRED && (
                 <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
               )}
             </P>
@@ -189,13 +174,13 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               ) : (
                 <StyledInputTags
                   name="tags"
-                  {...formik.getFieldProps('tags')}
+                  {...getFieldProps('tags')}
                   maxWidth={300}
                   suggestedTags={suggestedTags}
                   onChange={options => {
                     const tags = [];
                     options && options.length > 0 ? options.map(option => tags.push(option.value)) : [];
-                    formik.setFieldValue('tags', tags);
+                    setFieldValue('tags', tags);
                   }}
                 />
               )}
@@ -219,7 +204,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
         buttonStyle="primary"
         data-cy="submit-new-conversation-btn"
         disabled={disabled || loading}
-        loading={formik.isSubmitting}
+        loading={isSubmitting}
         minWidth={200}
         mt={3}
       >
