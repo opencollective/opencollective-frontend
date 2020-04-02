@@ -68,6 +68,10 @@ DefaultCollectiveLabel.propTypes = {
   }),
 };
 
+// Some flags to differentiate options in the picker
+const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
+const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
+
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.
  * Accepts all the props from [StyledSelect](#!/StyledSelect).
@@ -88,9 +92,11 @@ class CollectivePicker extends React.PureComponent {
    * Function to generate a single select option
    */
   buildCollectiveOption(collective) {
-    return collective === null
-      ? null
-      : { value: collective, label: collective.name, __collective_picker_collective__: true };
+    if (collective === null) {
+      return null;
+    } else {
+      return { value: collective, label: collective.name, [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true };
+    }
   }
 
   /**
@@ -149,7 +155,7 @@ class CollectivePicker extends React.PureComponent {
               label: null,
               value: null,
               isDisabled: true,
-              __collective_picker_new__: true,
+              [FLAG_NEW_COLLECTIVE]: true,
               __background__: 'white',
             },
           ],
@@ -238,9 +244,9 @@ class CollectivePicker extends React.PureComponent {
           value={this.getValue()}
           onChange={this.onChange}
           formatOptionLabel={(option, context) => {
-            if (option.__collective_picker_collective__) {
+            if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
               return formatOptionLabel(option, context);
-            } else if (option.__collective_picker_new__) {
+            } else if (option[FLAG_NEW_COLLECTIVE]) {
               return <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={types} />;
             } else {
               return option.label;
