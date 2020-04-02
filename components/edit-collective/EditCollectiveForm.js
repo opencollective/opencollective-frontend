@@ -76,8 +76,8 @@ class EditCollectiveForm extends React.Component {
       modified: false,
       section: 'info',
       collective,
-      tiers: tiers.length === 0 ? [{}] : tiers,
-      tickets: tickets.length === 0 ? [{}] : tickets,
+      tiers: tiers.length === 0 ? [] : tiers,
+      tickets: tickets.length === 0 ? [] : tickets,
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
