@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
-import { groupBy, sortBy, last, truncate } from 'lodash';
+import { groupBy, sortBy, last, truncate, isEqual } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { Flex } from '@rebass/grid';
 
@@ -137,10 +137,11 @@ class CollectivePicker extends React.PureComponent {
     }
 
     if (creatable) {
+      const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
       options = [
         ...options,
         {
-          label: this.props.types.includes('USER')
+          label: isOnlyForUser
             ? intl.formatMessage(Messages.inviteNew).toUpperCase()
             : intl.formatMessage(Messages.createNew).toUpperCase(),
           options: [
