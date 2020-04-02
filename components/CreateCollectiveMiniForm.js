@@ -167,7 +167,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
           ? (errors.members[0].member.name = formatMessage(msg.invalidName))
           : [{ member: { name: formatMessage(msg.invalidName) } }];
       }
-    } else {
+    } else if (isUser) {
       if (!values.email || !isValidEmail(values.email)) {
         errors.email = formatMessage(msg.invalidEmail);
       }
@@ -180,7 +180,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
   };
 
   const submit = formValues => {
-    createCollective({ variables: prepareMutationVariables({ ...formValues, type }) }).then(({ data }) => {
+    return createCollective({ variables: prepareMutationVariables({ ...formValues, type }) }).then(({ data }) => {
       return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
     });
   };
