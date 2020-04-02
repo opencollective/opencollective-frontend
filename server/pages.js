@@ -196,4 +196,11 @@ pages.add(
   'new-collective-page',
 );
 
+// New accept financial contributions flow
+
+pages.add(
+  'accept-financial-contributions',
+  '/:slug/accept-financial-contributions/:path(myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
+);
+
 module.exports = pages;
