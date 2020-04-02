@@ -73,6 +73,10 @@ const msg = defineMessages({
     id: 'save',
     defaultMessage: 'Save',
   },
+  saveUser: {
+    id: 'InviteUser',
+    defaultMessage: 'Invite user',
+  },
   invalidEmail: {
     id: 'error.email.invalid',
     defaultMessage: 'Invalid email address',
@@ -231,7 +235,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
           {formatMessage(msg.cancel)}
         </StyledButton>
         <StyledButton type="submit" buttonStyle="primary" minWidth={100} loading={formState.isSubmitting}>
-          {formatMessage(msg.save)}
+          {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
         </StyledButton>
       </Container>
     </form>
