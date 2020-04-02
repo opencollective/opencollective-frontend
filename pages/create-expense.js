@@ -7,33 +7,28 @@ import React from 'react';
 import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
-import { HELP_MESSAGE } from '../lib/constants/dismissable-help-message';
 import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
-import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
-import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
-import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
-import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
-import { H1, H5, P, Strong } from '../components/Text';
+import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
-import LinkCollective from '../components/LinkCollective';
-import DismissibleMessage from '../components/DismissibleMessage';
+import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
+import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 import {
   loggedInAccountExpensePayoutFieldsFragment,
   expensePageExpenseFieldsFragment,
@@ -192,21 +187,28 @@ class CreateExpensePage extends React.Component {
         <CollectiveThemeProvider collective={collective}>
           <React.Fragment>
             <CollectiveNavbar collective={collective} isLoading={!collective} />
-            <Container position="relative" minHeight={800}>
+            <Container position="relative" minHeight={[null, 800]}>
               {!loadingLoggedInUser && !LoggedInUser && (
                 <ContainerOverlay p={2} top="0" position={['fixed', null, 'absolute']}>
                   <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
                 </ContainerOverlay>
               )}
-              <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                {step === STEPS.SUMMARY && (
-                  <StyledLink color="black.600" onClick={() => this.setState({ step: STEPS.FORM, error: null })} mb={4}>
+              <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
+                <Box mb={3}>
+                  <StyledLink
+                    color="black.600"
+                    onClick={() =>
+                      step === STEPS.SUMMARY
+                        ? this.setState({ step: STEPS.FORM, error: null })
+                        : window?.history?.back()
+                    }
+                  >
                     &larr;&nbsp;
                     <FormattedMessage id="Back" defaultMessage="Back" />
                   </StyledLink>
-                )}
+                </Box>
                 <Flex justifyContent="space-between" flexWrap="wrap">
-                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]}>
+                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]} mb={5}>
                     <H1 fontSize="H4" lineHeight="H4" mb={24} py={2} ref={this.stepTitleRef}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
@@ -218,37 +220,7 @@ class CreateExpensePage extends React.Component {
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
-                        <DismissibleMessage messageId={HELP_MESSAGE.EXPENSE_CREATE_INFO}>
-                          {({ dismiss }) => (
-                            <MessageBox type="info" mb={4}>
-                              <P
-                                fontSize="Caption"
-                                lineHeight="Paragraph"
-                                color="black.800"
-                                mb={3}
-                                data-cy="expense-create-help"
-                              >
-                                <FormattedMessage
-                                  id="CreateExpense.HelpCreateInfo"
-                                  defaultMessage="Request payment from {collective} for work you’ve done or to be reimbursed for purchases. Expenses will be processed for payment once approved by a Collective admin. Only the amount and description are public in the Collective’s transparent budget—attachments, payment details, and other personal info is kept private."
-                                  values={{ collective: <strong>{collective.name}</strong> }}
-                                />
-                              </P>
-                              <StyledButton
-                                asLink
-                                onClick={dismiss}
-                                fontSize="Caption"
-                                data-cy="dismiss-expense-create-help"
-                                color="blue.600"
-                              >
-                                <FormattedMessage
-                                  id="DismissableHelp.DontShowAgain"
-                                  defaultMessage="Ok, don’t show me again"
-                                />
-                              </StyledButton>
-                            </MessageBox>
-                          )}
-                        </DismissibleMessage>
+                        <CreateExpenseDismissibleIntro />
                         {step === STEPS.FORM && (
                           <ExpenseForm
                             collective={collective}
@@ -290,47 +262,8 @@ class CreateExpensePage extends React.Component {
                       </Box>
                     )}
                   </Box>
-                  <Box mt={4} width={270}>
-                    <H5 mb={3}>
-                      <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
-                    </H5>
-                    <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
-                      {data.loading ? (
-                        <LoadingPlaceholder height={28} width={75} />
-                      ) : (
-                        <FormattedMoneyAmount
-                          currency={collective.currency}
-                          amount={collective.balance}
-                          amountStyles={{ color: 'black.800' }}
-                        />
-                      )}
-                    </Container>
-                    {host && (
-                      <P fontSize="SmallCaption" color="black.600" mt={2}>
-                        <FormattedMessage
-                          id="withColon"
-                          defaultMessage="{item}:"
-                          values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
-                        />{' '}
-                        <LinkCollective collective={host}>
-                          <Strong color="black.600">{host.name}</Strong>
-                        </LinkCollective>
-                      </P>
-                    )}
-                    <Box mt={50}>
-                      <H5 mb={3}>
-                        <FormattedMessage id="Tags" defaultMessage="Tags" />
-                      </H5>
-                      <StyledInputTags inputId="expense-tags" onChange={this.setTags} disabled />
-                    </Box>
-                    <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
-                    <Box mt={50}>
-                      <CreateExpenseFAQ
-                        withBorderLeft
-                        withNewButtons
-                        titleProps={{ fontSize: 'H5', fontWeight: 500, mb: 3 }}
-                      />
-                    </Box>
+                  <Box minWidth={300} width={['100%', null, null, 300]} px={3} mt={3}>
+                    <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
                   </Box>
                 </Flex>
               </Box>
