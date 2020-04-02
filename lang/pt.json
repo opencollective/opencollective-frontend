@@ -565,7 +565,7 @@
   "editCollective.menu.tiers": "Categorias",
   "editCollective.menu.virtualCards": "Vales-Presente",
   "editCollective.menu.webhooks": "Webhooks",
-  "editCollective.menus.expenses": "Expenses & Payouts",
+  "editCollective.menus.labelexpenses": "Expenses Policy",
   "editCollective.notFound": "Sem dados de coletivo para editar",
   "EditCollective.Updates.checkbox": "Habilitar atualizações",
   "EditCollective.Updates.description": "As atualizações são uma maneira de manter sua comunidade postada em seu progresso. Elas são enviadas por e-mail para todos os seus colaboradores e seguidores. Uma vez ativada, uma nova seção \"Atualizações\" será adicionada à sua página de perfil e uma página dedicada será criada em {updatesLink}.",

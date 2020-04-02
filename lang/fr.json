@@ -565,7 +565,7 @@
   "editCollective.menu.tiers": "Tiers",
   "editCollective.menu.virtualCards": "Cartes Cadeaux",
   "editCollective.menu.webhooks": "Webhooks",
-  "editCollective.menus.expenses": "Expenses & Payouts",
+  "editCollective.menus.labelexpenses": "Expenses Policy",
   "editCollective.notFound": "Le collectif n'a pas été trouvé",
   "EditCollective.Updates.checkbox": "Activer les actualités",
   "EditCollective.Updates.description": "Les actualités sont un moyen de tenir votre communauté au courant de votre progression. Elles sont envoyées par e-mail à tous vos contributeurs et abonnés. Une fois activé, une nouvelle section \"Actualités\" sera ajoutée à votre page de profil et une page dédiée sera créée sur {updatesLink}.",
