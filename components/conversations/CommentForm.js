@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import { withRouter } from 'next/router';
 import { get } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException, createError, ERROR } from '../../lib/errors';
+import { getErrorFromGraphqlException, createError, ERROR, formatErrorMessage } from '../../lib/errors';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import { withUser } from '../UserProvider';
@@ -17,6 +17,7 @@ import ContainerOverlay from '../ContainerOverlay';
 import MessageBox from '../MessageBox';
 import { P } from '../Text';
 import { CommentFieldsFragment } from './graphql';
+import { formatFormErrorMessage } from '../../lib/form-utils';
 
 const createCommentMutation = gqlV2`
   mutation CreateComment($comment: CommentCreateInput!) {
@@ -54,8 +55,8 @@ const isAutoFocused = id => {
 const mutationOptions = { context: API_V2_CONTEXT };
 
 /** A small helper to make the form work with params from both API V1 & V2 */
-const prepareCommentParams = (values, conversationId, expenseId) => {
-  const comment = { ...values };
+const prepareCommentParams = (html, conversationId, expenseId) => {
+  const comment = { html };
   if (conversationId) {
     comment.ConversationId = conversationId;
   } else if (expenseId) {
@@ -83,32 +84,25 @@ const CommentForm = ({
   LoggedInUser,
   isDisabled,
 }) => {
-  const [createComment, { loading, error, data }] = useMutation(createCommentMutation, mutationOptions);
-  const { formatMessage } = useIntl();
+  const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
+  const intl = useIntl();
   const [html, setHtml] = useState('');
-  const [validationError, setValidationError] = useState({});
-  const firstRender = useRef(true);
+  const [resetValue, setResetValue] = useState();
+  const [validationError, setValidationError] = useState();
+  const { formatMessage } = intl;
 
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    if (Object.keys(validationError).length === 0) {
-      submitForm({ html: html });
-    }
-  }, [validationError]);
-
-  const validateSubmit = async event => {
+  const submitForm = async () => {
     event.preventDefault();
-    setValidationError(!html ? await createError(ERROR.FORM_FIELD_REQUIRED) : {});
-  };
-
-  const submitForm = async htmlField => {
-    const comment = prepareCommentParams(htmlField, ConversationId, ExpenseId);
-    const response = await createComment({ variables: { comment } });
-    if (onSuccess) {
-      return onSuccess(response.data.createComment);
+    event.stopPropagation();
+    if (!html) {
+      setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
+    } else {
+      const comment = prepareCommentParams(html, ConversationId, ExpenseId);
+      const response = await createComment({ variables: { comment } });
+      setResetValue(response.data.createComment.id);
+      if (onSuccess) {
+        return onSuccess(response.data.createComment);
+      }
     }
   };
 
@@ -123,7 +117,7 @@ const CommentForm = ({
           />
         </ContainerOverlay>
       )}
-      <form onSubmit={validateSubmit} data-cy="comment-form">
+      <form onSubmit={submitForm} data-cy="comment-form">
         {loadingLoggedInUser ? (
           <LoadingPlaceholder height={232} />
         ) : (
@@ -134,21 +128,22 @@ const CommentForm = ({
             placeholder={formatMessage(messages.placeholder)}
             autoFocus={isAutoFocused(id)}
             disabled={isDisabled || !LoggedInUser || loading}
-            reset={get(data, 'createComment.id')}
+            reset={resetValue}
             fontSize="13px"
-            onChange={e => setHtml(e.target.value)}
+            onChange={e => {
+              setHtml(e.target.value);
+              setValidationError(null);
+            }}
           />
         )}
         {validationError && (
           <P color="red.500" mt={3}>
-            {validationError.type === ERROR.FORM_FIELD_REQUIRED && (
-              <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
-            )}
+            {formatFormErrorMessage(intl, validationError)}
           </P>
         )}
         {error && (
           <MessageBox type="error" withIcon mt={2}>
-            {getErrorFromGraphqlException(error).message}
+            {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
           </MessageBox>
         )}
         <StyledButton
