@@ -288,7 +288,9 @@ class CollectivePicker extends React.PureComponent {
                       type={createFormCollectiveType}
                       onCancel={this.setCreateFormCollectiveType}
                       onSuccess={collective => {
-                        onChange({ label: collective.name, value: collective });
+                        if (onChange) {
+                          onChange({ label: collective.name, value: collective });
+                        }
                         this.setState(state => ({
                           menuIsOpen: false,
                           createFormCollectiveType: null,

@@ -60,3 +60,24 @@ const [loading, setLoading] = React.useState(false);
   }}
 />;
 ```
+
+## Nested form
+
+When put inside a form, the collective picker should **never** submit its parent.
+
+```jsx
+const [isParentSubmitted, setParentSubmitted] = React.useState(false);
+<form
+  onSubmit={e => {
+    e.preventDefault();
+    console.log(e);
+    setParentSubmitted(true);
+  }}
+>
+  <p>
+    Is submitted: <strong>{isParentSubmitted ? 'Yes' : 'No'}</strong>
+  </p>
+  <CollectivePicker creatable />
+  <button style={{ marginTop: 400 }}>Submit</button>
+</form>;
+```
