@@ -147,7 +147,7 @@ class EditCollective extends React.Component {
               description={notification.description}
             />
           )}
-          <CollectiveNavbar collective={collective} isAdmin={canEditCollective} />
+          <CollectiveNavbar collective={collective} isAdmin={canEditCollective} onlyInfos={true} />
           <div className="content">
             {!canEditCollective && (
               <div className="login">
