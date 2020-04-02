@@ -15,7 +15,7 @@ const TrixEditorContainer = styled.div`
     props.withBorders &&
     css({
       border: '1px solid',
-      borderColor: 'black.300',
+      borderColor: !props.error ? 'black.300' : 'red.300',
       borderRadius: 10,
       padding: 3,
     })}

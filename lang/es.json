@@ -587,7 +587,6 @@
   "error.email.invalid": "correo electrónico inválido",
   "Error.FieldRequired": "Este campo es obligatorio",
   "error.goBack": "Volver a la página anterior",
-  "Error.MaxLength": "La longitud debe ser menor que {length}",
   "error.name.invalid": "Nombre es requerido",
   "Error.Network": "A network error occured, please try again",
   "error.reload": "Recargar página",

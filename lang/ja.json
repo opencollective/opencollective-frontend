@@ -587,7 +587,6 @@
   "error.email.invalid": "メールアドレスが正しくありません",
   "Error.FieldRequired": "このフィールドは入力必須です",
   "error.goBack": "前のページに戻る",
-  "Error.MaxLength": "Length must be less than {length}",
   "error.name.invalid": "名前が必須です",
   "Error.Network": "A network error occured, please try again",
   "error.reload": "ページをリロード",

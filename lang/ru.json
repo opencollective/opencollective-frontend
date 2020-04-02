@@ -587,7 +587,6 @@
   "error.email.invalid": "Недопустимый адрес электронной почты",
   "Error.FieldRequired": "This field is required",
   "error.goBack": "Вернуться на предыдущую страницу",
-  "Error.MaxLength": "Length must be less than {length}",
   "error.name.invalid": "Name is required",
   "Error.Network": "A network error occured, please try again",
   "error.reload": "Перезагрузить страницу",
