@@ -17,9 +17,7 @@ import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import CommentIcon from '../components/icons/CommentIcon';
 import Link from '../components/Link';
 import Page from '../components/Page';
-import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledLink from '../components/StyledLink';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError, formatErrorMessage } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
@@ -238,8 +236,6 @@ class ExpensePage extends React.Component {
       } else if (this.props.collectiveSlug !== data.expense.account.slug) {
         // TODO Error: Not on the righ URL
         return null;
-      } else if (!hasFeature(data.expense.account, FEATURES.NEW_EXPENSE_FLOW)) {
-        return <PageFeatureNotSupported />;
       }
     }
 

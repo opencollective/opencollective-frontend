@@ -10,15 +10,10 @@ const uploadReceipt = (dropzoneElement = '.InputTypeDropzone input') => {
 };
 
 describe('New expense flow', () => {
-  it('is disabled by default', () => {
-    cy.visit(`testCollective/expenses/new-v2`);
-    cy.contains('main', 'This feature is not activated for this collective');
-  });
-
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
-      cy.createHostedCollective({ settings: { features: { newExpenseFlow: true } } }).then(collective => {
-        cy.visit(`/${collective.slug}/expenses/new-v2`);
+      cy.createHostedCollective().then(collective => {
+        cy.visit(`/${collective.slug}/expenses/new/v2`);
         cy.getByDataCy('signIn-form');
       });
     });
@@ -28,17 +23,17 @@ describe('New expense flow', () => {
     let user, collective;
 
     before(() => {
-      cy.createHostedCollective({ settings: { features: { newExpenseFlow: true } } }).then(c => {
+      cy.createHostedCollective().then(c => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
-          redirect: `/${collective.slug}/expenses/new-v2`,
+          redirect: `/${collective.slug}/expenses/new/v2`,
         }).then(u => (user = u));
       });
     });
 
     beforeEach(() => {
-      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new-v2` });
+      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new/v2` });
     });
 
     it('has a dismissible help message', () => {
