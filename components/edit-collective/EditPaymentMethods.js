@@ -231,9 +231,9 @@ class EditPaymentMethods extends React.Component {
         )}
         {this.props.sendingSection && !showManualPaymentMethodForm && (
           <Flex className="paymentMethods" flexDirection="column" my={2}>
-            <H2>
+            <H3>
               <FormattedMessage id="paymentMethods.send.title" defaultMessage="Sending money" />
-            </H2>
+            </H3>
             {paymentMethods.map(pm => (
               <Container
                 className="paymentMethod"
@@ -280,9 +280,9 @@ class EditPaymentMethods extends React.Component {
         )}
         {this.props.receivingSection && showEditManualPaymentMethod && (
           <React.Fragment>
-            <H2>
+            <H3>
               <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />
-            </H2>
+            </H3>
             <EditReceivingSendingMoney
               collective={this.props.collective}
               connectedAccounts={this.props.collective.connectedAccounts}

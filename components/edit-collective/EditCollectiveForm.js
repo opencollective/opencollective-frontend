@@ -136,8 +136,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Short description',
       },
       'expensePolicy.label': {
-        id: 'editCollective.menus.expenses',
-        defaultMessage: 'Expenses & Payouts',
+        id: 'editCollective.menus.labelexpenses',
+        defaultMessage: 'Expenses Policy',
       },
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
