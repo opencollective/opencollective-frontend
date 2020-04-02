@@ -841,6 +841,12 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />{' '}
               </H3>
             )}
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES && (
+              <H3>
+                {' '}
+                <FormattedMessage id="editCollective.menu.expenses" defaultMessage={'Expenses & Payouts'} />{' '}
+              </H3>
+            )}
             {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
             {(this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES ||
               this.state.section === EDIT_COLLECTIVE_SECTIONS.INFO ||
