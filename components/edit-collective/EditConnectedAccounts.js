@@ -5,11 +5,12 @@ import { capitalize } from '../../lib/utils';
 import EditConnectedAccount from '../EditConnectedAccount';
 
 const EditConnectedAccounts = props => {
-  const services = ['twitter'];
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
-  if (props.collective.type === 'USER') {
-    services.push('github');
+  const services = [];
+
+  if (props.collective.type === 'COLLECTIVE' || props.collective.isHost) {
+    services.push('twitter');
   }
 
   return (
