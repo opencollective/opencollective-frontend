@@ -456,22 +456,22 @@ class EditCollectiveForm extends React.Component {
           <H3>{capitalize('Sending Money')}</H3>
           <Box>
             <Container fontSize="Caption" mt={2}>
-              <H2>
-                <h2>
-                  <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'Paypal'} />
-                </h2>
-              </H2>
-              <P>
-                <FormattedMessage
-                  id="collective.sendMoney.description"
-                  defaultMessage={'Paypal is activated by default.'}
-                />
-              </P>
               <EditReceivingSendingMoney
                 collective={collective}
                 connectedAccounts={collective.connectedAccounts}
                 sendingMoney={true}
               />
+              <H2>
+                <h2>
+                  <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'PayPal'} />
+                </h2>
+              </H2>
+              <P>
+                <FormattedMessage
+                  id="collective.sendMoney.description"
+                  defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
+                />
+              </P>
             </Container>
           </Box>
         </Flex>
