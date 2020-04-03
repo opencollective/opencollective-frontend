@@ -120,6 +120,13 @@ export const expensePageExpenseFieldsFragment = gqlV2`
             country
           }
         }
+        parentCollective {
+          id
+          slug
+          name
+          type
+          imageUrl
+        }
       }
     }
     payoutMethod {

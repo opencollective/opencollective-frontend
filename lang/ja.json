@@ -647,6 +647,7 @@
   "expense.created": "あなたの経費申請は成功しました。現在コレクティブのコアコントリビューターからの承認を待っています。承認されるとメールで通知されます。それからホスト ({host}) があなたの経費を払い戻します。",
   "expense.created.noHost": "Your expense has been submitted with success. It is now pending approval from one of the core contributors of the collective. You will be notified by email once it has been approved.",
   "Expense.delete": "Delete expense",
+  "Expense.DeleteDetails": "This will permanently delete this expense and all attached comments.",
   "expense.disclaimer": "You must upload a valid receipt or invoice clearly showing the total amount, date, legal address, and what the payment is for.",
   "Expense.edit": "Edit expense",
   "expense.error": "error",
