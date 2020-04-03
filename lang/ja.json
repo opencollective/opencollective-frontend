@@ -579,6 +579,7 @@
   "EditCollective.VATNumber": "VAT 番号",
   "EditCollective.VATNumber.Description": "Your European Value Added Tax (VAT) number",
   "EditGoals.Instructions": "You can define custom goals to share an overview of your financial plan with your community and to track your progress. They will be sent in the emails sent to your contributors. You can choose to display them on your collective page by checking the box below.",
+  "EditHostInvoice.extraInfoPlaceholder": "Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message.",
   "EditHostInvoice.Receipt.Instructions": "You can define a custom title that will appear on the receipts generated for the contributors of the Collectives you are hosting. Keep this field empty to use the default title:",
   "EditHostInvoice.receiptsSettings": "レシートの設定",
   "EditMembers.Title": "コアコントリビュータを編集",

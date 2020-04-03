@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import imgInvoiceTitlePreview from '../../public/static/images/invoice-title-preview.jpg';
 
@@ -16,7 +16,17 @@ import StyledTextarea from '../StyledTextarea';
 import { H3, P } from '../Text';
 import { updateSettingsMutation } from './mutations';
 
+const messages = defineMessages({
+  extraInfoPlaceholder: {
+    id: 'EditHostInvoice.extraInfoPlaceholder',
+    defaultMessage:
+      "Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message.",
+  },
+});
+
 const EditHostInvoice = ({ collective }) => {
+  const { formatMessage } = useIntl();
+
   // For invoice Title
   const defaultValue = get(collective.settings, 'invoiceTitle');
   const [setSettings, { loading, error, data }] = useMutation(updateSettingsMutation);
@@ -51,53 +61,56 @@ const EditHostInvoice = ({ collective }) => {
           {getErrorFromGraphqlException(setValue).message}
         </MessageBox>
       )}
-      <Flex flexWrap="wrap" flexDirection="column">
-        <StyledInput
-          placeholder="Payment Receipt"
-          defaultValue={value}
-          onChange={e => setValue(e.target.value)}
-          width="100%"
-          maxWidth={300}
-          my={3}
-        />
+      <Flex flexWrap="wrap" justifyContent="space-between" maxWidth={800}>
+        <Flex flexWrap="wrap" flexDirection="column" width="100%" maxWidth={350}>
+          <StyledInput
+            placeholder="Payment Receipt"
+            defaultValue={value}
+            onChange={e => setValue(e.target.value)}
+            width="100%"
+            maxWidth={350}
+            my={3}
+          />
 
-        <StyledTextarea
-          placeholder="Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message."
-          defaultValue={info}
-          onChange={e => setInfo(e.target.value)}
-          width="100%"
-          height="150px"
-          maxWidth={300}
-          my={2}
-        />
+          <StyledTextarea
+            placeholder={formatMessage(messages.extraInfoPlaceholder)}
+            defaultValue={info}
+            onChange={e => setInfo(e.target.value)}
+            width="100%"
+            height="150px"
+            maxWidth={350}
+            fontSize="LeadCaption"
+            my={2}
+          />
 
-        <StyledButton
-          buttonStyle="primary"
-          my={2}
-          maxWidth={300}
-          minWidth={200}
-          loading={loading}
-          maxLength={255}
-          disabled={!isTouched && !infoIsTouched}
-          onClick={() =>
-            setSettings({
-              variables: {
-                id: collective.id,
-                settings: { ...collective.settings, invoiceTitle: value, invoice: { extraInfo: info } },
-              },
-            })
-          }
-        >
-          {isSaved && infoIsSaved ? (
-            <FormattedMessage id="saved" defaultMessage="Saved" />
-          ) : (
-            <FormattedMessage id="save" defaultMessage="Save" />
-          )}
-        </StyledButton>
+          <StyledButton
+            buttonStyle="primary"
+            my={2}
+            maxWidth={300}
+            minWidth={200}
+            loading={loading}
+            maxLength={255}
+            disabled={!isTouched && !infoIsTouched}
+            onClick={() =>
+              setSettings({
+                variables: {
+                  id: collective.id,
+                  settings: { ...collective.settings, invoiceTitle: value, invoice: { extraInfo: info } },
+                },
+              })
+            }
+          >
+            {isSaved && infoIsSaved ? (
+              <FormattedMessage id="saved" defaultMessage="Saved" />
+            ) : (
+              <FormattedMessage id="save" defaultMessage="Save" />
+            )}
+          </StyledButton>
+        </Flex>
+        <Box mt={3} maxWidth={400}>
+          <img src={imgInvoiceTitlePreview} alt="" />
+        </Box>
       </Flex>
-      <Box mt={3} maxWidth={400}>
-        <img src={imgInvoiceTitlePreview} alt="" />
-      </Box>
     </Container>
   );
 };
