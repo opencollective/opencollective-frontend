@@ -59,17 +59,19 @@ class OnboardingProfileCard extends React.Component {
         ) : (
           <Admin
             closeButtonProps={
-              collective.id !== adminCollective.id && {
-                width: '1.5em',
-                height: '1.5em',
-                iconColor: 'black',
-                backgroundColor: 'rgba(0, 0, 0, 0)',
-                display: 'flex',
-                align: 'center',
-                onClick: () => {
-                  removeAdmin(collective);
-                },
-              }
+              collective.id !== adminCollective.id
+                ? {
+                    width: '1.5em',
+                    height: '1.5em',
+                    iconColor: 'black',
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    display: 'flex',
+                    align: 'center',
+                    onClick: () => {
+                      removeAdmin(collective);
+                    },
+                  }
+                : null
             }
           >
             <Flex alignItems="center">

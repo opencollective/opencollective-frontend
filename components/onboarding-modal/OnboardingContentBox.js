@@ -26,7 +26,7 @@ class OnboardingContentBox extends React.Component {
     updateAdmins: PropTypes.func,
     addContact: PropTypes.func,
     intl: PropTypes.object.isRequired,
-    viewport: PropTypes.object,
+    viewport: PropTypes.string,
     values: PropTypes.object,
     errors: PropTypes.object,
     touched: PropTypes.object,
