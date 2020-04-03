@@ -21,24 +21,21 @@ import StyledLink from '../components/StyledLink';
 import { generateNotFoundError, formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
-import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
-import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
-import { H5, Span, P, Strong } from '../components/Text';
+import { H5, Span, P } from '../components/Text';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import StyledHr from '../components/StyledHr';
 import MessageBox from '../components/MessageBox';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
-import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
-import LinkCollective from '../components/LinkCollective';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import StyledButton from '../components/StyledButton';
+import ExpenseInfoSidebar from './ExpenseInfoSidebar';
+import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import {
   loggedInAccountExpensePayoutFieldsFragment,
   expensePageExpenseFieldsFragment,
 } from '../components/expenses/graphql/fragments';
-import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
-import StyledButton from '../components/StyledButton';
 
 const messages = defineMessages({
   title: {
@@ -83,6 +80,7 @@ const PrivateNoteLabel = () => {
 };
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
+const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
@@ -230,7 +228,7 @@ class ExpensePage extends React.Component {
             <Container
               display={['none', null, null, 'flex']}
               justifyContent="flex-end"
-              width="calc((100% - 1260px) / 2)"
+              width={SIDE_MARGIN_WIDTH}
               minWidth={90}
               pt={55}
             >
@@ -247,9 +245,9 @@ class ExpensePage extends React.Component {
             <Box
               flex="1 1 650px"
               minWidth={300}
-              maxWidth={816}
-              mr={[null, 3, 4, 5]}
-              py={3}
+              maxWidth={750}
+              mr={[null, 2, 3, 4, 5]}
+              py={2}
               px={3}
               ref={this.expenseTopRef}
             >
@@ -351,7 +349,7 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
-                <Flex mb={60}>
+                <Box mb={60} display={['none', null, null, 'flex']}>
                   <StyledButton
                     buttonStyle="secondary"
                     buttonSize="small"
@@ -360,45 +358,13 @@ class ExpensePage extends React.Component {
                   >
                     <FormattedMessage id="Edit" defaultMessage="Edit" />
                   </StyledButton>
-                </Flex>
-                <H5 mb={3}>
-                  <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
-                </H5>
-                <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
-                  {data.loading ? (
-                    <LoadingPlaceholder height={28} width={75} />
-                  ) : (
-                    <FormattedMoneyAmount
-                      currency={collective.currency}
-                      amount={collective.balance}
-                      amountStyles={{ color: 'black.800' }}
-                    />
-                  )}
-                </Container>
-                {host && (
-                  <P fontSize="SmallCaption" color="black.600" mt={2}>
-                    <FormattedMessage
-                      id="withColon"
-                      defaultMessage="{item}:"
-                      values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
-                    />{' '}
-                    <LinkCollective collective={host}>
-                      <Strong color="black.600">{host.name}</Strong>
-                    </LinkCollective>
-                  </P>
-                )}
-                <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
-                <Box mt={50}>
-                  <CreateExpenseFAQ
-                    withBorderLeft
-                    withNewButtons
-                    titleProps={{ fontSize: 'H5', fontWeight: 500, mb: 3 }}
-                  />
                 </Box>
+                <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
               </Box>
             </Flex>
-            <Box width="calc((100% - 1260px) / 2)" />
+            <Box width={SIDE_MARGIN_WIDTH} />
           </Flex>
+          <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
         </CollectiveThemeProvider>
       </Page>
     );
