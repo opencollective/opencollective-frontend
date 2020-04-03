@@ -155,6 +155,17 @@ class ExpensePage extends React.Component {
     }
   };
 
+  onNotesChanges = e => {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState(state => ({
+      editedExpense: {
+        ...state.editedExpense,
+        [name]: value,
+      },
+    }));
+  };
+
   scrollToExpenseTop() {
     if (this.expenseTopRef.current) {
       this.expenseTopRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -233,13 +244,14 @@ class ExpensePage extends React.Component {
               pt={55}
             >
               <Flex flexDirection="column" alignItems="center" width={90}>
-                <ExpenseAdminActions
-                  expense={expense}
-                  collective={collective}
-                  permissions={expense?.permissions}
-                  onError={error => this.setState({ error })}
-                  isDisabled={status !== PAGE_STATUS.VIEW}
-                />
+                {status === PAGE_STATUS.VIEW && (
+                  <ExpenseAdminActions
+                    expense={expense}
+                    collective={collective}
+                    permissions={expense?.permissions}
+                    onError={error => this.setState({ error })}
+                  />
+                )}
               </Flex>
             </Container>
             <Box
@@ -286,7 +298,7 @@ class ExpensePage extends React.Component {
                   )}
                   {status === PAGE_STATUS.EDIT_SUMMARY && (
                     <div>
-                      <ExpenseNotesForm onChange={this.onNotesChanges} />
+                      <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
                       <StyledButton
                         mt={3}
                         mr={2}
@@ -321,6 +333,7 @@ class ExpensePage extends React.Component {
                     payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                     onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                     validateOnChange
+                    disableSubmitIfUntouched
                   />
                 </Box>
               )}

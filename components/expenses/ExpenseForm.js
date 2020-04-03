@@ -290,7 +290,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
             type="submit"
             data-cy="expense-summary-btn"
             buttonStyle="primary"
-            disabled={!stepTwoCompleted || !formik.isValid || !formik.dirty}
+            disabled={!stepTwoCompleted || !formik.isValid}
             loading={formik.isSubmitting}
             minWidth={170}
           >
