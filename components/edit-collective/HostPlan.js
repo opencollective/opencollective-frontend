@@ -112,7 +112,7 @@ const HostPlan = props => {
 
   const tiers = get(opencollective, 'Collective.tiers') || [];
   const subscribedTier = tiers.find(tier => tier.slug === collective.plan.name);
-  const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/hostSettings`;
+  const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/host-plan`;
 
   return (
     <div>
