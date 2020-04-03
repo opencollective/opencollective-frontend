@@ -271,7 +271,7 @@
   "completePledge.Title": "Completa tu promesa de donación",
   "confirm": "Confirmar",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",
-  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this \n                {collectiveType}.",
+  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",
   "confirmCollective.user.deletion.description": "We've deleted your user account, expenses, payment methods, and connected accounts.",
   "confirmEmail.error.InvalidToken": "El link de confirmación es invalido o ha expirado",
   "confirmEmail.sucess": "Your email has been changed to {newEmail}",
