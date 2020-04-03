@@ -1,15 +1,15 @@
 import { Box, Flex } from '@rebass/grid';
-import { cloneDeep, uniqBy, update } from 'lodash';
+import { cloneDeep, uniqBy, update, get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { graphql, withApollo } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import memoizeOne from 'memoize-one';
 
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import CommentForm from '../components/conversations/CommentForm';
-import { CommentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
@@ -18,7 +18,7 @@ import CommentIcon from '../components/icons/CommentIcon';
 import Link from '../components/Link';
 import Page from '../components/Page';
 import StyledLink from '../components/StyledLink';
-import { generateNotFoundError, formatErrorMessage } from '../lib/errors';
+import { generateNotFoundError, formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
@@ -32,6 +32,13 @@ import MessageBox from '../components/MessageBox';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
 import LinkCollective from '../components/LinkCollective';
+import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import {
+  loggedInAccountExpensePayoutFieldsFragment,
+  expensePageExpenseFieldsFragment,
+} from '../components/expenses/graphql/fragments';
+import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import StyledButton from '../components/StyledButton';
 
 const messages = defineMessages({
   title: {
@@ -41,102 +48,28 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2`
-query CreateExpensePage($legacyExpenseId: Int!) {
-  expense(expense: {legacyId: $legacyExpenseId}) {
-    id
-    legacyId
-    description
-    currency
-    type
-    status
-    privateMessage
-    attachments {
-      id
-      incurredAt
-      description
-      amount
-      url
+  query CreateExpensePage($legacyExpenseId: Int!) {
+    expense(expense: {legacyId: $legacyExpenseId}) {
+      ...expensePageExpenseFieldsFragment
     }
-    payee {
-      id
-      slug
-      name
-      type
-      location {
-        address
-        country
-      }
-    }
-    createdByAccount {
-      id
-      slug
-      name
-      type
-      imageUrl
-    }
-    account {
-      id
-      slug
-      name
-      type
-      imageUrl
-      description
-      settings
-      twitterHandle
-      currency
-      expensePolicy
-      ... on Collective {
-        id
-        isApproved
-        balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          location {
-            address
-            country
-          }
-        }
-      }
-      ... on Event {
-        id
-        isApproved
-        balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          location {
-            address
-            country
-          }
-        }
-      }
-    }
-    payoutMethod {
-      id
-      type
-      data
-    }
-    comments {
-      nodes {
-        ...CommentFields
-      }
-    }
-    permissions {
-      canEdit
-      canDelete
-      canSeeInvoiceInfo
+
+    loggedInAccount {
+      ...loggedInAccountExpensePayoutFieldsFragment
     }
   }
-}
 
-${CommentFieldsFragment}
+  ${loggedInAccountExpensePayoutFieldsFragment}
+  ${expensePageExpenseFieldsFragment}
+`;
+
+const editExpenseMutation = gqlV2`
+  mutation editExpense($expense: ExpenseUpdateInput!) {
+    editExpense(expense: $expense) {
+      ...expensePageExpenseFieldsFragment
+    }
+  }
+
+  ${expensePageExpenseFieldsFragment}
 `;
 
 const PrivateNoteLabel = () => {
@@ -148,6 +81,8 @@ const PrivateNoteLabel = () => {
     </Span>
   );
 };
+
+const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
@@ -164,11 +99,23 @@ class ExpensePage extends React.Component {
     client: PropTypes.object.isRequired,
     /** from withData */
     data: PropTypes.object.isRequired,
+    /** from withData */
+    mutate: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
   };
 
-  state = { isRefetchingDataForUser: false, error: null };
+  constructor(props) {
+    super(props);
+    this.expenseTopRef = React.createRef();
+    this.state = {
+      isRefetchingDataForUser: false,
+      error: null,
+      status: PAGE_STATUS.VIEW,
+      editedExpense: null,
+      isSubmitting: false,
+    };
+  }
 
   componentDidMount() {
     // LoggedInUser is not set during SSR, we refetch for permissions
@@ -177,10 +124,15 @@ class ExpensePage extends React.Component {
     }
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps, oldState) {
     // Refetch data when users are logged in to make sure they can see the private info
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.refetchDataForUser();
+    }
+
+    // Scroll to expense's top when changing status
+    if (oldState.status !== this.state.status) {
+      this.scrollToExpenseTop();
     }
   }
 
@@ -190,6 +142,24 @@ class ExpensePage extends React.Component {
       await this.props.data.refetch();
     } finally {
       this.setState({ isRefetchingDataForUser: false });
+    }
+  }
+
+  onSummarySubmit = async () => {
+    try {
+      this.setState({ isSubmitting: true, error: null });
+      const { editedExpense } = this.state;
+      await this.props.mutate({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
+      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false });
+    } catch (e) {
+      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
+      this.scrollToExpenseTop();
+    }
+  };
+
+  scrollToExpenseTop() {
+    if (this.expenseTopRef.current) {
+      this.expenseTopRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -221,9 +191,18 @@ class ExpensePage extends React.Component {
     this.props.client.writeQuery({ query, variables, data });
   };
 
+  getPayoutProfiles = memoizeOne(loggedInAccount => {
+    if (!loggedInAccount) {
+      return [];
+    } else {
+      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', []).map(member => member.account);
+      return [loggedInAccount, ...accountsAdminOf];
+    }
+  });
+
   render() {
     const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
-    const { isRefetchingDataForUser, error } = this.state;
+    const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -240,6 +219,7 @@ class ExpensePage extends React.Component {
     }
 
     const expense = data.expense;
+    const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
     return (
@@ -260,41 +240,92 @@ class ExpensePage extends React.Component {
                   collective={collective}
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
+                  isDisabled={status !== PAGE_STATUS.VIEW}
                 />
               </Flex>
             </Container>
-            <Box flex="1 1 650px" minWidth={300} maxWidth={816} mr={[null, 3, 4, 5]} py={3} px={3}>
-              <Box mb={4}>
-                <StyledLink as={Link} color="black.600" route="expenses" params={{ collectiveSlug }}>
-                  &larr;&nbsp;
-                  <FormattedMessage id="Back" defaultMessage="Back" />
-                </StyledLink>
-              </Box>
+            <Box
+              flex="1 1 650px"
+              minWidth={300}
+              maxWidth={816}
+              mr={[null, 3, 4, 5]}
+              py={3}
+              px={3}
+              ref={this.expenseTopRef}
+            >
+              {status === PAGE_STATUS.VIEW && (
+                <Box mb={4}>
+                  <StyledLink as={Link} color="black.600" route="expenses" params={{ collectiveSlug }}>
+                    &larr;&nbsp;
+                    <FormattedMessage id="Back" defaultMessage="Back" />
+                  </StyledLink>
+                </Box>
+              )}
               {error && (
                 <MessageBox type="error" withIcon mb={4}>
                   {formatErrorMessage(intl, error)}
                 </MessageBox>
               )}
-              <Box mb={3}>
-                <ExpenseSummary
-                  expense={expense}
-                  host={host}
-                  isLoading={!expense}
-                  isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
-                />
-                {expense?.privateMessage && (
-                  <Box>
-                    <H5 fontSize="LeadParagraph" mb={2}>
-                      <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                    </H5>
-                    <PrivateNoteLabel />
-                    <P color="black.700" mt={1} fontSize="LeadCaption">
-                      {expense.privateMessage}
-                    </P>
-                    <StyledHr borderColor="#DCDEE0" mt={4} />
-                  </Box>
-                )}
-              </Box>
+              {status !== PAGE_STATUS.EDIT && (
+                <Box mb={3}>
+                  <ExpenseSummary
+                    expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
+                    host={host}
+                    isLoading={!expense}
+                    isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
+                  />
+                  {expense?.privateMessage && status !== PAGE_STATUS.EDIT_SUMMARY && (
+                    <Box>
+                      <H5 fontSize="LeadParagraph" mb={2}>
+                        <FormattedMessage id="expense.notes" defaultMessage="Notes" />
+                      </H5>
+                      <PrivateNoteLabel />
+                      <P color="black.700" mt={1} fontSize="LeadCaption">
+                        {expense.privateMessage}
+                      </P>
+                      <StyledHr borderColor="#DCDEE0" mt={4} />
+                    </Box>
+                  )}
+                  {status === PAGE_STATUS.EDIT_SUMMARY && (
+                    <div>
+                      <ExpenseNotesForm onChange={this.onNotesChanges} />
+                      <StyledButton
+                        mt={3}
+                        mr={2}
+                        minWidth={150}
+                        data-cy="edit-expense-btn"
+                        onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
+                        disabled={this.state.isSubmitting}
+                      >
+                        ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+                      </StyledButton>
+                      <StyledButton
+                        buttonStyle="primary"
+                        mt={3}
+                        data-cy="submit-expense-btn"
+                        onClick={this.onSummarySubmit}
+                        loading={this.state.isSubmitting}
+                        minWidth={150}
+                      >
+                        <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                      </StyledButton>
+                    </div>
+                  )}
+                </Box>
+              )}
+              {status === PAGE_STATUS.EDIT && (
+                <Box mb={3}>
+                  <ExpenseForm
+                    collective={collective}
+                    loading={loadingLoggedInUser}
+                    expense={editedExpense}
+                    onSubmit={expense => this.setState({ editedExpense: expense, status: PAGE_STATUS.EDIT_SUMMARY })}
+                    payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                    onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
+                    validateOnChange
+                  />
+                </Box>
+              )}
               {expense && (
                 <Box mb={3} pt={3}>
                   <Thread
@@ -320,6 +351,16 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
+                <Flex mb={60}>
+                  <StyledButton
+                    buttonStyle="secondary"
+                    buttonSize="small"
+                    onClick={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
+                    disabled={status !== PAGE_STATUS.VIEW}
+                  >
+                    <FormattedMessage id="Edit" defaultMessage="Edit" />
+                  </StyledButton>
+                </Flex>
                 <H5 mb={3}>
                   <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
                 </H5>
@@ -371,4 +412,10 @@ const getData = graphql(expensePageQuery, {
   },
 });
 
-export default injectIntl(getData(withApollo(withUser(ExpensePage))));
+const withEditExpenseMutation = graphql(editExpenseMutation, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default injectIntl(getData(withApollo(withUser(withEditExpenseMutation(ExpensePage)))));

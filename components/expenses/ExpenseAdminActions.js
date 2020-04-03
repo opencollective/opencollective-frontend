@@ -38,14 +38,14 @@ const ButtonWithLabel = styled(StyledRoundButton).attrs({ size: 40, m: 2 })`
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
  */
-const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
+const ExpenseAdminActions = ({ expense, collective, permissions, onError, isDisabled }) => {
   const { isCopied, copy } = useClipboard();
   return (
     <React.Fragment>
       {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
         <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
           {({ isLoading, downloadInvoice }) => (
-            <ButtonWithLabel loading={isLoading} onClick={downloadInvoice}>
+            <ButtonWithLabel loading={isLoading} onClick={downloadInvoice} disabled={isDisabled}>
               <IconDownload size={18} />
               <ButtonLabel>
                 <FormattedMessage id="actions.download" defaultMessage="Download" />
@@ -54,7 +54,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
           )}
         </ExpenseInvoiceDownloadHelper>
       )}
-      <ButtonWithLabel onClick={() => copy(window.location.href)}>
+      <ButtonWithLabel onClick={() => copy(window.location.href)} disabled={isDisabled}>
         {isCopied ? <Check size={18} /> : <IconLink size={18} />}
         <ButtonLabel>
           {isCopied ? (
@@ -65,7 +65,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
         </ButtonLabel>
       </ButtonWithLabel>
       {permissions?.canDelete && (
-        <ButtonWithLabel buttonStyle="danger">
+        <ButtonWithLabel buttonStyle="danger" disabled={isDisabled}>
           <IconTrash size={18} />
           <ButtonLabel>
             <FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />
@@ -77,6 +77,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError }) => {
 };
 
 ExpenseAdminActions.propTypes = {
+  isDisabled: PropTypes.bool,
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
   }),
