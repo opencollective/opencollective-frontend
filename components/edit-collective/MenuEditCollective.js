@@ -158,11 +158,8 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
-  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: isOneOfTypes(
-    CollectiveType.COLLECTIVE,
-    CollectiveType.ORGANIZATION,
-    CollectiveType.USER,
-  ),
+  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: collective =>
+    collective.isHost || collective.type == CollectiveType.COLLECTIVE,
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: isOneOfTypes(
     CollectiveType.COLLECTIVE,
     CollectiveType.ORGANIZATION,
