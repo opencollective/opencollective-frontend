@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 import { capitalize } from '../../lib/utils';
 import EditConnectedAccount from '../EditConnectedAccount';
+import { H4 } from '../Text';
 
 const EditConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
@@ -17,7 +18,7 @@ const EditConnectedAccounts = props => {
     <div className="EditConnectedAccounts">
       {services.map(service => (
         <div key={`connect-${service}`}>
-          <h2>{capitalize(service)}</h2>
+          <H4 mt={2}>{capitalize(service)}</H4>
           <EditConnectedAccount
             collective={props.collective}
             service={service}

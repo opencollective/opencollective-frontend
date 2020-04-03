@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Flex } from '@rebass/grid';
@@ -29,11 +29,12 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced', // Last on purpose
   // Host Specific
-  HOST_SETTINGS: 'hostSettings',
-  INVOICES: 'invoices',
+  FISCAL_HOSTING: 'fiscal-hosting',
+  HOST_PLAN: 'host-plan',
+  EXPENSES_PAYOUTS: 'expenses-payouts',
+  INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
-  FISCAL_HOSTING: 'fiscal-hosting',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -63,34 +64,38 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
     id: 'editCollective.menu.expenses',
+    defaultMessage: 'Expenses Policy',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: {
+    id: 'editCollective.expensesPayouts',
     defaultMessage: 'Expenses & Payouts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
   },
-  [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: {
-    id: 'Host Plan',
+  [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: {
+    id: 'Host.Plan',
     defaultMessage: 'Host Plan',
   },
   [EDIT_COLLECTIVE_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
     defaultMessage: 'Info',
   },
-  [EDIT_COLLECTIVE_SECTIONS.INVOICES]: {
-    id: 'editCollective.menu.invoicesAndReceipts',
+  [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: {
+    id: 'editCollective.invoicesAndReceipts',
     defaultMessage: 'Invoices & Receipts',
   },
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
-    id: 'editCollective.menu.receivingMoney',
+    id: 'editCollective.receivingMoney',
     defaultMessage: 'Receiving Money',
   },
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
-    id: 'editCollective.menu.sendingMoney',
+    id: 'editCollective.sendingMoney',
     defaultMessage: 'Sending Money',
   },
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: {
-    id: 'editCollective.menu.fiscalHosting',
+    id: 'editCollective.fiscalHosting',
     defaultMessage: 'Fiscal Hosting',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
@@ -148,11 +153,6 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
@@ -165,6 +165,13 @@ const sectionsDisplayConditions = {
     CollectiveType.ORGANIZATION,
     CollectiveType.USER,
   ),
+  // Fiscal Host
+  [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
 };
 
 const shouldDisplaySection = (collective, section) => {
@@ -174,7 +181,7 @@ const shouldDisplaySection = (collective, section) => {
 /**
  * Displays the menu for the edit collective page
  */
-const MenuEditCollective = ({ collective, selectedSection }) => {
+const Menu = ({ collective, selectedSection }) => {
   const { formatMessage } = useIntl();
   const allSections = Object.values(EDIT_COLLECTIVE_SECTIONS);
   const displayedSections = allSections.filter(section => shouldDisplaySection(collective, section));
@@ -206,26 +213,26 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
-      {collective.type !== 'COLLECTIVE' && (
-        <React.Fragment>
+      {['USER', 'ORGANIZATION'].includes(collective.type) && (
+        <Fragment>
           <MenuDivider />
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING))}
-        </React.Fragment>
+        </Fragment>
       )}
       {collective.isHost && (
-        <React.Fragment>
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
+        <Fragment>
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_PLAN))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
-        </React.Fragment>
+        </Fragment>
       )}
     </Flex>
   );
 };
 
-MenuEditCollective.propTypes = {
+Menu.propTypes = {
   selectedSection: PropTypes.oneOf(Object.values(EDIT_COLLECTIVE_SECTIONS)),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
@@ -237,4 +244,4 @@ MenuEditCollective.propTypes = {
   }).isRequired,
 };
 
-export default React.memo(MenuEditCollective);
+export default React.memo(Menu);

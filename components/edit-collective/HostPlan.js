@@ -96,7 +96,7 @@ GenericPlanFeatures.propTypes = {
   plan: PropTypes.string.isRequired,
 };
 
-const EditHostSettings = props => {
+const HostPlan = props => {
   const { collective } = props;
   const { data: opencollective, loading } = useQuery(getCollectiveTiersDescriptionQuery, {
     variables: { slug: 'opencollective' },
@@ -115,7 +115,7 @@ const EditHostSettings = props => {
   const redirectUrl = `${process.env.WEBSITE_URL}/${collective.slug}/edit/hostSettings`;
 
   return (
-    <div className="ExportData">
+    <div>
       <H3>
         <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
       </H3>
@@ -269,8 +269,8 @@ const EditHostSettings = props => {
   );
 };
 
-EditHostSettings.propTypes = {
+HostPlan.propTypes = {
   collective: PropTypes.object.isRequired,
 };
 
-export default EditHostSettings;
+export default HostPlan;

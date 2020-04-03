@@ -21,6 +21,8 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
     setModal({ ...modal, show: true, isApproved: false });
   };
 
+  const onClose = () => setModal({ ...modal, show: false, isApproved: false });
+
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={2}>
       <H2>
@@ -69,8 +71,8 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
               />
             </StyledButton>
           )}
-          <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false, isApproved: false })}>
-            <ModalHeader>
+          <Modal show={modal.show} width="570px" onClose={onClose}>
+            <ModalHeader onClose={onClose}>
               <FormattedMessage
                 id="collective.emptyBalance.header"
                 values={{ action: modal.type }}

@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
-import { H2, H3, P } from '../Text';
+import { H3, H4, P } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
@@ -15,7 +15,6 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Currency } from '../../lib/constants/currency';
-import { capitalize } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
@@ -38,15 +37,15 @@ import ExternalLink from '../ExternalLink';
 import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
 import EditCollectiveArchive from './EditCollectiveArchive';
 import EditCollectiveDelete from './EditCollectiveDelete';
-import EditCollectiveHostAccount from './EditCollectiveHostAccount';
+import FiscalHosting from './FiscalHosting';
 import EditUserEmailForm from './EditUserEmailForm';
-import EditHostInvoice from './EditHostInvoice';
+import InvoicesReceipts from './InvoicesReceipts';
 import EditCollectiveConversations from './EditCollectiveConversations';
 import EditCollectiveUpdates from './EditCollectiveUpdates';
-import EditHostSettings from './EditHostSettings';
+import HostPlan from './HostPlan';
 import EditReceivingSendingMoney from './EditReceivingSendingMoney';
 
-import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
+import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -136,7 +135,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Short description',
       },
       'expensePolicy.label': {
-        id: 'editCollective.menus.labelexpenses',
+        id: 'editCollective.menu.expenses',
         defaultMessage: 'Expenses Policy',
       },
       'expensePolicy.description': {
@@ -176,7 +175,7 @@ class EditCollectiveForm extends React.Component {
       },
       'application.label': {
         id: 'collective.application.label',
-        defaultMessage: 'Applications',
+        defaultMessage: 'Open to Applications',
       },
       'application.description': {
         id: 'collective.application.description',
@@ -394,8 +393,8 @@ class EditCollectiveForm extends React.Component {
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.MEMBERS) {
       return <EditMembers collective={collective} LoggedInUser={LoggedInUser} />;
-    } else if (section === EDIT_COLLECTIVE_SECTIONS.INVOICES) {
-      return <EditHostInvoice collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS) {
+      return <InvoicesReceipts collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.UPDATES) {
       return <EditCollectiveUpdates collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS) {
@@ -432,10 +431,10 @@ class EditCollectiveForm extends React.Component {
       return (
         <EditHost collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
       );
-    } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS) {
-      return <EditHostSettings collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST_PLAN) {
+      return <HostPlan collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS) {
-      return <EditPaymentMethods collectiveSlug={collective.slug} sendingSection="true" />;
+      return <EditPaymentMethods collectiveSlug={collective.slug} sendingSection={true} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS) {
       return <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS) {
@@ -443,45 +442,31 @@ class EditCollectiveForm extends React.Component {
     } else if (section === EDIT_COLLECTIVE_SECTIONS.EXPORT) {
       return <ExportData collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING) {
-      return (
-        <Box>
-          {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
-            <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
-          )}
-        </Box>
-      );
+      return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY) {
       return (
-        <Flex mt={3} flexDirection="column">
-          <H3>{capitalize('Sending Money')}</H3>
-          <Box>
-            <Container fontSize="Caption" mt={2}>
-              <EditReceivingSendingMoney
-                collective={collective}
-                connectedAccounts={collective.connectedAccounts}
-                sendingMoney={true}
-              />
-              <H2>
-                <h2>
-                  <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'PayPal'} />
-                </h2>
-              </H2>
-              <P>
-                <FormattedMessage
-                  id="collective.sendMoney.description"
-                  defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
-                />
-              </P>
-            </Container>
-          </Box>
-        </Flex>
+        <React.Fragment>
+          <H3>
+            <FormattedMessage id="editCollective.sendingMoney" defaultMessage={'Sending Money'} />
+          </H3>
+          <EditReceivingSendingMoney
+            collective={collective}
+            connectedAccounts={collective.connectedAccounts}
+            sendingMoney={true}
+          />
+          <H4 mt={2}>
+            <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
+          </H4>
+          <P>
+            <FormattedMessage
+              id="collective.sendMoney.description"
+              defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
+            />
+          </P>
+        </React.Fragment>
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY) {
-      return (
-        <Flex mt={3} flexDirection="column">
-          <EditPaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />
-        </Flex>
-      );
+      return <EditPaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />;
     } else if (['gift-cards-create', 'gift-cards-send'].includes(this.state.section)) {
       return (
         <Flex mt={3} flexDirection="column">
@@ -720,6 +705,12 @@ class EditCollectiveForm extends React.Component {
           type: 'textarea',
         },
       ],
+      'expenses-payouts': [
+        {
+          name: 'expensePolicy',
+          type: 'textarea',
+        },
+      ],
       'fiscal-hosting': [
         {
           name: 'application',
@@ -835,22 +826,21 @@ class EditCollectiveForm extends React.Component {
         </style>
 
         <Flex flexWrap="wrap">
-          <MenuEditCollective collective={collective} selectedSection={this.getMenuSelectedSection()} />
+          <Menu collective={collective} selectedSection={this.getMenuSelectedSection()} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
             {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
               <H3>
-                {' '}
-                <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />{' '}
+                <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
               </H3>
             )}
-            {this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES && (
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
               <H3>
-                {' '}
-                <FormattedMessage id="editCollective.menu.expenses" defaultMessage={'Expenses & Payouts'} />{' '}
+                <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
               </H3>
             )}
             {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
             {(this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES ||
+              this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS ||
               this.state.section === EDIT_COLLECTIVE_SECTIONS.INFO ||
               collective.isHost) && (
               <div className="FormInputs">
@@ -929,7 +919,7 @@ class EditCollectiveForm extends React.Component {
             {collective.isHost &&
               [
                 EDIT_COLLECTIVE_SECTIONS.ADVANCED,
-                EDIT_COLLECTIVE_SECTIONS.EXPENSES,
+                EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS,
                 EDIT_COLLECTIVE_SECTIONS.INFO,
                 EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING,
               ].includes(this.state.section) && (

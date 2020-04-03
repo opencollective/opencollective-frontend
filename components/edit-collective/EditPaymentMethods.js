@@ -8,11 +8,11 @@ import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { compose, capitalize } from '../../lib/utils';
+import { compose } from '../../lib/utils';
 import { addEditCollectiveMutation } from '../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { H1, H2, H3, Span, P } from '../Text';
+import { H1, H2, H3, H4, Span, P } from '../Text';
 import Link from '../Link';
 import Loading from '../Loading';
 import EditPaymentMethod from './EditPaymentMethod';
@@ -281,7 +281,7 @@ class EditPaymentMethods extends React.Component {
         {this.props.receivingSection && showEditManualPaymentMethod && (
           <React.Fragment>
             <H3>
-              <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />
+              <FormattedMessage id="editCollective.receivingMoney" defaultMessage="Receiving Money" />
             </H3>
             <EditReceivingSendingMoney
               collective={this.props.collective}
@@ -292,9 +292,9 @@ class EditPaymentMethods extends React.Component {
         )}
         {this.props.receivingSection && showEditManualPaymentMethod && (
           <React.Fragment>
-            <H2>
-              <h2>{capitalize('Bank Transfers')}</h2>
-            </H2>
+            <H4 mt={2}>
+              <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
+            </H4>
 
             <Box>
               <Container fontSize="Caption" mt={2} color="black.600" textAlign="left">

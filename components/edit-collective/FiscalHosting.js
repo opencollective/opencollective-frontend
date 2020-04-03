@@ -57,7 +57,7 @@ const getCollectiveType = type => {
   }
 };
 
-const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deactivateCollectiveAsHost }) => {
+const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollectiveAsHost }) => {
   const collectiveType = getCollectiveType(collective.type);
   const { refetch } = useContext(GraphQLContext);
   const defaultAction = isHostAccount ? 'Activate' : 'Deactivate';
@@ -106,6 +106,8 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
       setaActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
     }
   };
+
+  const onClose = () => setModal({ ...modal, show: false });
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
@@ -176,8 +178,8 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         </P>
       )}
 
-      <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
-        <ModalHeader>
+      <Modal show={modal.show} width="570px" onClose={onClose}>
+        <ModalHeader onClose={onClose}>
           {modal.type === 'Activate' && (
             <FormattedMessage id="collective.activateAsHost" defaultMessage={'Activate as Host'} />
           )}
@@ -242,10 +244,10 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
   );
 };
 
-EditCollectiveHostAccount.propTypes = {
+FiscalHosting.propTypes = {
   collective: PropTypes.object.isRequired,
   activateCollectiveAsHost: PropTypes.func,
   deactivateCollectiveAsHost: PropTypes.func,
 };
 
-export default addDeactivateCollectiveAsHostMutation(addActivateCollectiveAsHostMutation(EditCollectiveHostAccount));
+export default addDeactivateCollectiveAsHostMutation(addActivateCollectiveAsHostMutation(FiscalHosting));
