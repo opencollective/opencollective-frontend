@@ -38,6 +38,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
     data: PropTypes.object,
     editCollective: PropTypes.func,
     buttonStyle: PropTypes.string,
+    buttonSize: PropTypes.string,
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
   };
@@ -71,11 +72,17 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   }
 
   render() {
-    const { host, data, disabled, buttonStyle, minWidth } = this.props;
+    const { host, data, disabled, buttonStyle, buttonSize, minWidth } = this.props;
 
     if (data.loading) {
       return (
-        <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} disabled data-cy="host-apply-btn-loading">
+        <StyledButton
+          buttonStyle={buttonStyle}
+          buttonSize={buttonSize}
+          minWidth={minWidth}
+          disabled
+          data-cy="host-apply-btn-loading"
+        >
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
         </StyledButton>
       );
@@ -90,7 +97,13 @@ class ApplyToHostBtnLoggedIn extends React.Component {
         <div className="ApplyToHostBtnLoggedIn">
           {!this.inactiveCollective && (
             <Link route={`/${host.slug}/apply`}>
-              <StyledButton buttonStyle={buttonStyle} disabled={disabled} minWidth={minWidth} data-cy="host-apply-btn">
+              <StyledButton
+                buttonStyle={buttonStyle}
+                buttonSize={buttonSize}
+                disabled={disabled}
+                minWidth={minWidth}
+                data-cy="host-apply-btn"
+              >
                 <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
               </StyledButton>
             </Link>

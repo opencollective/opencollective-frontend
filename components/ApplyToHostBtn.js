@@ -32,6 +32,7 @@ class ApplyToHostBtn extends React.Component {
     LoggedInUser: PropTypes.object,
     showConditions: PropTypes.bool,
     buttonStyle: PropTypes.string,
+    buttonSize: PropTypes.string,
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
   };
@@ -39,10 +40,11 @@ class ApplyToHostBtn extends React.Component {
   static defaultProps = {
     showConditions: true,
     buttonStyle: 'secondary',
+    buttonSize: 'small',
   };
 
   render() {
-    const { LoggedInUser, host, showConditions, buttonStyle, minWidth, disabled } = this.props;
+    const { LoggedInUser, host, showConditions, buttonStyle, buttonSize, minWidth, disabled } = this.props;
 
     return (
       <div className="ApplyToHostBtn">
@@ -58,6 +60,7 @@ class ApplyToHostBtn extends React.Component {
           <Link route={`/${host.slug}/apply`}>
             <StyledButton
               buttonStyle={buttonStyle}
+              buttonSize={buttonSize}
               disabled={disabled}
               minWidth={minWidth}
               data-cy="host-apply-btn-logged-out"
@@ -72,6 +75,7 @@ class ApplyToHostBtn extends React.Component {
             host={host}
             disabled={disabled}
             buttonStyle={buttonStyle}
+            buttonSize={buttonSize}
             minWidth={minWidth}
           />
         )}
