@@ -271,7 +271,7 @@
   "completePledge.Title": "Выполнить свое обязательство",
   "confirm": "Подтвердить",
   "confirmCollective.deletion.title": "Ваш {collectiveType} был удален.",
-  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this \n                {collectiveType}.",
+  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",
   "confirmCollective.user.deletion.description": "Мы удалили ваши учетную запись, расходы, способы оплаты и связанные аккаунты.",
   "confirmEmail.error.InvalidToken": "Ссылка подтверждения некорректна либо время активации истекло",
   "confirmEmail.sucess": "Ваша электронная почта была изменена",
