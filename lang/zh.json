@@ -271,7 +271,7 @@
   "completePledge.Title": "Complete your pledge",
   "confirm": "Confirm",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",
-  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this \n                {collectiveType}.",
+  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",
   "confirmCollective.user.deletion.description": "We've deleted your user account, expenses, payment methods, and connected accounts.",
   "confirmEmail.error.InvalidToken": "确认链接无效或已过期",
   "confirmEmail.sucess": "您的电子邮件已更改",

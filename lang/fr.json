@@ -271,7 +271,7 @@
   "completePledge.Title": "Compléter votre promesse de don",
   "confirm": "Confirmer",
   "confirmCollective.deletion.title": "Votre {collectiveType} a été supprimé.",
-  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this \n                {collectiveType}.",
+  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",
   "confirmCollective.user.deletion.description": "Nous avons supprimé votre compte utilisateur, vos dépenses, vos méthodes de paiement et vos comptes connectés.",
   "confirmEmail.error.InvalidToken": "Le lien de confirmation n’est pas valide ou a expiré",
   "confirmEmail.sucess": "Votre adresse email a été changée",
