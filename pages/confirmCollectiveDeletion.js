@@ -82,8 +82,7 @@ class ConfirmCollectiveDeletion extends Component {
               <FormattedMessage
                 id="confirmCollective.other.deletion.description"
                 values={{ collectiveType }}
-                defaultMessage="We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this 
-                {collectiveType}."
+                defaultMessage="We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}."
               />
             </P>
           )}
