@@ -1,7 +1,7 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 import PropTypes from 'prop-types';
-import { withApollo } from 'react-apollo';
+import { withApollo } from '@apollo/react-hoc';
 
 import { Router } from '../server/pages';
 import UserClass from '../lib/LoggedInUser';

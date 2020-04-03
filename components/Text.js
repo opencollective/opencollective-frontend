@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
 
-import { textTransform, whiteSpace, wordBreak, cursor } from '../lib/styled_system_custom';
+import { textTransform, whiteSpace, wordBreak, cursor } from '../lib/styled-system-custom-properties';
 
 export const P = styled.p.attrs(props => ({
   // Overrides default margin Y to avoid global styles
@@ -28,7 +28,7 @@ export const P = styled.p.attrs(props => ({
 P.defaultProps = {
   fontSize: 'Paragraph',
   letterSpacing: '-0.4px',
-  lineHeight: 'Paragraph',
+  lineHeight: '1.1em',
 };
 
 export const Span = P.withComponent('span');
@@ -39,6 +39,10 @@ Span.defaultProps = {
   lineHeight: 'inherit',
 };
 
+export const Label = P.withComponent('label');
+
+export const Strong = P.withComponent('strong');
+
 export const H1 = P.withComponent('h1');
 
 H1.defaultProps = {
@@ -47,6 +51,7 @@ H1.defaultProps = {
   fontWeight: 'bold',
   letterSpacing: '-1.2px',
   lineHeight: 'H1',
+  textAlign: 'left',
 };
 
 export const H2 = P.withComponent('h2');
@@ -87,5 +92,5 @@ H5.defaultProps = {
   letterSpacing: '-0.4px',
   lineHeight: 'H5',
   fontWeight: 500,
-  color: 'black.800',
+  color: 'black.900',
 };

@@ -3,8 +3,8 @@ import styled, { css } from 'styled-components';
 import { background, border, color, layout, flexbox, space, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import propTypes from '@styled-system/prop-types';
-import { overflow } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/theme';
+import { overflow } from '../lib/styled-system-custom-properties';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
 const getBorderColor = ({ error, success }) => {
   if (error) {
@@ -60,12 +60,20 @@ const StyledInput = styled.input`
     cursor: not-allowed;
   }
 
-  &:focus, &:hover:not(:disabled) {
+  &:hover:not(:disabled) {
     border-color: ${themeGet('colors.primary.300')};
+  }
+
+  &:focus:not(:disabled) {
+    border-color: ${themeGet('colors.primary.500')};
   }
 
   &::placeholder {
     color: ${themeGet('colors.black.400')};
+  }
+
+  &[type="date"] {
+    font-family: inherit;
   }
 `;
 

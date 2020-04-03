@@ -8,7 +8,7 @@ import React from 'react';
 import { get } from 'lodash';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from '@apollo/react-components';
 import theme from '../lib/theme';
 import * as Intl from '../server/intl';
 import initClient from '../lib/initClient';

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { border, color, layout, typography, space, flexbox } from 'styled-system';
-import themeGet from '@styled-system/theme-get';
+import { border, color, layout, typography, space, flexbox, background } from 'styled-system';
 
-import { textTransform } from '../lib/styled_system_custom';
-import { buttonSize, buttonStyle } from '../lib/theme';
+import { textTransform } from '../lib/styled-system-custom-properties';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 import StyledSpinner from './StyledSpinner';
+import theme from '../lib/theme';
 
 /**
  * styled-component button using styled-system
@@ -20,7 +20,9 @@ const StyledButtonContent = styled.button`
   outline: 0;
   border: 1px solid;
   border-radius: 100px;
-
+  letter-spacing: -0.4px;
+  font-weight: 500;
+  
   &:disabled {
     cursor: not-allowed;
   }
@@ -30,31 +32,43 @@ const StyledButtonContent = styled.button`
     vertical-align: middle;
   }
 
+  /** Variants */
   ${buttonStyle}
   ${buttonSize}
 
-  ${props =>
-    props.asLink &&
-    css`
-      background: none !important;
-      color: inherit;
-      border: none;
-      padding: 0;
-      font: inherit;
-      color: ${themeGet('colors.primary.500')};
-
-      &:active {
-        color: ${themeGet('colors.primary.400')};
-      }
-    `}
-
+  /** Styled-system */
   ${border}
   ${color}
+  ${background}
   ${flexbox}
   ${space}
   ${layout}
   ${typography}
   ${textTransform}
+
+  /** Special prop to render borderless */
+  ${props => {
+    if (props.asLink || props.isBorderless) {
+      const baseActiveStyles = props.theme.buttons[props.buttonStyle]['&:active'];
+
+      return css`
+        background: transparent;
+        background-color: transparent;
+        border: 1px solid transparent !important;
+
+        &:hover:not(:disabled):not(:active) {
+          background: ${props.theme.colors.black[50]};
+          background-color: ${props.theme.colors.black[50]};
+        }
+
+        &:active {
+          color: ${baseActiveStyles.color};
+          background: ${baseActiveStyles.background};
+          background-color: ${baseActiveStyles.backgroundColor};
+        }
+      `;
+    }
+  }}
 `;
 
 const StyledButton = ({ loading, ...props }) =>
@@ -62,7 +76,7 @@ const StyledButton = ({ loading, ...props }) =>
     <StyledButtonContent {...props} />
   ) : (
     <StyledButtonContent {...props} onClick={undefined}>
-      <StyledSpinner />
+      <StyledSpinner size="0.9em" />
     </StyledButtonContent>
   );
 
@@ -70,11 +84,11 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonSize: PropTypes.oneOf(['small', 'medium', 'large']),
+  buttonSize: PropTypes.oneOf(Object.keys(theme.buttonSizes)),
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark', 'danger', 'success']),
+  buttonStyle: PropTypes.oneOf(Object.keys(theme.buttons)),
   /**
    * From styled-system: accepts any css 'display' value
    */
@@ -108,8 +122,15 @@ StyledButton.propTypes = {
    * Show a loading spinner on button
    */
   loading: PropTypes.bool,
-  /** If true, will display a link instead of a button */
+  /**
+   * @deprecated Please use `isBorderless`
+   * If true, will display a link instead of a button
+   */
   asLink: PropTypes.bool,
+  /**
+   * If true, will display a link instead of a button
+   */
+  isBorderless: PropTypes.bool,
 };
 
 StyledButton.defaultProps = {

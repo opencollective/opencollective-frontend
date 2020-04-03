@@ -5,7 +5,7 @@ import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
 import { get, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 import { Lock } from '@styled-icons/fa-solid';
 
@@ -229,7 +229,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton data-cy="view-all-updates-btn" buttonSize="large" mt={4} width={1} p="10px">
+            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 
-import { textTransform } from '../lib/styled_system_custom';
+import { textTransform } from '../lib/styled-system-custom-properties';
 import StyledTooltip from './StyledTooltip';
 import Link from './Link';
 

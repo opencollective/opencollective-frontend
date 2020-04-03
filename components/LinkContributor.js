@@ -13,7 +13,7 @@ import Link from './Link';
  */
 const LinkContributor = ({ contributor, children }) => {
   if (contributor.isIncognito) {
-    return children || <FormattedMessage id="profile.incognito" defaultMessge="Incognito" />;
+    return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (contributor.collectiveSlug) {
     return (
       <Link route="collective" params={{ slug: contributor.collectiveSlug }}>

@@ -10,6 +10,7 @@ import Link from '../Link';
 import Logo from '../Logo';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
+import LinkCollective from '../LinkCollective';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo-card.svg';
 
@@ -154,19 +155,23 @@ class PledgedCollectiveCard extends React.Component {
     return (
       <StyledCard width={250} height={380} borderRadius={8} bg="#ffffff">
         <CardHeader>
-          <LogoBorder></LogoBorder>
+          <LogoBorder />
           <LogoContainer>
-            <Logo
-              src={defaultPledgedLogo}
-              type={collective.type}
-              website={collective.website}
-              height={70}
-              width={213}
-            />
+            <LinkCollective collective={collective}>
+              <Logo
+                src={defaultPledgedLogo}
+                type={collective.type}
+                website={collective.website}
+                height={70}
+                width={213}
+              />
+            </LinkCollective>
           </LogoContainer>
         </CardHeader>
         <CardBody>
-          <CollectiveNameText>{collective.name}</CollectiveNameText>
+          <LinkCollective collective={collective}>
+            <CollectiveNameText>{collective.name}</CollectiveNameText>
+          </LinkCollective>
           <CollectiveDescriptionText>
             <FormattedMessage id="pledgedCollective" defaultMessage="Pledged Collective" />
           </CollectiveDescriptionText>

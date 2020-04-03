@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { getSubscriptionsQuery } from '../lib/graphql/queries';
 import Subscriptions from './Subscriptions';
 import { cloneDeep } from 'lodash';

@@ -5,8 +5,18 @@ import { get } from 'lodash';
 
 import TopBar from './TopBar';
 
-import { truncate, getCollectiveImage } from '../lib/utils';
+import { truncate } from '../lib/utils';
+import { getCollectiveImage } from '../lib/image-utils';
 import UserWarnings from './UserWarnings';
+
+import { defineMessages, injectIntl } from 'react-intl';
+
+const messages = defineMessages({
+  defaultTitle: {
+    id: 'OC.tagline',
+    defaultMessage: 'Make your community sustainable. Collect and spend money transparently.',
+  },
+});
 
 class Header extends React.Component {
   static propTypes = {
@@ -23,6 +33,8 @@ class Header extends React.Component {
     metas: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
+    /** @ignore from injectIntl */
+    intl: PropTypes.object,
   };
 
   getTitle() {
@@ -32,7 +44,7 @@ class Header extends React.Component {
       if (this.props.collective) {
         title = this.props.collective.name;
       } else {
-        title = 'Open Collective - open your finances to your community';
+        title = `Open Collective - ${this.props.intl.formatMessage(messages.defaultTitle)}`;
       }
     }
 
@@ -44,8 +56,7 @@ class Header extends React.Component {
   }
 
   getMetas() {
-    const collective = this.props.collective;
-
+    const { noRobots, collective } = this.props;
     const title = this.props.title || (collective && collective.name);
     const image = this.props.image || (collective && getCollectiveImage(collective));
     const description =
@@ -55,7 +66,7 @@ class Header extends React.Component {
       (collective && (collective.twitterHandle || get(collective.parentCollective, 'twitterHandle')));
 
     const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
-    const defaultImage = 'https://opencollective.com/static/images/opencollective-og-default.jpg';
+    const defaultImage = `https://opencollective.com/static/images/opencollective-og-default.png`;
 
     const metas = {
       'twitter:site': '@opencollect',
@@ -72,7 +83,7 @@ class Header extends React.Component {
       ...this.props.metas,
     };
 
-    if (this.props.noRobots || (collective && collective.isIncognito)) {
+    if (noRobots || (collective && collective.isIncognito)) {
       metas.robots = 'none';
     }
 
@@ -104,4 +115,4 @@ class Header extends React.Component {
   }
 }
 
-export default Header;
+export default injectIntl(Header);

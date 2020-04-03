@@ -4,7 +4,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { get, orderBy, isEmpty } from 'lodash';
 import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
+import { Query } from '@apollo/react-components';
 
 import { formatCurrency } from '../../../lib/utils';
 import { P, Span } from '../../Text';
@@ -89,11 +89,11 @@ const SectionBudget = ({ collective, stats }) => {
                     <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
                       <StyledButton
                         data-cy="view-all-transactions-btn"
-                        buttonSize="large"
                         my={2}
                         minWidth={290}
                         width="100%"
-                        py="10px"
+                        buttonSize="small"
+                        fontSize="Paragraph"
                       >
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAll"
@@ -106,11 +106,11 @@ const SectionBudget = ({ collective, stats }) => {
                     <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
                       <StyledButton
                         data-cy="view-all-expenses-btn"
-                        buttonSize="large"
                         my={2}
                         minWidth={290}
                         width="100%"
-                        py="10px"
+                        buttonSize="small"
+                        fontSize="Paragraph"
                       >
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAllExpenses"

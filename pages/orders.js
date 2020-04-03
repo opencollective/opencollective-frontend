@@ -2,19 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import OrdersWithData from '../components/expenses/OrdersWithData';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage, { generateError } from '../components/ErrorPage';
-import SectionTitle from '../components/SectionTitle';
-
+import { generateNotFoundError } from '../lib/errors';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import OrdersWithData from '../components/expenses/OrdersWithData';
+import SectionTitle from '../components/SectionTitle';
 import { withUser } from '../components/UserProvider';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 
 class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
@@ -35,8 +34,7 @@ class OrdersPage extends React.Component {
     if (!data || data.error || data.loading) {
       return <ErrorPage data={data} />;
     } else if (!data.Collective) {
-      ssrNotFoundError(); // Force 404 when rendered server side
-      return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+      return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
     }
 
     const collective = data.Collective;
@@ -99,12 +97,13 @@ class OrdersPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
-          />
+          <Container mb={4}>
+            <CollectiveNavbar
+              collective={collective}
+              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+              showEdit
+            />
+          </Container>
 
           <div className="content">
             <SectionTitle section="orders" subtitle={subtitle} action={action} />

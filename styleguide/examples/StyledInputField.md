@@ -2,11 +2,6 @@ Using [renderProps](https://reactjs.org/docs/render-props.html#using-props-other
 
 Default state:
 
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import StyledInput from 'components/StyledInput';
-```
-
 ```jsx
 import StyledInput from 'components/StyledInput';
 <StyledInputField label="Component with Label" htmlFor="example">

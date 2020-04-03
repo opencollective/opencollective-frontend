@@ -11,7 +11,7 @@ import SignInOrJoinFree from './SignInOrJoinFree';
 import Container from './Container';
 
 /**
- * A wrapper arround `Page` that will display a spinner while user is loading.
+ * A wrapper around `Page` that will display a spinner while user is loading.
  * If authentication fails, users will be prompted with a form to login that will
  * redirect them to the correct page once they do.
  *

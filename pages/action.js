@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { Flex } from '@rebass/grid';
 
-import { capitalize, compose, getErrorFromGraphqlException } from '../lib/utils';
+import { capitalize, compose } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 import Header from '../components/Header';
 import Body from '../components/Body';

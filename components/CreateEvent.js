@@ -11,7 +11,7 @@ import EditEventForm from './EditEventForm';
 import CollectiveNavbar from './CollectiveNavbar';
 
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
-import { getErrorFromGraphqlException } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 class CreateEvent extends React.Component {
   static propTypes = {

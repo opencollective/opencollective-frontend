@@ -8,15 +8,15 @@ import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData'
 import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import ErrorPage from '../components/ErrorPage';
 import SectionTitle from '../components/SectionTitle';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { generateNotFoundError } from '../lib/errors';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 
 class ExpensesPage extends React.Component {
@@ -39,13 +39,13 @@ class ExpensesPage extends React.Component {
     if (!data || data.error || data.loading) {
       return <ErrorPage data={data} />;
     } else if (!data.Collective) {
-      ssrNotFoundError(); // Force 404 when rendered server side
-      return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+      return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
     } else if (!hasFeature(data.Collective, FEATURES.RECEIVE_EXPENSES)) {
       return <PageFeatureNotSupported />;
     }
 
     const collective = data.Collective;
+    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     let action, subtitle, filter;
     if (this.props.value) {
@@ -105,11 +105,10 @@ class ExpensesPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
+          <CollectiveNavbar
             collective={collective}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
+            isAdmin={canEdit}
+            showEdit
             callsToAction={{ hasContact: collective.canContact, hasSubmitExpense: !collective.isArchived }}
           />
 

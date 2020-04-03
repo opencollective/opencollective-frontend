@@ -6,7 +6,7 @@ import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, getPrecisionFromAmount } from '../../lib/utils';
 import Link from '../Link';
 import { P } from '../Text';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -107,6 +107,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                         interval={tier.interval}
                         currency={currency}
                         amountStyles={{ fontWeight: 'bold', fontSize: 'H5', color: 'black.900' }}
+                        precision={getPrecisionFromAmount(tier.goal)}
                       />
                     ),
                   }}
@@ -123,6 +124,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                         amount={raised}
                         currency={currency}
                         interval={tier.interval}
+                        precision={getPrecisionFromAmount(raised)}
                       />
                     ),
                   }}
@@ -178,6 +180,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 interval={tier.interval}
                 currency={currency}
                 amountStyles={{ fontSize: 'H5', fontWeight: 'bold', color: 'black.900' }}
+                precision={getPrecisionFromAmount(minAmount)}
               />
             </P>
           </div>

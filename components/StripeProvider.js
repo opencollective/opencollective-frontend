@@ -9,7 +9,7 @@ export const StripeLoaderContext = React.createContext({
 });
 
 /**
- * A wrapPropTypesper arround StriperProvider context that loads the external script
+ * A wrapPropTypesper around StriperProvider context that loads the external script
  * on the client.
  */
 class StripeProvider extends React.Component {

@@ -1,22 +1,17 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import paymentMethods from '../../mocks/payment_methods';
-import { personalProfile } from '../../mocks/profiles';
-```
-
 ### With PayPal and Manual
 
 ```js
 import paymentMethods from '../../mocks/payment_methods';
 import { personalProfile } from '../../mocks/profiles';
 
-initialState = { disabled: false, values: null };
+const [disabled, setDisabled] = React.useState(false);
+const [values, setValues] = React.useState(null);
 <div>
   <StepPayment
     withPaypal
     collective={personalProfile}
-    disabled={state.disabled}
-    onChange={values => setState({ values })}
+    disabled={disabled}
+    onChange={setValues}
     paymentMethods={paymentMethods}
     manual={{
       title: 'Bank transfer',
@@ -26,10 +21,10 @@ initialState = { disabled: false, values: null };
   />
   <br />
   <br />
-  <button onClick={() => setState({ disabled: !state.disabled })}>{state.disabled ? 'Enable' : 'Disable'}</button>
+  <button onClick={() => setDisabled(!disabled)}>{disabled ? 'Enable' : 'Disable'}</button>
   <hr />
   <br />
   <label>State</label>
-  <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(state.values, null, 2)}</pre>
+  <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(values, null, 2)}</pre>
 </div>;
 ```

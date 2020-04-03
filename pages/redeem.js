@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
 import sanitizeHtml from 'sanitize-html';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { fontSize, maxWidth } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -22,7 +22,8 @@ import { P, H1, H5 } from '../components/Text';
 import LinkCollective from '../components/LinkCollective';
 
 import { getLoggedInUserQuery } from '../lib/graphql/queries';
-import { isValidEmail, getErrorFromGraphqlException } from '../lib/utils';
+import { isValidEmail } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../lib/errors';
 
 import StyledButton from '../components/StyledButton';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';

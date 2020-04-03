@@ -29,6 +29,10 @@ class Response extends React.Component {
     const { intl, response } = this.props;
     const { user, description, status } = response;
 
+    if (!user) {
+      return <div />;
+    }
+
     const name =
       (user.name && user.name.match(/^null/) ? null : user.name) ||
       (user.email && user.email.substr(0, user.email.indexOf('@')));

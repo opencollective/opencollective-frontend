@@ -56,7 +56,12 @@ class ApplyToHostBtn extends React.Component {
         </style>
         {!LoggedInUser && (
           <Link route={`/${host.slug}/apply`}>
-            <StyledButton buttonStyle={buttonStyle} disabled={disabled} minWidth={minWidth} data-cy="host-apply-btn">
+            <StyledButton
+              buttonStyle={buttonStyle}
+              disabled={disabled}
+              minWidth={minWidth}
+              data-cy="host-apply-btn-logged-out"
+            >
               <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
             </StyledButton>
           </Link>

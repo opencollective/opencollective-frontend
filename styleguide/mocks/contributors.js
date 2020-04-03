@@ -9870,7 +9870,7 @@ export const webpackContributors = [
     totalAmountDonated: 1800,
     type: 'USER',
     publicMessage:
-      'Thank you for creating Webpack. This is a library we use every day and it has med web development configuration and build processes a lot more managable ',
+      'Thank you for creating Webpack. This is a library we use every day and it has med web development configuration and build processes a lot more manageable ',
   },
   {
     id: '17797',

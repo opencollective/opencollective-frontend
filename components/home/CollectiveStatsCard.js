@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
 
-import { imagePreview, getCollectiveImage } from '../../lib/utils';
+import { imagePreview, getCollectiveImage } from '../../lib/image-utils';
 
 import { Flex } from '@rebass/grid';
 import Container from '../Container';

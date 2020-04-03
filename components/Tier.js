@@ -25,8 +25,8 @@ class Tier extends React.Component {
     super(props);
     this.state = { customAmountError: null };
 
-    this.onChange = this.props.onChange || function() {};
-    this.onClick = this.props.onClick || function() {};
+    this.onChange = this.props.onChange || function () {};
+    this.onClick = this.props.onClick || function () {};
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 

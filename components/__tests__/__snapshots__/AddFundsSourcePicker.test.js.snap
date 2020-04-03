@@ -25,7 +25,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -33,7 +33,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
           Search for Users or Organizations
         </div>
         <div
-          className="css-1g6gooi"
+          className="css-b8ldur-Input"
         >
           <div
             className=""
@@ -91,10 +91,10 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
         </div>
       </div>
       <div
-        className=" css-1wy0on6"
+        className=" css-1hb7zxy-IndicatorsContainer"
       >
         <span
-          className=" css-1hyfx7x"
+          className=" css-1xjgjl1-IndicatorSeparator"
         />
         <div
           aria-hidden="true"
@@ -151,7 +151,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -159,7 +159,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
           Search for Users or Organizations
         </div>
         <div
-          className="css-1g6gooi"
+          className="css-b8ldur-Input"
         >
           <div
             className=""
@@ -217,10 +217,10 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
         </div>
       </div>
       <div
-        className=" css-1wy0on6"
+        className=" css-1hb7zxy-IndicatorsContainer"
       >
         <span
-          className=" css-1hyfx7x"
+          className=" css-1xjgjl1-IndicatorSeparator"
         />
         <div
           aria-hidden="true"
@@ -277,7 +277,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -285,7 +285,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
           Search for Users or Organizations
         </div>
         <div
-          className="css-1g6gooi"
+          className="css-b8ldur-Input"
         >
           <div
             className=""
@@ -343,10 +343,10 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
         </div>
       </div>
       <div
-        className=" css-1wy0on6"
+        className=" css-1hb7zxy-IndicatorsContainer"
       >
         <span
-          className=" css-1hyfx7x"
+          className=" css-1xjgjl1-IndicatorSeparator"
         />
         <div
           aria-hidden="true"
@@ -403,7 +403,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-1hwfws3"
+        className=" css-g1d714-ValueContainer"
       >
         <div
           className=" css-1wa3eu0-placeholder"
@@ -411,7 +411,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
           Search for Users or Organizations
         </div>
         <div
-          className="css-1g6gooi"
+          className="css-b8ldur-Input"
         >
           <div
             className=""
@@ -469,10 +469,10 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
         </div>
       </div>
       <div
-        className=" css-1wy0on6"
+        className=" css-1hb7zxy-IndicatorsContainer"
       >
         <span
-          className=" css-1hyfx7x"
+          className=" css-1xjgjl1-IndicatorSeparator"
         />
         <div
           aria-hidden="true"

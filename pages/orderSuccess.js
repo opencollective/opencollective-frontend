@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
@@ -11,7 +11,7 @@ import confetti from 'canvas-confetti';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 
-import orderSuccessBackgroundUrl from '../static/images/order-success-background.svg';
+import orderSuccessBackgroundUrl from '../public/static/images/order-success-background.svg';
 
 import { tweetURL, facebooKShareURL } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';

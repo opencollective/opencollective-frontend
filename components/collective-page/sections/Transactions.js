@@ -4,7 +4,7 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
 import { orderBy } from 'lodash';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import memoizeOne from 'memoize-one';
 
 import MessageBox from '../../MessageBox';
@@ -184,7 +184,7 @@ class SectionTransactions extends React.Component {
         <ContainerSectionContent>
           <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin || isRoot} isInverted />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton mt={3} width="100%">
+            <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
             </StyledButton>
           </Link>

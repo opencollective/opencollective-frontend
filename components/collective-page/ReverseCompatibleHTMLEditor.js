@@ -15,7 +15,7 @@ const convertTitlesDown = htmlString => {
 };
 
 /**
- * Having a convertion with Showdown here will ensure a smooth migration
+ * Having a conversion with Showdown here will ensure a smooth migration
  * from old collective page that used an (un-documented) markdown description.
  * Once the new collective page becomes the default, we should remove all
  * markdow-related code from the new collective page.

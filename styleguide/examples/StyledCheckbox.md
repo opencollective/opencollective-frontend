@@ -1,11 +1,11 @@
 ### Normal
 
 ```js
-initialState = { checked: false };
+const [checked, setChecked] = React.useState(false);
 <StyledCheckbox
-  checked={state.checked}
-  onChange={({ checked }) => setState({ checked })}
-  label={state.checked ? 'Checked' : 'Unchecked'}
+  checked={checked}
+  onChange={({ checked }) => setChecked(checked)}
+  label={checked ? 'Checked' : 'Unchecked'}
 />;
 ```
 
@@ -28,23 +28,18 @@ initialState = { checked: false };
 ### With custom sizes
 
 ```js
-initialState = { checked: false };
+const [checked, setChecked] = React.useState(false);
 
 <div>
   <StyledCheckbox
     label="A little bit bigger"
     size="20px"
-    checked={state.checked}
-    onChange={({ checked }) => setState({ checked })}
+    checked={checked}
+    onChange={({ checked }) => setChecked(checked)}
   />
   <br />
-  <StyledCheckbox label="Wow" size="30px" checked={state.checked} onChange={({ checked }) => setState({ checked })} />
+  <StyledCheckbox label="Wow" size="30px" checked={checked} onChange={({ checked }) => setChecked(checked)} />
   <br />
-  <StyledCheckbox
-    label="This is huge"
-    size="50px"
-    checked={state.checked}
-    onChange={({ checked }) => setState({ checked })}
-  />
+  <StyledCheckbox label="This is huge" size="50px" checked={checked} onChange={({ checked }) => setChecked(checked)} />
 </div>;
 ```

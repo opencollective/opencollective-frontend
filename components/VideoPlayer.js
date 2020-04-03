@@ -30,7 +30,7 @@ const ResponsiveIframe = styled(({ src, ...props }) => (
 ))`
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; // 16:9 aspect ratio equivalant (9/16 === 0.5625)
+  padding-bottom: 56.25%; // 16:9 aspect ratio equivalent (9/16 === 0.5625)
   background: black;
 
   iframe {

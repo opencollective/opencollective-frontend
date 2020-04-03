@@ -4,6 +4,9 @@ import { FormattedMessage } from 'react-intl';
 
 import Currency from './Currency';
 
+/** Default styles for the amount (not including currency) */
+export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', color: 'black.900' };
+
 /**
  * A practical component to format amounts and their intervals with proper
  * internationalization support.
@@ -16,6 +19,7 @@ const FormattedMoneyAmount = ({
   amount,
   interval,
   amountStyles,
+  showCurrencyCode,
 }) => {
   const formattedAmount = (
     <Currency
@@ -27,12 +31,13 @@ const FormattedMoneyAmount = ({
     />
   );
 
+  const currencyCode = showCurrencyCode ? currency : '';
   if (!interval) {
     return (
       <FormattedMessage
         id="Amount"
         defaultMessage="{amount} {currencyCode}"
-        values={{ amount: formattedAmount, currencyCode: currency }}
+        values={{ amount: formattedAmount, currencyCode }}
       />
     );
   } else if (abbreviateInterval) {
@@ -40,7 +45,7 @@ const FormattedMoneyAmount = ({
       <FormattedMessage
         id="AmountInterval"
         defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.}}"
-        values={{ amount: formattedAmount, interval: interval, currencyCode: currency }}
+        values={{ amount: formattedAmount, interval: interval, currencyCode }}
       />
     );
   } else {
@@ -48,7 +53,7 @@ const FormattedMoneyAmount = ({
       <FormattedMessage
         id="AmountIntervalLong"
         defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year}}"
-        values={{ amount: formattedAmount, interval: interval, currencyCode: currency }}
+        values={{ amount: formattedAmount, interval: interval, currencyCode }}
       />
     );
   }
@@ -63,6 +68,8 @@ FormattedMoneyAmount.propTypes = {
   abbreviateAmount: PropTypes.bool,
   /** Abbreviate the interval (eg. year => yr.) */
   abbreviateInterval: PropTypes.bool,
+  /** Whether to show the full currency code (ie. USD) */
+  showCurrencyCode: PropTypes.bool,
   /** How many numbers should we display after the comma */
   precision: PropTypes.number,
   /** An interval that goes with the amount */
@@ -75,6 +82,8 @@ FormattedMoneyAmount.defaultProps = {
   abbreviate: false,
   abbreviateInterval: false,
   precision: 0,
+  amountStyles: DEFAULT_AMOUNT_STYLES,
+  showCurrencyCode: true,
 };
 
 export default FormattedMoneyAmount;

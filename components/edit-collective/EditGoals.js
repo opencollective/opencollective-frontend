@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, sortBy } from 'lodash';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
@@ -14,7 +14,7 @@ import StyledButton from '../StyledButton';
 import { P, H3 } from '../Text';
 import StyledCheckbox from '../StyledCheckbox';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 

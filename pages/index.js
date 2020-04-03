@@ -1,4 +1,5 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 
 import Page from '../components/Page';
 import MakeCommunitySection from '../components/home/sections/MakeCommunity';
@@ -9,22 +10,36 @@ import FiscalHostSection from '../components/home/sections/FiscalHost';
 import WeAreOpenSection from '../components/home/sections/WeAreOpen';
 import LearnMoreSection from '../components/home/sections/LearnMore';
 import JoinUsSection from '../components/home/sections/JoinUs';
+import { useIntl, defineMessages } from 'react-intl';
 
-class NewHomePage extends React.Component {
-  render() {
-    return (
-      <Page menuItems={{ pricing: true, howItWorks: true }}>
-        <MakeCommunitySection />
-        <WhatCanYouDoSection />
-        <FeaturesSection />
-        <OCUsersSection />
-        <FiscalHostSection />
-        <WeAreOpenSection />
-        <LearnMoreSection />
-        <JoinUsSection />
-      </Page>
-    );
-  }
-}
+const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
+  ssr: false,
+});
 
-export default NewHomePage;
+const menuItems = { pricing: true, howItWorks: true };
+
+const messages = defineMessages({
+  defaultTitle: {
+    id: 'OC.tagline',
+    defaultMessage: 'Make your community sustainable. Collect and spend money transparently.',
+  },
+});
+
+const HomePage = () => {
+  const { formatMessage } = useIntl();
+  return (
+    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+      <MakeCommunitySection />
+      <WhatCanYouDoSection />
+      <FeaturesSection />
+      <OCUsersSection />
+      <FiscalHostSection />
+      <WeAreOpenSection />
+      <LearnMoreSection />
+      <JoinUsSection />
+      <CovidBanner showLink />
+    </Page>
+  );
+};
+
+export default HomePage;

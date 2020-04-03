@@ -2,20 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { get, set } from 'lodash';
+import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
+import { H2, H3, P } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { Currency } from '../../lib/constants/currency';
+import { capitalize } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
 import EditTiers from './EditTiers';
+import EditTickets from './EditTicket';
 import EditGoals from './EditGoals';
 import EditHost from './EditHost';
 import EditMembers from './EditMembers';
@@ -37,7 +42,9 @@ import EditCollectiveHostAccount from './EditCollectiveHostAccount';
 import EditUserEmailForm from './EditUserEmailForm';
 import EditHostInvoice from './EditHostInvoice';
 import EditCollectiveConversations from './EditCollectiveConversations';
+import EditCollectiveUpdates from './EditCollectiveUpdates';
 import EditHostSettings from './EditHostSettings';
+import EditReceivingSendingMoney from './EditReceivingSendingMoney';
 
 import MenuEditCollective, { EDIT_COLLECTIVE_SECTIONS } from './MenuEditCollective';
 
@@ -66,16 +73,18 @@ class EditCollectiveForm extends React.Component {
     collective.application = get(collective, 'settings.apply');
     collective.markdown = get(collective, 'settings.markdown');
 
+    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
     this.state = {
       modified: false,
       section: 'info',
       collective,
-      tiers: collective.tiers || [{}],
+      tiers: tiers.length === 0 ? [] : tiers,
+      tickets: tickets.length === 0 ? [] : tickets,
     };
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditImages = collective.type === CollectiveType.EVENT;
     this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
     this.showHost = collective.type === 'COLLECTIVE';
     this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
@@ -99,8 +108,8 @@ class EditCollectiveForm extends React.Component {
       'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
-        id: 'collective.tos.label',
-        defaultMessage: 'Terms of Service',
+        id: 'host.tos',
+        defaultMessage: 'Terms of fiscal sponsorship',
       },
       'tos.description': {
         id: 'collective.tos.description',
@@ -127,8 +136,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Short description',
       },
       'expensePolicy.label': {
-        id: 'collective.expensePolicy.label',
-        defaultMessage: 'Collective expense policy',
+        id: 'editCollective.menus.labelexpenses',
+        defaultMessage: 'Expenses Policy',
       },
       'expensePolicy.description': {
         id: 'collective.expensePolicy.description',
@@ -143,6 +152,10 @@ class EditCollectiveForm extends React.Component {
       'startsAt.label': {
         id: 'startDateAndTime',
         defaultMessage: 'start date and time',
+      },
+      'endsAt.label': {
+        id: 'event.endsAt.label',
+        defaultMessage: 'end date and time',
       },
       'image.label': { id: 'collective.image.label', defaultMessage: 'Avatar' },
       'backgroundImage.label': {
@@ -184,6 +197,14 @@ class EditCollectiveForm extends React.Component {
       'country.label': {
         id: 'collective.country.label',
         defaultMessage: 'Country',
+      },
+      'currency.label': {
+        id: 'collective.currency.label',
+        defaultMessage: 'Currency',
+      },
+      'currency.placeholder': {
+        id: 'collective.currency.placeholder',
+        defaultMessage: 'Select currency',
       },
       'address.label': {
         id: 'collective.address.label',
@@ -263,9 +284,12 @@ class EditCollectiveForm extends React.Component {
   componentDidUpdate(oldProps) {
     const { collective, router } = this.props;
     if (oldProps.collective !== collective) {
+      const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+      const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
       this.setState({
-        collective: collective,
-        tiers: collective.tiers,
+        collective,
+        tiers,
+        tickets,
       });
     } else if (oldProps.router.query.section !== router.query.section) {
       this.setState({ section: router.query.section });
@@ -284,6 +308,23 @@ class EditCollectiveForm extends React.Component {
       set(collective, 'settings.VAT.type', value);
     } else if (fieldname === 'VAT-number') {
       set(collective, 'settings.VAT.number', value);
+    } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
+      collective[fieldname] = value;
+      const endsAt = collective.endsAt;
+      if (!endsAt || new Date(endsAt) < new Date(value)) {
+        let newEndDate = new Date(value);
+        if (!endsAt) {
+          newEndDate.setHours(newEndDate.getHours() + 2);
+        } else {
+          // https://github.com/opencollπective/opencollective/issues/1232
+          const endsAtDate = new Date(endsAt);
+          newEndDate = new Date(value);
+          newEndDate.setHours(endsAtDate.getHours());
+          newEndDate.setMinutes(endsAtDate.getMinutes());
+        }
+        const endsAtValue = newEndDate.toString();
+        collective['endsAt'] = endsAtValue;
+      }
     } else {
       collective[fieldname] = value;
     }
@@ -294,12 +335,27 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleObjectChange(obj) {
-    this.setState({ ...obj, modified: true });
+    const { section } = this.state;
+    if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
+      this.setState({ tickets: obj.tiers, modified: true });
+    } else {
+      this.setState({ ...obj, modified: true });
+    }
     window.state = this.state;
   }
 
   async handleSubmit() {
     const collective = { ...this.state.collective, tiers: this.state.tiers };
+    if (collective.type === CollectiveType.EVENT) {
+      collective.tiers = [];
+      if (find(this.state.tickets, 'name')) {
+        collective.tiers = [...this.state.tickets];
+      }
+
+      if (find(this.state.tiers, 'name')) {
+        collective.tiers = [...collective.tiers, ...this.state.tiers];
+      }
+    }
     this.props.onSubmit(collective);
     this.setState({ modified: false });
   }
@@ -328,14 +384,11 @@ class EditCollectiveForm extends React.Component {
       return (
         <Box>
           {collective.type === CollectiveType.USER && <EditUserEmailForm />}
-          {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
-            <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
-          )}
           {collective.type === CollectiveType.COLLECTIVE && (
             <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
           )}
           <EditCollectiveArchive collective={collective} />
-          {collective.type !== CollectiveType.EVENT && <EditCollectiveDelete collective={collective} />}
+          <EditCollectiveDelete collective={collective} />
           <hr />
         </Box>
       );
@@ -343,6 +396,8 @@ class EditCollectiveForm extends React.Component {
       return <EditMembers collective={collective} LoggedInUser={LoggedInUser} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.INVOICES) {
       return <EditHostInvoice collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.UPDATES) {
+      return <EditCollectiveUpdates collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS) {
       return <EditCollectiveConversations collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.WEBHOOKS) {
@@ -356,7 +411,19 @@ class EditCollectiveForm extends React.Component {
           collective={collective}
           currency={collective.currency}
           onChange={this.handleObjectChange}
-          defaultType={this.defaultTierType}
+          defaultType="TIER"
+        />
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
+      return (
+        <EditTickets
+          title="Tickets"
+          types={['TICKET']}
+          tiers={this.state.tickets}
+          collective={collective}
+          currency={collective.currency}
+          onChange={this.handleObjectChange}
+          defaultType="TICKET"
         />
       );
     } else if (section === EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS) {
@@ -368,13 +435,53 @@ class EditCollectiveForm extends React.Component {
     } else if (section === EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS) {
       return <EditHostSettings collective={collective} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS) {
-      return <EditPaymentMethods collectiveSlug={collective.slug} />;
+      return <EditPaymentMethods collectiveSlug={collective.slug} sendingSection="true" />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS) {
       return <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS) {
       return <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
     } else if (section === EDIT_COLLECTIVE_SECTIONS.EXPORT) {
       return <ExportData collective={collective} />;
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING) {
+      return (
+        <Box>
+          {(collective.type === CollectiveType.USER || collective.type === CollectiveType.ORGANIZATION) && (
+            <EditCollectiveHostAccount collective={collective} LoggedInUser={LoggedInUser} />
+          )}
+        </Box>
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY) {
+      return (
+        <Flex mt={3} flexDirection="column">
+          <H3>{capitalize('Sending Money')}</H3>
+          <Box>
+            <Container fontSize="Caption" mt={2}>
+              <EditReceivingSendingMoney
+                collective={collective}
+                connectedAccounts={collective.connectedAccounts}
+                sendingMoney={true}
+              />
+              <H2>
+                <h2>
+                  <FormattedMessage id="collective.sendMoney.payapl" defaultMessage={'PayPal'} />
+                </h2>
+              </H2>
+              <P>
+                <FormattedMessage
+                  id="collective.sendMoney.description"
+                  defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
+                />
+              </P>
+            </Container>
+          </Box>
+        </Flex>
+      );
+    } else if (section === EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY) {
+      return (
+        <Flex mt={3} flexDirection="column">
+          <EditPaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />
+        </Flex>
+      );
     } else if (['gift-cards-create', 'gift-cards-send'].includes(this.state.section)) {
       return (
         <Flex mt={3} flexDirection="column">
@@ -420,6 +527,8 @@ class EditCollectiveForm extends React.Component {
       submitBtnMessageId = status;
     }
 
+    const isEvent = collective.type === CollectiveType.EVENT;
+    const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
     const type = collective.type.toLowerCase();
@@ -449,6 +558,7 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: 'https://opencollective.com/',
           placeholder: '',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'twitterHandle',
@@ -457,6 +567,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           placeholder: '',
           label: 'Twitter',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'githubHandle',
@@ -465,23 +576,77 @@ class EditCollectiveForm extends React.Component {
           maxLength: 39,
           placeholder: '',
           label: 'Github',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'website',
           type: 'text',
           maxLength: 255,
           placeholder: '',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'address',
           placeholder: '',
           maxLength: 255,
           type: 'textarea',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
         {
           name: 'country',
           type: 'country',
           placeholder: 'Select country',
+          when: () => collective.type !== CollectiveType.EVENT,
+        },
+        {
+          name: 'startsAt',
+          type: 'datetime',
+          placeholder: '',
+          defaultValue: collective.startsAt || defaultStartsAt,
+          validate: date => {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return date.isAfter(yesterday);
+          },
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'endsAt',
+          type: 'datetime',
+          options: { timezone: collective.timezone },
+          placeholder: '',
+          validate: date => {
+            const yesterday = new Date(collective.startsAt || defaultStartsAt);
+            yesterday.setDate(yesterday.getDate() - 1);
+            return date.isAfter(yesterday);
+          },
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'timezone',
+          type: 'TimezonePicker',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'location',
+          placeholder: '',
+          type: 'location',
+          when: () => collective.type === CollectiveType.EVENT,
+        },
+        {
+          name: 'currency',
+          type: 'select',
+          defaultValue: get(this.state.collective, 'currency'),
+          options: currencyOptions,
+          when: () => {
+            if (get(this.state.collective, 'isHost')) {
+              return false;
+            }
+            if ([CollectiveType.ORGANIZATION, CollectiveType.USER].includes(get(this.state.collective, 'type'))) {
+              return true;
+            }
+            return false;
+          },
         },
         {
           name: 'VAT',
@@ -520,6 +685,10 @@ class EditCollectiveForm extends React.Component {
           placeholder: 'FRXX999999999',
           defaultValue: get(this.state.collective, 'settings.VAT.number'),
           when: () => {
+            if (collective.type === CollectiveType.EVENT) {
+              return false;
+            }
+
             if (this.state.collective.type === CollectiveType.COLLECTIVE) {
               // Collectives can set a VAT number if configured
               const collectiveCountry = get(this.state.collective, 'location.country');
@@ -542,53 +711,22 @@ class EditCollectiveForm extends React.Component {
           maxLength: 128,
           type: 'tags',
           placeholder: 'meetup, javascript',
-        },
-        {
-          name: 'tos',
-          type: 'text',
-          placeholder: '',
-          defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => get(this.state.collective, 'isHost'),
-        },
-      ],
-      images: [
-        {
-          name: 'image',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images',
-        },
-        {
-          name: 'backgroundImage',
-          type: 'dropzone',
-          placeholder: 'Drop an image or click to upload',
-          className: 'horizontal',
-          when: () => this.state.section === 'images',
+          when: () => collective.type !== CollectiveType.EVENT,
         },
       ],
       expenses: [
         {
           name: 'expensePolicy',
           type: 'textarea',
-          description: 'Protip: you can use markdown',
         },
       ],
-      advanced: [
+      'fiscal-hosting': [
         {
           name: 'application',
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.apply'),
-          when: () => this.state.section === 'advanced' && collective.isHost,
-        },
-        {
-          name: 'sendInvoiceByEmail',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
-          when: () =>
-            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
+          when: () => collective.isHost,
         },
         {
           name: 'hostFeePercent',
@@ -596,7 +734,25 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           post: '%',
           defaultValue: get(this.state.collective, 'settings.hostFeePercent'),
-          when: () => this.state.section === 'advanced' && collective.isHost,
+          when: () => collective.isHost,
+        },
+        {
+          name: 'tos',
+          type: 'text',
+          placeholder: '',
+          className: 'horizontal',
+          defaultValue: get(this.state.collective, 'settings.tos'),
+          when: () => get(this.state.collective, 'isHost'),
+        },
+      ],
+      advanced: [
+        {
+          name: 'sendInvoiceByEmail',
+          className: 'horizontal',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
+          when: () =>
+            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
       ],
     };
@@ -681,66 +837,134 @@ class EditCollectiveForm extends React.Component {
         <Flex flexWrap="wrap">
           <MenuEditCollective collective={collective} selectedSection={this.getMenuSelectedSection()} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
-            {this.renderSection(this.state.section)}
-            <div className="FormInputs">
-              {Object.keys(this.fields).map(
-                section =>
-                  this.state.section === section && (
-                    <div className="inputs" key={section}>
-                      {this.fields[section].map(
-                        field =>
-                          (!field.when || field.when()) && (
-                            <InputField
-                              key={field.name}
-                              className={field.className}
-                              defaultValue={this.getFieldDefaultValue(field)}
-                              validate={field.validate}
-                              ref={field.name}
-                              name={field.name}
-                              label={field.label}
-                              description={field.description}
-                              options={field.options}
-                              placeholder={field.placeholder}
-                              type={field.type}
-                              pre={field.pre}
-                              post={field.post}
-                              context={this.state.collective}
-                              onChange={value => this.handleChange(field.name, value)}
-                            />
-                          ),
-                      )}
-                    </div>
-                  ),
-              )}
-            </div>
-
-            {[
-              EDIT_COLLECTIVE_SECTIONS.ADVANCED,
-              EDIT_COLLECTIVE_SECTIONS.EXPENSES,
-              EDIT_COLLECTIVE_SECTIONS.IMAGES,
-              EDIT_COLLECTIVE_SECTIONS.INFO,
-              EDIT_COLLECTIVE_SECTIONS.TIERS,
-            ].includes(this.state.section) && (
-              <div className="actions">
-                <Button
-                  bsStyle="primary"
-                  type="submit"
-                  onClick={this.handleSubmit}
-                  disabled={status === 'loading' || !this.state.modified}
-                >
-                  {submitBtnLabel}
-                </Button>
-                <div className="backToProfile">
-                  <Link route="collective" params={{ slug: collective.slug }}>
-                    <FormattedMessage
-                      id="collective.edit.backToProfile"
-                      defaultMessage="view {type} page"
-                      values={{ type }}
-                    />
-                  </Link>
-                </div>
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
+              <H3>
+                {' '}
+                <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />{' '}
+              </H3>
+            )}
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES && (
+              <H3>
+                {' '}
+                <FormattedMessage id="editCollective.menu.expenses" defaultMessage={'Expenses & Payouts'} />{' '}
+              </H3>
+            )}
+            {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
+            {(this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES ||
+              this.state.section === EDIT_COLLECTIVE_SECTIONS.INFO ||
+              collective.isHost) && (
+              <div className="FormInputs">
+                {Object.keys(this.fields).map(
+                  section =>
+                    this.state.section === section && (
+                      <div className="inputs" key={section}>
+                        {this.fields[section].map(
+                          field =>
+                            (!field.when || field.when()) && (
+                              <InputField
+                                key={field.name}
+                                className={field.className}
+                                defaultValue={this.getFieldDefaultValue(field)}
+                                validate={field.validate}
+                                ref={field.name}
+                                name={field.name}
+                                label={field.label}
+                                description={field.description}
+                                options={field.options}
+                                placeholder={field.placeholder}
+                                type={field.type}
+                                pre={field.pre}
+                                post={field.post}
+                                context={this.state.collective}
+                                onChange={value => this.handleChange(field.name, value)}
+                              />
+                            ),
+                        )}
+                      </div>
+                    ),
+                )}
               </div>
             )}
+
+            {/* special coniditon to handle collective expenses */}
+            {(collective.type === 'COLLECTIVE' || collective.type === 'EVENT') &&
+              [
+                EDIT_COLLECTIVE_SECTIONS.EXPENSES,
+                EDIT_COLLECTIVE_SECTIONS.TIERS,
+                EDIT_COLLECTIVE_SECTIONS.INFO,
+                EDIT_COLLECTIVE_SECTIONS.TICKETS,
+              ].includes(this.state.section) && (
+                <div className="actions">
+                  {(collective.type === 'COLLECTIVE' || collective.type === 'EVENT') && (
+                    <Button
+                      bsStyle="primary"
+                      type="submit"
+                      onClick={this.handleSubmit}
+                      disabled={status === 'loading' || !this.state.modified}
+                    >
+                      {submitBtnLabel}
+                    </Button>
+                  )}
+                  {(collective.type === 'COLLECTIVE' || collective.type === 'EVENT') && (
+                    <div className="backToProfile">
+                      <Link
+                        route={isEvent ? 'event' : 'collective'}
+                        params={
+                          isEvent
+                            ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                            : { slug: collective.slug }
+                        }
+                      >
+                        <FormattedMessage
+                          id="collective.edit.backToProfile"
+                          defaultMessage="view {type} page"
+                          values={{ type }}
+                        />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+
+            {collective.isHost &&
+              [
+                EDIT_COLLECTIVE_SECTIONS.ADVANCED,
+                EDIT_COLLECTIVE_SECTIONS.EXPENSES,
+                EDIT_COLLECTIVE_SECTIONS.INFO,
+                EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING,
+              ].includes(this.state.section) && (
+                <div className="actions">
+                  {collective.isHost && (
+                    <Button
+                      bsStyle="primary"
+                      type="submit"
+                      onClick={this.handleSubmit}
+                      disabled={status === 'loading' || !this.state.modified}
+                    >
+                      {submitBtnLabel}
+                    </Button>
+                  )}
+                  {collective.isHost && (
+                    <div className="backToProfile">
+                      <Link
+                        route={isEvent ? 'event' : 'collective'}
+                        params={
+                          isEvent
+                            ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                            : { slug: collective.slug }
+                        }
+                      >
+                        <FormattedMessage
+                          id="collective.edit.backToProfile"
+                          defaultMessage="view {type} page"
+                          values={{ type }}
+                        />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
           </Flex>
         </Flex>
       </div>

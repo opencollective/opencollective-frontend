@@ -22,7 +22,7 @@ const VideoPlaceholder = styled(({ children, ...props }) => (
   /** Main-container, sized with padding-bottom to be 16:9 */
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; // 16:9 aspect ratio equivalant (9/16 === 0.5625)
+  padding-bottom: 56.25%; // 16:9 aspect ratio equivalent (9/16 === 0.5625)
   background: #f7f8fa;
   color: #dcdee0;
 

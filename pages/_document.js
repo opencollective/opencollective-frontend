@@ -5,17 +5,8 @@ import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
 import { pick } from 'lodash';
-import * as Sentry from '@sentry/browser';
 
 import { parseToBoolean } from '../lib/utils';
-
-process.on('unhandledRejection', err => {
-  Sentry.captureException(err);
-});
-
-process.on('uncaughtException', err => {
-  Sentry.captureException(err);
-});
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
@@ -85,6 +76,8 @@ export default class IntlDocument extends Document {
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
       'SENTRY_DSN',
+      'SENTRY_RELEASE',
+      'WEBSITE_URL',
       'GOOGLE_MAPS_API_KEY',
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',

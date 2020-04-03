@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
+import { generateNotFoundError } from '../lib/errors';
 
 /**
  * This page is shown when NextJS triggers a critical error during server-side
@@ -26,7 +27,7 @@ class NextJSErrorPage extends React.Component {
       const slugRegex = /^\/([^/?]+)/;
       const parsedUrl = slugRegex.exec(url);
       const pageSlug = parsedUrl && parsedUrl[1];
-      return <ErrorPage log={false} error={generateError.notFound(pageSlug)} />;
+      return <ErrorPage log={false} error={generateNotFoundError(pageSlug, false)} />;
     } else {
       return <ErrorPage />;
     }

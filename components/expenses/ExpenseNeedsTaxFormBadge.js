@@ -34,6 +34,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
     return (
       !!isTaxFormRequired && (
         <Span display="inline-block">
+          {' | '}
           <span data-toggle="tooltip" data-placement="bottom" title={hoverMessage}>
             <MessageBox type="warning" display="inline" css={{ padding: '4px', borderRadius: '5px' }} withIcon={true}>
               <StyledLink
@@ -44,7 +45,6 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
               </StyledLink>
             </MessageBox>
           </span>
-          {' | '}
         </Span>
       )
     );

@@ -1,10 +1,3 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { Box, Flex } from '@rebass/grid';
-import { P } from 'components/Text';
-import { Info } from '@styled-icons/feather/Info';
-```
-
 ```js
 import { P } from 'components/Text';
 

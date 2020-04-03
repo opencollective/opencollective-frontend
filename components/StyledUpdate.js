@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 import ReactTooltip from 'react-tooltip';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { Lock } from '@styled-icons/fa-solid';

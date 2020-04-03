@@ -16,9 +16,7 @@ describe('create an update', () => {
     cy.get('[data-cy="privateIcon"]').should('not.exist');
     cy.get('.UpdatePage .PublishUpdateBtn').contains('Your update will be sent to');
     cy.get('.UpdatePage button.publish').click();
-    cy.get('[data-cy=meta]')
-      .contains('draft')
-      .should('not.exist');
+    cy.get('[data-cy=meta]').contains('draft').should('not.exist');
 
     cy.get('[data-cy=toggleEditUpdate').click();
     cy.wait(300);
@@ -32,9 +30,7 @@ describe('create an update', () => {
 describe('random user cannot see update', () => {
   it('cannot view private update', () => {
     cy.visit('/testcollective/updates');
-    cy.get('[data-cy=updateTitle]')
-      .first()
-      .click(); // The update created in the describe block above.
+    cy.get('[data-cy=updateTitle]').first().click(); // The update created in the describe block above.
     cy.wait(500);
     cy.get('[data-cy=mesgBox]').contains('Become a backer of');
     cy.get('[data-cy=mesgBox]').contains('to see this update');

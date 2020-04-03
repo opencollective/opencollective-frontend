@@ -1,8 +1,3 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { randomCollectivesList } from '../mocks/collectives';
-```
-
 ## Default
 
 ```jsx
@@ -48,16 +43,41 @@ const searchCollectives = search => {
     }, 1000);
   });
 };
-initialState = { collectives: [], loading: false };
+const [collectives, setCollectives] = React.useState([]);
+const [loading, setLoading] = React.useState(false);
 <CollectivePicker
-  isLoading={state.loading}
-  collectives={state.collectives}
+  isLoading={loading}
+  collectives={collectives}
   onInputChange={(search, { action }) => {
     if (action !== 'input-change') {
       return;
     }
-    setState({ loading: true });
-    searchCollectives(search).then(collectives => setState({ collectives, loading: false }));
+    setLoading(true);
+    searchCollectives(search).then(collectives => {
+      setCollectives(collectives);
+      setLoading(false);
+    });
   }}
 />;
+```
+
+## Nested form
+
+When put inside a form, the collective picker should **never** submit its parent.
+
+```jsx
+const [isParentSubmitted, setParentSubmitted] = React.useState(false);
+<form
+  onSubmit={e => {
+    e.preventDefault();
+    console.log(e);
+    setParentSubmitted(true);
+  }}
+>
+  <p>
+    Is submitted: <strong>{isParentSubmitted ? 'Yes' : 'No'}</strong>
+  </p>
+  <CollectivePicker creatable />
+  <button style={{ marginTop: 400 }}>Submit</button>
+</form>;
 ```

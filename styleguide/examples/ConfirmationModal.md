@@ -1,28 +1,24 @@
-```jsx noeditor
+```js
 import ConfirmationModal from 'components/ConfirmationModal';
 import StyledButton from 'components/StyledButton';
-```
 
-```js
-import StyledButton from 'components/StyledButton';
-
-initialState = { show: false };
+const [show, setShow] = React.useState(false);
 
 <React.Fragment>
-  {state.show ? (
+  {show ? (
     <ConfirmationModal
       show
       header={'Use modal'}
       body={'Are you sure you want to use this modal?'}
-      onClose={() => setState({ show: false })}
+      onClose={() => setShow(false)}
       cancelLabel={'No'}
-      cancelHandler={() => setState({ show: false })}
+      cancelHandler={() => setShow(false)}
       continueLabel={'Yes'}
       continueHandler={console.log}
     />
   ) : (
-    <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => setState({ show: true })}>
-      Use Modal
+    <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => setShow(true)}>
+      Show modal
     </StyledButton>
   )}
 </React.Fragment>;

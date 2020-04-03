@@ -33,9 +33,7 @@ describe('Contribution Flow: Create profile', () => {
     cy.visit('/apex/donate');
 
     // Select "Create oganization"
-    cy.get('[data-cy="cf-content"]')
-      .contains('Contribute as an organization')
-      .click();
+    cy.get('[data-cy="cf-content"]').contains('Contribute as an organization').click();
 
     // Test frontend validations
     cy.get('[data-cy="cf-content"] input[name=orgName]').type('Test Organization');

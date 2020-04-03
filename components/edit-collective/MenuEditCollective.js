@@ -16,13 +16,14 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INFO: 'info', // First on purpose
   COLLECTIVE_GOALS: 'goals',
   CONNECTED_ACCOUNTS: 'connected-accounts',
+  UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
   EXPENSES: 'expenses',
   EXPORT: 'export',
   HOST: 'host',
-  IMAGES: 'images',
   MEMBERS: 'members',
   PAYMENT_METHODS: 'payment-methods',
+  TICKETS: 'tickets',
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
@@ -30,6 +31,9 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   // Host Specific
   HOST_SETTINGS: 'hostSettings',
   INVOICES: 'invoices',
+  RECEIVING_MONEY: 'receiving-money',
+  SENDING_MONEY: 'sending-money',
+  FISCAL_HOSTING: 'fiscal-hosting',
 };
 
 const SECTION_LABELS = defineMessages({
@@ -45,6 +49,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.connectedAccounts',
     defaultMessage: 'Connected Accounts',
   },
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: {
+    id: 'updates',
+    defaultMessage: 'Updates',
+  },
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: {
     id: 'conversations',
     defaultMessage: 'Conversations',
@@ -55,7 +63,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: {
     id: 'editCollective.menu.expenses',
-    defaultMessage: 'Expenses Policy',
+    defaultMessage: 'Expenses & Payouts',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
@@ -65,10 +73,6 @@ const SECTION_LABELS = defineMessages({
     id: 'Host Plan',
     defaultMessage: 'Host Plan',
   },
-  [EDIT_COLLECTIVE_SECTIONS.IMAGES]: {
-    id: 'editCollective.menu.images',
-    defaultMessage: 'Images',
-  },
   [EDIT_COLLECTIVE_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
     defaultMessage: 'Info',
@@ -76,6 +80,18 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: {
     id: 'editCollective.menu.invoicesAndReceipts',
     defaultMessage: 'Invoices & Receipts',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: {
+    id: 'editCollective.menu.receivingMoney',
+    defaultMessage: 'Receiving Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: {
+    id: 'editCollective.menu.sendingMoney',
+    defaultMessage: 'Sending Money',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: {
+    id: 'editCollective.menu.fiscalHosting',
+    defaultMessage: 'Fiscal Hosting',
   },
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: {
     id: 'editCollective.menu.members',
@@ -96,6 +112,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: {
     id: 'editCollective.menu.webhooks',
     defaultMessage: 'Webhooks',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: {
+    id: 'editCollective.menu.tickets',
+    defaultMessage: 'Tickets',
   },
 });
 
@@ -123,17 +143,28 @@ const isOneOfTypes = (...collectiveTypes) => ({ type }) => collectiveTypes.inclu
 const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveType(type, feature);
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: isFeatureAllowed(FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.IMAGES]: isType(CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.INVOICES]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isType(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
+  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: collective =>
+    collective.isHost || collective.type == CollectiveType.COLLECTIVE,
+  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: isOneOfTypes(
+    CollectiveType.COLLECTIVE,
+    CollectiveType.ORGANIZATION,
+    CollectiveType.USER,
+  ),
 };
 
 const shouldDisplaySection = (collective, section) => {
@@ -153,14 +184,19 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
     section,
   });
   const displayedSectionsInfos = displayedSections.map(getSectionInfo);
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   // eslint-disable-next-line react/prop-types
   const renderMenuItem = ({ section, label, isSelected }) => (
     <MenuItem
       key={section}
       selected={isSelected}
-      route="editCollective"
-      params={{ slug: collective.slug, section }}
+      route={isEvent ? 'editEvent' : 'editCollective'}
+      params={
+        isEvent
+          ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug, section }
+          : { slug: collective.slug, section }
+      }
       data-cy={`menu-item-${section}`}
     >
       {label}
@@ -170,12 +206,19 @@ const MenuEditCollective = ({ collective, selectedSection }) => {
   return (
     <Flex width={0.2} flexDirection="column" mr={4} mb={3} flexWrap="wrap" css={{ flexGrow: 1, minWidth: 175 }}>
       {displayedSectionsInfos.map(renderMenuItem)}
-      {collective.isHost && (
+      {collective.type !== 'COLLECTIVE' && (
         <React.Fragment>
           <MenuDivider />
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING))}
+        </React.Fragment>
+      )}
+      {collective.isHost && (
+        <React.Fragment>
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_SETTINGS))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.EXPENSES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
+          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
         </React.Fragment>
       )}
     </Flex>
@@ -188,6 +231,9 @@ MenuEditCollective.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
     isHost: PropTypes.bool,
+    parentCollective: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
   }).isRequired,
 };
 

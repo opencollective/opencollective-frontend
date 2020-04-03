@@ -2,18 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import OrderWithData from '../components/expenses/OrderWithData';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage, { generateError } from '../components/ErrorPage';
-import Link from '../components/Link';
-
-import { ssrNotFoundError } from '../lib/nextjs_utils';
+import { generateNotFoundError } from '../lib/errors';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import Link from '../components/Link';
+import OrderWithData from '../components/expenses/OrderWithData';
 import { withUser } from '../components/UserProvider';
 
 class OrderPage extends React.Component {
@@ -42,8 +41,7 @@ class OrderPage extends React.Component {
     if (!data || data.error || data.loading) {
       return <ErrorPage data={data} />;
     } else if (!data.Collective) {
-      ssrNotFoundError(); // Force 404 when rendered server side
-      return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+      return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
     }
 
     const collective = data.Collective;
@@ -87,12 +85,13 @@ class OrderPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
-          />
+          <Container mb={4}>
+            <CollectiveNavbar
+              collective={collective}
+              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+              showEdit
+            />
+          </Container>
 
           <div className="content">
             <div className=" columns">

@@ -16,6 +16,7 @@ import StyledInput from '../StyledInput';
 import StyledButton from '../StyledButton';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getNextChargeDate } from '../../lib/date-utils';
+import { getPrecisionFromAmount } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 const FrequenciesI18n = defineMessages({
@@ -139,7 +140,7 @@ const StepDetails = ({
                 onChange={amount => dispatchChange({ amount })}
                 buttonPropsBuilder={({ item }) => ({ display: displayMap[item] })}
               >
-                {({ item }) => <Currency value={item} currency={currency} />}
+                {({ item }) => <Currency value={item} currency={currency} precision={getPrecisionFromAmount(item)} />}
               </StyledButtonSet>
             )}
           </StyledInputField>

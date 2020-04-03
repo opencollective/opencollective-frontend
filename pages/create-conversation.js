@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 import { withRouter } from 'next/router';
 
 import { Router } from '../server/pages';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
+import { generateNotFoundError } from '../lib/errors';
 import { withUser } from '../components/UserProvider';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -83,8 +83,7 @@ class CreateConversationPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(collectiveSlug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
       }
@@ -113,7 +112,8 @@ class CreateConversationPage extends React.Component {
                   </StyledLink>
                   <Box mt={4}>
                     <CreateConversationForm
-                      collectiveId={collective.id}
+                      collective={collective}
+                      LoggedInUser={LoggedInUser}
                       loading={loadingLoggedInUser}
                       onSuccess={this.onCreateSuccess}
                       suggestedTags={this.getSuggestedTags(collective)}

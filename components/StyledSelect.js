@@ -104,7 +104,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
         return { ...baseStyles, ...customStyles };
       },
       option: (baseStyles, state) => {
-        const customStyles = {};
+        const customStyles = { cursor: 'pointer' };
 
         if (state.data.__background__) {
           // Ability to force background by setting a special option prop
@@ -130,7 +130,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           : {
               ...baseStyles,
               overflow: 'hidden', // for children border-radius to apply
-              zIndex: 3,
+              zIndex: 10,
             };
       },
       menuList: baseStyles => ({
@@ -141,9 +141,17 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       indicatorSeparator: () => ({
         display: 'none',
       }),
+      clearIndicator: baseStyles => ({
+        ...baseStyles,
+        cursor: 'pointer',
+      }),
       dropdownIndicator: baseStyles => {
         return hideDropdownIndicator ? STYLES_DISPLAY_NONE : baseStyles;
       },
+      menuPortal: baseStyles => ({
+        ...baseStyles,
+        zIndex: 99999,
+      }),
     },
   }),
 )`
@@ -170,6 +178,8 @@ StyledSelect.propTypes = {
   hideMenu: PropTypes.bool,
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+  /** Default option */
+  defaultValue: PropTypes.object,
   // Styled-system
   ...propTypes.typography,
   ...propTypes.layout,

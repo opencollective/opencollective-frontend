@@ -152,7 +152,7 @@ class EditHost extends React.Component {
                       <br />
                       <FormattedMessage
                         id="editCollective.host.change.balanceNotEmpty"
-                        defaultMessage="If you would like to change fiscal host, you first need to empty your Collective balance. You can do this by submitting expenses, or by transfering funds to another Collective (select your Collective balance as the payment method when making a financial contribution) or to your host (via Advanced)."
+                        defaultMessage="If you would like to change fiscal host, you first need to empty your Collective balance. You can do this by submitting expenses, or by transferring funds to another Collective (select your Collective balance as the payment method when making a financial contribution) or to your host (via Advanced)."
                       />
                     </p>
                   )}

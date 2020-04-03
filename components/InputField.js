@@ -9,6 +9,7 @@ import InputTypeLocation from './InputTypeLocation';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
+import TimezonePicker from './TimezonePicker';
 
 import { capitalize } from '../lib/utils';
 
@@ -426,6 +427,16 @@ class InputField extends React.Component {
             className={`currency ${field.className}`}
             onFocus={event => event.target.select()}
             value={value}
+          />
+        );
+        break;
+
+      case 'TimezonePicker':
+        this.input = (
+          <TimezonePicker
+            label="Timezone"
+            selectedTimezone={field.defaultValue}
+            onChange={timezone => this.handleChange(timezone.value)}
           />
         );
         break;

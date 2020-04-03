@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import Header from '../Header';
 import Body from '../Body';
 import Footer from '../Footer';
@@ -147,7 +147,7 @@ class EditCollective extends React.Component {
               description={notification.description}
             />
           )}
-          <CollectiveNavbar collective={collective} isAdmin={canEditCollective} />
+          <CollectiveNavbar collective={collective} isAdmin={canEditCollective} onlyInfos={true} />
           <div className="content">
             {!canEditCollective && (
               <div className="login">

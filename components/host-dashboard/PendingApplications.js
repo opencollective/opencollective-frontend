@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation, graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
+import { Mutation } from '@apollo/react-components';
 import gql from 'graphql-tag';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
@@ -22,7 +23,7 @@ import Avatar from '../Avatar';
 import MessageBox from '../MessageBox';
 import AppRejectionReasonModal from './AppRejectionReasonModal';
 import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 
 const ApproveCollectiveMutation = gql`
   mutation approveCollective($id: Int!) {

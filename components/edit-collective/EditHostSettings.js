@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
@@ -10,6 +10,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import StyledTooltip from '../StyledTooltip';
 import Button from '../Button';
 import Loading from '../Loading';
+import { H3 } from '../Text';
 import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
 
 const LimitsInfoCircle = styled(InfoCircle)`
@@ -60,6 +61,41 @@ const DisabledMessage = styled.p`
   text-align: center;
 `;
 
+const GenericPlanFeatures = ({ plan }) => {
+  const collectiveLimits = {
+    'single-host-plan': 1,
+    'small-host-plan': 5,
+    'medium-host-plan': 10,
+    'large-host-plan': 10,
+  };
+  return (
+    <ul>
+      <li>
+        {collectiveLimits[plan] === 1 && (
+          <FormattedMessage id="Host.Plan.Collectives.single" defaultMessage="1 hosted collective" />
+        )}
+        {collectiveLimits[plan] > 1 && (
+          <FormattedMessage
+            id="Host.Plan.Collectives.limited"
+            values={{ n: collectiveLimits[plan] }}
+            defaultMessage="Up to {n} hosted collectives"
+          />
+        )}
+      </li>
+      <li>
+        <FormattedMessage id="Host.Plan.AddedFunds.unlimited" defaultMessage="Unlimited added funds" />
+      </li>
+      <li>
+        <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
+      </li>
+    </ul>
+  );
+};
+
+GenericPlanFeatures.propTypes = {
+  plan: PropTypes.string.isRequired,
+};
+
 const EditHostSettings = props => {
   const { collective } = props;
   const { data: opencollective, loading } = useQuery(getCollectiveTiersDescriptionQuery, {
@@ -80,25 +116,27 @@ const EditHostSettings = props => {
 
   return (
     <div className="ExportData">
-      <h3>
+      <H3>
         <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
-      </h3>
+      </H3>
 
       <PlanGrid>
         <Plan active={collective.plan.name === 'default'}>
           <PlanName>Free Plan</PlanName>
           <PlanFeatures>
             <ul>
-              <li>Unlimited hosted collectives</li>
               <li>
-                Up to $1000 added funds
-                <br />
-                (across all collectives)
+                <FormattedMessage id="Host.Plan.Collectives.unlimited" defaultMessage="Unlimited hosted collectives" />
               </li>
               <li>
-                Up to $1000 bank transfers
+                <FormattedMessage id="Host.Plan.AddedFunds.limited" defaultMessage="Up to $1000 added funds" />
                 <br />
-                (across all collectives)
+                (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.BankTransfers.limited" defaultMessage="Up to $1000 bank transfers" />
+                <br />
+                (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
               </li>
             </ul>
           </PlanFeatures>
@@ -122,11 +160,9 @@ const EditHostSettings = props => {
           return (
             <Plan key={tier.id} disabled={!isWithinLimits && !isCurrentPlan} active={isCurrentPlan}>
               <PlanName>{tier.name}</PlanName>
-              <PlanFeatures
-                dangerouslySetInnerHTML={{
-                  __html: tier.longDescription,
-                }}
-              />
+              <PlanFeatures>
+                <GenericPlanFeatures plan={tier.slug} />
+              </PlanFeatures>
               <PlanPrice>
                 ${tier.amount / 100} / {tier.interval}
               </PlanPrice>
@@ -145,9 +181,19 @@ const EditHostSettings = props => {
           <PlanName>Network Host Plan</PlanName>
           <PlanFeatures>
             <ul>
-              <li>More than 25 collectives</li>
-              <li>Unlimited added funds</li>
-              <li>Unlimited bank transfers</li>
+              <li>
+                <FormattedMessage
+                  id="Host.Plan.Collectives.more"
+                  values={{ n: 25 }}
+                  defaultMessage="More than {n} collectives"
+                />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.AddedFunds.unlimited" defaultMessage="Unlimited added funds" />
+              </li>
+              <li>
+                <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
+              </li>
             </ul>
           </PlanFeatures>
           <PlanPrice>Talk to Us</PlanPrice>

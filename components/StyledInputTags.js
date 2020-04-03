@@ -18,7 +18,7 @@ const getOptions = tags => {
   }
 };
 
-const StyledInputTags = ({ suggestedTags, ...props }) => {
+const StyledInputTags = ({ suggestedTags, value, defaultValue, ...props }) => {
   const { formatMessage } = useIntl();
   const options = getOptions(suggestedTags);
   return (
@@ -26,17 +26,22 @@ const StyledInputTags = ({ suggestedTags, ...props }) => {
       isMulti
       data-cy="styled-input-tags"
       options={options}
+      value={getOptions(value)}
       hideDropdownIndicator={!options}
       hideMenu={!options}
       placeholder={formatMessage(messages.placeholder)}
+      defaultValue={getOptions(defaultValue)}
       {...props}
     />
   );
 };
 
 StyledInputTags.propTypes = {
+  /** Id of the input */
+  inputId: PropTypes.string,
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  maxTagLength: PropTypes.number,
+  defaultValue: PropTypes.arrayOf(PropTypes.string),
+  value: PropTypes.arrayOf(PropTypes.string),
 };
 
-export default StyledInputTags;
+export default React.memo(StyledInputTags);

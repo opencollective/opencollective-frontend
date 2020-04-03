@@ -5,12 +5,12 @@ import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import { P } from '../../Text';
-import { HomeStandardLink } from '../HomeLinks';
 import StyledCarousel from '../../StyledCarousel';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import SectionSubTitle from '../SectionSubtitle';
 import Link from '../../Link';
+import StyledLink from '../../StyledLink';
 
 const Img = styled.img`
   max-width: 100%;
@@ -48,6 +48,7 @@ const users = [
     type: 'Open Source Projects',
     description: '',
     collectivePath: '/babel',
+    learnMorePath: '/discover?show=open%20source',
     picture: '/static/images/home/oc-users-babel.png',
   },
   {
@@ -56,6 +57,7 @@ const users = [
     type: 'Meetups',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/wwcodeatl',
+    learnMorePath: '/wwcodeinc',
     picture: '/static/images/home/oc-users-womenwhocode.png',
   },
   {
@@ -64,11 +66,12 @@ const users = [
     type: 'Movements',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/xr-belgium',
+    learnMorePath: '/search?q=rebellion',
     picture: '/static/images/home/oc-users-extinctionrebllion.png',
   },
 ];
 
-const User = ({ id, name, picture, type, collectivePath }) => {
+const User = ({ id, name, picture, type, collectivePath, learnMorePath }) => {
   const intl = useIntl();
 
   return (
@@ -112,9 +115,9 @@ const User = ({ id, name, picture, type, collectivePath }) => {
             {intl.formatMessage(messages[`home.OCusers.${id}`])}
           </P>
         </Box>
-        <HomeStandardLink width="72px" href="/discover">
+        <StyledLink minWidth="72px" href={learnMorePath} buttonStyle="standard" buttonSize="small">
           <FormattedMessage id="home.more" defaultMessage="More" />
-        </HomeStandardLink>
+        </StyledLink>
       </Container>
     </Container>
   );
@@ -126,6 +129,7 @@ User.propTypes = {
   picture: PropTypes.string,
   type: PropTypes.string,
   collectivePath: PropTypes.string,
+  learnMorePath: PropTypes.string,
 };
 
 const OCUsers = () => {
@@ -142,9 +146,13 @@ const OCUsers = () => {
           />
         </SectionSubTitle>
         <Box mt={5}>
-          <HomeStandardLink fontSize="14px" lineHeight="18px" href="/discover">
+          <StyledLink
+            buttonStyle="standard"
+            buttonSize="medium"
+            href="https://blog.opencollective.com/tag/case-studies/"
+          >
             <FormattedMessage id="home.discover" defaultMessage="Discover more" />
-          </HomeStandardLink>
+          </StyledLink>
         </Box>
       </Container>
       <StyledCarousel options={users} display={[null, null, 'none']} width={1}>

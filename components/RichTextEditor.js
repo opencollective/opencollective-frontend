@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import css from '@styled-system/css';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';
@@ -15,7 +15,7 @@ const TrixEditorContainer = styled.div`
     props.withBorders &&
     css({
       border: '1px solid',
-      borderColor: 'black.300',
+      borderColor: !props.error ? 'black.300' : 'red.300',
       borderRadius: 10,
       padding: 3,
     })}
@@ -143,8 +143,6 @@ export default class RichTextEditor extends React.Component {
     inputName: PropTypes.string,
     /** Change this prop to reset the value */
     reset: PropTypes.any,
-    /** A ref for the input. Useful to plug react-hook-form */
-    inputRef: PropTypes.func,
     /** Wether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
@@ -153,7 +151,7 @@ export default class RichTextEditor extends React.Component {
     disabled: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
     toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** Usefull to compensate the height of the toolbar when editing inline */
+    /** Useful to compensate the height of the toolbar when editing inline */
     toolbarOffsetY: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** Min height for the full component */
     editorMinHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
@@ -308,7 +306,6 @@ export default class RichTextEditor extends React.Component {
       editorMinHeight,
       withBorders,
       inputName,
-      inputRef,
       disabled,
       error,
       fontSize,
@@ -332,7 +329,7 @@ export default class RichTextEditor extends React.Component {
             {this.state.error.toString()}
           </MessageBox>
         )}
-        <input id={this.state.id} value={defaultValue} type="hidden" name={inputName} ref={inputRef} />
+        <input id={this.state.id} value={defaultValue} type="hidden" name={inputName} />
         <HTMLContent fontSize={fontSize}>
           <trix-editor
             ref={this.editorRef}

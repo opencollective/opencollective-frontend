@@ -97,7 +97,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
               <LinkContributor contributor={contributor}>
                 <P fontSize="Caption" lineHeight="Caption" fontWeight="bold" color="black.700">
                   {contributor.isIncognito ? (
-                    <FormattedMessage id="profile.incognito" defaultMessge="Incognito" />
+                    <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />
                   ) : (
                     truncate(contributor.name, { length: 20 })
                   )}

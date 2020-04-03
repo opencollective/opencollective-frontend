@@ -8,6 +8,7 @@ class DateTime extends React.Component {
     date: PropTypes.string.isRequired,
     timezone: PropTypes.string.isRequired,
   };
+
   render() {
     const props = this.props;
     const { date, timezone } = props;

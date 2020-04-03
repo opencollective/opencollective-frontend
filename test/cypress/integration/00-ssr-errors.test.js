@@ -21,9 +21,7 @@ describe('the NotFound page when logged out', () => {
   });
 
   it('includes a button to search for the collective', () => {
-    cy.contains('Search for')
-      .should('contain', notFoundSlug)
-      .click();
+    cy.contains('Search for').should('contain', notFoundSlug).click();
 
     // Search page shows an error in tests and dev so we don't have an
     // observable element to watch, fallback on cy.wait

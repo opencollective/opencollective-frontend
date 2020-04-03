@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Error from './Error';
 import Updates from './Updates';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import SectionTitle from './SectionTitle';

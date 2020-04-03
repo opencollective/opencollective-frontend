@@ -6,6 +6,10 @@ import { Box } from '@rebass/grid';
 
 import { P } from '../Text';
 import Container from '../Container';
+import { FormattedMessage } from 'react-intl';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
+import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
+import { size, space } from 'styled-system';
 
 /** Main entry container */
 export const Entry = styled.details`
@@ -29,6 +33,10 @@ export const Entry = styled.details`
     &:hover {
       color: ${themeGet('colors.black.700')};
     }
+
+    button {
+      display: none;
+    }
   }
 
   summary:focus {
@@ -50,8 +58,39 @@ export const Entry = styled.details`
   }
 `;
 
+const CollapseBtn = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: 1px solid #dcdee0;
+
+  [data-item='chevron-up'] {
+    margin-top: -5%;
+  }
+
+  [data-item='chevron-down'] {
+    margin-top: 5%;
+  }
+
+  ${size}
+  ${space}
+`;
+
 /** Entry title */
-export const Title = styled.summary``;
+export const Title = styled(({ children, ...props }) => (
+  <summary {...props}>
+    <div>{children}</div>
+    <CollapseBtn size={18} ml={3}>
+      <ChevronUp size="1em" data-item="chevron-up" style={{ marginTop: -1 }} />
+      <ChevronDown size="1em" data-item="chevron-down" />
+    </CollapseBtn>
+  </summary>
+))`
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+`;
 
 /** Entry content (hidden by default) */
 export const Content = styled(Box)``;
@@ -68,10 +107,40 @@ export const Separator = styled.hr`
 
 /** A simple wrapper to group entries */
 const EntryContainer = styled.div`
-  ${props =>
-    props.withBorderLeft &&
-    css`
-      ${Entry} {
+  ${Entry} {
+    ${props =>
+      props.withNewButtons
+        ? css`
+            [data-item='chevron-up'] {
+              display: none;
+            }
+
+            &[open] {
+              [data-item='chevron-up'] {
+                display: inline-block;
+              }
+              [data-item='chevron-down'] {
+                display: none;
+              }
+            }
+
+            summary::after {
+              display: none;
+            }
+
+            button {
+              display: block;
+            }
+          `
+        : css`
+            ${CollapseBtn} {
+              display: none;
+            }
+          `}
+
+    ${props =>
+      props.withBorderLeft &&
+      css`
         border-left: 1px solid #dcdee0;
         padding-left: 8px;
 
@@ -79,8 +148,8 @@ const EntryContainer = styled.div`
         &:hover {
           border-color: ${themeGet('colors.primary.500')};
         }
-      }
-    `}
+      `}
+  }
 `;
 
 /**
@@ -89,28 +158,30 @@ const EntryContainer = styled.div`
 export default class FAQ extends Component {
   static propTypes = {
     children: PropTypes.node,
-    /** The title to display above entries */
+    /** The title to display above entries. Set to null to disable it. */
     title: PropTypes.string,
+    /** Props for styling the title */
+    titleProps: PropTypes.object,
     /** If true, a border will be displayed on the left  */
     withBorderLeft: PropTypes.bool,
+    /** If true, will display a button with a chevron instead of the `+` sign  */
+    withNewButtons: PropTypes.bool,
     /** All properties from `Box` */
     ...Box.propTypes,
   };
 
-  static defaultProps = {
-    title: "FAQ's",
-  };
-
   render() {
-    const { title, children, withBorderLeft, ...props } = this.props;
+    const { title, children, withBorderLeft, withNewButtons, titleProps, ...props } = this.props;
     return (
       <Container {...props}>
-        {title && (
-          <P fontWeight="bold" mb={1}>
-            {title}
+        {title !== null && (
+          <P fontWeight="bold" mb={1} color="black.900" {...titleProps}>
+            {title || <FormattedMessage id="FAQs" defaultMessage="FAQ's" />}
           </P>
         )}
-        <EntryContainer withBorderLeft={withBorderLeft}>{children}</EntryContainer>
+        <EntryContainer withBorderLeft={withBorderLeft} withNewButtons={withNewButtons}>
+          {children}
+        </EntryContainer>
       </Container>
     );
   }

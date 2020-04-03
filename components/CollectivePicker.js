@@ -1,11 +1,14 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
-import { groupBy, sortBy, last } from 'lodash';
+import { groupBy, sortBy, last, truncate, isEqual } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { Flex } from '@rebass/grid';
+import { Manager, Reference, Popper } from 'react-popper';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { mergeRefs } from '../lib/react-utils';
 import StyledSelect from './StyledSelect';
 import Avatar from './Avatar';
 import { Span } from './Text';
@@ -34,6 +37,10 @@ const Messages = defineMessages({
     id: 'CollectivePicker.CreateNew',
     defaultMessage: 'Create new',
   },
+  inviteNew: {
+    id: 'CollectivePicker.InviteNew',
+    defaultMessage: 'Invite new',
+  },
 });
 
 /**
@@ -45,7 +52,7 @@ const DefaultCollectiveLabel = ({ value: collective }) => (
     <Avatar collective={collective} radius={28} />
     <Flex flexDirection="column" ml={2}>
       <Span fontSize="Caption" lineHeight={1.2} color="black.700">
-        {collective.name}
+        {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="Caption" lineHeight={1.2} color="black.500">
         @{collective.slug}
@@ -64,6 +71,10 @@ DefaultCollectiveLabel.propTypes = {
   }),
 };
 
+// Some flags to differentiate options in the picker
+const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
+const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
+
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.
  * Accepts all the props from [StyledSelect](#!/StyledSelect).
@@ -73,6 +84,7 @@ DefaultCollectiveLabel.propTypes = {
 class CollectivePicker extends React.PureComponent {
   constructor(props) {
     super(props);
+    this.containerRef = React.createRef();
     this.state = {
       createFormCollectiveType: null,
       menuIsOpen: props.menuIsOpen,
@@ -84,7 +96,11 @@ class CollectivePicker extends React.PureComponent {
    * Function to generate a single select option
    */
   buildCollectiveOption(collective) {
-    return { value: collective, label: collective.name, __collective_picker_collective__: true };
+    if (collective === null) {
+      return null;
+    } else {
+      return { value: collective, label: collective.name, [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true };
+    }
   }
 
   /**
@@ -131,16 +147,19 @@ class CollectivePicker extends React.PureComponent {
     }
 
     if (creatable) {
+      const isOnlyForUser = isEqual(this.props.types, [CollectiveType.USER]);
       options = [
         ...options,
         {
-          label: intl.formatMessage(Messages.createNew).toUpperCase(),
+          label: isOnlyForUser
+            ? intl.formatMessage(Messages.inviteNew).toUpperCase()
+            : intl.formatMessage(Messages.createNew).toUpperCase(),
           options: [
             {
               label: null,
               value: null,
               isDisabled: true,
-              __collective_picker_new__: true,
+              [FLAG_NEW_COLLECTIVE]: true,
               __background__: 'white',
             },
           ],
@@ -184,6 +203,16 @@ class CollectivePicker extends React.PureComponent {
     }
   };
 
+  getValue = () => {
+    if (this.props.collective !== undefined) {
+      return this.buildCollectiveOption(this.props.collective);
+    } else if (this.state.showCreatedCollective) {
+      return this.buildCollectiveOption(last(this.state.createdCollectives));
+    } else {
+      return this.props.getOptions(this.buildCollectiveOption);
+    }
+  };
+
   render() {
     const {
       intl,
@@ -192,7 +221,6 @@ class CollectivePicker extends React.PureComponent {
       customOptions,
       formatOptionLabel,
       getDefaultOptions,
-      getOptions,
       groupByType,
       onChange,
       sortFunc,
@@ -204,53 +232,80 @@ class CollectivePicker extends React.PureComponent {
       width,
       ...props
     } = this.props;
-    const { createFormCollectiveType, createdCollectives, showCreatedCollective } = this.state;
+    const { createFormCollectiveType, createdCollectives } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
     const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives, creatable, intl);
-    const value = showCreatedCollective
-      ? this.buildCollectiveOption(last(createdCollectives))
-      : getOptions(this.buildCollectiveOption);
 
     return (
-      <Container position="relative" minWidth={minWidth} maxWidth={maxWidth} width={width}>
-        <StyledSelect
-          options={allOptions}
-          defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
-          menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
-          isDisabled={Boolean(createFormCollectiveType) || isDisabled}
-          onMenuOpen={this.openMenu}
-          onMenuClose={this.closeMenu}
-          value={value}
-          onChange={this.onChange}
-          formatOptionLabel={(option, context) => {
-            if (option.__collective_picker_collective__) {
-              return formatOptionLabel(option, context);
-            } else if (option.__collective_picker_new__) {
-              return <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={types} />;
-            } else {
-              return option.label;
-            }
-          }}
-          {...props}
-        />
-        {createFormCollectiveType && (
-          <StyledCard position="absolute" p={3} mt={1} width="100%" zIndex={9}>
-            <CreateCollectiveMiniForm
-              type={createFormCollectiveType}
-              onCancel={this.setCreateFormCollectiveType}
-              onSuccess={collective => {
-                onChange({ label: collective.name, value: collective });
-                this.setState(state => ({
-                  menuIsOpen: false,
-                  createFormCollectiveType: null,
-                  createdCollectives: [...state.createdCollectives, collective],
-                  showCreatedCollective: true,
-                }));
-              }}
-            />
-          </StyledCard>
-        )}
-      </Container>
+      <Manager>
+        <Reference>
+          {({ ref }) => (
+            <Container
+              position="relative"
+              minWidth={minWidth}
+              maxWidth={maxWidth}
+              width={width}
+              ref={mergeRefs([this.containerRef, ref])}
+            >
+              <StyledSelect
+                options={allOptions}
+                defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
+                menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
+                isDisabled={Boolean(createFormCollectiveType) || isDisabled}
+                onMenuOpen={this.openMenu}
+                onMenuClose={this.closeMenu}
+                value={this.getValue()}
+                onChange={this.onChange}
+                formatOptionLabel={(option, context) => {
+                  if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
+                    return formatOptionLabel(option, context);
+                  } else if (option[FLAG_NEW_COLLECTIVE]) {
+                    return <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={types} />;
+                  } else {
+                    return option.label;
+                  }
+                }}
+                {...props}
+              />
+            </Container>
+          )}
+        </Reference>
+        {createFormCollectiveType &&
+          ReactDOM.createPortal(
+            <Popper placement="bottom">
+              {({ placement, ref, style }) => (
+                <div
+                  data-placement={placement}
+                  ref={ref}
+                  style={{
+                    ...style,
+                    width: this.containerRef.current.clientWidth,
+                    zIndex: 9999,
+                  }}
+                >
+                  <StyledCard p={3} my={1}>
+                    <CreateCollectiveMiniForm
+                      type={createFormCollectiveType}
+                      onCancel={this.setCreateFormCollectiveType}
+                      onSuccess={collective => {
+                        if (onChange) {
+                          onChange({ label: collective.name, value: collective });
+                        }
+                        this.setState(state => ({
+                          menuIsOpen: false,
+                          createFormCollectiveType: null,
+                          createdCollectives: [...state.createdCollectives, collective],
+                          showCreatedCollective: true,
+                        }));
+                      }}
+                    />
+                  </StyledCard>
+                </div>
+              )}
+            </Popper>,
+            document.body,
+          )}
+      </Manager>
     );
   }
 }
@@ -259,7 +314,7 @@ CollectivePicker.propTypes = {
   /** The list of collectives to display */
   collectives: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       type: PropTypes.string,
       name: PropTypes.string,
     }),
@@ -299,6 +354,12 @@ CollectivePicker.propTypes = {
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
+  /** Use this to control the value of the component */
+  collective: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    type: PropTypes.string,
+    name: PropTypes.string,
+  }),
 };
 
 CollectivePicker.defaultProps = {

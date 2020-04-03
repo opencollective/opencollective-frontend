@@ -7,7 +7,8 @@ import Currency from './Currency';
 import Link from './Link';
 import Logo from './Logo';
 import { get } from 'lodash';
-import { firstSentence, imagePreview } from '../lib/utils';
+import { firstSentence } from '../lib/utils';
+import { imagePreview } from '../lib/image-utils';
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import Container from './Container';
 

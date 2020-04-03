@@ -2,14 +2,14 @@ import React, { useState, useContext } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 import { H2, P } from '../Text';
 import Container from '../Container';
 import StyledButton from '../StyledButton';
 // import MessageBox from '../MessageBox';
 import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
-import { getErrorFromGraphqlException } from '../../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 import { GraphQLContext } from '../../lib/graphql/context';
 
 const activateCollectiveAsHostQuery = gql`
@@ -81,7 +81,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         ...activationStatus,
         processing: false,
         isHostAccount: true,
-        // confirmationMsg: 'The Host status was succesfully activated.',
+        // confirmationMsg: 'The Host status was successfully activated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -99,7 +99,7 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
         ...activationStatus,
         processing: false,
         isHostAccount: false,
-        // confirmationMsg: 'The Host status was succesfully deactivated.',
+        // confirmationMsg: 'The Host status was successfully deactivated.',
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -109,10 +109,6 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
-      <H2>
-        <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />
-      </H2>
-
       {!isHostAccount && (
         <P>
           <FormattedMessage
@@ -122,6 +118,12 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
             }
           />
         </P>
+      )}
+
+      {isHostAccount && (
+        <H2>
+          <FormattedMessage id="DeactivateFiscalhost" defaultMessage={'Deactivating as host'} />
+        </H2>
       )}
 
       {isHostAccount && (

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { alignSelf, height, width } from 'styled-system';
 
-import { cursor } from '../../lib/styled_system_custom';
+import { cursor } from '../../lib/styled-system-custom-properties';
 
 const StyledSVG = styled.svg`
   display: inline-block;

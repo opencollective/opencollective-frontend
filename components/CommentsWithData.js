@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 import { get, cloneDeep } from 'lodash';
@@ -45,7 +45,7 @@ class CommentsWithData extends React.Component {
 
     const CommentInputType = {
       ...comment,
-      ExpenseId: expense.id,
+      expense: { legacyId: expense.id },
     };
 
     const res = await this.props.createComment(CommentInputType);
@@ -201,7 +201,7 @@ export const commentsQuery = graphql(getCommentsQuery, {
 });
 
 const createCommentQuery = gqlV2`
-  mutation createComment($comment: CommentCreate!) {
+  mutation createComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       id
       html
@@ -293,7 +293,7 @@ const deleteCommentMutation = graphql(deleteCommentQuery, {
 });
 
 const editCommentQuery = gqlV2`
-  mutation editComment($comment: CommentEdit!) {
+  mutation editComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       id
       html

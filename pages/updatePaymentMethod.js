@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { maxWidth } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage, injectIntl } from 'react-intl';

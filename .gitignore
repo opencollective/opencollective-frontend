@@ -2,6 +2,7 @@
 .env
 node_modules
 npm-debug.log.*
+./report.*.json
 *.log
 yarn.lock
 .DS_Store
@@ -15,6 +16,7 @@ stage
 *.swp
 styleguide/index.html
 styleguide/build/
+styleguide/static/fonts
 .vimrc
 
 # VSCode & VSCode's extensions

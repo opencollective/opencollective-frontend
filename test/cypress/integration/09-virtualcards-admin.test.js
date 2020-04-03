@@ -49,7 +49,7 @@ describe('Virtual cards admin', () => {
   it('send gift cards by emails', () => {
     cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-create` });
 
-    // Button should be disabled untill we add emails
+    // Button should be disabled until we add emails
     checkSubmit(false, 'Create 0 gift cards');
 
     // Multi-email tests

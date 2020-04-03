@@ -1,21 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
 
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { withUser } from '../components/UserProvider';
-import ErrorPage, { generateError } from '../components/ErrorPage';
+import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import Loading from '../components/Loading';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import CollectivePage from '../components/collective-page';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import Container from '../components/Container';
 import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
+import { generateNotFoundError } from '../lib/errors';
 
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(
@@ -29,12 +30,15 @@ const IncognitoUserCollective = dynamic(
   { loading: Loading },
 );
 
+const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
+  ssr: false,
+});
+
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: ${prop => prop.smooth && 'smooth'};
   }
-
   section {
     margin: 0;
   }
@@ -45,20 +49,22 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
-  static getInitialProps({ req, res, query: { slug, eventSlug, status } }) {
+  static getInitialProps({ req, res, query: { slug, eventSlug, status, step, mode } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
     /** If there is a eventSlug parameter, use that one as slug,
      * remove this and fix routes when feature flag NEW_EVENTS is gone */
-    return { slug: eventSlug ? eventSlug : slug, status };
+    return { slug: eventSlug ? eventSlug : slug, status, step, mode };
   }
 
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+    step: PropTypes.string,
+    mode: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -90,6 +96,18 @@ class NewCollectivePage extends React.Component {
     }).isRequired, // from withData
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      smooth: false,
+      showOnboardingModal: true,
+    };
+  }
+
+  componentDidMount() {
+    this.setState({ smooth: true });
+  }
+
   getPageMetaData(collective) {
     if (collective) {
       return {
@@ -106,15 +124,19 @@ class NewCollectivePage extends React.Component {
     }
   }
 
+  setShowOnboardingModal = bool => {
+    this.setState({ showOnboardingModal: bool });
+  };
+
   render() {
-    const { slug, data, LoggedInUser, status } = this.props;
+    const { slug, data, LoggedInUser, status, step, mode } = this.props;
+    const { showOnboardingModal } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateError.notFound(slug)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {
@@ -123,16 +145,22 @@ class NewCollectivePage extends React.Component {
     }
 
     const collective = data && data.Collective;
+
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
-        <GlobalStyles />
+        <GlobalStyles smooth={this.state.smooth} />
         {data.loading ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
         ) : (
           <React.Fragment>
-            <CollectiveNotificationBar collective={collective} host={collective.host} status={status} />
+            <CollectiveNotificationBar
+              collective={collective}
+              host={collective.host}
+              status={status}
+              LoggedInUser={LoggedInUser}
+            />
             <CollectiveThemeProvider collective={collective}>
               {({ onPrimaryColorChange }) => (
                 <CollectivePage
@@ -151,13 +179,30 @@ class NewCollectivePage extends React.Component {
                   LoggedInUser={LoggedInUser}
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
-                  status={status}
                   onPrimaryColorChange={onPrimaryColorChange}
+                  step={step}
+                  mode={mode}
                 />
               )}
             </CollectiveThemeProvider>
+            {LoggedInUser && mode === 'onboarding' && (
+              <OnboardingModal
+                showOnboardingModal={showOnboardingModal}
+                setShowOnboardingModal={this.setShowOnboardingModal}
+                step={step}
+                mode={mode}
+                collective={collective}
+                LoggedInUser={LoggedInUser}
+              />
+            )}
           </React.Fragment>
         )}
+        <CovidBanner
+          variant={
+            collective?.tags?.some(tag => tag == 'covid' || tag == 'covid-19') ? 'SPONSORED_COLLECTIVE' : undefined
+          }
+          showLink
+        />
       </Page>
     );
   }

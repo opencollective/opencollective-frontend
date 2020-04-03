@@ -25,7 +25,7 @@ import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import CollectiveCard from '../components/virtual-cards/CollectiveCard';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 
 const paymentMethodQuery = gql`
   query PaymentMethod($code: String) {

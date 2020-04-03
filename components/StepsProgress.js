@@ -216,8 +216,9 @@ const StepsProgress = ({
 }) => {
   const focusIdx = focus ? steps.findIndex(step => step.name === focus.name) : -1;
   const mobileStepIdx = allCompleted ? steps.length - 1 : focusIdx > -1 ? focusIdx : 0;
-  const mobileNextStepText = mobileStepIdx < steps.length - 1 ? steps[mobileStepIdx + 1].name : null;
-  const mobileNextStepLabelKey = mobileStepIdx < steps.length - 1 ? steps[mobileStepIdx + 1].labelKey : null;
+  const mobileNextStepName = mobileStepIdx < steps.length - 1 ? steps[mobileStepIdx + 1].name : null;
+  const mobileNextStepIdx = mobileNextStepName ? steps.findIndex(step => step.name === mobileNextStepName) : -1;
+  const mobileNextStep = mobileNextStepIdx !== -1 && steps[mobileNextStepIdx];
   const progress = allCompleted ? 100 : (100 / steps.length) * (mobileStepIdx + 1);
   const bgColor = '#D9DBDD';
   const pieSize = '48';
@@ -228,24 +229,16 @@ const StepsProgress = ({
         <StepMobile>
           <StepsMobileLeft>
             <P color="black.900" fontWeight="600" fontSize="Paragraph">
-              {steps[mobileStepIdx].labelKey ? (
-                <FormattedMessage id={steps[mobileStepIdx].labelKey} />
-              ) : (
-                steps[mobileStepIdx].name
-              )}
+              {steps[mobileStepIdx].label || steps[mobileStepIdx].name}
             </P>
 
-            {(mobileNextStepText || mobileNextStepLabelKey) && (
+            {mobileNextStep && (
               <P color="black.500">
                 <FormattedMessage
                   id="StepsProgress.mobile.next"
                   defaultMessage="Next: {stepName}"
                   values={{
-                    stepName: mobileNextStepLabelKey ? (
-                      <FormattedMessage id={mobileNextStepLabelKey} />
-                    ) : (
-                      mobileNextStepText
-                    ),
+                    stepName: mobileNextStep.label || mobileNextStep.name,
                   }}
                 />
               </P>
@@ -306,7 +299,10 @@ const StepsProgress = ({
 };
 
 const stepType = PropTypes.shape({
+  /** A unique identifier for the step */
   name: PropTypes.string.isRequired,
+  /** A pretty label to display to the user */
+  label: PropTypes.string,
 });
 
 StepsProgress.propTypes = {

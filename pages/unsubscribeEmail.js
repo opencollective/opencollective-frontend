@@ -16,6 +16,7 @@ class UnsubscribeEmail extends React.Component {
   static getInitialProps({ query }) {
     return { email: query.email, slug: query.slug, type: query.type, token: query.token };
   }
+
   static propTypes = {
     /** Unsubscription email, given in URL */
     email: PropTypes.string.isRequired,
@@ -26,12 +27,14 @@ class UnsubscribeEmail extends React.Component {
     /** Unsubscription token, given in URL */
     token: PropTypes.string.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.state = {
       state: 'unsubscribing',
     };
   }
+
   async componentDidMount() {
     let state, errorMessage, response;
     await fetch(
@@ -51,6 +54,7 @@ class UnsubscribeEmail extends React.Component {
       this.setState({ state: state, errorMessage: errorMessage });
     });
   }
+
   getIconColor(state) {
     if (state === 'success') {
       return '#00A34C';
@@ -58,6 +62,7 @@ class UnsubscribeEmail extends React.Component {
       return '#CC1836';
     }
   }
+
   render() {
     return (
       <Page title="Unsubscribe Email">

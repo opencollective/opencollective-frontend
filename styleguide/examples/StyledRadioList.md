@@ -1,11 +1,3 @@
-```jsx noeditor
-// See https://github.com/styleguidist/react-styleguidist/issues/1278
-import { Box, Flex } from '@rebass/grid';
-import Container from 'components/Container';
-import StyledInputField from 'components/StyledInputField';
-import StyledCard from 'components/StyledCard';
-```
-
 Default style:
 
 ```js

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { Box, Flex } from '@rebass/grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
@@ -197,7 +197,6 @@ class EditTiers extends React.Component {
         name: 'presets',
         pre: getCurrencySymbol(props.currency),
         type: 'component',
-        options: { step: 1 },
         component: InputFieldPresets,
         label: intl.formatMessage(this.messages['presets.label']),
         when: tier => tier.amountType === 'FLEXIBLE',
@@ -206,7 +205,6 @@ class EditTiers extends React.Component {
         name: 'amount',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
-        options: { step: 1 },
         label: intl.formatMessage(this.messages['defaultAmount.label']),
         when: tier => tier.amountType === 'FLEXIBLE',
       },
@@ -214,7 +212,6 @@ class EditTiers extends React.Component {
         name: 'minimumAmount',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
-        options: { step: 1 },
         label: intl.formatMessage(this.messages['minimumAmount.label']),
         when: tier => tier.amountType === 'FLEXIBLE',
       },
@@ -241,7 +238,6 @@ class EditTiers extends React.Component {
         name: 'goal',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
-        options: { step: 1 },
         label: intl.formatMessage(this.messages['goal.label']),
         description: intl.formatMessage(this.messages['goal.description']),
       },
@@ -278,7 +274,7 @@ class EditTiers extends React.Component {
 
   addTier(tier) {
     const tiers = this.state.tiers;
-    tiers.push({ ...(tier || {}), __uuid: uuidv4() });
+    tiers.push({ ...(tier || {}), __uuid: uuid() });
     this.setState({ tiers });
   }
 

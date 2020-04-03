@@ -87,7 +87,7 @@ export const filterContributors = (contributors, filter) => {
 
 /**
  * A set of filters for contributors types. This file also exports helper functions
- * to deal with the filters, incuding:
+ * to deal with the filters, including:
  * - `getContributorsFilters`: For a given list of Contributors, returns all the filters that can be applied to the list.
  * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */

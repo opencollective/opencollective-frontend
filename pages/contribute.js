@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
 
@@ -110,11 +110,14 @@ class TiersPage extends React.Component {
                         </ContributeCardContainer>
                       ))}
 
-                      {collective.childCollectives.map(childCollective => (
-                        <ContributeCardContainer key={childCollective.id}>
-                          <ContributeCollective collective={childCollective} />
-                        </ContributeCardContainer>
-                      ))}
+                      {collective.subCollectives.map(member => {
+                        const childCollective = member.collective;
+                        return (
+                          <ContributeCardContainer key={member.id}>
+                            <ContributeCollective collective={childCollective} />
+                          </ContributeCardContainer>
+                        );
+                      })}
 
                       {collective.events.map(event => (
                         <ContributeCardContainer key={`event-${event.id}`}>
@@ -220,15 +223,17 @@ const addTiersData = graphql(
             type
           }
         }
-        events(includePastEvents: true) {
+        events(includePastEvents: true, includeInactive: true) {
           id
           slug
           name
           description
           image
+          isActive
           startsAt
           endsAt
-          contributors(limit: $nbContributorsPerContributeCard) {
+          backgroundImageUrl(height: 208)
+          contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
             id
             image
             collectiveSlug
@@ -245,28 +250,31 @@ const addTiersData = graphql(
             }
           }
         }
-        childCollectives {
+        subCollectives: members(role: "SUB_COLLECTIVE") {
           id
-          slug
-          name
-          type
-          description
-          backgroundImageUrl(height: 208)
-          stats {
+          collective: member {
             id
-            backers {
-              id
-              all
-              users
-              organizations
-            }
-          }
-          contributors(limit: $nbContributorsPerContributeCard) {
-            id
-            image
-            collectiveSlug
+            slug
             name
             type
+            description
+            backgroundImageUrl(height: 208)
+            stats {
+              id
+              backers {
+                id
+                all
+                users
+                organizations
+              }
+            }
+            contributors(limit: $nbContributorsPerContributeCard) {
+              id
+              image
+              collectiveSlug
+              name
+              type
+            }
           }
         }
       }

@@ -2,17 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
-import { graphql } from 'react-apollo';
-import { get } from 'lodash';
+import { graphql } from '@apollo/react-hoc';
+import { get, set, cloneDeep, uniq, pick, omit } from 'lodash';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { capitalize, getCurrencySymbol, imagePreview } from '../../lib/utils';
+import { capitalize, getCurrencySymbol, formatCurrency } from '../../lib/utils';
+import { imagePreview } from '../../lib/image-utils';
 import InputField from '../../components/InputField';
 import categories from '../../lib/constants/categories';
 import DefinedTerm, { Terms } from '../DefinedTerm';
-import { titleCase } from 'title-case';
 
 import TransactionDetails from './TransactionDetails';
+import { Box, Flex } from '@rebass/grid';
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+import StyledSpinner from '../StyledSpinner';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
+import { formatErrorMessage } from '../../lib/errors';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -52,9 +58,29 @@ class ExpenseDetails extends React.Component {
         id: 'expense.payoutMethod.banktransfer',
         defaultMessage: 'Bank Transfer',
       },
+      expenseTypeReceipt: {
+        id: 'Expense.Type.Receipt',
+        defaultMessage: 'Receipt',
+      },
+      expenseTypeInvoice: {
+        id: 'Expense.Type.Invoice',
+        defaultMessage: 'Invoice',
+      },
     });
 
-    this.state = { modified: false, expense: {} };
+    this.state = { modified: [], expense: this.getExpenseFromProps(props) };
+  }
+
+  componentDidMount() {
+    this.setState({ expense: this.getExpenseFromProps(this.props) });
+  }
+
+  componentDidUpdate(oldProps) {
+    const oldExpense = this.getExpenseFromProps(oldProps);
+    const newExpense = this.getExpenseFromProps(this.props);
+    if (oldExpense !== newExpense) {
+      this.setState({ expense: newExpense });
+    }
   }
 
   getOptions(arr, intlVars) {
@@ -66,22 +92,44 @@ class ExpenseDetails extends React.Component {
   }
 
   handleChange(attr, value) {
-    const expense = {
-      ...this.state.expense,
-      [attr]: value,
-    };
-    this.setState({ modified: true, expense });
-    this.props.onChange && this.props.onChange(expense);
+    this.setState(state => {
+      const expense = cloneDeep(state.expense);
+      set(expense, attr, value);
+      const rootField = attr.split(/[[.]/)[0];
+      const modified = uniq([...state.modified, rootField]);
+      const expenseChangeset = pick(expense, [...modified, 'id']);
+      if (expenseChangeset.attachments) {
+        expenseChangeset.attachments = expenseChangeset.attachments.map(a => omit(a, ['__typename']));
+      }
+      this.props.onChange && this.props.onChange(expenseChangeset);
+      return { modified, expense };
+    });
+  }
+
+  getAttachmentPreview = attachmentUrl => {
+    return attachmentUrl ? imagePreview(attachmentUrl) : '/static/images/receipt.svg';
+  };
+
+  getAttachmentTitle = (expense, attachment) => {
+    if (!attachment.description) {
+      return 'Open receipt in a new window';
+    }
+
+    return `${attachment.description} - ${formatCurrency(attachment.amount, expense.currency)}`;
+  };
+
+  getExpenseFromProps(props) {
+    // Always prefer locally fetched data
+    return props.data?.expense || props.expense;
   }
 
   render() {
-    const { LoggedInUser, data, intl } = this.props;
-    const expense = (data && data.Expense) || this.props.expense;
+    const { LoggedInUser, intl } = this.props;
+    const expense = this.getExpenseFromProps(this.props);
     const canEditExpense = LoggedInUser && LoggedInUser.canEditExpense(expense);
     const isAuthor = LoggedInUser && LoggedInUser.collective.id === expense.fromCollective.id;
     const canEditAmount = expense.status !== 'PAID' || expense.payoutMethod !== 'paypal';
     const editMode = canEditExpense && this.props.mode === 'edit';
-    const previewAttachmentImage = expense.attachment ? imagePreview(expense.attachment) : '/static/images/receipt.svg';
     const payoutMethod =
       get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT'
         ? 'banktransfer'
@@ -101,9 +149,16 @@ class ExpenseDetails extends React.Component {
     if (this.state.expense['type'] === 'RECEIPT' || this.state.expense['type'] === 'INVOICE') {
       delete expenseTypes['DEFAULT'];
     }
-    const expenseTypesOptions = Object.entries(expenseTypes).map(([key, value]) => {
-      return { [key]: titleCase(value) };
-    });
+    const expenseTypesOptions = [
+      { [expenseTypes.DEFAULT]: '' },
+      { [expenseTypes.RECEIPT]: intl.formatMessage(this.messages.expenseTypeReceipt) },
+      { [expenseTypes.INVOICE]: intl.formatMessage(this.messages.expenseTypeInvoice) },
+    ];
+    const attachmentsWithFiles = expense.attachments?.filter(attachment => Boolean(attachment.url)) || [];
+    const canDownloadAttachments =
+      isAuthor ||
+      LoggedInUser?.canEditCollective(expense.collective) ||
+      LoggedInUser?.canEditCollective(expense.collective?.host);
 
     return (
       <div className={`ExpenseDetails ${this.props.mode}`}>
@@ -119,20 +174,13 @@ class ExpenseDetails extends React.Component {
             }
             .ExpenseDetails .frame {
               padding: 4px;
-              margin-top: 1rem;
+              margin-top: 0.5rem;
               margin-right: 1rem;
               float: left;
               background-color: #f3f4f5;
             }
             .ExpenseDetails img {
               width: 64px;
-            }
-            .leftColumn,
-            .rightColumn {
-              overflow: hidden;
-            }
-            .leftColumn {
-              float: left;
             }
             .col {
               float: left;
@@ -200,34 +248,7 @@ class ExpenseDetails extends React.Component {
             }
           `}
         </style>
-
-        <div className="leftColumn">
-          <div className="frame">
-            {editMode && (
-              <InputField
-                type="dropzone"
-                options={{ accept: 'image/jpeg, image/png, application/pdf' }}
-                name="attachment"
-                className="attachmentField"
-                onChange={attachment => this.handleChange('attachment', attachment)}
-                defaultValue={expense.attachment || '/static/images/receipt.svg'}
-              />
-            )}
-            {!editMode && expense.attachment && (
-              <a
-                href={expense.attachment}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Open receipt in a new window"
-              >
-                <img src={previewAttachmentImage} />
-              </a>
-            )}
-            {!editMode && !expense.attachment && <img src={previewAttachmentImage} />}
-          </div>
-        </div>
-
-        <div className="rightColumn">
+        <Flex flexWrap="wrap" alignItems="flex-end">
           {editMode && (
             <div className="row">
               <div className="col large">
@@ -289,7 +310,7 @@ class ExpenseDetails extends React.Component {
             </div>
           )}
 
-          <div className="col">
+          <Box mt={2} mr={2}>
             <label>
               <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
             </label>
@@ -310,18 +331,21 @@ class ExpenseDetails extends React.Component {
                 )}
               </span>
             </div>
-          </div>
+          </Box>
 
-          <div className="col">
+          <Box mt={2} mr={2}>
             <label>
               <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
             </label>
-            {(!editMode || payoutMethod === 'banktransfer') &&
-              capitalize(
-                intl.formatMessage(this.messages[payoutMethod], {
-                  paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
-                }),
-              )}
+            {(!editMode || payoutMethod === 'banktransfer') && (
+              <div>
+                {capitalize(
+                  intl.formatMessage(this.messages[payoutMethod], {
+                    paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
+                  }),
+                )}
+              </div>
+            )}
             {editMode && payoutMethod !== 'banktransfer' && (
               <InputField
                 name="payoutMethod"
@@ -331,7 +355,7 @@ class ExpenseDetails extends React.Component {
                 onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
               />
             )}
-          </div>
+          </Box>
 
           {(expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) && (
             <div className="col large privateMessage">
@@ -349,7 +373,64 @@ class ExpenseDetails extends React.Component {
               )}
             </div>
           )}
+        </Flex>
+        {canDownloadAttachments && (
+          <Box mt={2}>
+            <label>
+              <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+            </label>
+            {expense.type === expenseTypes.INVOICE && attachmentsWithFiles.length === 0 && (
+              <ExpenseInvoiceDownloadHelper
+                collective={expense.collective}
+                expense={{ id: expense.idV2, legacyId: expense.id }}
+              >
+                {({ downloadInvoice, error, isLoading, filename }) => (
+                  <div>
+                    {error && (
+                      <MessageBox type="error" withIcon>
+                        {formatErrorMessage(intl, error)}
+                      </MessageBox>
+                    )}
+                    <div className="frame">
+                      <StyledButton asLink title={filename} onClick={downloadInvoice}>
+                        {isLoading ? <StyledSpinner size={64} /> : <img src={this.getAttachmentPreview()} />}
+                      </StyledButton>
+                    </div>
+                  </div>
+                )}
+              </ExpenseInvoiceDownloadHelper>
+            )}
+            {attachmentsWithFiles.map((attachment, idx) => (
+              <div key={attachment.id}>
+                <div className="frame">
+                  {editMode && (
+                    <InputField
+                      type="dropzone"
+                      options={{ accept: 'image/jpeg, image/png, application/pdf', canRemove: false }}
+                      name={`attachment-${attachment.id}`}
+                      className="attachmentField"
+                      onChange={attachment => this.handleChange(`attachments[${idx}].url`, attachment)}
+                      defaultValue={attachment.url || '/static/images/receipt.svg'}
+                    />
+                  )}
+                  {!editMode && attachment.url && (
+                    <a
+                      href={attachment.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={this.getAttachmentTitle(expense, attachment)}
+                    >
+                      <img src={this.getAttachmentPreview(attachment.url)} />
+                    </a>
+                  )}
+                  {!editMode && !attachment.url && <img src={this.getAttachmentPreview(attachment.url)} />}
+                </div>
+              </div>
+            ))}
+          </Box>
+        )}
 
+        <div>
           {expense.transaction && (
             <TransactionDetails
               className="col large"
@@ -368,6 +449,7 @@ const getExpenseQuery = gql`
   query Expense($id: Int!) {
     Expense(id: $id) {
       id
+      idV2
       description
       createdAt
       category
@@ -375,6 +457,12 @@ const getExpenseQuery = gql`
       status
       currency
       attachment
+      attachments {
+        id
+        url
+        description
+        amount
+      }
       payoutMethod
       PayoutMethod {
         id

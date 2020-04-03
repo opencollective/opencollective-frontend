@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
 import Error from '../Error';
@@ -84,6 +84,7 @@ const getExpenseQuery = gql`
   query Expense($id: Int!) {
     Expense(id: $id) {
       id
+      idV2
       description
       status
       createdAt
@@ -101,6 +102,12 @@ const getExpenseQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
+      attachments {
+        id
+        url
+        description
+        amount
+      }
       collective {
         id
         slug

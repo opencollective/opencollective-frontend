@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Generate a random email in the form of "oc-test-*@opencollective.com".
@@ -9,20 +9,20 @@ import uuidv4 from 'uuid/v4';
  * @param {bool} directSignIn: Set this to false to generage an email that cannot signin directly
  */
 export const randomEmail = (directSignIn = true) => {
-  const randomID = uuidv4().split('-')[0];
+  const randomID = uuid().split('-')[0];
   return directSignIn ? `oc-test-${randomID}@opencollective.com` : `oc-noDirectSignIn-${randomID}@opencollective.com`;
 };
 
 export const randomGmailEmail = () => {
-  const randomID = uuidv4().split('-')[0];
+  const randomID = uuid().split('-')[0];
   return `oc-test-${randomID}@gmail.com`;
 };
 
 export const randomHotMail = () => {
-  const randomID = uuidv4().split('-')[0];
+  const randomID = uuid().split('-')[0];
   return `oc-test-${randomID}@outlook.com`;
 };
 
 export const randomSlug = () => {
-  return uuidv4().split('-')[0];
+  return uuid().split('-')[0];
 };
