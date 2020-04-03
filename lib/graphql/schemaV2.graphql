@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Mar 31 2020 17:06:21 GMT+0200 (GMT+02:00)
+# timestamp: Fri Apr 03 2020 09:55:56 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -1365,7 +1365,7 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
-  ): Expense
+  ): Expense!
 
   """
   To update an existing expense

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Mar 31 2020 17:05:43 GMT+0200 (GMT+02:00)
+# timestamp: Fri Apr 03 2020 09:54:53 GMT-0300 (Brasilia Standard Time)
 
 """
 Application model
@@ -2597,6 +2597,8 @@ type PlanType {
   manualPayments: Boolean
   bankTransfers: Int
   bankTransfersLimit: Int
+  transferwisePayout: Int
+  transferwisePayoutLimit: Int
 }
 
 """
@@ -3482,8 +3484,8 @@ type User implements CollectiveInterface {
   connectedAccounts: [ConnectedAccountType]
   plan: PlanType
   stats: CollectiveStatsType
-  firstName: String
-  lastName: String
+  firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
+  lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String
   applications: [Application]
 }
