@@ -8,7 +8,7 @@ import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { compose } from '../../lib/utils';
+import { compose, capitalize } from '../../lib/utils';
 import { addEditCollectiveMutation } from '../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -22,6 +22,7 @@ import { withStripeLoader } from '../StripeProvider';
 import NewCreditCardForm from '../NewCreditCardForm';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 import MessageBox from '../MessageBox';
+import EditReceivingSendingMoney from './EditReceivingSendingMoney';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -40,6 +41,9 @@ class EditPaymentMethods extends React.Component {
     editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
+    receivingSection: PropTypes.bool,
+    sendingSection: PropTypes.bool,
+    collective: PropTypes.object,
   };
 
   constructor(props) {
@@ -225,11 +229,11 @@ class EditPaymentMethods extends React.Component {
             {this.renderError(error)}
           </MessageBox>
         )}
-        {!showManualPaymentMethodForm && (
+        {this.props.sendingSection && !showManualPaymentMethodForm && (
           <Flex className="paymentMethods" flexDirection="column" my={2}>
-            <H2>
+            <H3>
               <FormattedMessage id="paymentMethods.send.title" defaultMessage="Sending money" />
-            </H2>
+            </H3>
             {paymentMethods.map(pm => (
               <Container
                 className="paymentMethod"
@@ -254,7 +258,7 @@ class EditPaymentMethods extends React.Component {
             ))}
           </Flex>
         )}
-        {!showCreditCardForm && !showManualPaymentMethodForm && (
+        {this.props.sendingSection && !showCreditCardForm && !showManualPaymentMethodForm && (
           <Flex alignItems="center" mx={3} my={4} flexDirection="column">
             <StyledButton
               buttonStyle="standard"
@@ -274,15 +278,52 @@ class EditPaymentMethods extends React.Component {
             </Span>
           </Flex>
         )}
-        {showEditManualPaymentMethod && (
+        {this.props.receivingSection && showEditManualPaymentMethod && (
+          <React.Fragment>
+            <H3>
+              <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />
+            </H3>
+            <EditReceivingSendingMoney
+              collective={this.props.collective}
+              connectedAccounts={this.props.collective.connectedAccounts}
+              sendingMoney={false}
+            />
+          </React.Fragment>
+        )}
+        {this.props.receivingSection && showEditManualPaymentMethod && (
           <React.Fragment>
             <H2>
-              <FormattedMessage id="paymentMethods.receive.title" defaultMessage="Receiving money" />
+              <h2>{capitalize('Bank Transfers')}</h2>
             </H2>
-            <Flex alignItems="center" mx={3} my={4} flexDirection="column">
+
+            <Box>
+              <Container fontSize="Caption" mt={2} color="black.600" textAlign="left">
+                {Collective.plan.manualPayments ? (
+                  <FormattedMessage
+                    id="paymentMethods.manual.add.info"
+                    defaultMessage="To receive donations  directly on your bank account on behalf of the collectives that you are hosting"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="paymentMethods.manual.upgradePlan"
+                    defaultMessage="Subscribe to our special plans for hosts"
+                  />
+                )}
+                <Box mt={1}>
+                  <FormattedMessage
+                    id="paymentMethods.manual.add.trial"
+                    defaultMessage="Free for the first $1,000 received, "
+                  />
+                  <a href="/pricing">
+                    <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
+                  </a>
+                </Box>
+              </Container>
+            </Box>
+            <Flex alignItems="center" my={2}>
               <StyledButton
                 buttonStyle="standard"
-                buttonSize="large"
+                buttonSize="small"
                 disabled={!Collective.plan.manualPayments}
                 onClick={() => this.setState({ showManualPaymentMethodForm: true })}
               >
@@ -296,30 +337,6 @@ class EditPaymentMethods extends React.Component {
                   </React.Fragment>
                 )}
               </StyledButton>
-              <Box maxWidth={350}>
-                <Container fontSize="Caption" mt={2} color="black.600" textAlign="center">
-                  {Collective.plan.manualPayments ? (
-                    <FormattedMessage
-                      id="paymentMethods.manual.add.info"
-                      defaultMessage="To receive donations  directly on your bank account on behalf of the collectives that you are hosting"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="paymentMethods.manual.upgradePlan"
-                      defaultMessage="Subscribe to our special plans for hosts"
-                    />
-                  )}
-                  <Box mt={1}>
-                    <FormattedMessage
-                      id="paymentMethods.manual.add.trial"
-                      defaultMessage="Free for the first $1,000 received, "
-                    />
-                    <a href="/pricing">
-                      <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
-                    </a>
-                  </Box>
-                </Container>
-              </Box>
             </Flex>
           </React.Fragment>
         )}

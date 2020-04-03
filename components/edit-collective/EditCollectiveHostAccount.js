@@ -109,10 +109,6 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
-      <H2>
-        <FormattedMessage id="Fiscalhost" defaultMessage={'Fiscal Host'} />
-      </H2>
-
       {!isHostAccount && (
         <P>
           <FormattedMessage
@@ -122,6 +118,12 @@ const EditCollectiveHostAccount = ({ collective, activateCollectiveAsHost, deact
             }
           />
         </P>
+      )}
+
+      {isHostAccount && (
+        <H2>
+          <FormattedMessage id="DeactivateFiscalhost" defaultMessage={'Deactivating as host'} />
+        </H2>
       )}
 
       {isHostAccount && (
