@@ -1,25 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
-import { capitalize } from '../../lib/utils';
+import { capitalize, parseToBoolean } from '../../lib/utils';
 import EditConnectedAccount from '../EditConnectedAccount';
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { H4 } from '../Text';
 
 const EditReceivingSendingMoney = props => {
-  const services = [];
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
-  if (!props.sendingMoney && (props.collective.type === 'USER' || props.collective.type === 'ORGANIZATION')) {
+
+  const services = [];
+
+  if (!props.sendingMoney) {
     services.push('stripe');
   }
-  if (props.sendingMoney && props.collective.isHost && hasFeature(props.collective, FEATURES.TRANSFERWISE)) {
+
+  if (
+    props.sendingMoney &&
+    (hasFeature(props.collective, FEATURES.TRANSFERWISE) || parseToBoolean(process.env.TRANSFERWISE_ENABLED))
+  ) {
     services.push('transferwise');
   }
 
   return (
-    <div className="EditConnectedAccounts">
+    <div className="EditReceivingSendingMoney">
       {services.map(service => (
         <div key={`connect-${service}`}>
-          <h2>{capitalize(service)}</h2>
+          <H4>{capitalize(service)}</H4>
           <EditConnectedAccount
             collective={props.collective}
             service={service}

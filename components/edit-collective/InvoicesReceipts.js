@@ -13,7 +13,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledTextarea from '../StyledTextarea';
-import { H3, P } from '../Text';
+import { H3, H4, P } from '../Text';
 import { updateSettingsMutation } from './mutations';
 
 const messages = defineMessages({
@@ -43,11 +43,11 @@ const EditHostInvoice = ({ collective }) => {
   return (
     <Container>
       <H3>
-        <FormattedMessage id="editCollective.menu.invoicesAndReceipts" defaultMessage="Invoices & Receipts" />
+        <FormattedMessage id="editCollective.invoicesAndReceipts" defaultMessage="Invoices & Receipts" />
       </H3>
-      <P fontWeight="bold">
-        <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt settings" />
-      </P>
+      <H4 mt={2}>
+        <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt Settings" />
+      </H4>
       <P>
         <FormattedMessage
           id="EditHostInvoice.Receipt.Instructions"

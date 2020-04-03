@@ -20,6 +20,7 @@ const nextConfig = {
         WEBSITE_URL: null,
         SENTRY_DSN: null,
         ONBOARDING_MODAL: null,
+        TRANSFERWISE_ENABLED: null,
       }),
     );
 
