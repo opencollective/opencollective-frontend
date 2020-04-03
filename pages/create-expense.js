@@ -8,6 +8,7 @@ import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
 import expenseTypes from '../lib/constants/expenseTypes';
+import FormPersister from '../lib/form-persister';
 import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -94,6 +95,7 @@ class CreateExpensePage extends React.Component {
       expense: null,
       tags: null,
       isSubmitting: false,
+      formPersister: new FormPersister(),
     };
   }
 
@@ -137,6 +139,7 @@ class CreateExpensePage extends React.Component {
         expense: { ...prepareExpenseForSubmit(expense), tags: tags },
       });
 
+      this.state.formPersister.clearValues();
       const legacyExpenseId = result.data.createExpense.legacyId;
       Router.pushRoute(`/${this.props.collectiveSlug}/expenses/${legacyExpenseId}/v2`);
     } catch (e) {
@@ -212,6 +215,8 @@ class CreateExpensePage extends React.Component {
                           <ExpenseForm
                             collective={collective}
                             loading={loadingLoggedInUser}
+                            loggedInAccountId={loggedInAccount?.id}
+                            formPersister={this.state.formPersister}
                             onSubmit={this.onFormSubmit}
                             expense={this.state.expense}
                             payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
