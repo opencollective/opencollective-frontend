@@ -579,6 +579,7 @@
   "EditCollective.VATNumber": "Número de VAT",
   "EditCollective.VATNumber.Description": "Seu número de IVA (VAT)",
   "EditGoals.Instructions": "Você pode definir metas personalizadas para compartilhar uma visão geral do seu plano financeiro com a sua comunidade e acompanhar o seu progresso. Elas serão enviadas nos e-mails enviados aos seus colaboradores. Você pode exibi-los em sua página coletiva marcando a caixa abaixo.",
+  "EditHostInvoice.extraInfoPlaceholder": "Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message.",
   "EditHostInvoice.Receipt.Instructions": "Você pode definir um título customizado que aparecerá nos recibos gerados para os colaboradores dos coletivos que você administra. Deixe em branco para usar o título padrão:",
   "EditHostInvoice.receiptsSettings": "Configurações de recibo",
   "EditMembers.Title": "Editar Colaboradores Centrais",

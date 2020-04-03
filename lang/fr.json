@@ -579,6 +579,7 @@
   "EditCollective.VATNumber": "Numéro de TVA",
   "EditCollective.VATNumber.Description": "Votre numéro de TVA intra-communautaire",
   "EditGoals.Instructions": "Vous pouvez définir des objectifs personnalisés pour partager un aperçu de votre plan financier avec votre communauté et suivre vos progrès. Ils seront ajoutés aux emails envoyés à vos contributeurs. Vous pouvez également choisir de les afficher sur votre page de Collectif en cochant la case ci-dessous.",
+  "EditHostInvoice.extraInfoPlaceholder": "Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message.",
   "EditHostInvoice.Receipt.Instructions": "Vous pouvez définir un titre personnalisé qui apparaîtra sur les reçus générés pour les contributeurs des Collectifs que vous hébergez. Laissez ce champ vide pour utiliser le titre par défaut :",
   "EditHostInvoice.receiptsSettings": "Paramètres des reçus",
   "EditMembers.Title": "Éditer les membres de l'équipe",
