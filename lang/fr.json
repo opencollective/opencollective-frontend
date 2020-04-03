@@ -678,6 +678,7 @@
   "expense.pay.error.insufficientBalance": "Solde insuffisant",
   "expense.pay.manual.btn": "Marquer comme payé",
   "expense.pay.paypal.success": "La dépense a été payée avec PayPal, l'argent devrait déjà être disponible pour le bénéficiaire.",
+  "expense.pay.transferwise.planlimit": "You reached your plan's limit, <Link>upgrade your plan</Link> to continue paying expense with TransferWise",
   "expense.pay.transferwise.success": "Le transfert a été créé et financé avec TransferWise. Cette dépense est marquée comme « En traitement » jusqu'à ce que l'argent soit débité du compte de l'hôte, après quoi l'argent devrait arriver à destination sous peu. Si ce n'est pas le cas, cette dépense sera mise à jour et marquée comme « Erreur » et vous pourrez essayer à nouveau.",
   "Expense.Payee": "Bénéficiaire",
   "expense.paymentProcessorFeeInCollectiveCurrency": "commission du processeur de paiement",

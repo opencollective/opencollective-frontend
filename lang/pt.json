@@ -678,6 +678,7 @@
   "expense.pay.error.insufficientBalance": "Saldo insuficiente",
   "expense.pay.manual.btn": "Marcar como pago",
   "expense.pay.paypal.success": "Esta despesa foi paga usando PayPal, o dinheiro já deve estar disponível para o beneficiário.",
+  "expense.pay.transferwise.planlimit": "You reached your plan's limit, <Link>upgrade your plan</Link> to continue paying expense with TransferWise",
   "expense.pay.transferwise.success": "A transferência foi criada e financiada usando a TransferWise. Essa despesa é marcada como Processando até que o dinheiro deixe a conta do administrador, depois disso o dinheiro deverá chegar em seu destino em breve. Se não, esta despesa será atualizada e marcada como Erro e você poderá tentar novamente.",
   "Expense.Payee": "Beneficiário",
   "expense.paymentProcessorFeeInCollectiveCurrency": "taxa de processamento do pagamento",

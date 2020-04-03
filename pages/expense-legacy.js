@@ -14,7 +14,7 @@ import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFo
 import ErrorPage from '../components/ErrorPage';
 import Link from '../components/Link';
 
-import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { addCollectiveAndHostData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
 import MessageBox from '../components/MessageBox';
@@ -117,6 +117,7 @@ class ExpensePage extends React.Component {
               <ExpenseWithData
                 id={ExpenseId}
                 collective={collective}
+                host={collective.host}
                 view="details"
                 LoggedInUser={LoggedInUser}
                 allowPayAction={!this.state.isPayActionLocked}
@@ -134,7 +135,7 @@ class ExpensePage extends React.Component {
 }
 
 export default withUser(
-  addCollectiveCoverData(ExpensePage, {
+  addCollectiveAndHostData(ExpensePage, {
     options: props => ({
       variables: {
         slug: props.slug,
