@@ -271,7 +271,7 @@
   "completePledge.Title": "Complete sua promessa",
   "confirm": "Confirmar",
   "confirmCollective.deletion.title": "Seu {collectiveType} foi excluído.",
-  "confirmCollective.other.deletion.description": "Nós deletamos o seu {collectiveType}, despesas, colaboradores, categorias e todas as entidades relacionadas a este \n                {collectiveType}.",
+  "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",
   "confirmCollective.user.deletion.description": "Nós excluímos sua conta de usuário, despesas, métodos de pagamento e contas conectadas.",
   "confirmEmail.error.InvalidToken": "O link de confirmação é inválido ou expirou",
   "confirmEmail.sucess": "Seu email foi alterado",
