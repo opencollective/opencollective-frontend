@@ -87,7 +87,7 @@ class CreateExpensePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.stepTitleRef = React.createRef();
+    this.formTopRef = React.createRef();
     this.state = {
       step: STEPS.FORM,
       expense: null,
@@ -110,8 +110,8 @@ class CreateExpensePage extends React.Component {
     }
 
     // Scroll to top when switching steps
-    if (oldState.step !== this.state.step && this.stepTitleRef.current) {
-      this.stepTitleRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (oldState.step !== this.state.step && this.formTopRef.current) {
+      this.formTopRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -187,7 +187,7 @@ class CreateExpensePage extends React.Component {
         <CollectiveThemeProvider collective={collective}>
           <React.Fragment>
             <CollectiveNavbar collective={collective} isLoading={!collective} />
-            <Container position="relative" minHeight={[null, 800]}>
+            <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
               {!loadingLoggedInUser && !LoggedInUser && (
                 <ContainerOverlay p={2} top="0" position={['fixed', null, 'absolute']}>
                   <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
@@ -209,7 +209,7 @@ class CreateExpensePage extends React.Component {
                 </Box>
                 <Flex justifyContent="space-between" flexWrap="wrap">
                   <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]} mb={5}>
-                    <H1 fontSize="H4" lineHeight="H4" mb={24} py={2} ref={this.stepTitleRef}>
+                    <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
                       ) : (
