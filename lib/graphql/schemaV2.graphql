@@ -205,9 +205,13 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+<<<<<<< HEAD
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+=======
+  COLLECTIVE_EXPENSE_PAID
+>>>>>>> chore: update graphql schemas
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_MEMBER_CREATED
@@ -900,6 +904,10 @@ type Expense {
   The list of activities (ie. approved, edited, etc) for this expense ordered by date ascending
   """
   activities: [Activity!]!
+<<<<<<< HEAD
+=======
+  tags: [String]
+>>>>>>> chore: update graphql schemas
 }
 
 """
