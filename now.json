@@ -1,5 +1,0 @@
-{
-  "version": 2,
-  "name": "opencollective-frontend",
-  "builds": [{ "src": "package.json", "use": "@now/next" }]
-}
