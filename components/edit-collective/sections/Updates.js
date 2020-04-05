@@ -6,19 +6,19 @@ import { useMutation } from '@apollo/react-hooks';
 import { useIntl, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 
-import imgPreviewList from '../../public/static/images/updates/updates-list-preview.png';
-import imgPreviewNewUpdate from '../../public/static/images/updates/updates-new-preview.png';
+import imgPreviewList from '../../../public/static/images/updates/updates-list-preview.png';
+import imgPreviewNewUpdate from '../../../public/static/images/updates/updates-new-preview.png';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';
-import CreateUpdateFAQ from '../faqs/CreateUpdateFAQ';
-import Container from '../Container';
-import MessageBox from '../MessageBox';
-import { H3, P } from '../Text';
-import StyledCheckbox from '../StyledCheckbox';
-import Link from '../Link';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../../lib/allowed-features';
+import CreateUpdateFAQ from '../../faqs/CreateUpdateFAQ';
+import Container from '../../Container';
+import MessageBox from '../../MessageBox';
+import { H3, P } from '../../Text';
+import StyledCheckbox from '../../StyledCheckbox';
+import Link from '../../Link';
 
-import { updateSettingsMutation } from './mutations';
+import { updateSettingsMutation } from '../mutations';
 
 const messages = defineMessages({
   title: {
@@ -52,7 +52,7 @@ const ScreenshotPreview = styled.div`
 /**
  * A presentation of the updates feature, with a checkbox to (de-)activate it.
  */
-const EditCollectiveUpdates = ({ collective }) => {
+const Updates = ({ collective }) => {
   const defaultIsChecked = hasFeature(collective, FEATURES.UPDATES);
   const { formatMessage } = useIntl();
   const [setSettings, { loading, error }] = useMutation(updateSettingsMutation);
@@ -65,7 +65,7 @@ const EditCollectiveUpdates = ({ collective }) => {
           <P wordBreak="break-word">
             {formatMessage(messages.mainDescription, {
               updatesLink: (
-                <Link route="updates" params={{ collectiveSlug: collective.slug }}>
+                <Link key="updatesLink" route="updates" params={{ collectiveSlug: collective.slug }}>
                   {process.env.WEBSITE_URL}/{collective.slug}/updates
                 </Link>
               ),
@@ -107,7 +107,7 @@ const EditCollectiveUpdates = ({ collective }) => {
   );
 };
 
-EditCollectiveUpdates.propTypes = {
+Updates.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     settings: PropTypes.object,
@@ -115,4 +115,4 @@ EditCollectiveUpdates.propTypes = {
   }).isRequired,
 };
 
-export default EditCollectiveUpdates;
+export default Updates;

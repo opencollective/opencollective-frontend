@@ -6,7 +6,7 @@ import { get } from 'lodash';
 
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
-import EditCollective from '../components/edit-collective/EditCollective';
+import EditCollective from '../components/edit-collective';
 import ErrorPage from '../components/ErrorPage';
 import MessageBox from '../components/MessageBox';
 

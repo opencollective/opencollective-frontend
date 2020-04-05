@@ -183,7 +183,7 @@ const shouldDisplaySection = (collective, section) => {
 /**
  * Displays the menu for the edit collective page
  */
-const Menu = ({ collective, selectedSection }) => {
+const EditCollectiveMenu = ({ collective, selectedSection }) => {
   const { formatMessage } = useIntl();
   const allSections = Object.values(EDIT_COLLECTIVE_SECTIONS);
   const displayedSections = allSections.filter(section => shouldDisplaySection(collective, section));
@@ -234,7 +234,7 @@ const Menu = ({ collective, selectedSection }) => {
   );
 };
 
-Menu.propTypes = {
+EditCollectiveMenu.propTypes = {
   selectedSection: PropTypes.oneOf(Object.values(EDIT_COLLECTIVE_SECTIONS)),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
@@ -246,4 +246,4 @@ Menu.propTypes = {
   }).isRequired,
 };
 
-export default React.memo(Menu);
+export default React.memo(EditCollectiveMenu);

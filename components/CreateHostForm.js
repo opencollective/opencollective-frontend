@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import EditConnectedAccount from './EditConnectedAccount';
-import { groupBy } from 'lodash';
-import InputField from './InputField';
-import colors from '../lib/constants/colors';
 import { Flex, Box } from '@rebass/grid';
-import CreateOrganizationForm from './CreateOrganizationForm';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { groupBy } from 'lodash';
 import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
+
+import colors from '../lib/constants/colors';
+
+import InputField from './InputField';
+import CreateOrganizationForm from './CreateOrganizationForm';
+
+import EditConnectedAccount from './edit-collective/EditConnectedAccount';
 
 const ConnectStripeBox = styled(Box)`
   text-align: right;

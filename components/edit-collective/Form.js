@@ -8,7 +8,6 @@ import { H3, H4, P } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
-
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { TierTypes } from '../../lib/constants/tiers-types';
@@ -18,31 +17,37 @@ import { Currency } from '../../lib/constants/currency';
 import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
-import EditTiers from './EditTiers';
-import EditTickets from './EditTicket';
-import EditGoals from './EditGoals';
-import EditHost from './EditHost';
-import EditMembers from './EditMembers';
-import EditPaymentMethods from './EditPaymentMethods';
-import EditConnectedAccounts from './EditConnectedAccounts';
-import EditWebhooks from './EditWebhooks';
-import ExportData from '../ExportData';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
-import EditVirtualCards from './EditVirtualCards';
-import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import Container from '../Container';
 import ExternalLink from '../ExternalLink';
 
-import EditCollectiveEmptyBalance from './EditCollectiveEmptyBalance';
-import EditCollectiveArchive from './EditCollectiveArchive';
-import EditCollectiveDelete from './EditCollectiveDelete';
-import FiscalHosting from './FiscalHosting';
+// Generic Sections
+import CollectiveGoals from './sections/CollectiveGoals';
+import ConnectedAccounts from './sections/ConnectedAccounts';
+import Updates from './sections/Updates';
+import Conversations from './sections/Conversations';
+import Export from './sections/Export';
+import Host from './sections/Host';
+import Members from './sections/Members';
+import PaymentMethods from './sections/PaymentMethods';
+import Tiers from './sections/Tiers';
+import Tickets from './sections/Tickets';
+import VirtualCards from './sections/VirtualCards';
+import Webhooks from './sections/Webhooks';
+
+// Fical Host Sections
+import FiscalHosting from './sections/FiscalHosting';
+import HostPlan from './sections/HostPlan';
+import InvoicesReceipts from './sections/InvoicesReceipts';
+
+// Actions
+import EmptyBalance from './actions/EmptyBalance';
+import Archive from './actions/Archive';
+import Delete from './actions/Delete';
+
+import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import EditUserEmailForm from './EditUserEmailForm';
-import InvoicesReceipts from './InvoicesReceipts';
-import EditCollectiveConversations from './EditCollectiveConversations';
-import EditCollectiveUpdates from './EditCollectiveUpdates';
-import HostPlan from './HostPlan';
 import EditReceivingSendingMoney from './EditReceivingSendingMoney';
 
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
@@ -385,37 +390,37 @@ class EditCollectiveForm extends React.Component {
         return null;
 
       case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS:
-        return <EditGoals collective={collective} currency={collective.currency} />;
+        return <CollectiveGoals collective={collective} currency={collective.currency} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
-        return <EditConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
+        return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
 
       case EDIT_COLLECTIVE_SECTIONS.UPDATES:
-        return <EditCollectiveUpdates collective={collective} />;
+        return <Updates collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS:
-        return <EditCollectiveConversations collective={collective} />;
+        return <Conversations collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPENSES:
         return null;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPORT:
-        return <ExportData collective={collective} />;
+        return <Export collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST:
         return (
-          <EditHost collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
+          <Host collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
         );
 
       case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <EditMembers collective={collective} LoggedInUser={LoggedInUser} />;
+        return <Members collective={collective} LoggedInUser={LoggedInUser} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
-        return <EditPaymentMethods collectiveSlug={collective.slug} sendingSection={true} />;
+        return <PaymentMethods collectiveSlug={collective.slug} sendingSection={true} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TIERS:
         return (
-          <EditTiers
+          <Tiers
             title="Tiers"
             types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
             tiers={this.state.tiers}
@@ -428,7 +433,7 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
         return (
-          <EditTickets
+          <Tickets
             title="Tickets"
             types={['TICKET']}
             tiers={this.state.tickets}
@@ -440,7 +445,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
-        return <EditVirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
+        return <VirtualCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
 
       case 'gift-cards-create':
       case 'gift-cards-send':
@@ -480,18 +485,17 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.WEBHOOKS:
-        return <EditWebhooks collectiveSlug={collective.slug} />;
+        return <Webhooks collectiveSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
           <Box>
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
             {collective.type === CollectiveType.COLLECTIVE && (
-              <EditCollectiveEmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
+              <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
-            <EditCollectiveArchive collective={collective} />
-            <EditCollectiveDelete collective={collective} />
-            <hr />
+            <Archive collective={collective} />
+            <Delete collective={collective} />
           </Box>
         );
 
@@ -510,7 +514,7 @@ class EditCollectiveForm extends React.Component {
         return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
-        return <EditPaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />;
+        return <PaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />;
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return (
@@ -799,6 +803,8 @@ class EditCollectiveForm extends React.Component {
       });
     });
 
+    const fields = (this.fields[this.state.section] || []).filter(field => !field.when || field.when());
+
     return (
       <div className="EditCollectiveForm">
         <style jsx>
@@ -869,84 +875,73 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
               </H3>
             )}
-
             {this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
               <H3>
                 <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
               </H3>
             )}
-
-            {this.state.section !== EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
-
-            {[
-              EDIT_COLLECTIVE_SECTIONS.INFO,
-              EDIT_COLLECTIVE_SECTIONS.EXPENSES,
-              EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS,
-            ].includes(this.state.section) && (
-              <Fragment>
-                <div className="FormInputs">
-                  {Object.keys(this.fields).map(
-                    section =>
-                      this.state.section === section && (
-                        <div className="inputs" key={section}>
-                          {this.fields[section].map(
-                            field =>
-                              (!field.when || field.when()) && (
-                                <InputField
-                                  key={field.name}
-                                  className={field.className}
-                                  defaultValue={this.getFieldDefaultValue(field)}
-                                  validate={field.validate}
-                                  ref={field.name}
-                                  name={field.name}
-                                  label={field.label}
-                                  description={field.description}
-                                  options={field.options}
-                                  placeholder={field.placeholder}
-                                  type={field.type}
-                                  pre={field.pre}
-                                  post={field.post}
-                                  context={this.state.collective}
-                                  onChange={value => this.handleChange(field.name, value)}
-                                />
-                              ),
-                          )}
-                        </div>
-                      ),
-                  )}
+            {fields && fields.length > 0 && (
+              <div className="FormInputs">
+                <div className="inputs">
+                  {fields.map(field => (
+                    <InputField
+                      key={field.name}
+                      className={field.className}
+                      defaultValue={this.getFieldDefaultValue(field)}
+                      validate={field.validate}
+                      ref={field.name}
+                      name={field.name}
+                      label={field.label}
+                      description={field.description}
+                      options={field.options}
+                      placeholder={field.placeholder}
+                      type={field.type}
+                      pre={field.pre}
+                      post={field.post}
+                      context={this.state.collective}
+                      onChange={value => this.handleChange(field.name, value)}
+                    />
+                  ))}
                 </div>
-
-                <div className="actions">
-                  <Button
-                    bsStyle="primary"
-                    type="submit"
-                    onClick={this.handleSubmit}
-                    disabled={status === 'loading' || !this.state.modified}
-                  >
-                    {submitBtnLabel}
-                  </Button>
-
-                  <div className="backToProfile">
-                    <Link
-                      route={isEvent ? 'event' : 'collective'}
-                      params={
-                        isEvent
-                          ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
-                          : { slug: collective.slug }
-                      }
-                    >
-                      <FormattedMessage
-                        id="collective.edit.backToProfile"
-                        defaultMessage="view {type} page"
-                        values={{ type }}
-                      />
-                    </Link>
-                  </div>
-                </div>
-              </Fragment>
+              </div>
             )}
 
-            {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && this.renderSection(this.state.section)}
+            {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(this.state.section) &&
+              this.renderSection(this.state.section)}
+
+            {((fields && fields.length > 0) ||
+              [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(this.state.section)) && (
+              <div className="actions">
+                <Button
+                  bsStyle="primary"
+                  type="submit"
+                  onClick={this.handleSubmit}
+                  disabled={status === 'loading' || !this.state.modified}
+                >
+                  {submitBtnLabel}
+                </Button>
+
+                <div className="backToProfile">
+                  <Link
+                    route={isEvent ? 'event' : 'collective'}
+                    params={
+                      isEvent
+                        ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                        : { slug: collective.slug }
+                    }
+                  >
+                    <FormattedMessage
+                      id="collective.edit.backToProfile"
+                      defaultMessage="view {type} page"
+                      values={{ type }}
+                    />
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(this.state.section) &&
+              this.renderSection(this.state.section)}
           </Flex>
         </Flex>
       </div>

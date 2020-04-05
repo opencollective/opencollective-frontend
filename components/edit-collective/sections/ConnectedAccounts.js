@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
-import { capitalize } from '../../lib/utils';
-import EditConnectedAccount from '../EditConnectedAccount';
-import { H4 } from '../Text';
 
-const EditConnectedAccounts = props => {
+import { capitalize } from '../../../lib/utils';
+
+import { H4 } from '../../Text';
+
+import EditConnectedAccount from '../EditConnectedAccount';
+
+const ConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
   const services = [];
@@ -30,10 +33,10 @@ const EditConnectedAccounts = props => {
   );
 };
 
-EditConnectedAccounts.propTypes = {
+ConnectedAccounts.propTypes = {
   collective: PropTypes.object.isRequired,
   connectedAccounts: PropTypes.arrayOf(PropTypes.object),
   editMode: PropTypes.bool,
 };
 
-export default EditConnectedAccounts;
+export default ConnectedAccounts;

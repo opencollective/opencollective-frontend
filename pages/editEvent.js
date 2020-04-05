@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import EditCollective from '../components/edit-collective/EditCollective';
+import EditCollective from '../components/edit-collective';
 import ErrorPage from '../components/ErrorPage';
 
 import { addEventCollectiveData } from '../lib/graphql/queries';

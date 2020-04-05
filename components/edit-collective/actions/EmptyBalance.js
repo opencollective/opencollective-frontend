@@ -2,15 +2,15 @@ import React, { Fragment, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency } from '../../../lib/utils';
 
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
-import { H2, P } from '../Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import SendMoneyToCollectiveBtn from '../../SendMoneyToCollectiveBtn';
+import { H2, P } from '../../Text';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../StyledModal';
 
-const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
+const EmptyBalance = ({ collective, LoggedInUser }) => {
   const [modal, setModal] = useState({ type: 'Transfer', show: false, isApproved: false });
 
   if (!collective.host) {
@@ -21,7 +21,7 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
     setModal({ ...modal, show: true, isApproved: false });
   };
 
-  const onClose = () => setModal({ ...modal, show: false, isApproved: false });
+  const closeModal = () => setModal({ ...modal, show: false, isApproved: false });
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={2}>
@@ -43,7 +43,7 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
             defaultMessage={
               "The host doesn't support this feature. Submit an expense, donate to another Collective or contact support if you're blocked."
             }
-          />{' '}
+          />
         </P>
       )}
       {collective.host.hostCollective && (
@@ -71,8 +71,8 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
               />
             </StyledButton>
           )}
-          <Modal show={modal.show} width="570px" onClose={onClose}>
-            <ModalHeader onClose={onClose}>
+          <Modal show={modal.show} width="570px" onClose={closeModal}>
+            <ModalHeader onClose={closeModal}>
               <FormattedMessage
                 id="collective.emptyBalance.header"
                 values={{ action: modal.type }}
@@ -109,9 +109,9 @@ const EditCollectiveEmptyBalance = ({ collective, LoggedInUser }) => {
   );
 };
 
-EditCollectiveEmptyBalance.propTypes = {
+EmptyBalance.propTypes = {
   collective: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
 };
 
-export default EditCollectiveEmptyBalance;
+export default EmptyBalance;

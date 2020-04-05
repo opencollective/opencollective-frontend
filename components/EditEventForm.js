@@ -4,7 +4,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import Button from './Button';
 import InputField from './InputField';
-import EditTiers from './edit-collective/EditTiers';
+import EditTiers from './edit-collective/sections/Tiers';
 import TimezonePicker from './TimezonePicker';
 import Container from './Container';
 import { P } from './Text';

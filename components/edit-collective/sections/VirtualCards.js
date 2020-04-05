@@ -7,18 +7,18 @@ import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
-
 import { Add } from '@styled-icons/material/Add';
 
-import { Router } from '../../server/pages';
-import StyledSelect from '../StyledSelect';
-import VirtualCardDetails from '../VirtualCardDetails';
-import Loading from '../Loading';
-import Pagination from '../Pagination';
-import Link from '../Link';
-import StyledButtonSet from '../StyledButtonSet';
-import { P } from '../Text';
-import StyledButton from '../StyledButton';
+import { Router } from '../../../server/pages';
+
+import StyledSelect from '../../StyledSelect';
+import VirtualCardDetails from '../../VirtualCardDetails';
+import Loading from '../../Loading';
+import Pagination from '../../Pagination';
+import Link from '../../Link';
+import StyledButtonSet from '../../StyledButtonSet';
+import { P } from '../../Text';
+import StyledButton from '../../StyledButton';
 
 const messages = defineMessages({
   notBatched: {
@@ -37,7 +37,7 @@ const NOT_BATCHED_KEY = '__not-batched__';
  * A filterable list of virtual cards meant to be displayed for organization
  * admins.
  */
-class EditVirtualCards extends React.Component {
+class VirtualCards extends React.Component {
   static propTypes = {
     collectiveId: PropTypes.number.isRequired,
     collectiveSlug: PropTypes.string.isRequired,
@@ -246,4 +246,4 @@ export const addData = graphql(getCollectiveVirtualCards, {
   }),
 });
 
-export default withRouter(addData(injectIntl(EditVirtualCards)));
+export default withRouter(addData(injectIntl(VirtualCards)));

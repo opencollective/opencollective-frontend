@@ -6,19 +6,19 @@ import { useMutation } from '@apollo/react-hooks';
 import { useIntl, defineMessages } from 'react-intl';
 import styled from 'styled-components';
 
-import imgPreviewThread from '../../public/static/images/conversations/conversations-list-preview.png';
-import imgPreviewReplies from '../../public/static/images/conversations/conversation-replies-preview.png';
+import imgPreviewThread from '../../../public/static/images/conversations/conversations-list-preview.png';
+import imgPreviewReplies from '../../../public/static/images/conversations/conversation-replies-preview.png';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../lib/allowed-features';
-import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
-import Container from '../Container';
-import MessageBox from '../MessageBox';
-import { H3, P } from '../Text';
-import StyledCheckbox from '../StyledCheckbox';
-import Link from '../Link';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../../lib/allowed-features';
+import CreateConversationFAQ from '../../faqs/CreateConversationFAQ';
+import Container from '../../Container';
+import MessageBox from '../../MessageBox';
+import { H3, P } from '../../Text';
+import StyledCheckbox from '../../StyledCheckbox';
+import Link from '../../Link';
 
-import { updateSettingsMutation } from './mutations';
+import { updateSettingsMutation } from '../mutations';
 
 const messages = defineMessages({
   title: {
@@ -52,7 +52,7 @@ const ScreenshotPreview = styled.div`
 /**
  * A presentation of the conversations feature, with a checkbox to (de-)activate it.
  */
-const EditCollectiveConversations = ({ collective }) => {
+const Conversations = ({ collective }) => {
   const defaultIsChecked = hasFeature(collective, FEATURES.CONVERSATIONS);
   const { formatMessage } = useIntl();
   const [setSettings, { loading, error }] = useMutation(updateSettingsMutation);
@@ -65,7 +65,7 @@ const EditCollectiveConversations = ({ collective }) => {
           <P wordBreak="break-word">
             {formatMessage(messages.mainDescription, {
               conversationsLink: (
-                <Link route="conversations" params={{ collectiveSlug: collective.slug }}>
+                <Link key="conversationsLink" route="conversations" params={{ collectiveSlug: collective.slug }}>
                   {process.env.WEBSITE_URL}/{collective.slug}/conversations
                 </Link>
               ),
@@ -107,7 +107,7 @@ const EditCollectiveConversations = ({ collective }) => {
   );
 };
 
-EditCollectiveConversations.propTypes = {
+Conversations.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     settings: PropTypes.object,
@@ -115,4 +115,4 @@ EditCollectiveConversations.propTypes = {
   }).isRequired,
 };
 
-export default EditCollectiveConversations;
+export default Conversations;

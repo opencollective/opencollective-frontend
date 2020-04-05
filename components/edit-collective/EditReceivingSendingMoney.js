@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
+
 import { capitalize, parseToBoolean } from '../../lib/utils';
-import EditConnectedAccount from '../EditConnectedAccount';
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
+
 import { H4 } from '../Text';
+
+import EditConnectedAccount from './EditConnectedAccount';
 
 const EditReceivingSendingMoney = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');

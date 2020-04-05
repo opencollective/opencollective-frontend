@@ -7,13 +7,14 @@ import { v4 as uuid } from 'uuid';
 import { Box, Flex } from '@rebass/grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
-import { getCurrencySymbol, capitalize } from '../../lib/utils';
-import InputField from '../InputField';
-import InputFieldPresets from '../InputFieldPresets';
-import { Span } from '../Text';
-import MessageBox from '../MessageBox';
+import { getCurrencySymbol, capitalize } from '../../../lib/utils';
 
-class EditTiers extends React.Component {
+import InputField from '../../InputField';
+import InputFieldPresets from '../../InputFieldPresets';
+import { Span } from '../../Text';
+import MessageBox from '../../MessageBox';
+
+class Tiers extends React.Component {
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object).isRequired,
     types: PropTypes.arrayOf(PropTypes.string),
@@ -422,4 +423,4 @@ class EditTiers extends React.Component {
   }
 }
 
-export default injectIntl(EditTiers);
+export default injectIntl(Tiers);
