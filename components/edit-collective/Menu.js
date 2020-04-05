@@ -147,7 +147,10 @@ const isType = collectiveType => ({ type }) => type === collectiveType;
 const isOneOfTypes = (...collectiveTypes) => ({ type }) => collectiveTypes.includes(type);
 const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveType(type, feature);
 const sectionsDisplayConditions = {
+  [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
+  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: collective =>
+    collective.isHost || collective.type == CollectiveType.COLLECTIVE,
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: isFeatureAllowed(FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
@@ -155,16 +158,15 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
-  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: collective =>
-    collective.isHost || collective.type == CollectiveType.COLLECTIVE,
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: isOneOfTypes(
     CollectiveType.COLLECTIVE,
     CollectiveType.ORGANIZATION,
     CollectiveType.USER,
   ),
+  [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
