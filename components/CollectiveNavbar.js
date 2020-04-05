@@ -383,7 +383,7 @@ const CollectiveNavbar = ({
             </Link>
           )}
         </Flex>
-        <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />
+        {!onlyInfos && <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />}
       </InfosContainer>
 
       {/** Navbar items and buttons */}
