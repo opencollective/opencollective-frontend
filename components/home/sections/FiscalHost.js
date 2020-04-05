@@ -4,12 +4,12 @@ import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
 import { P } from '../../Text';
-import { Link } from '../../../server/pages';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import SectionTitle from '../SectionTitle';
 import Illustration from '../HomeIllustration';
 import StyledLink from '../../StyledLink';
+import Link from '../../Link';
 
 const Wrapper = styled(Container)`
   background-image: url('/static/images/home/fiscalhost-bg-sm.png');

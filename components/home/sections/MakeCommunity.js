@@ -5,11 +5,11 @@ import { Flex, Box } from '@rebass/grid';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
 
 import { P, Span, H1, H4 } from '../../Text';
-import Link from '../../Link';
 import Illustration from '../HomeIllustration';
 import StyledButton from '../../StyledButton';
 import Modal from '../../StyledModal';
 import Container from '../../Container';
+import Link from '../../Link';
 
 const SustainTextWrapper = styled(Span)`
   background-image: url('/static/images/home/sustain-underline-sm.png');
@@ -91,7 +91,7 @@ const MakeCommunity = () => {
             </P>
           </Box>
           <Box display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, null]}>
-            <Link route="create">
+            <Link route="/create">
               <StyledButton minWidth={175} my={[2, null, 0]} mr={[0, null, 3]} buttonStyle="dark">
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
