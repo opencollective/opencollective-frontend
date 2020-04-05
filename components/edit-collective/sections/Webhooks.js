@@ -7,23 +7,23 @@ import gql from 'graphql-tag';
 import { isURL } from 'validator';
 import { Close } from '@styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
-
-import events from '../../lib/constants/notificationEvents';
-
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { compose } from '../../lib/utils';
-import { CollectiveType } from '../../lib/constants/collectives';
-
-import Loading from '../Loading';
-import { Span } from '../Text';
-import StyledHr from '../StyledHr';
-import MessageBox from '../MessageBox';
 import { Flex, Box } from '@rebass/grid';
-import StyledButton from '../StyledButton';
-import StyledSelect from '../StyledSelect';
 import { Add } from '@styled-icons/material/Add';
-import StyledInputGroup from '../StyledInputGroup';
-import ExternalLink from '../ExternalLink';
+
+import events from '../../../lib/constants/notificationEvents';
+
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { compose } from '../../../lib/utils';
+import { CollectiveType } from '../../../lib/constants/collectives';
+
+import Loading from '../../Loading';
+import { Span } from '../../Text';
+import StyledHr from '../../StyledHr';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledSelect from '../../StyledSelect';
+import StyledInputGroup from '../../StyledInputGroup';
+import ExternalLink from '../../ExternalLink';
 
 const messages = defineMessages({
   'webhooks.url.label': {
@@ -50,7 +50,7 @@ const messages = defineMessages({
 
 const EMPTY_WEBHOOKS = [];
 
-class EditWebhooks extends React.Component {
+class Webhooks extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     editWebhooks: PropTypes.func,
@@ -375,4 +375,4 @@ const editWebhooks = graphql(
 
 const addData = compose(graphql(getCollectiveWithNotificationsQuery), editWebhooks);
 
-export default injectIntl(addData(EditWebhooks));
+export default injectIntl(addData(Webhooks));

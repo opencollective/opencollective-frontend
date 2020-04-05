@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import { exportMembers } from '../lib/export_file';
-import StyledLink from './StyledLink';
-import ExportImages from './ExportImages';
 
-class ExportData extends React.Component {
+import { exportMembers } from '../../../lib/export_file';
+
+import StyledLink from '../../StyledLink';
+import ExportImages from '../../ExportImages';
+
+class Export extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
   };
@@ -186,4 +187,4 @@ class ExportData extends React.Component {
   }
 }
 
-export default ExportData;
+export default Export;

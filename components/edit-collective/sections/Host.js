@@ -1,22 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import { Radio } from '@material-ui/core';
-import CreateHostFormWithData from '../CreateHostFormWithData';
-import HostsWithData from '../HostsWithData';
-import CollectiveCard from '../CollectiveCard';
-import Link from '../Link';
-import { P } from '../Text';
-import InputField from '../InputField';
-import { formatCurrency, getQueryParams, formatDate } from '../../lib/utils';
 import { Button } from 'react-bootstrap';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
+
+import { formatCurrency, getQueryParams, formatDate } from '../../../lib/utils';
+
+import CreateHostFormWithData from '../../CreateHostFormWithData';
+import HostsWithData from '../../HostsWithData';
+import CollectiveCard from '../../CollectiveCard';
+import Link from '../../Link';
+import { P } from '../../Text';
+import InputField from '../../InputField';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
 
 const Option = styled.div`
   h2 {
@@ -29,7 +30,7 @@ const Fineprint = styled.div`
   font-size: 14px;
 `;
 
-class EditHost extends React.Component {
+class Host extends React.Component {
   static propTypes = {
     goals: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.object.isRequired,
@@ -86,6 +87,8 @@ class EditHost extends React.Component {
     const { LoggedInUser, collective } = this.props;
     const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
     const { showModal, action } = this.state;
+
+    const closeModal = () => this.setState({ showModal: false });
 
     if (get(collective, 'host.id')) {
       const name = collective.host.name;
@@ -180,8 +183,8 @@ class EditHost extends React.Component {
               )}
             </Box>
           </Flex>
-          <Modal show={showModal} width="570px" onClose={() => this.setState({ showModal: false })}>
-            <ModalHeader>
+          <Modal show={showModal} width="570px" onClose={closeModal}>
+            <ModalHeader onClose={closeModal}>
               {action === 'Remove' ? (
                 <FormattedMessage id="collective.editHost.remove" values={{ name }} defaultMessage={'Remove {name}'} />
               ) : (
@@ -390,4 +393,4 @@ class EditHost extends React.Component {
   }
 }
 
-export default EditHost;
+export default Host;

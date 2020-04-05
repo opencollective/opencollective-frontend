@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../lib/graphql/mutations';
+import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../../lib/graphql/mutations';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { CollectiveType } from '../../../lib/constants/collectives';
 
-import { H2, P } from '../Text';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import MessageBox from '../MessageBox';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { CollectiveType } from '../../lib/constants/collectives';
+import { H2, P } from '../../Text';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import MessageBox from '../../MessageBox';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../StyledModal';
 
 const getCollectiveType = type => {
   switch (type) {
@@ -110,6 +110,8 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
 
   const hasBalance = collective.stats.balance > 0 && collective.type === 'COLLECTIVE';
 
+  const closeModal = () => setModal({ ...modal, show: false });
+
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
@@ -190,8 +192,8 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         </StyledButton>
       )}
 
-      <Modal show={modal.show} width="570px" onClose={() => setModal({ ...modal, show: false })}>
-        <ModalHeader>
+      <Modal show={modal.show} width="570px" onClose={closeModal}>
+        <ModalHeader onClose={closeModal}>
           {modal.type === 'Unarchive' ? (
             <FormattedMessage
               id="unarchive.modal.header"

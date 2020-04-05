@@ -5,22 +5,23 @@ import { v4 as uuid } from 'uuid';
 import { Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
-
-import { getCurrencySymbol } from '../../lib/utils';
-import InputField from '../InputField';
-import GoalsCover from '../GoalsCover';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import { P, H3 } from '../Text';
-import StyledCheckbox from '../StyledCheckbox';
 import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-import Link from '../Link';
-import MessageBox from '../MessageBox';
+
+import { getCurrencySymbol } from '../../../lib/utils';
+
+import InputField from '../../InputField';
+import GoalsCover from '../../GoalsCover';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import { P, H3 } from '../../Text';
+import StyledCheckbox from '../../StyledCheckbox';
+import Link from '../../Link';
+import MessageBox from '../../MessageBox';
 
 const BORDER = '1px solid #efefef';
 
-class EditGoals extends React.Component {
+class CollectiveGoals extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
@@ -264,4 +265,4 @@ const addEditCollectiveSettingsMutation = graphql(
   },
 );
 
-export default injectIntl(addEditCollectiveSettingsMutation(EditGoals));
+export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));

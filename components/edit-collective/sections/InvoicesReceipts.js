@@ -5,16 +5,18 @@ import React from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
-import imgInvoiceTitlePreview from '../../public/static/images/invoice-title-preview.jpg';
+import imgInvoiceTitlePreview from '../../../public/static/images/invoice-title-preview.jpg';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import Container from '../Container';
-import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
-import StyledInput from '../StyledInput';
-import StyledTextarea from '../StyledTextarea';
-import { H3, H4, P } from '../Text';
-import { updateSettingsMutation } from './mutations';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+
+import Container from '../../Container';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledInput from '../../StyledInput';
+import StyledTextarea from '../../StyledTextarea';
+import { H3, H4, P } from '../../Text';
+
+import { updateSettingsMutation } from '../mutations';
 
 const messages = defineMessages({
   extraInfoPlaceholder: {
@@ -24,7 +26,7 @@ const messages = defineMessages({
   },
 });
 
-const EditHostInvoice = ({ collective }) => {
+const InvoicesReceipts = ({ collective }) => {
   const { formatMessage } = useIntl();
 
   // For invoice Title
@@ -115,11 +117,11 @@ const EditHostInvoice = ({ collective }) => {
   );
 };
 
-EditHostInvoice.propTypes = {
+InvoicesReceipts.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     settings: PropTypes.object,
   }).isRequired,
 };
 
-export default EditHostInvoice;
+export default InvoicesReceipts;

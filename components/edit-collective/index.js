@@ -3,15 +3,17 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { defaultBackgroundImage } from '../../lib/constants/collectives';
+
 import Header from '../Header';
 import Body from '../Body';
 import Footer from '../Footer';
 import SignInOrJoinFree from '../SignInOrJoinFree';
-import EditCollectiveForm from './EditCollectiveForm';
 import CollectiveNavbar from '../CollectiveNavbar';
 import NotificationBar from '../NotificationBar';
-import { defaultBackgroundImage } from '../../lib/constants/collectives';
 import Loading from '../Loading';
+
+import Form from './Form';
 
 class EditCollective extends React.Component {
   static propTypes = {
@@ -162,7 +164,7 @@ class EditCollective extends React.Component {
             {canEditCollective && !loggedInEditDataLoaded && <Loading />}
             {canEditCollective && loggedInEditDataLoaded && (
               <div>
-                <EditCollectiveForm
+                <Form
                   collective={collective}
                   LoggedInUser={LoggedInUser}
                   onSubmit={this.editCollective}

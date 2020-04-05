@@ -7,11 +7,12 @@ import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
-import StyledTooltip from '../StyledTooltip';
-import Button from '../Button';
-import Loading from '../Loading';
-import { H3 } from '../Text';
-import { getCollectiveTiersDescriptionQuery } from '../../lib/graphql/queries';
+import { getCollectiveTiersDescriptionQuery } from '../../../lib/graphql/queries';
+
+import StyledTooltip from '../../StyledTooltip';
+import Button from '../../Button';
+import Loading from '../../Loading';
+import { H3 } from '../../Text';
 
 const LimitsInfoCircle = styled(InfoCircle)`
   vertical-align: baseline;

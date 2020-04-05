@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { withUser } from '../UserProvider';
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../../lib/graphql/mutations';
-import { H2, P } from '../Text';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
-import { Router } from '../../server/pages';
-import { CollectiveType } from '../../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../../../lib/graphql/mutations';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { Router } from '../../../server/pages';
+
+import { withUser } from '../../UserProvider';
+import { H2, P } from '../../Text';
+import Container from '../../Container';
+import StyledButton from '../../StyledButton';
+import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../StyledModal';
 
 const getCollectiveType = type => {
   switch (type) {
@@ -50,6 +51,8 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
   };
 
   const { deleting, error } = deleteStatus;
+
+  const closeModal = () => setShowModal(false);
 
   return (
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
@@ -110,8 +113,8 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
           />
         </P>
       )}
-      <Modal show={showModal} width="570px" onClose={() => setShowModal(false)}>
-        <ModalHeader>
+      <Modal show={showModal} width="570px" onClose={closeModal}>
+        <ModalHeader onClose={closeModal}>
           <FormattedMessage
             id="collective.delete.modal.header"
             values={{ name: collective.name }}
