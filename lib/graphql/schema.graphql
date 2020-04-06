@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Fri Apr 03 2020 12:10:47 GMT+0200 (GMT+02:00)
+# timestamp: Mon Apr 06 2020 17:45:53 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -1419,6 +1419,11 @@ type InvoiceType {
   Title for the invoice. Depending on the type of legal entity, a host should issue an Invoice or a Receipt.
   """
   title: String
+
+  """
+  more info about the invoice, which is then printed on receipts that go to financial contributors.
+  """
+  extraInfo: String
 
   """
   dateFrom and dateTo will be set for any invoice over a period of time. They
