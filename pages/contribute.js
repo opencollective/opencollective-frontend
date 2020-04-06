@@ -95,14 +95,16 @@ class TiersPage extends React.Component {
                   </P>
                   {canContribute ? (
                     <Container display="flex" flexWrap="wrap">
-                      <ContributeCardContainer>
-                        <ContributeCustom
-                          hideContributors={!hasContributors}
-                          collective={collective}
-                          contributors={financialContributorsWithoutTier}
-                          stats={collective.stats.backers}
-                        />
-                      </ContributeCardContainer>
+                      {!collective.settings.disableCustomContributions && (
+                        <ContributeCardContainer>
+                          <ContributeCustom
+                            hideContributors={!hasContributors}
+                            collective={collective}
+                            contributors={financialContributorsWithoutTier}
+                            stats={collective.stats.backers}
+                          />
+                        </ContributeCardContainer>
+                      )}
 
                       {collective.tiers.map(tier => (
                         <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">

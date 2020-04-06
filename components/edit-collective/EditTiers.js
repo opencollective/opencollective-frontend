@@ -372,7 +372,7 @@ const EditTiers = props => {
 
   let defaultIsChecked = false;
   if (props.collective.settings.disableCustomContributions === undefined) {
-    defaultIsChecked = true;
+    defaultIsChecked = false;
   } else {
     defaultIsChecked = props.collective.settings.disableCustomContributions;
   }
@@ -404,12 +404,12 @@ const EditTiers = props => {
           <StyledCheckbox
             name="custom-contributions"
             label={intl.formatMessage(messages['customContributions.label'])}
-            defaultChecked={defaultIsChecked}
+            defaultChecked={!defaultIsChecked}
             width="auto"
             isLoading={loading}
             onChange={({ target }) => {
               const updatedCollective = cloneDeep(props.collective);
-              set(updatedCollective, 'settings.disableCustomContributions', target.value);
+              set(updatedCollective, 'settings.disableCustomContributions', !target.value);
               return setSettings({ variables: pick(updatedCollective, ['id', 'settings']) });
             }}
           />
