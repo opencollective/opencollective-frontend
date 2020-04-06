@@ -42,7 +42,7 @@ const MenuLink = styled.a`
   letter-spacing: -0.2px;
   text-decoration: none;
   white-space: nowrap;
-  padding: 8px 16px 16px;
+  padding: 12px 16px 16px;
 
   &:focus {
     color: ${themeGet('colors.primary.700')};
@@ -266,9 +266,12 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   const sections = getDefaultSections(collective);
   const toRemove = new Set();
   collective = collective || {};
+  const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  if (!collective.isApproved && !isAdmin) {
+  const hasContribute = collective.isApproved;
+  const hasOtherWaysToContribute = !isEvent && (collective.events?.length > 0 || collective.subCollectives?.length > 0);
+  if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
@@ -299,7 +302,8 @@ export const getSectionsForCollective = (collective, isAdmin) => {
       toRemove.add(Sections.UPDATES);
     }
   }
-  if (collective.type === CollectiveType.EVENT) {
+
+  if (isEvent) {
     // Should not see tickets section if you can't order them
     if ((!collective.isApproved && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
       toRemove.add(Sections.TICKETS);
@@ -346,6 +350,7 @@ const CollectiveNavbar = ({
   onCollectiveClick,
   onSectionClick,
   hideInfos,
+  onlyInfos,
   isAnimated,
   intl,
 }) => {
@@ -378,82 +383,86 @@ const CollectiveNavbar = ({
             </Link>
           )}
         </Flex>
-        <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />
+        {!onlyInfos && <ExpandMenuIcon onClick={() => setExpended(!isExpended)} />}
       </InfosContainer>
 
       {/** Navbar items and buttons */}
-      <Container
-        position={['absolute', 'relative']}
-        display="flex"
-        justifyContent="space-between"
-        px={[0, Dimensions.PADDING_X[1]]}
-        width="100%"
-        background="white"
-      >
-        {isLoading ? (
-          <LoadingPlaceholder height={43} minWidth={150} mb={2} />
-        ) : (
-          <Container
-            flex="2 1 600px"
-            display={isExpended ? 'flex' : ['none', null, 'flex']}
-            css={{ overflowX: 'auto' }}
-            data-cy="CollectivePage.NavBar"
-            flexDirection={['column', null, 'row']}
-            height="100%"
-            borderBottom={['1px solid #e6e8eb', 'none']}
-          >
-            {sections.map(section => (
-              <MenuLinkContainer
-                key={section}
-                isSelected={section === selected}
-                onClick={() => {
-                  if (isExpended) {
-                    setExpended(false);
-                  }
-                  if (onSectionClick) {
-                    onSectionClick(section);
-                  }
-                }}
-              >
-                <MenuLink
-                  as={LinkComponent}
-                  collectivePath={collective.path || `/${collective.slug}`}
-                  section={section}
-                  label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
-                />
-              </MenuLinkContainer>
-            ))}
-            {callsToAction.hasSubmitExpense && (
-              <MenuLinkContainer mobileOnly>
-                <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
-                  <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
-                </MenuLink>
-              </MenuLinkContainer>
-            )}
-            {callsToAction.hasContact && (
-              <MenuLinkContainer mobileOnly>
-                <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
-                  <FormattedMessage id="Contact" defaultMessage="Contact" />
-                </MenuLink>
-              </MenuLinkContainer>
-            )}
-            {callsToAction.hasDashboard && collective.plan.hostDashboard && (
-              <MenuLinkContainer mobileOnly>
-                <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-                  <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
-                </MenuLink>
-              </MenuLinkContainer>
-            )}
-          </Container>
-        )}
-        <div>
-          <CollectiveCallsToAction
-            display={['none', null, 'flex']}
-            collective={collective}
-            callsToAction={callsToAction}
-          />
-        </div>
-      </Container>
+      {!onlyInfos && (
+        <Container
+          position={['absolute', 'relative']}
+          display="flex"
+          justifyContent="space-between"
+          px={[0, Dimensions.PADDING_X[1]]}
+          width="100%"
+          background="white"
+        >
+          {isLoading ? (
+            <LoadingPlaceholder height={43} minWidth={150} mb={2} />
+          ) : (
+            <Container
+              flex="2 1 600px"
+              display={isExpended ? 'flex' : ['none', null, 'flex']}
+              css={{ overflowX: 'auto' }}
+              data-cy="CollectivePage.NavBar"
+              flexDirection={['column', null, 'row']}
+              height="100%"
+              borderBottom={['1px solid #e6e8eb', 'none']}
+              backgroundColor="#fff"
+              zIndex={1}
+            >
+              {sections.map(section => (
+                <MenuLinkContainer
+                  key={section}
+                  isSelected={section === selected}
+                  onClick={() => {
+                    if (isExpended) {
+                      setExpended(false);
+                    }
+                    if (onSectionClick) {
+                      onSectionClick(section);
+                    }
+                  }}
+                >
+                  <MenuLink
+                    as={LinkComponent}
+                    collectivePath={collective.path || `/${collective.slug}`}
+                    section={section}
+                    label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
+                  />
+                </MenuLinkContainer>
+              ))}
+              {callsToAction.hasSubmitExpense && (
+                <MenuLinkContainer mobileOnly>
+                  <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                    <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+                  </MenuLink>
+                </MenuLinkContainer>
+              )}
+              {callsToAction.hasContact && (
+                <MenuLinkContainer mobileOnly>
+                  <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
+                    <FormattedMessage id="Contact" defaultMessage="Contact" />
+                  </MenuLink>
+                </MenuLinkContainer>
+              )}
+              {callsToAction.hasDashboard && collective.plan.hostDashboard && (
+                <MenuLinkContainer mobileOnly>
+                  <MenuLink as={Link} route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
+                    <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
+                  </MenuLink>
+                </MenuLinkContainer>
+              )}
+            </Container>
+          )}
+          <div>
+            <CollectiveCallsToAction
+              display={['none', null, 'flex']}
+              collective={collective}
+              callsToAction={callsToAction}
+            />
+          </div>
+        </Container>
+      )}
     </MainContainer>
   );
 };
@@ -499,6 +508,8 @@ CollectiveNavbar.propTypes = {
   hideInfos: PropTypes.bool,
   /** If true, the CTAs will be hidden on mobile */
   hideButtonsOnMobile: PropTypes.bool,
+  /** If true, the Navbar items and buttons will be skipped  */
+  onlyInfos: PropTypes.bool,
   /** If true, the collective infos will fadeInDown and fadeOutUp when transitioning */
   isAnimated: PropTypes.bool,
   /** Set this to true to make the component smaller in height */
@@ -510,6 +521,7 @@ CollectiveNavbar.propTypes = {
 CollectiveNavbar.defaultProps = {
   hideInfos: false,
   isAnimated: false,
+  onlyInfos: false,
   callsToAction: {},
   // eslint-disable-next-line react/prop-types
   LinkComponent: function DefaultNavbarLink({ section, label, collectivePath, className }) {

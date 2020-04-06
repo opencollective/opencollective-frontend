@@ -1,5 +1,5 @@
 import { Box, Flex } from '@rebass/grid';
-import { get, omit, pick } from 'lodash';
+import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -13,28 +13,26 @@ import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
-import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
-import ExpenseForm from '../components/expenses/ExpenseForm';
+import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
-import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
-import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
-import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
-import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
-import { H1, H5, P, Strong } from '../components/Text';
+import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import expenseTypes from '../lib/constants/expenseTypes';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
-import LinkCollective from '../components/LinkCollective';
+import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
+import ExpenseInfoSidebar from './ExpenseInfoSidebar';
+import {
+  loggedInAccountExpensePayoutFieldsFragment,
+  expensePageExpenseFieldsFragment,
+} from '../components/expenses/graphql/fragments';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -60,7 +58,7 @@ class CreateExpensePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      refetch: PropTypes.func.isRequired,
+      refetch: PropTypes.func,
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
@@ -89,7 +87,7 @@ class CreateExpensePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.stepTitleRef = React.createRef();
+    this.formTopRef = React.createRef();
     this.state = {
       step: STEPS.FORM,
       expense: null,
@@ -112,8 +110,8 @@ class CreateExpensePage extends React.Component {
     }
 
     // Scroll to top when switching steps
-    if (oldState.step !== this.state.step && this.stepTitleRef.current) {
-      this.stepTitleRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (oldState.step !== this.state.step && this.formTopRef.current) {
+      this.formTopRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -133,17 +131,9 @@ class CreateExpensePage extends React.Component {
     try {
       this.setState({ isSubmitting: true, error: null });
       const { expense, tags } = this.state;
-      const attachmentFieldsToOmit = expense.type === expenseTypes.INVOICE ? ['id', 'url'] : ['id'];
       const result = await this.props.createExpense({
         account: { id: this.props.data.account.id },
-        expense: {
-          ...pick(expense, ['description', 'type', 'privateMessage']),
-          payee: pick(expense.payee, ['id']),
-          payoutMethod: pick(expense.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-          // Omit attachment's ids that were created for keying purposes
-          attachments: expense.attachments.map(a => omit(a, attachmentFieldsToOmit)),
-          tags: tags,
-        },
+        expense: { ...prepareExpenseForSubmit(expense), tags: tags },
       });
 
       const legacyExpenseId = result.data.createExpense.legacyId;
@@ -186,8 +176,6 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
-      } else if (!hasFeature(data.account, FEATURES.NEW_EXPENSE_FLOW)) {
-        return <PageFeatureNotSupported />;
       }
     }
 
@@ -199,22 +187,29 @@ class CreateExpensePage extends React.Component {
         <CollectiveThemeProvider collective={collective}>
           <React.Fragment>
             <CollectiveNavbar collective={collective} isLoading={!collective} />
-            <Container position="relative" minHeight={800}>
+            <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
               {!loadingLoggedInUser && !LoggedInUser && (
                 <ContainerOverlay p={2} top="0" position={['fixed', null, 'absolute']}>
                   <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
                 </ContainerOverlay>
               )}
-              <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                {step === STEPS.SUMMARY && (
-                  <StyledLink color="black.600" onClick={() => this.setState({ step: STEPS.FORM, error: null })} mb={4}>
+              <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
+                <Box mb={3}>
+                  <StyledLink
+                    color="black.600"
+                    onClick={() =>
+                      step === STEPS.SUMMARY
+                        ? this.setState({ step: STEPS.FORM, error: null })
+                        : window?.history?.back()
+                    }
+                  >
                     &larr;&nbsp;
                     <FormattedMessage id="Back" defaultMessage="Back" />
                   </StyledLink>
-                )}
+                </Box>
                 <Flex justifyContent="space-between" flexWrap="wrap">
-                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]}>
-                    <H1 fontSize="H4" mb={24} py={2} ref={this.stepTitleRef}>
+                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]} mb={5}>
+                    <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
                       ) : (
@@ -225,6 +220,7 @@ class CreateExpensePage extends React.Component {
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
+                        <CreateExpenseDismissibleIntro />
                         {step === STEPS.FORM && (
                           <ExpenseForm
                             collective={collective}
@@ -232,6 +228,7 @@ class CreateExpensePage extends React.Component {
                             onSubmit={this.onFormSubmit}
                             expense={this.state.expense}
                             payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                            autoFocusTitle
                           />
                         )}
                         {step === STEPS.SUMMARY && (
@@ -265,47 +262,8 @@ class CreateExpensePage extends React.Component {
                       </Box>
                     )}
                   </Box>
-                  <Box mt={4} width={270}>
-                    <H5 mb={3}>
-                      <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
-                    </H5>
-                    <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
-                      {data.loading ? (
-                        <LoadingPlaceholder height={28} width={75} />
-                      ) : (
-                        <FormattedMoneyAmount
-                          currency={collective.currency}
-                          amount={collective.balance}
-                          amountStyles={{ color: 'black.800' }}
-                        />
-                      )}
-                    </Container>
-                    {host && (
-                      <P fontSize="SmallCaption" color="black.600" mt={2}>
-                        <FormattedMessage
-                          id="withColon"
-                          defaultMessage="{item}:"
-                          values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
-                        />{' '}
-                        <LinkCollective collective={host}>
-                          <Strong color="black.600">{host.name}</Strong>
-                        </LinkCollective>
-                      </P>
-                    )}
-                    <Box mt={50}>
-                      <H5 mb={3}>
-                        <FormattedMessage id="Tags" defaultMessage="Tags" />
-                      </H5>
-                      <StyledInputTags inputId="expense-tags" onChange={this.setTags} disabled />
-                    </Box>
-                    <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
-                    <Box mt={50}>
-                      <CreateExpenseFAQ
-                        withBorderLeft
-                        withNewButtons
-                        titleProps={{ fontSize: 'H5', fontWeight: 500, mb: 3 }}
-                      />
-                    </Box>
+                  <Box minWidth={300} width={['100%', null, null, 300]} px={3} mt={3}>
+                    <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
                   </Box>
                 </Flex>
               </Box>
@@ -332,12 +290,6 @@ const getData = graphql(
         twitterHandle
         currency
         expensePolicy
-        payoutMethods {
-          id
-          type
-          name
-          data
-        }
         ... on Collective {
           id
           isApproved
@@ -375,41 +327,11 @@ const getData = graphql(
         }
       }
       loggedInAccount {
-        id
-        slug
-        imageUrl
-        type
-        name
-        payoutMethods {
-          id
-          type
-          name
-          data
-        }
-        adminMemberships: memberOf(role: ADMIN) {
-          nodes {
-            id
-            account {
-              id
-              slug
-              imageUrl
-              type
-              name
-              location {
-                address
-                country
-              }
-              payoutMethods {
-                id
-                type
-                name
-                data
-              }
-            }
-          }
-        }
+        ...loggedInAccountExpensePayoutFieldsFragment
       }
     }
+
+    ${loggedInAccountExpensePayoutFieldsFragment}
   `,
   {
     options: {
@@ -422,10 +344,10 @@ const withCreateExpenseMutation = graphql(
   gqlV2`
   mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
     createExpense(expense: $expense, account: $account) {
-      id
-      legacyId
+      ...expensePageExpenseFieldsFragment
     }
   }
+  ${expensePageExpenseFieldsFragment}
 `,
   {
     options: { context: API_V2_CONTEXT },

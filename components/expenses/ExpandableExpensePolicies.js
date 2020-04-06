@@ -25,12 +25,12 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
     <Box {...props}>
       <Collapse title={<H5>{formatMessage(msg.policies)}</H5>}>
         {host && host.expensePolicy && (
-          <P fontSize="Caption" color="black.800" mb={2}>
+          <P fontSize="Caption" color="black.800" lineHeight="Paragraph" mb={2}>
             {host.expensePolicy}
           </P>
         )}
         {collective && collective.expensePolicy && (
-          <P fontSize="Caption" color="black.800">
+          <P fontSize="Caption" color="black.800" lineHeight="Paragraph">
             {collective.expensePolicy}
           </P>
         )}

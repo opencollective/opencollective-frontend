@@ -23,7 +23,7 @@ const PrivateNoteLabel = () => {
   );
 };
 
-const ExpenseNotesForm = ({ onChange, disabled }) => {
+const ExpenseNotesForm = ({ onChange, disabled, defaultValue }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledInputField
@@ -40,6 +40,7 @@ const ExpenseNotesForm = ({ onChange, disabled }) => {
           minHeight={80}
           onChange={onChange}
           disabled={disabled}
+          defaultValue={defaultValue}
         />
       )}
     </StyledInputField>
@@ -47,6 +48,7 @@ const ExpenseNotesForm = ({ onChange, disabled }) => {
 };
 
 ExpenseNotesForm.propTypes = {
+  defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
 };

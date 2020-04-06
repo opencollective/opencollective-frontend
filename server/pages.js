@@ -53,7 +53,7 @@ const pages = routes()
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
   .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
-  .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new-v2')
+  .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new/v2')
   .add(
     'expense-v2',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/v2',
@@ -84,7 +84,6 @@ pages.add(
 
 // Events using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
-pages.add('legacy-event', '/:parentCollectiveSlug/events/:eventSlug/legacy', 'event');
 
 // Tier page
 // ---------------
@@ -193,9 +192,8 @@ pages.add('new-collective-page', '/:slug/v2');
 pages.add('collective', '/:slug', 'new-collective-page');
 pages.add(
   'collective-with-onboarding',
-  '/:slug/:mode(onboarding)?/:step(administrators|contact)?',
+  '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
   'new-collective-page',
 );
-pages.add('legacy-collective-page', '/:slug/legacy', 'collective');
 
 module.exports = pages;

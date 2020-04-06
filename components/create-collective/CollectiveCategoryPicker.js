@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
 import styled from 'styled-components';
-import { Info } from '@styled-icons/material/Info';
 import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
 
-import { H1, P } from '../Text';
+import { H1 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
@@ -36,10 +35,6 @@ const Image = styled.img`
   }
 `;
 
-const RedInfo = styled(Info)`
-  color: ${themeGet('colors.red.500')};
-`;
-
 class CollectiveCategoryPicker extends React.Component {
   static propTypes = {
     query: PropTypes.object,
@@ -65,11 +60,6 @@ class CollectiveCategoryPicker extends React.Component {
       },
       climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
       covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
-      waivefees: {
-        id: 'createCollective.waivefees',
-        defaultMessage:
-          'We are waiving our platform fees on COVID-19 related Collectives until the end of June. Take care of each other.',
-      },
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       examples: { id: 'createCollective.examples', defaultMessage: 'See examples' },
     });
@@ -88,10 +78,6 @@ class CollectiveCategoryPicker extends React.Component {
           <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             {intl.formatMessage(this.messages.header)}
           </H1>
-          <P color="black.700" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
-            <RedInfo size={14} />
-            {intl.formatMessage(this.messages.waivefees)}
-          </P>
         </Box>
         <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
           <Box alignItems="center">

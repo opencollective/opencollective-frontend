@@ -2,18 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import OrdersWithData from '../components/expenses/OrdersWithData';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage from '../components/ErrorPage';
-import SectionTitle from '../components/SectionTitle';
-
 import { generateNotFoundError } from '../lib/errors';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import OrdersWithData from '../components/expenses/OrdersWithData';
+import SectionTitle from '../components/SectionTitle';
 import { withUser } from '../components/UserProvider';
 
 class OrdersPage extends React.Component {
@@ -98,12 +97,13 @@ class OrdersPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            key={collective.slug}
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            displayContributeLink={collective.isActive && collective.host ? true : false}
-          />
+          <Container mb={4}>
+            <CollectiveNavbar
+              collective={collective}
+              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+              showEdit
+            />
+          </Container>
 
           <div className="content">
             <SectionTitle section="orders" subtitle={subtitle} action={action} />

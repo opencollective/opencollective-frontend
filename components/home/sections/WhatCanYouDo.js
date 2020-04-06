@@ -5,13 +5,13 @@ import { display } from 'styled-system';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import { Link } from '../../../server/pages';
 import { P, H3, H4 } from '../../Text';
 import Illustration from '../HomeIllustration';
-import { HomePrimaryLink } from '../HomeLinks';
 import Container from '../../Container';
 import SectionTitle from '../SectionTitle';
 import SectionSubTitle from '../SectionSubtitle';
+import StyledButton from '../../StyledButton';
+import Link from '../../Link';
 
 const Wrapper = styled(Box)`
   background-image: ${props =>
@@ -199,14 +199,15 @@ const WhatCanYouDo = () => {
           </H4>
         </Box>
         <Wrapper width={['288px', '380px']} height={['288px', '375px']} hovering={hoverCreateCollectiveButton}>
-          <Link route="/create" passHref>
-            <HomePrimaryLink
-              border="none"
+          <Link route="/create">
+            <StyledButton
+              buttonStyle="dark"
+              minWidth={232}
               onMouseEnter={() => setHoverCreateCollectiveButton(true)}
               onMouseLeave={() => setHoverCreateCollectiveButton(false)}
             >
               <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-            </HomePrimaryLink>
+            </StyledButton>
           </Link>
         </Wrapper>
       </Container>

@@ -148,6 +148,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       dropdownIndicator: baseStyles => {
         return hideDropdownIndicator ? STYLES_DISPLAY_NONE : baseStyles;
       },
+      menuPortal: baseStyles => ({
+        ...baseStyles,
+        zIndex: 99999,
+      }),
     },
   }),
 )`

@@ -17,7 +17,8 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import ExternalLink from '../ExternalLink';
-import CreateCollectiveCover from '../CreateCollectiveCover';
+import slugify from 'slugify';
+import CollectiveNavbar from '../CollectiveNavbar';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
@@ -76,9 +77,14 @@ class CreateCollectiveForm extends React.Component {
       header: { id: 'home.create', defaultMessage: 'Create a Collective' },
       nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
       slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+      suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
       descriptionLabel: {
         id: 'createCollective.form.descriptionLabel',
         defaultMessage: 'What does your collective do?',
+      },
+      descriptionHint: {
+        id: 'createCollective.form.descriptionHint',
+        defaultMessage: 'Write a short description of your Collective (150 characters max)',
       },
       createButton: {
         id: 'collective.create.button',
@@ -167,7 +173,11 @@ class CreateCollectiveForm extends React.Component {
 
     return (
       <Flex flexDirection="column" m={[3, 0]}>
-        {host && host.slug !== 'opensource' && <CreateCollectiveCover host={host} />}
+        {host && host.slug !== 'opensource' && (
+          <Container mb={4}>
+            <CollectiveNavbar collective={host} onlyInfos={true} />
+          </Container>
+        )}
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
@@ -208,7 +218,23 @@ class CreateCollectiveForm extends React.Component {
           >
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
               {formik => {
-                const { values, handleSubmit, errors, touched } = formik;
+                const { values, handleSubmit, errors, touched, setFieldValue } = formik;
+
+                const suggestedSlug = value => {
+                  const slugOptions = {
+                    replacement: '-',
+                    lower: true,
+                    strict: true,
+                  };
+
+                  return slugify(value, slugOptions);
+                };
+
+                const handleSlugChange = e => {
+                  if (!touched.slug) {
+                    setFieldValue('slug', suggestedSlug(e.target.value));
+                  }
+                };
 
                 return (
                   <Form>
@@ -218,6 +244,7 @@ class CreateCollectiveForm extends React.Component {
                       error={touched.name && errors.name}
                       label={intl.formatMessage(this.messages.nameLabel)}
                       value={values.name}
+                      onChange={handleSlugChange}
                       required
                       mt={4}
                       mb={3}
@@ -231,17 +258,24 @@ class CreateCollectiveForm extends React.Component {
                       label={intl.formatMessage(this.messages.slugLabel)}
                       value={values.slug}
                       required
-                      my={3}
+                      mt={3}
+                      mb={2}
                     >
                       {inputProps => (
                         <Field
+                          onChange={e => {
+                            setFieldValue('slug', e.target.value);
+                          }}
                           as={StyledInputGroup}
                           {...inputProps}
-                          prepend="opencollective.com"
+                          prepend="opencollective.com/"
                           placeholder={placeholders.slug}
                         />
                       )}
                     </StyledInputField>
+                    {values.name.length > 0 && !touched.slug && (
+                      <P fontSize="Tiny">{intl.formatMessage(this.messages.suggestedLabel)}</P>
+                    )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
@@ -250,7 +284,7 @@ class CreateCollectiveForm extends React.Component {
                       value={values.description}
                       required
                       mt={3}
-                      mb={4}
+                      mb={2}
                     >
                       {inputProps => (
                         <Field
@@ -260,6 +294,7 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
+                    <P fontSize="SmallCaption">{intl.formatMessage(this.messages.descriptionHint)}</P>
 
                     <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox

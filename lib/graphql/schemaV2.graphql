@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Mar 19 2020 09:39:10 GMT-0300 (Brasilia Standard Time)
+# timestamp: Fri Apr 03 2020 12:11:13 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -143,6 +143,11 @@ input AccountReferenceInput {
   """
   slug: String
 }
+
+"""
+Values that can be edited in Account's settings
+"""
+scalar AccountSettingsKey
 
 """
 All account types
@@ -735,6 +740,11 @@ type Event implements Account {
   Returns whether this collective is approved
   """
   isApproved: Boolean
+
+  """
+  The collective hosting this event
+  """
+  parentCollective: Collective
 }
 
 """
@@ -873,9 +883,47 @@ input ExpenseAttachmentCreateInput {
   incurredAt: DateString
 }
 
+input ExpenseAttachmentInput {
+  """
+  ID of the attachment
+  """
+  id: String
+
+  """
+  Amount in cents
+  """
+  amount: Int
+
+  """
+  What is this attachment about?
+  """
+  description: String
+
+  """
+  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
+  """
+  url: String
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
 input ExpenseCreateInput {
+  """
+  Main title of the expense
+  """
   description: String!
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
   tags: [String]
+
+  """
+  The type of the expense
+  """
   type: ExpenseType!
 
   """
@@ -963,6 +1011,53 @@ enum ExpenseType {
   Unclassified expense
   """
   UNCLASSIFIED
+}
+
+input ExpenseUpdateInput {
+  """
+  ID of the expense that you are trying to edit
+  """
+  id: String!
+
+  """
+  Main title of the expense
+  """
+  description: String
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
+  tags: [String]
+
+  """
+  The type of the expense
+  """
+  type: ExpenseType
+
+  """
+  A private note that will be attached to your invoice
+  """
+  privateMessage: String
+
+  """
+  Tax ID, VAT number...etc This information will be printed on your invoice.
+  """
+  invoiceInfo: String
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput
+
+  """
+  The list of attachments for this expense. Total amount will be computed from them.
+  """
+  attachments: [ExpenseAttachmentInput]
+
+  """
+  Account to reimburse
+  """
+  payee: AccountReferenceInput
 }
 
 enum ImageFormat {
@@ -1275,7 +1370,47 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
-  ): Expense
+  ): Expense!
+
+  """
+  To update an existing expense
+  """
+  editExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseUpdateInput!
+  ): Expense!
+
+  """
+  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
+  """
+  deleteExpense(
+    """
+    Reference of the expense to delete
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  Edit the settings for the given account
+  """
+  editAccountSetting(
+    """
+    Account where the settings will be updated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The key that you want to edit in settings
+    """
+    key: AccountSettingsKey!
+
+    """
+    The value to set for this key
+    """
+    value: JSON!
+  ): Account!
 }
 
 """

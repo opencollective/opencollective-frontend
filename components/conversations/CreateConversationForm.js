@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { useForm } from 'react-hook-form';
+import { useFormik } from 'formik';
 import { Flex, Box } from '@rebass/grid';
 import { useMutation } from '@apollo/react-hooks';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { getErrorFromGraphqlException, ERROR, createError } from '../../lib/errors';
 import StyledInput from '../StyledInput';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
@@ -15,6 +15,8 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { P, H4 } from '../Text';
 import StyledInputTags from '../StyledInputTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
+import FormPersister from '../../lib/form-persister';
+import { formatFormErrorMessage } from '../../lib/form-utils';
 
 const CreateConversationMutation = gqlV2`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
@@ -43,62 +45,97 @@ const messages = defineMessages({
   },
 });
 
+const validate = values => {
+  const errors = {};
+  const { title, html } = values;
+
+  if (!title) {
+    errors.title = createError(ERROR.FORM_FIELD_REQUIRED);
+  } else if (title.length < 3) {
+    errors.title = createError(ERROR.FORM_FIELD_MIN_LENGTH);
+  } else if (title.length > 255) {
+    errors.title = createError(ERROR.FORM_FIELD_MAX_LENGTH);
+  }
+
+  if (!html) {
+    errors.html = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
+  return errors;
+};
+
 /**
  * Form to create a new conversation. User must be authenticated.
  *
  * /!\ Can only be used with data from API V2.
  */
-const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabled, loading }) => {
+const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled, loading }) => {
+  const intl = useIntl();
+  const { id: collectiveId, slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(CreateConversationMutation, mutationOptions);
-  const { register, handleSubmit, errors, formState, setValue } = useForm();
+  const [formPersister] = React.useState(new FormPersister());
 
-  // Manually register custom fields
-  React.useEffect(() => {
-    register('html', { required: true });
-    register('tags');
-  }, []);
+  const { values, errors, getFieldProps, handleSubmit, setFieldValue, setValues, isSubmitting, touched } = useFormik({
+    initialValues: {
+      title: '',
+      html: '',
+      tags: [],
+    },
+    validate,
+    onSubmit: async values => {
+      const response = await createConversation({ variables: { ...values, CollectiveId: collectiveId } });
+      formPersister.clearValues();
+      return onSuccess(response.data.createConversation);
+    },
+  });
+
+  // Load values from localstorage
+  useEffect(() => {
+    if (!loading && LoggedInUser && !values.title && !values.html && !values.tags.length) {
+      const id = `conversation-${collectiveSlug}-${LoggedInUser.id}`;
+      formPersister.setFormId(id);
+    }
+
+    const formValues = formPersister.loadValues();
+    if (formValues && !values.title && !values.html && !values.tags.length) {
+      setValues(formValues);
+    }
+  }, [loading, LoggedInUser]);
+
+  // Save values in localstorage
+  useEffect(() => {
+    if (values.title || values.html || values.tags.length || !formPersister.loadValues()) {
+      formPersister.saveValues({ html: values.html, tags: values.tags, title: values.title });
+    }
+  }, [values.title, values.html, values.tags]);
 
   return (
-    <form
-      onSubmit={handleSubmit(async values => {
-        const response = await createConversation({ variables: { ...values, CollectiveId: collectiveId } });
-        return onSuccess(response.data.createConversation);
-      })}
-    >
+    <form onSubmit={handleSubmit}>
       <Flex flexWrap="wrap">
         <Box flex={['1 1 100%', null, null, '1 1']}>
           {loading ? (
             <LoadingPlaceholder height={36} />
           ) : (
             <StyledInput
+              name="title"
+              {...getFieldProps('title')}
               bare
               data-cy="conversation-title-input"
-              error={errors.title}
+              error={touched.title && errors.title}
               withOutline
               width="100%"
               fontSize="H4"
               border="none"
-              name="title"
               maxLength={255}
               px={0}
               py={0}
               placeholder={formatMessage(messages.titlePlaceholder)}
-              ref={register({ required: true, minLength: 3, maxLength: 255 })}
             />
           )}
-          {errors.title && (
+          {errors.title && touched.title && (
             <P color="red.500" mt={3}>
-              {errors.title.type === 'required' && (
-                <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
-              )}
-              {errors.title.type === 'maxLength' && (
-                <FormattedMessage
-                  id="Error.MaxLength"
-                  defaultMessage="Length must be less than {length}"
-                  values={{ length: 255 }}
-                />
-              )}
+              {formatFormErrorMessage(intl, errors.title)}
             </P>
           )}
           <Box my={3}>
@@ -106,20 +143,23 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
               <LoadingPlaceholder height={228} />
             ) : (
               <RichTextEditor
+                inputName="html"
+                {...getFieldProps('html')}
                 withStickyToolbar
                 toolbarOffsetY={0}
                 placeholder={formatMessage(messages.bodyPlaceholder)}
                 editorMinHeight={225}
-                inputName="html"
                 fontSize="13px"
-                onChange={e => setValue('html', e.target.value)}
-                error={errors.title}
+                error={touched.html && errors.html}
+                defaultValue={values.html}
               />
             )}
           </Box>
-          {errors.html && (
+          {errors.html && touched.html && (
             <P color="red.500" mt={3}>
-              <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
+              {errors.html.type === ERROR.FORM_FIELD_REQUIRED && (
+                <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
+              )}
             </P>
           )}
         </Box>
@@ -133,11 +173,15 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
                 <LoadingPlaceholder height={38} />
               ) : (
                 <StyledInputTags
+                  name="tags"
+                  {...getFieldProps('tags')}
                   maxWidth={300}
                   suggestedTags={suggestedTags}
-                  onChange={options =>
-                    setValue('tags', options && options.length > 0 ? options.map(option => option.value) : null)
-                  }
+                  onChange={options => {
+                    const tags = [];
+                    options && options.length > 0 ? options.map(option => tags.push(option.value)) : [];
+                    setFieldValue('tags', tags);
+                  }}
                 />
               )}
             </Box>
@@ -160,7 +204,7 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
         buttonStyle="primary"
         data-cy="submit-new-conversation-btn"
         disabled={disabled || loading}
-        loading={formState.isSubmitting}
+        loading={isSubmitting}
         minWidth={200}
         mt={3}
       >
@@ -171,8 +215,8 @@ const CreateConversationForm = ({ collectiveId, suggestedTags, onSuccess, disabl
 };
 
 CreateConversationForm.propTypes = {
-  /** ID of the collective where the conversation will be created */
-  collectiveId: PropTypes.string.isRequired,
+  /** the collective where the conversation will be created */
+  collective: PropTypes.object.isRequired,
   /** Called when the conversation gets successfully created. Return a promise if you want to keep the submitting state active. */
   onSuccess: PropTypes.func.isRequired,
   /** Will disable the form */
@@ -181,6 +225,8 @@ CreateConversationForm.propTypes = {
   loading: PropTypes.bool,
   /** Tags suggested for this new conversation */
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
+  /** LoggedInUser */
+  LoggedInUser: PropTypes.object,
 };
 
 export default CreateConversationForm;

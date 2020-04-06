@@ -211,7 +211,7 @@ const DiscoverPage = ({ router, intl }) => {
             >
               <Flex width={[1]} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
                 <Flex width={[1, 0.8]} my={2}>
-                  <NavList as="ul" p={0} justifyContent="space-between" width={1} css={{ maxWidth: 650 }}>
+                  <NavList as="ul" p={0} justifyContent="space-between" width={1}>
                     <NavLinkContainer>
                       <Link route="discover" params={{ show: 'all', sort: query.sort }}>
                         <NavLink
@@ -229,8 +229,15 @@ const DiscoverPage = ({ router, intl }) => {
                         <NavLink className={query.show == 'open source' ? 'selected' : ''}>
                           <FormattedMessage
                             id="discover.openSourceCollectives"
-                            defaultMessage="Open source collectives"
+                            defaultMessage="Open Source collectives"
                           />
+                        </NavLink>
+                      </Link>
+                    </NavLinkContainer>
+                    <NavLinkContainer>
+                      <Link route="discover" params={{ show: 'covid-19', sort: query.sort }}>
+                        <NavLink className={query.show == 'covid-19' ? 'selected' : ''}>
+                          <FormattedMessage id="discover.covidCollectives" defaultMessage="COVID-19 collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>

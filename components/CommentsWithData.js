@@ -45,7 +45,7 @@ class CommentsWithData extends React.Component {
 
     const CommentInputType = {
       ...comment,
-      ExpenseId: expense.id,
+      expense: { legacyId: expense.id },
     };
 
     const res = await this.props.createComment(CommentInputType);

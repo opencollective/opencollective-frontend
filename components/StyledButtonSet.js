@@ -67,6 +67,7 @@ const StyledButtonSet = ({
         className={item === selected ? 'selected' : undefined}
         disabled={disabled}
         type="button"
+        py="8px"
         {...buttonProps}
         {...(buttonPropsBuilder ? buttonPropsBuilder({ item }) : {})}
       >

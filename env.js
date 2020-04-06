@@ -20,6 +20,7 @@ const defaults = {
   RECAPTCHA_ENABLED: false,
   CLIENT_ANALYTICS_ENABLED: false,
   ONBOARDING_MODAL: false,
+  TRANSFERWISE_ENABLED: true,
 };
 
 if (process.env.NODE_ENV === 'e2e') {

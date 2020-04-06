@@ -60,7 +60,7 @@ const CollectiveStatsCard = ({
         top={10}
         left={0}
       >
-        <Link route={`/${slug}`} passHref>
+        <Link route={`/${slug}`}>
           <a>
             <Container
               bg="#2877ED"

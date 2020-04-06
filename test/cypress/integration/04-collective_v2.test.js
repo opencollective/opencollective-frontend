@@ -57,19 +57,10 @@ describe('New collective page', () => {
     });
 
     it('Can edit primary color', () => {
-      let color = null;
-
       cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click();
-      cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]').then($colorBtn => {
-        const randomPick = Math.round(Math.random() * $colorBtn.length);
-        const withFailSafe = $colorBtn[randomPick] || $colorBtn[0];
-
-        cy.wrap(withFailSafe).click();
-        color = withFailSafe.style.backgroundColor;
-      });
-
+      cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]:first').click();
       cy.get('[data-cy=collective-color-picker-save-btn]').then($saveBtn => {
-        cy.wrap($saveBtn).should('have.css', 'background-color', color);
+        cy.wrap($saveBtn).should('have.css', 'background-color', 'rgb(193, 40, 34)');
         cy.wrap($saveBtn).click();
       });
     });

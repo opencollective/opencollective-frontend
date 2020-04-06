@@ -1,15 +1,15 @@
 import { Box, Flex } from '@rebass/grid';
-import { cloneDeep, uniqBy, update } from 'lodash';
+import { cloneDeep, uniqBy, update, get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { graphql, withApollo } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import memoizeOne from 'memoize-one';
 
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import CommentForm from '../components/conversations/CommentForm';
-import { CommentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
@@ -17,23 +17,25 @@ import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import CommentIcon from '../components/icons/CommentIcon';
 import Link from '../components/Link';
 import Page from '../components/Page';
-import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledLink from '../components/StyledLink';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { generateNotFoundError, formatErrorMessage } from '../lib/errors';
+import { generateNotFoundError, formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
-import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
-import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
-import { H5, Span, P, Strong } from '../components/Text';
+import { H5, Span, P } from '../components/Text';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import StyledHr from '../components/StyledHr';
 import MessageBox from '../components/MessageBox';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
-import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
-import LinkCollective from '../components/LinkCollective';
+import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import StyledButton from '../components/StyledButton';
+import ExpenseInfoSidebar from './ExpenseInfoSidebar';
+import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
+import {
+  loggedInAccountExpensePayoutFieldsFragment,
+  expensePageExpenseFieldsFragment,
+} from '../components/expenses/graphql/fragments';
 
 const messages = defineMessages({
   title: {
@@ -43,102 +45,28 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2`
-query CreateExpensePage($legacyExpenseId: Int!) {
-  expense(expense: {legacyId: $legacyExpenseId}) {
-    id
-    legacyId
-    description
-    currency
-    type
-    status
-    privateMessage
-    attachments {
-      id
-      incurredAt
-      description
-      amount
-      url
+  query CreateExpensePage($legacyExpenseId: Int!) {
+    expense(expense: {legacyId: $legacyExpenseId}) {
+      ...expensePageExpenseFieldsFragment
     }
-    payee {
-      id
-      slug
-      name
-      type
-      location {
-        address
-        country
-      }
-    }
-    createdByAccount {
-      id
-      slug
-      name
-      type
-      imageUrl
-    }
-    account {
-      id
-      slug
-      name
-      type
-      imageUrl
-      description
-      settings
-      twitterHandle
-      currency
-      expensePolicy
-      ... on Collective {
-        id
-        isApproved
-        balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          location {
-            address
-            country
-          }
-        }
-      }
-      ... on Event {
-        id
-        isApproved
-        balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          location {
-            address
-            country
-          }
-        }
-      }
-    }
-    payoutMethod {
-      id
-      type
-      data
-    }
-    comments {
-      nodes {
-        ...CommentFields
-      }
-    }
-    permissions {
-      canEdit
-      canDelete
-      canSeeInvoiceInfo
+
+    loggedInAccount {
+      ...loggedInAccountExpensePayoutFieldsFragment
     }
   }
-}
 
-${CommentFieldsFragment}
+  ${loggedInAccountExpensePayoutFieldsFragment}
+  ${expensePageExpenseFieldsFragment}
+`;
+
+const editExpenseMutation = gqlV2`
+  mutation editExpense($expense: ExpenseUpdateInput!) {
+    editExpense(expense: $expense) {
+      ...expensePageExpenseFieldsFragment
+    }
+  }
+
+  ${expensePageExpenseFieldsFragment}
 `;
 
 const PrivateNoteLabel = () => {
@@ -150,6 +78,9 @@ const PrivateNoteLabel = () => {
     </Span>
   );
 };
+
+const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
+const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
@@ -166,11 +97,23 @@ class ExpensePage extends React.Component {
     client: PropTypes.object.isRequired,
     /** from withData */
     data: PropTypes.object.isRequired,
+    /** from withData */
+    mutate: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
   };
 
-  state = { isRefetchingDataForUser: false, error: null };
+  constructor(props) {
+    super(props);
+    this.expenseTopRef = React.createRef();
+    this.state = {
+      isRefetchingDataForUser: false,
+      error: null,
+      status: PAGE_STATUS.VIEW,
+      editedExpense: null,
+      isSubmitting: false,
+    };
+  }
 
   componentDidMount() {
     // LoggedInUser is not set during SSR, we refetch for permissions
@@ -179,10 +122,15 @@ class ExpensePage extends React.Component {
     }
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps, oldState) {
     // Refetch data when users are logged in to make sure they can see the private info
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.refetchDataForUser();
+    }
+
+    // Scroll to expense's top when changing status
+    if (oldState.status !== this.state.status) {
+      this.scrollToExpenseTop();
     }
   }
 
@@ -192,6 +140,35 @@ class ExpensePage extends React.Component {
       await this.props.data.refetch();
     } finally {
       this.setState({ isRefetchingDataForUser: false });
+    }
+  }
+
+  onSummarySubmit = async () => {
+    try {
+      this.setState({ isSubmitting: true, error: null });
+      const { editedExpense } = this.state;
+      await this.props.mutate({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
+      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false });
+    } catch (e) {
+      this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
+      this.scrollToExpenseTop();
+    }
+  };
+
+  onNotesChanges = e => {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState(state => ({
+      editedExpense: {
+        ...state.editedExpense,
+        [name]: value,
+      },
+    }));
+  };
+
+  scrollToExpenseTop() {
+    if (this.expenseTopRef.current) {
+      this.expenseTopRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -223,9 +200,18 @@ class ExpensePage extends React.Component {
     this.props.client.writeQuery({ query, variables, data });
   };
 
+  getPayoutProfiles = memoizeOne(loggedInAccount => {
+    if (!loggedInAccount) {
+      return [];
+    } else {
+      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', []).map(member => member.account);
+      return [loggedInAccount, ...accountsAdminOf];
+    }
+  });
+
   render() {
     const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
-    const { isRefetchingDataForUser, error } = this.state;
+    const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -238,12 +224,11 @@ class ExpensePage extends React.Component {
       } else if (this.props.collectiveSlug !== data.expense.account.slug) {
         // TODO Error: Not on the righ URL
         return null;
-      } else if (!hasFeature(data.expense.account, FEATURES.NEW_EXPENSE_FLOW)) {
-        return <PageFeatureNotSupported />;
       }
     }
 
     const expense = data.expense;
+    const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
     return (
@@ -254,51 +239,104 @@ class ExpensePage extends React.Component {
             <Container
               display={['none', null, null, 'flex']}
               justifyContent="flex-end"
-              width="calc((100% - 1260px) / 2)"
+              width={SIDE_MARGIN_WIDTH}
               minWidth={90}
               pt={55}
             >
               <Flex flexDirection="column" alignItems="center" width={90}>
-                <ExpenseAdminActions
-                  expense={expense}
-                  collective={collective}
-                  permissions={expense?.permissions}
-                  onError={error => this.setState({ error })}
-                />
+                {status === PAGE_STATUS.VIEW && (
+                  <ExpenseAdminActions
+                    expense={expense}
+                    collective={collective}
+                    permissions={expense?.permissions}
+                    onError={error => this.setState({ error })}
+                  />
+                )}
               </Flex>
             </Container>
-            <Box flex="1 1 650px" minWidth={300} maxWidth={816} mr={[null, 3, 4, 5]} py={3} px={3}>
-              <Box mb={4}>
-                <StyledLink as={Link} color="black.600" route="expenses" params={{ collectiveSlug }}>
-                  &larr;&nbsp;
-                  <FormattedMessage id="Back" defaultMessage="Back" />
-                </StyledLink>
-              </Box>
+            <Box
+              flex="1 1 650px"
+              minWidth={300}
+              maxWidth={750}
+              mr={[null, 2, 3, 4, 5]}
+              py={2}
+              px={3}
+              ref={this.expenseTopRef}
+            >
+              {status === PAGE_STATUS.VIEW && (
+                <Box mb={4}>
+                  <StyledLink as={Link} color="black.600" route="expenses" params={{ collectiveSlug }}>
+                    &larr;&nbsp;
+                    <FormattedMessage id="Back" defaultMessage="Back" />
+                  </StyledLink>
+                </Box>
+              )}
               {error && (
                 <MessageBox type="error" withIcon mb={4}>
                   {formatErrorMessage(intl, error)}
                 </MessageBox>
               )}
-              <Box mb={3}>
-                <ExpenseSummary
-                  expense={expense}
-                  host={host}
-                  isLoading={!expense}
-                  isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
-                />
-                {expense?.privateMessage && (
-                  <Box>
-                    <H5 fontSize="LeadParagraph" mb={2}>
-                      <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                    </H5>
-                    <PrivateNoteLabel />
-                    <P color="black.700" mt={1} fontSize="LeadCaption">
-                      {expense.privateMessage}
-                    </P>
-                    <StyledHr borderColor="#DCDEE0" mt={4} />
-                  </Box>
-                )}
-              </Box>
+              {status !== PAGE_STATUS.EDIT && (
+                <Box mb={3}>
+                  <ExpenseSummary
+                    expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
+                    host={host}
+                    isLoading={!expense}
+                    isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
+                  />
+                  {expense?.privateMessage && status !== PAGE_STATUS.EDIT_SUMMARY && (
+                    <Box>
+                      <H5 fontSize="LeadParagraph" mb={2}>
+                        <FormattedMessage id="expense.notes" defaultMessage="Notes" />
+                      </H5>
+                      <PrivateNoteLabel />
+                      <P color="black.700" mt={1} fontSize="LeadCaption">
+                        {expense.privateMessage}
+                      </P>
+                      <StyledHr borderColor="#DCDEE0" mt={4} />
+                    </Box>
+                  )}
+                  {status === PAGE_STATUS.EDIT_SUMMARY && (
+                    <div>
+                      <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
+                      <StyledButton
+                        mt={3}
+                        mr={2}
+                        minWidth={150}
+                        data-cy="edit-expense-btn"
+                        onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
+                        disabled={this.state.isSubmitting}
+                      >
+                        ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+                      </StyledButton>
+                      <StyledButton
+                        buttonStyle="primary"
+                        mt={3}
+                        data-cy="submit-expense-btn"
+                        onClick={this.onSummarySubmit}
+                        loading={this.state.isSubmitting}
+                        minWidth={150}
+                      >
+                        <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                      </StyledButton>
+                    </div>
+                  )}
+                </Box>
+              )}
+              {status === PAGE_STATUS.EDIT && (
+                <Box mb={3}>
+                  <ExpenseForm
+                    collective={collective}
+                    loading={loadingLoggedInUser}
+                    expense={editedExpense}
+                    onSubmit={expense => this.setState({ editedExpense: expense, status: PAGE_STATUS.EDIT_SUMMARY })}
+                    payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                    onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
+                    validateOnChange
+                    disableSubmitIfUntouched
+                  />
+                </Box>
+              )}
               {expense && (
                 <Box mb={3} pt={3}>
                   <Thread
@@ -324,44 +362,22 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
-                <H5 mb={3}>
-                  <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
-                </H5>
-                <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
-                  {data.loading ? (
-                    <LoadingPlaceholder height={28} width={75} />
-                  ) : (
-                    <FormattedMoneyAmount
-                      currency={collective.currency}
-                      amount={collective.balance}
-                      amountStyles={{ color: 'black.800' }}
-                    />
-                  )}
-                </Container>
-                {host && (
-                  <P fontSize="SmallCaption" color="black.600" mt={2}>
-                    <FormattedMessage
-                      id="withColon"
-                      defaultMessage="{item}:"
-                      values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
-                    />{' '}
-                    <LinkCollective collective={host}>
-                      <Strong color="black.600">{host.name}</Strong>
-                    </LinkCollective>
-                  </P>
-                )}
-                <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
-                <Box mt={50}>
-                  <CreateExpenseFAQ
-                    withBorderLeft
-                    withNewButtons
-                    titleProps={{ fontSize: 'H5', fontWeight: 500, mb: 3 }}
-                  />
+                <Box mb={60} display={['none', null, null, 'flex']}>
+                  <StyledButton
+                    buttonStyle="secondary"
+                    buttonSize="small"
+                    onClick={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
+                    disabled={status !== PAGE_STATUS.VIEW}
+                  >
+                    <FormattedMessage id="Edit" defaultMessage="Edit" />
+                  </StyledButton>
                 </Box>
+                <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
               </Box>
             </Flex>
-            <Box width="calc((100% - 1260px) / 2)" />
+            <Box width={SIDE_MARGIN_WIDTH} />
           </Flex>
+          <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
         </CollectiveThemeProvider>
       </Page>
     );
@@ -375,4 +391,10 @@ const getData = graphql(expensePageQuery, {
   },
 });
 
-export default injectIntl(getData(withApollo(withUser(ExpensePage))));
+const withEditExpenseMutation = graphql(editExpenseMutation, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default injectIntl(getData(withApollo(withUser(withEditExpenseMutation(ExpensePage)))));
