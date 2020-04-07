@@ -56,6 +56,10 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       amount
       url
     }
+    attachedFiles {
+      id
+      url
+    }
     payee {
       id
       slug

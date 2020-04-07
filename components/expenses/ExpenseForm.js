@@ -67,6 +67,7 @@ export const prepareExpenseForSubmit = expenseData => {
     ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'tags']),
     payee: pick(expenseData.payee, ['id']),
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
+    attachedFiles: expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])),
     // Omit attachment's ids that were created for keying purposes
     attachments: expenseData.attachments.map(attachment => {
       return pick(attachment, [

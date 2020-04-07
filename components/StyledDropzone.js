@@ -5,12 +5,16 @@ import { FormattedMessage } from 'react-intl';
 import { useDropzone } from 'react-dropzone';
 import styled, { css } from 'styled-components';
 import { isNil } from 'lodash';
+import { v4 as uuid } from 'uuid';
+
+import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 
 import { uploadImageWithXHR } from '../lib/api';
 import { P } from './Text';
 import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
+import ContainerOverlay from './ContainerOverlay';
 
 const Dropzone = styled(Container)`
   border: 1px dashed #c4c7cc;
@@ -21,6 +25,7 @@ const Dropzone = styled(Container)`
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 
   &:hover:not(:disabled) {
     background: #f9f9f9;
@@ -78,7 +83,7 @@ const StyledDropzone = ({
   const [isUploading, setUploading] = React.useState(false);
   const [uploadProgressList, setUploadProgressList] = React.useState([]);
   const uploadProgress = getUploadProgress(uploadProgressList);
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept,
     minSize,
     maxSize,
@@ -134,11 +139,23 @@ const StyledDropzone = ({
           >
             <StyledSpinner size="70%" />
           </Container>
-          {isUploading && <Container>{uploadProgress}%</Container>}
+          {isUploading && <Container fontSize="Caption">{uploadProgress}%</Container>}
           {isLoading && !isNil(loadingProgress) && <Container>{loadingProgress}%</Container>}
         </Container>
       ) : (
-        <Box my={3} maxHeight="100%" maxWidth="100%">
+        <Container my={3} maxHeight="100%" maxWidth="100%" position="relative">
+          {isDragActive && (
+            <ContainerOverlay backgroundType="white" backgroundOpacity={1} color="primary.500">
+              <Box mb={2}>
+                <DownloadIcon size={20} />
+              </Box>
+              <FormattedMessage
+                id="StyledDropzone.DropMsg"
+                defaultMessage="Drop {count,plural, one {file} other {files}} here"
+                values={{ count: isMulti ? 2 : 1 }}
+              />
+            </ContainerOverlay>
+          )}
           {showDefaultMessage && (
             <P color="black.500" px={2} fontSize={fontSize}>
               {isMulti ? (
@@ -158,7 +175,7 @@ const StyledDropzone = ({
             </P>
           )}
           {children}
-        </Box>
+        </Container>
       )}
     </Dropzone>
   );
@@ -201,7 +218,7 @@ StyledDropzone.propTypes = {
 
 StyledDropzone.defaultProps = {
   minHeight: 96,
-  mockImageGenerator: index => `https://loremflickr.com/120/120?lock=${index}`,
+  mockImageGenerator: () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   isMulti: true,
   fontSize: 'Paragraph',
   showDefaultMessage: true,

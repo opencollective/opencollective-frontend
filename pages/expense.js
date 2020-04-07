@@ -36,6 +36,9 @@ import {
   loggedInAccountExpensePayoutFieldsFragment,
   expensePageExpenseFieldsFragment,
 } from '../components/expenses/graphql/fragments';
+import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
+import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
+import expenseTypes from '../lib/constants/expenseTypes';
 
 const messages = defineMessages({
   title: {
@@ -158,12 +161,11 @@ class ExpensePage extends React.Component {
   onNotesChanges = e => {
     const name = e.target.name;
     const value = e.target.value;
-    this.setState(state => ({
-      editedExpense: {
-        ...state.editedExpense,
-        [name]: value,
-      },
-    }));
+    this.setState(state => ({ editedExpense: { ...state.editedExpense, [name]: value } }));
+  };
+
+  onAttachedFilesChange = attachedFiles => {
+    this.setState(state => ({ editedExpense: { ...state.editedExpense, attachedFiles } }));
   };
 
   scrollToExpenseTop() {
@@ -235,6 +237,7 @@ class ExpensePage extends React.Component {
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
+    const hasAttachedFiles = expense?.attachedFiles?.length > 0;
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
         <CollectiveThemeProvider collective={collective}>
@@ -288,23 +291,43 @@ class ExpensePage extends React.Component {
                     isLoading={!expense}
                     isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
                   />
-                  {expense?.privateMessage && status !== PAGE_STATUS.EDIT_SUMMARY && (
-                    <Box>
-                      <H5 fontSize="LeadParagraph" mb={2}>
-                        <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                      </H5>
-                      <PrivateNoteLabel />
-                      <P color="black.700" mt={1} fontSize="LeadCaption">
-                        {expense.privateMessage}
-                      </P>
-                      <StyledHr borderColor="#DCDEE0" mt={4} />
-                    </Box>
+                  {status !== PAGE_STATUS.EDIT_SUMMARY && (
+                    <React.Fragment>
+                      {expense?.privateMessage && (
+                        <Box>
+                          <H5 fontSize="LeadParagraph" mb={2}>
+                            <FormattedMessage id="expense.notes" defaultMessage="Notes" />
+                          </H5>
+                          <PrivateNoteLabel />
+                          <P color="black.700" mt={1} fontSize="LeadCaption">
+                            {expense.privateMessage}
+                          </P>
+                        </Box>
+                      )}
+                      {hasAttachedFiles && (
+                        <Box mt={4}>
+                          <H5 fontSize="LeadParagraph" mb={2}>
+                            <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+                          </H5>
+                          <ExpenseAttachedFiles files={expense.attachedFiles} />
+                        </Box>
+                      )}
+                      {(hasAttachedFiles || expense?.privateMessage) && <StyledHr borderColor="#DCDEE0" mt={4} />}
+                    </React.Fragment>
                   )}
                   {status === PAGE_STATUS.EDIT_SUMMARY && (
                     <div>
                       <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
+                      {editedExpense.type === expenseTypes.INVOICE && (
+                        <Box mt={4}>
+                          <ExpenseAttachedFilesForm
+                            onChange={this.onAttachedFilesChange}
+                            defaultValue={editedExpense.attachedFiles}
+                          />
+                        </Box>
+                      )}
                       <StyledButton
-                        mt={3}
+                        mt={4}
                         mr={2}
                         minWidth={150}
                         data-cy="edit-expense-btn"
@@ -371,16 +394,18 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
-                <Box mb={60} display={['none', null, null, 'flex']}>
-                  <StyledButton
-                    buttonStyle="secondary"
-                    buttonSize="small"
-                    onClick={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
-                    disabled={status !== PAGE_STATUS.VIEW}
-                  >
-                    <FormattedMessage id="Edit" defaultMessage="Edit" />
-                  </StyledButton>
-                </Box>
+                {expense?.permissions.canEdit && (
+                  <Box mb={60} display={['none', null, null, 'flex']}>
+                    <StyledButton
+                      buttonStyle="secondary"
+                      buttonSize="small"
+                      onClick={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
+                      disabled={status !== PAGE_STATUS.VIEW}
+                    >
+                      <FormattedMessage id="Edit" defaultMessage="Edit" />
+                    </StyledButton>
+                  </Box>
+                )}
                 <ExpenseInfoSidebar
                   isLoading={data.loading}
                   collective={collective}

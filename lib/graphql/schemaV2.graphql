@@ -1,5 +1,6 @@
 # source: http://localhost:3060/graphql/v2
 # timestamp: Wed Apr 08 2020 11:07:13 GMT-0300 (Brasilia Standard Time)
+# timestamp: Tue Apr 07 2020 17:48:50 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -205,9 +206,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
-  COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_PAID
-  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_MEMBER_CREATED
@@ -879,6 +878,11 @@ type Expense {
   The payout method to use for this expense
   """
   payoutMethod: PayoutMethod
+
+  """
+  (Optional) files attached to the expense
+  """
+  attachedFiles: [ExpenseAttachedFile!]
   attachments: [ExpenseAttachment]
 
   """
@@ -900,7 +904,31 @@ type Expense {
   The list of activities (ie. approved, edited, etc) for this expense ordered by date ascending
   """
   activities: [Activity!]!
+
   tags: [String]!
+}
+
+"""
+Fields for an expense's attached file
+"""
+type ExpenseAttachedFile {
+  """
+  Unique identifier for this file
+  """
+  id: String!
+  url: String
+}
+
+input ExpenseAttachedFileInput {
+  """
+  ID of the file
+  """
+  id: String
+
+  """
+  URL of the file
+  """
+  url: String!
 }
 
 """
@@ -1025,6 +1053,11 @@ input ExpenseCreateInput {
   attachments: [ExpenseAttachmentCreateInput]!
 
   """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [ExpenseAttachedFileInput!]
+
+  """
   Account to reimburse
   """
   payee: AccountReferenceInput!
@@ -1131,6 +1164,11 @@ input ExpenseUpdateInput {
   The list of attachments for this expense. Total amount will be computed from them.
   """
   attachments: [ExpenseAttachmentInput]
+
+  """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [ExpenseAttachedFileInput!]
 
   """
   Account to reimburse
