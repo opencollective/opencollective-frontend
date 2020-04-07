@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Присоединиться к существующему фискальному хосту",
   "collective.edit.host.noHost.description": "Без фискального хоста вы не можете собирать деньги. Вы можете использовать другие функции, такие как редактирование вашего Коллектива, отправка расходов и размещение обновлений.",
   "collective.edit.host.noHost.title": "Нет фискального хоста",
-  "collective.edit.host.suggestedHosts.description": "Основываясь на валюте вашего Коллектива ({currency}) и тегах ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "Нет предложений. Пожалуйста, взгляните на всех доступных хостов или создайте нового.",
   "collective.edit.host.suggestedHosts.title": "Предлагаемые представители",
   "collective.edit.host.useOwn.description": "Держите средства одного или нескольких Коллективов на Вашем банковском счете. Вы будете отвечать за оплату утвержденных расходов и обработку бухгалтерского и налогового учета.",
