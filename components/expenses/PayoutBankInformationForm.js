@@ -45,7 +45,7 @@ const FormFieldsContainer = styled(Flex)`
 `;
 
 const requiredFieldsQuery = gqlV2`
-  query Collective($slug: String, $currency: TransferWiseCurrency!) {
+  query Collective($slug: String, $currency: String!) {
     collective(slug: $slug) {
       host {
         transferwise {
