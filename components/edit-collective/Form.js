@@ -68,7 +68,6 @@ class EditCollectiveForm extends React.Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleObjectChange = this.handleObjectChange.bind(this);
 
     const collective = { ...(props.collective || {}) };
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
@@ -79,6 +78,7 @@ class EditCollectiveForm extends React.Component {
 
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
+
     this.state = {
       modified: false,
       section: 'info',
@@ -245,8 +245,6 @@ class EditCollectiveForm extends React.Component {
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
-
-    window.OC = { collective, state: this.state };
   }
 
   componentDidMount() {
@@ -286,24 +284,15 @@ class EditCollectiveForm extends React.Component {
   }
 
   componentDidUpdate(oldProps) {
-    const { collective, router } = this.props;
-    if (oldProps.collective !== collective) {
-      const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
-      const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
-      this.setState({
-        collective,
-        tiers,
-        tickets,
-      });
-    } else if (oldProps.router.query.section !== router.query.section) {
-      this.setState({ section: router.query.section });
+    if (oldProps.router.query.section !== this.props.router.query.section) {
+      this.setState({ section: this.props.router.query.section });
     }
   }
 
   handleChange(fieldname, value) {
-    const collective = { ...this.state.collective };
+    const collective = {};
 
-    // GrarphQL schema has address emebed within location
+    // GraphQL schema has address embeded within location
     // mutation expects { location: { address: '' } }
     if (['address', 'country'].includes(fieldname)) {
       collective.location = collective.location || {};
@@ -332,35 +321,26 @@ class EditCollectiveForm extends React.Component {
     } else {
       collective[fieldname] = value;
     }
-    this.setState({
-      modified: true,
-      collective: Object.assign({}, this.state.collective, collective),
+
+    this.setState(prevState => {
+      return { collective: { ...prevState.collective, ...collective }, modified: true };
     });
   }
 
-  handleObjectChange(obj) {
-    const { section } = this.state;
-    if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
-      this.setState({ tickets: obj.tiers, modified: true });
-    } else {
-      this.setState({ ...obj, modified: true });
-    }
-    window.state = this.state;
-  }
-
   async handleSubmit() {
-    const collective = { ...this.state.collective, tiers: this.state.tiers };
-    if (collective.type === CollectiveType.EVENT) {
-      collective.tiers = [];
-      if (find(this.state.tickets, 'name')) {
-        collective.tiers = [...this.state.tickets];
-      }
+    const collective = { ...this.state.collective };
 
-      if (find(this.state.tiers, 'name')) {
-        collective.tiers = [...collective.tiers, ...this.state.tiers];
-      }
+    // Add Tiers and Tickets
+    collective.tiers = [];
+    if (find(this.state.tiers, 'name')) {
+      collective.tiers = [...this.state.tiers];
     }
+    if (find(this.state.tickets, 'name')) {
+      collective.tiers = [...collective.tiers, ...this.state.tickets];
+    }
+
     this.props.onSubmit(collective);
+
     this.setState({ modified: false });
   }
 
@@ -426,7 +406,7 @@ class EditCollectiveForm extends React.Component {
             tiers={this.state.tiers}
             collective={collective}
             currency={collective.currency}
-            onChange={this.handleObjectChange}
+            onChange={tiers => this.setState({ tiers, modified: true })}
             defaultType="TIER"
           />
         );
@@ -439,7 +419,7 @@ class EditCollectiveForm extends React.Component {
             tiers={this.state.tickets}
             collective={collective}
             currency={collective.currency}
-            onChange={this.handleObjectChange}
+            onChange={tickets => this.setState({ tickets, modified: true })}
             defaultType="TICKET"
           />
         );

@@ -270,7 +270,7 @@ class Tiers extends React.Component {
       [fieldname]: value,
     };
     this.setState({ tiers });
-    this.onChange({ tiers });
+    this.onChange(tiers);
   }
 
   addTier(tier) {
@@ -286,7 +286,7 @@ class Tiers extends React.Component {
     }
     tiers = [...tiers.slice(0, index), ...tiers.slice(index + 1)];
     this.setState({ tiers });
-    this.onChange({ tiers });
+    this.onChange(tiers);
   }
 
   renderLabel(field, hasTax) {
