@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Apply to an existing fiscal host",
   "collective.edit.host.noHost.description": "Without a fiscal host, you can't collect money. You can still use other features, like editing your Collective page, submitting expenses, and posting updates.",
   "collective.edit.host.noHost.title": "No fiscal host",
-  "collective.edit.host.suggestedHosts.description": "귀하의 Collecitve 통화({currency})과 태그({tags})에 기반",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "No suggestions. Please look at all available hosts or consider creating a new host.",
   "collective.edit.host.suggestedHosts.title": "추천 호스트",
   "collective.edit.host.useOwn.description": "하나이상의 Collective(들)의 계좌에 자금을 보관해 주십시오. 귀하에게는 승인된 비용과 세금을 비롯한 회계 사항을 처리해야 할 책임이 있습니다.",
