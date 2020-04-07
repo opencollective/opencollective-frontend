@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Inscreva-se com um administrador fiscal existente",
   "collective.edit.host.noHost.description": "Sem um administrador fiscal, você não pode coletar dinheiro. Você ainda pode usar outros recursos, como editar sua página do Coletivo, enviar despesas e publicar atualizações.",
   "collective.edit.host.noHost.title": "Sem administrador fiscal",
-  "collective.edit.host.suggestedHosts.description": "Baseado na moeda do seu Coletivo ({currency}) e nas tags ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "Sem sugestões. Por favor consulte todos os administradores disponíveis ou considere criar um novo administrador.",
   "collective.edit.host.suggestedHosts.title": "Administradores sugeridos",
   "collective.edit.host.useOwn.description": "Guarde fundos para um ou mais Coletivos em sua conta bancária. Você será o responsável pelo pagamento de despesas aprovadas e pelo tratamento da contabilidade e impostos.",
