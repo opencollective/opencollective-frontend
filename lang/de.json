@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Auf einen existierenden Steuer-Host anwenden",
   "collective.edit.host.noHost.description": "Ohne einen Steuer-Host kannst du kein Geld sammeln. Du kannst immernoch andere Funktionen verwenden, wie das Bearbeiten deiner Collective-Seite, das Einreichen von Ausgaben und das Posten von Updates.",
   "collective.edit.host.noHost.title": "Kein Steuer-Träger",
-  "collective.edit.host.suggestedHosts.description": "Basierend auf der Währung deines Kollektivs ({currency}) und den Tags ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "Keine Vorschläge. Bitte schauen Sie sich alle verfügbaren Hosts an oder erwägen Sie einen neuen Host zu kreieren.",
   "collective.edit.host.suggestedHosts.title": "Empfohlene Träger",
   "collective.edit.host.useOwn.description": "Halten Sie Guthaben für ein oder mehrere Collective in Ihrem Bankkonto. Sie sind verantwortlich für die Zahlung von genehmigten Ausgaben und die Abwicklung von Buchungen und Steuern.",
