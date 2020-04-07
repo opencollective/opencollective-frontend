@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Apply to an existing fiscal host",
   "collective.edit.host.noHost.description": "Without a fiscal host, you can't collect money. You can still use other features, like editing your Collective page, submitting expenses, and posting updates.",
   "collective.edit.host.noHost.title": "No fiscal host",
-  "collective.edit.host.suggestedHosts.description": "Based on the currency of your Collective ({currency}) and the tags ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "No suggestions. Please look at all available hosts or consider creating a new host.",
   "collective.edit.host.suggestedHosts.title": "Suggested hosts",
   "collective.edit.host.useOwn.description": "Hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes.",
