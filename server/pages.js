@@ -83,7 +83,7 @@ pages.add(
 );
 
 // Events using new collective page
-pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
+pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', '[slug]/events/[eventSlug]');
 
 // Tier page
 // ---------------
@@ -185,15 +185,12 @@ pages.add(
 // Collective
 // ----------
 
-// New collective page - we keep the v2 alias because we shared some of these URLs by email
-pages.add('new-collective-page', '/:slug/v2');
-
 // Collective page
-pages.add('collective', '/:slug', 'new-collective-page');
+pages.add('collective', '/:slug', '[slug]');
 pages.add(
   'collective-with-onboarding',
   '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
-  'new-collective-page',
+  '[slug]/onboarding/[step].js',
 );
 
 module.exports = pages;
