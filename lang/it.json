@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Fai richiesta presso un gestore fiscale esistente",
   "collective.edit.host.noHost.description": "Senza un gestore fiscale, non puoi raccogliere soldi. Puoi comunque utilizzare altre funzionalità, come modificare la pagina del tuo collettivo, inviare spese e pubblicare aggiornamenti.",
   "collective.edit.host.noHost.title": "Nessun host fiscale",
-  "collective.edit.host.suggestedHosts.description": "Basato sulla valuta del tuo collettivo ({currency}) e sui tag ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "Nessun suggerimento. Consulta tutti gli host disponibili o considera la creazione di un nuovo host.",
   "collective.edit.host.suggestedHosts.title": "Host suggeriti",
   "collective.edit.host.useOwn.description": "Detieni fondi per uno o più collettivi sul tuo conto bancario. Sarai responsabile del pagamento delle spese approvate e della contabilità e delle tasse.",

@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Doe een aanvraag bij een bestaande fiscaal beheerder",
   "collective.edit.host.noHost.description": "Zonder een fiscaal beheerder kan je geen geld ontvangen. Je kan nog steeds gebruik maken van andere voorzieningen zoals je Collectiefpagina bewerken, onkostennota's indienen en updates plaatsen.",
   "collective.edit.host.noHost.title": "Geen fiscaal beheerder",
-  "collective.edit.host.suggestedHosts.description": "Gebaseerd op de valuta van jouw Collectief ({currency}) en de labels ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "Geen suggesties. Gelieve te kijken naar alle beschikbare beheerders of overweeg een nieuwe beheerder aan te maken.",
   "collective.edit.host.suggestedHosts.title": "Voorgestelde beheerders",
   "collective.edit.host.useOwn.description": "Houd saldo vast voor één of meer Collectieven op je bankrekening. Je bent verantwoordelijk voor het betalen van goedgekeurde uitgaven en het verwerken van boekingen en belastingen.",

@@ -14,7 +14,6 @@ import HostsWithData from '../../HostsWithData';
 import CollectiveCard from '../../CollectiveCard';
 import Link from '../../Link';
 import { P } from '../../Text';
-import InputField from '../../InputField';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
@@ -45,7 +44,6 @@ class Host extends React.Component {
     this.state = {
       selectedOption: 'noHost',
       collective: props.collective,
-      currency: props.collective.currency,
       showModal: false,
       action: '',
     };
@@ -333,23 +331,6 @@ class Host extends React.Component {
               />
               {this.state.selectedOption === 'findHost' && (
                 <div>
-                  <InputField
-                    name="currency"
-                    label="What will be the primary currency of your Collective?"
-                    description=""
-                    type="select"
-                    options={[
-                      { AUD: 'AUD' },
-                      { CAD: 'CAD' },
-                      { EUR: 'EUR' },
-                      { GBP: 'GBP' },
-                      { MXN: 'MXN' },
-                      { NZD: 'NZD' },
-                      { USD: 'USD' },
-                    ]}
-                    defaultValue={collective.currency}
-                    onChange={val => this.handleChange('currency', val)}
-                  />
                   <div className="suggestedHostsTitle">
                     <h3>
                       <FormattedMessage
@@ -361,21 +342,20 @@ class Host extends React.Component {
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all fiscal hosts" />
                     </Link>
                   </div>
-                  <div className="suggestedHostsDescription subtitle">
-                    <FormattedMessage
-                      id="collective.edit.host.suggestedHosts.description"
-                      defaultMessage="Based on the currency of your Collective ({currency}) and the tags ({tags})"
-                      values={{
-                        tags: collective.tags,
-                        currency: this.state.currency,
-                      }}
-                    />
-                    .
-                  </div>
+                  {collective.tags && collective.tags.length > 0 && (
+                    <div className="suggestedHostsDescription subtitle">
+                      <FormattedMessage
+                        id="collective.edit.host.suggestedHosts.description"
+                        defaultMessage="Based on the tags of your Collective ({tags})"
+                        values={{
+                          tags: collective.tags.join(', '),
+                        }}
+                      />
+                    </div>
+                  )}
                   <HostsWithData
                     limit={6}
                     tags={collective.tags}
-                    currency={this.state.currency}
                     empty={
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.empty"
