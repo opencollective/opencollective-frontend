@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Aplicar para un patrocinador fiscal existente",
   "collective.edit.host.noHost.description": "Sin un patrocinador fiscal, no puede recibir dinero. Aún puedes usar otras herramientas, como editar su página del Colectivo, enviar gastos y publicar actualizaciones.",
   "collective.edit.host.noHost.title": "No hay patrocinador fiscal",
-  "collective.edit.host.suggestedHosts.description": "Basado en la moneda de su Colectivo ({currency}) y las etiquetas ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "No hay sugerencias. Por favor revise todos los patrocinadores disponibles o considere crear un nuevo patrocinador.",
   "collective.edit.host.suggestedHosts.title": "Hosts sugeridos",
   "collective.edit.host.useOwn.description": "Reciba los fondos de uno o más Colectivos en su cuenta bancaria. Usted será responsable de pagar los gastos aprobados por el Colectivo y manejar la contabilidad e impuestos.",
