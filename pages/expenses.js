@@ -12,7 +12,7 @@ import CollectiveNavbar from '../components/CollectiveNavbar';
 import ErrorPage from '../components/ErrorPage';
 import SectionTitle from '../components/SectionTitle';
 
-import { addCollectiveAndHostData } from '../lib/graphql/queries';
+import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import { withUser } from '../components/UserProvider';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
@@ -25,7 +25,7 @@ class ExpensesPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveAndHostData
+    slug: PropTypes.string, // for addCollectiveCoverData
     filter: PropTypes.string,
     value: PropTypes.string,
     data: PropTypes.object.isRequired, // from withData
@@ -139,7 +139,7 @@ class ExpensesPage extends React.Component {
 }
 
 export default withUser(
-  addCollectiveAndHostData(ExpensesPage, {
+  addCollectiveCoverData(ExpensesPage, {
     options: props => ({
       variables: { slug: props.slug, throwIfMissing: false },
     }),
