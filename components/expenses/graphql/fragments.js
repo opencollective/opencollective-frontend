@@ -103,6 +103,9 @@ export const expensePageExpenseFieldsFragment = gqlV2`
             address
             country
           }
+          transferwise {
+            availableCurrencies
+          }
         }
       }
       ... on Event {
