@@ -148,7 +148,7 @@ class ExpensePage extends React.Component {
       this.setState({ isSubmitting: true, error: null });
       const { editedExpense } = this.state;
       await this.props.mutate({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
-      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false });
+      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false, editedExpense: undefined });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
       this.scrollToExpenseTop();
@@ -333,7 +333,12 @@ class ExpensePage extends React.Component {
                     collective={collective}
                     loading={loadingLoggedInUser}
                     expense={editedExpense}
-                    onSubmit={expense => this.setState({ editedExpense: expense, status: PAGE_STATUS.EDIT_SUMMARY })}
+                    onSubmit={expense =>
+                      this.setState(({ editedExpense }) => ({
+                        editedExpense: { ...editedExpense, expense },
+                        status: PAGE_STATUS.EDIT_SUMMARY,
+                      }))
+                    }
                     payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                     onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                     validateOnChange
@@ -376,7 +381,16 @@ class ExpensePage extends React.Component {
                     <FormattedMessage id="Edit" defaultMessage="Edit" />
                   </StyledButton>
                 </Box>
-                <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+                <ExpenseInfoSidebar
+                  isLoading={data.loading}
+                  collective={collective}
+                  host={host}
+                  expense={editedExpense || expense}
+                  isEditing={status === PAGE_STATUS.EDIT}
+                  onChange={tags =>
+                    this.setState(({ editedExpense }) => ({ editedExpense: { ...editedExpense, tags } }))
+                  }
+                />
               </Box>
             </Flex>
             <Box width={SIDE_MARGIN_WIDTH} />

@@ -48,6 +48,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     type
     status
     privateMessage
+    tags
     attachments {
       id
       incurredAt

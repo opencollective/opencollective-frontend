@@ -64,7 +64,7 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
  */
 export const prepareExpenseForSubmit = expenseData => {
   return {
-    ...pick(expenseData, ['id', 'description', 'type', 'privateMessage']),
+    ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'tags']),
     payee: pick(expenseData.payee, ['id']),
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
     // Omit attachment's ids that were created for keying purposes
