@@ -155,7 +155,7 @@
   "collective.edit.host.findHost.title": "Postuler à un hôte fiscal existant",
   "collective.edit.host.noHost.description": "Sans hôte fiscal, vous ne pouvez pas collecter de l'argent. Vous pouvez toujours utiliser d'autres fonctions, comme la modification de votre page de collectif, la soumission de dépenses et l'affichage de mises à jour.",
   "collective.edit.host.noHost.title": "Pas d'hôte fiscal",
-  "collective.edit.host.suggestedHosts.description": "Basé sur la devise de votre collectif ({currency}) et ses tags ({tags})",
+  "collective.edit.host.suggestedHosts.description": "Based on the tags of your Collective ({tags})",
   "collective.edit.host.suggestedHosts.empty": "Aucune suggestion n'est disponible. Vous pouvez vous reporter à liste de tous les hôtes ou en créer un nouveau.",
   "collective.edit.host.suggestedHosts.title": "Suggestions",
   "collective.edit.host.useOwn.description": "Détenez des fonds pour un ou plusieurs Collectifs sur votre compte bancaire. Vous serez responsable du paiement des dépenses approuvées, de la comptabilité et des taxes.",
