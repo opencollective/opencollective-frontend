@@ -50,6 +50,19 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      # use apt-spy2 to select closest apt mirror,
+      # which helps avoid connectivity issues in Azure;
+      # see https://github.com/actions/virtual-environments/issues/675
+
+      - name: Install apt-spy2
+        run: sudo gem install apt-spy2
+
+      - name: Check using apt-spy2
+        run: sudo apt-spy2 check
+
+      - name: Fix using apt-spy2
+        run: sudo apt-spy2 check
+
       - name: Update apt
         run: sudo apt-get update || exit 0
 
