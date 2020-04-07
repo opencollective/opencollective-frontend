@@ -5,7 +5,7 @@ import { typography, layout, space } from 'styled-system';
 import Select, { components } from 'react-select';
 import { injectIntl, defineMessages } from 'react-intl';
 import propTypes from '@styled-system/prop-types';
-import { truncate } from 'lodash';
+import { truncate, unescape } from 'lodash';
 
 import SearchIcon from './SearchIcon';
 import StyledTag from './StyledTag';
@@ -41,7 +41,7 @@ const SelectContainer = ({ innerProps, ...props }) => (
 // eslint-disable-next-line react/prop-types
 const MultiValue = ({ children, removeProps }) => {
   if (typeof children === 'string') {
-    children = truncate(children, { maxLength: 32 });
+    children = truncate(unescape(children), { maxLength: 32 });
   }
 
   return (
