@@ -2590,8 +2590,8 @@ type PlanType {
   manualPayments: Boolean
   bankTransfers: Int
   bankTransfersLimit: Int
-  transferwisePayout: Int
-  transferwisePayoutLimit: Int
+  transferwisePayouts: Int
+  transferwisePayoutsLimit: Int
 }
 
 """

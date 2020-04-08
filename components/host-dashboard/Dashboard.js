@@ -232,8 +232,8 @@ const getDataQuery = gql`
       plan {
         addedFunds
         addedFundsLimit
-        transferwisePayout
-        transferwisePayoutLimit
+        transferwisePayouts
+        transferwisePayoutsLimit
         name
       }
     }

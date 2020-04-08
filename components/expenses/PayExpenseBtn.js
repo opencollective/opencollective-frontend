@@ -114,8 +114,8 @@ class PayExpenseBtn extends React.Component {
       selectedPayoutMethod = 'TransferWise';
       successMessage = intl.formatMessage(this.messages['transferwiseSuccessMessage']);
       if (
-        host?.plan.transferwisePayoutLimit !== null &&
-        host?.plan.transferwisePayout >= host?.plan.transferwisePayoutLimit
+        host?.plan.transferwisePayoutsLimit !== null &&
+        host?.plan.transferwisePayouts >= host?.plan.transferwisePayoutsLimit
       ) {
         disabled = true;
         disabledMessage = intl.formatMessage(this.messages['transferwisePlanLimitMessage'], {

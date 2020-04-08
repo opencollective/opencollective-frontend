@@ -95,7 +95,7 @@ const rows = [
       render() {
         return (
           <FormattedMessage
-            id="pricingTable.row.transferwisePayout"
+            id="pricingTable.row.transferwisePayouts"
             defaultMessage="Enable one-click payout with TransferWise"
           />
         );
@@ -200,7 +200,7 @@ const SingleCollectiveWithBankAccount = () => (
             {isTransferwiseEnabled && (
               <Box as="li" my={3}>
                 <FormattedMessage
-                  id="pricing.starterPlans.transferwisePayout"
+                  id="pricing.starterPlans.transferwisePayouts"
                   defaultMessage="Pay expenses in local currency with one-click using the <strong>TransferWise</strong> integration."
                   values={I18nFormatters}
                 />

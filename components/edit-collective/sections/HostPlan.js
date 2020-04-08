@@ -95,7 +95,7 @@ const GenericPlanFeatures = ({ plan }) => {
       {isTransferwiseEnabled && (
         <li>
           <FormattedMessage
-            id="Host.Plan.TransferwisePayout.unlimited"
+            id="Host.Plan.TransferwisePayouts.unlimited"
             defaultMessage="Unlimited payouts with TranferWise"
           />
         </li>
@@ -153,7 +153,7 @@ const HostPlan = props => {
               {isTransferwiseEnabled && (
                 <li>
                   <FormattedMessage
-                    id="Host.Plan.TransferwisePayout.limited"
+                    id="Host.Plan.TransferwisePayouts.limited"
                     defaultMessage="Up to $1000 in payouts with TransferWise"
                   />
                   <br />
@@ -219,7 +219,7 @@ const HostPlan = props => {
               {isTransferwiseEnabled && (
                 <li>
                   <FormattedMessage
-                    id="Host.Plan.TransferwisePayout.unlimited"
+                    id="Host.Plan.TransferwisePayouts.unlimited"
                     defaultMessage="Unlimited payouts with TranferWise"
                   />
                 </li>
@@ -308,12 +308,12 @@ const HostPlan = props => {
               <LimitsInfoCircle size={12} />
             </StyledTooltip>
             :{' '}
-            {collective.plan.transferwisePayoutLimit && (
+            {collective.plan.transferwisePayoutsLimit && (
               <span>
-                ${collective.plan.transferwisePayout / 100} of ${collective.plan.transferwisePayoutLimit / 100}
+                ${collective.plan.transferwisePayouts / 100} of ${collective.plan.transferwisePayoutsLimit / 100}
               </span>
             )}
-            {!collective.plan.transferwisePayoutLimit && (
+            {!collective.plan.transferwisePayoutsLimit && (
               <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
             )}
           </li>
