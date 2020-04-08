@@ -263,7 +263,14 @@ class CreateExpensePage extends React.Component {
                     )}
                   </Box>
                   <Box minWidth={300} width={['100%', null, null, 300]} px={3} mt={3}>
-                    <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+                    <ExpenseInfoSidebar
+                      isLoading={data.loading}
+                      collective={collective}
+                      host={host}
+                      expense={{ tags: this.state.tags }}
+                      onChangeTags={this.setTags}
+                      isEditing={step === STEPS.FORM}
+                    />
                   </Box>
                 </Flex>
               </Box>

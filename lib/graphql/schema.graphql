@@ -1331,6 +1331,7 @@ type ExpenseType {
   incurredAt: DateString
   description: String
   category: String
+  tags: [String]
   status: String
   type: String
   payoutMethod: String @deprecated(reason: "2020-01-23 - Please use the private field instead.")

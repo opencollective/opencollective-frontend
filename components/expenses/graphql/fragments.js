@@ -48,6 +48,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     type
     status
     privateMessage
+    tags
     attachments {
       id
       incurredAt
@@ -102,6 +103,9 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           location {
             address
             country
+          }
+          transferwise {
+            availableCurrencies
           }
         }
       }

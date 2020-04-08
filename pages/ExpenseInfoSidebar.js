@@ -1,7 +1,8 @@
-import { Box } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+
 import Container from '../components/Container';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
@@ -9,15 +10,40 @@ import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
 import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import { H5, Strong, P } from '../components/Text';
+import StyledTag from '../components/StyledTag';
+import StyledInputTags from '../components/StyledInputTags';
 
 /**
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isLoading, host, collective }) => {
+const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, onChangeTags }) => {
+  const handleTagUpdate = tags => {
+    const labels = tags.map(t => t.value.toUpperCase());
+    onChangeTags(labels);
+  };
+
   return (
     <Box width="100%">
-      <Box display={['none', 'block']}>
+      <Box>
+        <H5 mb={3}>
+          <FormattedMessage id="Tags" defaultMessage="Tags" />
+        </H5>
+        {isLoading && <LoadingPlaceholder height={28} width="100%" />}
+        {!isLoading &&
+          (isEditing ? (
+            <StyledInputTags onChange={handleTagUpdate} value={expense.tags} />
+          ) : (
+            <Flex flexWrap="wrap">
+              {expense?.tags?.map(tag => (
+                <StyledTag mb="8px" mr="8px">
+                  {tag}
+                </StyledTag>
+              ))}
+            </Flex>
+          ))}
+      </Box>
+      <Box mt={50} display={['none', 'block']}>
         <H5 mb={3}>
           <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
         </H5>
@@ -55,6 +81,8 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective }) => {
 
 ExpenseInfoSidebar.propTypes = {
   isLoading: PropTypes.bool,
+  isEditing: PropTypes.bool,
+  onChangeTags: PropTypes.func,
   /** Must be provided if isLoading is false */
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
@@ -62,6 +90,9 @@ ExpenseInfoSidebar.propTypes = {
   }),
   host: PropTypes.shape({
     name: PropTypes.string.isRequired,
+  }),
+  expense: PropTypes.shape({
+    tags: PropTypes.arrayOf(PropTypes.string),
   }),
 };
 
