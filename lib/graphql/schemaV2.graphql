@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Apr 07 2020 15:06:55 GMT-0300 (Brasilia Standard Time)
+# timestamp: Wed Apr 08 2020 11:07:13 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -900,7 +900,7 @@ type Expense {
   The list of activities (ie. approved, edited, etc) for this expense ordered by date ascending
   """
   activities: [Activity!]!
-  tags: [String]
+  tags: [String]!
 }
 
 """
