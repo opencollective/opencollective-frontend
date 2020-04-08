@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Flex } from '@rebass/grid';
 import { get } from 'lodash';
+import { graphql } from '@apollo/react-hoc';
 
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
@@ -10,8 +11,7 @@ import EditCollective from '../components/edit-collective';
 import ErrorPage from '../components/ErrorPage';
 import MessageBox from '../components/MessageBox';
 
-import { compose } from '../lib/utils';
-import { addCollectiveToEditData } from '../lib/graphql/queries';
+import { getCollectiveToEditQuery } from '../lib/graphql/queries';
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
 import { GraphQLContext } from '../lib/graphql/context';
 
@@ -38,7 +38,7 @@ class EditCollectivePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { Collective: get(props, 'data.Collective'), loading: false };
+    this.state = { Collective: get(props, 'data.Collective') };
   }
 
   async componentDidMount() {
@@ -53,16 +53,7 @@ class EditCollectivePage extends React.Component {
     // See https://github.com/opencollective/opencollective/issues/1872
     const currentCollective = get(this.props, 'data.Collective');
     if (currentCollective && get(oldProps, 'data.Collective.id') !== currentCollective.id) {
-      // const refetch = get(oldProps, 'data.Collective.id') ? true : false;
-      // TODO: to implement and avoid double fetching. no-cache ?
-      const refetch = false;
-      this.setState({ Collective: currentCollective, loading: refetch }, () => {
-        // Edge case: same component, different collective (moving from edit to another edit through the menu)
-        // This will reload data and also should re-initialize Form and sub-components
-        if (refetch) {
-          return this.props.data.refetch().then(() => this.setState({ loading: false }));
-        }
-      });
+      this.setState({ Collective: currentCollective });
     }
   }
 
@@ -70,7 +61,7 @@ class EditCollectivePage extends React.Component {
     const { data, editCollective, LoggedInUser, loadingLoggedInUser } = this.props;
     const collective = get(data, 'Collective') || this.state.Collective;
 
-    if (this.state.loading || (data && data.loading) || loadingLoggedInUser) {
+    if ((data && data.loading) || loadingLoggedInUser) {
       return (
         <Page>
           <Flex justifyContent="center" py={6}>
@@ -111,12 +102,12 @@ class EditCollectivePage extends React.Component {
   }
 }
 
-const addGraphQL = compose(
-  component =>
-    addCollectiveToEditData(component, {
-      skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
-    }),
-  addEditCollectiveMutation,
-);
+const addCollectiveToEditData = graphql(getCollectiveToEditQuery, {
+  skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
+  // The fetchPolicy is important for an edge case.
+  // Same component, different collective (moving from edit to another edit through the menu)
+  // Reloading data make sure we get the loading state and we re-initialize Form and sub-components
+  options: { fetchPolicy: 'network-only' },
+});
 
-export default withUser(addGraphQL(EditCollectivePage));
+export default withUser(addEditCollectiveMutation(addCollectiveToEditData(EditCollectivePage)));
