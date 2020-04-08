@@ -1,8 +1,7 @@
-import { Box } from '@rebass/grid';
+import { Flex, Box } from '@rebass/grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import Container from '../components/Container';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
@@ -13,12 +12,6 @@ import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import { H5, Strong, P } from '../components/Text';
 import StyledTag from '../components/StyledTag';
 import StyledInputTags from '../components/StyledInputTags';
-
-const TagsWrapper = styled.div`
-  > div {
-    display: inline-block;
-  }
-`;
 
 /**
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
@@ -41,13 +34,13 @@ const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, o
           (isEditing ? (
             <StyledInputTags onChange={handleTagUpdate} value={expense.tags} />
           ) : (
-            <TagsWrapper>
+            <Flex>
               {expense?.tags?.map(tag => (
                 <StyledTag mb="8px" mr="8px">
                   {tag}
                 </StyledTag>
               ))}
-            </TagsWrapper>
+            </Flex>
           ))}
       </Box>
       <Box mt={50} display={['none', 'block']}>
