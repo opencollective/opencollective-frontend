@@ -290,40 +290,40 @@ class EditCollectiveForm extends React.Component {
   }
 
   handleChange(fieldname, value) {
-    const collective = {};
+    this.setState(state => {
+      const collective = { ...state.collective };
 
-    // GraphQL schema has address embeded within location
-    // mutation expects { location: { address: '' } }
-    if (['address', 'country'].includes(fieldname)) {
-      collective.location = collective.location || {};
-      collective.location[fieldname] = value;
-    } else if (fieldname === 'VAT') {
-      set(collective, 'settings.VAT.type', value);
-    } else if (fieldname === 'VAT-number') {
-      set(collective, 'settings.VAT.number', value);
-    } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
-      collective[fieldname] = value;
-      const endsAt = collective.endsAt;
-      if (!endsAt || new Date(endsAt) < new Date(value)) {
-        let newEndDate = new Date(value);
-        if (!endsAt) {
-          newEndDate.setHours(newEndDate.getHours() + 2);
-        } else {
-          // https://github.com/opencollπective/opencollective/issues/1232
-          const endsAtDate = new Date(endsAt);
-          newEndDate = new Date(value);
-          newEndDate.setHours(endsAtDate.getHours());
-          newEndDate.setMinutes(endsAtDate.getMinutes());
+      // GraphQL schema has address embeded within location
+      // mutation expects { location: { address: '' } }
+      if (['address', 'country'].includes(fieldname)) {
+        collective.location = collective.location || {};
+        collective.location[fieldname] = value;
+      } else if (fieldname === 'VAT') {
+        set(collective, 'settings.VAT.type', value);
+      } else if (fieldname === 'VAT-number') {
+        set(collective, 'settings.VAT.number', value);
+      } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
+        collective[fieldname] = value;
+        const endsAt = collective.endsAt;
+        if (!endsAt || new Date(endsAt) < new Date(value)) {
+          let newEndDate = new Date(value);
+          if (!endsAt) {
+            newEndDate.setHours(newEndDate.getHours() + 2);
+          } else {
+            // https://github.com/opencollπective/opencollective/issues/1232
+            const endsAtDate = new Date(endsAt);
+            newEndDate = new Date(value);
+            newEndDate.setHours(endsAtDate.getHours());
+            newEndDate.setMinutes(endsAtDate.getMinutes());
+          }
+          const endsAtValue = newEndDate.toString();
+          collective['endsAt'] = endsAtValue;
         }
-        const endsAtValue = newEndDate.toString();
-        collective['endsAt'] = endsAtValue;
+      } else {
+        collective[fieldname] = value;
       }
-    } else {
-      collective[fieldname] = value;
-    }
 
-    this.setState(prevState => {
-      return { collective: { ...prevState.collective, ...collective }, modified: true };
+      return { collective, modified: true };
     });
   }
 
