@@ -1,5 +1,5 @@
 import { Box, Flex } from '@rebass/grid';
-import { cloneDeep, uniqBy, update, get } from 'lodash';
+import { cloneDeep, uniqBy, update, get, sortBy } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { graphql, withApollo } from '@apollo/react-hoc';
@@ -209,6 +209,10 @@ class ExpensePage extends React.Component {
     }
   });
 
+  getThreadItems = memoizeOne((comments, activities) => {
+    return sortBy([...comments, ...activities], 'createdAt');
+  });
+
   render() {
     const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
     const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
@@ -341,7 +345,7 @@ class ExpensePage extends React.Component {
                 <Box mb={3} pt={3}>
                   <Thread
                     collective={collective}
-                    items={expense.comments.nodes}
+                    items={this.getThreadItems(expense.comments.nodes, expense.activities)}
                     onCommentDeleted={this.onCommentDeleted}
                   />
                 </Box>

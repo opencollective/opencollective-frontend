@@ -144,6 +144,18 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canDelete
       canSeeInvoiceInfo
     }
+    activities {
+      id
+      type
+      createdAt
+      individual {
+        id
+        type
+        slug
+        name
+        imageUrl
+      }
+    }
   }
 
   ${CommentFieldsFragment}

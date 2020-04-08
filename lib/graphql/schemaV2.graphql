@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Fri Apr 03 2020 12:11:13 GMT+0200 (GMT+02:00)
+# timestamp: Mon Apr 06 2020 17:46:25 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -158,6 +158,78 @@ enum AccountType {
   EVENT
   ORGANIZATION
   INDIVIDUAL
+}
+
+"""
+An activity describing something that happened on the platform
+"""
+type Activity {
+  """
+  Unique identifier for this activity
+  """
+  id: String!
+
+  """
+  The type of the activity
+  """
+  type: ActivityType!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The account concerned by this activity, if any
+  """
+  account: Account
+
+  """
+  The person who triggered the action, if any
+  """
+  individual: Individual
+}
+
+enum ActivityType {
+  ACTIVITY_ALL
+  CONNECTED_ACCOUNT_CREATED
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  COLLECTIVE_COMMENT_CREATED
+  COLLECTIVE_CONVERSATION_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_TRANSACTION_CREATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_CONTACT
+  ORGANIZATION_COLLECTIVE_CREATED
+  SUBSCRIPTION_CONFIRMED
+  SUBSCRIPTION_CANCELED
+  TICKET_CONFIRMED
+  USER_CREATED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY
+  ORDERS_SUSPICIOUS
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  ADDED_FUND_TO_ORG
+  ACTIVATED_COLLECTIVE_AS_HOST
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  COLLECTIVE_TRANSACTION_PAID
 }
 
 """
@@ -823,6 +895,11 @@ type Expense {
   The permissions given to current logged in user for this expense
   """
   permissions: ExpensePermissions!
+
+  """
+  The list of activities (ie. approved, edited, etc) for this expense ordered by date ascending
+  """
+  activities: [Activity!]!
 }
 
 """

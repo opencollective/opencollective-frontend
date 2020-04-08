@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Flex, Box } from '@rebass/grid';
-import styled, { css } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
 
 import CommentIconLib from '../icons/CommentIcon';
 import { withUser } from '../UserProvider';
 import Comment from './Comment';
 import Container from '../Container';
+import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadActivity';
 
 const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
@@ -15,7 +16,7 @@ const CommentIcon = styled(CommentIconLib).attrs({
   margin-top: 8px;
 `;
 
-const CommentContainer = styled.div`
+const ItemContainer = styled.div`
   width: 100%;
 
   ${props =>
@@ -30,7 +31,7 @@ const CommentContainer = styled.div`
 /**
  * A thread is meant to display comments and activities in a chronological order.
  */
-const Thread = ({ collective, items, onCommentDeleted, LoggedInUser }) => {
+const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme }) => {
   if (!items || items.length === 0) {
     return null;
   }
@@ -50,14 +51,28 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser }) => {
                     </Box>
                     <Container width="1px" height="100%" background="#E8E9EB" />
                   </Flex>
-                  <CommentContainer isLast={idx + 1 === items.length}>
+                  <ItemContainer isLast={idx + 1 === items.length}>
                     <Comment
                       comment={item}
                       canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       onDelete={onCommentDeleted}
                     />
-                  </CommentContainer>
+                  </ItemContainer>
+                </Flex>
+              </Box>
+            );
+          case 'Activity':
+            return !isSupportedActivity(item) ? null : (
+              <Box key={`activity-${item.id}`}>
+                <Flex>
+                  <Flex flexDirection="column" alignItems="center" width="40px">
+                    <Box mb={2}>{getActivityIcon(item, theme)}</Box>
+                    <Container width="1px" height="100%" background="#E8E9EB" />
+                  </Flex>
+                  <ItemContainer isLast={idx + 1 === items.length}>
+                    <ThreadActivity key={item.id} activity={item} />
+                  </ItemContainer>
                 </Flex>
               </Box>
             );
@@ -74,7 +89,8 @@ Thread.propTypes = {
   /** The list of items to display, sorted by chronoligal order */
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      __typename: PropTypes.oneOf(['Comment']),
+      __typename: PropTypes.oneOf(['Comment', 'Activity']),
+      id: PropTypes.string.isRequired,
     }),
   ),
   /** Called when a comment get deleted */
@@ -85,6 +101,8 @@ Thread.propTypes = {
   }).isRequired,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
+  /** @ignore from withTheme */
+  theme: PropTypes.object,
 };
 
-export default withUser(Thread);
+export default withUser(withTheme(Thread));
