@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { unescape } from 'lodash';
 
 import Container from '../components/Container';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
@@ -45,7 +44,7 @@ const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, o
             <TagsWrapper>
               {expense?.tags?.map(tag => (
                 <StyledTag mb="8px" mr="8px">
-                  {unescape(tag)}
+                  {tag}
                 </StyledTag>
               ))}
             </TagsWrapper>
