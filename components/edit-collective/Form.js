@@ -66,26 +66,12 @@ class EditCollectiveForm extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = { ...this.getStateFromProps(props) };
+
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
 
-    const collective = { ...(props.collective || {}) };
-    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
-    collective.tos = get(collective, 'settings.tos');
-    collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
-    collective.application = get(collective, 'settings.apply');
-    collective.markdown = get(collective, 'settings.markdown');
-
-    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
-    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
-
-    this.state = {
-      modified: false,
-      section: 'info',
-      collective,
-      tiers: tiers.length === 0 ? [] : tiers,
-      tickets: tickets.length === 0 ? [] : tickets,
-    };
+    const { collective } = this.state;
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
@@ -287,6 +273,27 @@ class EditCollectiveForm extends React.Component {
     if (oldProps.router.query.section !== this.props.router.query.section) {
       this.setState({ section: this.props.router.query.section });
     }
+  }
+
+  getStateFromProps(props) {
+    const collective = { ...(props.collective || {}) };
+
+    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
+    collective.tos = get(collective, 'settings.tos');
+    collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
+    collective.application = get(collective, 'settings.apply');
+    collective.markdown = get(collective, 'settings.markdown');
+
+    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
+
+    return {
+      modified: false,
+      section: 'info',
+      collective,
+      tiers: tiers.length === 0 ? [] : tiers,
+      tickets: tickets.length === 0 ? [] : tickets,
+    };
   }
 
   handleChange(fieldname, value) {
