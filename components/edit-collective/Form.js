@@ -271,7 +271,7 @@ class EditCollectiveForm extends React.Component {
 
   componentDidUpdate(oldProps) {
     if (oldProps.router.query.section !== this.props.router.query.section) {
-      this.setState({ section: this.props.router.query.section });
+      this.setState({ section: this.props.router.query.section || 'info' });
     }
   }
 
