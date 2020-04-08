@@ -183,14 +183,17 @@ class StepPayment extends React.Component {
   generatePaymentsOptions() {
     const { collective, defaultValue, withPaypal, manual } = this.props;
     // Add collective payment methods
-    const paymentMethodsOptions = (collective.paymentMethods || []).map(pm => ({
-      key: `pm-${pm.id}`,
-      title: getPaymentMethodName(pm),
-      subtitle: getPaymentMethodMetadata(pm),
-      icon: getPaymentMethodIcon(pm, collective),
-      paymentMethod: pm,
-      disabled: pm.balance < minBalance,
-    }));
+    const paymentMethodsOptions = (collective.paymentMethods || [])
+      // Adaptive paymentMethods are for internal use and should never be returned
+      .filter(pm => !(pm.service === 'paypal' && pm.type === 'adaptive'))
+      .map(pm => ({
+        key: `pm-${pm.id}`,
+        title: getPaymentMethodName(pm),
+        subtitle: getPaymentMethodMetadata(pm),
+        icon: getPaymentMethodIcon(pm, collective),
+        paymentMethod: pm,
+        disabled: pm.balance < minBalance,
+      }));
 
     // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
     if (collective.type !== CollectiveType.COLLECTIVE) {
