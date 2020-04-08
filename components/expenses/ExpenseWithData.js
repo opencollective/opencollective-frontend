@@ -102,7 +102,7 @@ const getExpenseQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
-      attachments {
+      items {
         id
         url
         description

@@ -24,7 +24,7 @@ Hello
     id: '1',
     type: 'RECEIPT',
     description: 'Food for the team retreat',
-    attachments: [
+    items: [
       {
         id: '1',
         url: 'https://loremflickr.com/120/120/invoice?lock=1',

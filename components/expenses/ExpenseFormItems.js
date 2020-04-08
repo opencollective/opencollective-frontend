@@ -10,14 +10,14 @@ import { I18nBold } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledDropzone from '../StyledDropzone';
 import { P, Span } from '../Text';
-import ExpenseAttachmentForm from './ExpenseAttachmentForm';
+import ExpenseItemForm from './ExpenseItemForm';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 import { toIsoDateStr } from '../../lib/date-utils';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import AttachmentsTotalAmount from './AttachmentsTotalAmount';
+import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 
-/** Init a new attachments with default attributes */
-const newAttachment = attrs => ({
+/** Init a new expense item with default attributes */
+const newExpenseItem = attrs => ({
   id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
   incurredAt: toIsoDateStr(new Date()),
   description: '',
@@ -27,10 +27,10 @@ const newAttachment = attrs => ({
   ...attrs,
 });
 
-/** Converts a list of filenames to attachment objects */
-const filesListToAttachments = files => files.map(url => newAttachment({ url }));
+/** Converts a list of filenames to expense item objects */
+const filesListToItems = files => files.map(url => newExpenseItem({ url }));
 
-export default class ExpenseFormAttachments extends React.PureComponent {
+export default class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
     /** Array helper as provided by formik */
     push: PropTypes.func.isRequired,
@@ -45,22 +45,22 @@ export default class ExpenseFormAttachments extends React.PureComponent {
   };
 
   componentDidMount() {
-    this.addDefaultAttachmentIfEmpty();
+    this.addDefaultItemIfEmpty();
   }
 
   componentDidUpdate() {
-    this.addDefaultAttachmentIfEmpty();
+    this.addDefaultItemIfEmpty();
   }
 
-  addDefaultAttachmentIfEmpty() {
+  addDefaultItemIfEmpty() {
     const { values } = this.props.form;
-    if (values.type === expenseTypes.INVOICE && isEmpty(values.attachments)) {
-      this.props.push(newAttachment());
+    if (values.type === expenseTypes.INVOICE && isEmpty(values.items)) {
+      this.props.push(newExpenseItem());
     }
   }
 
-  remove = attachment => {
-    const idx = this.props.form.values.attachments.findIndex(a => a.id === attachment.id);
+  remove = item => {
+    const idx = this.props.form.values.items.findIndex(a => a.id === item.id);
     if (idx !== -1) {
       this.props.remove(idx);
     }
@@ -69,15 +69,15 @@ export default class ExpenseFormAttachments extends React.PureComponent {
   render() {
     const { values, errors } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
-    const attachments = values.attachments || [];
-    const hasAttachments = attachments.length > 0;
+    const items = values.items || [];
+    const hasItems = items.length > 0;
 
-    if (!hasAttachments && requireFile) {
+    if (!hasItems && requireFile) {
       return (
         <StyledDropzone
           {...attachmentDropzoneParams}
           data-cy="expense-multi-attachments-dropzone"
-          onSuccess={files => filesListToAttachments(files).map(this.props.push)}
+          onSuccess={files => filesListToItems(files).map(this.props.push)}
           showDefaultMessage
           mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
           mb={3}
@@ -93,15 +93,15 @@ export default class ExpenseFormAttachments extends React.PureComponent {
       );
     }
 
-    const onRemove = requireFile || attachments.length > 1 ? this.remove : null;
+    const onRemove = requireFile || items.length > 1 ? this.remove : null;
     return (
       <Box>
-        {attachments.map((attachment, index) => (
-          <ExpenseAttachmentForm
-            key={`attachment-${attachment.id}`}
+        {items.map((attachment, index) => (
+          <ExpenseItemForm
+            key={`item-${attachment.id}`}
             attachment={attachment}
             currency={values.currency}
-            name={`attachments[${index}]`}
+            name={`items[${index}]`}
             errors={errors}
             onRemove={onRemove}
             requireFile={requireFile}
@@ -112,9 +112,9 @@ export default class ExpenseFormAttachments extends React.PureComponent {
           buttonStyle="secondary"
           width="100%"
           onClick={() => {
-            this.props.push(newAttachment());
-            if (!hasAttachments) {
-              this.props.push(newAttachment());
+            this.props.push(newExpenseItem());
+            if (!hasItems) {
+              this.props.push(newExpenseItem());
             }
           }}
         >
@@ -132,7 +132,7 @@ export default class ExpenseFormAttachments extends React.PureComponent {
             <Container fontSize="Caption" fontWeight="bold" mr={3} whiteSpace="nowrap">
               <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
             </Container>
-            <AttachmentsTotalAmount name={name} currency={values.currency} attachments={attachments} />
+            <ExpenseItemsTotalAmount name={name} currency={values.currency} items={items} />
           </Flex>
         </Container>
       </Box>
