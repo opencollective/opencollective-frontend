@@ -385,9 +385,9 @@ class ExpensePage extends React.Component {
                   isLoading={data.loading}
                   collective={collective}
                   host={host}
-                  expense={editedExpense || expense}
+                  expense={status === PAGE_STATUS.VIEW ? expense : editedExpense}
                   isEditing={status === PAGE_STATUS.EDIT}
-                  onChange={tags =>
+                  onChangeTags={tags =>
                     this.setState(({ editedExpense }) => ({ editedExpense: { ...editedExpense, tags } }))
                   }
                 />

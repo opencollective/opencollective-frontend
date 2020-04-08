@@ -17,10 +17,10 @@ import StyledInputTags from '../components/StyledInputTags';
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, onChange }) => {
+const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, onChangeTags }) => {
   const handleTagUpdate = tags => {
     const labels = tags.map(t => t.value.toUpperCase());
-    onChange(labels);
+    onChangeTags(labels);
   };
 
   return (
@@ -82,7 +82,7 @@ const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, o
 ExpenseInfoSidebar.propTypes = {
   isLoading: PropTypes.bool,
   isEditing: PropTypes.bool,
-  onChange: PropTypes.func,
+  onChangeTags: PropTypes.func,
   /** Must be provided if isLoading is false */
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
