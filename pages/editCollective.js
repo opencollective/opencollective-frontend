@@ -38,7 +38,7 @@ class EditCollectivePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { Collective: get(props, 'data.Collective') };
+    this.state = { Collective: get(props, 'data.Collective'), loading: false };
   }
 
   async componentDidMount() {
@@ -52,8 +52,17 @@ class EditCollectivePage extends React.Component {
     // during re-hydratation.
     // See https://github.com/opencollective/opencollective/issues/1872
     const currentCollective = get(this.props, 'data.Collective');
-    if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
-      this.setState({ Collective: currentCollective });
+    if (currentCollective && get(oldProps, 'data.Collective.id') !== currentCollective.id) {
+      // const refetch = get(oldProps, 'data.Collective.id') ? true : false;
+      // TODO: to implement and avoid double fetching. no-cache ?
+      const refetch = false;
+      this.setState({ Collective: currentCollective, loading: refetch }, () => {
+        // Edge case: same component, different collective (moving from edit to another edit through the menu)
+        // This will reload data and also should re-initialize Form and sub-components
+        if (refetch) {
+          return this.props.data.refetch().then(() => this.setState({ loading: false }));
+        }
+      });
     }
   }
 
@@ -61,7 +70,7 @@ class EditCollectivePage extends React.Component {
     const { data, editCollective, LoggedInUser, loadingLoggedInUser } = this.props;
     const collective = get(data, 'Collective') || this.state.Collective;
 
-    if ((data && data.loading) || loadingLoggedInUser) {
+    if (this.state.loading || (data && data.loading) || loadingLoggedInUser) {
       return (
         <Page>
           <Flex justifyContent="center" py={6}>
