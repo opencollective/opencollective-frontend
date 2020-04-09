@@ -6,12 +6,12 @@ import { groupBy } from 'lodash';
 import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import colors from '../lib/constants/colors';
+import colors from '../../lib/constants/colors';
 
-import InputField from './InputField';
+import InputField from '../InputField';
+
 import CreateOrganizationForm from './CreateOrganizationForm';
-
-import EditConnectedAccount from './edit-collective/EditConnectedAccount';
+import EditConnectedAccount from './EditConnectedAccount';
 
 const ConnectStripeBox = styled(Box)`
   text-align: right;

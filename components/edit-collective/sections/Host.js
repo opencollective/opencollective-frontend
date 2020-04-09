@@ -9,7 +9,6 @@ import { Button } from 'react-bootstrap';
 
 import { formatCurrency, getQueryParams, formatDate } from '../../../lib/utils';
 
-import CreateHostFormWithData from '../../CreateHostFormWithData';
 import HostsWithData from '../../HostsWithData';
 import CollectiveCard from '../../CollectiveCard';
 import Link from '../../Link';
@@ -17,6 +16,8 @@ import { P } from '../../Text';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
+
+import CreateHostFormWithData from '../CreateHostFormWithData';
 
 const Option = styled.div`
   h2 {

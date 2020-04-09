@@ -6,10 +6,10 @@ import gql from 'graphql-tag';
 
 import { Flex } from '@rebass/grid';
 
-import { getErrorFromGraphqlException } from '../lib/errors';
-import { compose } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 
-import LoadingGrid from './LoadingGrid';
+import LoadingGrid from '../LoadingGrid';
 import CreateHostForm from './CreateHostForm';
 
 class CreateHostFormWithData extends React.Component {
