@@ -6,13 +6,13 @@ import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { Box, Flex } from '@rebass/grid';
 import styled from 'styled-components';
-import confetti from 'canvas-confetti';
 
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 
 import orderSuccessBackgroundUrl from '../public/static/images/order-success-background.svg';
 
+import { confettiFireworks } from '../lib/confettis';
 import { tweetURL, facebooKShareURL } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';
 import Link from '../components/Link';
@@ -124,21 +124,9 @@ class OrderSuccessPage extends React.Component {
   }
 
   componentDidMount() {
-    const durationInSeconds = 10 * 1000;
-    const animationEnd = Date.now() + durationInSeconds;
-    const randomInRange = (min, max) => Math.random() * (max - min) + min;
-    const confettisParams = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      } else {
-        const particleCount = 50 * (timeLeft / durationInSeconds);
-        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0, 0.3), y: Math.random() - 0.2 } });
-        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0.7, 1), y: Math.random() - 0.2 } });
-      }
-    }, 250);
+    if (!this.props.data?.error) {
+      confettiFireworks();
+    }
   }
 
   renderUserProfileBtn(loading = false) {
