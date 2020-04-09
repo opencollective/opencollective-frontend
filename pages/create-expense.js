@@ -7,6 +7,7 @@ import React from 'react';
 import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
+import expenseTypes from '../lib/constants/expenseTypes';
 import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -27,6 +28,7 @@ import { withUser } from '../components/UserProvider';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
 import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 import {
@@ -146,12 +148,11 @@ class CreateExpensePage extends React.Component {
   onNotesChanges = e => {
     const name = e.target.name;
     const value = e.target.value;
-    this.setState(state => ({
-      expense: {
-        ...state.expense,
-        [name]: value,
-      },
-    }));
+    this.setState(state => ({ expense: { ...state.expense, [name]: value } }));
+  };
+
+  onAttachedFilesChange = attachedFiles => {
+    this.setState(state => ({ expense: { ...state.expense, attachedFiles } }));
   };
 
   setTags = tags => {
@@ -242,6 +243,13 @@ class CreateExpensePage extends React.Component {
                               }}
                             />
                             <ExpenseNotesForm onChange={this.onNotesChanges} />
+                            {this.state.expense.type === expenseTypes.INVOICE && (
+                              <React.Fragment>
+                                <br />
+                                <br />
+                                <ExpenseAttachedFilesForm onChange={this.onAttachedFilesChange} />
+                              </React.Fragment>
+                            )}
                             {this.state.error && (
                               <MessageBox type="error" withIcon mt={3}>
                                 {this.state.error.message}
@@ -249,7 +257,7 @@ class CreateExpensePage extends React.Component {
                             )}
                             <StyledButton
                               buttonStyle="primary"
-                              mt={3}
+                              mt={4}
                               data-cy="submit-expense-btn"
                               onClick={this.onSummarySubmit}
                               loading={this.state.isSubmitting}

@@ -9,14 +9,17 @@ import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 const msg = defineMessages({
   notesPlaceholder: {
     id: 'ExpenseSummary.addNotesPlaceholder',
-    defaultMessage: 'Add attachments, notes, or any other important thing. ',
+    defaultMessage: 'Add notes',
   },
 });
 
 const PrivateNoteLabel = () => {
   return (
     <Span fontSize="Caption" color="black.700">
-      <FormattedMessage id="ExpenseSummary.addNotesLabel" defaultMessage="Add notes or attachments" />
+      <FormattedMessage
+        id="ExpenseSummary.addNotesLabel"
+        defaultMessage="Add more details, notes, or any important information"
+      />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
     </Span>
