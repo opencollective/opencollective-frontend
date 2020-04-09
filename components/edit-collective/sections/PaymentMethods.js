@@ -192,7 +192,7 @@ class EditPaymentMethods extends React.Component {
   renderError(error) {
     if (typeof error === 'string') {
       return error;
-    } else if (error.id === 'PM.Remove.HasActiveSubscriptions') {
+    } else if (error.extensions.code === 'PM.Remove.HasActiveSubscriptions') {
       return (
         <React.Fragment>
           <FormattedMessage
