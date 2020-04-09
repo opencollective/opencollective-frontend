@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
+import { Link as RouterLink } from '../../../server/pages';
+
 import { P } from '../../Text';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import SectionTitle from '../SectionTitle';
 import Illustration from '../HomeIllustration';
 import StyledLink from '../../StyledLink';
-import Link from '../../Link';
 
 const Wrapper = styled(Container)`
   background-image: url('/static/images/home/fiscalhost-bg-sm.png');
@@ -67,16 +68,18 @@ const FiscalHost = () => (
           </P>
         </Box>
         <Box my={5} display="flex" flexDirection={['column', 'row']} alignItems="center">
-          <Link route="/become-a-fiscal-host" passHref>
-            <StyledButton mb={[3, 0]} minWidth={232} mr={[null, 3]}>
-              <FormattedMessage id="home.fiscalHost.becomeHostBtn" defaultMessage="Become a fiscal host" />
-            </StyledButton>
-          </Link>
-          <Link route="/hosts" passHref>
+          <RouterLink route="/become-a-fiscal-host">
+            <a>
+              <StyledButton mb={[3, 0]} minWidth={232} mr={[null, 3]}>
+                <FormattedMessage id="home.fiscalHost.becomeHostBtn" defaultMessage="Become a fiscal host" />
+              </StyledButton>
+            </a>
+          </RouterLink>
+          <RouterLink href="/hosts" passHref>
             <JoinHostLink buttonStyle="standard" buttonSize="medium" minWidth={232}>
               <FormattedMessage id="home.joinHost" defaultMessage="Join a fiscal host" />
             </JoinHostLink>
-          </Link>
+          </RouterLink>
         </Box>
       </Container>
       <Container ml={[null, null, null, null, 4]}>
