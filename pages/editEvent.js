@@ -36,14 +36,7 @@ class EditEventPage extends React.Component {
     }
 
     const event = data.Collective;
-    return (
-      <EditCollective
-        editCollective={editCollective}
-        collective={event}
-        LoggedInUser={LoggedInUser}
-        loggedInEditDataLoaded
-      />
-    );
+    return <EditCollective editCollective={editCollective} collective={event} LoggedInUser={LoggedInUser} />;
   }
 }
 

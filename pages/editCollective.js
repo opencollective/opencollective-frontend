@@ -23,13 +23,16 @@ class EditCollectivePage extends React.Component {
       res.set('Cache-Control', 'no-cache');
     }
 
-    const scripts = { googleMaps: true }; // Used in <InputTypeLocation>
-    return { slug: query && query.slug, query, ssr: false, scripts };
+    return {
+      slug: query.slug,
+      scripts: {
+        googleMaps: true, // Used in <InputTypeLocation>
+      },
+    };
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveToEditData
-    ssr: PropTypes.bool,
+    slug: PropTypes.string.isRequired, // for addCollectiveToEditData
     data: PropTypes.object, // from withData
     LoggedInUser: PropTypes.object, // from withLoggedInUser
     loadingLoggedInUser: PropTypes.bool, // from withLoggedInUser
@@ -90,12 +93,7 @@ class EditCollectivePage extends React.Component {
     return (
       <div>
         <GraphQLContext.Provider value={data}>
-          <EditCollective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            editCollective={editCollective}
-            loggedInEditDataLoaded
-          />
+          <EditCollective collective={collective} LoggedInUser={LoggedInUser} editCollective={editCollective} />
         </GraphQLContext.Provider>
       </div>
     );
