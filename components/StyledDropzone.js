@@ -55,7 +55,7 @@ const getUploadProgress = uploadProgressList => {
     return 0;
   } else {
     const totalUploadProgress = uploadProgressList.reduce((total, current) => total + current, 0);
-    return totalUploadProgress / uploadProgressList.length;
+    return Math.trunc(totalUploadProgress / uploadProgressList.length);
   }
 };
 
