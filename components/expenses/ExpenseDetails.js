@@ -98,8 +98,8 @@ class ExpenseDetails extends React.Component {
       const rootField = attr.split(/[[.]/)[0];
       const modified = uniq([...state.modified, rootField]);
       const expenseChangeset = pick(expense, [...modified, 'id']);
-      if (expenseChangeset.attachments) {
-        expenseChangeset.attachments = expenseChangeset.attachments.map(a => omit(a, ['__typename']));
+      if (expenseChangeset.items) {
+        expenseChangeset.items = expenseChangeset.items.map(a => omit(a, ['__typename']));
       }
       this.props.onChange && this.props.onChange(expenseChangeset);
       return { modified, expense };
@@ -154,7 +154,7 @@ class ExpenseDetails extends React.Component {
       { [expenseTypes.RECEIPT]: intl.formatMessage(this.messages.expenseTypeReceipt) },
       { [expenseTypes.INVOICE]: intl.formatMessage(this.messages.expenseTypeInvoice) },
     ];
-    const attachmentsWithFiles = expense.attachments?.filter(attachment => Boolean(attachment.url)) || [];
+    const itemsWithFiles = expense.items?.filter(item => Boolean(item.url)) || [];
     const canDownloadAttachments =
       isAuthor ||
       LoggedInUser?.canEditCollective(expense.collective) ||
@@ -379,7 +379,7 @@ class ExpenseDetails extends React.Component {
             <label>
               <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
             </label>
-            {expense.type === expenseTypes.INVOICE && attachmentsWithFiles.length === 0 && (
+            {expense.type === expenseTypes.INVOICE && itemsWithFiles.length === 0 && (
               <ExpenseInvoiceDownloadHelper
                 collective={expense.collective}
                 expense={{ id: expense.idV2, legacyId: expense.id }}
@@ -400,7 +400,7 @@ class ExpenseDetails extends React.Component {
                 )}
               </ExpenseInvoiceDownloadHelper>
             )}
-            {attachmentsWithFiles.map((attachment, idx) => (
+            {itemsWithFiles.map((attachment, idx) => (
               <div key={attachment.id}>
                 <div className="frame">
                   {editMode && (
@@ -457,7 +457,7 @@ const getExpenseQuery = gql`
       status
       currency
       attachment
-      attachments {
+      items {
         id
         url
         description

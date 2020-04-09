@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Apr 07 2020 14:59:39 GMT+0200 (GMT+02:00)
+# timestamp: Thu Apr 09 2020 12:11:18 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -1228,31 +1228,6 @@ type Expense implements Transaction {
 }
 
 """
-Public fields for an expense attachment
-"""
-type ExpenseAttachment {
-  id: Int!
-  amount: Int!
-  createdAt: IsoDateString!
-  updatedAt: IsoDateString!
-  incurredAt: IsoDateString!
-  deletedAt: IsoDateString
-  description: String
-  url: String
-}
-
-"""
-Fields for creating or editing an expense attachment
-"""
-input ExpenseAttachmentInputType {
-  id: Int
-  url: String
-  amount: Int!
-  incurredAt: DateString
-  description: String
-}
-
-"""
 Input type for ExpenseType
 """
 input ExpenseInputType {
@@ -1273,9 +1248,35 @@ input ExpenseInputType {
   PayoutMethod: PayoutMethodInput
   privateMessage: String
   attachment: String
-  attachments: [ExpenseAttachmentInputType]
+  attachments: [ExpenseItemInputType]
+  items: [ExpenseItemInputType]
   user: UserInputType
   collective: CollectiveAttributesInputType
+}
+
+"""
+Public fields for an expense item
+"""
+type ExpenseItem {
+  id: Int!
+  amount: Int!
+  createdAt: IsoDateString!
+  updatedAt: IsoDateString!
+  incurredAt: IsoDateString!
+  deletedAt: IsoDateString
+  description: String
+  url: String
+}
+
+"""
+Fields for creating or editing an expense item
+"""
+input ExpenseItemInputType {
+  id: Int
+  url: String
+  amount: Int!
+  incurredAt: DateString
+  description: String
 }
 
 """
@@ -1330,21 +1331,17 @@ type ExpenseType {
   updatedAt: DateString
   incurredAt: DateString
   description: String
-  category: String
+  category: String @deprecated(reason: "2020-04-01 - Please use tags")
   tags: [String]
   status: String
   type: String
   payoutMethod: String @deprecated(reason: "2020-01-23 - Please use the private field instead.")
   PayoutMethod: PayoutMethod
-
-  """
-  Informs the frontend about what fields are accessible in the expense for current user
-  """
-  canSeePrivateInfo: ExpenseViewPermissions
   privateMessage: String
   attachment: String
     @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
-  attachments: [ExpenseAttachment]
+  attachments: [ExpenseItem] @deprecated(reason: "2020-04-09 - Please use items")
+  items: [ExpenseItem]
   userTaxFormRequiredBeforePayment: Boolean
   user: UserDetails
   fromCollective: CollectiveInterface
@@ -1355,16 +1352,6 @@ type ExpenseType {
   Returns the DEBIT transaction to pay out this expense
   """
   transaction: Transaction
-}
-
-"""
-Returns info about whether user is allowed to see expense's private info, such as attachment's URLS or payout methods.
-"""
-type ExpenseViewPermissions {
-  attachments: Boolean
-  payoutMethod: Boolean
-  userLocation: Boolean
-  invoiceInfo: Boolean
 }
 
 """

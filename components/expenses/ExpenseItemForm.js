@@ -53,9 +53,9 @@ export const PreviewImg = styled.img`
   border-radius: 10px;
 `;
 
-/** Validates a single attachment, one field at a time (doesn't return multiple errors) */
-export const validateAttachment = (expense, attachment) => {
-  const errors = requireFields(attachment, ['description', 'incurredAt', 'amount']);
+/** Validates a single expense item, one field at a time (doesn't return multiple errors) */
+export const validateExpenseItem = (expense, item) => {
+  const errors = requireFields(item, ['description', 'incurredAt', 'amount']);
 
   if (!isEmpty(errors)) {
     return errors;
@@ -63,9 +63,9 @@ export const validateAttachment = (expense, attachment) => {
 
   // Attachment URL
   if (attachmentRequiresFile(expense.type)) {
-    if (!attachment.url) {
+    if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
-    } else if (!isURL(attachment.url)) {
+    } else if (!isURL(item.url)) {
       errors.url = createError(ERROR.FORM_FIELD_BAD_PATTERN);
     }
   }
@@ -84,7 +84,7 @@ const AttachmentLabel = () => (
 /**
  * Form for a single attachment. Must be used with Formik.
  */
-const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, requireFile, name }) => {
+const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, name }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
@@ -206,7 +206,7 @@ const ExpenseAttachmentForm = ({ attachment, errors, onRemove, currency, require
   );
 };
 
-ExpenseAttachmentForm.propTypes = {
+ExpenseItemForm.propTypes = {
   /** The currency of the collective */
   currency: PropTypes.string.isRequired,
   /** ReactHookForm key */
@@ -227,6 +227,6 @@ ExpenseAttachmentForm.propTypes = {
   }).isRequired,
 };
 
-ExpenseAttachmentForm.whyDidYouRender = true;
+ExpenseItemForm.whyDidYouRender = true;
 
-export default React.memo(ExpenseAttachmentForm);
+export default React.memo(ExpenseItemForm);

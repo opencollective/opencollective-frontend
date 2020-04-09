@@ -17,7 +17,7 @@ import LinkCollective from '../LinkCollective';
 import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { H4, P, Span } from '../Text';
-import AttachmentsTotalAmount from './AttachmentsTotalAmount';
+import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import PayoutMethodData from './PayoutMethodData';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import ExternalLink from '../ExternalLink';
@@ -182,8 +182,8 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
               <FormattedMessage id="ReceiptItems" defaultMessage="Expense receipts" />
             )}
           </P>
-          <div data-cy="expense-summary-attachments">
-            {expense.attachments.map((attachment, idx) => (
+          <div data-cy="expense-summary-items">
+            {expense.items.map((attachment, idx) => (
               <React.Fragment key={attachment.id}>
                 <Flex justifyContent="space-between" alignItems="center" my={24}>
                   {expense.type === expenseTypes.RECEIPT ? (
@@ -241,7 +241,7 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
                     />
                   </P>
                 </Flex>
-                {idx + 1 !== expense.attachments.length && <StyledHr borderStyle="dotted" />}
+                {idx + 1 !== expense.items.length && <StyledHr borderStyle="dotted" />}
               </React.Fragment>
             ))}
           </div>
@@ -256,7 +256,7 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
           {isLoading ? (
             <LoadingPlaceholder height={18} width={100} />
           ) : (
-            <AttachmentsTotalAmount currency={expense.currency} attachments={expense.attachments} />
+            <ExpenseItemsTotalAmount currency={expense.currency} items={expense.items} />
           )}
         </Flex>
       </Flex>
@@ -287,7 +287,7 @@ ExpenseSummary.propTypes = {
     status: PropTypes.oneOf(Object.values(expenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
-    attachments: PropTypes.arrayOf(
+    items: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
         incurredAt: PropTypes.string,

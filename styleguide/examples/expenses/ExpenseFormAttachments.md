@@ -7,7 +7,7 @@
 ```jsx
 import { Formik, FieldArray } from 'formik';
 <Formik initialValues={{ type: 'RECEIPT', currency: 'USD' }}>
-  {() => <FieldArray name="attachments" component={ExpenseFormAttachments} />}
+  {() => <FieldArray name="items" component={ExpenseFormItems} />}
 </Formik>;
 ```
 
@@ -16,11 +16,11 @@ import { Formik, FieldArray } from 'formik';
 ```jsx
 import { Formik, FieldArray } from 'formik';
 <Formik initialValues={{ type: 'INVOICE', currency: 'EUR' }}>
-  {() => <FieldArray name="attachments" component={ExpenseFormAttachments} />}
+  {() => <FieldArray name="items" component={ExpenseFormItems} />}
 </Formik>;
 ```
 
-### With some attachments
+### With some items
 
 ```jsx
 import { Formik, FieldArray } from 'formik';
@@ -28,18 +28,18 @@ import { Formik, FieldArray } from 'formik';
   initialValues={{
     type: 'RECEIPT',
     currency: 'USD',
-    attachments: [
+    items: [
       { id: '1', url: 'https://loremflickr.com/120/120/invoice?lock=1', incurredAt: '2020-02-07' },
       { id: '2', url: 'https://loremflickr.com/120/120/invoice?lock=2', incurredAt: '2020-02-07' },
       { id: '3', url: 'https://loremflickr.com/120/120/invoice?lock=3', incurredAt: '2020-02-07' },
     ],
   }}
 >
-  {() => <FieldArray name="attachments" component={ExpenseFormAttachments} />}
+  {() => <FieldArray name="items" component={ExpenseFormItems} />}
 </Formik>;
 ```
 
-### With some attachments (mobile)
+### With some items (mobile)
 
 ```jsx
 import { Formik, FieldArray } from 'formik';
@@ -48,14 +48,14 @@ import { Formik, FieldArray } from 'formik';
     initialValues={{
       type: 'RECEIPT',
       currency: 'EUR',
-      attachments: [
+      items: [
         { id: '1', url: 'https://loremflickr.com/120/120/invoice?lock=4', incurredAt: '2020-02-07' },
         { id: '2', url: 'https://loremflickr.com/120/120/invoice?lock=5', incurredAt: '2020-02-07' },
         { id: '3', url: 'https://loremflickr.com/120/120/invoice?lock=6', incurredAt: '2020-02-07' },
       ],
     }}
   >
-    {() => <FieldArray name="attachments" component={ExpenseFormAttachments} />}
+    {() => <FieldArray name="items" component={ExpenseFormItems} />}
   </Formik>
   ;
 </div>;

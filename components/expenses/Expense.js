@@ -647,7 +647,7 @@ const editExpense = graphql(
         description
         amount
         attachment
-        attachments {
+        items {
           id
           url
           description

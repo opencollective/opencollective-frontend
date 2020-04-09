@@ -49,7 +49,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     status
     privateMessage
     tags
-    attachments {
+    items {
       id
       incurredAt
       description
