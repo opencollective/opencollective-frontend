@@ -920,7 +920,7 @@
   "host.tos": "Conditions de l'hôte fiscal",
   "host.types.label": "Catégorie de l'entité de l'hôte",
   "host.types.organization.description": "L’entité légale (idéalement une organisation non gouvernementale) recevra des fonds et des factures d’émission au nom du collectif. Une solution recommandée si vous envisagez d’animer plusieurs collectifs ou si vous anticipez d’encaisser plus que $10,000/an pour votre collectif.",
-  "host.types.organization.label": "une entreprise",
+  "host.types.organization.label": "une organisation",
   "host.types.user.description": "Vous recevrez les fonds du collectif sous votre propre nom. Merci de vérifier avec les autorités fiscales locales que vous n’avez pas à déclarer les dons comme revenu imposable.",
   "host.types.user.label": "un individu",
   "HostedCollectives": "Collectifs hébergés",
