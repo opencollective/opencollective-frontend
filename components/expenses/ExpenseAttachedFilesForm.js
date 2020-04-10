@@ -24,16 +24,6 @@ const PrivateNoteLabel = () => {
 const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
 
-  const onSuccess = React.useCallback(
-    urls => {
-      const newFiles = urls.map(url => ({ url }));
-      const updatedFiles = uniqBy([...files, ...newFiles], 'url');
-      setFiles(updatedFiles);
-      onChange(updatedFiles);
-    },
-    [files],
-  );
-
   return (
     <StyledInputField
       name="attachedFiles"
@@ -62,7 +52,12 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
             {...attachmentDropzoneParams}
             isMulti
             disabled={disabled}
-            onSuccess={onSuccess}
+            onSuccess={urls => {
+              const newFiles = urls.map(url => ({ url }));
+              const updatedFiles = uniqBy([...files, ...newFiles], 'url');
+              setFiles(updatedFiles);
+              onChange(updatedFiles);
+            }}
           />
         </div>
       )}
@@ -71,7 +66,11 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
 };
 
 ExpenseAttachedFilesForm.propTypes = {
-  defaultValue: PropTypes.string,
+  defaultValue: PropTypes.arrayOf(
+    PropTypes.shape({
+      url: PropTypes.string.isRequired,
+    }),
+  ),
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
 };

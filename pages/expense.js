@@ -299,7 +299,7 @@ class ExpensePage extends React.Component {
                             <FormattedMessage id="expense.notes" defaultMessage="Notes" />
                           </H5>
                           <PrivateNoteLabel />
-                          <P color="black.700" mt={1} fontSize="LeadCaption">
+                          <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre">
                             {expense.privateMessage}
                           </P>
                         </Box>
