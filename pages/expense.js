@@ -356,16 +356,16 @@ class ExpensePage extends React.Component {
                     collective={collective}
                     loading={loadingLoggedInUser}
                     expense={editedExpense}
-                    onSubmit={expense =>
-                      this.setState(({ editedExpense }) => ({
-                        editedExpense: { ...editedExpense, expense },
-                        status: PAGE_STATUS.EDIT_SUMMARY,
-                      }))
-                    }
                     payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                     onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                     validateOnChange
                     disableSubmitIfUntouched
+                    onSubmit={expense =>
+                      this.setState({
+                        editedExpense: { ...expense, tags: editedExpense.tags },
+                        status: PAGE_STATUS.EDIT_SUMMARY,
+                      })
+                    }
                   />
                 </Box>
               )}
