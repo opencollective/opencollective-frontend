@@ -14,7 +14,6 @@ import { P } from './Text';
 import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
-import ContainerOverlay from './ContainerOverlay';
 
 const Dropzone = styled(Container)`
   border: 1px dashed #c4c7cc;
@@ -88,32 +87,35 @@ const StyledDropzone = ({
     minSize,
     maxSize,
     multiple: isMulti,
-    onDrop: React.useCallback(async (acceptedFiles, rejectedFiles) => {
-      setUploading(true);
-      const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
-      const files = await Promise.all(
-        filesToUpload.map((file, index) =>
-          uploadImageWithXHR(file, {
-            mockImage: mockImageGenerator && mockImageGenerator(index),
-            onProgress: progress => {
-              const newProgressList = [...uploadProgressList];
-              newProgressList.splice(index, 0, progress);
-              setUploadProgressList(newProgressList);
-            },
-          }),
-        ),
-      );
+    onDrop: React.useCallback(
+      async (acceptedFiles, rejectedFiles) => {
+        setUploading(true);
+        const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
+        const files = await Promise.all(
+          filesToUpload.map((file, index) =>
+            uploadImageWithXHR(file, {
+              mockImage: mockImageGenerator && mockImageGenerator(index),
+              onProgress: progress => {
+                const newProgressList = [...uploadProgressList];
+                newProgressList.splice(index, 0, progress);
+                setUploadProgressList(newProgressList);
+              },
+            }),
+          ),
+        );
 
-      setUploading(false);
+        setUploading(false);
 
-      if (onSuccess) {
-        await onSuccess(isMulti ? files : files[0]);
-      }
+        if (onSuccess) {
+          await onSuccess(isMulti ? files : files[0]);
+        }
 
-      if (onReject) {
-        onReject(isMulti ? rejectedFiles : rejectedFiles[0]);
-      }
-    }, []),
+        if (onReject) {
+          onReject(isMulti ? rejectedFiles : rejectedFiles[0]);
+        }
+      },
+      [isMulti, onSuccess, onReject, mockImageGenerator, uploadProgressList],
+    ),
   });
 
   minHeight = size || minHeight;
@@ -144,8 +146,8 @@ const StyledDropzone = ({
         </Container>
       ) : (
         <Container my={3} maxHeight="100%" maxWidth="100%" position="relative">
-          {isDragActive && (
-            <ContainerOverlay backgroundType="white" backgroundOpacity={1} color="primary.500">
+          {isDragActive ? (
+            <Container color="primary.500">
               <Box mb={2}>
                 <DownloadIcon size={20} />
               </Box>
@@ -154,27 +156,30 @@ const StyledDropzone = ({
                 defaultMessage="Drop {count,plural, one {file} other {files}} here"
                 values={{ count: isMulti ? 2 : 1 }}
               />
-            </ContainerOverlay>
-          )}
-          {showDefaultMessage && (
-            <P color="black.500" px={2} fontSize={fontSize}>
-              {isMulti ? (
-                <FormattedMessage
-                  id="DropZone.UploadBox"
-                  defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
-                  values={{ 'i18n-link': getI18nLink() }}
-                />
-              ) : (
-                <FormattedMessage
-                  id="DragAndDropOrClickToUpload"
-                  defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
-                  values={{ 'i18n-link': getI18nLink() }}
-                  tagName="span"
-                />
+            </Container>
+          ) : (
+            <React.Fragment>
+              {showDefaultMessage && (
+                <P color="black.500" px={2} fontSize={fontSize}>
+                  {isMulti ? (
+                    <FormattedMessage
+                      id="DropZone.UploadBox"
+                      defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
+                      values={{ 'i18n-link': getI18nLink() }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="DragAndDropOrClickToUpload"
+                      defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
+                      values={{ 'i18n-link': getI18nLink() }}
+                      tagName="span"
+                    />
+                  )}
+                </P>
               )}
-            </P>
+              {children}
+            </React.Fragment>
           )}
-          {children}
         </Container>
       )}
     </Dropzone>
