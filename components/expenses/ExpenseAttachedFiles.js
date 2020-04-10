@@ -29,7 +29,7 @@ const ExpenseAttachedFiles = ({ files, onRemove }) => {
   return (
     <Flex flexWrap="wrap">
       {files.map((file, idx) => (
-        <Box key={file.id}>
+        <Box key={file.id || file.url}>
           <ImageLink href={file.url}>
             <img src={file.url} alt={`Attachment ${idx}`} />
           </ImageLink>
@@ -53,7 +53,7 @@ const ExpenseAttachedFiles = ({ files, onRemove }) => {
 ExpenseAttachedFiles.propTypes = {
   files: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.string,
       url: PropTypes.string.isRequired,
     }).isRequired,
   ).isRequired,
