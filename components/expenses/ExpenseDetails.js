@@ -409,7 +409,7 @@ class ExpenseDetails extends React.Component {
                       options={{ accept: 'image/jpeg, image/png, application/pdf', canRemove: false }}
                       name={`attachment-${attachment.id}`}
                       className="attachmentField"
-                      onChange={attachment => this.handleChange(`attachments[${idx}].url`, attachment)}
+                      onChange={attachment => this.handleChange(`items[${idx}].url`, attachment)}
                       defaultValue={attachment.url || '/static/images/receipt.svg'}
                     />
                   )}
