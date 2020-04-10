@@ -117,6 +117,7 @@ class ExpensePage extends React.Component {
               <ExpenseWithData
                 id={ExpenseId}
                 collective={collective}
+                host={collective.host}
                 view="details"
                 LoggedInUser={LoggedInUser}
                 allowPayAction={!this.state.isPayActionLocked}
