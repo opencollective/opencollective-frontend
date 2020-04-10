@@ -87,32 +87,35 @@ const StyledDropzone = ({
     minSize,
     maxSize,
     multiple: isMulti,
-    onDrop: React.useCallback(async (acceptedFiles, rejectedFiles) => {
-      setUploading(true);
-      const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
-      const files = await Promise.all(
-        filesToUpload.map((file, index) =>
-          uploadImageWithXHR(file, {
-            mockImage: mockImageGenerator && mockImageGenerator(index),
-            onProgress: progress => {
-              const newProgressList = [...uploadProgressList];
-              newProgressList.splice(index, 0, progress);
-              setUploadProgressList(newProgressList);
-            },
-          }),
-        ),
-      );
+    onDrop: React.useCallback(
+      async (acceptedFiles, rejectedFiles) => {
+        setUploading(true);
+        const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
+        const files = await Promise.all(
+          filesToUpload.map((file, index) =>
+            uploadImageWithXHR(file, {
+              mockImage: mockImageGenerator && mockImageGenerator(index),
+              onProgress: progress => {
+                const newProgressList = [...uploadProgressList];
+                newProgressList.splice(index, 0, progress);
+                setUploadProgressList(newProgressList);
+              },
+            }),
+          ),
+        );
 
-      setUploading(false);
+        setUploading(false);
 
-      if (onSuccess) {
-        await onSuccess(isMulti ? files : files[0]);
-      }
+        if (onSuccess) {
+          await onSuccess(isMulti ? files : files[0]);
+        }
 
-      if (onReject) {
-        onReject(isMulti ? rejectedFiles : rejectedFiles[0]);
-      }
-    }, []),
+        if (onReject) {
+          onReject(isMulti ? rejectedFiles : rejectedFiles[0]);
+        }
+      },
+      [isMulti, onSuccess, onReject, mockImageGenerator, uploadProgressList],
+    ),
   });
 
   minHeight = size || minHeight;
