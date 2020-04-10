@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Apr 09 2020 12:11:45 GMT+0200 (GMT+02:00)
+# timestamp: Thu Apr 09 2020 21:37:52 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -1302,6 +1302,7 @@ type Host implements Account {
   """
   location: Location
   stats: AccountStats
+  hostFeePercent: Int
   totalHostedCollectives: Int
 }
 
