@@ -26,8 +26,6 @@ export default class InvoiceDownloadLink extends Component {
     dateTo: PropTypes.string,
     /** Invoice date to */
     invoice: PropTypes.object,
-    /** Invoice Recipient */
-    recipient: PropTypes.string,
     /** Transaction creation date */
     createdAt: PropTypes.string,
   };
@@ -45,10 +43,10 @@ export default class InvoiceDownloadLink extends Component {
   }
 
   getFilename() {
-    const { fromCollectiveSlug, toCollectiveSlug, dateFrom, dateTo, recipient, createdAt } = this.props;
+    const { fromCollectiveSlug, toCollectiveSlug, dateFrom, dateTo, createdAt } = this.props;
     if (this.props.type === 'transaction') {
       const createdAtString = toIsoDateStr(createdAt ? new Date(createdAt) : new Date());
-      return `${recipient}_${createdAtString}_${this.props.transactionUuid}.pdf`;
+      return `${toCollectiveSlug || 'transaction'}_${createdAtString}_${this.props.transactionUuid}.pdf`;
     } else {
       const fromString = toIsoDateStr(dateFrom ? new Date(dateFrom) : new Date());
       const toString = toIsoDateStr(dateTo ? new Date(dateTo) : new Date());
