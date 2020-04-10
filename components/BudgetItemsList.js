@@ -447,7 +447,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
               toCollectiveSlug={collective.slug}
             >
               {({ loading, download }) => (
-                <StyledButton buttonSize="small" loading={loading} onClick={download} minWidth={140} height={30}>
+                <StyledButton buttonSize="small" loading={loading} onClick={download} minWidth={140}>
                   <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />
                 </StyledButton>
               )}
