@@ -17,6 +17,7 @@ import { Span } from '../Text';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 import StyledDropzone from '../StyledDropzone';
 import StyledButton from '../StyledButton';
+import UploadedFilePreview from '../UploadedFilePreview';
 
 export const msg = defineMessages({
   previewImgAlt: {
@@ -45,12 +46,6 @@ export const FormFieldsContainer = styled.div`
   border-bottom: 1px dashed #eaeaea;
   display: flex;
   margin-bottom: 18px;
-`;
-
-export const PreviewImg = styled.img`
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
 `;
 
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
@@ -116,7 +111,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                   fontSize="LeadCaption"
                   size={112}
                 >
-                  {hasValidUrl && <PreviewImg src={field.value} alt={formatMessage(msg.previewImgAlt)} />}
+                  {hasValidUrl && <UploadedFilePreview size={112} url={field.value} hasLink={false} border="none" />}
                 </StyledDropzone>
               </StyledInputField>
             );

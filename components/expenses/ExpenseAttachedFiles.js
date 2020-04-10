@@ -2,37 +2,17 @@ import { Box, Flex } from '@rebass/grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
-import ExternalLink from '../ExternalLink';
 import StyledButton from '../StyledButton';
-
-const ImageLink = styled(ExternalLink).attrs({ openInNewTab: true })`
-  border: 1px solid #dcdee0;
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  overflow: hidden;
-  width: 88px;
-  height: 88px;
-  display: block;
-  margin-right: 16px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    max-height: 100%;
-    max-width: 100%;
-  }
-`;
+import UploadedFilePreview from '../UploadedFilePreview';
 
 const ExpenseAttachedFiles = ({ files, onRemove }) => {
   return (
     <Flex flexWrap="wrap">
       {files.map((file, idx) => (
-        <Box key={file.id || file.url}>
-          <ImageLink href={file.url}>
+        <Box key={file.id || file.url} mr={3}>
+          <UploadedFilePreview size={88} url={file.url}>
             <img src={file.url} alt={`Attachment ${idx}`} />
-          </ImageLink>
+          </UploadedFilePreview>
           {onRemove && (
             <StyledButton
               isBorderless
