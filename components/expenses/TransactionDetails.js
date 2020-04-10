@@ -276,7 +276,7 @@ class TransactionDetails extends React.Component {
                 <InvoiceDownloadLink
                   type="transaction"
                   transactionUuid={uuid}
-                  recipient={recipient.name}
+                  toCollectiveSlug={recipient.slug}
                   createdAt={createdAt}
                 >
                   {({ loading, download }) => (
