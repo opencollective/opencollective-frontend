@@ -66,7 +66,11 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
 };
 
 ExpenseAttachedFilesForm.propTypes = {
-  defaultValue: PropTypes.string,
+  defaultValue: PropTypes.arrayOf(
+    PropTypes.shape({
+      url: PropTypes.string.isRequired,
+    }),
+  ),
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
 };
