@@ -64,7 +64,7 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
  */
 export const prepareExpenseForSubmit = expenseData => {
   return {
-    ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'tags']),
+    ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee: pick(expenseData.payee, ['id']),
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
     attachedFiles: expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])),
