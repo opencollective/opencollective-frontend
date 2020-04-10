@@ -14,7 +14,6 @@ import { P } from './Text';
 import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
-import ContainerOverlay from './ContainerOverlay';
 
 const Dropzone = styled(Container)`
   border: 1px dashed #c4c7cc;
@@ -144,8 +143,8 @@ const StyledDropzone = ({
         </Container>
       ) : (
         <Container my={3} maxHeight="100%" maxWidth="100%" position="relative">
-          {isDragActive && (
-            <ContainerOverlay backgroundType="white" backgroundOpacity={1} color="primary.500">
+          {isDragActive ? (
+            <Container color="primary.500">
               <Box mb={2}>
                 <DownloadIcon size={20} />
               </Box>
@@ -154,27 +153,30 @@ const StyledDropzone = ({
                 defaultMessage="Drop {count,plural, one {file} other {files}} here"
                 values={{ count: isMulti ? 2 : 1 }}
               />
-            </ContainerOverlay>
-          )}
-          {showDefaultMessage && (
-            <P color="black.500" px={2} fontSize={fontSize}>
-              {isMulti ? (
-                <FormattedMessage
-                  id="DropZone.UploadBox"
-                  defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
-                  values={{ 'i18n-link': getI18nLink() }}
-                />
-              ) : (
-                <FormattedMessage
-                  id="DragAndDropOrClickToUpload"
-                  defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
-                  values={{ 'i18n-link': getI18nLink() }}
-                  tagName="span"
-                />
+            </Container>
+          ) : (
+            <React.Fragment>
+              {showDefaultMessage && (
+                <P color="black.500" px={2} fontSize={fontSize}>
+                  {isMulti ? (
+                    <FormattedMessage
+                      id="DropZone.UploadBox"
+                      defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
+                      values={{ 'i18n-link': getI18nLink() }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="DragAndDropOrClickToUpload"
+                      defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
+                      values={{ 'i18n-link': getI18nLink() }}
+                      tagName="span"
+                    />
+                  )}
+                </P>
               )}
-            </P>
+              {children}
+            </React.Fragment>
           )}
-          {children}
         </Container>
       )}
     </Dropzone>
