@@ -36,7 +36,7 @@ const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, o
           ) : (
             <Flex flexWrap="wrap">
               {expense?.tags?.map(tag => (
-                <StyledTag mb="8px" mr="8px">
+                <StyledTag mb="8px" mr="8px" key={tag}>
                   {tag}
                 </StyledTag>
               ))}
