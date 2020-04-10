@@ -11,7 +11,7 @@ const renderObject = object =>
     if (isObject(value)) {
       return [
         ...acc,
-        <P key={key} fontSize="Caption" fontWeight="bold">
+        <P key={key} fontSize="Caption" fontWeight="bold" lineHeight="Caption" mt={2}>
           {startCase(key)}
         </P>,
         ...renderObject(value),
@@ -19,7 +19,7 @@ const renderObject = object =>
     } else {
       return [
         ...acc,
-        <P key={key} fontSize="Caption">
+        <P key={key} fontSize="Caption" lineHeight="Caption">
           {startCase(key)}: {value}
         </P>,
       ];

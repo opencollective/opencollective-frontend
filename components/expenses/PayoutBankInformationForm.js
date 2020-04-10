@@ -198,6 +198,8 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
             name={field.name}
             error={meta.error && formatFormErrorMessage(meta.error)}
             label={formatMessage(msg.currency)}
+            mt={3}
+            mb={2}
           >
             {({ id }) => (
               <StyledSelect

@@ -136,9 +136,9 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
               {!expense.payoutMethod?.data && isLoadingLoggedInUser ? (
                 <LoadingPlaceholder height={20} width={200} />
               ) : (
-                <P fontSize="Caption" color="black.600" data-cy="expense-summary-payout-method-data">
+                <Container fontSize="Caption" color="black.600" data-cy="expense-summary-payout-method-data">
                   <PayoutMethodData payoutMethod={expense.payoutMethod} />
-                </P>
+                </Container>
               )}
             </Box>
             <Box minWidth={250} mt={3}>
