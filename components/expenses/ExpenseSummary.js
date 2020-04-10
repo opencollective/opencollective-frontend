@@ -2,7 +2,6 @@ import { Box, Flex } from '@rebass/grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage, useIntl, FormattedDate } from 'react-intl';
-import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import expenseStatus from '../../lib/constants/expense-status';
@@ -20,25 +19,8 @@ import { H4, P, Span } from '../Text';
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import PayoutMethodData from './PayoutMethodData';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import ExternalLink from '../ExternalLink';
 import ExpenseStatusTag from './ExpenseStatusTag';
-
-const ImageContainer = styled.div`
-  border: 1px solid #dcdee0;
-  padding: 8px;
-  margin-right: 16px;
-  height: 88px;
-  width: 88px;
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  img {
-    width: 100%;
-    height: 100%;
-  }
-`;
+import UploadedFilePreview from '../UploadedFilePreview';
 
 /**
  * Last step of the create expense flow, shows the summary of the expense with
@@ -188,21 +170,13 @@ const ExpenseSummary = ({ expense, host, isLoading, isLoadingLoggedInUser }) => 
                 <Flex justifyContent="space-between" alignItems="center" my={24}>
                   {expense.type === expenseTypes.RECEIPT ? (
                     <Flex>
-                      {attachment.url ? (
-                        <ImageContainer>
-                          <ExternalLink openInNewTab href={attachment.url}>
-                            <img src={attachment.url} alt={`Receipt file for ${attachment.description}`} />
-                          </ExternalLink>
-                        </ImageContainer>
-                      ) : (
-                        <ImageContainer>
-                          {isLoading || isLoadingLoggedInUser ? (
-                            <LoadingPlaceholder />
-                          ) : (
-                            <PrivateInfoIcon color="#dcdee0" size={42} />
-                          )}
-                        </ImageContainer>
-                      )}
+                      <Box mr={3}>
+                        <UploadedFilePreview
+                          url={attachment.url}
+                          isLoading={isLoading}
+                          isPrivate={!attachment.url && !isLoading}
+                        />
+                      </Box>
                       <Flex flexDirection="column">
                         <Span mt={2} color="black.900" fontWeight="500">
                           {attachment.description || (
