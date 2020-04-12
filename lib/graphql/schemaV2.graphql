@@ -956,7 +956,7 @@ type ExpenseAttachedFile {
   Unique identifier for this file
   """
   id: String!
-  url: String
+  url: URL
 }
 
 input ExpenseAttachedFileInput {
@@ -968,7 +968,7 @@ input ExpenseAttachedFileInput {
   """
   URL of the file
   """
-  url: String!
+  url: URL!
 }
 
 input ExpenseCreateInput {
@@ -1057,7 +1057,7 @@ type ExpenseItem {
   A description for this item. Enforced for new items, but old expenses may not have one.
   """
   description: String
-  url: String
+  url: URL
 }
 
 input ExpenseItemCreateInput {
@@ -1074,7 +1074,7 @@ input ExpenseItemCreateInput {
   """
   URL of the file linked to this item. Must be provided if the expense type is RECEIPT.
   """
-  url: String
+  url: URL
 
   """
   When was the money spent?
@@ -2063,3 +2063,8 @@ type TransferWiseRequiredField {
   title: String
   fields: [TransferWiseField]
 }
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt
+"""
+scalar URL
