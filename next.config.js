@@ -14,8 +14,7 @@ const nextConfig = {
       new webpack.EnvironmentPlugin({
         API_KEY: null,
         API_URL: null,
-        INVOICES_URL: null,
-        GIFTCARDS_GENERATOR_URL: null,
+        PDF_SERVICE_URL: null,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         SENTRY_DSN: null,
