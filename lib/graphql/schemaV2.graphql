@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Apr 09 2020 21:37:52 GMT+0100 (British Summer Time)
+# timestamp: Tue Apr 14 2020 16:49:13 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -301,7 +301,22 @@ type Bot implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -401,7 +416,22 @@ type Collective implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -787,7 +817,22 @@ type Event implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -1260,7 +1305,22 @@ type Host implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -1356,7 +1416,22 @@ type Individual implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -1776,7 +1851,22 @@ type Organization implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
