@@ -47,12 +47,6 @@ class AcceptFinancialContributionsPage extends React.Component {
   }
 }
 
-const getCollective = graphql(getCollectivePageQuery, {
-  options: props => ({
-    variables: {
-      slug: props.slug,
-    },
-  }),
-});
+const getCollective = graphql(getCollectivePageQuery);
 
 export default withUser(getCollective(AcceptFinancialContributionsPage));
