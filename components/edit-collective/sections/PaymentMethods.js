@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
 
-import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
 import { compose } from '../../../lib/utils';
 import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
@@ -192,7 +192,7 @@ class EditPaymentMethods extends React.Component {
   renderError(error) {
     if (typeof error === 'string') {
       return error;
-    } else if (error.id === 'PM.Remove.HasActiveSubscriptions') {
+    } else if (isErrorType(error, 'PM.Remove.HasActiveSubscriptions')) {
       return (
         <React.Fragment>
           <FormattedMessage
