@@ -170,12 +170,10 @@ const getCommentsQueryVariables = ({ expense, limit = COMMENTS_PER_PAGE }) => ({
 
 const COMMENTS_PER_PAGE = 10;
 export const commentsQuery = graphql(getCommentsQuery, {
-  options(props) {
-    return {
-      context: { apiVersion: '2' },
-      variables: getCommentsQueryVariables(props),
-    };
-  },
+  options: props => ({
+    context: { apiVersion: '2' },
+    variables: getCommentsQueryVariables(props),
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

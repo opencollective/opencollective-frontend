@@ -40,13 +40,11 @@ class SubscriptionsWithData extends React.Component {
 }
 
 export const addSubscriptionsData = graphql(getSubscriptionsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: props.slug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: props.slug,
+    },
+  }),
 
   props: ({ data }) => {
     let subscriptions = [];

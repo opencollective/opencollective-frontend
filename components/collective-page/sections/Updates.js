@@ -241,13 +241,11 @@ class SectionUpdates extends React.PureComponent {
 
 export default injectIntl(
   graphql(UpdatesQuery, {
-    options(props) {
-      return {
-        variables: {
-          slug: props.collective.slug,
-          onlyPublishedUpdates: !props.isAdmin,
-        },
-      };
-    },
+    options: props => ({
+      variables: {
+        slug: props.collective.slug,
+        onlyPublishedUpdates: !props.isAdmin,
+      },
+    }),
   })(SectionUpdates),
 );

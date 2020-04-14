@@ -86,15 +86,13 @@ query getHosts($tags: [String], $limit: Int) {
 `;
 
 export const addHostsData = graphql(getHostsQuery, {
-  options(props) {
-    return {
-      variables: {
-        tags: props.tags,
-        limit: props.limit,
-      },
-      context: API_V2_CONTEXT,
-    };
-  },
+  options: props => ({
+    variables: {
+      tags: props.tags,
+      limit: props.limit,
+    },
+    context: API_V2_CONTEXT,
+  }),
 });
 
 export default withRouter(addHostsData(AcceptFinancialContributions));

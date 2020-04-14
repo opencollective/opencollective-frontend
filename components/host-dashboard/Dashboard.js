@@ -241,13 +241,11 @@ const getDataQuery = gql`
 `;
 
 export const addData = graphql(getDataQuery, {
-  options(props) {
-    return {
-      variables: {
-        hostCollectiveSlug: props.hostCollectiveSlug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      hostCollectiveSlug: props.hostCollectiveSlug,
+    },
+  }),
 });
 
 export default withUser(addData(HostDashboard));

@@ -136,12 +136,11 @@ const getUpdatesVariables = props => {
 };
 
 const UPDATES_PER_PAGE = 10;
+
 export const addUpdatesData = graphql(getUpdatesQuery, {
-  options(props) {
-    return {
-      variables: getUpdatesVariables(props),
-    };
-  },
+  options: props => ({
+    variables: getUpdatesVariables(props),
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

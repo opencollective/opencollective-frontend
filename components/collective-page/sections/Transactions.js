@@ -213,9 +213,9 @@ export default React.memo(
       ${BudgetItemExpenseTypeFragment}
     `,
     {
-      options(props) {
-        return { variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED } };
-      },
+      options: props => ({
+        variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED },
+      }),
     },
   )(injectIntl(SectionTransactions)),
 );

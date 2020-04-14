@@ -112,13 +112,11 @@ const addPaymentMethodsQuery = gql`
 `;
 
 const addPaymentMethods = graphql(addPaymentMethodsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: get(props, 'fromCollective.slug'),
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: get(props, 'fromCollective.slug'),
+    },
+  }),
   skip: props => {
     return !props.LoggedInUser;
   },

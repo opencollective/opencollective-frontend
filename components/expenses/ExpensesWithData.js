@@ -161,12 +161,10 @@ const getExpensesVariables = props => {
 };
 
 export const addExpensesData = graphql(getExpensesQuery, {
-  options(props) {
-    return {
-      variables: getExpensesVariables(props),
-      fetchPolicy: 'network-only',
-    };
-  },
+  options: props => ({
+    variables: getExpensesVariables(props),
+    fetchPolicy: 'network-only',
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {
