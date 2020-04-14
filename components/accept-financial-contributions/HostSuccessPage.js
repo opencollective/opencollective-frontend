@@ -64,7 +64,7 @@ class HostSuccessPage extends React.Component {
 
     return (
       <Fragment>
-        <Box mb={4} mt={5}>
+        <Box mb={4} mt={5} mx={[2, 6]}>
           <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             <FormattedMessage
               id="acceptContributions.applicationSuccess"
@@ -76,7 +76,7 @@ class HostSuccessPage extends React.Component {
           </H1>
         </Box>
         <Container display="flex" flexDirection="column" alignItems="center">
-          <Flex flexDirection="column" alignItems="center" maxWidth={'575px'} my={3}>
+          <Flex flexDirection="column" alignItems="center" maxWidth={'575px'} my={3} mx={[3, 0]}>
             <Avatar collective={chosenHost} radius={64} mb={2} />
             <P fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold" mb={4}>
               {chosenHost.name}
@@ -91,9 +91,15 @@ class HostSuccessPage extends React.Component {
               />
             </P>
           </Flex>
-          <Flex alignItems="center" justifyContent="center" my={4}>
+          <Flex
+            flexDirection={['column', 'row']}
+            justifyContent="center"
+            alignItems="center"
+            mx={[2, 4, 0]}
+            my={[2, 4]}
+          >
             <img src={placeholderIllustration} width="264px" height="352px" />
-            <Flex flexDirection="column" ml={4} maxWidth={'475px'}>
+            <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
                 {intl.formatMessage(this.messages.tiersAbout)}
               </H2>
@@ -108,14 +114,14 @@ class HostSuccessPage extends React.Component {
               </SmallExternalLink>
             </Flex>
           </Flex>
-          <Flex justifyContent="center" my={3}>
+          <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>
             <Link
               route="collective"
               params={{
                 slug: collective.slug,
               }}
             >
-              <StyledButton buttonStyle="standard" mt={[2, 3]} mb={2} px={3}>
+              <StyledButton buttonStyle="standard" mt={[2, 3]} mb={[3, 2]} px={3}>
                 {intl.formatMessage(this.messages.goBack)}
               </StyledButton>
             </Link>
@@ -126,7 +132,7 @@ class HostSuccessPage extends React.Component {
                 section: 'tiers',
               }}
             >
-              <StyledButton buttonStyle="dark" mt={[2, 3]} mb={2} ml={3} px={3}>
+              <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 {intl.formatMessage(this.messages.createCustomTiers)}
               </StyledButton>
             </Link>

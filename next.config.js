@@ -21,6 +21,7 @@ const nextConfig = {
         SENTRY_DSN: null,
         ONBOARDING_MODAL: null,
         TRANSFERWISE_ENABLED: null,
+        NEW_HOST_APPLICATION_FLOW: null,
       }),
     );
 
