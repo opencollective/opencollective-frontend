@@ -11,17 +11,15 @@ import Footer from '../Footer';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import CollectiveNavbar from '../CollectiveNavbar';
 import NotificationBar from '../NotificationBar';
-import Loading from '../Loading';
 
 import Form from './Form';
 
 class EditCollective extends React.Component {
   static propTypes = {
-    collective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
-    editCollective: PropTypes.func.isRequired,
-    loggedInEditDataLoaded: PropTypes.bool.isRequired,
-    intl: PropTypes.object.isRequired,
+    collective: PropTypes.object.isRequired, // passed from Page with addCollectiveToEditData
+    LoggedInUser: PropTypes.object.isRequired, // passed from Page with withUser
+    editCollective: PropTypes.func.isRequired, // passed from Page with addEditCollectiveMutation
+    intl: PropTypes.object.isRequired, // from injectIntl
   };
 
   constructor(props) {
@@ -86,7 +84,7 @@ class EditCollective extends React.Component {
   }
 
   render() {
-    const { intl, LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
+    const { intl, LoggedInUser, collective } = this.props;
 
     if (!collective || !collective.slug) {
       return <div />;
@@ -150,8 +148,7 @@ class EditCollective extends React.Component {
                 <SignInOrJoinFree />
               </div>
             )}
-            {canEditCollective && !loggedInEditDataLoaded && <Loading />}
-            {canEditCollective && loggedInEditDataLoaded && (
+            {canEditCollective && (
               <div>
                 <Form
                   collective={collective}

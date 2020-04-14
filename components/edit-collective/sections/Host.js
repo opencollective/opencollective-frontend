@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -6,10 +6,11 @@ import styled from 'styled-components';
 import { Flex, Box } from '@rebass/grid';
 import { Radio } from '@material-ui/core';
 import { Button } from 'react-bootstrap';
+import { withRouter } from 'next/router';
 
 import { formatCurrency, getQueryParams, formatDate } from '../../../lib/utils';
+import { Router } from '../../../server/pages';
 
-import CreateHostFormWithData from '../../CreateHostFormWithData';
 import HostsWithData from '../../HostsWithData';
 import CollectiveCard from '../../CollectiveCard';
 import Link from '../../Link';
@@ -17,6 +18,8 @@ import { P } from '../../Text';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
+
+import CreateHostFormWithData from '../CreateHostFormWithData';
 
 const Option = styled.div`
   h2 {
@@ -35,14 +38,14 @@ class Host extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     editCollectiveMutation: PropTypes.func.isRequired,
+    router: PropTypes.object.isRequired, // from withRouter
   };
 
   constructor(props) {
     super(props);
     this.changeHost = this.changeHost.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.updateSelectedOption = this.updateSelectedOption.bind(this);
     this.state = {
-      selectedOption: 'noHost',
       collective: props.collective,
       showModal: false,
       action: '',
@@ -59,8 +62,12 @@ class Host extends React.Component {
     }
   }
 
-  handleChange(attr, value) {
-    this.setState({ [attr]: value });
+  updateSelectedOption(option) {
+    Router.pushRoute('editCollective', {
+      slug: this.props.collective.slug,
+      section: 'host',
+      selectedOption: option,
+    });
   }
 
   async changeHost(newHost = { id: null }) {
@@ -74,17 +81,16 @@ class Host extends React.Component {
       HostCollectiveId: newHost.id,
     });
     if (!newHost.id) {
-      this.setState({ selectedOption: 'noHost' });
-      if (window.location.search.length > 0) {
-        window.location.replace(`/${collective.slug}/edit/host`); // make sure we clean the query params if any
-      }
+      this.updateSelectedOption('noHost');
     }
   }
 
   render() {
-    const { LoggedInUser, collective } = this.props;
-    const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
+    const { LoggedInUser, collective, router } = this.props;
     const { showModal, action } = this.state;
+
+    const selectedOption = get(router, 'query.selectedOption', 'noHost');
+    const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
 
     const closeModal = () => this.setState({ showModal: false });
 
@@ -92,7 +98,7 @@ class Host extends React.Component {
       const name = collective.host.name;
 
       return (
-        <React.Fragment>
+        <Fragment>
           <Flex>
             <Box p={1} mr={3}>
               <CollectiveCard collective={collective.host} membership={hostMembership} />
@@ -233,12 +239,12 @@ class Host extends React.Component {
               </Container>
             </ModalFooter>
           </Modal>
-        </React.Fragment>
+        </Fragment>
       );
     }
 
     return (
-      <div>
+      <div className="EditCollectiveHostSection">
         <style jsx>
           {`
             .suggestedHostsTitle {
@@ -253,8 +259,9 @@ class Host extends React.Component {
               color: #666f80;
               font-size: 1.5rem;
             }
-            :global(#findHost label) {
-              width: 100%;
+            :global(.EditCollectiveHostSection h2 label, .CreateHostForm div.form-group:not(.horizontal) label) {
+              cursor: pointer;
+              width: auto;
             }
           `}
         </style>
@@ -262,13 +269,17 @@ class Host extends React.Component {
           <Flex>
             <Box width="50px" mr={2}>
               <Radio
-                checked={this.state.selectedOption === 'noHost'}
-                onChange={() => this.handleChange('selectedOption', 'noHost')}
+                id="host-radio-noHost"
+                checked={selectedOption === 'noHost'}
+                onChange={() => this.updateSelectedOption('noHost')}
+                className="hostRadio"
               />
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No fiscal host" />
+                <label htmlFor="host-radio-noHost">
+                  <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No fiscal host" />
+                </label>
               </h2>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
@@ -278,17 +289,21 @@ class Host extends React.Component {
           </Flex>
         </Option>
 
-        <Option id="createHost">
+        <Option id="ownHost">
           <Flex>
             <Box width="50px" mr={2}>
               <Radio
-                checked={this.state.selectedOption === 'createHost'}
-                onChange={() => this.handleChange('selectedOption', 'createHost')}
+                id="host-radio-ownHost"
+                checked={selectedOption === 'ownHost'}
+                onChange={() => this.updateSelectedOption('ownHost')}
+                className="hostRadio"
               />
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Use own fiscal host" />
+                <label htmlFor="host-radio-ownHost">
+                  <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Use own fiscal host" />
+                </label>
               </h2>
               <FormattedMessage
                 id="collective.edit.host.useOwn.description"
@@ -299,7 +314,7 @@ class Host extends React.Component {
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
               .
-              {this.state.selectedOption === 'createHost' && LoggedInUser && (
+              {selectedOption === 'ownHost' && LoggedInUser && (
                 <CreateHostFormWithData
                   collective={collective}
                   LoggedInUser={LoggedInUser}
@@ -314,22 +329,26 @@ class Host extends React.Component {
           <Flex>
             <Box width="50px" mr={2}>
               <Radio
-                checked={this.state.selectedOption === 'findHost'}
-                onChange={() => this.handleChange('selectedOption', 'findHost')}
+                id="host-radio-findHost"
+                checked={selectedOption === 'findHost'}
+                onChange={() => this.updateSelectedOption('findHost')}
+                className="hostRadio"
               />
             </Box>
             <Box mb={4}>
               <h2>
-                <FormattedMessage
-                  id="collective.edit.host.findHost.title"
-                  defaultMessage="Apply to an existing fiscal host"
-                />
+                <label htmlFor="host-radio-findHost">
+                  <FormattedMessage
+                    id="collective.edit.host.findHost.title"
+                    defaultMessage="Apply to an existing fiscal host"
+                  />
+                </label>
               </h2>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
                 defaultMessage="With this option, you don't need to hold funds yourself, or set up a legal entity and bank account for your project. The fiscal host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming)."
               />
-              {this.state.selectedOption === 'findHost' && (
+              {selectedOption === 'findHost' && (
                 <div>
                   <div className="suggestedHostsTitle">
                     <h3>
@@ -373,4 +392,4 @@ class Host extends React.Component {
   }
 }
 
-export default Host;
+export default withRouter(Host);
