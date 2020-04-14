@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Apr 09 2020 21:37:36 GMT+0100 (British Summer Time)
+# timestamp: Tue Apr 14 2020 16:48:40 GMT+0200 (GMT+02:00)
 
 """
 Application model
@@ -179,6 +179,11 @@ type Collective implements CollectiveInterface {
     Only return memberships for active collectives (that have been approved by the host)
     """
     onlyActiveCollectives: Boolean = false
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
   ): [Member]
 
   """
@@ -447,6 +452,11 @@ interface CollectiveInterface {
     Only return memberships for active collectives (that have been approved by the host)
     """
     onlyActiveCollectives: Boolean = false
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
   ): [Member]
 
   """
@@ -1062,6 +1072,11 @@ type Event implements CollectiveInterface {
     Only return memberships for active collectives (that have been approved by the host)
     """
     onlyActiveCollectives: Boolean = false
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
   ): [Member]
 
   """
@@ -1228,6 +1243,17 @@ type Expense implements Transaction {
 }
 
 """
+Fields for an expense's attached file
+"""
+type ExpenseAttachedFile {
+  """
+  Unique identifier for this file
+  """
+  id: Int!
+  url: String
+}
+
+"""
 Input type for ExpenseType
 """
 input ExpenseInputType {
@@ -1342,6 +1368,7 @@ type ExpenseType {
     @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
   attachments: [ExpenseItem] @deprecated(reason: "2020-04-09 - Please use items")
   items: [ExpenseItem]
+  attachedFiles: [ExpenseAttachedFile!]
   userTaxFormRequiredBeforePayment: Boolean
   user: UserDetails
   fromCollective: CollectiveInterface
@@ -2305,6 +2332,11 @@ type Organization implements CollectiveInterface {
     Only return memberships for active collectives (that have been approved by the host)
     """
     onlyActiveCollectives: Boolean = false
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
   ): [Member]
 
   """
@@ -3373,6 +3405,11 @@ type User implements CollectiveInterface {
     Only return memberships for active collectives (that have been approved by the host)
     """
     onlyActiveCollectives: Boolean = false
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
   ): [Member]
 
   """
