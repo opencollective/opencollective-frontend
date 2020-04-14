@@ -7,7 +7,7 @@ import { Flex } from '@rebass/grid';
 import { get } from 'lodash';
 
 import { capitalize, formatCurrency, compose } from '../../lib/utils';
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { getErrorFromGraphqlException, formatErrorMessage } from '../../lib/errors';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
@@ -496,7 +496,7 @@ class Expense extends React.Component {
           )}
           {this.state.error && (
             <MessageBox type="error" withIcon mb={2}>
-              {this.state.error}
+              {formatErrorMessage(intl, this.state.error)}
             </MessageBox>
           )}
           {editable && (
