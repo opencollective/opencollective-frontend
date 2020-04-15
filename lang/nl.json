@@ -1101,7 +1101,7 @@
   "Pagination.Count": "Page {current} of {total}",
   "Pagination.Next": "Next",
   "Pagination.Prev": "Previous",
-  "ParticipantsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} participating",
+  "ParticipantsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {is} other {are}} participating",
   "paymentMethod.activeSubscriptions": "{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}",
   "paymentMethod.add": "New Credit Card",
   "paymentMethod.editSubscriptions": "Edit recurring financial contributions",

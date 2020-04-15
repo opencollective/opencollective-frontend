@@ -217,7 +217,7 @@ const ContributeCard = ({
                       {type === 'TICKET' && (
                         <FormattedMessage
                           id="ParticipantsCount"
-                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} participating"
+                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {is} other {are}} participating"
                           values={{
                             userCount: stats.users,
                             orgCount: stats.organizations,
