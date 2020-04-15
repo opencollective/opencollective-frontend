@@ -45,7 +45,7 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
 
   const loggedInAccount = data?.loggedInAccount || LoggedInUser?.collective;
   // Hide it if SSR or still loading user
-  if (typeof window === 'undefined' || (!LoggedInUser && loading)) {
+  if (typeof window === 'undefined' || loading) {
     return null;
   } else if (
     isDismissedLocally ||
