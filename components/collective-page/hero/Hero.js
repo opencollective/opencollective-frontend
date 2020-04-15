@@ -12,6 +12,7 @@ import { Github } from '@styled-icons/feather/Github';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Globe } from '@styled-icons/feather/Globe';
+import { Settings } from '@styled-icons/feather/Settings';
 
 // General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -37,6 +38,7 @@ import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContr
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
 import MessageBox from '../../MessageBox';
+import Link from '../../Link';
 
 // Dynamic imports
 const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
@@ -107,17 +109,17 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
             top={25}
             zIndex={222}
           >
-            <StyledButton data-cy="edit-cover-btn" onClick={() => editCover(true)}>
-              <Span mr={2}>
-                <Camera size="1.2em" />
+            <StyledButton data-cy="edit-cover-btn" buttonSize="tiny" onClick={() => editCover(true)}>
+              <Camera size="1.2em" />
+              <Span ml={2} css={{ verticalAlign: 'middle' }}>
+                <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
               </Span>
-              <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
             </StyledButton>
-            <StyledButton data-cy="edit-main-color-btn" ml={3} onClick={() => showColorPicker(true)}>
-              <Span mr={2}>
-                <Palette size="1.2em" />
+            <StyledButton data-cy="edit-main-color-btn" buttonSize="tiny" ml={3} onClick={() => showColorPicker(true)}>
+              <Palette size="1.2em" />
+              <Span ml={2} css={{ verticalAlign: 'middle' }}>
+                <FormattedMessage id="Hero.EditColor" defaultMessage="Edit main color" />
               </Span>
-              <FormattedMessage id="Hero.EditColor" defaultMessage="Edit main color" />
             </StyledButton>
           </Container>
         )}
@@ -135,6 +137,23 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           <Container position="relative" mb={2} width={128}>
             <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
           </Container>
+          {isAdmin && (
+            <Link
+              route={isEvent ? 'editEvent' : 'editCollective'}
+              params={
+                isEvent
+                  ? { parentCollectiveSlug: collective.parentCollective?.slug, eventSlug: collective.slug }
+                  : { slug: collective.slug }
+              }
+            >
+              <StyledButton buttonSize="tiny" minWidth={96} my={3} data-cy="edit-collective-btn">
+                <Settings size={14} />
+                <Span ml={1} css={{ verticalAlign: 'middle' }}>
+                  <FormattedMessage id="Settings" defaultMessage="Settings" />
+                </Span>
+              </StyledButton>
+            </Link>
+          )}
           <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left" data-cy="collective-title">
             {collective.name || collective.slug}
           </H1>
@@ -286,6 +305,9 @@ Hero.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     settings: PropTypes.shape({
       tos: PropTypes.string,
+    }).isRequired,
+    parentCollective: PropTypes.shape({
+      slug: PropTypes.string,
     }).isRequired,
   }).isRequired,
 
