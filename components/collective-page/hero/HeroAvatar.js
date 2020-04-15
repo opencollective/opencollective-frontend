@@ -6,18 +6,15 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Mutation } from '@apollo/react-components';
 
 import { Camera } from '@styled-icons/feather/Camera';
-import { Settings } from '@styled-icons/feather/Settings';
 
 import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
-import { CollectiveType } from '../../../lib/constants/collectives';
 import Avatar from '../../Avatar';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import StyledRoundButton from '../../StyledRoundButton';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import { EditAvatarMutation } from '../graphql/mutations';
-import Link from '../../Link';
+import { Span } from '../../Text';
 
 const AVATAR_SIZE = 128;
 
@@ -93,7 +90,6 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
-  const isEvent = collective.type === CollectiveType.EVENT;
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -141,12 +137,12 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
               <EditableAvatarContainer isDragActive={isDragActive}>
                 <EditOverlay borderRadius={borderRadius}>
                   {!isDragActive && (
-                    <React.Fragment>
-                      <StyledRoundButton backgroundColor="primary.900" color="white.full" size={40} mb={2}>
-                        <Camera size={25} />
-                      </StyledRoundButton>
-                      <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
-                    </React.Fragment>
+                    <StyledButton buttonSize="tiny">
+                      <Camera size={12} />
+                      <Span ml={2} css={{ verticalAlign: 'center' }}>
+                        <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
+                      </Span>
+                    </StyledButton>
                   )}
                   {isDragActive &&
                     (isDragAccept ? (
@@ -163,21 +159,6 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
             </div>
           )}
         </Dropzone>
-        <Container position="absolute" right={0} bottom={0}>
-          <Link
-            route={isEvent ? 'editEvent' : 'editCollective'}
-            params={
-              isEvent
-                ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
-                : { slug: collective.slug }
-            }
-            title={intl.formatMessage(Translations.settings)}
-          >
-            <StyledRoundButton size={40} color="black.700" data-cy="edit-collective-btn">
-              <Settings size={18} />
-            </StyledRoundButton>
-          </Link>
-        </Container>
       </Fragment>
     );
   } else {
