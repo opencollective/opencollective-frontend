@@ -13,7 +13,7 @@ import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const PrivateNoteLabel = () => {
   return (
-    <Span fontSize="Caption" color="black.700">
+    <Span color="black.700">
       <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
@@ -30,7 +30,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
       required={false}
       maxWidth={782}
       label={<PrivateNoteLabel />}
-      labelProps={{ fontWeight: 'bold', fontSize: 'SmallCaption', mb: 3 }}
+      labelProps={{ fontWeight: '500', fontSize: 'LeadCaption' }}
     >
       {inputProps => (
         <div>
@@ -52,6 +52,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
             {...attachmentDropzoneParams}
             isMulti
             disabled={disabled}
+            minHeight={72}
             onSuccess={urls => {
               const newFiles = urls.map(url => ({ url }));
               const updatedFiles = uniqBy([...files, ...newFiles], 'url');

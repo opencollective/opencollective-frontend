@@ -2,6 +2,7 @@ import { Flex, Box } from '@rebass/grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import { isEmpty } from 'lodash';
 
 import Container from '../components/Container';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
@@ -25,13 +26,13 @@ const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, o
 
   return (
     <Box width="100%">
-      <Box>
-        <H5 mb={3}>
-          <FormattedMessage id="Tags" defaultMessage="Tags" />
-        </H5>
-        {isLoading && <LoadingPlaceholder height={28} width="100%" />}
-        {!isLoading &&
-          (isEditing ? (
+      {(!isEmpty(expense?.tags) || isEditing) && (
+        <Box mb={50}>
+          <H5 mb={3}>
+            <FormattedMessage id="Tags" defaultMessage="Tags" />
+          </H5>
+          {isLoading && <LoadingPlaceholder height={28} width="100%" />}
+          {!isLoading && isEditing ? (
             <StyledInputTags onChange={handleTagUpdate} value={expense.tags} />
           ) : (
             <Flex flexWrap="wrap">
@@ -41,9 +42,10 @@ const ExpenseInfoSidebar = ({ isEditing, isLoading, host, collective, expense, o
                 </StyledTag>
               ))}
             </Flex>
-          ))}
-      </Box>
-      <Box mt={50} display={['none', 'block']}>
+          )}
+        </Box>
+      )}
+      <Box display={['none', 'block']}>
         <H5 mb={3}>
           <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
         </H5>

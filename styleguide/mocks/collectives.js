@@ -5,6 +5,7 @@ export const openSourceHost = {
   image: 'https://opencollective-production.s3-us-west-1.amazonaws.com/5f4a3920-11b6-11e8-b28d-b359f3c5ca14.png',
   imageUrl: 'https://images-staging.opencollective.com/opensource/cd1565e/logo/256.png',
   type: 'ORGANIZATION',
+  website: 'https://opencollective.com/opensource',
   location: {
     address: 'EIN 82-2037583\n340 S LEMON AVE #3717\nWalnut, CA 91789 USA',
     country: 'US',
