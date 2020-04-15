@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Apr 14 2020 16:49:13 GMT+0200 (GMT+02:00)
+# timestamp: Wed Apr 15 2020 17:06:24 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -916,6 +916,11 @@ type Expense {
   Total amount of the expense (sum of the item's amounts).
   """
   amount: Int!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
 
   """
   Currency that should be used for the payout

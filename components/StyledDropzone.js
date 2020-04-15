@@ -204,7 +204,7 @@ StyledDropzone.propTypes = {
   /** Min height of the container */
   minHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   /** To have square container */
-  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /** A function to generate mock images */
   mockImageGenerator: PropTypes.func,
   /** Wether the dropzone should accept multiple files */

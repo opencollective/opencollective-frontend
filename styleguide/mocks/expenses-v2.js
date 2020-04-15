@@ -10,6 +10,7 @@ export const expenseInvoice = {
   privateMessage: 'Please pay the money fast',
   currency: 'USD',
   type: 'INVOICE',
+  createdAt: '2020-04-22T06:00:00Z',
   items: [
     {
       id: '661ae79b-ff2b-4c64-aee4-44b7e6b21a4c',
@@ -50,6 +51,7 @@ export const expenseReceipt = {
   privateMessage: '',
   currency: 'USD',
   type: 'RECEIPT',
+  createdAt: '2020-04-22T06:00:00Z',
   items: [
     {
       id: '661ae79b-ff2b-4c64-aee4-44b7e6b21a4c',

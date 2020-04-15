@@ -50,7 +50,7 @@ const StaticTypeIllustration = styled(TypeIllustration).attrs(props => ({
 const ExpenseTypeOptionContainer = styled.label`
   display: flex;
   align-items: center;
-  padding: 24px 16px;
+  padding: 15px 16px;
   margin-bottom: 0;
   cursor: pointer;
   background: white;
@@ -78,7 +78,7 @@ const ExpenseTypeOption = ({ name, type, defaultChecked }) => {
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
       <input type="radio" name={name} value={type} defaultChecked={defaultChecked} />
-      <Box mr={3}>
+      <Box mr={3} size={64}>
         <StaticTypeIllustration expenseType={type} />
         <TypeIllustration src={type === expenseTypes.RECEIPT ? receiptIllustration : invoiceIllustration} />
       </Box>

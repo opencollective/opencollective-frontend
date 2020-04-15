@@ -3,7 +3,6 @@ import { get, isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 import { Field, FastField } from 'formik';
 import { isURL } from 'validator';
 
@@ -18,6 +17,7 @@ import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachme
 import StyledDropzone from '../StyledDropzone';
 import StyledButton from '../StyledButton';
 import UploadedFilePreview from '../UploadedFilePreview';
+import StyledHr from '../StyledHr';
 
 export const msg = defineMessages({
   previewImgAlt: {
@@ -36,17 +36,15 @@ export const msg = defineMessages({
     id: 'expense.incurredAt',
     defaultMessage: 'Date',
   },
-  remove: {
-    id: 'Remove',
-    defaultMessage: 'Remove',
+  removeReceipt: {
+    id: 'expense.RemoveReceipt',
+    defaultMessage: 'Remove receipt',
+  },
+  removeItem: {
+    id: 'expense.RemoveItem',
+    defaultMessage: 'Remove item',
   },
 });
-
-export const FormFieldsContainer = styled.div`
-  border-bottom: 1px dashed #eaeaea;
-  display: flex;
-  margin-bottom: 18px;
-`;
 
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
 export const validateExpenseItem = (expense, item) => {
@@ -69,7 +67,7 @@ export const validateExpenseItem = (expense, item) => {
 };
 
 const AttachmentLabel = () => (
-  <Span fontSize="LeadCaption">
+  <Span fontSize="LeadCaption" whiteSpace="nowrap">
     <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />
     &nbsp;&nbsp;
     <PrivateInfoIcon color="#969BA3" />
@@ -87,117 +85,119 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
 
   return (
-    <FormFieldsContainer data-cy="expense-attachment-form">
-      {requireFile && (
-        <FastField name={getFieldName('url')}>
-          {({ field, form, meta }) => {
-            const hasValidUrl = field.value && isURL(field.value);
-            return (
-              <StyledInputField
-                mr={4}
-                htmlFor={attachmentKey}
-                label={<AttachmentLabel />}
-                error={formatFormErrorMessage(intl, meta.error)}
-                data-cy="attachment-url-field"
-                required
-              >
-                <StyledDropzone
-                  {...attachmentDropzoneParams}
-                  isMulti={false}
-                  error={meta.error}
-                  onSuccess={url => form.setFieldValue(field.name, url)}
-                  showDefaultMessage={!hasValidUrl}
-                  mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
-                  fontSize="LeadCaption"
-                  size={112}
+    <Box mb={18} data-cy="expense-attachment-form">
+      <Flex flexWrap="wrap">
+        {requireFile && (
+          <FastField name={getFieldName('url')}>
+            {({ field, form, meta }) => {
+              const hasValidUrl = field.value && isURL(field.value);
+              return (
+                <StyledInputField
+                  mr={[1, 4]}
+                  mt={2}
+                  htmlFor={attachmentKey}
+                  label={<AttachmentLabel />}
+                  error={formatFormErrorMessage(intl, meta.error)}
+                  data-cy="attachment-url-field"
+                  required
                 >
-                  {hasValidUrl && <UploadedFilePreview size={112} url={field.value} hasLink={false} border="none" />}
-                </StyledDropzone>
-              </StyledInputField>
-            );
-          }}
-        </FastField>
-      )}
-      <Box flex="1 1" minWidth={200}>
-        <StyledInputField
-          name={getFieldName('description')}
-          error={getError('description')}
-          htmlFor={`${attachmentKey}-description`}
-          label={formatMessage(msg.descriptionLabel)}
-          labelFontSize="LeadCaption"
-          required
-        >
-          {inputProps => <Field as={StyledInput} {...inputProps} />}
-        </StyledInputField>
-        <Flex flexWrap="wrap" justifyContent="space-between">
+                  <StyledDropzone
+                    {...attachmentDropzoneParams}
+                    isMulti={false}
+                    error={meta.error}
+                    onSuccess={url => form.setFieldValue(field.name, url)}
+                    showDefaultMessage={!hasValidUrl}
+                    mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
+                    fontSize="LeadCaption"
+                    size={[84, 112]}
+                  >
+                    {hasValidUrl && <UploadedFilePreview size={112} url={field.value} hasLink={false} border="none" />}
+                  </StyledDropzone>
+                </StyledInputField>
+              );
+            }}
+          </FastField>
+        )}
+        <Box flex="1 1" minWidth={170} mt={2}>
           <StyledInputField
-            name={getFieldName('incurredAt')}
-            error={getError('incurredAt')}
-            htmlFor={`${attachmentKey}-incurredAt`}
-            inputType="date"
-            required
-            label={formatMessage(msg.dateLabel)}
+            name={getFieldName('description')}
+            error={getError('description')}
+            htmlFor={`${attachmentKey}-description`}
+            label={formatMessage(msg.descriptionLabel)}
             labelFontSize="LeadCaption"
-            flex="1 1 50%"
-            mt={3}
-            mr={[null, 3]}
-          >
-            {inputProps => (
-              <Field as={StyledInput} maxHeight={39} {...inputProps}>
-                {({ field }) => (
-                  <StyledInput
-                    {...inputProps}
-                    {...field}
-                    value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
-                  />
-                )}
-              </Field>
-            )}
-          </StyledInputField>
-          <StyledInputField
-            name={getFieldName('amount')}
-            error={getError('amount')}
-            htmlFor={`${attachmentKey}-amount`}
-            label={formatMessage(msg.amountLabel)}
             required
-            labelFontSize="LeadCaption"
-            inputType="number"
-            flex="1 1 30%"
-            maxWidth="100%"
-            mt={3}
           >
-            {inputProps => (
-              <Field
-                as={StyledInputAmount}
-                {...inputProps}
-                currency={currency}
-                currencyDisplay="CODE"
-                min="0.01"
-                maxWidth="100%"
-                placeholder="0.00"
-                parseNumbers
-              />
-            )}
+            {inputProps => <Field as={StyledInput} {...inputProps} />}
           </StyledInputField>
-        </Flex>
-        <Box mt={2} p={2} textAlign="right">
-          {onRemove && (
-            <StyledButton
-              type="button"
-              color="red.500"
-              borderColor="red.500"
-              focusColor="red.500"
-              fontSize="Caption"
-              onClick={() => onRemove(attachment)}
-              p={2}
-              asLink
+          <Flex flexWrap="wrap" justifyContent="space-between">
+            <StyledInputField
+              name={getFieldName('incurredAt')}
+              error={getError('incurredAt')}
+              htmlFor={`${attachmentKey}-incurredAt`}
+              inputType="date"
+              required
+              label={formatMessage(msg.dateLabel)}
+              labelFontSize="LeadCaption"
+              flex="1 1 50%"
+              mt={3}
             >
-              {formatMessage(msg.remove)}
-            </StyledButton>
-          )}
+              {inputProps => (
+                <Field as={StyledInput} maxHeight={39} {...inputProps}>
+                  {({ field }) => (
+                    <StyledInput
+                      {...inputProps}
+                      {...field}
+                      value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                    />
+                  )}
+                </Field>
+              )}
+            </StyledInputField>
+            <Box flex="0 1 8px" width={[0, 8]} />
+            <StyledInputField
+              name={getFieldName('amount')}
+              error={getError('amount')}
+              htmlFor={`${attachmentKey}-amount`}
+              label={formatMessage(msg.amountLabel)}
+              required
+              labelFontSize="LeadCaption"
+              inputType="number"
+              flex="1 1 30%"
+              maxWidth="100%"
+              mt={3}
+            >
+              {inputProps => (
+                <Field
+                  as={StyledInputAmount}
+                  {...inputProps}
+                  currency={currency}
+                  currencyDisplay="CODE"
+                  min="0.01"
+                  maxWidth="100%"
+                  placeholder="0.00"
+                  parseNumbers
+                />
+              )}
+            </StyledInputField>
+          </Flex>
         </Box>
-      </Box>
-    </FormFieldsContainer>
+      </Flex>
+      <Flex alignItems="center" mt={3}>
+        {onRemove && (
+          <StyledButton
+            type="button"
+            buttonStyle="dangerSecondary"
+            buttonSize="tiny"
+            isBorderless
+            ml={-10}
+            onClick={() => onRemove(attachment)}
+          >
+            {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
+          </StyledButton>
+        )}
+        <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />
+      </Flex>
+    </Box>
   );
 };
 

@@ -3,6 +3,7 @@ import { Mutation } from '@apollo/react-components';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
+import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Check } from '@styled-icons/feather/Check';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
@@ -50,7 +51,7 @@ const ButtonWithLabel = styled(StyledRoundButton).attrs({ size: 40, m: 2 })`
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
  */
-const ExpenseAdminActions = ({ expense, collective, permissions, onError, isDisabled }) => {
+const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit, isDisabled }) => {
   const [hasDeleteConfirm, showDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
 
@@ -78,6 +79,14 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, isDisa
           )}
         </ButtonLabel>
       </ButtonWithLabel>
+      {permissions?.canEdit && (
+        <ButtonWithLabel onClick={onEdit} disabled={isDisabled}>
+          <IconEdit size={16} />
+          <ButtonLabel>
+            <FormattedMessage id="Edit" defaultMessage="Edit" />
+          </ButtonLabel>
+        </ButtonWithLabel>
+      )}
       {permissions?.canDelete && (
         <React.Fragment>
           <ButtonWithLabel buttonStyle="danger" disabled={isDisabled} onClick={() => showDeleteConfirm(true)}>
@@ -138,6 +147,7 @@ ExpenseAdminActions.propTypes = {
   }),
   /** Called with an error if anything wrong happens */
   onError: PropTypes.func,
+  onEdit: PropTypes.func,
 };
 
 export default ExpenseAdminActions;

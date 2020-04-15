@@ -35,7 +35,7 @@ const StyledInputField = ({
             display="block"
             fontSize={labelFontSize}
             fontWeight="normal"
-            mb={isCheckbox ? 0 : 1}
+            mb={isCheckbox ? 0 : 2}
             mr={2}
             {...labelProps}
           >

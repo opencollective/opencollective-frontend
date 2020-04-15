@@ -15,17 +15,14 @@ import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import CommentIcon from '../components/icons/CommentIcon';
-import Link from '../components/Link';
 import Page from '../components/Page';
-import StyledLink from '../components/StyledLink';
 import { generateNotFoundError, formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { ssrNotFoundError } from '../lib/nextjs_utils';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
-import { H5, Span, P } from '../components/Text';
+import { H5, Span, P, H1 } from '../components/Text';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
-import StyledHr from '../components/StyledHr';
 import MessageBox from '../components/MessageBox';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
@@ -74,7 +71,7 @@ const editExpenseMutation = gqlV2`
 
 const PrivateNoteLabel = () => {
   return (
-    <Span fontSize="Caption" color="black.700" fontWeight="500">
+    <Span fontSize="Caption" color="black.700" fontWeight="bold">
       <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
@@ -242,13 +239,13 @@ class ExpensePage extends React.Component {
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
         <CollectiveThemeProvider collective={collective}>
           <CollectiveNavbar collective={collective} isLoading={!collective} selected={Sections.BUDGET} />
-          <Flex flexWrap="wrap" my={[4, null, 5]} data-cy="expense-page-content">
+          <Flex flexWrap="wrap" my={4} data-cy="expense-page-content">
             <Container
               display={['none', null, null, 'flex']}
               justifyContent="flex-end"
               width={SIDE_MARGIN_WIDTH}
               minWidth={90}
-              pt={55}
+              pt={80}
             >
               <Flex flexDirection="column" alignItems="center" width={90}>
                 {status === PAGE_STATUS.VIEW && (
@@ -257,6 +254,7 @@ class ExpensePage extends React.Component {
                     collective={collective}
                     permissions={expense?.permissions}
                     onError={error => this.setState({ error })}
+                    onEdit={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
                   />
                 )}
               </Flex>
@@ -270,14 +268,9 @@ class ExpensePage extends React.Component {
               px={3}
               ref={this.expenseTopRef}
             >
-              {status === PAGE_STATUS.VIEW && (
-                <Box mb={4}>
-                  <StyledLink as={Link} color="black.600" route="expenses" params={{ collectiveSlug }}>
-                    &larr;&nbsp;
-                    <FormattedMessage id="Back" defaultMessage="Back" />
-                  </StyledLink>
-                </Box>
-              )}
+              <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+                <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
+              </H1>
               {error && (
                 <MessageBox type="error" withIcon mb={4}>
                   {formatErrorMessage(intl, error)}
@@ -293,39 +286,38 @@ class ExpensePage extends React.Component {
                   />
                   {status !== PAGE_STATUS.EDIT_SUMMARY && (
                     <React.Fragment>
-                      {expense?.privateMessage && (
-                        <Box>
-                          <H5 fontSize="LeadParagraph" mb={2}>
-                            <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                          </H5>
-                          <PrivateNoteLabel />
-                          <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre">
-                            {expense.privateMessage}
-                          </P>
-                        </Box>
-                      )}
                       {hasAttachedFiles && (
-                        <Box mt={4}>
-                          <H5 fontSize="LeadParagraph" mb={2}>
-                            <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+                        <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
+                          <H5 fontSize="LeadParagraph" mb={3}>
+                            <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
                           </H5>
                           <ExpenseAttachedFiles files={expense.attachedFiles} />
-                        </Box>
+                        </Container>
                       )}
-                      {(hasAttachedFiles || expense?.privateMessage) && <StyledHr borderColor="#DCDEE0" mt={4} />}
+                      {expense?.privateMessage && (
+                        <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
+                          <H5 fontSize="LeadParagraph" mb={3}>
+                            <FormattedMessage id="expense.notes" defaultMessage="Notes" />
+                          </H5>
+                          <PrivateNoteLabel mb={2} />
+                          <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre-wrap">
+                            {expense.privateMessage}
+                          </P>
+                        </Container>
+                      )}
                     </React.Fragment>
                   )}
                   {status === PAGE_STATUS.EDIT_SUMMARY && (
-                    <div>
-                      <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
+                    <Box mt={24}>
                       {editedExpense.type === expenseTypes.INVOICE && (
-                        <Box mt={4}>
+                        <Box mb={4}>
                           <ExpenseAttachedFilesForm
                             onChange={this.onAttachedFilesChange}
                             defaultValue={editedExpense.attachedFiles}
                           />
                         </Box>
                       )}
+                      <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
                       <StyledButton
                         mt={4}
                         mr={2}
@@ -346,7 +338,7 @@ class ExpensePage extends React.Component {
                       >
                         <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
                       </StyledButton>
-                    </div>
+                    </Box>
                   )}
                 </Box>
               )}
@@ -392,20 +384,8 @@ class ExpensePage extends React.Component {
                 </Box>
               </Flex>
             </Box>
-            <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={[1, 2, 5]}>
+            <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
               <Box minWidth={300} width={['100%', null, null, 300]} px={3}>
-                {expense?.permissions.canEdit && (
-                  <Box mb={60} display={['none', null, null, 'flex']}>
-                    <StyledButton
-                      buttonStyle="secondary"
-                      buttonSize="small"
-                      onClick={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
-                      disabled={status !== PAGE_STATUS.VIEW}
-                    >
-                      <FormattedMessage id="Edit" defaultMessage="Edit" />
-                    </StyledButton>
-                  </Box>
-                )}
                 <ExpenseInfoSidebar
                   isLoading={data.loading}
                   collective={collective}

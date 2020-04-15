@@ -14,10 +14,14 @@ const msg = defineMessages({
 /**
  * A lock icon with a tooltip indicating that this info is private
  */
-const PrivateInfoIcon = ({ children, size, ...props }) => {
+const PrivateInfoIcon = ({ children, size, tooltipProps, ...props }) => {
   const { formatMessage } = useIntl();
   return (
-    <StyledTooltip childrenContainer="span" content={() => children || formatMessage(msg.defaultContent)}>
+    <StyledTooltip
+      childrenContainer="span"
+      content={() => children || formatMessage(msg.defaultContent)}
+      {...tooltipProps}
+    >
       <Lock size={size} {...props} />
     </StyledTooltip>
   );
@@ -27,6 +31,7 @@ PrivateInfoIcon.propTypes = {
   /** A message to display in the tooltip in place of the default one */
   children: PropTypes.node,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  tooltipProps: PropTypes.object,
 };
 
 PrivateInfoIcon.defaultProps = {

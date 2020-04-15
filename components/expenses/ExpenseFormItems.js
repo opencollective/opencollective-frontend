@@ -7,9 +7,8 @@ import { isEmpty } from 'lodash';
 
 import Container from '../Container';
 import { I18nBold } from '../I18nFormatters';
-import StyledButton from '../StyledButton';
 import StyledDropzone from '../StyledDropzone';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 import ExpenseItemForm from './ExpenseItemForm';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 import { toIsoDateStr } from '../../lib/date-utils';
@@ -29,6 +28,11 @@ const newExpenseItem = attrs => ({
 
 /** Converts a list of filenames to expense item objects */
 const filesListToItems = files => files.map(url => newExpenseItem({ url }));
+
+/** Helper to add a new item to the form */
+export const addNewExpenseItem = (formik, defaultValues) => {
+  formik.setFieldValue('items', [...(formik.values.items || []), newExpenseItem(defaultValues)]);
+};
 
 export default class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
@@ -82,7 +86,7 @@ export default class ExpenseFormItems extends React.PureComponent {
           mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
           mb={3}
         >
-          <P color="black.700" mt={1}>
+          <P color="black.700" mt={1} px={2}>
             <FormattedMessage
               id="MultipleAttachmentsDropzone.UploadWarning"
               defaultMessage="<i18n-bold>Important</i18n-bold>: Expenses will not be paid without a valid receipt."
@@ -107,34 +111,13 @@ export default class ExpenseFormItems extends React.PureComponent {
             requireFile={requireFile}
           />
         ))}
-        <StyledButton
-          type="button"
-          buttonStyle="secondary"
-          width="100%"
-          onClick={() => {
-            this.props.push(newExpenseItem());
-            if (!hasItems) {
-              this.props.push(newExpenseItem());
-            }
-          }}
-        >
-          <Span mr={2}>
-            {requireFile ? (
-              <FormattedMessage id="ExpenseForm.AddReceipt" defaultMessage="Add another receipt" />
-            ) : (
-              <FormattedMessage id="ExpenseForm.AddLineItem" defaultMessage="Add another line item" />
-            )}
-          </Span>
-          <Span fontWeight="bold">+</Span>
-        </StyledButton>
-        <Container display="flex" borderTop="1px dashed #eaeaea" my={3} pt={3} justifyContent="flex-end">
-          <Flex alignItems="center">
-            <Container fontSize="Caption" fontWeight="bold" mr={3} whiteSpace="nowrap">
-              <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
-            </Container>
-            <ExpenseItemsTotalAmount name={name} currency={values.currency} items={items} />
-          </Flex>
-        </Container>
+        <Flex alignItems="center" my={3}>
+          <Box flex="0 1" flexBasis={['3%', requireFile ? '53%' : '47%']} />
+          <Container fontSize="Caption" fontWeight="500" mr={3} whiteSpace="nowrap">
+            <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
+          </Container>
+          <ExpenseItemsTotalAmount name={name} currency={values.currency} items={items} />
+        </Flex>
       </Box>
     );
   }

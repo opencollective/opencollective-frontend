@@ -22,7 +22,6 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
-import StyledLink from '../components/StyledLink';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -195,21 +194,8 @@ class CreateExpensePage extends React.Component {
                 </ContainerOverlay>
               )}
               <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                <Box mb={3}>
-                  <StyledLink
-                    color="black.600"
-                    onClick={() =>
-                      step === STEPS.SUMMARY
-                        ? this.setState({ step: STEPS.FORM, error: null })
-                        : window?.history?.back()
-                    }
-                  >
-                    &larr;&nbsp;
-                    <FormattedMessage id="Back" defaultMessage="Back" />
-                  </StyledLink>
-                </Box>
                 <Flex justifyContent="space-between" flexWrap="wrap">
-                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[3, null, 5]} mb={5}>
+                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[0, 3, 5]} mb={5}>
                     <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
@@ -242,29 +228,29 @@ class CreateExpensePage extends React.Component {
                                 createdByAccount: this.props.data.loggedInAccount,
                               }}
                             />
-                            <ExpenseNotesForm onChange={this.onNotesChanges} />
-                            {this.state.expense.type === expenseTypes.INVOICE && (
-                              <React.Fragment>
-                                <br />
-                                <br />
-                                <ExpenseAttachedFilesForm onChange={this.onAttachedFilesChange} />
-                              </React.Fragment>
-                            )}
-                            {this.state.error && (
-                              <MessageBox type="error" withIcon mt={3}>
-                                {this.state.error.message}
-                              </MessageBox>
-                            )}
-                            <StyledButton
-                              buttonStyle="primary"
-                              mt={4}
-                              data-cy="submit-expense-btn"
-                              onClick={this.onSummarySubmit}
-                              loading={this.state.isSubmitting}
-                              minWidth={150}
-                            >
-                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                            </StyledButton>
+                            <Box mt={24}>
+                              {this.state.expense.type === expenseTypes.INVOICE && (
+                                <Box mb={4}>
+                                  <ExpenseAttachedFilesForm onChange={this.onAttachedFilesChange} />
+                                </Box>
+                              )}
+                              <ExpenseNotesForm onChange={this.onNotesChanges} />
+                              {this.state.error && (
+                                <MessageBox type="error" withIcon mt={3}>
+                                  {this.state.error.message}
+                                </MessageBox>
+                              )}
+                              <StyledButton
+                                buttonStyle="primary"
+                                mt={4}
+                                data-cy="submit-expense-btn"
+                                onClick={this.onSummarySubmit}
+                                loading={this.state.isSubmitting}
+                                minWidth={150}
+                              >
+                                <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                              </StyledButton>
+                            </Box>
                           </div>
                         )}
                       </Box>

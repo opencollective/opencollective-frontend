@@ -8,6 +8,10 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
     imageUrl
     type
     name
+    location {
+      address
+      country
+    }
     payoutMethods {
       id
       type
@@ -49,6 +53,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     status
     privateMessage
     tags
+    createdAt
     items {
       id
       incurredAt
@@ -104,6 +109,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           slug
           type
           expensePolicy
+          website
           location {
             address
             country
@@ -123,6 +129,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           slug
           type
           expensePolicy
+          website
           location {
             address
             country
