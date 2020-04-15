@@ -38,7 +38,7 @@
     "apollo-client": "2.6.8",
     "apollo-link": "1.2.13",
     "apollo-link-context": "1.0.19",
-    "apollo-link-error": "1.1.12",
+    "apollo-link-error": "1.1.13",
     "apollo-link-http": "1.5.16",
     "bootstrap": "3.4.1",
     "canvas-confetti": "1.2.0",
