@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@rebass/grid';
 import { defineMessages, useIntl } from 'react-intl';
+import Markdown from 'react-markdown';
 import Collapse from '../Collapse';
 import { H5, P } from '../Text';
 
@@ -26,12 +27,12 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
       <Collapse title={<H5>{formatMessage(msg.policies)}</H5>}>
         {host && host.expensePolicy && (
           <P fontSize="Caption" color="black.800" lineHeight="Paragraph" mb={2}>
-            {host.expensePolicy}
+            <Markdown source={host.expensePolicy} />
           </P>
         )}
         {collective && collective.expensePolicy && (
           <P fontSize="Caption" color="black.800" lineHeight="Paragraph">
-            {collective.expensePolicy}
+            <Markdown source={collective.expensePolicy} />
           </P>
         )}
       </Collapse>
