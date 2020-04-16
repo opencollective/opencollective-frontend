@@ -41,8 +41,10 @@ const EventDetails = ({ event, tier }) => {
             <HTMLContent>
               <Markdown source={truncatedDescription} />
             </HTMLContent>
-          ) : (
+          ) : event.longDescription ? (
             <HTMLContent content={truncatedDescription} />
+          ) : (
+            <HTMLContent>{truncatedDescription}</HTMLContent>
           )}
           {(isExpended || truncatedDescription.length !== description.length) &&
             (isExpended ? (
