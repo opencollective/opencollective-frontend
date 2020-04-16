@@ -216,18 +216,16 @@ const getTopBackersQuery = gql`
 `;
 
 export const addBackersData = graphql(getTopBackersQuery, {
-  options(props) {
-    return {
-      variables: {
-        CollectiveId: props.collective.id,
-        TierId: props.tier && props.tier.id,
-        offset: 0,
-        role: 'BACKER',
-        orderBy: 'totalDonations',
-        limit: props.limit || 5,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      CollectiveId: props.collective.id,
+      TierId: props.tier && props.tier.id,
+      offset: 0,
+      role: 'BACKER',
+      orderBy: 'totalDonations',
+      limit: props.limit || 5,
+    },
+  }),
 });
 
 export default addBackersData(TopBackersCoverWithData);

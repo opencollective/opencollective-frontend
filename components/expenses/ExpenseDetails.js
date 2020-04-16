@@ -517,13 +517,11 @@ export const addGetExpense = component => {
   }
 
   return graphql(getExpenseQuery, {
-    options(props) {
-      return {
-        variables: {
-          id: props.expense.id,
-        },
-      };
-    },
+    options: props => ({
+      variables: {
+        id: props.expense.id,
+      },
+    }),
   })(component);
 };
 

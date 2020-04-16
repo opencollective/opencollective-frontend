@@ -161,18 +161,16 @@ const getHostsQuery = gql`
 `;
 
 export const addHostsData = graphql(getHostsQuery, {
-  options(props) {
-    return {
-      variables: {
-        tags: props.tags,
-        currency: props.currency,
-        orderBy: props.orderBy,
-        orderDirection: props.orderDirection,
-        offset: 0,
-        limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      tags: props.tags,
+      currency: props.currency,
+      orderBy: props.orderBy,
+      orderDirection: props.orderDirection,
+      offset: 0,
+      limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data, ownProps }) => ({
     data,
     fetchMore: () =>

@@ -337,13 +337,11 @@ export const replaceCreditCard = graphql(
 );
 
 const addSubscriptionsData = graphql(getSubscriptionsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: props.slug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: props.slug,
+    },
+  }),
 
   skip: props => {
     return props.loadingLoggedInUser || !props.LoggedInUser;

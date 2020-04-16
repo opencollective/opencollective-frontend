@@ -204,7 +204,7 @@ class OrderSuccessContributorCardWithData extends React.Component {
 
 export default injectIntl(
   graphql(GetMemberQuery, {
-    options(props) {
+    options: props => {
       const { collective, fromCollective, tier } = props.order;
       const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
       if (tier) {

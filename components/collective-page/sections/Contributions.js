@@ -443,9 +443,9 @@ const withData = graphql(
     }
   `,
   {
-    options(props) {
-      return { variables: { id: props.collective.id } };
-    },
+    options: props => ({
+      variables: { id: props.collective.id },
+    }),
   },
 );
 

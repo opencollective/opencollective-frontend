@@ -208,8 +208,8 @@ const getHostsQuery = gql`
 `;
 
 const addHostsData = graphql(getHostsQuery, {
-  options() {
-    return { variables: { slugs: featuredHostsSlugs } };
+  options: {
+    variables: { slugs: featuredHostsSlugs },
   },
 });
 

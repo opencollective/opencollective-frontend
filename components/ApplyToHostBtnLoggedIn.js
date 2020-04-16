@@ -228,13 +228,11 @@ const editCollectiveMutation = gql`
 `;
 
 const addQuery = graphql(getInactiveCollectivesQuery, {
-  options(props) {
-    return {
-      variables: {
-        memberOfCollectiveSlug: props.LoggedInUser.collective.slug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      memberOfCollectiveSlug: props.LoggedInUser.collective.slug,
+    },
+  }),
 });
 
 const addMutation = graphql(editCollectiveMutation, {

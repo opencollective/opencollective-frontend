@@ -103,13 +103,11 @@ const getConnectedAccountsQuery = gql`
 `;
 
 export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: get(props, 'LoggedInUser.collective.slug'),
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: get(props, 'LoggedInUser.collective.slug'),
+    },
+  }),
 });
 
 const createCollectiveQuery = gql`
