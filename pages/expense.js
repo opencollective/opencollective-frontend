@@ -353,9 +353,9 @@ class ExpensePage extends React.Component {
                     onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                     validateOnChange
                     disableSubmitIfUntouched
-                    onSubmit={expense =>
+                    onSubmit={editedExpense =>
                       this.setState({
-                        editedExpense: { ...expense, tags: editedExpense.tags },
+                        editedExpense,
                         status: PAGE_STATUS.EDIT_SUMMARY,
                       })
                     }
@@ -387,16 +387,7 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
               <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-                <ExpenseInfoSidebar
-                  isLoading={data.loading}
-                  collective={collective}
-                  host={host}
-                  expense={status === PAGE_STATUS.VIEW ? expense : editedExpense}
-                  isEditing={status === PAGE_STATUS.EDIT}
-                  onChangeTags={tags =>
-                    this.setState(({ editedExpense }) => ({ editedExpense: { ...editedExpense, tags } }))
-                  }
-                />
+                <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
               </Box>
             </Flex>
             <Box width={SIDE_MARGIN_WIDTH} />

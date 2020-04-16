@@ -8,10 +8,13 @@ import { Formik, Form, Field, FieldArray, FastField } from 'formik';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { i18nExpenseType } from '../../lib/i18n-expense';
 import { P, Span } from '../Text';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import StyledInput from '../StyledInput';
 import StyledHr from '../StyledHr';
+import StyledTag from '../StyledTag';
+import StyledInputTags from '../StyledInputTags';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
 import StyledInputField from '../StyledInputField';
 import CollectivePicker from '../CollectivePicker';
@@ -189,6 +192,20 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
               maxLength={255}
               withOutline
             />
+            <Flex alignItems="baseline">
+              <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
+                {i18nExpenseType(intl, values.type, values.legacyId)}
+              </StyledTag>
+              <StyledInputTags
+                onChange={tags =>
+                  formik.setFieldValue(
+                    'tags',
+                    tags.map(t => t.value.toUpperCase()),
+                  )
+                }
+                value={values.tags}
+              />
+            </Flex>
             {errors.description && (
               <P color="red.500" mt={2}>
                 {formatFormErrorMessage(intl, errors.description)}
