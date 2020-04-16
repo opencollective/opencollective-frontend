@@ -137,7 +137,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
               <EditableAvatarContainer isDragActive={isDragActive}>
                 <EditOverlay borderRadius={borderRadius}>
                   {!isDragActive && (
-                    <StyledButton buttonSize="tiny">
+                    <StyledButton buttonSize="tiny" minWidth={120}>
                       <Camera size={12} />
                       <Span ml={2} css={{ verticalAlign: 'center' }}>
                         <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
