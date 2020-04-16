@@ -5,6 +5,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
+import nonHostSuccessIllustration from '../../public/static/images/create-collective/original/acceptContributionsNonHostSuccessIllustration.png';
 import placeholderIllustration from '../../public/static/images/create-collective/original/placeholderGraphic.png';
 import { H1, H2, P } from '../Text';
 import Container from '../Container';
@@ -13,17 +14,21 @@ import Avatar from '../Avatar';
 import ExternalLink from '../ExternalLink';
 import Link from '../Link';
 
+import { confettiFireworks } from '../../lib/confettis';
+import { withRouter } from 'next/router';
+
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
 const SmallExternalLink = styled(ExternalLink)`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
 
-class HostSuccessPage extends React.Component {
+class SuccessPage extends React.Component {
   static propTypes = {
-    chosenHost: PropTypes.object.isRequired,
+    chosenHost: PropTypes.object,
     intl: PropTypes.object.isRequired,
     collective: PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -59,37 +64,71 @@ class HostSuccessPage extends React.Component {
     });
   }
 
+  componentDidMount() {
+    confettiFireworks(5000, { zIndex: 3000 });
+  }
+
   render() {
-    const { intl, collective, chosenHost } = this.props;
+    const { intl, collective, chosenHost, router } = this.props;
+    const { path } = router;
 
     return (
       <Fragment>
-        <Box mb={4} mt={5} mx={[2, 6]}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
-            <FormattedMessage
-              id="acceptContributions.applicationSuccess"
-              defaultMessage="You have applied to be hosted by {hostName}."
-              values={{
-                hostName: chosenHost.name,
-              }}
-            />
-          </H1>
-        </Box>
+        <Flex justifyContent={'center'} alignItems={'center'}>
+          <Box mb={4} mt={5} mx={[2, 6]} maxWidth={'575px'}>
+            <H1
+              fontSize={['H5', 'H3']}
+              lineHeight={['H5', 'H3']}
+              fontWeight="bold"
+              color="black.900"
+              textAlign="center"
+            >
+              {path === 'host' ? (
+                <FormattedMessage
+                  id="acceptContributions.myselfSuccess"
+                  defaultMessage="You have applied to be hosted by {hostName}."
+                  values={{
+                    hostName: chosenHost.name,
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="acceptContributions.success.nowAcceptingContributions"
+                  defaultMessage="Congratulations! {collective} is now accepting financial contributions."
+                  values={{
+                    collective: collective.name,
+                  }}
+                />
+              )}
+            </H1>
+          </Box>
+        </Flex>
         <Container display="flex" flexDirection="column" alignItems="center">
           <Flex flexDirection="column" alignItems="center" maxWidth={'575px'} my={3} mx={[3, 0]}>
-            <Avatar collective={chosenHost} radius={64} mb={2} />
-            <P fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold" mb={4}>
-              {chosenHost.name}
-            </P>
-            <P fontSize="LeadParagraph" lineHeight={'H5'} color="black.600" textAlign="center">
-              <FormattedMessage
-                id="acceptContributions.notifiedWhen"
-                defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will only go live once the Collective is approved by the fiscal host."
-                values={{
-                  hostName: chosenHost.name,
-                }}
-              />
-            </P>
+            {path === 'host' ? (
+              <Fragment>
+                <Avatar collective={chosenHost} radius={64} mb={2} />
+                <P fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold" mb={4}>
+                  {chosenHost.name}
+                </P>
+                <P fontSize="LeadParagraph" lineHeight={'H5'} color="black.600" textAlign="center">
+                  <FormattedMessage
+                    id="acceptContributions.notifiedWhen"
+                    defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will only go live once the Collective is approved by the fiscal host."
+                    values={{
+                      hostName: chosenHost.name,
+                    }}
+                  />
+                </P>
+              </Fragment>
+            ) : (
+              <P fontSize="LeadParagraph" lineHeight={'H5'} color="black.600" textAlign="center">
+                <FormattedMessage
+                  id="acceptContributions.success.toConsider"
+                  defaultMessage="A few more things you should consider:"
+                />
+              </P>
+            )}
           </Flex>
           <Flex
             flexDirection={['column', 'row']}
@@ -98,7 +137,11 @@ class HostSuccessPage extends React.Component {
             mx={[2, 4, 0]}
             my={[2, 4]}
           >
-            <img src={placeholderIllustration} width="264px" height="352px" />
+            <img
+              src={path === 'host' ? placeholderIllustration : nonHostSuccessIllustration}
+              width="264px"
+              height="352px"
+            />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
                 {intl.formatMessage(this.messages.tiersAbout)}
@@ -143,4 +186,4 @@ class HostSuccessPage extends React.Component {
   }
 }
 
-export default injectIntl(HostSuccessPage);
+export default withRouter(injectIntl(SuccessPage));

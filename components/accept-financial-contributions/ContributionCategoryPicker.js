@@ -16,6 +16,7 @@ import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
 import ExternalLink from '../ExternalLink';
+import CollectiveNavbar from '../CollectiveNavbar';
 
 const Image = styled.img`
   position: absolute;
@@ -59,6 +60,7 @@ class ContributionCategoryPicker extends React.Component {
   static propTypes = {
     router: PropTypes.object,
     intl: PropTypes.object.isRequired,
+    collective: PropTypes.object,
   };
 
   constructor(props) {
@@ -91,10 +93,11 @@ class ContributionCategoryPicker extends React.Component {
   }
 
   render() {
-    const { intl, router } = this.props;
+    const { intl, router, collective } = this.props;
 
     return (
       <div>
+        <CollectiveNavbar collective={collective} onlyInfos={true} />
         <Box mb={4} mt={5}>
           <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
             {intl.formatMessage(this.messages.header)}
@@ -113,12 +116,10 @@ class ContributionCategoryPicker extends React.Component {
                     <HoverImage src={acceptMyselfHoverIllustration} alt={intl.formatMessage(this.messages.myself)} />
                   </Box>
                   <Link
-                    route="editCollective"
+                    route="accept-financial-contributions"
                     params={{
                       slug: router.query.slug,
-                      section: 'host',
-                      selectedOption: 'ownHost',
-                      hostType: 'individual',
+                      path: 'myself',
                     }}
                   >
                     <StyledButton

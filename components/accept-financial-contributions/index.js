@@ -4,7 +4,8 @@ import { withRouter } from 'next/router';
 
 import ContributionCategoryPicker from './ContributionCategoryPicker';
 import ApplyToHost from './ApplyToHost';
-import HostSuccessPage from './HostSuccessPage';
+import SuccessPage from './SuccessPage';
+import AcceptContributionsMyself from './AcceptContributionsMyself';
 
 class AcceptFinancialContributions extends Component {
   static propTypes = {
@@ -30,17 +31,21 @@ class AcceptFinancialContributions extends Component {
   render() {
     const { router } = this.props;
     const { chosenHost } = this.state;
-    const { path, state } = router.query;
+    const { path, state, message } = router.query;
 
     if (!path) {
-      return <ContributionCategoryPicker />;
+      return <ContributionCategoryPicker collective={this.props.collective} />;
     }
 
-    if (state) {
-      return <HostSuccessPage chosenHost={chosenHost} collective={this.props.collective} />;
+    if (state || message === 'StripeAccountConnected') {
+      return <SuccessPage chosenHost={chosenHost} collective={this.props.collective} />;
     }
 
-    return <ApplyToHost collective={this.props.collective} onChange={this.handleChange} />;
+    if (path === 'host') {
+      return <ApplyToHost collective={this.props.collective} onChange={this.handleChange} />;
+    } else if (path === 'myself') {
+      return <AcceptContributionsMyself collective={this.props.collective} />;
+    }
   }
 }
 
