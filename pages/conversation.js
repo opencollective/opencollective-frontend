@@ -387,11 +387,11 @@ class ConversationPage extends React.Component {
                                   </H4>
                                   {!isEditing ? (
                                     !isEmpty(conversation.tags) && (
-                                      <Flex flexWrap="wrap">
+                                      <Flex flexWrap="wrap" mx={2}>
                                         {conversation.tags.map(tag => (
-                                          <Box key={tag} m={2}>
-                                            <StyledTag>{tag}</StyledTag>
-                                          </Box>
+                                          <StyledTag key={tag} variant="rounded-right" mb="4px" mr="4px">
+                                            {tag}
+                                          </StyledTag>
                                         ))}
                                       </Flex>
                                     )
