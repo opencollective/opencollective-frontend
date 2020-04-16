@@ -207,7 +207,7 @@ class CreateExpensePage extends React.Component {
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
-                        <CreateExpenseDismissibleIntro />
+                        <CreateExpenseDismissibleIntro collectiveName={collective.name} />
                         {step === STEPS.FORM && (
                           <ExpenseForm
                             collective={collective}
