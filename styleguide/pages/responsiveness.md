@@ -1,0 +1,89 @@
+#### Responsive props
+
+The main way to deal with responsiveness in our codebase is through
+the [responsive props or styled-system](https://styled-system.com/responsive-styles).
+
+We use the following breakpoints:
+
+```jsx
+import { getViewportFromWidth } from '../../lib/withViewport';
+import breakpoints from '../../lib/theme/breakpoints';
+import { emToPx } from '../../lib/theme/helpers';
+<table style={{ maxWidth: 350, width: '100%' }}>
+  <thead>
+    <th align="left">Name</th>
+    <th align="left">Value (em)</th>
+    <th align="left">Value (px)</th>
+  </thead>
+  <tbody>
+    {breakpoints.map(breakpoint => (
+      <tr key={breakpoint}>
+        <td>{getViewportFromWidth(emToPx(breakpoint))}</td>
+        <td>{breakpoint}</td>
+        <td>{emToPx(breakpoint)}px</td>
+      </tr>
+    ))}
+  </tbody>
+</table>;
+```
+
+Based on that, the following props will be applied:
+
+```jsx
+import { BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS } from '../../lib/withViewport';
+<pre>{`
+  <Box
+    height={[
+      10, // Default value
+      20, // Applied above ${BREAKPOINTS_NAMES[0]} (${BREAKPOINTS_WIDTHS[0]}px)
+      30, // Applied above ${BREAKPOINTS_NAMES[1]} (${BREAKPOINTS_WIDTHS[1]}px)
+      40, // Applied above ${BREAKPOINTS_NAMES[2]} (${BREAKPOINTS_WIDTHS[2]}px)
+      50, // Applied above ${BREAKPOINTS_NAMES[3]} (${BREAKPOINTS_WIDTHS[3]}px)
+    ]}
+  />
+`}</pre>;
+```
+
+Which will translate to the following CSS:
+
+```css
+.Box-hash {
+  height: 10px;
+}
+
+@media screen and (min-width: 40em) {
+  .Box-hash {
+    height: 20px;
+  }
+}
+
+@media screen and (min-width: 52em) {
+  .Box-hash {
+    height: 30px;
+  }
+}
+
+@media screen and (min-width: 64em) {
+  .Box-hash {
+    height: 40px;
+  }
+}
+
+@media screen and (min-width: 88em) {
+  .Box-hash {
+    height: 50px;
+  }
+}
+```
+
+### withViewport
+
+`withViewport` is a helper to handle responsiveness from JS. Its usage is strongly discouraged if an alternative exists with CSS because:
+
+- It's normally CSS responsibility to handle the responsiveness
+- CSS is more performant to handle that
+- We don't have any info on the screen resolution during SSR
+
+That being said there are legit use cases for it, for example when the layout for a component
+is completly different between mobile and desktop and cannot be reconciliated with flex and
+responsive props.
