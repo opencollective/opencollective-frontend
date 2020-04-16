@@ -492,6 +492,11 @@ class Expense extends React.Component {
               {this.state.success}
             </MessageBox>
           )}
+          {this.state.error && (
+            <MessageBox type="error" withIcon mb={2}>
+              {this.state.error}
+            </MessageBox>
+          )}
           {editable && (
             <div className="actions">
               {mode === 'edit' && this.state.modified && this.state.expense['type'] !== 'UNCLASSIFIED' && (
@@ -517,12 +522,6 @@ class Expense extends React.Component {
                       payoutMethod={expense.payoutMethod}
                     />
                   )}
-                  {this.state.error && (
-                    <MessageBox type="error" withIcon mb={2}>
-                      {this.state.error}
-                    </MessageBox>
-                  )}
-
                   <Flex data-cy="expense-actions" flexDirection={['column', 'row']} flexWrap="wrap" width="100%">
                     {canPay && (
                       <React.Fragment>
