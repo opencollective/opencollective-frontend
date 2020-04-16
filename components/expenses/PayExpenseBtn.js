@@ -83,7 +83,7 @@ class PayExpenseBtn extends React.Component {
         this.props.onSuccess(successMessage);
       }
     } catch (e) {
-      const error = getErrorFromGraphqlException(e).message;
+      const error = getErrorFromGraphqlException(e);
       this.props.onError(error);
       this.setState({ loading: false });
       unlock();
