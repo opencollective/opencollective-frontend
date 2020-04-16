@@ -20,6 +20,7 @@ const defaultRoundedStyleProps = {
 
 const StyledTagBase = styled.div`
   text-align: center;
+  white-space: nowrap; 
 
   ${variant({
     prop: 'variant',
