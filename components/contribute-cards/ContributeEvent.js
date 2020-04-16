@@ -8,7 +8,7 @@ import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
-import { canOrderTicketsFromEvent } from '../../lib/events';
+import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
 import { Span } from '../Text';
 import Link from '../Link';
 import Contribute from './Contribute';
@@ -19,7 +19,8 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const { startsAt, endsAt } = event;
   const description = truncate(event.description, { length: 100 });
   const isTruncated = description && description.length < event.description.length;
-  const isPassed = !canOrderTicketsFromEvent(event);
+  const isPassed = isPastEvent(event);
+  const canOrderTickets = canOrderTicketsFromEvent(event);
   const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
   const eventRouteParams = { parentCollectiveSlug: collective.slug, eventSlug: event.slug };
   return (
@@ -27,6 +28,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       route="event"
       routeParams={eventRouteParams}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
+      disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
