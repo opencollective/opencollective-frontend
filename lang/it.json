@@ -722,7 +722,6 @@
   "expense.RemoveItem": "Remove item",
   "expense.RemoveReceipt": "Remove receipt",
   "Expense.ReviewSummary": "Review expense summary",
-  "expense.save": "salva",
   "Expense.SaveChanges": "Save changes",
   "Expense.SubmittedBy": "Submitted by {name}",
   "Expense.SubmittedByOnDate": "Submitted by {name} on {date, date, long}",
