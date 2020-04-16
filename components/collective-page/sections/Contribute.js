@@ -25,6 +25,11 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import TopContributors from '../TopContributors';
 import SectionTitle from '../SectionTitle';
 
+import { parseToBoolean } from '../../../lib/utils';
+
+// link to new fiscal host application flow if flag is on
+const newHostFlow = parseToBoolean(process.env.NEW_HOST_APPLICATION_FLOW);
+
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];
 
 const ContributeCardContainer = styled(Box).attrs({ px: CONTRIBUTE_CARD_PADDING_X })(
@@ -187,11 +192,17 @@ class SectionContribute extends React.PureComponent {
             </Flex>
             <Box my={5}>
               <Link
-                route="editCollective"
-                params={{
-                  slug: collective.slug,
-                  section: 'host',
-                }}
+                route={newHostFlow ? 'accept-financial-contributions' : 'editCollective'}
+                params={
+                  newHostFlow
+                    ? {
+                        slug: collective.slug,
+                      }
+                    : {
+                        slug: collective.slug,
+                        section: 'host',
+                      }
+                }
               >
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
