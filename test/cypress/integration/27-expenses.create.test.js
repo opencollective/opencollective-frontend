@@ -187,7 +187,7 @@ describe('Legacy expense flow', () => {
       );
       cy.get('.Expenses .expense:first .inputField.description input').focus();
       cy.wait(300);
-      cy.get('.Expenses .expense:first button.save').click();
+      cy.getByDataCy('expense-edit-save-btn').click();
       cy.get('.Expenses .expense:first .status').contains('pending'); // editing an expense should switch status back to pending
       cy.get('.Expenses .expense:first .description').contains('edited');
       cy.get('.Expenses .expense:first .privateMessage').contains('edited');

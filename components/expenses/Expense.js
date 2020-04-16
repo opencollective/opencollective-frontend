@@ -13,7 +13,6 @@ import colors from '../../lib/constants/colors';
 import Avatar from '../Avatar';
 import { Span } from '../Text';
 import Link from '../Link';
-import SmallButton from '../SmallButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
@@ -83,6 +82,7 @@ class Expense extends React.Component {
       showDeleteExpenseModal: false,
       error: null,
       success: null,
+      isSubmitting: false,
     };
 
     this.save = this.save.bind(this);
@@ -185,13 +185,15 @@ class Expense extends React.Component {
 
   async save() {
     try {
+      this.setState({ isSubmitting: true });
       const expense = {
         id: this.props.expense.id,
         ...this.state.expense,
       };
       await this.props.editExpense(expense);
-      this.setState({ modified: false, mode: 'details' });
+      this.setState({ modified: false, mode: 'details', isSubmitting: false });
     } catch (e) {
+      this.setState({ isSubmitting: false });
       this.handleErrorMessage(getErrorFromGraphqlException(e).message);
     }
   }
@@ -210,7 +212,7 @@ class Expense extends React.Component {
 
   render() {
     const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
-
+    console.log(this.props);
     if (!expense.fromCollective) {
       console.warn('No FromCollective for expense', expense);
       return <div />;
@@ -503,9 +505,15 @@ class Expense extends React.Component {
                 <div>
                   <div className="leftColumn" />
                   <div className="rightColumn">
-                    <SmallButton className="primary save" onClick={this.save}>
-                      <FormattedMessage id="expense.save" defaultMessage="save" />
-                    </SmallButton>
+                    <StyledButton
+                      buttonStyle="primary"
+                      onClick={this.save}
+                      loading={this.state.isSubmitting}
+                      data-cy="expense-edit-save-btn"
+                      minWidth={132}
+                    >
+                      <FormattedMessage id="save" defaultMessage="Save" />
+                    </StyledButton>
                   </div>
                 </div>
               )}
