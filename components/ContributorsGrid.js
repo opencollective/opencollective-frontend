@@ -173,10 +173,10 @@ ContributorsGrid.propTypes = {
   /** Maximum number of rows for different viewports. Will fallback on `defaultNbRows` if not provided */
   maxNbRowsForViewports: PropTypes.shape({
     [VIEWPORTS.UNKNOWN]: PropTypes.number,
-    [VIEWPORTS.MOBILE]: PropTypes.number,
-    [VIEWPORTS.TABLET]: PropTypes.number,
-    [VIEWPORTS.DESKTOP]: PropTypes.number,
-    [VIEWPORTS.WIDESCREEN]: PropTypes.number,
+    [VIEWPORTS.XSMALL]: PropTypes.number,
+    [VIEWPORTS.SMALL]: PropTypes.number,
+    [VIEWPORTS.MEDIUM]: PropTypes.number,
+    [VIEWPORTS.LARGE]: PropTypes.number,
   }).isRequired,
 
   /** A callback to calculate left padding */
@@ -205,10 +205,10 @@ ContributorsGrid.defaultProps = {
   defaultNbRows: 1,
   maxNbRowsForViewports: {
     [VIEWPORTS.UNKNOWN]: 1,
-    [VIEWPORTS.MOBILE]: 1,
-    [VIEWPORTS.TABLET]: 2,
-    [VIEWPORTS.DESKTOP]: 3,
-    [VIEWPORTS.WIDESCREEN]: 3,
+    [VIEWPORTS.XSMALL]: 1,
+    [VIEWPORTS.SMALL]: 2,
+    [VIEWPORTS.MEDIUM]: 3,
+    [VIEWPORTS.LARGE]: 3,
   },
 };
 
