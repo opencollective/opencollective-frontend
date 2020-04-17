@@ -84,7 +84,6 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
 export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
-
   return {
     ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee: expenseData.payee && { [payeeIdField]: expenseData.payee.id },
@@ -94,7 +93,7 @@ export const prepareExpenseForSubmit = expenseData => {
     items: expenseData.items.map(item => {
       return pick(item, [
         ...(item.__isNew ? [] : ['id']),
-        ...(item.type === expenseTypes.INVOICE ? [] : ['url']), // never submit URLs for invoices
+        ...(expenseData.type === expenseTypes.INVOICE ? [] : ['url']), // never submit URLs for invoices
         'description',
         'incurredAt',
         'amount',

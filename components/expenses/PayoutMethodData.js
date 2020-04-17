@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get, startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { Span, P } from '../Text';
+import { P } from '../Text';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Container from '../Container';
 
@@ -33,18 +33,12 @@ export const payoutMethodHasData = payoutMethod => {
   }
 };
 
-const PrivateFallback = () => (
-  <Span color="black.500" fontStyle="italic">
-    <FormattedMessage id="Private" defaultMessage="Private" />
-  </Span>
-);
-
 /**
  * Shows the data of the given payout method
  */
 const PayoutMethodData = ({ payoutMethod }) => {
   if (!payoutMethodHasData(payoutMethod)) {
-    return <PrivateFallback />;
+    return null;
   }
 
   switch (payoutMethod.type) {
