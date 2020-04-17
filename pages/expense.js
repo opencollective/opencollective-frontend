@@ -310,26 +310,35 @@ class ExpensePage extends React.Component {
                         </Box>
                       )}
                       <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
-                      <StyledButton
-                        mt={4}
-                        mr={2}
-                        minWidth={150}
-                        data-cy="edit-expense-btn"
-                        onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
-                        disabled={this.state.isSubmitting}
-                      >
-                        ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
-                      </StyledButton>
-                      <StyledButton
-                        buttonStyle="primary"
-                        mt={3}
-                        data-cy="submit-expense-btn"
-                        onClick={this.onSummarySubmit}
-                        loading={this.state.isSubmitting}
-                        minWidth={150}
-                      >
-                        <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
-                      </StyledButton>
+                      <Flex flexWrap="wrap" mt={4}>
+                        <StyledButton
+                          mt={2}
+                          minWidth={175}
+                          width={['100%', 'auto']}
+                          mx={[2, 0]}
+                          mr={[null, 3]}
+                          whiteSpace="nowrap"
+                          data-cy="edit-expense-btn"
+                          onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
+                          disabled={this.state.isSubmitting}
+                        >
+                          ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+                        </StyledButton>
+                        <StyledButton
+                          buttonStyle="primary"
+                          mt={2}
+                          minWidth={175}
+                          width={['100%', 'auto']}
+                          mx={[2, 0]}
+                          mr={[null, 3]}
+                          whiteSpace="nowrap"
+                          data-cy="submit-expense-btn"
+                          onClick={this.onSummarySubmit}
+                          loading={this.state.isSubmitting}
+                        >
+                          <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                        </StyledButton>
+                      </Flex>
                     </Box>
                   )}
                 </Box>

@@ -231,25 +231,49 @@ class CreateExpensePage extends React.Component {
                             <Box mt={24}>
                               {this.state.expense.type === expenseTypes.INVOICE && (
                                 <Box mb={4}>
-                                  <ExpenseAttachedFilesForm onChange={this.onAttachedFilesChange} />
+                                  <ExpenseAttachedFilesForm
+                                    onChange={this.onAttachedFilesChange}
+                                    defaultValue={this.state.expense.attachedFiles}
+                                  />
                                 </Box>
                               )}
-                              <ExpenseNotesForm onChange={this.onNotesChanges} />
+                              <ExpenseNotesForm
+                                onChange={this.onNotesChanges}
+                                defaultValue={this.state.expense.privateMessage}
+                              />
                               {this.state.error && (
                                 <MessageBox type="error" withIcon mt={3}>
                                   {this.state.error.message}
                                 </MessageBox>
                               )}
-                              <StyledButton
-                                buttonStyle="primary"
-                                mt={4}
-                                data-cy="submit-expense-btn"
-                                onClick={this.onSummarySubmit}
-                                loading={this.state.isSubmitting}
-                                minWidth={150}
-                              >
-                                <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                              </StyledButton>
+                              <Flex flexWrap="wrap" mt={4}>
+                                <StyledButton
+                                  mt={2}
+                                  minWidth={175}
+                                  width={['100%', 'auto']}
+                                  mx={[2, 0]}
+                                  mr={[null, 3]}
+                                  whiteSpace="nowrap"
+                                  data-cy="edit-expense-btn"
+                                  onClick={() => this.setState({ step: STEPS.FORM })}
+                                  disabled={this.state.isSubmitting}
+                                >
+                                  ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+                                </StyledButton>
+                                <StyledButton
+                                  buttonStyle="primary"
+                                  mt={2}
+                                  width={['100%', 'auto']}
+                                  mx={[2, 0]}
+                                  whiteSpace="nowrap"
+                                  data-cy="submit-expense-btn"
+                                  onClick={this.onSummarySubmit}
+                                  loading={this.state.isSubmitting}
+                                  minWidth={175}
+                                >
+                                  <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                                </StyledButton>
+                              </Flex>
                             </Box>
                           </div>
                         )}

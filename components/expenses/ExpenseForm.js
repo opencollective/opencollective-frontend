@@ -286,7 +286,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                     {values.payoutMethod && (
                       <FastField name="payoutMethod">
                         {({ field, meta }) => (
-                          <Box mr={fieldsMarginRight} mt={2} flex="1" minWidth={300}>
+                          <Box mr={fieldsMarginRight} mt={2} flex="1" minWidth={258}>
                             <PayoutMethodForm
                               fieldsPrefix="payoutMethod"
                               payoutMethod={field.value}
@@ -304,14 +304,18 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
           </StyledCard>
         </Box>
       )}
-      <Box mt={4}>
+      <Flex mt={4} flexWrap="wrap">
         {onCancel && (
           <StyledButton
             type="button"
             data-cy="expense-cancel-btn"
             disabled={formik.isSubmitting}
-            minWidth={170}
-            mr={2}
+            mt={2}
+            minWidth={175}
+            width={['100%', 'auto']}
+            mx={[2, 0]}
+            mr={[null, 3]}
+            whiteSpace="nowrap"
             onClick={() => {
               if (!formik.dirty || confirm(formatMessage(msg.leaveWithUnsavedChanges))) {
                 onCancel();
@@ -323,16 +327,21 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
         )}
         <StyledButton
           type="submit"
+          minWidth={175}
+          width={['100%', 'auto']}
+          mx={[2, 0]}
+          mr={[null, 3]}
+          mt={2}
+          whiteSpace="nowrap"
           data-cy="expense-summary-btn"
           buttonStyle="primary"
           disabled={!stepTwoCompleted || !formik.isValid}
           loading={formik.isSubmitting}
-          minWidth={170}
         >
           <FormattedMessage id="Expense.ReviewSummary" defaultMessage="Review expense summary" />
           &nbsp;→
         </StyledButton>
-      </Box>
+      </Flex>
     </Form>
   );
 };
