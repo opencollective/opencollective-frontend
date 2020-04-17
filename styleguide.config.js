@@ -34,29 +34,39 @@ module.exports = {
       content: 'styleguide/pages/index.md',
     },
     {
-      name: 'Typography',
-      content: 'styleguide/pages/typography.md',
-      components: 'components/Text.js',
+      name: 'Design system',
+      description: 'Defines the general rules & best practices for design',
+      sections: [
+        {
+          name: 'Responsiveness',
+          content: 'styleguide/pages/responsiveness.md',
+        },
+        {
+          name: 'Grid',
+          content: 'styleguide/pages/Grid.md',
+          sections: [
+            {
+              name: 'Box',
+              content: 'styleguide/examples/Box.md',
+            },
+            {
+              name: 'Flex',
+              content: 'styleguide/examples/Flex.md',
+            },
+          ],
+        },
+        {
+          name: 'Typography',
+          content: 'styleguide/pages/typography.md',
+          components: 'components/Text.js',
+        },
+      ],
     },
     {
       name: 'Atoms',
       components: 'components/Styled*.js',
       description: 'Base design atoms.',
       sectionDepth: 1,
-    },
-    {
-      name: 'Grid',
-      content: 'styleguide/pages/Grid.md',
-      sections: [
-        {
-          name: 'Box',
-          content: 'styleguide/examples/Box.md',
-        },
-        {
-          name: 'Flex',
-          content: 'styleguide/examples/Flex.md',
-        },
-      ],
     },
     {
       name: 'Master components',

@@ -225,7 +225,7 @@ const StepsProgress = ({
 
   return (
     <StepsOuter className="steps-progress">
-      {viewport === VIEWPORTS.MOBILE ? (
+      {viewport === VIEWPORTS.XSMALL ? (
         <StepMobile>
           <StepsMobileLeft>
             <P color="black.900" fontWeight="600" fontSize="Paragraph">

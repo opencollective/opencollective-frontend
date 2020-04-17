@@ -32,7 +32,7 @@ class Pricing extends Component {
   getActiveTab() {
     const { viewport, tab } = this.props;
     // Return a default tab for desktop
-    if (viewport !== VIEWPORTS.UNKNOWN && viewport !== VIEWPORTS.MOBILE && !tab) {
+    if (viewport !== VIEWPORTS.UNKNOWN && viewport !== VIEWPORTS.XSMALL && !tab) {
       return 'singleCollectiveWithAccount';
     }
     return tab;
