@@ -308,7 +308,7 @@ Hero.propTypes = {
     }).isRequired,
     parentCollective: PropTypes.shape({
       slug: PropTypes.string,
-    }).isRequired,
+    }),
   }).isRequired,
 
   /** Collective's host */
