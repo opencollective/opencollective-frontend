@@ -17,6 +17,8 @@ env:
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+  GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
