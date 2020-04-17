@@ -5,6 +5,7 @@ import { Box, Flex } from '@rebass/grid';
 import { first, isEmpty, get, pick } from 'lodash';
 import { Formik, Form, Field, FieldArray, FastField } from 'formik';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { P, Span } from '../Text';
@@ -81,9 +82,12 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
  * like URLs for items when the expense is an invoice.
  */
 export const prepareExpenseForSubmit = expenseData => {
+  // The collective picker still uses API V1 for when creating a new profile on the fly
+  const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
+
   return {
     ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
-    payee: pick(expenseData.payee, ['id']),
+    payee: expenseData.payee && { [payeeIdField]: expenseData.payee.id },
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
     attachedFiles: expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])),
     // Omit item's ids that were created for keying purposes
@@ -204,6 +208,9 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                         >
                           {({ id }) => (
                             <CollectivePicker
+                              creatable
+                              addLoggedInUserAsAdmin
+                              types={[CollectiveType.ORGANIZATION]}
                               inputId={id}
                               collectives={payoutProfiles}
                               getDefaultOptions={build => values.payee && build(values.payee)}
