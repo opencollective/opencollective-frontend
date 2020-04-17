@@ -139,7 +139,7 @@ ExpenseAdminActions.propTypes = {
     parentCollective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
-  }).isRequired,
+  }),
   permissions: PropTypes.shape({
     canEdit: PropTypes.bool,
     canDelete: PropTypes.bool,
