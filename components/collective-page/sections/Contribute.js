@@ -51,7 +51,7 @@ class SectionContribute extends React.PureComponent {
         contributors: PropTypes.arrayOf(PropTypes.object),
       }),
     ),
-    subCollectives: PropTypes.arrayOf(
+    relatedCollectives: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,
         collective: PropTypes.shape({
@@ -146,7 +146,7 @@ class SectionContribute extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, events, subCollectives, contributors, contributorsStats, isAdmin } = this.props;
+    const { collective, tiers, events, relatedCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
@@ -154,7 +154,7 @@ class SectionContribute extends React.PureComponent {
     const sortedTiers = this.sortTiers(this.removeTickets(tiers));
     const isEvent = collective.type === CollectiveType.EVENT;
     const hasContribute = collective.isActive || isAdmin;
-    const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || subCollectives.length > 0);
+    const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || relatedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
 
@@ -164,7 +164,7 @@ class SectionContribute extends React.PureComponent {
     1. admin + no host = Contribute Section and 'Start accepting financial contributions' ✅
     2a. admin + host = normal Contribute section ✅
     2b. not admin + Collective active = normal Contribute section ???
-    3. not admin + Collective not active + no subcollectives/events = display nothing ✅
+    3. not admin + Collective not active + no relatedcollectives/events = display nothing ✅
     */
 
     const createContributionTierRoute = isEvent
@@ -276,7 +276,7 @@ class SectionContribute extends React.PureComponent {
                     <ContainerSectionContent>
                       <Flex justifyContent="space-between" alignItems="center" mb={3}>
                         <H3 fontSize="H5" fontWeight="600" color="black.700">
-                          {subCollectives.length > 0 ? (
+                          {relatedCollectives.length > 0 ? (
                             <FormattedMessage
                               id="SectionContribute.MoreWays"
                               defaultMessage="More ways to contribute"
@@ -292,7 +292,7 @@ class SectionContribute extends React.PureComponent {
                     </ContainerSectionContent>
 
                     <ContributeCardsContainer ref={ref}>
-                      {subCollectives.map(({ id, collective }) => (
+                      {relatedCollectives.map(({ id, collective }) => (
                         <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
                           <ContributeCollective collective={collective} />
                         </Box>

@@ -435,7 +435,7 @@
   "CP.Contribute.Financial": "Contributions financières",
   "CP.Contribute.Title": "Contribuez",
   "CP.Contributions.PartOfOrg": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de notre Organisation",
-  "CP.Contributions.SubCollective": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de ce que nous faisons",
+  "CP.Contributions.RelatedCollective": "{n, plural, one {Ce Collectif fait} other {Ces Collectifs font}} partie de ce que nous faisons",
   "create-expense.title": "Ajouter une dépense",
   "create.collective.placeholder": "Faire du monde un endroit meilleur",
   "create.pledge.stats": "par {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# personne } other {# personnes }}",
