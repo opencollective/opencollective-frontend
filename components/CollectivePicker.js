@@ -230,6 +230,7 @@ class CollectivePicker extends React.PureComponent {
       minWidth,
       maxWidth,
       width,
+      addLoggedInUserAsAdmin,
       ...props
     } = this.props;
     const { createFormCollectiveType, createdCollectives } = this.state;
@@ -287,6 +288,7 @@ class CollectivePicker extends React.PureComponent {
                     <CreateCollectiveMiniForm
                       type={createFormCollectiveType}
                       onCancel={this.setCreateFormCollectiveType}
+                      addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
                       onSuccess={collective => {
                         if (onChange) {
                           onChange({ label: collective.name, value: collective });
@@ -340,6 +342,8 @@ CollectivePicker.propTypes = {
   groupByType: PropTypes.bool,
   /** If true, a permanent option to create a collective will be displayed in the select */
   creatable: PropTypes.bool,
+  /** If true, logged in user will be added as an admin of the created account */
+  addLoggedInUserAsAdmin: PropTypes.bool,
   /** Force menu to be open. Ignored during collective creation */
   menuIsOpen: PropTypes.bool,
   /** Disabled */

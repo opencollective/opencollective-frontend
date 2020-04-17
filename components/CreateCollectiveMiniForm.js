@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Box } from '@rebass/grid';
-import { get, pick } from 'lodash';
+import { get, pick, cloneDeep } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { Formik, Field, Form } from 'formik';
@@ -17,6 +17,7 @@ import StyledInput from './StyledInput';
 import Container from './Container';
 import StyledButton from './StyledButton';
 import MessageBox from './MessageBox';
+import { withUser } from './UserProvider';
 
 const CreateNewMessages = defineMessages({
   [CollectiveType.COLLECTIVE]: {
@@ -112,6 +113,15 @@ const CreateCollectiveMutation = gql`
       slug
       type
       imageUrl(height: 64)
+      members {
+        id
+        role
+        member {
+          id
+          slug
+          name
+        }
+      }
     }
   }
 `;
@@ -140,7 +150,7 @@ const CreateUserMutation = gql`
  * A mini-form to create collectives/orgs/users. Meant to be embed in popups or
  * small component where we want to provide just the essential fields.
  */
-const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
+const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAsAdmin, LoggedInUser }) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
@@ -180,7 +190,12 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess }) => {
   };
 
   const submit = formValues => {
-    return createCollective({ variables: prepareMutationVariables({ ...formValues, type }) }).then(({ data }) => {
+    const values = cloneDeep({ ...formValues, type });
+    if (addLoggedInUserAsAdmin && LoggedInUser && values.members) {
+      values.members.push({ member: { id: LoggedInUser.CollectiveId } });
+    }
+
+    return createCollective({ variables: prepareMutationVariables(values) }).then(({ data }) => {
       return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
     });
   };
@@ -312,6 +327,10 @@ CreateCollectiveMiniForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   /** Called with the collective created when the function succeed */
   onSuccess: PropTypes.func.isRequired,
+  /** If true, the logged in user will be added as an admin of the collective */
+  addLoggedInUserAsAdmin: PropTypes.bool,
+  /** @ignore from withUser */
+  LoggedInUser: PropTypes.object,
 };
 
-export default CreateCollectiveMiniForm;
+export default withUser(CreateCollectiveMiniForm);
