@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Mon May 04 2020 11:35:58 GMT+0100 (British Summer Time)
+# timestamp: Mon May 04 2020 22:17:41 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -530,7 +530,7 @@ type Collective implements Account {
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
-  host: Account
+  host: Host
 
   """
   Return this collective approved date
@@ -2202,7 +2202,7 @@ type Event implements Account {
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
-  host: Account
+  host: Host
 
   """
   Returns whether this collective is approved

@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Fragment } from 'react';
 import themeGet from '@styled-system/theme-get';
-import { defineMessages, injectIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../Container';
@@ -35,169 +35,118 @@ const Image = styled.img`
   }
 `;
 
-class CollectiveCategoryPicker extends React.Component {
-  static propTypes = {
-    query: PropTypes.object,
-    defaultValue: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    intl: PropTypes.object.isRequired,
-    subtitle: PropTypes.string,
-  };
+const messages = defineMessages({
+  community: {
+    id: 'createCollective.category.community',
+    defaultMessage: 'For any community',
+  },
+  opensource: {
+    id: 'createCollective.category.newOpenSource',
+    defaultMessage: 'For open source projects',
+  },
+  climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
+  covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
+});
 
-  constructor(props) {
-    super(props);
-    this.state = { category: null };
-    this.handleChange = this.handleChange.bind(this);
+const CollectiveCategoryPicker = () => {
+  const router = useRouter();
+  const { formatMessage } = useIntl();
 
-    this.messages = defineMessages({
-      community: {
-        id: 'createCollective.category.community',
-        defaultMessage: 'For any community',
-      },
-      opensource: {
-        id: 'createCollective.category.newOpenSource',
-        defaultMessage: 'For open source projects',
-      },
-      climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
-      covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
-      header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
-      examples: { id: 'createCollective.examples', defaultMessage: 'See examples' },
-    });
-  }
-
-  handleChange(fieldname, value) {
-    this.props.onChange(fieldname, value);
-  }
-
-  render() {
-    const { intl, query } = this.props;
-
-    return (
-      <div>
-        <Box mb={4} mt={5}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
-            {intl.formatMessage(this.messages.header)}
-          </H1>
+  return (
+    <Fragment>
+      <Box mb={4} mt={5}>
+        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+          <FormattedMessage id="createCollective.header.create" defaultMessage="Create a Collective" />
+        </H1>
+      </Box>
+      <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
+        <Box alignItems="center">
+          <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
+            <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
+              <Flex flexDirection="column" justifyContent="center" alignItems="center">
+                <Image
+                  src="/static/images/create-collective/openSourceIllustration.png"
+                  alt={formatMessage(messages.opensource)}
+                />
+                <Link
+                  route="create-collective"
+                  params={{
+                    hostCollectiveSlug: router.query.hostCollectiveSlug,
+                    verb: router.query.verb,
+                    category: 'opensource',
+                  }}
+                >
+                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
+                    {formatMessage(messages.opensource)}
+                  </StyledButton>
+                </Link>
+                <ExamplesLink href="/discover?show=opensource" openInNewTab>
+                  <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
+                </ExamplesLink>
+              </Flex>
+            </Container>
+            <Container
+              borderLeft={['none', '1px solid #E6E8EB']}
+              borderTop={['1px solid #E6E8EB', 'none']}
+              alignItems="center"
+              width={[null, 280, 312]}
+              mb={[4, 0]}
+            >
+              <Flex flexDirection="column" justifyContent="center" alignItems="center">
+                <Image
+                  src="/static/images/create-collective/climateIllustration.png"
+                  alt={formatMessage(messages.covid)}
+                />
+                <Link
+                  route="create-collective"
+                  params={{
+                    hostCollectiveSlug: router.query.hostCollectiveSlug,
+                    verb: router.query.verb,
+                    category: 'covid-19',
+                  }}
+                >
+                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
+                    {formatMessage(messages.covid)}
+                  </StyledButton>
+                </Link>
+                <ExamplesLink href="/discover?show=covid-19" openInNewTab>
+                  <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
+                </ExamplesLink>
+              </Flex>
+            </Container>
+            <Container
+              borderLeft={['none', '1px solid #E6E8EB']}
+              borderTop={['1px solid #E6E8EB', 'none']}
+              alignItems="center"
+              width={[null, 280, 312]}
+            >
+              <Flex flexDirection="column" justifyContent="center" alignItems="center">
+                <Image
+                  src="/static/images/create-collective/communityIllustration.png"
+                  alt={formatMessage(messages.community)}
+                />
+                <Link
+                  route="create-collective"
+                  params={{
+                    hostCollectiveSlug: router.query.hostCollectiveSlug,
+                    verb: router.query.verb,
+                    category: 'community',
+                  }}
+                >
+                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
+                    {formatMessage(messages.community)}
+                  </StyledButton>
+                </Link>
+                <ExamplesLink href="/discover?show=community" openInNewTab>
+                  <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
+                </ExamplesLink>
+              </Flex>
+            </Container>
+          </Flex>
         </Box>
-        <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
-          <Box alignItems="center">
-            <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
-              <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
-                <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <Image
-                    src="/static/images/create-collective/openSourceIllustration.png"
-                    alt={intl.formatMessage(this.messages.opensource)}
-                  />
-                  <Link
-                    route="create-collective"
-                    params={{
-                      hostCollectiveSlug: query.hostCollectiveSlug,
-                      verb: query.verb,
-                      category: 'opensource',
-                    }}
-                  >
-                    <StyledButton
-                      fontSize="13px"
-                      buttonStyle="primary"
-                      minHeight="36px"
-                      mt={[2, 3]}
-                      mb={3}
-                      px={3}
-                      onClick={() => {
-                        this.handleChange('category', 'opensource');
-                      }}
-                    >
-                      {intl.formatMessage(this.messages.opensource)}
-                    </StyledButton>
-                  </Link>
-                  <ExamplesLink href="/discover?show=opensource" openInNewTab>
-                    {intl.formatMessage(this.messages.examples)}
-                  </ExamplesLink>
-                </Flex>
-              </Container>
-              <Container
-                borderLeft={['none', '1px solid #E6E8EB']}
-                borderTop={['1px solid #E6E8EB', 'none']}
-                alignItems="center"
-                width={[null, 280, 312]}
-                mb={[4, 0]}
-              >
-                <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <Image
-                    src="/static/images/create-collective/climateIllustration.png"
-                    alt={intl.formatMessage(this.messages.covid)}
-                  />
-                  <Link
-                    route="create-collective"
-                    params={{
-                      hostCollectiveSlug: query.hostCollectiveSlug,
-                      verb: query.verb,
-                      category: 'covid-19',
-                    }}
-                  >
-                    <StyledButton
-                      fontSize="13px"
-                      buttonStyle="primary"
-                      minHeight="36px"
-                      mt={[2, 3]}
-                      mb={3}
-                      px={3}
-                      onClick={() => {
-                        this.handleChange('category', 'covid-19');
-                      }}
-                    >
-                      {intl.formatMessage(this.messages.covid)}&nbsp;
-                    </StyledButton>
-                  </Link>
-                  <ExamplesLink href="/discover?show=covid-19" openInNewTab>
-                    {intl.formatMessage(this.messages.examples)}
-                  </ExamplesLink>
-                </Flex>
-              </Container>
-              <Container
-                borderLeft={['none', '1px solid #E6E8EB']}
-                borderTop={['1px solid #E6E8EB', 'none']}
-                alignItems="center"
-                width={[null, 280, 312]}
-              >
-                <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <Image
-                    src="/static/images/create-collective/communityIllustration.png"
-                    alt={intl.formatMessage(this.messages.community)}
-                  />
-                  <Link
-                    route="create-collective"
-                    params={{
-                      hostCollectiveSlug: query.hostCollectiveSlug,
-                      verb: query.verb,
-                      category: 'community',
-                    }}
-                  >
-                    <StyledButton
-                      fontSize="13px"
-                      buttonStyle="primary"
-                      minHeight="36px"
-                      mt={[2, 3]}
-                      mb={3}
-                      px={3}
-                      onClick={() => {
-                        this.handleChange('category', 'community');
-                      }}
-                    >
-                      {intl.formatMessage(this.messages.community)}
-                    </StyledButton>
-                  </Link>
-                  <ExamplesLink href="/discover?show=community" openInNewTab>
-                    {intl.formatMessage(this.messages.examples)}
-                  </ExamplesLink>
-                </Flex>
-              </Container>
-            </Flex>
-          </Box>
-        </Flex>
-      </div>
-    );
-  }
-}
+      </Flex>
+    </Fragment>
+  );
+};
 
-export default injectIntl(CollectiveCategoryPicker);
+export default CollectiveCategoryPicker;
