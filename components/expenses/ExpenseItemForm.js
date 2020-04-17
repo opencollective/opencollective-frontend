@@ -138,7 +138,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               required
               label={formatMessage(msg.dateLabel)}
               labelFontSize="LeadCaption"
-              flex="1 1 50%"
+              flex={requireFile ? '1 1 44%' : '1 1 50%'}
               mt={3}
             >
               {inputProps => (
@@ -163,6 +163,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               labelFontSize="LeadCaption"
               inputType="number"
               flex="1 1 30%"
+              minWidth={150}
               maxWidth="100%"
               mt={3}
             >

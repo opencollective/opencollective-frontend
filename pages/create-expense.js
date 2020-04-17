@@ -207,7 +207,7 @@ class CreateExpensePage extends React.Component {
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
-                        <CreateExpenseDismissibleIntro />
+                        <CreateExpenseDismissibleIntro collectiveName={collective.name} />
                         {step === STEPS.FORM && (
                           <ExpenseForm
                             collective={collective}
@@ -256,7 +256,7 @@ class CreateExpensePage extends React.Component {
                       </Box>
                     )}
                   </Box>
-                  <Box minWidth={300} width={['100%', null, null, 300]} px={3} mt={3}>
+                  <Box minWidth={270} width={['100%', null, null, 275]} mt={70}>
                     <ExpenseInfoSidebar
                       isLoading={data.loading}
                       collective={collective}

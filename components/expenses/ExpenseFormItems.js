@@ -49,16 +49,30 @@ export default class ExpenseFormItems extends React.PureComponent {
   };
 
   componentDidMount() {
-    this.addDefaultItemIfEmpty();
-  }
-
-  componentDidUpdate() {
-    this.addDefaultItemIfEmpty();
-  }
-
-  addDefaultItemIfEmpty() {
     const { values } = this.props.form;
-    if (values.type === expenseTypes.INVOICE && isEmpty(values.items)) {
+    if (values.type === expenseTypes.INVOICE) {
+      this.addDefaultItem();
+    }
+  }
+
+  componentDidUpdate(oldProps) {
+    const { values, touched } = this.props.form;
+
+    if (oldProps.form.values.type !== values.type) {
+      if (values.type === expenseTypes.INVOICE) {
+        this.addDefaultItem();
+      } else if (!touched.items && values.items?.length === 1) {
+        const firstItem = values.items[0];
+        if (!firstItem.url && !firstItem.description && !firstItem.amount) {
+          this.props.remove(0);
+        }
+      }
+    }
+  }
+
+  addDefaultItem() {
+    const { values } = this.props.form;
+    if (isEmpty(values.items)) {
       this.props.push(newExpenseItem());
     }
   }
