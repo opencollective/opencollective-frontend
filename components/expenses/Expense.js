@@ -212,7 +212,6 @@ class Expense extends React.Component {
 
   render() {
     const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
-    console.log(this.props);
     if (!expense.fromCollective) {
       console.warn('No FromCollective for expense', expense);
       return <div />;
