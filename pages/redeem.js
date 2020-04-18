@@ -112,9 +112,7 @@ class RedeemPage extends React.Component {
     try {
       if (this.props.LoggedInUser) {
         await this.props.claimPaymentMethod(code);
-
-        // Refresh LoggedInUser
-        this.props.refetchLoggedInUser();
+        await this.props.refetchLoggedInUser({ ignoreApolloCache: true });
         Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
         return;
       } else {
@@ -307,8 +305,6 @@ const addMutation = graphql(redeemMutation, {
       // `client.query` will deliver new data for next call
       return await mutate({
         variables: { code, user },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),

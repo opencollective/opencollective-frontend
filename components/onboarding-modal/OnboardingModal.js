@@ -19,7 +19,6 @@ import StyledButton from '../../components/StyledButton';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { Router } from '../../server/pages';
 
 const StepsProgressBox = styled(Box)`
@@ -415,8 +414,6 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
     EditCollectiveMembers: async ({ collectiveId, members }) => {
       return await mutate({
         variables: { collectiveId, members },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
@@ -439,8 +436,6 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
     EditCollectiveContact: async ({ collective }) => {
       return await mutate({
         variables: { collective },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),

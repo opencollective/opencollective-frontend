@@ -41,7 +41,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
         await deleteUserCollective(collective.id);
       } else {
         await deleteCollective(collective.id);
-        await props.refetchLoggedInUser();
+        await props.refetchLoggedInUser({ ignoreApolloCache: true });
       }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
     } catch (err) {

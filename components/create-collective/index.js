@@ -13,7 +13,6 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import MessageBox from '../MessageBox';
 import { withUser } from '../UserProvider';
 
-import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { parseToBoolean } from '../../lib/utils';
@@ -100,7 +99,7 @@ class CreateCollective extends Component {
         status: 'idle',
         result: { success: 'Collective created successfully' },
       });
-      await this.props.refetchLoggedInUser();
+      await this.props.refetchLoggedInUser({ ignoreApolloCache: true });
       // don't show banner if we show the modal and vice versa
       if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
         Router.pushRoute('collective-with-onboarding', {
@@ -218,8 +217,6 @@ const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
     createCollective: async ({ collective, host, automateApprovalWithGithub }) => {
       return await mutate({
         variables: { collective, host, automateApprovalWithGithub },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
