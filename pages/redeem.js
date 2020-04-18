@@ -21,7 +21,6 @@ import RedeemSuccess from '../components/RedeemSuccess';
 import { P, H1, H5 } from '../components/Text';
 import LinkCollective from '../components/LinkCollective';
 
-import { getLoggedInUserQuery } from '../lib/graphql/queries';
 import { isValidEmail } from '../lib/utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 
@@ -301,11 +300,7 @@ const redeemMutation = gql`
 const addMutation = graphql(redeemMutation, {
   props: ({ mutate }) => ({
     claimPaymentMethod: async (code, user) => {
-      // Claim payment method and refresh LoggedInUser Apollo cache so
-      // `client.query` will deliver new data for next call
-      return await mutate({
-        variables: { code, user },
-      });
+      return await mutate({ variables: { code, user } });
     },
   }),
 });

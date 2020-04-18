@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { addDeleteCollectiveMutation, addDeleteUserCollectiveMutation } from '../../../lib/graphql/mutations';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { Router } from '../../../server/pages';
 
@@ -26,21 +27,36 @@ const getCollectiveType = type => {
   }
 };
 
-const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, ...props }) => {
+const DELETE_COLLECTIVE = gql`
+  mutation deleteCollective($id: Int!) {
+    deleteCollective(id: $id) {
+      id
+    }
+  }
+`;
+
+const DELETE_USER_COLLECTIVE = gql`
+  mutation deleteUserCollective($id: Int!) {
+    deleteUserCollective(id: $id) {
+      id
+    }
+  }
+`;
+
+const DeleteCollective = ({ collective, ...props }) => {
   const collectiveType = getCollectiveType(collective.type);
   const [showModal, setShowModal] = useState(false);
-  const [deleteStatus, setDeleteStatus] = useState({
-    deleting: false,
-    error: null,
-  });
+  const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
+  const [deleteCollective] = useMutation(DELETE_COLLECTIVE, { variables: { id: collective.id } });
+  const [deleteUserCollective] = useMutation(DELETE_USER_COLLECTIVE, { variables: { id: collective.id } });
 
   const handleDelete = async () => {
     try {
       setDeleteStatus({ ...deleteStatus, deleting: true });
       if (collective.type === 'USER') {
-        await deleteUserCollective(collective.id);
+        await deleteUserCollective();
       } else {
-        await deleteCollective(collective.id);
+        await deleteCollective();
         await props.refetchLoggedInUser({ ignoreApolloCache: true });
       }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);
@@ -154,10 +170,7 @@ const DeleteCollective = ({ collective, deleteCollective, deleteUserCollective, 
 
 DeleteCollective.propTypes = {
   collective: PropTypes.object.isRequired,
-  deleteCollective: PropTypes.func,
-  logout: PropTypes.func,
-  deleteUserCollective: PropTypes.func,
   refetchLoggedInUser: PropTypes.func,
 };
 
-export default withUser(addDeleteCollectiveMutation(addDeleteUserCollectiveMutation(DeleteCollective)));
+export default withUser(DeleteCollective);
