@@ -9,11 +9,11 @@ import { textTransform } from '../lib/styled-system-custom-properties';
 import { Span } from './Text';
 
 const defaultRoundedStyleProps = {
-  background: '#F0F1F2',
+  backgroundColor: 'black.100',
   maxHeight: '24px',
   display: 'inline-flex',
   alignItems: 'center',
-  color: '#4E5052',
+  color: 'black.700',
   fontSize: '12px',
   lineHeight: '18px',
 };
@@ -49,7 +49,7 @@ const StyledTagBase = styled.div`
   & > * {
     vertical-align: middle;
   }
-
+  
   ${background}
   ${color}
   ${space}
@@ -95,8 +95,15 @@ const StyledTagBase = styled.div`
   })}
 `;
 
-const CloseIcon = styled(Times)`
+const CloseButton = styled.button`
   cursor: pointer;
+  color: inherit;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  line-height: inherit;
+  outline: none;
 `;
 
 /** Simple tag to display a short string */
@@ -113,7 +120,9 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
       <Span mr={2} letterSpacing="inherit">
         {children}
       </Span>
-      <CloseIcon size="10px" {...closeButtonProps} />
+      <CloseButton {...closeButtonProps}>
+        <Times size="10px" />
+      </CloseButton>
     </StyledTagBase>
   );
 };
