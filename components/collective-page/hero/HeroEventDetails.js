@@ -34,21 +34,19 @@ const StyledEventNote = styled.div`
   }
 `;
 
-const FormattedDateProps = (value, timeZone) => {
-  const props = {
-    value,
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  };
-  return process.browser ? { ...props, timeZone } : props;
-};
+const FormattedDateProps = (value, timeZone) => ({
+  value,
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone,
+});
 
-const FormattedTimeProps = (value, timeZone) => {
-  const props = { value };
-  return process.browser ? { ...props, timeZone } : props;
-};
+const FormattedTimeProps = (value, timeZone) => ({
+  value,
+  timeZone,
+});
 
 const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
   return (
