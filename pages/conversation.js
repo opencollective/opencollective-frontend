@@ -396,11 +396,14 @@ class ConversationPage extends React.Component {
                                       </Flex>
                                     )
                                   ) : (
-                                    <StyledInputTags
-                                      suggestedTags={this.getSuggestedTags(collective)}
-                                      defaultValue={conversation.tags}
-                                      onChange={options => this.handleTagsChange(options, setValue)}
-                                    />
+                                    <Box mx={2}>
+                                      <StyledInputTags
+                                        renderUpdatedTags
+                                        suggestedTags={this.getSuggestedTags(collective)}
+                                        defaultValue={conversation.tags}
+                                        onChange={options => this.handleTagsChange(options, setValue)}
+                                      />
+                                    </Box>
                                   )}
                                 </React.Fragment>
                               )}

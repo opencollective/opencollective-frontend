@@ -175,7 +175,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
               maxLength={255}
               withOutline
             />
-            <Flex alignItems="baseline">
+            <Flex alignItems="flex-start">
               <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
                 {i18nExpenseType(intl, values.type, values.legacyId)}
               </StyledTag>
