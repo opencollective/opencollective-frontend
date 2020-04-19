@@ -64,7 +64,7 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
           <FormattedTime {...FormattedTimeProps(endsAt, timezone)} />{' '}
         </Fragment>
       )}
-      {moment().tz(timezone).zoneAbbr()}
+      (UTC{moment().tz(timezone).format('Z')})
     </Fragment>
   );
 };
@@ -127,7 +127,7 @@ class HeroEventDetails extends React.Component {
                         endsAt={endsAt}
                         timezone={moment.tz.guess()}
                         isSameDay={this.isSameDay(startsAt, endsAt, moment.tz.guess())}
-                      />
+                      />{' '}
                       (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
                     </Fragment>
                   )}
