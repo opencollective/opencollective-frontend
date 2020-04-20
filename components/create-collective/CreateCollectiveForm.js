@@ -349,7 +349,7 @@ class CreateCollectiveForm extends React.Component {
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton
                         fontSize="13px"
-                        width="148px"
+                        minWidth="148px"
                         minHeight="36px"
                         buttonStyle="primary"
                         type="submit"
