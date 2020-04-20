@@ -71,6 +71,18 @@ class AcceptContributionsMyself extends React.Component {
         id: 'acceptContributions.organization.subtitle',
         defaultMessage: 'Our organization',
       },
+      myOganizations: {
+        id: 'acceptContributions.organization.myOrgs',
+        defaultMessage: 'My organizations',
+      },
+      createNew: {
+        id: 'CollectivePicker.CreateNew',
+        defaultMessage: 'Create new',
+      },
+      createNewOrganization: {
+        id: 'acceptContributions.organization.createNewOrganization',
+        defaultMessage: 'Create new organization',
+      },
     });
   }
 
@@ -107,7 +119,7 @@ class AcceptContributionsMyself extends React.Component {
           <Flex flexDirection="column" justifyContent="center" alignItems="center" my={3} minWidth={'450px'}>
             <Flex px={3} width="100%">
               <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
-                My organizations
+                {intl.formatMessage(this.messages.myOrganizations)}
               </P>
               <Flex flexGrow={1} alignItems="center">
                 <StyledHr width="100%" ml={2} />
@@ -135,7 +147,7 @@ class AcceptContributionsMyself extends React.Component {
             )}
             <Flex px={3} width="100%">
               <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
-                Create new
+                {intl.formatMessage(this.messages.createNew)}
               </P>
               <Flex flexGrow={1} alignItems="center">
                 <StyledHr width="100%" ml={2} />
@@ -155,7 +167,7 @@ class AcceptContributionsMyself extends React.Component {
                 <CreateNewOrg alignItems="center" onClick={() => this.setState({ miniForm: true })}>
                   <PlusCircle size="24" color="gray" />
                   <P fontSize="Caption" color="black.800" ml={2}>
-                    Create new organization
+                    {intl.formatMessage(this.messages.createNewOrganization)}
                   </P>
                 </CreateNewOrg>
               )}
