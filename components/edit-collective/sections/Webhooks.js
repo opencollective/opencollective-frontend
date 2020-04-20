@@ -139,7 +139,7 @@ class Webhooks extends React.Component {
   addWebhook = () => {
     const { webhooks } = this.state;
     webhooks.push({ webhookUrl: '', type: 'all' });
-    this.setState({ webhooks, modified: true });
+    this.setState({ webhooks, modified: true, status: 'invalid' });
   };
 
   removeWebhook = index => {
