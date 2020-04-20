@@ -3,7 +3,6 @@ const path = require('path');
 
 const glob = require('glob');
 const accepts = require('accepts');
-const areIntlLocalesSupported = require('intl-locales-supported').default;
 
 const logger = require('./logger');
 
@@ -15,29 +14,6 @@ const supportedLanguages = [
     .map(f => path.basename(f, '.json'))
     .filter(locale => locale !== 'en'),
 ];
-
-// Polyfill Node with `Intl` that has data for all locales.
-// See: https://formatjs.io/guides/runtime-environments/#server
-if (global.Intl) {
-  // Determine if the built-in `Intl` has the locale data we need.
-  if (!areIntlLocalesSupported(supportedLanguages)) {
-    // `Intl` exists, but it doesn't have the data we need, so load the
-    // polyfill and patch the constructors we need with the polyfills.
-    const IntlPolyfill = require('intl');
-    Intl.NumberFormat = IntlPolyfill.NumberFormat;
-    Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
-    Intl.__disableRegExpRestore = IntlPolyfill.__disableRegExpRestore;
-  }
-} else {
-  // No `Intl`, so use and load the polyfill.
-  global.Intl = require('intl');
-}
-
-// Fix: https://github.com/zeit/next.js/issues/11777
-// See related issue: https://github.com/andyearnshaw/Intl.js/issues/308
-if (Intl.__disableRegExpRestore) {
-  Intl.__disableRegExpRestore();
-}
 
 // We need to expose React Intl's locale data on the request for the user's
 // locale. This function will also cache the scripts by lang in memory.

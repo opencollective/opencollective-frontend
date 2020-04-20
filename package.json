@@ -63,8 +63,6 @@
     "graphql-tag": "2.10.3",
     "helmet": "3.22.0",
     "i18n-iso-countries": "5.1.0",
-    "intl": "1.2.5",
-    "intl-locales-supported": "1.8.5",
     "jsdom": "16.2.2",
     "jsonwebtoken": "8.5.1",
     "load-script": "1.0.0",
