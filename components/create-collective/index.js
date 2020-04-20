@@ -99,7 +99,7 @@ class CreateCollective extends Component {
         status: 'idle',
         result: { success: 'Collective created successfully' },
       });
-      await this.props.refetchLoggedInUser({ ignoreApolloCache: true });
+      await this.props.refetchLoggedInUser();
       // don't show banner if we show the modal and vice versa
       if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
         Router.pushRoute('collective-with-onboarding', {

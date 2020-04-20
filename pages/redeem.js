@@ -111,7 +111,7 @@ class RedeemPage extends React.Component {
     try {
       if (this.props.LoggedInUser) {
         await this.props.claimPaymentMethod(code);
-        await this.props.refetchLoggedInUser({ ignoreApolloCache: true });
+        await this.props.refetchLoggedInUser();
         Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
         return;
       } else {

@@ -98,10 +98,10 @@ class UserProvider extends React.Component {
    * [refetchQueries](https://www.apollographql.com/docs/react/api/react-apollo.html#graphql-mutation-options-refetchQueries)
    * if you really need to be up-to-date with server.
    */
-  refetchLoggedInUser = async ({ ignoreApolloCache = false } = {}) => {
+  refetchLoggedInUser = async () => {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = await getLoggedInUser({ ignoreLocalStorage: true, ignoreApolloCache });
+      const LoggedInUser = await getLoggedInUser({ ignoreLocalStorage: true });
       this.setState({
         errorLoggedInUser: null,
         loadingLoggedInUser: false,
