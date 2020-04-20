@@ -68,7 +68,7 @@ class PayoutMethodSelect extends React.Component {
       if (payoutMethod.name) {
         return payoutMethod.name;
       } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
-        return get(payoutMethod.data, 'email');
+        return `PayPal - ${get(payoutMethod.data, 'email')}`;
       } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
         if (payoutMethod.data.details?.IBAN) {
           return `IBAN ${payoutMethod.data.details.IBAN}`;
