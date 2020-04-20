@@ -13,7 +13,6 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import MessageBox from '../MessageBox';
 import { withUser } from '../UserProvider';
 
-import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { parseToBoolean } from '../../lib/utils';
@@ -218,8 +217,6 @@ const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
     createCollective: async ({ collective, host, automateApprovalWithGithub }) => {
       return await mutate({
         variables: { collective, host, automateApprovalWithGithub },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
