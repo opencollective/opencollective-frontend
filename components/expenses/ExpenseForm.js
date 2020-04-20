@@ -66,6 +66,14 @@ const msg = defineMessages({
     id: 'ExpenseForm.Step1Invoice',
     defaultMessage: 'Set invoice details',
   },
+  step2: {
+    id: 'ExpenseForm.Step2',
+    defaultMessage: 'Reimbursements details',
+  },
+  step2Invoice: {
+    id: 'ExpenseForm.Step2Invoice',
+    defaultMessage: 'Vendor information',
+  },
 });
 
 const getDefaultExpense = (collective, payoutProfiles) => ({
@@ -185,7 +193,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
               <React.Fragment>
                 <Flex alignItems="center" my={24}>
                   <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
-                    <FormattedMessage id="ExpenseForm.Step2" defaultMessage="Payee & payout information" />
+                    {formatMessage(isReceipt ? msg.step2 : msg.step2Invoice)}
                   </Span>
                   <Box ml={2}>
                     <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
