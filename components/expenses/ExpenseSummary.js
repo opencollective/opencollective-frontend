@@ -150,8 +150,8 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
                       />
                     </Box>
                   )}
-                  <Flex flexDirection="column">
-                    <Span mt={2} color="black.900" fontWeight="500">
+                  <Flex flexDirection="column" justifyContent="center">
+                    <Span color="black.900" fontWeight="500">
                       {attachment.description || (
                         <Span color="black.500" fontStyle="italic">
                           <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
