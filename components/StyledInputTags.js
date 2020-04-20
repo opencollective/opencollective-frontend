@@ -143,7 +143,13 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
     isOpen ? handleClose() : setOpen(true);
   };
   const addTag = tag => setTags(uniqBy([...tags, { label: tag.toUpperCase(), value: tag.toUpperCase() }], 'value'));
-  const removeTag = tag => setTags(tags.filter(v => v.value !== tag));
+  const removeTag = (tag, update) => {
+    const updatedTags = tags.filter(v => v.value !== tag);
+    setTags(updatedTags);
+    if (update) {
+      onChange(updatedTags);
+    }
+  };
   const handleNewValue = e => {
     if (e.key === 'Enter') {
       if (e.target.value.length) {
@@ -163,13 +169,19 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   return (
     <Manager>
       <Flex ref={wrapperRef} flexWrap="wrap">
-        {(renderUpdatedTags ? tags : getOptions(value))
-          .map(t => t.value)
-          ?.map(tag => (
-            <StyledTag key={tag} variant="rounded-right" mr="4px" mb="4px">
-              {tag}
-            </StyledTag>
-          ))}
+        {(renderUpdatedTags ? tags : getOptions(value))?.map(tag => (
+          <StyledTag
+            key={tag.value}
+            variant="rounded-right"
+            mr="4px"
+            mb="4px"
+            closeButtonProps={{
+              onClick: () => removeTag(tag.value, true),
+            }}
+          >
+            {tag.label}
+          </StyledTag>
+        ))}
         <Reference>
           {({ ref }) => (
             <Flex ref={ref}>
