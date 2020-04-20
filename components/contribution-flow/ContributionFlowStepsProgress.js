@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import StepsProgress from '../StepsProgress';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { Span } from '../Text';
 import { formatCurrency } from '../../lib/utils';
 

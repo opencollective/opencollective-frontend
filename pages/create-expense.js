@@ -1,4 +1,4 @@
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../components/Grid';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';

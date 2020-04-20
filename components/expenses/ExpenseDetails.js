@@ -13,7 +13,7 @@ import categories from '../../lib/constants/categories';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 
 import TransactionDetails from './TransactionDetails';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import StyledSpinner from '../StyledSpinner';
 import StyledButton from '../StyledButton';

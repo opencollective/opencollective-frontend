@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { get } from 'lodash';
 import { checkVATNumberFormat, getVatPercentage, getVatOriginCountry } from '@opencollective/taxes';
 

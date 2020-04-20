@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import styled from 'styled-components';
 import { truncate, size } from 'lodash';
 

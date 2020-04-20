@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 
 import { Span, H4, P } from '../../Text';
 import Container from '../../Container';

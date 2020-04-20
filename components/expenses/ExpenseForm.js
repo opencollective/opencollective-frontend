@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { first, isEmpty, get, pick } from 'lodash';
 import { Formik, Form, Field, FieldArray, FastField } from 'formik';
 

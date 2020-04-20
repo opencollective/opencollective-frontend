@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useFormik } from 'formik';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { useMutation } from '@apollo/react-hooks';
 
 import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';

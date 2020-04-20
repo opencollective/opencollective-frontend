@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import Container from '../Container';

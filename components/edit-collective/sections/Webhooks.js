@@ -7,7 +7,7 @@ import gql from 'graphql-tag';
 import { isURL } from 'validator';
 import { Close } from '@styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { Add } from '@styled-icons/material/Add';
 
 import events from '../../../lib/constants/notificationEvents';

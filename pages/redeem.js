@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import sanitizeHtml from 'sanitize-html';
 import { graphql } from '@apollo/react-hoc';
 import { fontSize, maxWidth } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 

@@ -5,7 +5,7 @@ import { borders } from 'styled-system';
 import ReactTooltip from 'react-tooltip';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';

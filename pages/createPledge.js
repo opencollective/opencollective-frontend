@@ -21,7 +21,7 @@ import Footer from '../components/Footer';
 import { H3, H4, H5, P } from '../components/Text';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputGroup from '../components/StyledInputGroup';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../components/Grid';
 import Container from '../components/Container';
 import ButtonGroup from '../components/ButtonGroup';
 import Link from '../components/Link';

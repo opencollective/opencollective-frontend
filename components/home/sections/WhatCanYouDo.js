@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { display } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import { P, H3, H4 } from '../../Text';

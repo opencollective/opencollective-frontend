@@ -19,7 +19,6 @@
     "@material-ui/core": "4.9.11",
     "@opencollective/taxes": "2.4.0",
     "@popperjs/core": "2.3.3",
-    "@rebass/grid": "6.1.0",
     "@sentry/browser": "5.15.4",
     "@sentry/node": "5.15.4",
     "@styled-icons/boxicons-regular": "10.0.0",

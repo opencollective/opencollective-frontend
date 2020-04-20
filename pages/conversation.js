@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { get, isEmpty, cloneDeep, update, uniqBy } from 'lodash';
 
 import { Router } from '../server/pages';

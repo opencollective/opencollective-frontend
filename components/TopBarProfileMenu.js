@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get, uniqBy } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 
 import { Settings } from '@styled-icons/feather/Settings';

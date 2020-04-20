@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import { get, truncate } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
 import moment from 'moment';

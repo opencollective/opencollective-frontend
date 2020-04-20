@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 

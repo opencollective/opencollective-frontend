@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 

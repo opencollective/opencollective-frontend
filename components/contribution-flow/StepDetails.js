@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import memoizeOne from 'memoize-one';
 
 import Container from '../Container';

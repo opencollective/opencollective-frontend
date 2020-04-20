@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { Link } from '../server/pages';
 
 import Hide from './Hide';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';

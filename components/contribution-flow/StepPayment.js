@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { uniqBy, get } from 'lodash';
 

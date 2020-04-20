@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { P } from './Text';
 import InputField from './InputField';

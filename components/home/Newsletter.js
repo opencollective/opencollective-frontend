@@ -1,6 +1,6 @@
 import React from 'react';
 import Container from '../Container';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 import { Envelope } from '@styled-icons/fa-solid/Envelope';
 

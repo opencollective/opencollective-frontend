@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import styled from 'styled-components';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'next/router';

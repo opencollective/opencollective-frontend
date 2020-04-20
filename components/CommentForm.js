@@ -7,7 +7,7 @@ import Avatar from './Avatar';
 import Link from './Link';
 import MessageBox from './MessageBox';
 import RichTextEditor from './RichTextEditor';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 
 /**
  * Component to render for for **new** comments. Comment Edit form is created

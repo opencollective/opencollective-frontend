@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { compose } from '../../lib/utils';

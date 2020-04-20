@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import dynamic from 'next/dynamic';
 import { get } from 'lodash';
 

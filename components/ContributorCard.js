@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { truncate } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import styled, { css } from 'styled-components';
 
 import formatMemberRole from '../lib/i18n-member-role';

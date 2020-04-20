@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Blog } from '@styled-icons/icomoon/Blog';

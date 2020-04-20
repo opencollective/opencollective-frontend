@@ -6,7 +6,7 @@ import { Times } from '@styled-icons/fa-solid/Times';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import gql from 'graphql-tag';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 
 import { Span } from './Text';
 import StyledButton from './StyledButton';
