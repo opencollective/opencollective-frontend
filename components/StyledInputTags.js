@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { useIntl, defineMessages } from 'react-intl';
 import { PriceTags } from '@styled-icons/icomoon/PriceTags';
-import { Flex, Box } from '@rebass/grid';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { Plus } from '@styled-icons/fa-solid/Plus';
 import { uniqBy } from 'lodash';
 import { Manager, Reference, Popper } from 'react-popper';
 
+import { Flex, Box } from './Grid';
 import StyledTag from './StyledTag';
 import StyledCard from './StyledCard';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
@@ -129,15 +129,15 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   const scrollerRef = React.useRef();
   const [isOpen, setOpen] = React.useState(false);
   const [tags, setTags] = React.useState(getOptions(value || defaultValue));
+  useGlobalBlur(wrapperRef, outside => {
+    if (outside) {
+      handleClose();
+    }
+  });
 
   const handleClose = () => {
     onChange(tags);
     setOpen(false);
-  };
-  const handleOutsideClick = outside => {
-    if (outside) {
-      handleClose();
-    }
   };
   const handleToggleInput = () => {
     isOpen ? handleClose() : setOpen(true);
@@ -163,8 +163,6 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
       }
     }
   };
-
-  useGlobalBlur(wrapperRef, handleOutsideClick);
 
   return (
     <Manager>
@@ -277,7 +275,7 @@ StyledInputTags.propTypes = {
 };
 
 StyledInputTags.defaultProps = {
-  maxHeight: '30vh',
+  maxHeight: ['50vh', '30vh'],
   width: '240px',
   renderUpdatedTags: false,
 };
