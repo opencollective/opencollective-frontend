@@ -29,6 +29,7 @@ class AcceptContributionsMyself extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     addBankAccount: PropTypes.func,
     refetchLoggedInUser: PropTypes.func,
+    applyToHost: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -38,6 +39,23 @@ class AcceptContributionsMyself extends React.Component {
       loading: null,
     };
   }
+
+  addHost = async (collective, host) => {
+    const collectiveInput = {
+      legacyId: collective.id,
+    };
+    const hostInput = {
+      legacyId: host.id,
+    };
+    try {
+      await this.props.applyToHost(collectiveInput, hostInput);
+      this.setState({ loading: false });
+      await this.props.refetchLoggedInUser();
+    } catch (err) {
+      const errorMsg = getErrorFromGraphqlException(err).message;
+      throw new Error(errorMsg);
+    }
+  };
 
   submitBankAccountInformation = async bankAccountInfo => {
     // set state to loading
@@ -84,7 +102,7 @@ class AcceptContributionsMyself extends React.Component {
       window.scrollTo(0, 0);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ error: errorMsg });
+      throw new Error(errorMsg);
     }
   };
 
@@ -96,9 +114,19 @@ class AcceptContributionsMyself extends React.Component {
       bankInformation: '',
     };
 
-    const submit = values => {
-      const { bankInformation } = values;
-      this.submitBankAccountInformation(bankInformation);
+    const submit = async values => {
+      try {
+        const { bankInformation } = values;
+        await this.submitBankAccountInformation(bankInformation);
+        await this.addHost(collective, LoggedInUser.collective);
+        Router.pushRoute('accept-financial-contributions', {
+          slug: this.props.collective.slug,
+          path: this.props.router.query.path,
+          state: 'success',
+        }).then(() => window.scrollTo(0, 0));
+      } catch (e) {
+        this.setState({ error: e });
+      }
     };
 
     return (
@@ -181,7 +209,7 @@ class AcceptContributionsMyself extends React.Component {
                           {error && (
                             <Flex alignItems="center" justifyContent="center">
                               <MessageBox type="error" withIcon mb={[1, 3]}>
-                                {error.replace('GraphQL error: ', 'Error: ')}
+                                {error.message}
                               </MessageBox>
                             </Flex>
                           )}
@@ -225,7 +253,14 @@ class AcceptContributionsMyself extends React.Component {
               </Flex>
             </Flex>
           )}
-          {!router.query.method && <StripeOrBankAccountPicker collective={collective} />}
+          {!router.query.method && (
+            <StripeOrBankAccountPicker
+              collectiveSlug={LoggedInUser.collective.slug}
+              LoggedInUser={LoggedInUser}
+              addHost={this.addHost}
+              collective={collective}
+            />
+          )}
         </Container>
       </Fragment>
     );
@@ -241,9 +276,33 @@ const bankAccountMutation = gqlV2`
   }
 `;
 
+const applyToHostMutation = gqlV2`
+mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
+  applyToHost(collective: $collective, host: $host) {
+    id
+    slug
+    host {
+      id
+      slug
+    }
+  }
+}
+`;
+
+const addApplyToHostMutation = graphql(applyToHostMutation, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+  props: ({ mutate }) => ({
+    applyToHost: async (collectiveInput, hostInput) => {
+      return await mutate({ variables: { collective: collectiveInput, host: hostInput } });
+    },
+  }),
+});
+
 const addBankAccountMutation = graphql(bankAccountMutation, {
   name: 'addBankAccount',
   options: { context: API_V2_CONTEXT },
 });
 
-export default withUser(withRouter(addBankAccountMutation(AcceptContributionsMyself)));
+export default withUser(withRouter(addBankAccountMutation(addApplyToHostMutation(AcceptContributionsMyself))));
