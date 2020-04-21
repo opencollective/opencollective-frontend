@@ -137,10 +137,10 @@ const validate = expense => {
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
-const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel }) => {
+const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel, formPersister }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors } = formik;
+  const { values, handleChange, errors, setValues, dirty } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
@@ -152,6 +152,23 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
       formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles]);
+
+  // Load values from localstorage
+  React.useEffect(() => {
+    if (formPersister && !dirty) {
+      const formValues = formPersister.loadValues();
+      if (formValues) {
+        setValues(formValues);
+      }
+    }
+  }, [formPersister, dirty]);
+
+  // Save values in localstorage
+  React.useEffect(() => {
+    if (dirty && formPersister) {
+      formPersister.saveValues(values);
+    }
+  }, [formPersister, dirty, values]);
 
   return (
     <Form>
@@ -358,6 +375,7 @@ ExpenseFormBody.propTypes = {
   payoutProfiles: PropTypes.array,
   autoFocusTitle: PropTypes.bool,
   onCancel: PropTypes.func,
+  formPersister: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     host: PropTypes.shape({
@@ -371,7 +389,16 @@ ExpenseFormBody.propTypes = {
 /**
  * Main create expense form
  */
-const ExpenseForm = ({ onSubmit, collective, expense, payoutProfiles, autoFocusTitle, onCancel, validateOnChange }) => {
+const ExpenseForm = ({
+  onSubmit,
+  collective,
+  expense,
+  payoutProfiles,
+  autoFocusTitle,
+  onCancel,
+  validateOnChange,
+  formPersister,
+}) => {
   const [hasValidate, setValidate] = React.useState(validateOnChange);
 
   return (
@@ -397,6 +424,7 @@ const ExpenseForm = ({ onSubmit, collective, expense, payoutProfiles, autoFocusT
           collective={collective}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
+          formPersister={formPersister}
         />
       )}
     </Formik>
@@ -408,6 +436,8 @@ ExpenseForm.propTypes = {
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   onCancel: PropTypes.func,
+  /** To save draft of form values */
+  formPersister: PropTypes.object,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,

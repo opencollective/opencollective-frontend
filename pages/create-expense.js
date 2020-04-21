@@ -8,6 +8,7 @@ import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
 import expenseTypes from '../lib/constants/expenseTypes';
+import FormPersister from '../lib/form-persister';
 import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -94,6 +95,7 @@ class CreateExpensePage extends React.Component {
       expense: null,
       tags: null,
       isSubmitting: false,
+      formPersister: null,
     };
   }
 
@@ -101,6 +103,7 @@ class CreateExpensePage extends React.Component {
     // Re-fetch data if user is logged in
     if (this.props.LoggedInUser) {
       this.props.data.refetch();
+      this.initFormPersister();
     }
   }
 
@@ -108,6 +111,11 @@ class CreateExpensePage extends React.Component {
     // Re-fetch data if user is logged in
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.props.data.refetch();
+    }
+
+    // Reset form persister when data loads or when account changes
+    if (!this.state.formPersister || oldProps.data?.account?.id !== this.props.data?.account?.id) {
+      this.initFormPersister();
     }
 
     // Scroll to top when switching steps
@@ -124,6 +132,15 @@ class CreateExpensePage extends React.Component {
     }
   }
 
+  initFormPersister() {
+    const { data, LoggedInUser } = this.props;
+    if (data?.account && LoggedInUser) {
+      this.setState({
+        formPersister: new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`),
+      });
+    }
+  }
+
   onFormSubmit = expense => {
     this.setState({ expense, step: STEPS.SUMMARY });
   };
@@ -137,6 +154,12 @@ class CreateExpensePage extends React.Component {
         expense: { ...prepareExpenseForSubmit(expense), tags: tags },
       });
 
+      // Clear local storage backup if expense submitted successfuly
+      if (this.state.formPersister) {
+        this.state.formPersister.clearValues();
+      }
+
+      // Redirect to the expense page
       const legacyExpenseId = result.data.createExpense.legacyId;
       Router.pushRoute(`/${this.props.collectiveSlug}/expenses/${legacyExpenseId}/v2`);
     } catch (e) {
@@ -215,6 +238,7 @@ class CreateExpensePage extends React.Component {
                             onSubmit={this.onFormSubmit}
                             expense={this.state.expense}
                             payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                            formPersister={this.state.formPersister}
                             autoFocusTitle
                           />
                         )}
