@@ -459,6 +459,7 @@
   "create.collective.placeholder": "Making the world a better place",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
   "createAccount.alreadyLoggedIn": "Parece que ya ha iniciado sesión como \"{email}\". Si desea crear una nueva cuenta, cierre la sesión primero.",
+  "createCollective.acceptTermsOfFiscalSponsorship": "Please accept the terms of fiscal sponsorship",
   "createCollective.category.climate": "Para iniciativas sobre el clima",
   "createCollective.category.community": "Para cualquier comunidad",
   "createCollective.category.covid": "For COVID-19 initiatives",

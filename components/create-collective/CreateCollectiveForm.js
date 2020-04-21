@@ -212,7 +212,7 @@ class CreateCollectiveForm extends React.Component {
                       name="name"
                       htmlFor="name"
                       error={touched.name && errors.name}
-                      label={intl.formatMessage(this.messages.nameLabel)}
+                      label={intl.formatMessage(messages.nameLabel)}
                       value={values.name}
                       onChange={handleSlugChange}
                       required
@@ -225,7 +225,7 @@ class CreateCollectiveForm extends React.Component {
                       name="slug"
                       htmlFor="slug"
                       error={touched.slug && errors.slug}
-                      label={intl.formatMessage(this.messages.slugLabel)}
+                      label={intl.formatMessage(messages.slugLabel)}
                       value={values.slug}
                       required
                       mt={3}
@@ -244,13 +244,13 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
                     {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny">{intl.formatMessage(this.messages.suggestedLabel)}</P>
+                      <P fontSize="Tiny">{intl.formatMessage(messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
                       error={touched.description && errors.description}
-                      label={intl.formatMessage(this.messages.descriptionLabel)}
+                      label={intl.formatMessage(messages.descriptionLabel)}
                       value={values.description}
                       required
                       mt={3}
@@ -260,11 +260,11 @@ class CreateCollectiveForm extends React.Component {
                         <Field
                           as={StyledInput}
                           {...inputProps}
-                          placeholder={intl.formatMessage(this.messages.descriptionPlaceholder)}
+                          placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
                         />
                       )}
                     </StyledInputField>
-                    <P fontSize="SmallCaption">{intl.formatMessage(this.messages.descriptionHint)}</P>
+                    <P fontSize="SmallCaption">{intl.formatMessage(messages.descriptionHint)}</P>
 
                     <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox
