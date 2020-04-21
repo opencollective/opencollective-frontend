@@ -275,7 +275,7 @@ StyledInputTags.propTypes = {
 };
 
 StyledInputTags.defaultProps = {
-  maxHeight: ['50vh', '30vh'],
+  maxHeight: ['50vh', null, '30vh'],
   width: '240px',
   renderUpdatedTags: false,
 };
