@@ -22,7 +22,7 @@ import { withStripeLoader } from '../../StripeProvider';
 import NewCreditCardForm from '../../NewCreditCardForm';
 import MessageBox from '../../MessageBox';
 
-import EditReceivingSendingMoney from '../EditReceivingSendingMoney';
+import ConnectedAccounts from './ConnectedAccounts';
 import EditPaymentMethod from '../EditPaymentMethod';
 import BankTransfer from './BankTransfer';
 
@@ -232,6 +232,7 @@ class EditPaymentMethods extends React.Component {
     const paymentMethods = this.getPaymentMethodsToDisplay();
     const showEditManualPaymentMethod =
       !showCreditCardForm && !showManualPaymentMethodForm && get(Collective, 'isHost');
+    const services = ['stripe'];
     return loading ? (
       <Loading />
     ) : (
@@ -295,10 +296,10 @@ class EditPaymentMethods extends React.Component {
             <H3>
               <FormattedMessage id="editCollective.receivingMoney" defaultMessage="Receiving Money" />
             </H3>
-            <EditReceivingSendingMoney
+            <ConnectedAccounts
               collective={this.props.collective}
               connectedAccounts={this.props.collective.connectedAccounts}
-              sendingMoney={false}
+              services={services}
             />
           </React.Fragment>
         )}

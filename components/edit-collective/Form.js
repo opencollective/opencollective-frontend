@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set, find } from 'lodash';
 import { Flex, Box } from '@rebass/grid';
-import { H3, H4, P } from '../Text';
+import { H3 } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
@@ -47,7 +47,7 @@ import Delete from './actions/Delete';
 
 import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import EditUserEmailForm from './EditUserEmailForm';
-import EditReceivingSendingMoney from './EditReceivingSendingMoney';
+import SendingMoney from './sections/SendingMoney';
 
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
@@ -460,27 +460,7 @@ class EditCollectiveForm extends React.Component {
         return <PaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />;
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
-        return (
-          <Fragment>
-            <H3>
-              <FormattedMessage id="editCollective.sendingMoney" defaultMessage={'Sending Money'} />
-            </H3>
-            <EditReceivingSendingMoney
-              collective={collective}
-              connectedAccounts={collective.connectedAccounts}
-              sendingMoney={true}
-            />
-            <H4 mt={2}>
-              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
-            </H4>
-            <P>
-              <FormattedMessage
-                id="collective.sendMoney.description"
-                defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
-              />
-            </P>
-          </Fragment>
-        );
+        return <SendingMoney collective={collective} sendingMoney={true}></SendingMoney>;
 
       default:
         return null;
