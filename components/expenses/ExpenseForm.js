@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { Box, Flex } from '../Grid';
-import { first, isEmpty, get, pick, isEqual } from 'lodash';
+import { first, isEmpty, get, pick } from 'lodash';
 import { Formik, Form, Field, FieldArray, FastField } from 'formik';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -137,11 +137,10 @@ const validate = expense => {
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
-const ExpenseFormBody = ({ formik, collective, autoFocusTitle, onCancel, formPersister, loggedInAccount }) => {
+const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel, formPersister }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors, initialValues, setValues } = formik;
-  const { id: loggedInAccountId, payoutProfiles } = loggedInAccount;
+  const { values, handleChange, errors, setValues, dirty } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
@@ -156,20 +155,20 @@ const ExpenseFormBody = ({ formik, collective, autoFocusTitle, onCancel, formPer
 
   // Load values from localstorage
   React.useEffect(() => {
-    if (formPersister && loggedInAccountId) {
-      formPersister.setFormId(`expense-${collective.name}-${loggedInAccountId}`);
-
+    if (formPersister && !dirty) {
       const formValues = formPersister.loadValues();
-      if (formValues && isEqual(values, initialValues)) {
+      if (formValues) {
         setValues(formValues);
       }
     }
-  }, [formPersister, loggedInAccountId]);
+  }, [formPersister, dirty]);
 
   // Save values in localstorage
   React.useEffect(() => {
-    formPersister?.saveValues(values);
-  }, [formPersister, values]);
+    if (dirty && formPersister) {
+      formPersister.saveValues(values);
+    }
+  }, [formPersister, dirty, values]);
 
   return (
     <Form>
@@ -373,15 +372,11 @@ const ExpenseFormBody = ({ formik, collective, autoFocusTitle, onCancel, formPer
 
 ExpenseFormBody.propTypes = {
   formik: PropTypes.object,
+  payoutProfiles: PropTypes.array,
   autoFocusTitle: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
-  loggedInAccount: PropTypes.shape({
-    id: PropTypes.string,
-    payoutProfiles: PropTypes.array,
-  }),
   collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
@@ -402,11 +397,9 @@ const ExpenseForm = ({
   autoFocusTitle,
   onCancel,
   validateOnChange,
-  loggedInAccountId,
   formPersister,
 }) => {
   const [hasValidate, setValidate] = React.useState(validateOnChange);
-  const loggedInAccount = { id: loggedInAccountId, payoutProfiles };
 
   return (
     <Formik
@@ -427,11 +420,11 @@ const ExpenseForm = ({
       {formik => (
         <ExpenseFormBody
           formik={formik}
+          payoutProfiles={payoutProfiles}
           collective={collective}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
           formPersister={formPersister}
-          loggedInAccount={loggedInAccount}
         />
       )}
     </Formik>
@@ -443,7 +436,6 @@ ExpenseForm.propTypes = {
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   onCancel: PropTypes.func,
-  loggedInAccountId: PropTypes.string,
   /** To save draft of form values */
   formPersister: PropTypes.object,
   collective: PropTypes.shape({
