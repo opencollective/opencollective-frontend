@@ -161,6 +161,10 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
     if (formPersister && !dirty) {
       const formValues = formPersister.loadValues();
       if (formValues) {
+        // Reset payoutMethod if host is no longer connected to TransferWise
+        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host.transferwise) {
+          formValues.payoutMethod = undefined;
+        }
         setValues(formValues);
       }
     }
