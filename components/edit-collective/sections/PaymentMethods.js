@@ -13,18 +13,18 @@ import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
 
-import { H1, H2, H3, H4, Span, P } from '../../Text';
+import { H3, Span } from '../../Text';
 import Link from '../../Link';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import { withStripeLoader } from '../../StripeProvider';
 import NewCreditCardForm from '../../NewCreditCardForm';
-import UpdateBankDetailsForm from '../../UpdateBankDetailsForm';
 import MessageBox from '../../MessageBox';
 
 import EditReceivingSendingMoney from '../EditReceivingSendingMoney';
 import EditPaymentMethod from '../EditPaymentMethod';
+import BankTransfer from './BankTransfer';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -182,6 +182,18 @@ class EditPaymentMethods extends React.Component {
     window.scrollTo(0, 0);
   };
 
+  showManualPaymentMethod = (formvalue, setError) => {
+    if (setError) {
+      this.setState({ showManualPaymentMethodForm: formvalue, error: null });
+    } else {
+      this.setState({ showManualPaymentMethodForm: formvalue });
+    }
+  };
+
+  setBankDetails = bankDetails => {
+    this.setState({ bankDetails, error: null });
+  };
+
   getPaymentMethodsToDisplay() {
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
       pm => pm.balance > 0 || (pm.type === 'virtualcard' && pm.monthlyLimitPerMember),
@@ -220,8 +232,6 @@ class EditPaymentMethods extends React.Component {
     const paymentMethods = this.getPaymentMethodsToDisplay();
     const showEditManualPaymentMethod =
       !showCreditCardForm && !showManualPaymentMethodForm && get(Collective, 'isHost');
-    const existingManualPaymentMethod = !!get(Collective, 'settings.paymentMethods.manual.instructions');
-
     return loading ? (
       <Loading />
     ) : (
@@ -292,128 +302,17 @@ class EditPaymentMethods extends React.Component {
             />
           </React.Fragment>
         )}
-        {this.props.receivingSection && showEditManualPaymentMethod && (
-          <React.Fragment>
-            <H4 mt={2}>
-              <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
-            </H4>
-
-            <Box>
-              <Container fontSize="Caption" mt={2} color="black.600" textAlign="left">
-                {Collective.plan.manualPayments ? (
-                  <FormattedMessage
-                    id="paymentMethods.manual.add.info"
-                    defaultMessage="To receive donations  directly on your bank account on behalf of the collectives that you are hosting"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="paymentMethods.manual.upgradePlan"
-                    defaultMessage="Subscribe to our special plans for hosts"
-                  />
-                )}
-                <Box mt={1}>
-                  <FormattedMessage
-                    id="paymentMethods.manual.add.trial"
-                    defaultMessage="Free for the first $1,000 received, "
-                  />
-                  <a href="/pricing">
-                    <FormattedMessage id="paymentMethods.manual.add.seePricing" defaultMessage="see pricing" />
-                  </a>
-                </Box>
-              </Container>
-            </Box>
-            <Flex alignItems="center" my={2}>
-              <StyledButton
-                buttonStyle="standard"
-                buttonSize="small"
-                disabled={!Collective.plan.manualPayments}
-                onClick={() => this.setState({ showManualPaymentMethodForm: true })}
-              >
-                {existingManualPaymentMethod ? (
-                  <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit your bank account details" />
-                ) : (
-                  <React.Fragment>
-                    <Add size="1em" />
-                    {'  '}
-                    <FormattedMessage id="paymentMethods.manual.add" defaultMessage="Add your bank account details" />
-                  </React.Fragment>
-                )}
-              </StyledButton>
-            </Flex>
-          </React.Fragment>
-        )}
-        {showManualPaymentMethodForm && (
-          <Container px={3} py={1}>
-            <H1 fontSize="3rem" textAlign="left">
-              <FormattedMessage
-                id="paymentMethod.manual.edit.title"
-                defaultMessage="Enable contributors to make donations by wire transfer"
-              />
-            </H1>
-            <H2>
-              <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
-            </H2>
-            <Flex>
-              <P>
-                <FormattedMessage
-                  id="paymentMethod.manual.edit.description"
-                  defaultMessage='Contributors will be able to choose "Bank Transfer" as a payment method when they check out. The instructions to make the wire transfer will be emailed to them along with a unique order id. Once you received the money, you will be able to mark the corresponding pending order as paid in your host dashboard.'
-                />
-              </P>
-              <img src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
-            </Flex>
-            <H2>
-              <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-            </H2>
-            <P>
-              <FormattedMessage
-                id="paymentMethod.manual.edit.description.pricing"
-                defaultMessage="There is no platform fee for donations made this way. However, we ask you to kindly subscribe to our special plans for fiscal hosts to be able to maintain and improve this feature over time (the first $1,000 of yearly budget are included in the free plan)"
-              />
-              .
-              <br />
-              <a href="https://opencollective.com/opencollective">
-                <FormattedMessage
-                  id="paymentMethods.manual.upgradePlan"
-                  defaultMessage="Subscribe to our special plans for hosts"
-                />
-              </a>
-            </P>
-
-            <H2>
-              <FormattedMessage
-                id="paymentMethods.manual.instructions.title"
-                defaultMessage="Define the instructions to make a bank transfer to your account"
-              />
-            </H2>
-            <Box mr={2} css={{ flexGrow: 1 }}>
-              <UpdateBankDetailsForm
-                value={get(Collective, 'settings.paymentMethods.manual')}
-                onChange={bankDetails => this.setState({ bankDetails, error: null })}
-              />
-            </Box>
-            <Box my={2}>
-              <StyledButton
-                mr={2}
-                buttonStyle="standard"
-                buttonSize="medium"
-                onClick={() => this.setState({ showManualPaymentMethodForm: false, error: null })}
-                disabled={submitting}
-              >
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
-                buttonStyle="primary"
-                buttonSize="medium"
-                type="submit"
-                onClick={this.updateBankDetails}
-                disabled={submitting}
-                loading={submitting}
-              >
-                <FormattedMessage id="save" defaultMessage="Save" />
-              </StyledButton>
-            </Box>
-          </Container>
+        {this.props.receivingSection && (
+          <BankTransfer
+            data={this.props.data}
+            receivingSection={this.props.receivingSection}
+            showEditManualPaymentMethod={showEditManualPaymentMethod}
+            submitting={submitting}
+            showManualPaymentMethodForm={showManualPaymentMethodForm}
+            setBankDetails={this.setBankDetails}
+            updateBankDetails={this.updateBankDetails}
+            showManualPaymentMethod={this.showManualPaymentMethod}
+          ></BankTransfer>
         )}
         {showCreditCardForm && (
           <Container
