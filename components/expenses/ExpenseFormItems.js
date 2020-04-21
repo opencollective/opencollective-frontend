@@ -96,7 +96,6 @@ export default class ExpenseFormItems extends React.PureComponent {
           {...attachmentDropzoneParams}
           data-cy="expense-multi-attachments-dropzone"
           onSuccess={files => filesListToItems(files).map(this.props.push)}
-          showDefaultMessage
           mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
           mb={3}
         >
