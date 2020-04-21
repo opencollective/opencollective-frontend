@@ -64,6 +64,7 @@ export const getCollectivePageQuery = gql`
         name
         slug
         type
+        settings
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         ...ContributorsFieldsFragment
