@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import styled from 'styled-components';
 
 import { CONTRIBUTE_CARD_WIDTH, CONTRIBUTE_CARD_BORDER_RADIUS } from './Contribute';

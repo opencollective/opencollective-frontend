@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 import themeGet from '@styled-system/theme-get';
 
 import Currency from '../Currency';

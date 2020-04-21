@@ -6,7 +6,7 @@ import Body from './Body';
 import Footer from './Footer';
 import { IncognitoAvatar } from './Avatar';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 class IncognitoUserCollective extends React.Component {
   static propTypes = {

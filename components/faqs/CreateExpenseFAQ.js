@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import FAQ, { Entry, Title, Content } from './FAQ';
 import StyledLink from '../StyledLink';
 import ExternalLink from '../ExternalLink';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 
 const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
   <FAQ {...props}>

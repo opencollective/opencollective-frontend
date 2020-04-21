@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box } from '../../Grid';
 
 import LocationComponent from '../../Location';
 import SectionTitle from '../SectionTitle';

@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import memoizeOne from 'memoize-one';
 import { orderBy } from 'lodash';
 import styled from 'styled-components';

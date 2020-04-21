@@ -4,7 +4,7 @@ import { capitalize, omit, uniqBy, get, remove } from 'lodash';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 
 import { Search } from '@styled-icons/octicons/Search';
 

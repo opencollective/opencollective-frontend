@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';

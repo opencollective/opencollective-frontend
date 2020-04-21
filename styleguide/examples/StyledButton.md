@@ -163,7 +163,7 @@
 ### Defaults to the `medium` button size
 
 ```jsx
-import { Flex } from '@rebass/grid';
+import { Flex } from 'components/Grid';
 const [buttonSize, setButtonSize] = React.useState('medium');
 <React.Fragment>
   <Flex mb={4} flexWrap="wrap" justifyContent="space-evenly">
@@ -229,7 +229,7 @@ const [buttonSize, setButtonSize] = React.useState('medium');
 Use the `asLink` prop. Works best with secondary button styles.
 
 ```jsx padded
-import { Flex } from '@rebass/grid';
+import { Flex } from 'components/Grid';
 <React.Fragment>
   <h4>Default</h4>
   <Flex justifyContent="space-evenly">

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import { useDropzone } from 'react-dropzone';
 import styled, { css } from 'styled-components';

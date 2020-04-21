@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { Check } from '@styled-icons/fa-solid/Check';

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 import { display } from 'styled-system';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { isObject } from 'lodash';
 

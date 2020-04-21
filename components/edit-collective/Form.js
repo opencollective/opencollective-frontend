@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set, find } from 'lodash';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { H3, H4, P } from '../Text';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';

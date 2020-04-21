@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { uniqBy, get } from 'lodash';
-import { Box } from '@rebass/grid';
+import { Box } from '../../Grid';
 
 import Responses from '../../Responses';
 import Sponsors from '../../Sponsors';

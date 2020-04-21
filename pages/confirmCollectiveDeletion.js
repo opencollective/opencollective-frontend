@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../components/Grid';
 
 import Container from '../components/Container';
 import Page from '../components/Page';

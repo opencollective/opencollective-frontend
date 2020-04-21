@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { FormattedMessage } from 'react-intl';
 
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';

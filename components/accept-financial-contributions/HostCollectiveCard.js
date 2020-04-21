@@ -1,6 +1,6 @@
 import React, { useState, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { FormattedDate, useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';

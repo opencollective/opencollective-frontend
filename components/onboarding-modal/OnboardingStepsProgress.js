@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import { Span } from '../Text';

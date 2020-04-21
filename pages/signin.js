@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../components/Grid';
 import { mapValues } from 'lodash';
 
 import { Router } from '../server/pages';
