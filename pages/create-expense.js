@@ -98,14 +98,14 @@ class CreateExpensePage extends React.Component {
   }
 
   componentDidMount() {
-    // Reftech data if user is logged in
+    // Re-fetch data if user is logged in
     if (this.props.LoggedInUser) {
       this.props.data.refetch();
     }
   }
 
   componentDidUpdate(oldProps, oldState) {
-    // Reftech data if user is logged in
+    // Re-fetch data if user is logged in
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.props.data.refetch();
     }
@@ -203,7 +203,7 @@ class CreateExpensePage extends React.Component {
                         <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
                       )}
                     </H1>
-                    {data.loading ? (
+                    {data.loading || loadingLoggedInUser ? (
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
