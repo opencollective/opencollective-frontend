@@ -10,7 +10,6 @@ import ConnectedAccounts from './ConnectedAccounts';
 class SendingMoney extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    sendingMoney: PropTypes.bool,
   };
 
   constructor(props) {

@@ -40,7 +40,7 @@ ConnectedAccounts.propTypes = {
   collective: PropTypes.object.isRequired,
   connectedAccounts: PropTypes.arrayOf(PropTypes.object),
   editMode: PropTypes.bool,
-  services: PropTypes.bool,
+  services: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default ConnectedAccounts;

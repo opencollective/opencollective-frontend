@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
+import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 
 import { H1, H2, H4, P } from '../../Text';
 
@@ -11,38 +13,80 @@ import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
 import UpdateBankDetailsForm from '../../UpdateBankDetailsForm';
+import { compose } from '../../../lib/utils';
+import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 
 class BankTransfer extends React.Component {
   static propTypes = {
+    collectiveSlug: PropTypes.string.isRequired,
     /** From graphql query */
     data: PropTypes.object.isRequired,
     /** From intl */
     intl: PropTypes.object.isRequired,
-    /** From stripeLoader */
-    showManualPaymentMethod: PropTypes.func.isRequired,
-    updateBankDetails: PropTypes.func.isRequired,
-    setBankDetails: PropTypes.func.isRequired,
-    receivingSection: PropTypes.bool,
-    showEditManualPaymentMethod: PropTypes.bool,
-    showManualPaymentMethodForm: PropTypes.bool,
-    submitting: PropTypes.bool,
+    /** From graphql query */
+    editCollective: PropTypes.func.isRequired,
+
+    hideTopsection: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
   }
 
+  state = {
+    bankDetails: null,
+    error: null,
+    submitting: false,
+  };
+
+  showManualPaymentMethod = (formvalue, setError) => {
+    this.props.hideTopsection(formvalue);
+    if (setError) {
+      this.setState({ showManualPaymentMethodForm: formvalue, error: null });
+    } else {
+      this.setState({ showManualPaymentMethodForm: formvalue });
+    }
+  };
+
+  handleSuccess = () => {
+    this.props.data.refetch();
+    this.props.hideTopsection(false);
+    this.setState({
+      error: null,
+      showManualPaymentMethodForm: false,
+      submitting: false,
+    });
+  };
+
+  updateBankDetails = async () => {
+    if (!this.state.bankDetails) {
+      this.setState({ error: null, showManualPaymentMethodForm: false, submitting: false });
+      return;
+    }
+    const { Collective } = this.props.data;
+    const CollectiveInputType = { id: Collective.id, settings: Collective.settings || {} };
+    set(CollectiveInputType, 'settings.paymentMethods.manual.instructions', this.state.bankDetails.instructions);
+    this.setState({ submitting: true });
+    try {
+      await this.props.editCollective(CollectiveInputType);
+      this.handleSuccess();
+    } catch (e) {
+      this.setState({ error: e.message });
+    } finally {
+      this.setState({ submitting: false });
+    }
+  };
+
   render() {
-    const showManualPaymentMethodForm = this.props.showManualPaymentMethodForm;
-    const submitting = this.props.submitting;
     const { Collective, loading } = this.props.data;
-    const showEditManualPaymentMethod = this.props.showEditManualPaymentMethod;
+    const { showManualPaymentMethodForm, submitting } = this.state;
     const existingManualPaymentMethod = !!get(Collective, 'settings.paymentMethods.manual.instructions');
+    const showEditManualPaymentMethod = !showManualPaymentMethodForm && get(Collective, 'isHost');
     return loading ? (
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        {this.props.receivingSection && showEditManualPaymentMethod && (
+        {showEditManualPaymentMethod && (
           <React.Fragment>
             <H4 mt={2}>
               <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
@@ -77,7 +121,7 @@ class BankTransfer extends React.Component {
                 buttonStyle="standard"
                 buttonSize="small"
                 disabled={!Collective.plan.manualPayments}
-                onClick={() => this.props.showManualPaymentMethod(true, false)}
+                onClick={() => this.showManualPaymentMethod(true, false)}
               >
                 {existingManualPaymentMethod ? (
                   <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit your bank account details" />
@@ -139,7 +183,7 @@ class BankTransfer extends React.Component {
             <Box mr={2} css={{ flexGrow: 1 }}>
               <UpdateBankDetailsForm
                 value={get(Collective, 'settings.paymentMethods.manual')}
-                onChange={bankDetails => this.props.setBankDetails(bankDetails)}
+                onChange={bankDetails => this.setState({ bankDetails, error: null })}
               />
             </Box>
             <Box my={2}>
@@ -147,7 +191,7 @@ class BankTransfer extends React.Component {
                 mr={2}
                 buttonStyle="standard"
                 buttonSize="medium"
-                onClick={() => this.props.showManualPaymentMethod(false, true)}
+                onClick={() => this.showManualPaymentMethod(false, true)}
                 disabled={submitting}
               >
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -156,7 +200,7 @@ class BankTransfer extends React.Component {
                 buttonStyle="primary"
                 buttonSize="medium"
                 type="submit"
-                onClick={() => this.props.updateBankDetails()}
+                onClick={this.updateBankDetails}
                 disabled={submitting}
                 loading={submitting}
               >
@@ -169,5 +213,45 @@ class BankTransfer extends React.Component {
     );
   }
 }
+const getPaymentMethods = graphql(gql`
+  query Collective($collectiveSlug: String) {
+    Collective(slug: $collectiveSlug) {
+      id
+      type
+      slug
+      name
+      currency
+      isHost
+      settings
+      plan {
+        addedFunds
+        addedFundsLimit
+        bankTransfers
+        bankTransfersLimit
+        hostDashboard
+        hostedCollectives
+        hostedCollectivesLimit
+        manualPayments
+        name
+      }
+      paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
+        id
+        uuid
+        name
+        data
+        monthlyLimitPerMember
+        service
+        type
+        balance
+        currency
+        expiryDate
+        subscriptions: orders(hasActiveSubscription: true) {
+          id
+        }
+      }
+    }
+  }
+`);
+const addData = compose(getPaymentMethods, addEditCollectiveMutation);
 
-export default injectIntl(BankTransfer);
+export default injectIntl(addData(BankTransfer));

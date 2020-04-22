@@ -48,6 +48,7 @@ import Delete from './actions/Delete';
 import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import EditUserEmailForm from './EditUserEmailForm';
 import SendingMoney from './sections/SendingMoney';
+import ReceivingMoney from './sections/ReceivingMoney';
 
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
@@ -359,7 +360,7 @@ class EditCollectiveForm extends React.Component {
         return <Members collective={collective} LoggedInUser={LoggedInUser} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
-        return <PaymentMethods collectiveSlug={collective.slug} sendingSection={true} />;
+        return <PaymentMethods collectiveSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TIERS:
         return (
@@ -457,10 +458,10 @@ class EditCollectiveForm extends React.Component {
         return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
-        return <PaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />;
+        return <ReceivingMoney collective={collective} collectiveSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
-        return <SendingMoney collective={collective} sendingMoney={true}></SendingMoney>;
+        return <SendingMoney collective={collective}></SendingMoney>;
 
       default:
         return null;

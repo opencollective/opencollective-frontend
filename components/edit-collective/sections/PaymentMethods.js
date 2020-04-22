@@ -2,7 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { set, get, sortBy } from 'lodash';
+import { get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Flex, Box } from '@rebass/grid';
 import { Add } from '@styled-icons/material/Add';
@@ -22,9 +22,7 @@ import { withStripeLoader } from '../../StripeProvider';
 import NewCreditCardForm from '../../NewCreditCardForm';
 import MessageBox from '../../MessageBox';
 
-import ConnectedAccounts from './ConnectedAccounts';
 import EditPaymentMethod from '../EditPaymentMethod';
-import BankTransfer from './BankTransfer';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -43,9 +41,6 @@ class EditPaymentMethods extends React.Component {
     editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
-    receivingSection: PropTypes.bool,
-    sendingSection: PropTypes.bool,
-    collective: PropTypes.object,
   };
 
   constructor(props) {
@@ -72,25 +67,6 @@ class EditPaymentMethods extends React.Component {
   componentDidMount() {
     this.props.loadStripe();
   }
-
-  updateBankDetails = async () => {
-    if (!this.state.bankDetails) {
-      this.setState({ showCreditCardForm: false, error: null, showManualPaymentMethodForm: false, submitting: false });
-      return;
-    }
-    const { Collective } = this.props.data;
-    const CollectiveInputType = { id: Collective.id, settings: Collective.settings || {} };
-    set(CollectiveInputType, 'settings.paymentMethods.manual.instructions', this.state.bankDetails.instructions);
-    this.setState({ submitting: true });
-    try {
-      await this.props.editCollective(CollectiveInputType);
-      this.handleSuccess();
-    } catch (e) {
-      this.setState({ error: e.message });
-    } finally {
-      this.setState({ submitting: false });
-    }
-  };
 
   submitNewCreditCard = async () => {
     const data = get(this.state, 'newCreditCardInfo.value');
@@ -124,7 +100,6 @@ class EditPaymentMethods extends React.Component {
     this.props.data.refetch();
     this.setState({
       showCreditCardForm: false,
-      showManualPaymentMethodForm: false,
       error: null,
       newCreditCardInfo: null,
       submitting: false,
@@ -182,18 +157,6 @@ class EditPaymentMethods extends React.Component {
     window.scrollTo(0, 0);
   };
 
-  showManualPaymentMethod = (formvalue, setError) => {
-    if (setError) {
-      this.setState({ showManualPaymentMethodForm: formvalue, error: null });
-    } else {
-      this.setState({ showManualPaymentMethodForm: formvalue });
-    }
-  };
-
-  setBankDetails = bankDetails => {
-    this.setState({ bankDetails, error: null });
-  };
-
   getPaymentMethodsToDisplay() {
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
       pm => pm.balance > 0 || (pm.type === 'virtualcard' && pm.monthlyLimitPerMember),
@@ -227,12 +190,9 @@ class EditPaymentMethods extends React.Component {
   }
 
   render() {
-    const { showCreditCardForm, showManualPaymentMethodForm, error, submitting, removedId, savingId } = this.state;
     const { Collective, loading } = this.props.data;
+    const { showCreditCardForm, error, submitting, removedId, savingId } = this.state;
     const paymentMethods = this.getPaymentMethodsToDisplay();
-    const showEditManualPaymentMethod =
-      !showCreditCardForm && !showManualPaymentMethodForm && get(Collective, 'isHost');
-    const services = ['stripe'];
     return loading ? (
       <Loading />
     ) : (
@@ -242,7 +202,7 @@ class EditPaymentMethods extends React.Component {
             {this.renderError(error)}
           </MessageBox>
         )}
-        {this.props.sendingSection && !showManualPaymentMethodForm && (
+        {
           <Flex className="paymentMethods" flexDirection="column" my={2}>
             <H3>
               <FormattedMessage id="paymentMethods.send.title" defaultMessage="Sending money" />
@@ -270,8 +230,8 @@ class EditPaymentMethods extends React.Component {
               </Container>
             ))}
           </Flex>
-        )}
-        {this.props.sendingSection && !showCreditCardForm && !showManualPaymentMethodForm && (
+        }
+        {!showCreditCardForm && (
           <Flex alignItems="center" mx={3} my={4} flexDirection="column">
             <StyledButton
               buttonStyle="standard"
@@ -290,30 +250,6 @@ class EditPaymentMethods extends React.Component {
               />
             </Span>
           </Flex>
-        )}
-        {this.props.receivingSection && showEditManualPaymentMethod && (
-          <React.Fragment>
-            <H3>
-              <FormattedMessage id="editCollective.receivingMoney" defaultMessage="Receiving Money" />
-            </H3>
-            <ConnectedAccounts
-              collective={this.props.collective}
-              connectedAccounts={this.props.collective.connectedAccounts}
-              services={services}
-            />
-          </React.Fragment>
-        )}
-        {this.props.receivingSection && (
-          <BankTransfer
-            data={this.props.data}
-            receivingSection={this.props.receivingSection}
-            showEditManualPaymentMethod={showEditManualPaymentMethod}
-            submitting={submitting}
-            showManualPaymentMethodForm={showManualPaymentMethodForm}
-            setBankDetails={this.setBankDetails}
-            updateBankDetails={this.updateBankDetails}
-            showManualPaymentMethod={this.showManualPaymentMethod}
-          ></BankTransfer>
         )}
         {showCreditCardForm && (
           <Container
