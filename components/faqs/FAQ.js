@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 
 import { P } from '../Text';
 import Container from '../Container';

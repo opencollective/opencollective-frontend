@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get, set } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
+
 import { Add } from '@styled-icons/material/Add';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';

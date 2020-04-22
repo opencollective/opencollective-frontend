@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../components/Grid';
 import { get } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
 

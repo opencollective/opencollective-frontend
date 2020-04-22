@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 
 import { User } from '@styled-icons/feather/User';
 

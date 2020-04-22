@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 
 import I18nFormatters from '../I18nFormatters';
 import StyledInputField from '../StyledInputField';

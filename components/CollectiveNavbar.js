@@ -4,7 +4,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 import { Settings } from '@styled-icons/feather/Settings';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';

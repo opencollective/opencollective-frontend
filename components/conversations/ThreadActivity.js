@@ -1,4 +1,4 @@
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

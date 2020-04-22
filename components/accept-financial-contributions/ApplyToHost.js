@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 

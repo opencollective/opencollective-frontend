@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 import { pick, get } from 'lodash';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';

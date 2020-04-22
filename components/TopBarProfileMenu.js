@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get, uniqBy } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 
 import { Settings } from '@styled-icons/feather/Settings';
@@ -307,7 +307,13 @@ class TopBarProfileMenu extends React.Component {
               </StyledLink>
             </ListItem>
             <ListItem py={1}>
-              <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" onClick={this.logout}>
+              <StyledLink
+                data-cy="logout"
+                color="#494D52"
+                fontSize="1.2rem"
+                fontFamily="montserratlight, arial"
+                onClick={this.logout}
+              >
                 <FormattedMessage id="menu.logout" defaultMessage="Log out" />
               </StyledLink>
             </ListItem>

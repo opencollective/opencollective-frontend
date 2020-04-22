@@ -1,4 +1,4 @@
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as BankIcon } from '@styled-icons/fa-solid/University';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';

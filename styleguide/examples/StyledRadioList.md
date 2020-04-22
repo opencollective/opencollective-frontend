@@ -24,7 +24,7 @@ Using a default value:
 Customize list style using child render function:
 
 ```js
-const { Box } = require('@rebass/grid');
+const { Box } = require('components/Grid');
 <StyledRadioList
   options={['one', 'two', 'three', 'four', 'five']}
   name="selected-list"
@@ -45,7 +45,7 @@ const { Box } = require('@rebass/grid');
 Advanced customization:
 
 ```js
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from 'components/Grid';
 import Container from 'components/Container';
 import StyledInputField from 'components/StyledInputField';
 import StyledCard from 'components/StyledCard';

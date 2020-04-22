@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { v4 as uuid } from 'uuid';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../../Grid';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
 import { getCurrencySymbol, capitalize } from '../../../lib/utils';

@@ -31,7 +31,14 @@ const editAccountSettingsMutation = gqlV2`
  *
  * Messages will never be displayed if user is not logged in.
  */
-const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, children, dismissedComponent }) => {
+const DismissibleMessage = ({
+  children,
+  dismissedComponent,
+  displayForLoggedOutUser,
+  loadingLoggedInUser,
+  LoggedInUser,
+  messageId,
+}) => {
   const settingsKey = `${DISMISSABLE_HELP_MESSAGE_KEY}.${messageId}`;
   const [isDismissedLocally, setDismissedLocally] = React.useState(getFromLocalStorage(settingsKey));
   const [editAccountSettings] = useMutation(editAccountSettingsMutation, {
@@ -45,7 +52,7 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
 
   const loggedInAccount = data?.loggedInAccount || LoggedInUser?.collective;
   // Hide it if SSR or still loading user
-  if (typeof window === 'undefined' || loading) {
+  if (typeof window === 'undefined' || loading || loadingLoggedInUser) {
     return null;
   } else if (
     isDismissedLocally ||
@@ -73,6 +80,7 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
 DismissibleMessage.propTypes = {
   messageId: PropTypes.oneOf([...Object.values(HELP_MESSAGE), ...Object.values(BANNER)]).isRequired,
   displayForLoggedOutUser: PropTypes.bool,
+  loadingLoggedInUser: PropTypes.bool,
   /** A function to render the actual message */
   children: PropTypes.func.isRequired,
   /** A component we can display if the message was already dismissed once */

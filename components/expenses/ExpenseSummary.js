@@ -1,4 +1,4 @@
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage, useIntl, FormattedDate } from 'react-intl';
@@ -81,17 +81,20 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
           />
         )}
       </Flex>
-      <StyledTag
-        fontSize="Caption"
-        textTransform="none"
-        display="inline-block"
-        letterSpacing="0.1em"
-        color="black.700"
-        borderRadius="100px 2px 2px 100px"
-        pl={10}
-      >
-        {isLoading ? <LoadingPlaceholder height={12} width={65} /> : i18nExpenseType(intl, expense.type)}
-      </StyledTag>
+      <Flex flexWrap="wrap">
+        <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
+          {isLoading ? (
+            <LoadingPlaceholder height={12} width={65} />
+          ) : (
+            i18nExpenseType(intl, expense.type, expense.legacyId)
+          )}
+        </StyledTag>
+        {expense?.tags?.map(tag => (
+          <StyledTag variant="rounded-right" mb="4px" mr="4px" key={tag}>
+            {tag}
+          </StyledTag>
+        ))}
+      </Flex>
       <Flex alignItems="center" mt={3}>
         {isLoading ? (
           <LoadingPlaceholder height={24} width={200} />
@@ -150,8 +153,8 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
                       />
                     </Box>
                   )}
-                  <Flex flexDirection="column">
-                    <Span mt={2} color="black.900" fontWeight="500">
+                  <Flex flexDirection="column" justifyContent="center">
+                    <Span color="black.900" fontWeight="500">
                       {attachment.description || (
                         <Span color="black.500" fontStyle="italic">
                           <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
@@ -291,6 +294,7 @@ ExpenseSummary.propTypes = {
   }),
   /** Must be provided if isLoading is false */
   expense: PropTypes.shape({
+    legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,

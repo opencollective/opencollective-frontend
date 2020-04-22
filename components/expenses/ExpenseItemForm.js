@@ -1,4 +1,4 @@
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { get, isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -16,7 +16,6 @@ import { Span } from '../Text';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 import StyledDropzone from '../StyledDropzone';
 import StyledButton from '../StyledButton';
-import UploadedFilePreview from '../UploadedFilePreview';
 import StyledHr from '../StyledHr';
 
 export const msg = defineMessages({
@@ -106,13 +105,11 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                     isMulti={false}
                     error={meta.error}
                     onSuccess={url => form.setFieldValue(field.name, url)}
-                    showDefaultMessage={!hasValidUrl}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="LeadCaption"
                     size={[84, 112]}
-                  >
-                    {hasValidUrl && <UploadedFilePreview size={112} url={field.value} hasLink={false} border="none" />}
-                  </StyledDropzone>
+                    value={hasValidUrl && field.value}
+                  />
                 </StyledInputField>
               );
             }}

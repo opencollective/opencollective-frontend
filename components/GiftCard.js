@@ -7,7 +7,7 @@ import Container from './Container';
 import { Span, P } from './Text';
 import Currency from './Currency';
 import Link from './Link';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import styled from 'styled-components';
 import { FormattedMessage, FormattedDate } from 'react-intl';
 import { width, height, fontSize } from 'styled-system';

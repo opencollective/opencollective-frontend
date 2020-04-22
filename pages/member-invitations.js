@@ -61,7 +61,7 @@ class MemberInvitationsPage extends React.Component {
                   <Loading />
                 ) : (
                   <div>
-                    <H1 mb={5}>
+                    <H1 mb={5} textAlign="center">
                       <FormattedMessage id="MemberInvitations.title" defaultMessage="Pending invitations" />
                     </H1>
                     {!data || !data.memberInvitations || error ? (

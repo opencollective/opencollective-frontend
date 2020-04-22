@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import ExpensesWithData from '../expenses/ExpensesWithData';

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import StyledRoundButton from '../../components/StyledRoundButton';

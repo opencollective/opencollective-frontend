@@ -1,10 +1,8 @@
-[See `@rebass/grid` docs for more info](https://www.npmjs.com/package/@rebass/grid#box)
-
 Using fractions to set percentage width:
 
 ```js
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from 'components/Grid';
 import { P } from 'components/Text';
 
 const Block = styled(Box)`
@@ -31,7 +29,7 @@ Using fixed pixel width:
 
 ```js
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from 'components/Grid';
 import { P } from 'components/Text';
 const Block = styled(Box)`
   border: 1px solid black;
@@ -46,7 +44,7 @@ Using relative unit widths:
 
 ```js
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from 'components/Grid';
 import { P } from 'components/Text';
 const Block = styled(Box)`
   border: 1px solid black;
@@ -61,7 +59,7 @@ Set responsive width using an array of values, works for padding and margin prop
 
 ```js
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from 'components/Grid';
 import { P } from 'components/Text';
 const Block = styled(Box)`
   border: 1px solid black;

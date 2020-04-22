@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import { Router } from '../server/pages';
 
 import { Support } from '@styled-icons/boxicons-regular/Support';

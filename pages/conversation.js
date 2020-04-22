@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { get, isEmpty, cloneDeep, update, uniqBy } from 'lodash';
 
 import { Router } from '../server/pages';
@@ -387,20 +387,23 @@ class ConversationPage extends React.Component {
                                   </H4>
                                   {!isEditing ? (
                                     !isEmpty(conversation.tags) && (
-                                      <Flex flexWrap="wrap">
+                                      <Flex flexWrap="wrap" mx={2}>
                                         {conversation.tags.map(tag => (
-                                          <Box key={tag} m={2}>
-                                            <StyledTag>{tag}</StyledTag>
-                                          </Box>
+                                          <StyledTag key={tag} variant="rounded-right" mb="4px" mr="4px">
+                                            {tag}
+                                          </StyledTag>
                                         ))}
                                       </Flex>
                                     )
                                   ) : (
-                                    <StyledInputTags
-                                      suggestedTags={this.getSuggestedTags(collective)}
-                                      defaultValue={conversation.tags}
-                                      onChange={options => this.handleTagsChange(options, setValue)}
-                                    />
+                                    <Box mx={2}>
+                                      <StyledInputTags
+                                        renderUpdatedTags
+                                        suggestedTags={this.getSuggestedTags(collective)}
+                                        defaultValue={conversation.tags}
+                                        onChange={options => this.handleTagsChange(options, setValue)}
+                                      />
+                                    </Box>
                                   )}
                                 </React.Fragment>
                               )}

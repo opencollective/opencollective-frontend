@@ -1,4 +1,4 @@
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 import { uniqBy } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';

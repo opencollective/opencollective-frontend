@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';

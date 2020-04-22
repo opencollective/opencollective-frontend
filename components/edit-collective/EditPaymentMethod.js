@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 
 import { Link } from '../../server/pages';
 import { getCurrencySymbol, capitalize } from '../../lib/utils';

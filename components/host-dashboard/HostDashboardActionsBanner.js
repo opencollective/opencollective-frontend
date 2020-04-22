@@ -4,7 +4,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import styled from 'styled-components';
 
 import Container from '../Container';

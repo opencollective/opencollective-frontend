@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';

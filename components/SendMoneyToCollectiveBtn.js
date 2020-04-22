@@ -8,7 +8,7 @@ import { get, pick } from 'lodash';
 import { compose, formatCurrency } from '../lib/utils';
 
 import StyledButton from './StyledButton';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {

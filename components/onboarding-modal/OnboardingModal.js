@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';

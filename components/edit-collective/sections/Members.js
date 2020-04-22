@@ -4,7 +4,7 @@ import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get, update, omit } from 'lodash';
 import styled from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import memoizeOne from 'memoize-one';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';

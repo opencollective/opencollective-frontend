@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash';
 
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import Container from './Container';
 
 /**

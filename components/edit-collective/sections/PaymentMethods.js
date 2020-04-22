@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { Add } from '@styled-icons/material/Add';
 
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';

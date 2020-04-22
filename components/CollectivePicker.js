@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
 import { groupBy, sortBy, last, truncate, isEqual } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import { Manager, Reference, Popper } from 'react-popper';
 
 import { CollectiveType } from '../lib/constants/collectives';

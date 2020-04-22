@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Close as _Close } from '@styled-icons/material/Close';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import StyledLink from '../StyledLink';

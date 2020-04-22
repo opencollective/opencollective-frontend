@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
 
 import { P, Span, H1, H4 } from '../../Text';
