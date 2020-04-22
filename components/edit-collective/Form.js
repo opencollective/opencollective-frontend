@@ -458,10 +458,10 @@ class EditCollectiveForm extends React.Component {
         return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
-        return <ReceivingMoney collective={collective} collectiveSlug={collective.slug} />;
+        return <ReceivingMoney collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
-        return <SendingMoney collective={collective}></SendingMoney>;
+        return <SendingMoney collective={collective} />;
 
       default:
         return null;

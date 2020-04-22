@@ -1,21 +1,22 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, set } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '../../Grid';
-
 import { Add } from '@styled-icons/material/Add';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
-import { H1, H2, H4, P } from '../../Text';
+import { compose } from '../../../lib/utils';
+import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 
+import { Flex, Box } from '../../Grid';
+import { H3, H4, P } from '../../Text';
+import Link from '../../Link';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import Container from '../../Container';
-import UpdateBankDetailsForm from '../../UpdateBankDetailsForm';
-import { compose } from '../../../lib/utils';
-import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
+
+import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 
 class BankTransfer extends React.Component {
   static propTypes = {
@@ -29,10 +30,6 @@ class BankTransfer extends React.Component {
 
     hideTopsection: PropTypes.func.isRequired,
   };
-
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     bankDetails: null,
@@ -62,6 +59,7 @@ class BankTransfer extends React.Component {
   updateBankDetails = async () => {
     if (!this.state.bankDetails) {
       this.setState({ error: null, showManualPaymentMethodForm: false, submitting: false });
+      this.props.hideTopsection(false);
       return;
     }
     const { Collective } = this.props.data;
@@ -88,7 +86,7 @@ class BankTransfer extends React.Component {
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
         {showEditManualPaymentMethod && (
-          <React.Fragment>
+          <Fragment>
             <H4 mt={2}>
               <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
             </H4>
@@ -127,27 +125,21 @@ class BankTransfer extends React.Component {
                 {existingManualPaymentMethod ? (
                   <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit your bank account details" />
                 ) : (
-                  <React.Fragment>
+                  <Fragment>
                     <Add size="1em" />
                     {'  '}
                     <FormattedMessage id="paymentMethods.manual.add" defaultMessage="Add your bank account details" />
-                  </React.Fragment>
+                  </Fragment>
                 )}
               </StyledButton>
             </Flex>
-          </React.Fragment>
+          </Fragment>
         )}
         {showManualPaymentMethodForm && (
-          <Container px={3} py={1}>
-            <H1 fontSize="3rem" textAlign="left">
-              <FormattedMessage
-                id="paymentMethod.manual.edit.title"
-                defaultMessage="Enable contributors to make donations by wire transfer"
-              />
-            </H1>
-            <H2>
+          <Fragment>
+            <H3>
               <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
-            </H2>
+            </H3>
             <Flex>
               <P>
                 <FormattedMessage
@@ -157,9 +149,9 @@ class BankTransfer extends React.Component {
               </P>
               <img src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} />
             </Flex>
-            <H2>
+            <H3>
               <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-            </H2>
+            </H3>
             <P>
               <FormattedMessage
                 id="paymentMethod.manual.edit.description.pricing"
@@ -167,20 +159,20 @@ class BankTransfer extends React.Component {
               />
               .
               <br />
-              <a href="https://opencollective.com/opencollective">
+              <Link route={`/${Collective.slug}/edit/host-plan`}>
                 <FormattedMessage
                   id="paymentMethods.manual.upgradePlan"
                   defaultMessage="Subscribe to our special plans for hosts"
                 />
-              </a>
+              </Link>
             </P>
 
-            <H2>
+            <H3>
               <FormattedMessage
                 id="paymentMethods.manual.instructions.title"
                 defaultMessage="Define the instructions to make a bank transfer to your account"
               />
-            </H2>
+            </H3>
             <Box mr={2} css={{ flexGrow: 1 }}>
               <UpdateBankDetailsForm
                 value={get(Collective, 'settings.paymentMethods.manual')}
@@ -208,7 +200,7 @@ class BankTransfer extends React.Component {
                 <FormattedMessage id="save" defaultMessage="Save" />
               </StyledButton>
             </Box>
-          </Container>
+          </Fragment>
         )}
       </Flex>
     );
@@ -253,6 +245,7 @@ const getPaymentMethods = graphql(gql`
     }
   }
 `);
+
 const addData = compose(getPaymentMethods, addEditCollectiveMutation);
 
 export default injectIntl(addData(BankTransfer));

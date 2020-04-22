@@ -12,10 +12,6 @@ class SendingMoney extends React.Component {
     collective: PropTypes.object.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const services = [];
     if (hasFeature(this.props.collective, FEATURES.TRANSFERWISE) || parseToBoolean(process.env.TRANSFERWISE_ENABLED)) {

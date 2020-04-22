@@ -8,13 +8,8 @@ import BankTransfer from './BankTransfer';
 
 class ReceivingMoney extends React.Component {
   static propTypes = {
-    collectiveSlug: PropTypes.string.isRequired,
     collective: PropTypes.object.isRequired,
   };
-
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     hideTopsection: false,
@@ -40,7 +35,7 @@ class ReceivingMoney extends React.Component {
             />
           </React.Fragment>
         )}
-        <BankTransfer collectiveSlug={this.props.collectiveSlug} hideTopsection={this.hideTopsection}></BankTransfer>
+        <BankTransfer collectiveSlug={this.props.collective.slug} hideTopsection={this.hideTopsection} />
       </Fragment>
     );
   }
