@@ -51,6 +51,7 @@ class AcceptContributionsMyself extends React.Component {
 
     const value = {
       manual: {
+        title: 'Bank transfer',
         features: {
           recurring: false,
         },
