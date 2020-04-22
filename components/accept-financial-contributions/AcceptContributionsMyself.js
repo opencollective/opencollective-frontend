@@ -29,6 +29,7 @@ class AcceptContributionsMyself extends React.Component {
     router: PropTypes.object,
     LoggedInUser: PropTypes.object.isRequired,
     addBankAccount: PropTypes.func,
+    refetchLoggedInUser: PropTypes.func,
   };
 
   constructor(props) {
@@ -49,11 +50,11 @@ class AcceptContributionsMyself extends React.Component {
     };
 
     const value = {
-      name: 'Bank account',
-      features: {
-        recurring: false,
-      },
-      instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n 
+      manual: {
+        features: {
+          recurring: false,
+        },
+        instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n 
       <code>
       Amount: {amount}
       <br/>\n
@@ -61,6 +62,7 @@ class AcceptContributionsMyself extends React.Component {
       <br/>\n
       ${bankAccountInfo}
       </code>`,
+      },
     };
 
     // try mutation
@@ -71,6 +73,7 @@ class AcceptContributionsMyself extends React.Component {
         value,
       });
       this.setState({ loading: false });
+      await this.props.refetchLoggedInUser();
       Router.pushRoute('accept-financial-contributions', {
         slug: this.props.collective.slug,
         path: this.props.router.query.path,
@@ -227,8 +230,8 @@ class AcceptContributionsMyself extends React.Component {
 }
 
 const bankAccountMutation = gqlV2`
-  mutation addBankAccount($account: AccountReferenceInput!, $key: AccountSettingsKey!) {
-    editAccountSetting(account: $account, key: $key, value: true) {
+  mutation addBankAccount($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+    editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
     }
