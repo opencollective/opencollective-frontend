@@ -142,7 +142,7 @@ class StripeOrBankAccountPicker extends React.Component {
                     mb={3}
                     minWidth={'145px'}
                     onClick={() => {
-                      const host = LoggedInUser ? LoggedInUser.collective : hostOrganization;
+                      const host = hostOrganization ? hostOrganization : LoggedInUser.collective;
                       addHost(collective, host);
                       this.connectStripe();
                     }}
@@ -232,7 +232,7 @@ class StripeOrBankAccountPicker extends React.Component {
             mt={4}
             minWidth={'145px'}
             onClick={async () => {
-              const host = LoggedInUser ? LoggedInUser.collective : hostOrganization;
+              const host = hostOrganization ? hostOrganization : LoggedInUser.collective;
               await addHost(collective, host);
               await Router.pushRoute('accept-financial-contributions', {
                 slug: router.query.slug,

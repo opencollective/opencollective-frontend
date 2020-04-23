@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 import ContributionCategoryPicker from './ContributionCategoryPicker';
 import ApplyToHost from './ApplyToHost';
 import SuccessPage from './SuccessPage';
-import AcceptContributionsMyself from './AcceptContributionsMyself';
+import AcceptContributionsMyselfOrOrg from './AcceptContributionsMyselfOrOrg';
 
 class AcceptFinancialContributions extends Component {
   static propTypes = {
@@ -43,8 +43,8 @@ class AcceptFinancialContributions extends Component {
 
     if (path === 'host') {
       return <ApplyToHost collective={this.props.collective} onChange={this.handleChange} />;
-    } else if (path === 'myself') {
-      return <AcceptContributionsMyself collective={this.props.collective} />;
+    } else {
+      return <AcceptContributionsMyselfOrOrg collective={this.props.collective} />;
     }
   }
 }
