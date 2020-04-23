@@ -186,9 +186,9 @@ class TopBarProfileMenu extends React.Component {
             >
               <FormattedMessage id="collective" defaultMessage="my collectives" />
             </P>
-            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
+            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={35} />
             <Link route="/create" passHref>
-              <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
+              <StyledLink buttonStyle="standard" buttonSize="tiny" display="inline-block" ml={2} whiteSpace="nowrap">
                 + <FormattedMessage id="Collective.New" defaultMessage="New" />
               </StyledLink>
             </Link>
@@ -219,9 +219,9 @@ class TopBarProfileMenu extends React.Component {
             >
               <FormattedMessage id="organization" defaultMessage="my organizations" />
             </P>
-            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
+            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={35} />
             <Link route="/organizations/new" passHref>
-              <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
+              <StyledLink buttonStyle="standard" buttonSize="tiny" display="inline-block" ml={2} whiteSpace="nowrap">
                 + <FormattedMessage id="Organization.New" defaultMessage="New" />
               </StyledLink>
             </Link>
