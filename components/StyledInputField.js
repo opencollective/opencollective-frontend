@@ -80,7 +80,7 @@ StyledInputField.propTypes = {
   /** Show disabled state for field */
   disabled: PropTypes.bool,
   /** text to display below the input or error status */
-  error: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  error: PropTypes.any,
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** By default name is equal to htmlFor, but you can use this prop to override it */

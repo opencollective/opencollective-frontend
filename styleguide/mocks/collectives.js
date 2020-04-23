@@ -10,6 +10,10 @@ export const openSourceHost = {
     address: 'EIN 82-2037583\n340 S LEMON AVE #3717\nWalnut, CA 91789 USA',
     country: 'US',
   },
+  plan: {
+    transferwisePayoutsLimit: 100000,
+    transferwisePayouts: 4200,
+  },
   __typename: 'Organization',
 };
 

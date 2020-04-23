@@ -44,6 +44,28 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
   }
 `;
 
+const HostFieldsFragment = gqlV2`
+  fragment HostFieldsFragment on Host {
+    id
+    name
+    slug
+    type
+    expensePolicy
+    website
+    location {
+      address
+      country
+    }
+    plan {
+      transferwisePayouts
+      transferwisePayoutsLimit
+    }
+    transferwise {
+      availableCurrencies
+    }
+  }
+`;
+
 export const expensePageExpenseFieldsFragment = gqlV2`
   fragment expensePageExpenseFieldsFragment on Expense {
     id
@@ -54,6 +76,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     status
     privateMessage
     tags
+    amount
     createdAt
     items {
       id
@@ -105,19 +128,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         isApproved
         balance
         host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          website
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
+          ...HostFieldsFragment
         }
       }
       ... on Event {
@@ -125,16 +136,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         isApproved
         balance
         host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          website
-          location {
-            address
-            country
-          }
+          ...HostFieldsFragment
         }
         parentCollective {
           id
@@ -159,6 +161,11 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canEdit
       canDelete
       canSeeInvoiceInfo
+      canApprove
+      canUnapprove
+      canReject
+      canPay
+      canMarkAsUnpaid
     }
     activities {
       id
@@ -175,4 +182,5 @@ export const expensePageExpenseFieldsFragment = gqlV2`
   }
 
   ${CommentFieldsFragment}
+  ${HostFieldsFragment}
 `;
