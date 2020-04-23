@@ -659,6 +659,10 @@ const editExpense = graphql(
           description
           amount
         }
+        attachedFiles {
+          id
+          url
+        }
         category
         type
         privateMessage

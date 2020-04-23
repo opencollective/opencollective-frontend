@@ -110,6 +110,10 @@ const getExpenseQuery = gql`
         description
         amount
       }
+      attachedFiles {
+        id
+        url
+      }
       collective {
         id
         slug
