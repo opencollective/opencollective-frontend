@@ -709,6 +709,7 @@
   "expense.markAsUnpaid.btn": "Mark as unpaid",
   "expense.notes": "Notes",
   "Expense.NotFound": "This expense doesn't exist",
+  "Expense.OpenAttachedFile": "Open attached file in a new window",
   "expense.paid": "paid",
   "expense.pay.btn": "Pay with {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Insufficient balance",
