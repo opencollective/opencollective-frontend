@@ -817,6 +817,7 @@
   "FinancialContributions": "Contributions financières",
   "Finish": "Terminer",
   "Fiscalhost": "Hôte fiscal",
+  "fiscalHost.allFiscalHosts": "All fiscal hosts",
   "fiscalHost.apply.info": "With this option, you don't need to set up a legal entity and bank account for your project. The fiscal host will hold funds on your behalf, and take care of accounting, invoices, tax, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming).",
   "Fiscalhost.definition": "Un hôte fiscal est une entité légale qui stocke l'argent et a la responsabilité de l'administration et des taxes pour le collectif.",
   "fiscalHost.interestedInHosting": "Are you interested in fiscally hosting Collectives?",
