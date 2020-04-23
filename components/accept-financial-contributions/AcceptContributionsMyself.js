@@ -20,7 +20,6 @@ import { withRouter } from 'next/router';
 import { Router } from '../../server/pages';
 import { withUser } from '../UserProvider';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 class AcceptContributionsMyself extends React.Component {
@@ -55,7 +54,7 @@ class AcceptContributionsMyself extends React.Component {
         features: {
           recurring: false,
         },
-        instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n 
+        instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n
       <code>
       Amount: {amount}
       <br/>\n
@@ -69,17 +68,20 @@ class AcceptContributionsMyself extends React.Component {
     // try mutation
     try {
       await this.props.addBankAccount({
-        account,
-        key: 'paymentMethods',
-        value,
+        variables: {
+          account,
+          key: 'paymentMethods',
+          value,
+        },
       });
       this.setState({ loading: false });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('accept-financial-contributions', {
+      await Router.pushRoute('accept-financial-contributions', {
         slug: this.props.collective.slug,
         path: this.props.router.query.path,
         state: 'success',
-      }).then(() => window.scrollTo(0, 0));
+      });
+      window.scrollTo(0, 0);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ error: errorMsg });
@@ -240,18 +242,8 @@ const bankAccountMutation = gqlV2`
 `;
 
 const addBankAccountMutation = graphql(bankAccountMutation, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
-  props: ({ mutate }) => ({
-    addBankAccount: async ({ account, key, value }) => {
-      return await mutate({
-        variables: { account, key, value },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
-      });
-    },
-  }),
+  name: 'addBankAccount',
+  options: { context: API_V2_CONTEXT },
 });
 
 export default withUser(withRouter(addBankAccountMutation(AcceptContributionsMyself)));
