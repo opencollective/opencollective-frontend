@@ -108,7 +108,7 @@ class HostDashboardActionsBanner extends React.Component {
     order.fromCollective = { id: Number(form.FromCollectiveId) };
 
     try {
-      await this.props.addFundsToCollective(order);
+      await this.props.addFundsToCollective({ variables: { order } });
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -222,7 +222,7 @@ class HostDashboardActionsBanner extends React.Component {
   }
 }
 
-const addFundsToCollectiveQuery = gql`
+const addFundsToCollectiveMutation = gql`
   mutation addFundsToCollective($order: OrderInputType!) {
     addFundsToCollective(order: $order) {
       id
@@ -233,7 +233,6 @@ const addFundsToCollectiveQuery = gql`
       }
       collective {
         id
-
         stats {
           id
           balance
@@ -243,12 +242,6 @@ const addFundsToCollectiveQuery = gql`
   }
 `;
 
-const addMutation = graphql(addFundsToCollectiveQuery, {
-  props: ({ mutate }) => ({
-    addFundsToCollective: async order => {
-      return await mutate({ variables: { order } });
-    },
-  }),
-});
+const addMutation = graphql(addFundsToCollectiveMutation, { name: 'addFundsToCollective' });
 
 export default addMutation(injectIntl(HostDashboardActionsBanner));
