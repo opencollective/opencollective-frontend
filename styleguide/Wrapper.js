@@ -8,6 +8,7 @@ import StripeProvider from '../components/StripeProvider';
 import theme from '../lib/theme';
 import initClient from '../lib/initClient';
 import { getBaseApiUrl } from '../lib/utils';
+import UserProvider from '../components/UserProvider';
 
 const STRIPE_KEY = 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8';
 
@@ -34,7 +35,7 @@ export default class ThemeWrapper extends Component {
         <IntlProvider locale="en">
           <StripeProvider token={STRIPE_KEY} loadOnMount>
             <ApolloProvider client={initClient(undefined, this.getGraphQLAPIURL())}>
-              {this.props.children}
+              <UserProvider skipRouteCheck>{this.props.children}</UserProvider>
             </ApolloProvider>
           </StripeProvider>
         </IntlProvider>

@@ -161,7 +161,14 @@ class CreateExpensePage extends React.Component {
 
       // Redirect to the expense page
       const legacyExpenseId = result.data.createExpense.legacyId;
-      Router.pushRoute(`/${this.props.collectiveSlug}/expenses/${legacyExpenseId}/v2`);
+      const { collectiveSlug, parentCollectiveSlug } = this.props;
+      Router.pushRoute(`expense-v2`, {
+        parentCollectiveSlug,
+        collectiveSlug,
+        collectiveType: parentCollectiveSlug && 'events',
+        ExpenseId: legacyExpenseId,
+        createSuccess: true,
+      });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
     }
