@@ -20,7 +20,6 @@ import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { twitterProfileUrl, githubProfileUrl } from '../../../lib/url_helpers';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledLink from '../../StyledLink';
-import ExternalLink from '../../ExternalLink';
 import { Span, H1 } from '../../Text';
 import Container from '../../Container';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
@@ -172,7 +171,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               )}
               <Flex my={2}>
                 {collective.twitterHandle && (
-                  <ExternalLink
+                  <StyledLink
                     data-cy="twitterProfileUrl"
                     href={twitterProfileUrl(collective.twitterHandle)}
                     title="Twitter"
@@ -182,10 +181,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledRoundButton size={32} mr={3}>
                       <Twitter size={12} />
                     </StyledRoundButton>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
                 {collective.githubHandle && (
-                  <ExternalLink
+                  <StyledLink
                     data-cy="githubProfileUrl"
                     href={githubProfileUrl(collective.githubHandle)}
                     title="Github"
@@ -195,10 +194,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledRoundButton size={32} mr={3}>
                       <Github size={12} />
                     </StyledRoundButton>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
                 {collective.website && (
-                  <ExternalLink
+                  <StyledLink
                     data-cy="collectiveWebsite"
                     href={collective.website}
                     title={intl.formatMessage(Translations.website)}
@@ -208,7 +207,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledRoundButton size={32} mr={3}>
                       <Globe size={14} />
                     </StyledRoundButton>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
               </Flex>
               {host && collective.isApproved && !isEvent && (

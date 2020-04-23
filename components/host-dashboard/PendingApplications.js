@@ -18,7 +18,7 @@ import Container from '../Container';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import Avatar from '../Avatar';
 import MessageBox from '../MessageBox';
 import AppRejectionReasonModal from './AppRejectionReasonModal';
@@ -136,10 +136,10 @@ class HostPendingApplications extends React.Component {
                   </LinkCollective>
                 </div>
                 {c.githubHandle && (
-                  <ExternalLink href={`https://github.com/${c.githubHandle}`} openInNewTab>
+                  <StyledLink href={`https://github.com/${c.githubHandle}`} openInNewTab>
                     <Github size="1em" />
                     <Span ml={1}>{c.githubHandle}</Span>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
               </Container>
             </Flex>

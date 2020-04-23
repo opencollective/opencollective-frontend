@@ -11,7 +11,7 @@ import SectionTitle from '../SectionTitle';
 import SectionSubtitle from '../SectionSubtitle';
 import Illustration from '../HomeIllustration';
 import StyledCarousel from '../../StyledCarousel';
-import ExternalLink from '../../ExternalLink';
+import StyledLink from '../../StyledLink';
 
 const SelectFeatureButton = styled.button`
   width: 100%;
@@ -69,7 +69,7 @@ const Title = styled(Span)`
   }
 `;
 
-const LearnMoreLink = styled(ExternalLink)`
+const LearnMoreLink = styled(StyledLink)`
   color: #dc5f7d;
   &:hover {
     color: #dc5f7d;

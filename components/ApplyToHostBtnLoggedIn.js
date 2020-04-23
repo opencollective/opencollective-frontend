@@ -14,7 +14,7 @@ import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
 import StyledCheckbox from './StyledCheckbox';
 import StyledButton from './StyledButton';
 import Container from './Container';
-import ExternalLink from './ExternalLink';
+import StyledLink from './StyledLink';
 
 const CheckboxWrapper = styled(Container)`
   color: #090a0a;
@@ -158,9 +158,9 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                       defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
                       values={{
                         'tos-link': msg => (
-                          <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
+                          <StyledLink href={get(host, 'settings.tos')} openInNewTab>
                             {msg}
-                          </ExternalLink>
+                          </StyledLink>
                         ),
                         hostName: host.name,
                       }}

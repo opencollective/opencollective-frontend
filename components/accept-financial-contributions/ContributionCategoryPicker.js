@@ -15,7 +15,7 @@ import { H1, P } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import CollectiveNavbar from '../CollectiveNavbar';
 
 const Image = styled.img`
@@ -220,9 +220,9 @@ class ContributionCategoryPicker extends React.Component {
                         defaultMessage="Outsource fundholding to an entity who offers this service ({moreInfo})"
                         values={{
                           moreInfo: (
-                            <ExternalLink href={moreInfoHostsLink} openInNewTab>
+                            <StyledLink href={moreInfoHostsLink} openInNewTab>
                               More info
-                            </ExternalLink>
+                            </StyledLink>
                           ),
                         }}
                       />

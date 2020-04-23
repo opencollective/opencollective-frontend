@@ -19,7 +19,7 @@ import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import Avatar from '../Avatar';
 import MessageBox from '../MessageBox';
 import StyledCheckbox from '../StyledCheckbox';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 
 const messages = defineMessages({
   collectives: {
@@ -184,9 +184,9 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
                       defaultMessage="I agree with the {hostTosLink} of {hostName}."
                       values={{
                         hostTosLink: (
-                          <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
+                          <StyledLink href={get(host, 'settings.tos')} openInNewTab>
                             <FormattedMessage id="tos" defaultMessage="terms of service" />
-                          </ExternalLink>
+                          </StyledLink>
                         ),
                         hostName: host.name,
                       }}

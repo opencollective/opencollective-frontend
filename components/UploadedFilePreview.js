@@ -4,12 +4,12 @@ import styled from 'styled-components';
 import { max } from 'lodash';
 import { FileText } from '@styled-icons/feather/FileText';
 import { imagePreview } from '../lib/image-utils';
-import ExternalLink from './ExternalLink';
+import StyledLink from './StyledLink';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
 import LoadingPlaceholder from './LoadingPlaceholder';
 
-const ImageLink = styled(ExternalLink).attrs({ openInNewTab: true })`
+const ImageLink = styled(StyledLink).attrs({ openInNewTab: true })`
   cursor: pointer;
   overflow: hidden;
   display: block;

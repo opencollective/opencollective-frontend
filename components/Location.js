@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Map from './Map';
 import colors from '../lib/constants/colors';
-import ExternalLink from './ExternalLink';
+import StyledLink from './StyledLink';
 
 class Location extends React.Component {
   static propTypes = {
@@ -37,13 +37,13 @@ class Location extends React.Component {
           {this.props.showTitle && <h1>Location</h1>}
           <div className="name">{name}</div>
           <div className="address" style={{ color: colors.darkgray }}>
-            <ExternalLink
+            <StyledLink
               href={`https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`}
               openInNewTab
             >
               {address}
               {country ? `, ${country}` : ''}
-            </ExternalLink>
+            </StyledLink>
           </div>
         </div>
         {lat && long && (
