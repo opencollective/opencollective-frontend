@@ -102,22 +102,11 @@ class HostDashboardActionsBanner extends React.Component {
     }
 
     this.setState({ loading: true });
-    const hostCollective = this.props.host;
+
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
     order.collective = { id: this.state.selectedCollective.id };
     order.fromCollective = { id: Number(form.FromCollectiveId) };
 
-    const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
-    if (!pm) {
-      this.setState({
-        error: "This host doesn't have an opencollective payment method",
-        loading: false,
-      });
-      return;
-    }
-    order.paymentMethod = {
-      uuid: pm.uuid,
-    };
     try {
       await this.props.addFundsToCollective(order);
       this.setState({ showAddFunds: false, loading: false });
