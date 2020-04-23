@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Flex } from '../Grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { has } from 'lodash';
+import { has, find } from 'lodash';
+import themeGet from '@styled-system/theme-get';
+import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
 
 import stripeIllustration from '../../public/static/images/create-collective/stripeIllustration.png';
 import bankAccountIllustration from '../../public/static/images/create-collective/bankAccountIllustration.png';
@@ -14,10 +15,9 @@ import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
 import Loading from '../Loading';
-import StyledCheckbox from '../StyledCheckbox';
+import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 
 import { connectAccount } from '../../lib/api';
-import { compose } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import { withRouter } from 'next/router';
@@ -42,11 +42,16 @@ const ConnectedAccountCard = styled(Flex)`
   border-radius: 16px;
 `;
 
+const GreenCheckbox = styled(CheckboxChecked)`
+  color: ${themeGet('colors.green.700')};
+`;
+
 class StripeOrBankAccountPicker extends React.Component {
   static propTypes = {
     data: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
     router: PropTypes.object,
-    collectiveSlug: PropTypes.string.isRequired,
+    hostCollectiveSlug: PropTypes.string.isRequired,
     LoggedInUser: PropTypes.object,
     addHost: PropTypes.func.isRequired,
     collective: PropTypes.object,
@@ -58,6 +63,17 @@ class StripeOrBankAccountPicker extends React.Component {
     this.state = {
       loading: null,
     };
+
+    this.messages = defineMessages({
+      addBankAccount: {
+        id: 'acceptContributions.addBankAccount',
+        defaultMessage: 'Add bank account',
+      },
+      connectStripe: {
+        id: 'collective.connectedAccounts.stripe.button',
+        defaultMessage: 'Connect Stripe',
+      },
+    });
   }
 
   connectStripe = () => {
@@ -74,7 +90,7 @@ class StripeOrBankAccountPicker extends React.Component {
   };
 
   render() {
-    const { router, data, LoggedInUser, addHost, collective } = this.props;
+    const { router, data, LoggedInUser, addHost, collective, intl } = this.props;
     const { loading, Collective } = data;
 
     if (loading) {
@@ -88,8 +104,8 @@ class StripeOrBankAccountPicker extends React.Component {
       : has(hostOrganization, 'settings.paymentMethods.manual');
     const connectedAccounts = LoggedInUser
       ? LoggedInUser.collective.connectedAccounts
-      : hostOrganization.connectAccounts;
-    const stripeAccount = connectedAccounts && connectedAccounts['stripe'] && connectedAccounts['stripe'][0];
+      : hostOrganization.connectedAccounts;
+    const stripeAccount = find(connectedAccounts, { service: 'stripe' });
 
     return (
       <Flex flexDirection="column" justifyContent="center" alignItems="center" my={[5]}>
@@ -97,16 +113,18 @@ class StripeOrBankAccountPicker extends React.Component {
           <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
             <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  src={stripeIllustration}
-                  alt={
-                    <FormattedMessage id="collective.connectedAccounts.stripe.button" defaultMessage="Connect Stripe" />
-                  }
-                />
+                <Image src={stripeIllustration} alt={intl.formatMessage(this.messages.connectStripe)} />
                 {stripeAccount ? (
-                  <ConnectedAccountCard width={2 / 3} minHeight={'50px'} px={2}>
-                    <StyledCheckbox name="stripeCheckbox" checked />
-                    <Flex flexDirection="column" justifyContent="space-evenly" ml={4}>
+                  <ConnectedAccountCard
+                    width={2 / 3}
+                    px={2}
+                    mt={[2, 3]}
+                    mb={3}
+                    alignItems="center"
+                    justifyContent="space-around"
+                  >
+                    <GreenCheckbox size={30} />
+                    <Flex flexDirection="column" minHeight={'47px'} justifyContent="space-evenly">
                       <P fontWeight="bold">
                         <FormattedMessage id="acceptContributions.stripeConnected" defaultMessage="Stripe connected" />
                       </P>
@@ -151,14 +169,18 @@ class StripeOrBankAccountPicker extends React.Component {
               pt={[3, 0]}
             >
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  src={bankAccountIllustration}
-                  alt={<FormattedMessage id="acceptContributions.addBankAccount" defaultMessage="Add bank account" />}
-                />
+                <Image src={bankAccountIllustration} alt={intl.formatMessage(this.messages.addBankAccount)} />
                 {isBankAccountAlreadyThere ? (
-                  <ConnectedAccountCard width={2 / 3} minHeight={'50px'} px={2}>
-                    <StyledCheckbox name="bankAccountCheckbox" checked />
-                    <Flex flexDirection="column" justifyContent="space-evenly" ml={4}>
+                  <ConnectedAccountCard
+                    width={2 / 3}
+                    px={2}
+                    mt={[2, 3]}
+                    mb={3}
+                    alignItems="center"
+                    justifyContent="space-around"
+                  >
+                    <GreenCheckbox size={30} />
+                    <Flex flexDirection="column" minHeight={'47px'} justifyContent="space-evenly">
                       <P fontWeight="bold">
                         <FormattedMessage
                           id="acceptContributions.bankAccountSetUp"
@@ -209,14 +231,15 @@ class StripeOrBankAccountPicker extends React.Component {
             minHeight="36px"
             mt={4}
             minWidth={'145px'}
-            onClick={() => {
+            onClick={async () => {
               const host = LoggedInUser ? LoggedInUser.collective : hostOrganization;
-              addHost(collective, host);
-              Router.pushRoute('accept-financial-contributions', {
+              await addHost(collective, host);
+              await Router.pushRoute('accept-financial-contributions', {
                 slug: router.query.slug,
                 path: router.query.path,
                 state: 'success',
-              }).then(() => window.scrollTo(0, 0));
+              });
+              window.scrollTo(0, 0);
             }}
           >
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
@@ -227,17 +250,12 @@ class StripeOrBankAccountPicker extends React.Component {
   }
 }
 
-const getBankAccountQuery = graphql(gql`
-  query Collective($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
-      id
-      slug
-      name
-      settings
-    }
-  }
-`);
+const getBankAccountInfo = graphql(getCollectivePageQuery, {
+  options: props => ({
+    variables: {
+      slug: props.hostCollectiveSlug,
+    },
+  }),
+});
 
-const addGraphQL = compose(getBankAccountQuery);
-
-export default withRouter(addGraphQL(StripeOrBankAccountPicker));
+export default injectIntl(withRouter(getBankAccountInfo(StripeOrBankAccountPicker)));

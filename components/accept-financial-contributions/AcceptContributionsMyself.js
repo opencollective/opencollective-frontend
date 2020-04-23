@@ -48,9 +48,12 @@ class AcceptContributionsMyself extends React.Component {
       legacyId: host.id,
     };
     try {
-      await this.props.applyToHost(collectiveInput, hostInput);
-      this.setState({ loading: false });
-      await this.props.refetchLoggedInUser();
+      await this.props.applyToHost({
+        variables: {
+          collective: collectiveInput,
+          host: hostInput,
+        },
+      });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       throw new Error(errorMsg);
@@ -58,9 +61,6 @@ class AcceptContributionsMyself extends React.Component {
   };
 
   submitBankAccountInformation = async bankAccountInfo => {
-    // set state to loading
-    this.setState({ loading: true });
-
     // prepare objects
     const account = {
       legacyId: this.props.LoggedInUser.CollectiveId,
@@ -92,14 +92,6 @@ class AcceptContributionsMyself extends React.Component {
           value,
         },
       });
-      this.setState({ loading: false });
-      await this.props.refetchLoggedInUser();
-      await Router.pushRoute('accept-financial-contributions', {
-        slug: this.props.collective.slug,
-        path: this.props.router.query.path,
-        state: 'success',
-      });
-      window.scrollTo(0, 0);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       throw new Error(errorMsg);
@@ -116,15 +108,19 @@ class AcceptContributionsMyself extends React.Component {
 
     const submit = async values => {
       try {
+        this.setState({ loading: true });
         const { bankInformation } = values;
         await this.submitBankAccountInformation(bankInformation);
         await this.addHost(collective, LoggedInUser.collective);
-        Router.pushRoute('accept-financial-contributions', {
+        await this.props.refetchLoggedInUser();
+        await Router.pushRoute('accept-financial-contributions', {
           slug: this.props.collective.slug,
           path: this.props.router.query.path,
           state: 'success',
-        }).then(() => window.scrollTo(0, 0));
+        });
+        window.scrollTo(0, 0);
       } catch (e) {
+        this.setState({ loading: false });
         this.setState({ error: e });
       }
     };
@@ -255,8 +251,8 @@ class AcceptContributionsMyself extends React.Component {
           )}
           {!router.query.method && (
             <StripeOrBankAccountPicker
-              collectiveSlug={LoggedInUser.collective.slug}
               LoggedInUser={LoggedInUser}
+              hostCollectiveSlug={LoggedInUser.collective.slug}
               addHost={this.addHost}
               collective={collective}
             />
@@ -290,14 +286,8 @@ mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenc
 `;
 
 const addApplyToHostMutation = graphql(applyToHostMutation, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
-  props: ({ mutate }) => ({
-    applyToHost: async (collectiveInput, hostInput) => {
-      return await mutate({ variables: { collective: collectiveInput, host: hostInput } });
-    },
-  }),
+  name: 'applyToHost',
+  options: { context: API_V2_CONTEXT },
 });
 
 const addBankAccountMutation = graphql(bankAccountMutation, {
