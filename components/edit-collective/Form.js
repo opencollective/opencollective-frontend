@@ -19,7 +19,7 @@ import InputField from '../InputField';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 
 // Generic Sections
 import CollectiveGoals from './sections/CollectiveGoals';
@@ -411,14 +411,11 @@ class EditCollectiveForm extends React.Component {
                 </StyledButton>
               </Link>
 
-              <ExternalLink
-                href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq"
-                openInNewTab
-              >
+              <StyledLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
                 <InfoCircle size="1em" />
                 &nbsp;
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
-              </ExternalLink>
+              </StyledLink>
             </Container>
             <CreateVirtualCardsForm
               collectiveId={collective.id}

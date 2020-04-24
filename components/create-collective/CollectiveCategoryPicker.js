@@ -9,9 +9,9 @@ import { H1 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 
-const ExamplesLink = styled(ExternalLink)`
+const ExamplesLink = styled(StyledLink)`
   color: ${themeGet('colors.blue.500')};
   font-size: ${themeGet('fontSizes.Caption')}px;
 

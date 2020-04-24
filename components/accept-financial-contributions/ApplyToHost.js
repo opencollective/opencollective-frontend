@@ -8,7 +8,7 @@ import umbrellaIllustration from '../../public/static/images/create-collective/a
 import climateIllustration from '../../public/static/images/create-collective/climateIllustration.png';
 import { H1, H2, H3, P } from '../Text';
 import StyledButton from '../StyledButton';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import Container from '../Container';
 import HostsContainer from './HostsContainer';
 import StyledTag from '../../components/StyledTag';
@@ -155,11 +155,11 @@ class ApplyToHost extends React.Component {
                 </H3>
               </Box>
               <Box order={[3, 2, 3]}>
-                <ExternalLink href={FISCAL_HOST_LINK} openInNewTab>
+                <StyledLink href={FISCAL_HOST_LINK} openInNewTab>
                   <StyledButton buttonStyle="dark" mt={[2, 3]} mb={3} px={3}>
                     {intl.formatMessage(this.messages.becomeHost)}
                   </StyledButton>
-                </ExternalLink>
+                </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
                 <img src={climateIllustration} width="192px" height="192px" />

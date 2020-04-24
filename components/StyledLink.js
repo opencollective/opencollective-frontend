@@ -10,7 +10,14 @@ import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledLink = styled.a`
+const StyledLink = styled.a.attrs(props => {
+  if (props.openInNewTab) {
+    return {
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    };
+  }
+})`
   color: ${themeGet('colors.primary.500')};
   cursor: pointer;
   text-decoration: none;
@@ -95,6 +102,8 @@ StyledLink.propTypes = {
   disabled: PropTypes.bool,
   /** Wether text should be truncated if too long */
   truncateOverflow: PropTypes.bool,
+  /** If true, the link will open in a new tab when clicked */
+  openInNewTab: PropTypes.bool,
 };
 
 /** @component */

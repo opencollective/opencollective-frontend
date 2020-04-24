@@ -11,7 +11,7 @@ import { H1, H2, P } from '../Text';
 import Container from '../Container';
 import StyledButton from '../StyledButton';
 import Avatar from '../Avatar';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import Link from '../Link';
 
 import { confettiFireworks } from '../../lib/confettis';
@@ -19,7 +19,7 @@ import { withRouter } from 'next/router';
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
-const SmallExternalLink = styled(ExternalLink)`
+const SmallExternalLink = styled(StyledLink)`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
 

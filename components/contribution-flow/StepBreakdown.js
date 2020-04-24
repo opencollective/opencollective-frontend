@@ -16,7 +16,7 @@ import fetchGeoLocation from '../../lib/geolocation_api';
 import StyledCard from '../StyledCard';
 import { Span } from '../Text';
 import StyledHr from '../StyledHr';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import InputTypeCountry from '../InputTypeCountry';
 import Container from '../Container';
 import StyledButton from '../StyledButton';
@@ -82,9 +82,9 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
             <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
             {' ('}
             {pmFeeInfo.aboutURL ? (
-              <ExternalLink href={pmFeeInfo.aboutURL} openInNewTab>
+              <StyledLink href={pmFeeInfo.aboutURL} openInNewTab>
                 {capitalize(paymentMethod.service)}
-              </ExternalLink>
+              </StyledLink>
             ) : (
               capitalize(paymentMethod.service)
             )}

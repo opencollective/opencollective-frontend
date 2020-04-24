@@ -19,7 +19,7 @@ import StyledSpinner from '../StyledSpinner';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import { formatErrorMessage } from '../../lib/errors';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -419,13 +419,9 @@ class ExpenseDetails extends React.Component {
                     />
                   )}
                   {!editMode && attachment.url && (
-                    <ExternalLink
-                      href={attachment.url}
-                      openInNewTab
-                      title={this.getAttachmentTitle(expense, attachment)}
-                    >
+                    <StyledLink href={attachment.url} openInNewTab title={this.getAttachmentTitle(expense, attachment)}>
                       <img src={this.getAttachmentPreview(attachment.url)} />
-                    </ExternalLink>
+                    </StyledLink>
                   )}
                   {!editMode && !attachment.url && <img src={this.getAttachmentPreview(attachment.url)} />}
                 </div>
@@ -435,13 +431,13 @@ class ExpenseDetails extends React.Component {
               <div key={attachment.id}>
                 <div className="frame">
                   {attachment.url ? (
-                    <ExternalLink
+                    <StyledLink
                       href={attachment.url}
                       openInNewTab
                       title={intl.formatMessage(this.messages.attachedFile)}
                     >
                       <img src={this.getAttachmentPreview(attachment.url)} />
-                    </ExternalLink>
+                    </StyledLink>
                   ) : (
                     <img src={this.getAttachmentPreview(attachment.url)} />
                   )}

@@ -21,7 +21,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import UploadedFilePreview from '../UploadedFilePreview';
 import StyledCard from '../StyledCard';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
 const CreatedByUserLink = ({ account }) => {
@@ -225,9 +225,9 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
               )}
               {host.website && (
                 <P mt={2} fontSize="11px">
-                  <ExternalLink href={host.website} openInNewTab>
+                  <StyledLink href={host.website} openInNewTab>
                     {host.website}
-                  </ExternalLink>
+                  </StyledLink>
                 </P>
               )}
             </PrivateInfoColumn>
@@ -251,9 +251,9 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
             )}
             {payee.website && (
               <P mt={2} fontSize="11px">
-                <ExternalLink href={payee.website} openInNewTab>
+                <StyledLink href={payee.website} openInNewTab>
                   {payee.website}
-                </ExternalLink>
+                </StyledLink>
               </P>
             )}
           </PrivateInfoColumn>
