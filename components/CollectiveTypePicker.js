@@ -38,7 +38,15 @@ const CollectiveTypePicker = ({ types, onChange }) => {
   return (
     <Container display="flex" background="white" justifyContent="space-between">
       {types.map(type => (
-        <StyledButton key={type} flex={buttonFlex} px={2} py={4} borderRadius={8} onClick={() => onChange(type)}>
+        <StyledButton
+          key={type}
+          flex={buttonFlex}
+          px={2}
+          py={4}
+          borderRadius={8}
+          onClick={() => onChange(type)}
+          data-cy={`collective-type-picker-${type}`}
+        >
           <Box mb={2}>{getTypeIcon(type)}</Box>
           <Span fontSize="Caption">{formatCollectiveType(formatMessage, type)}</Span>
         </StyledButton>

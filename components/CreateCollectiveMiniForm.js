@@ -206,7 +206,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAs
         const { values, handleSubmit, errors, touched, isSubmitting } = formik;
 
         return (
-          <Form>
+          <Form data-cy="create-collective-mini-form">
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
             <Box mt={3}>
               {(isUser || isOrganization) && (

@@ -101,6 +101,7 @@ const StyledDropzone = ({
   accept,
   minSize,
   maxSize,
+  name,
   error,
   value,
   isMulti,
@@ -156,7 +157,7 @@ const StyledDropzone = ({
       size={size}
       error={error}
     >
-      <input {...getInputProps()} />
+      <input name={name} {...getInputProps()} />
       {isLoading || isUploading ? (
         <Container
           position="relative"
@@ -230,6 +231,8 @@ const StyledDropzone = ({
 StyledDropzone.propTypes = {
   /** Called back with the uploaded files on success */
   onSuccess: PropTypes.func,
+  /** Name for the input */
+  name: PropTypes.string,
   /** Called back with the rejectd files */
   onReject: PropTypes.func,
   /** Content to show inside the dropzone. Defaults to message "Drag and drop one or..." */
