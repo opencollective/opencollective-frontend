@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 
 import { Span, H4, P } from '../../Text';
 import Container from '../../Container';
@@ -11,7 +11,7 @@ import SectionTitle from '../SectionTitle';
 import SectionSubtitle from '../SectionSubtitle';
 import Illustration from '../HomeIllustration';
 import StyledCarousel from '../../StyledCarousel';
-import ExternalLink from '../../ExternalLink';
+import StyledLink from '../../StyledLink';
 
 const SelectFeatureButton = styled.button`
   width: 100%;
@@ -69,7 +69,7 @@ const Title = styled(Span)`
   }
 `;
 
-const LearnMoreLink = styled(ExternalLink)`
+const LearnMoreLink = styled(StyledLink)`
   color: #dc5f7d;
   &:hover {
     color: #dc5f7d;

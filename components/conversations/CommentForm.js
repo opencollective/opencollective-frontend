@@ -109,7 +109,7 @@ const CommentForm = ({
   return (
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
-        <ContainerOverlay background="rgba(255, 255, 255, 0.75)">
+        <ContainerOverlay backgroundType="white">
           <SignInOrJoinFree
             routes={{ join: getRedirectUrl(router, id) }}
             signInLabel={formatMessage(messages.signInLabel)}

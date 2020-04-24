@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Blog } from '@styled-icons/icomoon/Blog';
@@ -16,7 +16,6 @@ import Container from './Container';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 import StyledTooltip from './StyledTooltip';
-import ExternalLink from './ExternalLink';
 
 import languages from '../lib/constants/locales';
 
@@ -123,9 +122,9 @@ class Footer extends React.Component {
                       defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
                       values={{
                         crowdinLink: (
-                          <ExternalLink href="https://crowdin.com/project/opencollective" openInNewTab>
+                          <StyledLink href="https://crowdin.com/project/opencollective" openInNewTab>
                             Crowdin
-                          </ExternalLink>
+                          </StyledLink>
                         ),
                       }}
                     />

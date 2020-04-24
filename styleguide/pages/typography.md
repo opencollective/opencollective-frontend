@@ -1,6 +1,6 @@
 The main way to deal with typography is through the components in `components/Text.js`.
 
-# Typeface & fonts
+### Typeface & fonts
 
 🎨️ [Figma file](https://www.figma.com/file/jxJfC29te8i1C8qMReth95/%5BDS%5D-01-Typography?node-id=9%3A10)
 
@@ -22,7 +22,7 @@ import { P } from 'components/Text';
 </div>;
 ```
 
-# Type scale
+### Type scale
 
 You can configure the scale through `fontSize` and `lineHeight` props.
 

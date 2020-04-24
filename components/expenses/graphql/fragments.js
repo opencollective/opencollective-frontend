@@ -8,13 +8,17 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
     imageUrl
     type
     name
+    location {
+      address
+      country
+    }
     payoutMethods {
       id
       type
       name
       data
     }
-    adminMemberships: memberOf(role: ADMIN) {
+    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION], isHostAccount: false) {
       nodes {
         id
         account {
@@ -48,11 +52,17 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     type
     status
     privateMessage
-    attachments {
+    tags
+    createdAt
+    items {
       id
       incurredAt
       description
       amount
+      url
+    }
+    attachedFiles {
+      id
       url
     }
     payee {
@@ -99,9 +109,13 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           slug
           type
           expensePolicy
+          website
           location {
             address
             country
+          }
+          transferwise {
+            availableCurrencies
           }
         }
       }
@@ -115,6 +129,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           slug
           type
           expensePolicy
+          website
           location {
             address
             country
@@ -143,6 +158,18 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canEdit
       canDelete
       canSeeInvoiceInfo
+    }
+    activities {
+      id
+      type
+      createdAt
+      individual {
+        id
+        type
+        slug
+        name
+        imageUrl
+      }
     }
   }
 

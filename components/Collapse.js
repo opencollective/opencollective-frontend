@@ -81,9 +81,9 @@ const CollapseBtn = styled.div`
 /**
  * A stylized version of the `details` HTML element to hide & show content when clicked.
  */
-const Collapse = ({ children, title, buttonSize, ...props }) => {
+const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
   return (
-    <Details {...props}>
+    <Details open={defaultIsOpen} {...props}>
       {title && (
         <summary>
           <div>{title}</div>
@@ -101,6 +101,7 @@ const Collapse = ({ children, title, buttonSize, ...props }) => {
 Collapse.propTypes = {
   title: PropTypes.node,
   children: PropTypes.node,
+  defaultIsOpen: PropTypes.bool,
   buttonSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -20,18 +20,18 @@ const ExpenseTypeLabels = defineMessages({
   },
   [expenseTypes.RECEIPT]: {
     id: 'ExpenseForm.ReceiptLabel',
-    defaultMessage: 'Receipt(s)',
+    defaultMessage: 'Reimbursement',
   },
 });
 
 const ExpenseTypeDescription = defineMessages({
   [expenseTypes.RECEIPT]: {
     id: 'ExpenseForm.InvoiceDescription',
-    defaultMessage: 'Get paid back for a purchase already made.',
+    defaultMessage: 'Get reimbursed for a purchase already made.',
   },
   [expenseTypes.INVOICE]: {
     id: 'ExpenseForm.ReceiptDescription',
-    defaultMessage: 'Charge for your time or get paid in advance.',
+    defaultMessage: 'Create an invoice to get paid or to pay a vendor directly.',
   },
 });
 
@@ -50,7 +50,7 @@ const StaticTypeIllustration = styled(TypeIllustration).attrs(props => ({
 const ExpenseTypeOptionContainer = styled.label`
   display: flex;
   align-items: center;
-  padding: 24px 16px;
+  padding: 15px 16px;
   margin-bottom: 0;
   cursor: pointer;
   background: white;
@@ -73,12 +73,12 @@ const ExpenseTypeOptionContainer = styled.label`
   }
 `;
 
-const ExpenseTypeOption = ({ name, type, defaultChecked }) => {
+const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
   const { formatMessage } = useIntl();
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
-      <input type="radio" name={name} value={type} defaultChecked={defaultChecked} />
-      <Box mr={3}>
+      <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
+      <Box mr={3} size={64}>
         <StaticTypeIllustration expenseType={type} />
         <TypeIllustration src={type === expenseTypes.RECEIPT ? receiptIllustration : invoiceIllustration} />
       </Box>
@@ -97,7 +97,8 @@ const ExpenseTypeOption = ({ name, type, defaultChecked }) => {
 ExpenseTypeOption.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
-  defaultChecked: PropTypes.bool,
+  isChecked: PropTypes.bool,
+  onChange: PropTypes.func,
 };
 
 const Fieldset = styled.fieldset`
@@ -118,8 +119,18 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value }) => {
     <StyledCard>
       <Fieldset onChange={onChange}>
         <Flex flexWrap="wrap" overflow="hidden">
-          <ExpenseTypeOption name={name} type={expenseTypes.RECEIPT} defaultChecked={value === expenseTypes.RECEIPT} />
-          <ExpenseTypeOption name={name} type={expenseTypes.INVOICE} defaultChecked={value === expenseTypes.INVOICE} />
+          <ExpenseTypeOption
+            name={name}
+            type={expenseTypes.RECEIPT}
+            isChecked={value === expenseTypes.RECEIPT}
+            onChange={onChange}
+          />
+          <ExpenseTypeOption
+            name={name}
+            type={expenseTypes.INVOICE}
+            isChecked={value === expenseTypes.INVOICE}
+            onChange={onChange}
+          />
         </Flex>
       </Fieldset>
     </StyledCard>

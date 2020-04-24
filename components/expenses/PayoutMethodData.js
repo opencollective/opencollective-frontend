@@ -1,29 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isObject, startCase } from 'lodash';
+import { get, startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { Span, P } from '../Text';
+import { P } from '../Text';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import Container from '../Container';
 
 const renderObject = object =>
-  Object.entries(object).reduce((acc, next) => {
-    const [key, value] = next;
-    if (isObject(value)) {
-      return [
-        ...acc,
-        <P key={key} fontSize="Caption" fontWeight="bold">
-          {startCase(key)}
-        </P>,
-        ...renderObject(value),
-      ];
-    } else {
-      return [
-        ...acc,
-        <P key={key} fontSize="Caption">
-          {startCase(key)}: {value}
-        </P>,
-      ];
-    }
+  Object.entries(object).reduce((acc, [key, value]) => {
+    return [
+      ...acc,
+      <P key={key} fontSize="11px" lineHeight="Caption">
+        <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
+      </P>,
+    ];
   }, []);
 
 /**
@@ -42,23 +33,59 @@ export const payoutMethodHasData = payoutMethod => {
   }
 };
 
-const PrivateFallback = () => (
-  <Span color="black.500" fontStyle="italic">
-    <FormattedMessage id="Private" defaultMessage="Private" />
-  </Span>
-);
-
 /**
  * Shows the data of the given payout method
  */
 const PayoutMethodData = ({ payoutMethod }) => {
+  if (!payoutMethodHasData(payoutMethod)) {
+    return null;
+  }
+
   switch (payoutMethod.type) {
     case PayoutMethodType.PAYPAL:
-      return get(payoutMethod, 'data.email') || <PrivateFallback />;
+      return (
+        <div>
+          <Container fontSize="11px" fontWeight="500" mb={2}>
+            <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
+            &nbsp;&nbsp;
+            <PrivateInfoIcon color="#969BA3" />
+          </Container>
+          <P fontSize="11px" color="black.700">
+            {payoutMethod.data.email}
+          </P>
+        </div>
+      );
     case PayoutMethodType.OTHER:
-      return get(payoutMethod, 'data.content') || <PrivateFallback />;
+      return (
+        <div>
+          <Container fontSize="11px" fontWeight="500" mb={2}>
+            <FormattedMessage id="Details" defaultMessage="Details" />
+            &nbsp;&nbsp;
+            <PrivateInfoIcon color="#969BA3" />
+          </Container>
+          <P fontSize="11px" color="black.700">
+            {payoutMethod.data.content}
+          </P>
+        </div>
+      );
     case PayoutMethodType.BANK_ACCOUNT:
-      return payoutMethodHasData(payoutMethod) ? renderObject(payoutMethod.data) : <PrivateFallback />;
+      return (
+        <div>
+          <Container fontSize="11px" fontWeight="500" mb={2}>
+            <FormattedMessage id="Details" defaultMessage="Details" />
+            &nbsp;&nbsp;
+            <PrivateInfoIcon color="#969BA3" />
+          </Container>
+          <Container fontSize="11px" color="black.700">
+            <FormattedMessage
+              id="BankInfo.Type"
+              defaultMessage="Type: {type}"
+              values={{ type: upperCase(payoutMethod.data.type) }}
+            />
+            {renderObject(payoutMethod.data.details)}
+          </Container>
+        </div>
+      );
     default:
       return null;
   }

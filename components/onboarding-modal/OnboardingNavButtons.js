@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 
 import StyledRoundButton from '../../components/StyledRoundButton';
@@ -46,7 +46,7 @@ class OnboardingNavButtons extends React.Component {
       <Flex>
         {step === 2 ? (
           <Fragment>
-            {viewport === VIEWPORTS.MOBILE ? (
+            {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
                 type="button"
                 mx={1}
@@ -86,7 +86,7 @@ class OnboardingNavButtons extends React.Component {
           </Fragment>
         ) : (
           <Fragment>
-            {viewport === VIEWPORTS.MOBILE ? (
+            {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
                 type="button"
                 mx={1}
@@ -119,7 +119,7 @@ class OnboardingNavButtons extends React.Component {
                 ←
               </StyledRoundButton>
             )}
-            {viewport === VIEWPORTS.MOBILE ? (
+            {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
                 type="button"
                 mx={1}

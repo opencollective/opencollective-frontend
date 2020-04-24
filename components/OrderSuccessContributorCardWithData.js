@@ -4,7 +4,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
@@ -204,7 +204,7 @@ class OrderSuccessContributorCardWithData extends React.Component {
 
 export default injectIntl(
   graphql(GetMemberQuery, {
-    options(props) {
+    options: props => {
       const { collective, fromCollective, tier } = props.order;
       const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
       if (tier) {

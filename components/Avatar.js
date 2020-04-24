@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 import { getCollectiveImage, getAvatarBorderRadius } from '../lib/image-utils';
 import { defaultImage, CollectiveType } from '../lib/constants/collectives';

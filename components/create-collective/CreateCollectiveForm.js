@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Formik, Field, Form } from 'formik';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { assign, get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
@@ -16,7 +16,7 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import slugify from 'slugify';
 import CollectiveNavbar from '../CollectiveNavbar';
 
@@ -305,9 +305,9 @@ class CreateCollectiveForm extends React.Component {
                             defaultMessage="I agree with the {toslink} of Open Collective."
                             values={{
                               toslink: (
-                                <ExternalLink href="/tos" openInNewTab>
+                                <StyledLink href="/tos" openInNewTab>
                                   <FormattedMessage id="tos" defaultMessage="terms of service" />
-                                </ExternalLink>
+                                </StyledLink>
                               ),
                             }}
                           />
@@ -329,9 +329,9 @@ class CreateCollectiveForm extends React.Component {
                               defaultMessage="I agree with the the {hosttoslink} of the host that will collect money on behalf of our collective."
                               values={{
                                 hosttoslink: (
-                                  <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
+                                  <StyledLink href={get(host, 'settings.tos')} openInNewTab>
                                     <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
-                                  </ExternalLink>
+                                  </StyledLink>
                                 ),
                               }}
                             />
@@ -349,7 +349,7 @@ class CreateCollectiveForm extends React.Component {
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton
                         fontSize="13px"
-                        width="148px"
+                        minWidth="148px"
                         minHeight="36px"
                         buttonStyle="primary"
                         type="submit"

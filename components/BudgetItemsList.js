@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components';
 import { round, truncate } from 'lodash';
@@ -441,9 +441,13 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
             </div>
           )}
           {hasInvoiceBtn && (
-            <InvoiceDownloadLink type="transaction" transactionUuid={transaction.uuid}>
+            <InvoiceDownloadLink
+              type="transaction"
+              transactionUuid={transaction.uuid}
+              toCollectiveSlug={collective.slug}
+            >
               {({ loading, download }) => (
-                <StyledButton buttonSize="small" loading={loading} onClick={download} minWidth={140} height={30}>
+                <StyledButton buttonSize="small" loading={loading} onClick={download} minWidth={140}>
                   <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />
                 </StyledButton>
               )}

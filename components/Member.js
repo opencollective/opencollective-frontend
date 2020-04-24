@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 import colors from '../lib/constants/colors';
 import { formatCurrency, formatDate, firstSentence, singular, capitalize } from '../lib/utils';

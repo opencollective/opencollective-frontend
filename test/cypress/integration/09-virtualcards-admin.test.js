@@ -10,7 +10,7 @@ describe('Virtual cards admin', () => {
 
   it('start with empty gift cards list', () => {
     cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards` });
-    cy.get('.virtualcards-list').contains('Create your first gift card!');
+    cy.getByDataCy('virtualcards-list').contains('Create your first gift card!');
   });
 
   it('create gift card codes', () => {
@@ -69,10 +69,12 @@ describe('Virtual cards admin', () => {
     cy.get(multiEmailSelector).type(
       '{selectall} test1@opencollective.com test2@opencollective.com test3@opencollective.com',
     );
-    cy.get('#virtualcard-amount').type('12');
+    cy.get('#virtualcard-amount').type('{selectall}').type('12');
     checkSubmit(true, 'Create 3 gift cards');
     cy.getByDataCy('submit-new-virtualcards').click();
     cy.contains('Your 3 gift cards have been sent!');
+    cy.getByDataCy('back-to-giftcards-list').click();
+    cy.getByDataCy('virtualcards-list').contains('$12.00 sent to test3@opencollective.com');
   });
 });
 

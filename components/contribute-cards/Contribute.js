@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 
@@ -217,7 +217,7 @@ const ContributeCard = ({
                       {type === 'TICKET' && (
                         <FormattedMessage
                           id="ParticipantsCount"
-                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} participating"
+                          defaultMessage="{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {is} other {are}} participating"
                           values={{
                             userCount: stats.users,
                             orgCount: stats.organizations,

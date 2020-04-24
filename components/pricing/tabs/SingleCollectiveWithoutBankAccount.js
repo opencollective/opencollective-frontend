@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 
@@ -103,7 +103,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           lineHeight={['26px']}
           letterSpacing={['-0.008em']}
         >
-          <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a fiscal host." />
+          <FormattedMessage id="pricing.applyFiscalHost" defaultMessage="Apply to a fiscal host" />
         </H3>
         <HostsWrapper width={1} justifyContent="center" py={4}>
           {hosts.map(collective => (
@@ -208,8 +208,8 @@ const getHostsQuery = gql`
 `;
 
 const addHostsData = graphql(getHostsQuery, {
-  options() {
-    return { variables: { slugs: featuredHostsSlugs } };
+  options: {
+    variables: { slugs: featuredHostsSlugs },
   },
 });
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import SectionTitle from './SectionTitle';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import MemberCard from './MemberCard';
 
 class TeamSection extends React.Component {

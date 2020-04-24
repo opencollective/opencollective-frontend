@@ -1,7 +1,8 @@
-import { Box } from '@rebass/grid';
+import { Box } from '../components/Grid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+
 import Container from '../components/Container';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';

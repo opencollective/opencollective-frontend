@@ -150,12 +150,11 @@ const getOrdersVariables = props => {
 };
 
 const ORDERS_PER_PAGE = 10;
+
 export const addOrdersData = graphql(getOrdersQuery, {
-  options(props) {
-    return {
-      variables: getOrdersVariables(props),
-    };
-  },
+  options: props => ({
+    variables: getOrdersVariables(props),
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

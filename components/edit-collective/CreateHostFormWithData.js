@@ -4,12 +4,12 @@ import { get } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 
-import { getErrorFromGraphqlException } from '../lib/errors';
-import { compose } from '../lib/utils';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 
-import LoadingGrid from './LoadingGrid';
+import LoadingGrid from '../LoadingGrid';
 import CreateHostForm from './CreateHostForm';
 
 class CreateHostFormWithData extends React.Component {
@@ -103,13 +103,11 @@ const getConnectedAccountsQuery = gql`
 `;
 
 export const addConnectedAccountsQuery = graphql(getConnectedAccountsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: get(props, 'LoggedInUser.collective.slug'),
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: get(props, 'LoggedInUser.collective.slug'),
+    },
+  }),
 });
 
 const createCollectiveQuery = gql`

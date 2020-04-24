@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
@@ -15,8 +15,6 @@ import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 import OnboardingProfileCard from './OnboardingProfileCard';
 import OnboardingSkipButton from './OnboardingSkipButton';
 
-import withViewport, { VIEWPORTS } from '../../lib/withViewport';
-
 class OnboardingContentBox extends React.Component {
   static propTypes = {
     slug: PropTypes.string,
@@ -26,7 +24,6 @@ class OnboardingContentBox extends React.Component {
     updateAdmins: PropTypes.func,
     addContact: PropTypes.func,
     intl: PropTypes.object.isRequired,
-    viewport: PropTypes.string,
     values: PropTypes.object,
     errors: PropTypes.object,
     touched: PropTypes.object,
@@ -65,7 +62,7 @@ class OnboardingContentBox extends React.Component {
   };
 
   render() {
-    const { slug, step, collective, updateAdmins, intl, LoggedInUser, viewport, values, errors, touched } = this.props;
+    const { slug, step, collective, updateAdmins, intl, LoggedInUser, values, errors, touched } = this.props;
     const { admins } = this.state;
 
     return (
@@ -88,11 +85,9 @@ class OnboardingContentBox extends React.Component {
               />
               &nbsp;🎉
             </H1>
-            {viewport === VIEWPORTS.MOBILE && (
-              <Fragment>
-                <OnboardingSkipButton slug={slug} />
-              </Fragment>
-            )}
+            <Box display={['block', null, 'none']}>
+              <OnboardingSkipButton slug={slug} />
+            </Box>
           </Flex>
         )}
         {step === 1 && (
@@ -241,4 +236,4 @@ class OnboardingContentBox extends React.Component {
   }
 }
 
-export default withViewport(injectIntl(OnboardingContentBox));
+export default injectIntl(OnboardingContentBox);

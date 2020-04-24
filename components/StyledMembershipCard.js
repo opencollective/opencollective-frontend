@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
@@ -37,9 +37,11 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
               </Span>
               <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
-                {/** Ideally we should breakdown amounts donated per currency, but for now
+                {
+                  /** Ideally we should breakdown amounts donated per currency, but for now
                       the API only returns the total amount in collective's currency. */
-                formatCurrency(stats.totalDonations, collective.currency || 'USD', { precision: 0 })}
+                  formatCurrency(stats.totalDonations, collective.currency || 'USD', { precision: 0 })
+                }
               </Span>
             </P>
           ) : (

@@ -13,12 +13,13 @@ import categories from '../../lib/constants/categories';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 
 import TransactionDetails from './TransactionDetails';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import StyledSpinner from '../StyledSpinner';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import { formatErrorMessage } from '../../lib/errors';
+import StyledLink from '../StyledLink';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -66,6 +67,10 @@ class ExpenseDetails extends React.Component {
         id: 'Expense.Type.Invoice',
         defaultMessage: 'Invoice',
       },
+      attachedFile: {
+        id: 'Expense.OpenAttachedFile',
+        defaultMessage: 'Open attached file in a new window',
+      },
     });
 
     this.state = { modified: [], expense: this.getExpenseFromProps(props) };
@@ -98,8 +103,8 @@ class ExpenseDetails extends React.Component {
       const rootField = attr.split(/[[.]/)[0];
       const modified = uniq([...state.modified, rootField]);
       const expenseChangeset = pick(expense, [...modified, 'id']);
-      if (expenseChangeset.attachments) {
-        expenseChangeset.attachments = expenseChangeset.attachments.map(a => omit(a, ['__typename']));
+      if (expenseChangeset.items) {
+        expenseChangeset.items = expenseChangeset.items.map(a => omit(a, ['__typename']));
       }
       this.props.onChange && this.props.onChange(expenseChangeset);
       return { modified, expense };
@@ -154,7 +159,7 @@ class ExpenseDetails extends React.Component {
       { [expenseTypes.RECEIPT]: intl.formatMessage(this.messages.expenseTypeReceipt) },
       { [expenseTypes.INVOICE]: intl.formatMessage(this.messages.expenseTypeInvoice) },
     ];
-    const attachmentsWithFiles = expense.attachments?.filter(attachment => Boolean(attachment.url)) || [];
+    const itemsWithFiles = expense.items?.filter(item => Boolean(item.url)) || [];
     const canDownloadAttachments =
       isAuthor ||
       LoggedInUser?.canEditCollective(expense.collective) ||
@@ -379,7 +384,7 @@ class ExpenseDetails extends React.Component {
             <label>
               <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
             </label>
-            {expense.type === expenseTypes.INVOICE && attachmentsWithFiles.length === 0 && (
+            {expense.type === expenseTypes.INVOICE && itemsWithFiles.length === 0 && (
               <ExpenseInvoiceDownloadHelper
                 collective={expense.collective}
                 expense={{ id: expense.idV2, legacyId: expense.id }}
@@ -400,7 +405,7 @@ class ExpenseDetails extends React.Component {
                 )}
               </ExpenseInvoiceDownloadHelper>
             )}
-            {attachmentsWithFiles.map((attachment, idx) => (
+            {itemsWithFiles.map((attachment, idx) => (
               <div key={attachment.id}>
                 <div className="frame">
                   {editMode && (
@@ -409,21 +414,33 @@ class ExpenseDetails extends React.Component {
                       options={{ accept: 'image/jpeg, image/png, application/pdf', canRemove: false }}
                       name={`attachment-${attachment.id}`}
                       className="attachmentField"
-                      onChange={attachment => this.handleChange(`attachments[${idx}].url`, attachment)}
+                      onChange={attachment => this.handleChange(`items[${idx}].url`, attachment)}
                       defaultValue={attachment.url || '/static/images/receipt.svg'}
                     />
                   )}
                   {!editMode && attachment.url && (
-                    <a
-                      href={attachment.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={this.getAttachmentTitle(expense, attachment)}
-                    >
+                    <StyledLink href={attachment.url} openInNewTab title={this.getAttachmentTitle(expense, attachment)}>
                       <img src={this.getAttachmentPreview(attachment.url)} />
-                    </a>
+                    </StyledLink>
                   )}
                   {!editMode && !attachment.url && <img src={this.getAttachmentPreview(attachment.url)} />}
+                </div>
+              </div>
+            ))}
+            {((!editMode && expense.attachedFiles) || []).map(attachment => (
+              <div key={attachment.id}>
+                <div className="frame">
+                  {attachment.url ? (
+                    <StyledLink
+                      href={attachment.url}
+                      openInNewTab
+                      title={intl.formatMessage(this.messages.attachedFile)}
+                    >
+                      <img src={this.getAttachmentPreview(attachment.url)} />
+                    </StyledLink>
+                  ) : (
+                    <img src={this.getAttachmentPreview(attachment.url)} />
+                  )}
                 </div>
               </div>
             ))}
@@ -457,11 +474,15 @@ const getExpenseQuery = gql`
       status
       currency
       attachment
-      attachments {
+      items {
         id
         url
         description
         amount
+      }
+      attachedFiles {
+        id
+        url
       }
       payoutMethod
       PayoutMethod {
@@ -517,13 +538,11 @@ export const addGetExpense = component => {
   }
 
   return graphql(getExpenseQuery, {
-    options(props) {
-      return {
-        variables: {
-          id: props.expense.id,
-        },
-      };
-    },
+    options: props => ({
+      variables: {
+        id: props.expense.id,
+      },
+    }),
   })(component);
 };
 

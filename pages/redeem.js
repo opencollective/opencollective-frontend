@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import sanitizeHtml from 'sanitize-html';
 import { graphql } from '@apollo/react-hoc';
 import { fontSize, maxWidth } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
@@ -21,7 +21,6 @@ import RedeemSuccess from '../components/RedeemSuccess';
 import { P, H1, H5 } from '../components/Text';
 import LinkCollective from '../components/LinkCollective';
 
-import { getLoggedInUserQuery } from '../lib/graphql/queries';
 import { isValidEmail } from '../lib/utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 
@@ -112,9 +111,7 @@ class RedeemPage extends React.Component {
     try {
       if (this.props.LoggedInUser) {
         await this.props.claimPaymentMethod(code);
-
-        // Refresh LoggedInUser
-        this.props.refetchLoggedInUser();
+        await this.props.refetchLoggedInUser();
         Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
         return;
       } else {
@@ -303,13 +300,7 @@ const redeemMutation = gql`
 const addMutation = graphql(redeemMutation, {
   props: ({ mutate }) => ({
     claimPaymentMethod: async (code, user) => {
-      // Claim payment method and refresh LoggedInUser Apollo cache so
-      // `client.query` will deliver new data for next call
-      return await mutate({
-        variables: { code, user },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
-      });
+      return await mutate({ variables: { code, user } });
     },
   }),
 });

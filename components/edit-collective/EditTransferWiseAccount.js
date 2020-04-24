@@ -104,7 +104,7 @@ const EditTransferWiseAccount = props => {
             <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
           )}
         </StyledInputField>
-        <StyledButton type="submit" buttonSize="small" loading={isCreating}>
+        <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
           {props.intl.formatMessage(messages.button)}
         </StyledButton>
       </form>

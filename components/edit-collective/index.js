@@ -11,17 +11,15 @@ import Footer from '../Footer';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import CollectiveNavbar from '../CollectiveNavbar';
 import NotificationBar from '../NotificationBar';
-import Loading from '../Loading';
 
 import Form from './Form';
 
 class EditCollective extends React.Component {
   static propTypes = {
-    collective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
-    editCollective: PropTypes.func.isRequired,
-    loggedInEditDataLoaded: PropTypes.bool.isRequired,
-    intl: PropTypes.object.isRequired,
+    collective: PropTypes.object.isRequired, // passed from Page with addCollectiveToEditData
+    LoggedInUser: PropTypes.object.isRequired, // passed from Page with withUser
+    editCollective: PropTypes.func.isRequired, // passed from Page with addEditCollectiveMutation
+    intl: PropTypes.object.isRequired, // from injectIntl
   };
 
   constructor(props) {
@@ -48,44 +46,33 @@ class EditCollective extends React.Component {
     });
   }
 
-  componentDidMount() {
-    window.OC = window.OC || {};
-    window.OC.editCollective = this.editCollective.bind(this);
-  }
+  async editCollective(updatedCollective) {
+    const collective = { ...updatedCollective };
 
-  validate(CollectiveInputType) {
-    if (typeof CollectiveInputType.tags === 'string') {
-      CollectiveInputType.tags = CollectiveInputType.tags.split(',').map(t => t.trim());
+    if (typeof collective.tags === 'string') {
+      collective.tags = collective.tags.split(',').map(t => t.trim());
     }
-    if (CollectiveInputType.backgroundImage === defaultBackgroundImage[CollectiveInputType.type]) {
-      delete CollectiveInputType.backgroundImage;
+    if (collective.backgroundImage === defaultBackgroundImage[collective.type]) {
+      delete collective.backgroundImage;
     }
 
-    const { collective } = this.props;
-    CollectiveInputType.settings = {
-      ...collective.settings,
-      editor: CollectiveInputType.markdown ? 'markdown' : 'html',
-      sendInvoiceByEmail: CollectiveInputType.sendInvoiceByEmail,
-      apply: CollectiveInputType.application,
-      tos: CollectiveInputType.tos,
+    collective.settings = {
+      ...this.props.collective.settings,
+      editor: collective.markdown ? 'markdown' : 'html',
+      sendInvoiceByEmail: collective.sendInvoiceByEmail,
+      apply: collective.application,
+      tos: collective.tos,
     };
-    delete CollectiveInputType.markdown;
-    delete CollectiveInputType.sendInvoiceByEmail;
-    delete CollectiveInputType.tos;
-    delete CollectiveInputType.application;
 
-    return CollectiveInputType;
-  }
-
-  async editCollective(CollectiveInputType) {
-    CollectiveInputType = this.validate(CollectiveInputType);
-    if (!CollectiveInputType) {
-      return false;
-    }
+    delete collective.markdown;
+    delete collective.sendInvoiceByEmail;
+    delete collective.tos;
+    delete collective.application;
 
     this.setState({ status: 'loading' });
+
     try {
-      await this.props.editCollective(CollectiveInputType);
+      await this.props.editCollective(collective);
       this.setState({ status: 'saved', result: { error: null } });
       setTimeout(() => {
         this.setState({ status: null });
@@ -97,7 +84,7 @@ class EditCollective extends React.Component {
   }
 
   render() {
-    const { intl, LoggedInUser, collective, loggedInEditDataLoaded } = this.props;
+    const { intl, LoggedInUser, collective } = this.props;
 
     if (!collective || !collective.slug) {
       return <div />;
@@ -161,8 +148,7 @@ class EditCollective extends React.Component {
                 <SignInOrJoinFree />
               </div>
             )}
-            {canEditCollective && !loggedInEditDataLoaded && <Loading />}
-            {canEditCollective && loggedInEditDataLoaded && (
+            {canEditCollective && (
               <div>
                 <Form
                   collective={collective}

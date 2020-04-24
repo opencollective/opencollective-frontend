@@ -7,7 +7,7 @@ import gql from 'graphql-tag';
 import { isURL } from 'validator';
 import { Close } from '@styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { Add } from '@styled-icons/material/Add';
 
 import events from '../../../lib/constants/notificationEvents';
@@ -23,7 +23,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledSelect from '../../StyledSelect';
 import StyledInputGroup from '../../StyledInputGroup';
-import ExternalLink from '../../ExternalLink';
+import StyledLink from '../../StyledLink';
 
 const messages = defineMessages({
   'webhooks.url.label': {
@@ -139,7 +139,7 @@ class Webhooks extends React.Component {
   addWebhook = () => {
     const { webhooks } = this.state;
     webhooks.push({ webhookUrl: '', type: 'all' });
-    this.setState({ webhooks, modified: true });
+    this.setState({ webhooks, modified: true, status: 'invalid' });
   };
 
   removeWebhook = index => {
@@ -252,12 +252,12 @@ class Webhooks extends React.Component {
                 defaultMessage="NEW! You can now use the Beta {zapierLink} app to manage your integrations."
                 values={{
                   zapierLink: (
-                    <ExternalLink
+                    <StyledLink
                       href="https://zapier.com/developer/public-invite/21484/63399c65bb01d75e00fe091ae7f58683/"
                       openInNewTab
                     >
                       Zapier
-                    </ExternalLink>
+                    </StyledLink>
                   ),
                 }}
               />

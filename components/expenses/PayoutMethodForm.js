@@ -1,4 +1,4 @@
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 import { Field } from 'formik';
 import { get, set } from 'lodash';
 import PropTypes from 'prop-types';

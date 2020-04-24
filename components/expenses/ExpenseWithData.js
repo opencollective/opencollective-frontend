@@ -12,6 +12,7 @@ import Expense from './Expense';
 class ExpenseWithData extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     limit: PropTypes.number,
     view: PropTypes.string, // "compact" for homepage (can't edit expense, don't show header), "summary" for list view, "details" for details view
     filter: PropTypes.object, // { category, recipient }
@@ -28,7 +29,7 @@ class ExpenseWithData extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, collective, view, allowPayAction, lockPayAction, unlockPayAction } = this.props;
+    const { data, LoggedInUser, collective, host, view, allowPayAction, lockPayAction, unlockPayAction } = this.props;
 
     if (data.error) {
       return <Error message={data.error.message} />;
@@ -60,6 +61,7 @@ class ExpenseWithData extends React.Component {
         <Expense
           key={expense.id}
           collective={collective}
+          host={host}
           expense={expense}
           view={view}
           editable={true}
@@ -102,11 +104,15 @@ const getExpenseQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
-      attachments {
+      items {
         id
         url
         description
         amount
+      }
+      attachedFiles {
+        id
+        url
       }
       collective {
         id

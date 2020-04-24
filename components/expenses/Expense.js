@@ -3,17 +3,16 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { get } from 'lodash';
 
 import { capitalize, formatCurrency, compose } from '../../lib/utils';
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { getErrorFromGraphqlException, formatErrorMessage } from '../../lib/errors';
 import colors from '../../lib/constants/colors';
 
 import Avatar from '../Avatar';
 import { Span } from '../Text';
 import Link from '../Link';
-import SmallButton from '../SmallButton';
 import Moment from '../Moment';
 import AmountCurrency from './AmountCurrency';
 import ExpenseDetails from './ExpenseDetails';
@@ -83,6 +82,7 @@ class Expense extends React.Component {
       showDeleteExpenseModal: false,
       error: null,
       success: null,
+      isSubmitting: false,
     };
 
     this.save = this.save.bind(this);
@@ -185,13 +185,15 @@ class Expense extends React.Component {
 
   async save() {
     try {
+      this.setState({ isSubmitting: true });
       const expense = {
         id: this.props.expense.id,
         ...this.state.expense,
       };
       await this.props.editExpense(expense);
-      this.setState({ modified: false, mode: 'details' });
+      this.setState({ modified: false, mode: 'details', isSubmitting: false });
     } catch (e) {
+      this.setState({ isSubmitting: false });
       this.handleErrorMessage(getErrorFromGraphqlException(e).message);
     }
   }
@@ -210,7 +212,6 @@ class Expense extends React.Component {
 
   render() {
     const { intl, collective, host, expense, includeHostedCollectives, LoggedInUser, editable } = this.props;
-
     if (!expense.fromCollective) {
       console.warn('No FromCollective for expense', expense);
       return <div />;
@@ -492,15 +493,26 @@ class Expense extends React.Component {
               {this.state.success}
             </MessageBox>
           )}
+          {this.state.error && (
+            <MessageBox type="error" withIcon mb={2}>
+              {formatErrorMessage(intl, this.state.error)}
+            </MessageBox>
+          )}
           {editable && (
             <div className="actions">
               {mode === 'edit' && this.state.modified && this.state.expense['type'] !== 'UNCLASSIFIED' && (
                 <div>
                   <div className="leftColumn" />
                   <div className="rightColumn">
-                    <SmallButton className="primary save" onClick={this.save}>
-                      <FormattedMessage id="expense.save" defaultMessage="save" />
-                    </SmallButton>
+                    <StyledButton
+                      buttonStyle="primary"
+                      onClick={this.save}
+                      loading={this.state.isSubmitting}
+                      data-cy="expense-edit-save-btn"
+                      minWidth={132}
+                    >
+                      <FormattedMessage id="save" defaultMessage="Save" />
+                    </StyledButton>
                   </div>
                 </div>
               )}
@@ -517,12 +529,6 @@ class Expense extends React.Component {
                       payoutMethod={expense.payoutMethod}
                     />
                   )}
-                  {this.state.error && (
-                    <MessageBox type="error" withIcon mb={2}>
-                      {this.state.error}
-                    </MessageBox>
-                  )}
-
                   <Flex data-cy="expense-actions" flexDirection={['column', 'row']} flexWrap="wrap" width="100%">
                     {canPay && (
                       <React.Fragment>
@@ -647,11 +653,15 @@ const editExpense = graphql(
         description
         amount
         attachment
-        attachments {
+        items {
           id
           url
           description
           amount
+        }
+        attachedFiles {
+          id
+          url
         }
         category
         type

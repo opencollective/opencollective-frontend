@@ -38,7 +38,7 @@ module.exports = (server, app) => {
   });
 
   server.use((req, res, next) => {
-    if (req.query.language && intl.languages.includes(req.query.language) && req.query.set) {
+    if (req.query.language && intl.supportedLanguages.includes(req.query.language) && req.query.set) {
       res.cookie('language', req.language);
       const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
       url.searchParams.delete('language');

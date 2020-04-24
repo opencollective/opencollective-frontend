@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 
 import colors from '../../lib/constants/colors';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box } from '../../Grid';
 import { orderBy } from 'lodash';
 import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
@@ -213,9 +213,9 @@ export default React.memo(
       ${BudgetItemExpenseTypeFragment}
     `,
     {
-      options(props) {
-        return { variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED } };
-      },
+      options: props => ({
+        variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED },
+      }),
     },
   )(injectIntl(SectionTransactions)),
 );

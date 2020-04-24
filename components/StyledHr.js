@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { space, layout, shadow, border } from 'styled-system';
+import { space, layout, shadow, border, flex } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
 import propTypes from '@styled-system/prop-types';
 
@@ -13,6 +13,7 @@ const StyledHr = styled.hr`
   height: 1px;
 
   ${space}
+  ${flex}
   ${layout}
   ${shadow}
   ${border}

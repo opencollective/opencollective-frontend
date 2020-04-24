@@ -161,17 +161,15 @@ const getMembershipsQuery = gql`
 `;
 
 export const addMembershipsData = graphql(getMembershipsQuery, {
-  options(props) {
-    return {
-      variables: {
-        memberCollectiveSlug: props.memberCollectiveSlug,
-        offset: 0,
-        role: props.role,
-        orderBy: props.orderBy || 'totalDonations',
-        limit: props.limit || MEMBERSHIPS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      memberCollectiveSlug: props.memberCollectiveSlug,
+      offset: 0,
+      role: props.role,
+      orderBy: props.orderBy || 'totalDonations',
+      limit: props.limit || MEMBERSHIPS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

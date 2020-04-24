@@ -6,7 +6,7 @@ import { truncate, get } from 'lodash';
 import StyledCard from './StyledCard';
 import { FormattedMessage } from 'react-intl';
 import StyledLink from './StyledLink';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import { Span } from './Text';
 import HTMLContent from './HTMLContent';
 
@@ -41,8 +41,10 @@ const EventDetails = ({ event, tier }) => {
             <HTMLContent>
               <Markdown source={truncatedDescription} />
             </HTMLContent>
-          ) : (
+          ) : event.longDescription ? (
             <HTMLContent content={truncatedDescription} />
+          ) : (
+            <HTMLContent>{truncatedDescription}</HTMLContent>
           )}
           {(isExpended || truncatedDescription.length !== description.length) &&
             (isExpended ? (

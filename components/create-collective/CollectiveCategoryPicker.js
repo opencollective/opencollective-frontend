@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import styled from 'styled-components';
 import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
@@ -9,9 +9,9 @@ import { H1 } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 
-const ExamplesLink = styled(ExternalLink)`
+const ExamplesLink = styled(StyledLink)`
   color: ${themeGet('colors.blue.500')};
   font-size: ${themeGet('fontSizes.Caption')}px;
 

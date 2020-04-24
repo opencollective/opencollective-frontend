@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import memoizeOne from 'memoize-one';
 
 import Container from '../Container';
@@ -114,7 +114,6 @@ const StepDetails = ({
     Router.pushRoute(`/${collectiveSlug}/donate/details`);
   };
   interval = interval || 'oneTime';
-
   return (
     <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap">
       <Flex mb={3}>
@@ -160,16 +159,17 @@ const StepDetails = ({
             }
             htmlFor="custom-amount"
             disabled={disabledAmount}
+            required
           >
             {fieldProps => (
               <StyledInputAmount
                 {...fieldProps}
                 type="number"
                 currency={currency}
-                min={minAmount / 100}
-                value={amount / 100}
+                min={minAmount}
+                value={amount}
                 width={1}
-                onChange={({ target }) => dispatchChange({ amount: Math.round(parseFloat(target.value) * 100) })}
+                onChange={amount => dispatchChange({ amount })}
                 containerProps={{ borderRadius: hasOptions ? '0 4px 4px 0' : 3, ml: '-1px' }}
                 prependProps={{ pl: 2, pr: 0, bg: 'white.full' }}
                 px="2px"

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/react-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
 import { set } from 'lodash';
 import styled, { withTheme } from 'styled-components';

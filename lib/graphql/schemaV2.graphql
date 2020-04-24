@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Fri Apr 03 2020 12:11:13 GMT+0200 (GMT+02:00)
+# timestamp: Wed Apr 15 2020 17:06:24 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -107,6 +107,7 @@ interface Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  stats: AccountStats
 }
 
 """
@@ -150,6 +151,34 @@ Values that can be edited in Account's settings
 scalar AccountSettingsKey
 
 """
+Stats for the Account
+"""
+type AccountStats {
+  id: Int
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Amount
+
+  """
+  Average amount spent per month based on the last 90 days
+  """
+  monthlySpending: Amount
+
+  """
+  Total amount spent
+  """
+  totalAmountSpent: Amount
+
+  """
+  Net amount received
+  """
+  totalAmountReceived: Amount
+  yearlyBudget: Amount
+}
+
+"""
 All account types
 """
 enum AccountType {
@@ -158,6 +187,78 @@ enum AccountType {
   EVENT
   ORGANIZATION
   INDIVIDUAL
+}
+
+"""
+An activity describing something that happened on the platform
+"""
+type Activity {
+  """
+  Unique identifier for this activity
+  """
+  id: String!
+
+  """
+  The type of the activity
+  """
+  type: ActivityType!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The account concerned by this activity, if any
+  """
+  account: Account
+
+  """
+  The person who triggered the action, if any
+  """
+  individual: Individual
+}
+
+enum ActivityType {
+  ACTIVITY_ALL
+  CONNECTED_ACCOUNT_CREATED
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  COLLECTIVE_COMMENT_CREATED
+  COLLECTIVE_CONVERSATION_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_TRANSACTION_CREATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_CONTACT
+  ORGANIZATION_COLLECTIVE_CREATED
+  SUBSCRIPTION_CONFIRMED
+  SUBSCRIPTION_CANCELED
+  TICKET_CONFIRMED
+  USER_CREATED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY
+  ORDERS_SUSPICIOUS
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  ADDED_FUND_TO_ORG
+  ACTIVATED_COLLECTIVE_AS_HOST
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  COLLECTIVE_TRANSACTION_PAID
 }
 
 """
@@ -200,7 +301,22 @@ type Bot implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -241,6 +357,7 @@ type Bot implements Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  stats: AccountStats
 }
 
 """
@@ -299,7 +416,22 @@ type Collective implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -340,6 +472,7 @@ type Collective implements Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  stats: AccountStats
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -684,7 +817,22 @@ type Event implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -725,6 +873,7 @@ type Event implements Account {
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
+  stats: AccountStats
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -764,9 +913,14 @@ type Expense {
   description: String!
 
   """
-  Total amount of the expense (sum of the attachments).
+  Total amount of the expense (sum of the item's amounts).
   """
   amount: Int!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
 
   """
   Currency that should be used for the payout
@@ -783,8 +937,15 @@ type Expense {
   """
   status: ExpenseStatus!
   comments(
-    limit: Int
-    offset: Int
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
   ): CommentCollection!
 
@@ -807,7 +968,13 @@ type Expense {
   The payout method to use for this expense
   """
   payoutMethod: PayoutMethod
-  attachments: [ExpenseAttachment]
+
+  """
+  (Optional) files attached to the expense
+  """
+  attachedFiles: [ExpenseAttachedFile!]
+  attachments: [ExpenseItem] @deprecated(reason: "2020-04-08: Field has been renamed to \"items\"")
+  items: [ExpenseItem]
 
   """
   Additional information about the payment. Only visible to user and admins.
@@ -823,91 +990,35 @@ type Expense {
   The permissions given to current logged in user for this expense
   """
   permissions: ExpensePermissions!
+
+  """
+  The list of activities (ie. approved, edited, etc) for this expense ordered by date ascending
+  """
+  activities: [Activity!]!
+  tags: [String]!
 }
 
 """
-Fields for an expense attachment
+Fields for an expense's attached file
 """
-type ExpenseAttachment {
+type ExpenseAttachedFile {
   """
-  Unique identifier for this expense attachment
+  Unique identifier for this file
   """
   id: String!
-
-  """
-  Amount of this attachment
-  """
-  amount: Int!
-
-  """
-  The date on which the attachment was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the attachment was last updated
-  """
-  updatedAt: DateTime!
-
-  """
-  The date on which the expense took place
-  """
-  incurredAt: DateTime!
-
-  """
-  A description for this attachment. Enforced for new items, but old expenses may not have one.
-  """
-  description: String
-  url: String
+  url: URL
 }
 
-input ExpenseAttachmentCreateInput {
+input ExpenseAttachedFileInput {
   """
-  Amount in cents
-  """
-  amount: Int!
-
-  """
-  What is this attachment about?
-  """
-  description: String!
-
-  """
-  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
-  """
-  url: String
-
-  """
-  When was the money spent?
-  """
-  incurredAt: DateString
-}
-
-input ExpenseAttachmentInput {
-  """
-  ID of the attachment
+  ID of the file
   """
   id: String
 
   """
-  Amount in cents
+  URL of the file
   """
-  amount: Int
-
-  """
-  What is this attachment about?
-  """
-  description: String
-
-  """
-  URL of the file linked to this attachment. Must be provided if the expense type is RECEIPT.
-  """
-  url: String
-
-  """
-  When was the money spent?
-  """
-  incurredAt: DateString
+  url: URL!
 }
 
 input ExpenseCreateInput {
@@ -942,9 +1053,20 @@ input ExpenseCreateInput {
   payoutMethod: PayoutMethodInput!
 
   """
-  The list of attachments for this expense. Total amount will be computed from them.
+  @deprecated 2020-04-08: Please use the items field - The list of items for
+  this expense. Total amount will be computed from them.
   """
-  attachments: [ExpenseAttachmentCreateInput]!
+  attachments: [ExpenseItemCreateInput]
+
+  """
+  The list of items for this expense. Total amount will be computed from them.
+  """
+  items: [ExpenseItemCreateInput]
+
+  """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [ExpenseAttachedFileInput!]
 
   """
   Account to reimburse
@@ -953,7 +1075,92 @@ input ExpenseCreateInput {
 }
 
 """
-Fields for an expense attachment
+Fields for an expense item
+"""
+type ExpenseItem {
+  """
+  Unique identifier for this expense item
+  """
+  id: String!
+
+  """
+  Amount of this item
+  """
+  amount: Int!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the item was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The date on which the expense took place
+  """
+  incurredAt: DateTime!
+
+  """
+  A description for this item. Enforced for new items, but old expenses may not have one.
+  """
+  description: String
+  url: URL
+}
+
+input ExpenseItemCreateInput {
+  """
+  Amount in cents
+  """
+  amount: Int!
+
+  """
+  What is this item about?
+  """
+  description: String!
+
+  """
+  URL of the file linked to this item. Must be provided if the expense type is RECEIPT.
+  """
+  url: URL
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
+input ExpenseItemInput {
+  """
+  ID of the item
+  """
+  id: String
+
+  """
+  Amount in cents
+  """
+  amount: Int
+
+  """
+  What is this item about?
+  """
+  description: String
+
+  """
+  URL of the file linked to this item. Must be provided if the expense type is RECEIPT.
+  """
+  url: String
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
+"""
+Fields for the user permissions on an expense
 """
 type ExpensePermissions {
   """
@@ -1050,14 +1257,128 @@ input ExpenseUpdateInput {
   payoutMethod: PayoutMethodInput
 
   """
-  The list of attachments for this expense. Total amount will be computed from them.
+  @deprecated 2020-04-08: Please use the items field - The list of items for
+  this expense. Total amount will be computed from them.
   """
-  attachments: [ExpenseAttachmentInput]
+  attachments: [ExpenseItemInput]
+
+  """
+  The list of items for this expense. Total amount will be computed from them.
+  """
+  items: [ExpenseItemInput]
+
+  """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [ExpenseAttachedFileInput!]
 
   """
   Account to reimburse
   """
   payee: AccountReferenceInput
+}
+
+"""
+This represents an Host account
+"""
+type Host implements Account {
+  id: String
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  tags: [String]
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  expensePolicy: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  stats: AccountStats
+  hostFeePercent: Int
+  totalHostedCollectives: Int
+}
+
+"""
+A collection of "Hosts"
+"""
+type HostCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Host]
 }
 
 enum ImageFormat {
@@ -1100,7 +1421,22 @@ type Individual implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -1143,6 +1479,7 @@ type Individual implements Account {
     - Hosts can see the address of users submitting expenses to their collectives
   """
   location: Location
+  stats: AccountStats
   firstName: String
   lastName: String
   email: String
@@ -1205,7 +1542,7 @@ type Member {
 """
 A collection of "Members" (ie: Organization backing a Collective)
 """
-type MemberCollection {
+type MemberCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
@@ -1233,7 +1570,9 @@ type MemberOf {
 """
 A collection of "MemberOf" (ie: Collective backed by an Organization)
 """
-type MemberOfCollection {
+type MemberOfCollection implements Collection {
+  offset: Int
+  limit: Int
   totalCount: Int
   nodes: [MemberOf]
 }
@@ -1411,6 +1750,21 @@ type Mutation {
     """
     value: JSON!
   ): Account!
+
+  """
+  Apply to an host with a collective
+  """
+  applyToHost(
+    """
+    Account applying to the host.
+    """
+    collective: AccountReferenceInput!
+
+    """
+    Host to apply to.
+    """
+    host: AccountReferenceInput!
+  ): Collective!
 }
 
 """
@@ -1437,7 +1791,7 @@ type Order {
 """
 A collection of "Orders"
 """
-type OrderCollection {
+type OrderCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
@@ -1502,7 +1856,22 @@ type Organization implements Account {
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
-  memberOf(limit: Int, offset: Int, role: [MemberRole], accountType: [AccountType]): MemberOfCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
   transactions(
     type: TransactionType
     limit: Int = 100
@@ -1545,6 +1914,7 @@ type Organization implements Account {
     - Hosts can see the address of organizations submitting expenses to their collectives
   """
   location: Location
+  stats: AccountStats
   email: String
 }
 
@@ -1655,6 +2025,22 @@ type Query {
     """
     expense: ExpenseReferenceInput
   ): Expense
+  hosts(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    Filter hosts by tags (multiple = OR)
+    """
+    tags: [String]
+  ): HostCollection
   loggedInAccount: Account
 }
 
@@ -1715,7 +2101,9 @@ interface Transaction {
 """
 A collection of Transactions (Debit or Credit)
 """
-type TransactionCollection {
+type TransactionCollection implements Collection {
+  offset: Int
+  limit: Int
   totalCount: Int
   nodes: [Transaction]
 }
@@ -1736,289 +2124,9 @@ type TransferWise {
     """
     The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
     """
-    currency: TransferWiseCurrency!
+    currency: String!
   ): [TransferWiseRequiredField]
-  availableCurrencies: [TransferWiseCurrency]
-}
-
-"""
-All currencies supported by TransferWise
-"""
-enum TransferWiseCurrency {
-  """
-  Euro
-  """
-  EUR
-
-  """
-  Pound Sterling
-  """
-  GBP
-
-  """
-  Indian Rupee
-  """
-  INR
-
-  """
-  US Dollar
-  """
-  USD
-
-  """
-  UAE Dirham
-  """
-  AED
-
-  """
-  Argentine Peso
-  """
-  ARS
-
-  """
-  Australian Dollar
-  """
-  AUD
-
-  """
-  Taka
-  """
-  BDT
-
-  """
-  Bulgarian Lev
-  """
-  BGN
-
-  """
-  Brazilian Real
-  """
-  BRL
-
-  """
-  Pula
-  """
-  BWP
-
-  """
-  Canadian Dollar
-  """
-  CAD
-
-  """
-  Swiss Franc
-  """
-  CHF
-
-  """
-  Chilean Peso
-  """
-  CLP
-
-  """
-  Yuan Renminbi
-  """
-  CNY
-
-  """
-  Costa Rican Colon
-  """
-  CRC
-
-  """
-  Czech Koruna
-  """
-  CZK
-
-  """
-  Danish Krone
-  """
-  DKK
-
-  """
-  Egyptian Pound
-  """
-  EGP
-
-  """
-  Lari
-  """
-  GEL
-
-  """
-  Ghana Cedi
-  """
-  GHS
-
-  """
-  Hong Kong Dollar
-  """
-  HKD
-
-  """
-  Kuna
-  """
-  HRK
-
-  """
-  Forint
-  """
-  HUF
-
-  """
-  Rupiah
-  """
-  IDR
-
-  """
-  New Israeli Sheqel
-  """
-  ILS
-
-  """
-  Yen
-  """
-  JPY
-
-  """
-  Kenyan Shilling
-  """
-  KES
-
-  """
-  Won
-  """
-  KRW
-
-  """
-  Sri Lanka Rupee
-  """
-  LKR
-
-  """
-  Moroccan Dirham
-  """
-  MAD
-
-  """
-  Mexican Peso
-  """
-  MXN
-
-  """
-  Malaysian Ringgit
-  """
-  MYR
-
-  """
-  Naira
-  """
-  NGN
-
-  """
-  Norwegian Krone
-  """
-  NOK
-
-  """
-  Nepalese Rupee
-  """
-  NPR
-
-  """
-  New Zealand Dollar
-  """
-  NZD
-
-  """
-  Nuevo Sol
-  """
-  PEN
-
-  """
-  Philippine Peso
-  """
-  PHP
-
-  """
-  Pakistan Rupee
-  """
-  PKR
-
-  """
-  Zloty
-  """
-  PLN
-
-  """
-  Romanian Leu
-  """
-  RON
-
-  """
-  Russian Ruble
-  """
-  RUB
-
-  """
-  Swedish Krona
-  """
-  SEK
-
-  """
-  Singapore Dollar
-  """
-  SGD
-
-  """
-  Baht
-  """
-  THB
-
-  """
-  Turkish Lira
-  """
-  TRY
-
-  """
-  Tanzanian Shilling
-  """
-  TZS
-
-  """
-  Hryvnia
-  """
-  UAH
-
-  """
-  Uganda Shilling
-  """
-  UGX
-
-  """
-  Peso Uruguayo
-  """
-  UYU
-
-  """
-  Dong
-  """
-  VND
-
-  """
-  CFA Franc BCEAO
-  """
-  XOF
-
-  """
-  Rand
-  """
-  ZAR
-
-  """
-  Zambian Kwacha
-  """
-  ZMW
+  availableCurrencies: [String]
 }
 
 type TransferWiseField {
@@ -2050,3 +2158,8 @@ type TransferWiseRequiredField {
   title: String
   fields: [TransferWiseField]
 }
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt
+"""
+scalar URL

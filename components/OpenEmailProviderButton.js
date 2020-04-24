@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from './StyledButton';
-import ExternalLink from './ExternalLink';
+import StyledLink from './StyledLink';
 
 /** Returns info about email's provider, or null if unknown provider */
 const getProvider = email => {
@@ -33,7 +33,7 @@ const OpenEmailProviderButton = ({ email, children }) => {
   return !provider
     ? null
     : children(
-        <ExternalLink data-cy="open-inbox-link" href={provider.link}>
+        <StyledLink data-cy="open-inbox-link" href={provider.link}>
           <StyledButton buttonStyle="primary" minWidth={200} mx={2} my={3}>
             <FormattedMessage
               id="OpenInbox"
@@ -41,7 +41,7 @@ const OpenEmailProviderButton = ({ email, children }) => {
               values={{ providerName: provider.name }}
             />
           </StyledButton>
-        </ExternalLink>,
+        </StyledLink>,
       );
 };
 

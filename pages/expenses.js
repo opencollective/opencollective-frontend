@@ -117,7 +117,12 @@ class ExpensesPage extends React.Component {
 
             <div className=" columns">
               <div className="col large">
-                <ExpensesWithData collective={collective} LoggedInUser={LoggedInUser} filters={filter} />
+                <ExpensesWithData
+                  collective={collective}
+                  host={collective.host}
+                  LoggedInUser={LoggedInUser}
+                  filters={filter}
+                />
               </div>
 
               <div className="col side">

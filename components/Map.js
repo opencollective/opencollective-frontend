@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import ExternalLink from './ExternalLink';
+import StyledLink from './StyledLink';
 import { FormattedMessage } from 'react-intl';
 
 const tile2Long = (tile, zoom) => {
@@ -52,12 +52,12 @@ const Map = ({ lat, long }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <iframe width="100%" height="100%" frameBorder="0" scrolling="no" src={src}></iframe>
-      <ExternalLink
+      <StyledLink
         openInNewTab
         href={`https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`}
       >
         <FormattedMessage id="map.viewLarger" defaultMessage="View Larger Map" />
-      </ExternalLink>
+      </StyledLink>
     </div>
   );
 };

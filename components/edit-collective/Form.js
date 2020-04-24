@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { get, set, find } from 'lodash';
-import { Flex, Box } from '@rebass/grid';
-import { H3, H4, P } from '../Text';
+import { H3 } from '../Text';
+import { Flex, Box } from '../Grid';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
@@ -14,13 +14,12 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { Currency } from '../../lib/constants/currency';
-import { Router } from '../../server/pages';
 
 import InputField from '../InputField';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 
 // Generic Sections
 import CollectiveGoals from './sections/CollectiveGoals';
@@ -48,7 +47,8 @@ import Delete from './actions/Delete';
 
 import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
 import EditUserEmailForm from './EditUserEmailForm';
-import EditReceivingSendingMoney from './EditReceivingSendingMoney';
+import SendingMoney from './sections/SendingMoney';
+import ReceivingMoney from './sections/ReceivingMoney';
 
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
@@ -58,34 +58,20 @@ class EditCollectiveForm extends React.Component {
     status: PropTypes.string, // loading, saved
     onSubmit: PropTypes.func,
     LoggedInUser: PropTypes.object.isRequired,
-    /** Provided by withRouter */
-    router: PropTypes.object,
-    intl: PropTypes.object.isRequired,
+    router: PropTypes.object, // from withRouter
+    intl: PropTypes.object.isRequired, // from injectIntl
+    query: PropTypes.object, // passed from Page/Router through index/EditCollective
   };
 
   constructor(props) {
     super(props);
 
+    this.state = { ...this.getStateFromProps(props) };
+
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleObjectChange = this.handleObjectChange.bind(this);
 
-    const collective = { ...(props.collective || {}) };
-    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
-    collective.tos = get(collective, 'settings.tos');
-    collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
-    collective.application = get(collective, 'settings.apply');
-    collective.markdown = get(collective, 'settings.markdown');
-
-    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
-    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
-    this.state = {
-      modified: false,
-      section: 'info',
-      collective,
-      tiers: tiers.length === 0 ? [] : tiers,
-      tickets: tickets.length === 0 ? [] : tickets,
-    };
+    const { collective } = this.state;
 
     this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
     this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
@@ -245,122 +231,80 @@ class EditCollectiveForm extends React.Component {
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
-
-    window.OC = { collective, state: this.state };
   }
 
-  componentDidMount() {
-    const hash = window.location.hash;
+  getStateFromProps(props) {
+    const collective = { ...(props.collective || {}) };
 
-    if (this.props.router.query.section) {
-      this.setState({ section: this.props.router.query.section });
-    } else if (hash) {
-      // Legacy route converter - sections used to be assigned to URLs looking
-      // like `/collective/edit#paymentMethods. We have migrated them to proper
-      // routes (like `/collective/edit/payment-methods`) but we keep this
-      // legacy redirect for old emails sent with the old URL scheme
-      // Deprecated on 2018-12-08
-      const legacySections = [
-        'info',
-        'images',
-        'members',
-        'payment-methods',
-        'connected-accounts',
-        'advanced',
-        'expenses',
-      ];
-      let section = hash.substr(1);
-      if (section === 'connectedAccounts') {
-        section = 'connected-accounts';
-      } else if (section === 'paymentMethods') {
-        section = 'payment-methods';
-      }
-      if (legacySections.includes(section)) {
-        Router.pushRoute('editCollective', {
-          ...this.props.router.query,
-          slug: this.props.collective.slug,
-          section: section,
-        });
-      }
-    }
-  }
+    collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
+    collective.tos = get(collective, 'settings.tos');
+    collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
+    collective.application = get(collective, 'settings.apply');
+    collective.markdown = get(collective, 'settings.markdown');
 
-  componentDidUpdate(oldProps) {
-    const { collective, router } = this.props;
-    if (oldProps.collective !== collective) {
-      const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
-      const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
-      this.setState({
-        collective,
-        tiers,
-        tickets,
-      });
-    } else if (oldProps.router.query.section !== router.query.section) {
-      this.setState({ section: router.query.section });
-    }
+    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
+    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
+
+    return {
+      modified: false,
+      collective,
+      tiers: tiers.length === 0 ? [] : tiers,
+      tickets: tickets.length === 0 ? [] : tickets,
+    };
   }
 
   handleChange(fieldname, value) {
-    const collective = { ...this.state.collective };
+    this.setState(state => {
+      const collective = { ...state.collective };
 
-    // GrarphQL schema has address emebed within location
-    // mutation expects { location: { address: '' } }
-    if (['address', 'country'].includes(fieldname)) {
-      collective.location = collective.location || {};
-      collective.location[fieldname] = value;
-    } else if (fieldname === 'VAT') {
-      set(collective, 'settings.VAT.type', value);
-    } else if (fieldname === 'VAT-number') {
-      set(collective, 'settings.VAT.number', value);
-    } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
-      collective[fieldname] = value;
-      const endsAt = collective.endsAt;
-      if (!endsAt || new Date(endsAt) < new Date(value)) {
-        let newEndDate = new Date(value);
-        if (!endsAt) {
-          newEndDate.setHours(newEndDate.getHours() + 2);
-        } else {
-          // https://github.com/opencollπective/opencollective/issues/1232
-          const endsAtDate = new Date(endsAt);
-          newEndDate = new Date(value);
-          newEndDate.setHours(endsAtDate.getHours());
-          newEndDate.setMinutes(endsAtDate.getMinutes());
+      // GraphQL schema has address embeded within location
+      // mutation expects { location: { address: '' } }
+      if (['address', 'country'].includes(fieldname)) {
+        collective.location = collective.location || {};
+        collective.location[fieldname] = value;
+      } else if (fieldname === 'VAT') {
+        set(collective, 'settings.VAT.type', value);
+      } else if (fieldname === 'VAT-number') {
+        set(collective, 'settings.VAT.number', value);
+      } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
+        collective[fieldname] = value;
+        const endsAt = collective.endsAt;
+        if (!endsAt || new Date(endsAt) < new Date(value)) {
+          let newEndDate = new Date(value);
+          if (!endsAt) {
+            newEndDate.setHours(newEndDate.getHours() + 2);
+          } else {
+            // https://github.com/opencollπective/opencollective/issues/1232
+            const endsAtDate = new Date(endsAt);
+            newEndDate = new Date(value);
+            newEndDate.setHours(endsAtDate.getHours());
+            newEndDate.setMinutes(endsAtDate.getMinutes());
+          }
+          const endsAtValue = newEndDate.toString();
+          collective['endsAt'] = endsAtValue;
         }
-        const endsAtValue = newEndDate.toString();
-        collective['endsAt'] = endsAtValue;
+      } else {
+        collective[fieldname] = value;
       }
-    } else {
-      collective[fieldname] = value;
-    }
-    this.setState({
-      modified: true,
-      collective: Object.assign({}, this.state.collective, collective),
+
+      return { collective, modified: true };
     });
   }
 
-  handleObjectChange(obj) {
-    const { section } = this.state;
-    if (section === EDIT_COLLECTIVE_SECTIONS.TICKETS) {
-      this.setState({ tickets: obj.tiers, modified: true });
-    } else {
-      this.setState({ ...obj, modified: true });
-    }
-    window.state = this.state;
-  }
-
   async handleSubmit() {
-    const collective = { ...this.state.collective, tiers: this.state.tiers };
-    if (collective.type === CollectiveType.EVENT) {
-      collective.tiers = [];
-      if (find(this.state.tickets, 'name')) {
-        collective.tiers = [...this.state.tickets];
-      }
+    const collective = { ...this.state.collective };
 
-      if (find(this.state.tiers, 'name')) {
-        collective.tiers = [...collective.tiers, ...this.state.tiers];
-      }
+    // Add Tiers and Tickets
+    collective.tiers = [];
+    if (find(this.state.tiers, 'name')) {
+      collective.tiers = [...this.state.tiers];
     }
+    if (find(this.state.tickets, 'name')) {
+      collective.tiers = [...collective.tiers, ...this.state.tickets];
+    }
+
     this.props.onSubmit(collective);
+
     this.setState({ modified: false });
   }
 
@@ -374,11 +318,11 @@ class EditCollectiveForm extends React.Component {
     return this.state.collective[field.name];
   }
 
-  getMenuSelectedSection() {
-    if (['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(this.state.section)) {
+  getMenuSelectedSection(section) {
+    if (['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(section)) {
       return EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS;
     } else {
-      return this.state.section;
+      return section;
     }
   }
 
@@ -416,7 +360,7 @@ class EditCollectiveForm extends React.Component {
         return <Members collective={collective} LoggedInUser={LoggedInUser} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
-        return <PaymentMethods collectiveSlug={collective.slug} sendingSection={true} />;
+        return <PaymentMethods collectiveSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TIERS:
         return (
@@ -426,7 +370,7 @@ class EditCollectiveForm extends React.Component {
             tiers={this.state.tiers}
             collective={collective}
             currency={collective.currency}
-            onChange={this.handleObjectChange}
+            onChange={tiers => this.setState({ tiers, modified: true })}
             defaultType="TIER"
           />
         );
@@ -439,7 +383,7 @@ class EditCollectiveForm extends React.Component {
             tiers={this.state.tickets}
             collective={collective}
             currency={collective.currency}
-            onChange={this.handleObjectChange}
+            onChange={tickets => this.setState({ tickets, modified: true })}
             defaultType="TICKET"
           />
         );
@@ -461,20 +405,17 @@ class EditCollectiveForm extends React.Component {
               flexWrap="wrap"
             >
               <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
-                <StyledButton>
+                <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                 </StyledButton>
               </Link>
 
-              <ExternalLink
-                href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq"
-                openInNewTab
-              >
+              <StyledLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
                 <InfoCircle size="1em" />
                 &nbsp;
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
-              </ExternalLink>
+              </StyledLink>
             </Container>
             <CreateVirtualCardsForm
               collectiveId={collective.id}
@@ -514,30 +455,10 @@ class EditCollectiveForm extends React.Component {
         return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
-        return <PaymentMethods collectiveSlug={collective.slug} collective={collective} receivingSection={true} />;
+        return <ReceivingMoney collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
-        return (
-          <Fragment>
-            <H3>
-              <FormattedMessage id="editCollective.sendingMoney" defaultMessage={'Sending Money'} />
-            </H3>
-            <EditReceivingSendingMoney
-              collective={collective}
-              connectedAccounts={collective.connectedAccounts}
-              sendingMoney={true}
-            />
-            <H4 mt={2}>
-              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
-            </H4>
-            <P>
-              <FormattedMessage
-                id="collective.sendMoney.description"
-                defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
-              />
-            </P>
-          </Fragment>
-        );
+        return <SendingMoney collective={collective} />;
 
       default:
         return null;
@@ -545,7 +466,10 @@ class EditCollectiveForm extends React.Component {
   }
 
   render() {
-    const { collective, status, intl } = this.props;
+    const { collective, status, intl, router } = this.props;
+
+    const section = get(router, 'query.section', 'info');
+
     const isNew = !(collective && collective.id);
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
     if (['loading', 'saved'].includes(status)) {
@@ -773,7 +697,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           className: 'horizontal',
           defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => get(this.state.collective, 'isHost'),
+          when: () => collective.isHost,
         },
       ],
       advanced: [
@@ -782,8 +706,7 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
-          when: () =>
-            this.state.section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
+          when: () => section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
       ],
     };
@@ -803,7 +726,7 @@ class EditCollectiveForm extends React.Component {
       });
     });
 
-    const fields = (this.fields[this.state.section] || []).filter(field => !field.when || field.when());
+    const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
 
     return (
       <div className="EditCollectiveForm">
@@ -868,14 +791,14 @@ class EditCollectiveForm extends React.Component {
         </style>
 
         <Flex flexWrap="wrap">
-          <Menu collective={collective} selectedSection={this.getMenuSelectedSection()} />
+          <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
-            {this.state.section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
+            {section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
               <H3>
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
               </H3>
             )}
-            {this.state.section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
+            {section === EDIT_COLLECTIVE_SECTIONS.EXPENSES_PAYOUTS && (
               <H3>
                 <FormattedMessage id="editCollective.expensesPayouts" defaultMessage={'Expenses & Payouts'} />
               </H3>
@@ -906,11 +829,11 @@ class EditCollectiveForm extends React.Component {
               </div>
             )}
 
-            {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(this.state.section) &&
-              this.renderSection(this.state.section)}
+            {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
+              this.renderSection(section)}
 
             {((fields && fields.length > 0) ||
-              [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(this.state.section)) && (
+              [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
               <div className="actions">
                 <Button
                   bsStyle="primary"
@@ -940,8 +863,8 @@ class EditCollectiveForm extends React.Component {
               </div>
             )}
 
-            {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(this.state.section) &&
-              this.renderSection(this.state.section)}
+            {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
+              this.renderSection(section)}
           </Flex>
         </Flex>
       </div>

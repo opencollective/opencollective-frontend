@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import styled from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
 import { maxWidth } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 
@@ -337,13 +337,11 @@ export const replaceCreditCard = graphql(
 );
 
 const addSubscriptionsData = graphql(getSubscriptionsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: props.slug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: props.slug,
+    },
+  }),
 
   skip: props => {
     return props.loadingLoggedInUser || !props.LoggedInUser;

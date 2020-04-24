@@ -101,11 +101,15 @@ const getExpensesQuery = gql`
       privateMessage
       userTaxFormRequiredBeforePayment
       attachment
-      attachments {
+      items {
         id
         url
         description
         amount
+      }
+      attachedFiles {
+        id
+        url
       }
       collective {
         id
@@ -141,9 +145,6 @@ const EXPENSES_PER_PAGE = 10;
 
 const getExpensesVariables = props => {
   const filters = { ...props.filters };
-  if (filters.status === 'READY') {
-    filters.status = 'APPROVED';
-  }
 
   const vars = {
     CollectiveId: props.collective.id,
@@ -157,16 +158,20 @@ const getExpensesVariables = props => {
   } else {
     vars.category = null;
   }
+
+  if (vars.status === 'READY') {
+    vars.status = 'APPROVED';
+    vars.limit = null;
+  }
+
   return vars;
 };
 
 export const addExpensesData = graphql(getExpensesQuery, {
-  options(props) {
-    return {
-      variables: getExpensesVariables(props),
-      fetchPolicy: 'network-only',
-    };
-  },
+  options: props => ({
+    variables: getExpensesVariables(props),
+    fetchPolicy: 'network-only',
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

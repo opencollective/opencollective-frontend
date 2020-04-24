@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 import memoizeOne from 'memoize-one';
 
 import { P, H2 } from '../Text';

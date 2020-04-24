@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
 import gql from 'graphql-tag';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { fontSize, maxWidth } from 'styled-system';
 import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';

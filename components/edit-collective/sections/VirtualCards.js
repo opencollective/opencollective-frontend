@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { get, last } from 'lodash';
 import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
@@ -153,7 +153,7 @@ class VirtualCards extends React.Component {
         {data.loading ? (
           <Loading />
         ) : (
-          <div className="virtualcards-list">
+          <div data-cy="virtualcards-list">
             {paymentMethods.length === 0 && (
               <Flex justifyContent="center" mt="4em">
                 {this.renderNoVirtualCardMessage(onlyConfirmed)}

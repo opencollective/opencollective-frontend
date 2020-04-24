@@ -10,7 +10,8 @@ export const expenseInvoice = {
   privateMessage: 'Please pay the money fast',
   currency: 'USD',
   type: 'INVOICE',
-  attachments: [
+  createdAt: '2020-04-22T06:00:00Z',
+  items: [
     {
       id: '661ae79b-ff2b-4c64-aee4-44b7e6b21a4c',
       incurredAt: '2020-02-14',
@@ -50,7 +51,8 @@ export const expenseReceipt = {
   privateMessage: '',
   currency: 'USD',
   type: 'RECEIPT',
-  attachments: [
+  createdAt: '2020-04-22T06:00:00Z',
+  items: [
     {
       id: '661ae79b-ff2b-4c64-aee4-44b7e6b21a4c',
       incurredAt: '2020-02-14',

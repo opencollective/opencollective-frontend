@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { get } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -45,7 +45,7 @@ const FormFieldsContainer = styled(Flex)`
 `;
 
 const requiredFieldsQuery = gqlV2`
-  query Collective($slug: String, $currency: TransferWiseCurrency!) {
+  query Collective($slug: String, $currency: String!) {
     collective(slug: $slug) {
       host {
         transferwise {
@@ -198,6 +198,8 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
             name={field.name}
             error={meta.error && formatFormErrorMessage(meta.error)}
             label={formatMessage(msg.currency)}
+            mt={3}
+            mb={2}
           >
             {({ id }) => (
               <StyledSelect

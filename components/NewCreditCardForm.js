@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Elements, CardElement, injectStripe } from 'react-stripe-elements';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { Span } from './Text';

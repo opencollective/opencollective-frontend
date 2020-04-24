@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import dynamic from 'next/dynamic';
 import { get } from 'lodash';
 
@@ -10,6 +10,7 @@ import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
 import Link from './Link';
 import _ApplyToHostBtn from './ApplyToHostBtn';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 // Dynamic imports
 const AddFundsModal = dynamic(() => import('./AddFundsModal'));
@@ -43,7 +44,11 @@ const CollectiveCallsToAction = ({
         </Link>
       )}
       {hasSubmitExpense && (
-        <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+        <Link
+          // Redirect to the new Expense flow if the host is using TransferWise
+          route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
+          params={{ collectiveSlug: collective.slug }}
+        >
           <StyledButton
             buttonSize="small"
             mx={2}
@@ -118,6 +123,7 @@ CollectiveCallsToAction.propTypes = {
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     plan: PropTypes.object,
+    host: PropTypes.object,
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */

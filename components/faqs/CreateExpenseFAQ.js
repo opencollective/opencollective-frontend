@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import FAQ, { Entry, Title, Content } from './FAQ';
 import StyledLink from '../StyledLink';
-import ExternalLink from '../ExternalLink';
-import { Box } from '@rebass/grid';
+import { Box } from '../Grid';
 
 const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
   <FAQ {...props}>
@@ -54,7 +53,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
     <Box mt={2} pl={2}>
       <StyledLink
-        as={ExternalLink}
+        as={StyledLink}
         href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
         openInNewTab
         fontSize="Caption"

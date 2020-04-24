@@ -9,12 +9,13 @@ import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
 import CollectiveNavbar from '../components/CollectiveNavbar';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../components/Grid';
 import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
 import ErrorPage from '../components/ErrorPage';
 import Link from '../components/Link';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 import { withUser } from '../components/UserProvider';
 import MessageBox from '../components/MessageBox';
@@ -96,7 +97,11 @@ class ExpensePage extends React.Component {
                 </StyledButton>
               </Link>
               {!collective.isArchived && (
-                <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                <Link
+                  // Redirect to the new Expense flow if the host is using TransferWise
+                  route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
+                  params={{ collectiveSlug: collective.slug }}
+                >
                   <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
                     <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                   </StyledButton>
@@ -117,6 +122,7 @@ class ExpensePage extends React.Component {
               <ExpenseWithData
                 id={ExpenseId}
                 collective={collective}
+                host={collective.host}
                 view="details"
                 LoggedInUser={LoggedInUser}
                 allowPayAction={!this.state.isPayActionLocked}

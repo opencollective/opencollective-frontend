@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import confetti from 'canvas-confetti';
 import { Formik, Form } from 'formik';
 import { isURL, matches } from 'validator';
 
@@ -18,8 +17,8 @@ import Container from '../../components/Container';
 import { H1, P } from '../../components/Text';
 import StyledButton from '../../components/StyledButton';
 
+import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getLoggedInUserQuery } from '../../lib/graphql/queries';
 import { Router } from '../../server/pages';
 
 const StepsProgressBox = styled(Box)`
@@ -211,7 +210,9 @@ class OnboardingModal extends React.Component {
         mode: this.props.mode,
         slug: this.props.collective.slug,
         step: 'success',
-      }).then(() => this.confetti());
+      }).then(() => {
+        confettiFireworks(5000, { zIndex: 3000 });
+      });
     } catch (e) {
       this.setState({ isSubmitting: false, error: e });
     }
@@ -225,24 +226,6 @@ class OnboardingModal extends React.Component {
     this.setState({ noOverlay: true });
     this.props.setShowOnboardingModal(false);
     Router.pushRoute('collective', { slug: this.props.collective.slug });
-  };
-
-  confetti = () => {
-    const durationInSeconds = 5 * 1000;
-    const animationEnd = Date.now() + durationInSeconds;
-    const randomInRange = (min, max) => Math.random() * (max - min) + min;
-    const confettisParams = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      } else {
-        const particleCount = 50 * (timeLeft / durationInSeconds);
-        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0, 0.3), y: Math.random() - 0.2 } });
-        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0.7, 1), y: Math.random() - 0.2 } });
-      }
-    }, 250);
   };
 
   validateFormik = values => {
@@ -431,8 +414,6 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
     EditCollectiveMembers: async ({ collectiveId, members }) => {
       return await mutate({
         variables: { collectiveId, members },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
@@ -455,8 +436,6 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
     EditCollectiveContact: async ({ collective }) => {
       return await mutate({
         variables: { collective },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),

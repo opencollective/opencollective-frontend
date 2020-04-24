@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import copy from 'copy-to-clipboard';
 
 // Styled-icons
@@ -14,7 +14,7 @@ import { Clipboard } from '@styled-icons/feather/Clipboard';
 // Open Collective Frontend imports
 import { facebooKShareURL, tweetURL, linkedInShareURL, mailToURL } from '../../lib/url_helpers';
 import StyledTooltip from '../StyledTooltip';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
 import StyledRoundButton from '../StyledRoundButton';
 import Container from '../Container';
 
@@ -48,26 +48,26 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
 
   return (
     <Flex justifyContent="space-between">
-      <ExternalLink title="Facebook" href={facebooKShareURL({ u: pageUrl })} openInNewTab>
+      <StyledLink title="Facebook" href={facebooKShareURL({ u: pageUrl })} openInNewTab>
         <StyledRoundButton size={40}>
           <Facebook size={14} />
         </StyledRoundButton>
-      </ExternalLink>
-      <ExternalLink title="Twitter" href={tweetURL({ url: pageUrl, text: twitterShareMsg })} openInNewTab>
+      </StyledLink>
+      <StyledLink title="Twitter" href={tweetURL({ url: pageUrl, text: twitterShareMsg })} openInNewTab>
         <StyledRoundButton size={40}>
           <Twitter size={14} />
         </StyledRoundButton>
-      </ExternalLink>
-      <ExternalLink title="Linkedin" href={linkedInShareURL({ url: pageUrl, title: defaultShareTitle })} openInNewTab>
+      </StyledLink>
+      <StyledLink title="Linkedin" href={linkedInShareURL({ url: pageUrl, title: defaultShareTitle })} openInNewTab>
         <StyledRoundButton size={40}>
           <Linkedin size={14} />
         </StyledRoundButton>
-      </ExternalLink>
-      <ExternalLink title="Mail" href={mailToURL('', { subject: defaultShareTitle })} openInNewTab>
+      </StyledLink>
+      <StyledLink title="Mail" href={mailToURL('', { subject: defaultShareTitle })} openInNewTab>
         <StyledRoundButton size={40}>
           <Mail size={14} />
         </StyledRoundButton>
-      </ExternalLink>
+      </StyledLink>
       <StyledTooltip
         delayHide={0}
         content={() => (

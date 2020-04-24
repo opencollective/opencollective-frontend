@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../../Grid';
 import dynamic from 'next/dynamic';
 
 import { CollectiveType } from '../../../lib/constants/collectives';

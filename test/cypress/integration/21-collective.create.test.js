@@ -14,18 +14,18 @@ describe('create a collective', () => {
     cy.get('.actions button').click();
     cy.get('.result').contains('Collective created successfully');
     cy.wait(800);
-    cy.get('#createHost input[type="radio"]', { timeout: 20000 }).click();
-    cy.get('#createHost .CreateHostForm');
+    cy.get('#ownHost input[type="radio"]', { timeout: 20000 }).click();
+    cy.get('#ownHost .CreateHostForm');
     cy.get('select[name="hostType"]').select('organization');
     cy.fillInputField('organization_name', 'new org');
     cy.fillInputField('organization_website', 'newco.com');
     cy.wait(300);
-    cy.get('#createHost .createOrganizationBtn').click();
+    cy.get('#ownHost .createOrganizationBtn').click();
     cy.wait(300);
-    cy.get('#createHost .inputField.HostCollectiveId', {
+    cy.get('#ownHost .inputField.hostId', {
       timeout: 10000,
     }).contains('new org');
-    cy.get('#createHost .EditConnectedAccount [data-cy="connect-stripe-button"]').contains('Connect Stripe');
+    cy.get('#ownHost .EditConnectedAccount [data-cy="connect-stripe-button"]').contains('Connect Stripe');
     cy.get('#findHost input[type="radio"]').click();
     cy.get('#findHost a[href="/hosts"]').click();
     cy.get('.CollectiveCard', { timeout: 10000 }).should('have.length', 11);

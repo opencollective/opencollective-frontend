@@ -8,7 +8,7 @@ import { get, pick } from 'lodash';
 import { compose, formatCurrency } from '../lib/utils';
 
 import StyledButton from './StyledButton';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -112,13 +112,11 @@ const addPaymentMethodsQuery = gql`
 `;
 
 const addPaymentMethods = graphql(addPaymentMethodsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: get(props, 'fromCollective.slug'),
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: get(props, 'fromCollective.slug'),
+    },
+  }),
   skip: props => {
     return !props.LoggedInUser;
   },

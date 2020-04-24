@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 import { Search } from '@styled-icons/octicons/Search';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 

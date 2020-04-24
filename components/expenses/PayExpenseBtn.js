@@ -10,6 +10,7 @@ import { isValidEmail } from '../../lib/utils';
 import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import StyledTooltip from '../StyledTooltip';
+import Link from '../Link';
 import { payExpenseMutation } from './graphql/mutations';
 
 class PayExpenseBtn extends React.Component {
@@ -51,6 +52,11 @@ class PayExpenseBtn extends React.Component {
         defaultMessage:
           "Transfer was created and funded using TransferWise. This expense is be marked as Processing until the money leaves the Host account, after that the money should arrive its destination shortly. If it doesn't, this expense will be updated and marked as Error and you'll be able to try it again.",
       },
+      transferwisePlanLimitMessage: {
+        id: 'expense.pay.transferwise.planlimit',
+        defaultMessage:
+          "You reached your plan's limit, <Link>upgrade your plan</Link> to continue paying expense with TransferWise",
+      },
     });
   }
 
@@ -77,7 +83,7 @@ class PayExpenseBtn extends React.Component {
         this.props.onSuccess(successMessage);
       }
     } catch (e) {
-      const error = getErrorFromGraphqlException(e).message;
+      const error = getErrorFromGraphqlException(e);
       this.props.onError(error);
       this.setState({ loading: false });
       unlock();
@@ -105,8 +111,17 @@ class PayExpenseBtn extends React.Component {
       }
       successMessage = intl.formatMessage(this.messages['paypalSuccessMessage']);
     } else if (get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT') {
-      selectedPayoutMethod = 'Transferwise';
+      selectedPayoutMethod = 'TransferWise';
       successMessage = intl.formatMessage(this.messages['transferwiseSuccessMessage']);
+      if (
+        host?.plan.transferwisePayoutsLimit !== null &&
+        host?.plan.transferwisePayouts >= host?.plan.transferwisePayoutsLimit
+      ) {
+        disabled = true;
+        disabledMessage = intl.formatMessage(this.messages['transferwisePlanLimitMessage'], {
+          Link: (...chunks) => <Link route={`/${host.slug}/edit/host-plan`}>{chunks}</Link>,
+        });
+      }
     } else if (selectedPayoutMethod === 'other') {
       return null;
     }

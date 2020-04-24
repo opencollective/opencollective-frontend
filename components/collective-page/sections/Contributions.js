@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
 import memoizeOne from 'memoize-one';
@@ -443,9 +443,9 @@ const withData = graphql(
     }
   `,
   {
-    options(props) {
-      return { variables: { id: props.collective.id } };
-    },
+    options: props => ({
+      variables: { id: props.collective.id },
+    }),
   },
 );
 
