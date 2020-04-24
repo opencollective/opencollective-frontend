@@ -1,6 +1,7 @@
 {
   "Accept": "Přijmout",
   "acceptContributions.addBankAccount": "Add bank account",
+  "acceptContributions.bankAccountSetUp": "Bank account set up",
   "acceptContributions.bankAccountUpgradeInfo": "Your first $1000 is free, then you'll need to upgrade to a paid plan",
   "acceptContributions.definePaymentInstructions": "Define payment instructions",
   "acceptContributions.definePaymentInstructionsDetails": "Include any details contributors will need to send you money, such as: account name and number; IBAN, Swift, or routing codes; bank name and address, etc. The amount and order ID will be automatically included.",
@@ -13,6 +14,7 @@
   "acceptContributions.HowDoesItWork.details": "Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective\\'s balance.",
   "acceptContributions.myselfSuccess": "You have applied to be hosted by {hostName}.",
   "acceptContributions.notifiedWhen": "Budete upozorněni, až {hostName} schválí nebo odmítne vaši žádost. Úrovně příspěvků budou aktivní až poté, co bude kolektiv schválen fiskálním hostitelem.",
+  "acceptContributions.personalAccount": "Personal account",
   "acceptContributions.picker.header": "Přijmout finanční příspěvky",
   "acceptContributions.picker.host": "Fiskální hostitel",
   "acceptContributions.picker.hostInfo": "Outsource fundholding to an entity who offers this service ({moreInfo})",
@@ -21,6 +23,7 @@
   "acceptContributions.picker.organization": "Naše organizace",
   "acceptContributions.picker.organizationInfo": "Použít bankovní účet mé společnosti nebo organizace",
   "acceptContributions.picker.subtitle": "Kdo bude držet peníze jménem kolektivu?",
+  "acceptContributions.stripeConnected": "Stripe connected",
   "acceptContributions.success.nowAcceptingContributions": "Congratulations! {collective} is now accepting financial contributions.",
   "acceptContributions.success.toConsider": "A few more things you should consider:",
   "acceptContributions.tiers.paragraphOne": "Vytvořili jsme jednorázovou úroveň dárcovství pro začátek. Posuňte se dále a vytvořte různé jednorázové stupně a předplatné pro určení úrovní nebo druhů finančních příspěvků, které váš kolektiv přijímá.",
