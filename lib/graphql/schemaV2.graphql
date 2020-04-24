@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Apr 22 2020 16:27:43 GMT+0200 (GMT+02:00)
+# timestamp: Tue Apr 28 2020 16:03:48 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -107,6 +107,11 @@ interface Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -364,6 +369,11 @@ type Bot implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -484,6 +494,11 @@ type Collective implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -570,13 +585,18 @@ input CommentUpdateInput {
 }
 
 """
-Fields for a connected account
+This represents a Connected Account
 """
 type ConnectedAccount {
   """
   Unique identifier for this connected account
   """
   id: String!
+
+  """
+  The internal database identifier of the Connected Account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-05-01: should only be used during the transition to GraphQL API v2.")
 
   """
   The date on which the ConnectedAccount was created
@@ -903,6 +923,11 @@ type Event implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -1458,6 +1483,11 @@ type Host implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -1635,6 +1665,11 @@ type Individual implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   Address. This field is public for hosts, otherwise:
@@ -2095,6 +2130,11 @@ type Organization implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   Address. This field is public for hosts, otherwise:
