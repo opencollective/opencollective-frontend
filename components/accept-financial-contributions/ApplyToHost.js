@@ -13,9 +13,7 @@ import Container from '../Container';
 import HostsContainer from './HostsContainer';
 import StyledTag from '../../components/StyledTag';
 import CollectiveNavbar from '../CollectiveNavbar';
-import I18nCollectiveTags from '../I18nCollectiveTags';
 
-const tagList = ['All fiscal hosts', 'climate', 'opensource', 'covid'];
 const FISCAL_HOST_LINK = 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host';
 
 const FilterTag = styled(StyledTag)`
@@ -75,11 +73,21 @@ class ApplyToHost extends React.Component {
         id: 'fiscalHost.seeMoreHosts',
         defaultMessage: 'See more hosts',
       },
+      allFiscalHosts: {
+        id: 'fiscalHost.allFiscalHosts',
+        defaultMessage: 'All fiscal hosts',
+      },
     });
+
+    this.tagList = {
+      all: props.intl.formatMessage(this.messages.allFiscalHosts),
+      opensource: 'Open Source', // No need to translate
+      'covid-19': 'COVID-19', // No need to translate
+    };
   }
 
   setTags = tag => {
-    tag === 'All fiscal hosts' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
+    tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
   };
 
   render() {
@@ -114,9 +122,9 @@ class ApplyToHost extends React.Component {
             </Box>
           </Container>
           <Flex px={[3, 5]} my={4} flexWrap="wrap">
-            {tagList.map(tag => (
-              <FilterTag key={`${tag}-tag`} px={2} mr={2} onClick={() => this.setTags(tag)}>
-                <I18nCollectiveTags tags={tag} />
+            {Object.keys(this.tagList).map(tagKey => (
+              <FilterTag key={`${tagKey}-tag`} px={2} mr={2} onClick={() => this.setTags(tagKey)}>
+                {this.tagList[tagKey]}
               </FilterTag>
             ))}
           </Flex>
