@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '@rebass/grid';
 import { defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-
-import { H4, P, Span } from './Text';
-import Container from './Container';
-import StyledTextarea from './StyledTextarea';
 import styled from 'styled-components';
+
+import { Box, Flex } from '../Grid';
+import { H4, P, Span } from '../Text';
+import Container from '../Container';
+import StyledTextarea from '../StyledTextarea';
 
 const List = styled.ul`
   margin: 0;
@@ -47,7 +47,7 @@ class UpdateBankDetailsForm extends React.Component {
     BIC: TRIOBEBB
     Bank name: Triodos
 </code>
-        
+
 Please note that it will take a few days to process your payment.`,
       },
     });

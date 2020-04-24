@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from '../../Grid';
 import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
 import { H3, P } from '../../Text';

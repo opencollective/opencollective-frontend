@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import { useDropzone } from 'react-dropzone';
 import styled, { css } from 'styled-components';
-import { isNil } from 'lodash';
+import { isNil, omit } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
@@ -14,27 +14,33 @@ import { P } from './Text';
 import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
+import UploadedFilePreview from './UploadedFilePreview';
 
 const Dropzone = styled(Container)`
   border: 1px dashed #c4c7cc;
   border-radius: 10px;
   text-align: center;
-  cursor: pointer;
   background: white;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
 
-  &:hover:not(:disabled) {
-    background: #f9f9f9;
-    border-color: ${props => props.theme.colors.primary[300]};
-  }
+  ${props =>
+    props.onClick &&
+    css`
+      cursor: pointer;
 
-  &:focus {
-    outline: 0;
-    border-color: ${props => props.theme.colors.primary[500]};
-  }
+      &:hover:not(:disabled) {
+        background: #f9f9f9;
+        border-color: ${props => props.theme.colors.primary[300]};
+      }
+
+      &:focus {
+        outline: 0;
+        border-color: ${props => props.theme.colors.primary[500]};
+      }
+    `}
 
   ${props =>
     props.error &&
@@ -45,6 +51,27 @@ const Dropzone = styled(Container)`
   img {
     max-height: 100%;
     max-width: 100%;
+  }
+`;
+
+const ReplaceContainer = styled.div`
+  box-sizing: border-box;
+  background: rgba(49, 50, 51, 0.5);
+  color: #ffffff;
+  cursor: pointer;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 24px;
+  padding: 8px;
+  margin-top: -24px;
+  font-size: 12px;
+  line-height: 1em;
+
+  &:hover {
+    background: rgba(49, 50, 51, 0.6);
   }
 `;
 
@@ -64,7 +91,6 @@ const getUploadProgress = uploadProgressList => {
 const StyledDropzone = ({
   onSuccess,
   onReject,
-  showDefaultMessage,
   children,
   isLoading,
   loadingProgress,
@@ -76,6 +102,7 @@ const StyledDropzone = ({
   minSize,
   maxSize,
   error,
+  value,
   isMulti,
   ...props
 }) => {
@@ -120,8 +147,15 @@ const StyledDropzone = ({
 
   minHeight = size || minHeight;
   const innerMinHeight = minHeight - 2; // -2 To account for the borders
+  const dropProps = getRootProps();
   return (
-    <Dropzone {...props} {...getRootProps()} minHeight={size || minHeight} size={size} error={error}>
+    <Dropzone
+      {...props}
+      {...(value ? omit(dropProps, ['onClick']) : dropProps)}
+      minHeight={size || minHeight}
+      size={size}
+      error={error}
+    >
       <input {...getInputProps()} />
       {isLoading || isUploading ? (
         <Container
@@ -145,9 +179,9 @@ const StyledDropzone = ({
           {isLoading && !isNil(loadingProgress) && <Container>{loadingProgress}%</Container>}
         </Container>
       ) : (
-        <Container my={3} maxHeight="100%" maxWidth="100%" position="relative">
+        <Container position="relative">
           {isDragActive ? (
-            <Container color="primary.500">
+            <Container color="primary.500" fontSize="Caption">
               <Box mb={2}>
                 <DownloadIcon size={20} />
               </Box>
@@ -159,7 +193,7 @@ const StyledDropzone = ({
             </Container>
           ) : (
             <React.Fragment>
-              {showDefaultMessage && (
+              {!value ? (
                 <P color="black.500" px={2} fontSize={fontSize}>
                   {isMulti ? (
                     <FormattedMessage
@@ -176,6 +210,13 @@ const StyledDropzone = ({
                     />
                   )}
                 </P>
+              ) : (
+                <React.Fragment>
+                  <UploadedFilePreview size={size} url={value} hasLink border="none" />
+                  <ReplaceContainer onClick={dropProps.onClick}>
+                    <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
+                  </ReplaceContainer>
+                </React.Fragment>
               )}
               {children}
             </React.Fragment>
@@ -193,8 +234,6 @@ StyledDropzone.propTypes = {
   onReject: PropTypes.func,
   /** Content to show inside the dropzone. Defaults to message "Drag and drop one or..." */
   children: PropTypes.node,
-  /** Whether to show the default message. By default, the message will be displayed if there's no children */
-  showDefaultMessage: PropTypes.bool,
   /** Force loading state to be displayed */
   isLoading: PropTypes.bool,
   /** Use this to override the loading progress indicator */
@@ -219,6 +258,8 @@ StyledDropzone.propTypes = {
   error: PropTypes.any,
   /** required field */
   required: PropTypes.bool,
+  /** if set, the image will be displayed and a "replace" banner will be added */
+  value: PropTypes.string,
 };
 
 StyledDropzone.defaultProps = {
@@ -226,7 +267,6 @@ StyledDropzone.defaultProps = {
   mockImageGenerator: () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   isMulti: true,
   fontSize: 'Paragraph',
-  showDefaultMessage: true,
 };
 
 export default StyledDropzone;

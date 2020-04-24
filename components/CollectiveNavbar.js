@@ -4,7 +4,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 
 import { Settings } from '@styled-icons/feather/Settings';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
@@ -433,7 +433,12 @@ const CollectiveNavbar = ({
               ))}
               {callsToAction.hasSubmitExpense && (
                 <MenuLinkContainer mobileOnly>
-                  <MenuLink as={Link} route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                  <MenuLink
+                    as={Link}
+                    // Redirect to the new Expense flow if the host is using TransferWise
+                    route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
+                    params={{ collectiveSlug: collective.slug }}
+                  >
                     <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
                   </MenuLink>
                 </MenuLinkContainer>

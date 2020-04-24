@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../components/Grid';
 import { omit } from 'lodash';
 
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';

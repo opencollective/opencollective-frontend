@@ -4,7 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import fetch from 'node-fetch';
 import { get } from 'lodash';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../components/Grid';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { URLSearchParams } from 'universal-url';
 

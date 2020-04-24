@@ -1,17 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { first, isEmpty, get, pick } from 'lodash';
 import { Formik, Form, Field, FieldArray, FastField } from 'formik';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { i18nExpenseType } from '../../lib/i18n-expense';
 import { P, Span } from '../Text';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import StyledInput from '../StyledInput';
 import StyledHr from '../StyledHr';
+import StyledTag from '../StyledTag';
+import StyledInputTags from '../StyledInputTags';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
 import StyledInputField from '../StyledInputField';
 import CollectivePicker from '../CollectivePicker';
@@ -137,10 +140,10 @@ const validate = expense => {
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
-const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel }) => {
+const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel, formPersister }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, handleChange, errors } = formik;
+  const { values, handleChange, errors, setValues, dirty } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
@@ -152,6 +155,27 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
       formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles]);
+
+  // Load values from localstorage
+  React.useEffect(() => {
+    if (formPersister && !dirty) {
+      const formValues = formPersister.loadValues();
+      if (formValues) {
+        // Reset payoutMethod if host is no longer connected to TransferWise
+        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host.transferwise) {
+          formValues.payoutMethod = undefined;
+        }
+        setValues(formValues);
+      }
+    }
+  }, [formPersister, dirty]);
+
+  // Save values in localstorage
+  React.useEffect(() => {
+    if (dirty && formPersister) {
+      formPersister.saveValues(values);
+    }
+  }, [formPersister, dirty, values]);
 
   return (
     <Form>
@@ -172,6 +196,20 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
               maxLength={255}
               withOutline
             />
+            <Flex alignItems="flex-start">
+              <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
+                {i18nExpenseType(intl, values.type, values.legacyId)}
+              </StyledTag>
+              <StyledInputTags
+                onChange={tags =>
+                  formik.setFieldValue(
+                    'tags',
+                    tags.map(t => t.value.toUpperCase()),
+                  )
+                }
+                value={values.tags}
+              />
+            </Flex>
             {errors.description && (
               <P color="red.500" mt={2}>
                 {formatFormErrorMessage(intl, errors.description)}
@@ -358,6 +396,7 @@ ExpenseFormBody.propTypes = {
   payoutProfiles: PropTypes.array,
   autoFocusTitle: PropTypes.bool,
   onCancel: PropTypes.func,
+  formPersister: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     host: PropTypes.shape({
@@ -371,7 +410,16 @@ ExpenseFormBody.propTypes = {
 /**
  * Main create expense form
  */
-const ExpenseForm = ({ onSubmit, collective, expense, payoutProfiles, autoFocusTitle, onCancel, validateOnChange }) => {
+const ExpenseForm = ({
+  onSubmit,
+  collective,
+  expense,
+  payoutProfiles,
+  autoFocusTitle,
+  onCancel,
+  validateOnChange,
+  formPersister,
+}) => {
   const [hasValidate, setValidate] = React.useState(validateOnChange);
 
   return (
@@ -397,6 +445,7 @@ const ExpenseForm = ({ onSubmit, collective, expense, payoutProfiles, autoFocusT
           collective={collective}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
+          formPersister={formPersister}
         />
       )}
     </Formik>
@@ -408,6 +457,8 @@ ExpenseForm.propTypes = {
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   onCancel: PropTypes.func,
+  /** To save draft of form values */
+  formPersister: PropTypes.object,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,

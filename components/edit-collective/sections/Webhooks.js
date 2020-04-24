@@ -7,7 +7,7 @@ import gql from 'graphql-tag';
 import { isURL } from 'validator';
 import { Close } from '@styled-icons/material/Close';
 import memoizeOne from 'memoize-one';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { Add } from '@styled-icons/material/Add';
 
 import events from '../../../lib/constants/notificationEvents';
@@ -139,7 +139,7 @@ class Webhooks extends React.Component {
   addWebhook = () => {
     const { webhooks } = this.state;
     webhooks.push({ webhookUrl: '', type: 'all' });
-    this.setState({ webhooks, modified: true });
+    this.setState({ webhooks, modified: true, status: 'invalid' });
   };
 
   removeWebhook = index => {

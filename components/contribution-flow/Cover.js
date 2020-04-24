@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../Grid';
 
 import LinkCollective from '../LinkCollective';
 import Logo from '../Logo';

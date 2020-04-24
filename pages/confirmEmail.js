@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Box } from '@rebass/grid';
+import { Box } from '../components/Grid';
 
 import { Email } from '@styled-icons/material/Email';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,14 +8,7 @@ import Avatar from '../../components/Avatar';
 import StyledTag from '../../components/StyledTag';
 import StyledTooltip from '../../components/StyledTooltip';
 
-const Admin = styled(StyledTag)`
-  font-size: 14px;
-  border-top-right-radius: 50px;
-  border-bottom-right-radius: 50px;
-  text-transform: none;
-  display: flex;
-  align-items: center;
-`;
+const Admin = styled(StyledTag).attrs({ variant: 'rounded-right' })``;
 
 class OnboardingProfileCard extends React.Component {
   static propTypes = {
@@ -37,19 +30,13 @@ class OnboardingProfileCard extends React.Component {
           >
             <Admin
               closeButtonProps={{
-                width: '1.5em',
-                height: '1.5em',
-                iconColor: 'black',
-                backgroundColor: 'rgba(0, 0, 0, 0)',
-                display: 'flex',
-                align: 'center',
                 onClick: () => {
                   removeAdmin(collective);
                 },
               }}
             >
               <Flex alignItems="center">
-                <Avatar radius={15} collective={collective} />
+                <Avatar radius={16} collective={collective} />
                 <Box fontSize="Caption" ml={2}>
                   {name}
                 </Box>
@@ -61,12 +48,6 @@ class OnboardingProfileCard extends React.Component {
             closeButtonProps={
               collective.id !== adminCollective.id
                 ? {
-                    width: '1.5em',
-                    height: '1.5em',
-                    iconColor: 'black',
-                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                    display: 'flex',
-                    align: 'center',
                     onClick: () => {
                       removeAdmin(collective);
                     },
@@ -75,7 +56,7 @@ class OnboardingProfileCard extends React.Component {
             }
           >
             <Flex alignItems="center">
-              <Avatar radius={15} collective={collective} />
+              <Avatar radius={16} collective={collective} />
               <Box fontSize="Caption" ml={2}>
                 {name}
               </Box>

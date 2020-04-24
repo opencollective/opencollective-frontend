@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import gql from 'graphql-tag';
 import styled, { css } from 'styled-components';
 import { round, truncate } from 'lodash';

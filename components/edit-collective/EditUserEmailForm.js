@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import { isNil } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';

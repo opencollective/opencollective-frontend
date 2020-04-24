@@ -6,7 +6,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import StyledCard from './StyledCard';
 import { H5, Span } from './Text';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 import Avatar from './Avatar';
 import Link from './Link';
 import UserCompany from './UserCompany';

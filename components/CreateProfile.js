@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';

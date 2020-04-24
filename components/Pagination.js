@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import { TextInput } from './StyledInput';
 import StyledButton from './StyledButton';
 import Link from './Link';

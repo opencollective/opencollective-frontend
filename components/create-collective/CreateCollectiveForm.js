@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Formik, Field, Form } from 'formik';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../Grid';
 import { assign, get } from 'lodash';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
@@ -349,7 +349,7 @@ class CreateCollectiveForm extends React.Component {
                     <Flex justifyContent={['center', 'left']} mb={4}>
                       <StyledButton
                         fontSize="13px"
-                        width="148px"
+                        minWidth="148px"
                         minHeight="36px"
                         buttonStyle="primary"
                         type="submit"

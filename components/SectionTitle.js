@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
+import { Box } from './Grid';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import Link from './Link';

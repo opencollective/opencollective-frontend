@@ -4,7 +4,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import styled from 'styled-components';
 
 import Container from '../Container';
@@ -102,24 +102,13 @@ class HostDashboardActionsBanner extends React.Component {
     }
 
     this.setState({ loading: true });
-    const hostCollective = this.props.host;
+
     const order = pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']);
     order.collective = { id: this.state.selectedCollective.id };
     order.fromCollective = { id: Number(form.FromCollectiveId) };
 
-    const pm = hostCollective.paymentMethods.find(pm => pm.service === 'opencollective');
-    if (!pm) {
-      this.setState({
-        error: "This host doesn't have an opencollective payment method",
-        loading: false,
-      });
-      return;
-    }
-    order.paymentMethod = {
-      uuid: pm.uuid,
-    };
     try {
-      await this.props.addFundsToCollective(order);
+      await this.props.addFundsToCollective({ variables: { order } });
       this.setState({ showAddFunds: false, loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -233,7 +222,7 @@ class HostDashboardActionsBanner extends React.Component {
   }
 }
 
-const addFundsToCollectiveQuery = gql`
+const addFundsToCollectiveMutation = gql`
   mutation addFundsToCollective($order: OrderInputType!) {
     addFundsToCollective(order: $order) {
       id
@@ -244,7 +233,6 @@ const addFundsToCollectiveQuery = gql`
       }
       collective {
         id
-
         stats {
           id
           balance
@@ -254,12 +242,6 @@ const addFundsToCollectiveQuery = gql`
   }
 `;
 
-const addMutation = graphql(addFundsToCollectiveQuery, {
-  props: ({ mutate }) => ({
-    addFundsToCollective: async order => {
-      return await mutate({ variables: { order } });
-    },
-  }),
-});
+const addMutation = graphql(addFundsToCollectiveMutation, { name: 'addFundsToCollective' });
 
 export default addMutation(injectIntl(HostDashboardActionsBanner));

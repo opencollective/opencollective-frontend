@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from './Grid';
 
 import { Clipboard } from '@styled-icons/feather/Clipboard';
 import { CheckCircle } from '@styled-icons/feather/CheckCircle';

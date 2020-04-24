@@ -4,7 +4,7 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { debounce, findIndex, get, pick, isNil } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import styled from 'styled-components';
 import { isURL } from 'validator';
 import { v4 as uuid } from 'uuid';

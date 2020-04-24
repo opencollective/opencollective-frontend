@@ -8,21 +8,49 @@ import { Times } from '@styled-icons/fa-solid/Times';
 import { textTransform } from '../lib/styled-system-custom-properties';
 import { Span } from './Text';
 
+const defaultRoundedStyleProps = {
+  backgroundColor: 'black.100',
+  maxHeight: '24px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  color: 'black.700',
+  fontSize: '12px',
+  lineHeight: '18px',
+};
+
 const StyledTagBase = styled.div`
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 8px;
-  line-height: 12px;
-  background: #F0F2F5;
-  color: #71757A;
   text-align: center;
+  white-space: nowrap; 
+
+  ${variant({
+    prop: 'variant',
+    variants: {
+      squared: {
+        color: '#71757A',
+        background: '#F0F2F5',
+        borderRadius: '4px',
+        padding: '8px',
+        fontSize: '8px',
+        lineHeight: '12px',
+      },
+      'rounded-right': {
+        ...defaultRoundedStyleProps,
+        borderRadius: '2px 12px 12px 2px',
+        padding: '3px 10px 3px 6px',
+      },
+      'rounded-left': {
+        ...defaultRoundedStyleProps,
+        borderRadius: '12px 2px 2px 12px',
+        padding: '3px 6px 3px 10px',
+      },
+    },
+  })}
 
   & > * {
     vertical-align: middle;
   }
-
+  
   ${background}
-  ${border}
   ${color}
   ${space}
   ${border}
@@ -68,36 +96,32 @@ const StyledTagBase = styled.div`
 `;
 
 const CloseButton = styled.button`
-  border-radius: 50%;
-  background: ${closeButtonProps => closeButtonProps.iconBackgroundColor};
-  color: ${closeButtonProps => closeButtonProps.iconColor};
-  mix-blend-mode: color-burn;
   cursor: pointer;
-  margin: 0px;
+  color: inherit;
   text-align: center;
-  line-height: 1;
-  padding: 4px;
-  width: ${closeButtonProps => closeButtonProps.iconWidth};
-  height: ${closeButtonProps => closeButtonProps.iconHeight};
-  display: ${closeButtonProps => closeButtonProps.iconDisplay};
-  align-items: ${closeButtonProps => closeButtonProps.iconAlign};
-  &:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  line-height: inherit;
+  outline: none;
 `;
 
 /** Simple tag to display a short string */
 const StyledTag = ({ closeButtonProps, children, ...props }) => {
+  // Redesigned variants are not capsized by default
+  if (props.variant !== 'squared') {
+    props.textTransform = 'none';
+  }
+
   return !closeButtonProps ? (
     <StyledTagBase {...props}>{children}</StyledTagBase>
   ) : (
-    <StyledTagBase py={1} {...props}>
+    <StyledTagBase {...props}>
       <Span mr={2} letterSpacing="inherit">
         {children}
       </Span>
       <CloseButton {...closeButtonProps}>
-        <Times size="1em" />
+        <Times size="10px" />
       </CloseButton>
     </StyledTagBase>
   );
@@ -113,10 +137,12 @@ StyledTag.propTypes = {
   iconColor: PropTypes.string,
   iconDisplay: PropTypes.string,
   iconAlign: PropTypes.string,
+  variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left']),
   children: PropTypes.node,
 };
 
 StyledTag.defaultProps = {
+  variant: 'squared',
   textTransform: 'uppercase',
   iconHeight: '2.5em',
   iconWidth: '2.5em',

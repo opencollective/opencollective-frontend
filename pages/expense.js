@@ -1,10 +1,11 @@
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../components/Grid';
 import { cloneDeep, uniqBy, update, get, sortBy } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { graphql, withApollo } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import memoizeOne from 'memoize-one';
+import { Router } from '../server/pages';
 
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
@@ -36,6 +37,8 @@ import {
 import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
 import expenseTypes from '../lib/constants/expenseTypes';
+import TemporaryNotification from '../components/TemporaryNotification';
+import I18nFormatters from '../components/I18nFormatters';
 
 const messages = defineMessages({
   title: {
@@ -83,15 +86,22 @@ const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 
 class ExpensePage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, ExpenseId } }) {
-    return { collectiveSlug, legacyExpenseId: parseInt(ExpenseId) };
+  static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, createSuccess } }) {
+    return {
+      parentCollectiveSlug,
+      collectiveSlug,
+      legacyExpenseId: parseInt(ExpenseId),
+      createSuccess: Boolean(createSuccess),
+    };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string,
+    parentCollectiveSlug: PropTypes.string,
     legacyExpenseId: PropTypes.number,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    createSuccess: PropTypes.bool,
     expenseCreated: PropTypes.string, // actually a stringed boolean 'true'
     /** @ignore from withApollo */
     client: PropTypes.object.isRequired,
@@ -212,8 +222,25 @@ class ExpensePage extends React.Component {
     return sortBy([...comments, ...activities], 'createdAt');
   });
 
+  onSuccessMsgDismiss = () => {
+    // Replaces the route by the version without `createSuccess=true`
+    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId } = this.props;
+    Router.replaceRoute(
+      `expense-v2`,
+      {
+        parentCollectiveSlug,
+        collectiveSlug,
+        collectiveType: parentCollectiveSlug && 'events',
+        ExpenseId: legacyExpenseId,
+      },
+      {
+        shallow: true, // Do not re-fetch data, do not loose state
+      },
+    );
+  };
+
   render() {
-    const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
+    const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
     const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
 
     if (!data.loading) {
@@ -237,6 +264,15 @@ class ExpensePage extends React.Component {
     const hasAttachedFiles = expense?.attachedFiles?.length > 0;
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
+        {createSuccess && (
+          <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
+            <FormattedMessage
+              id="expense.createSuccess"
+              defaultMessage="<strong>Expense submited!</strong> You can edit or review updates on the expense feed."
+              values={I18nFormatters}
+            />
+          </TemporaryNotification>
+        )}
         <CollectiveThemeProvider collective={collective}>
           <CollectiveNavbar collective={collective} isLoading={!collective} selected={Sections.BUDGET} />
           <Flex flexWrap="wrap" my={[4, 5]} data-cy="expense-page-content">
@@ -353,9 +389,9 @@ class ExpensePage extends React.Component {
                     onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                     validateOnChange
                     disableSubmitIfUntouched
-                    onSubmit={expense =>
+                    onSubmit={editedExpense =>
                       this.setState({
-                        editedExpense: { ...expense, tags: editedExpense.tags },
+                        editedExpense,
                         status: PAGE_STATUS.EDIT_SUMMARY,
                       })
                     }
@@ -387,16 +423,7 @@ class ExpensePage extends React.Component {
             </Box>
             <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
               <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-                <ExpenseInfoSidebar
-                  isLoading={data.loading}
-                  collective={collective}
-                  host={host}
-                  expense={status === PAGE_STATUS.VIEW ? expense : editedExpense}
-                  isEditing={status === PAGE_STATUS.EDIT}
-                  onChangeTags={tags =>
-                    this.setState(({ editedExpense }) => ({ editedExpense: { ...editedExpense, tags } }))
-                  }
-                />
+                <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
               </Box>
             </Flex>
             <Box width={SIDE_MARGIN_WIDTH} />

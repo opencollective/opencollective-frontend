@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -161,20 +161,27 @@ class ConversationsPage extends React.Component {
                           <H4 px={2} mb={3}>
                             <FormattedMessage id="Tags" defaultMessage="Tags" />
                           </H4>
-                          <Flex flexWrap="wrap">
-                            {collective.conversationsTags.map(({ tag }) => (
-                              <Box key={tag} m={2}>
-                                {tag === this.props.tag ? (
-                                  <StyledTag type="info" closeButtonProps={{ onClick: this.resetTag }}>
+                          <Flex flexWrap="wrap" mx={2}>
+                            {collective.conversationsTags.map(({ tag }) =>
+                              tag === this.props.tag ? (
+                                <StyledTag
+                                  key={tag}
+                                  type="info"
+                                  variant="rounded-right"
+                                  m="4px"
+                                  mr="4px"
+                                  closeButtonProps={{ onClick: this.resetTag }}
+                                >
+                                  {tag}
+                                </StyledTag>
+                              ) : (
+                                <Link key={tag} route="conversations" params={{ collectiveSlug, tag }}>
+                                  <StyledTag variant="rounded-right" mb="4px" mr="4px">
                                     {tag}
                                   </StyledTag>
-                                ) : (
-                                  <Link route="conversations" params={{ collectiveSlug, tag }}>
-                                    <StyledTag>{tag}</StyledTag>
-                                  </Link>
-                                )}
-                              </Box>
-                            ))}
+                                </Link>
+                              ),
+                            )}
                           </Flex>
                         </React.Fragment>
                       )}

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Swipeable } from 'react-swipeable';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from './Grid';
 import { throttle } from 'lodash';
 import { ArrowLeftCircle } from '@styled-icons/feather/ArrowLeftCircle';
 import { ArrowRightCircle } from '@styled-icons/feather/ArrowRightCircle';

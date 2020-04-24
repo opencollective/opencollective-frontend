@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import { get } from 'lodash';
-import { Box } from '@rebass/grid';
+import { Box } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
 import { P } from '../../Text';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../../Grid';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 
 import { H1, P } from '../../Text';

@@ -13,12 +13,13 @@ import categories from '../../lib/constants/categories';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 
 import TransactionDetails from './TransactionDetails';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../Grid';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import StyledSpinner from '../StyledSpinner';
 import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
 import { formatErrorMessage } from '../../lib/errors';
+import ExternalLink from '../ExternalLink';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -65,6 +66,10 @@ class ExpenseDetails extends React.Component {
       expenseTypeInvoice: {
         id: 'Expense.Type.Invoice',
         defaultMessage: 'Invoice',
+      },
+      attachedFile: {
+        id: 'Expense.OpenAttachedFile',
+        defaultMessage: 'Open attached file in a new window',
       },
     });
 
@@ -414,16 +419,32 @@ class ExpenseDetails extends React.Component {
                     />
                   )}
                   {!editMode && attachment.url && (
-                    <a
+                    <ExternalLink
                       href={attachment.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      openInNewTab
                       title={this.getAttachmentTitle(expense, attachment)}
                     >
                       <img src={this.getAttachmentPreview(attachment.url)} />
-                    </a>
+                    </ExternalLink>
                   )}
                   {!editMode && !attachment.url && <img src={this.getAttachmentPreview(attachment.url)} />}
+                </div>
+              </div>
+            ))}
+            {((!editMode && expense.attachedFiles) || []).map(attachment => (
+              <div key={attachment.id}>
+                <div className="frame">
+                  {attachment.url ? (
+                    <ExternalLink
+                      href={attachment.url}
+                      openInNewTab
+                      title={intl.formatMessage(this.messages.attachedFile)}
+                    >
+                      <img src={this.getAttachmentPreview(attachment.url)} />
+                    </ExternalLink>
+                  ) : (
+                    <img src={this.getAttachmentPreview(attachment.url)} />
+                  )}
                 </div>
               </div>
             ))}
@@ -462,6 +483,10 @@ const getExpenseQuery = gql`
         url
         description
         amount
+      }
+      attachedFiles {
+        id
+        url
       }
       payoutMethod
       PayoutMethod {

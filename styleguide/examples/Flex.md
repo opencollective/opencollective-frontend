@@ -1,9 +1,9 @@
-[See `@rebass/grid` docs for more info](https://www.npmjs.com/package/@rebass/grid#flex)
+[See `components/Grid` docs for more info](https://www.npmjs.com/package/components/Grid#flex)
 
 The `<Flex />` component extends the `<Box />` with `display: flex` on by default;
 
 ```js
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from 'components/Grid';
 import styled from 'styled-components';
 import { P } from 'components/Text';
 
@@ -24,7 +24,7 @@ const Block = styled(Box)`
 Use any of the flexbox style props: `alignItems`, `justifyContent`, `flexDirection`, `flexWrap`:
 
 ```js
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from 'components/Grid';
 import styled from 'styled-components';
 import { P } from 'components/Text';
 

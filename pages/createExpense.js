@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../components/Grid';
 
 import { compose } from '../lib/utils';
 

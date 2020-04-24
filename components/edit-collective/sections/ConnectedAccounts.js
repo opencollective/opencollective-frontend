@@ -11,10 +11,13 @@ import EditConnectedAccount from '../EditConnectedAccount';
 const ConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
-  const services = [];
-
-  if (props.collective.type === 'COLLECTIVE' || props.collective.isHost) {
-    services.push('twitter');
+  let services = [];
+  if (props.services) {
+    services = [...props.services, ...services];
+  } else {
+    if (props.collective.type === 'COLLECTIVE' || props.collective.isHost) {
+      services.push('twitter');
+    }
   }
 
   return (
@@ -37,6 +40,7 @@ ConnectedAccounts.propTypes = {
   collective: PropTypes.object.isRequired,
   connectedAccounts: PropTypes.arrayOf(PropTypes.object),
   editMode: PropTypes.bool,
+  services: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default ConnectedAccounts;

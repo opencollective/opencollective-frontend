@@ -5,7 +5,7 @@ import { Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { withRouter } from 'next/router';
-import { Box, Flex } from '@rebass/grid';
+import { Box, Flex } from '../components/Grid';
 import styled from 'styled-components';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';

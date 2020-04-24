@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../components/Grid';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import Page from '../components/Page';

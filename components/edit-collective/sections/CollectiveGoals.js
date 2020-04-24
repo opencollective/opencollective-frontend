@@ -4,7 +4,7 @@ import { get, sortBy } from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { Form } from 'react-bootstrap';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { Flex } from '../../Grid';
 import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
 

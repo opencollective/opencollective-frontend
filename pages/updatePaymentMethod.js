@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import styled from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
 import { maxWidth } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
+import { Flex, Box } from '../components/Grid';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
 

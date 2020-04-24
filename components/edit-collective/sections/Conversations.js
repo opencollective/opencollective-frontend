@@ -1,4 +1,4 @@
-import { Flex } from '@rebass/grid';
+import { Flex } from '../../Grid';
 import { set, cloneDeep, pick } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
