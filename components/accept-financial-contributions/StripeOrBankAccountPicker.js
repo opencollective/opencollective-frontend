@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Box, Flex } from '../Grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import { graphql } from '@apollo/react-hoc';
 import { has, find } from 'lodash';
 import themeGet from '@styled-system/theme-get';
 import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
@@ -14,8 +13,6 @@ import { P } from '../Text';
 import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
-import Loading from '../Loading';
-import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 
 import { connectAccount } from '../../lib/api';
 import { Router } from '../../server/pages';
@@ -51,10 +48,9 @@ class StripeOrBankAccountPicker extends React.Component {
     data: PropTypes.object.isRequired,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
-    hostCollectiveSlug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
+    collective: PropTypes.object.isRequired,
+    host: PropTypes.object.isRequired,
     addHost: PropTypes.func.isRequired,
-    collective: PropTypes.object,
   };
 
   constructor(props) {
@@ -77,10 +73,11 @@ class StripeOrBankAccountPicker extends React.Component {
   }
 
   connectStripe = () => {
-    const { collective } = this.props.LoggedInUser ? this.props.LoggedInUser : this.props.data.Collective;
+    const { host } = this.props;
+
     const service = 'stripe';
 
-    connectAccount(collective.id, service)
+    connectAccount(host.id, service)
       .then(json => {
         return (window.location.href = json.redirectUrl);
       })
@@ -90,22 +87,10 @@ class StripeOrBankAccountPicker extends React.Component {
   };
 
   render() {
-    const { router, data, LoggedInUser, addHost, collective, intl } = this.props;
-    const { loading, Collective } = data;
+    const { router, addHost, collective, host, intl } = this.props;
 
-    if (loading) {
-      return <Loading />;
-    }
-
-    const hostOrganization = Collective;
-
-    const isBankAccountAlreadyThere = LoggedInUser
-      ? has(LoggedInUser, 'collective.settings.paymentMethods.manual')
-      : has(hostOrganization, 'settings.paymentMethods.manual');
-    const connectedAccounts = LoggedInUser
-      ? LoggedInUser.collective.connectedAccounts
-      : hostOrganization.connectedAccounts;
-    const stripeAccount = find(connectedAccounts, { service: 'stripe' });
+    const isBankAccountAlreadyThere = has(host, 'settings.paymentMethods.manual');
+    const stripeAccount = find(host.connectedAccounts, { service: 'stripe' });
 
     return (
       <Flex flexDirection="column" justifyContent="center" alignItems="center" my={[5]}>
@@ -142,7 +127,6 @@ class StripeOrBankAccountPicker extends React.Component {
                     mb={3}
                     minWidth={'145px'}
                     onClick={() => {
-                      const host = LoggedInUser ? LoggedInUser.collective : hostOrganization;
                       addHost(collective, host);
                       this.connectStripe();
                     }}
@@ -232,7 +216,6 @@ class StripeOrBankAccountPicker extends React.Component {
             mt={4}
             minWidth={'145px'}
             onClick={async () => {
-              const host = LoggedInUser ? LoggedInUser.collective : hostOrganization;
               await addHost(collective, host);
               await Router.pushRoute('accept-financial-contributions', {
                 slug: router.query.slug,
@@ -250,12 +233,4 @@ class StripeOrBankAccountPicker extends React.Component {
   }
 }
 
-const getBankAccountInfo = graphql(getCollectivePageQuery, {
-  options: props => ({
-    variables: {
-      slug: props.hostCollectiveSlug,
-    },
-  }),
-});
-
-export default injectIntl(withRouter(getBankAccountInfo(StripeOrBankAccountPicker)));
+export default injectIntl(withRouter(StripeOrBankAccountPicker));

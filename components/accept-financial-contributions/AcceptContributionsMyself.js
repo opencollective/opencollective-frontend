@@ -250,12 +250,7 @@ class AcceptContributionsMyself extends React.Component {
             </Flex>
           )}
           {!router.query.method && (
-            <StripeOrBankAccountPicker
-              LoggedInUser={LoggedInUser}
-              hostCollectiveSlug={LoggedInUser.collective.slug}
-              addHost={this.addHost}
-              collective={collective}
-            />
+            <StripeOrBankAccountPicker collective={collective} host={LoggedInUser.collective} addHost={this.addHost} />
           )}
         </Container>
       </Fragment>
