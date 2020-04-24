@@ -1,6 +1,7 @@
 {
   "Accept": "تایید",
   "acceptContributions.addBankAccount": "Add bank account",
+  "acceptContributions.bankAccountSetUp": "Bank account set up",
   "acceptContributions.bankAccountUpgradeInfo": "Your first $1000 is free, then you'll need to upgrade to a paid plan",
   "acceptContributions.definePaymentInstructions": "Define payment instructions",
   "acceptContributions.definePaymentInstructionsDetails": "Include any details contributors will need to send you money, such as: account name and number; IBAN, Swift, or routing codes; bank name and address, etc. The amount and order ID will be automatically included.",
@@ -13,6 +14,7 @@
   "acceptContributions.HowDoesItWork.details": "Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective\\'s balance.",
   "acceptContributions.myselfSuccess": "You have applied to be hosted by {hostName}.",
   "acceptContributions.notifiedWhen": "زمانی که {hostName} درخواست شما را قبول یا رد کرد به شما اطلاع رسانی خواهد شد. پیام مشارکت شما زمانی همگانی خواهد شد که اشتراک شما توسط میزبان مالی تایید شود.",
+  "acceptContributions.personalAccount": "Personal account",
   "acceptContributions.picker.header": "پذیرفتن مشارکت های مالی",
   "acceptContributions.picker.host": "یک میزبان مالی",
   "acceptContributions.picker.hostInfo": "Outsource fundholding to an entity who offers this service ({moreInfo})",
@@ -21,6 +23,7 @@
   "acceptContributions.picker.organization": "سازمان ما",
   "acceptContributions.picker.organizationInfo": "از حساب بانکی سازمان یا شرکت من استفاده کن",
   "acceptContributions.picker.subtitle": "چه کسی پول مشارکت را نگه داری خواهد کرد؟",
+  "acceptContributions.stripeConnected": "Stripe connected",
   "acceptContributions.success.nowAcceptingContributions": "Congratulations! {collective} is now accepting financial contributions.",
   "acceptContributions.success.toConsider": "A few more things you should consider:",
   "acceptContributions.tiers.paragraphOne": "We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts.",
