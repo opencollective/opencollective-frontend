@@ -1,4 +1,5 @@
 import 'cypress-file-upload';
+import { randomEmail } from '../support/faker';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
@@ -47,7 +48,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-create-help').should('not.exist');
     });
 
-    it('submits new expense ', () => {
+    it('submits new expense then edit it', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.get('input[name="description"]').type('Brussels January team retreat');
 
@@ -92,8 +93,55 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
       cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
 
+      // Submit!
       cy.getByDataCy('submit-expense-btn').click();
+      cy.contains('[data-cy="temporary-notification"]', 'Expense submited!');
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
+      cy.getByDataCy('dismiss-temporary-notification-btn').click();
+      cy.getByDataCy('temporary-notification').should('not.exist');
+
+      // Start editing
+      cy.getByDataCy('edit-expense-btn').click();
+      cy.get('input[name="description"]').type(' edited');
+      cy.get('input[name="items[0].description"]').type(' but not too expensive');
+      cy.get('input[name="items[0].amount"]').type('{selectall}111');
+      // Add new item
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
+      cy.get('input[name="items[2].amount"]').type('{selectall}34');
+      cy.fixture('images/receipt.jpg').then(fileContent => {
+        cy.getByDataCy('items[2].url-dropzone').upload(
+          [{ fileContent, fileName: `receipt2.jpg`, mimeType: 'image/jpeg' }],
+          { subjectType: 'drag-n-drop' },
+        );
+      });
+      // Change payee - use a new organization
+      cy.getByDataCy('select-expense-payee').click();
+      cy.getByDataCy('collective-type-picker-ORGANIZATION').click();
+      cy.getByDataCy('create-collective-mini-form').then($form => {
+        cy.wrap($form).find('input[name="members[0].member.email"]').type(randomEmail());
+        cy.wrap($form).find('input[name="members[0].member.name"]').type('Jack');
+        cy.wrap($form).find('input[name="name"]').type('PayeeOrg');
+        cy.wrap($form).find('button[type="submit"]').click();
+      });
+      cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
+      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test-2@opencollective.com');
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.getByDataCy('submit-expense-btn').click();
+      cy.getByDataCy('submit-expense-btn').should('not.exist'); // wait for form to be submitted
+
+      // Check final expense page
+      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat edited');
+      cy.getByDataCy('expense-summary-payee').should('contain', 'PayeeOrg');
+      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'paypal-test-2@opencollective.com');
+      cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'PayPal');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$237.50 USD');
+      cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
+      cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
+      cy.getByDataCy('expense-summary-items').should('contain', 'Some more delicious stuff');
     });
 
     // This can happen if you start with an invoice then switch to receipts

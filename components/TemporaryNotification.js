@@ -48,12 +48,13 @@ const TemporaryNotification = ({ children, position, onDismiss }) => {
   }
 
   return (
-    <Notification position={position}>
+    <Notification position={position} data-cy="temporary-notification">
       <Box mr="auto" />
       <Box>{children}</Box>
       <Box ml="auto">
         <DismissButton
           ml={2}
+          data-cy="dismiss-temporary-notification-btn"
           onClick={() => {
             setDismissed(true);
             if (onDismiss) {

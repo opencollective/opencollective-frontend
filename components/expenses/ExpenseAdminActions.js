@@ -80,7 +80,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
         </ButtonLabel>
       </ButtonWithLabel>
       {permissions?.canEdit && (
-        <ButtonWithLabel onClick={onEdit} disabled={isDisabled}>
+        <ButtonWithLabel onClick={onEdit} disabled={isDisabled} data-cy="edit-expense-btn">
           <IconEdit size={16} />
           <ButtonLabel>
             <FormattedMessage id="Edit" defaultMessage="Edit" />
