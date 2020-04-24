@@ -74,10 +74,10 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
   // GraphQL functions
   addHost = async (collective, host) => {
     const collectiveInput = {
-      legacyId: collective.id,
+      slug: collective.slug,
     };
     const hostInput = {
-      legacyId: host.id,
+      slug: host.slug,
     };
     try {
       await this.props.applyToHost({
@@ -375,10 +375,9 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
           )}
           {ableToChoseStripeOrBankAccount && (
             <StripeOrBankAccountPicker
-              LoggedInUser={LoggedInUser}
-              hostCollectiveSlug={organization ? organization.slug : LoggedInUser.collective.slug}
-              addHost={this.addHost}
               collective={collective}
+              host={organization ? organization : LoggedInUser.collective}
+              addHost={this.addHost}
             />
           )}
         </Container>
