@@ -227,7 +227,6 @@
   "collective.location.label": "都市",
   "collective.meetup.label": "ミートアップ URL",
   "collective.members.label": "メンバーの数",
-  "collective.messages.StripeAccountConnected": "Stripe アカウントの連携に成功しました",
   "Collective.New": "New",
   "collective.pending": "Collective pending approval.",
   "collective.pending.description": "This collective is pending approval from the host ({host}).",
