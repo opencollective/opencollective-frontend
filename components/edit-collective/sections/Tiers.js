@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, set, cloneDeep } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
+import { Mutation } from '@apollo/react-components';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 import { Box, Flex } from '../../Grid';
+import StyledCheckbox from '../../StyledCheckbox';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
 import { getCurrencySymbol, capitalize } from '../../../lib/utils';
+
+import { updateSettingsMutation } from './../mutations';
 
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
@@ -149,6 +153,10 @@ class Tiers extends React.Component {
       'maxQuantity.description': {
         id: 'tier.maxQuantity.description',
         defaultMessage: 'Leave it empty for unlimited',
+      },
+      'customContributions.label': {
+        id: 'tier.customContributions.label',
+        defaultMessage: 'Enable custom contributions',
       },
       forceLongDescription: {
         id: 'tier.forceLongDescription',
@@ -313,7 +321,6 @@ class Tiers extends React.Component {
     const hasVat = Boolean(get(collective, 'settings.VAT.type'));
     const vatOriginCountry = hasVat && getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
     const vatPercentage = hasVat ? getStandardVatRate(tier.type, vatOriginCountry) : 0;
-
     if (!tier.amountType) {
       tier.amountType = tier.presets ? 'FLEXIBLE' : 'FIXED';
     }
@@ -387,38 +394,66 @@ class Tiers extends React.Component {
 
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
+    let defaultIsChecked = false;
+    if (this.props.collective.settings.disableCustomContributions === undefined) {
+      defaultIsChecked = false;
+    } else {
+      defaultIsChecked = this.props.collective.settings.disableCustomContributions;
+    }
 
     return (
-      <div className="EditTiers">
-        <style jsx>
-          {`
-            :global(.tierActions) {
-              text-align: right;
-              font-size: 1.3rem;
-            }
-            :global(.field) {
-              margin: 1rem;
-            }
-            .editTiersActions {
-              text-align: right;
-              margin-top: -10px;
-            }
-            :global(.tier) {
-              margin: 3rem 0;
-            }
-          `}
-        </style>
+      <Mutation mutation={updateSettingsMutation}>
+        {(editSettings, { loading }) => (
+          <div className="EditTiers">
+            <style jsx>
+              {`
+                :global(.tierActions) {
+                  text-align: right;
+                  font-size: 1.3rem;
+                }
+                :global(.field) {
+                  margin: 1rem;
+                }
+                .editTiersActions {
+                  text-align: right;
+                  margin-top: -10px;
+                }
+                :global(.tier) {
+                  margin: 3rem 0;
+                }
+              `}
+            </style>
+            <div className="tiers">
+              <h2>{this.props.title}</h2>
+              <Flex flexDirection="column" alignItems="center" justifyContent="center" minWidth={300}>
+                <StyledCheckbox
+                  name="custom-contributions"
+                  label={intl.formatMessage(this.messages['customContributions.label'])}
+                  defaultChecked={!defaultIsChecked}
+                  width="auto"
+                  loading={loading}
+                  onChange={({ target }) => {
+                    const updatedCollective = cloneDeep(this.props.collective);
 
-        <div className="tiers">
-          <h2>{this.props.title}</h2>
-          {this.state.tiers.map(this.renderTier)}
-        </div>
-        <div className="editTiersActions">
-          <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
-            {intl.formatMessage(this.messages[`${defaultType}.add`])}
-          </Button>
-        </div>
-      </div>
+                    editSettings({
+                      variables: {
+                        id: this.props.collective.id,
+                        settings: set(updatedCollective.settings, 'disableCustomContributions', !target.value),
+                      },
+                    });
+                  }}
+                />
+              </Flex>
+              {this.state.tiers.map(this.renderTier)}
+            </div>
+            <div className="editTiersActions">
+              <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
+                {intl.formatMessage(this.messages[`${defaultType}.add`])}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Mutation>
     );
   }
 }
