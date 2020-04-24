@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, defineMessages } from 'react-intl';
 import { Box } from './Grid';
-import { get, pick, cloneDeep } from 'lodash';
+import { get, pick, cloneDeep, assign } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { Formik, Field, Form } from 'formik';
@@ -176,7 +176,7 @@ const CreateCollectiveMiniForm = ({
   const validate = values => {
     const errors = {};
 
-    if (isOrganization) {
+    if (isOrganization && !excludeAdminFields) {
       if (!get(values, 'members[0].member.email') || !isValidEmail(get(values, 'members[0].member.email'))) {
         errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
       }
@@ -198,11 +198,17 @@ const CreateCollectiveMiniForm = ({
   };
 
   const submit = formValues => {
-    const values = cloneDeep({ ...formValues, type });
-    if (addLoggedInUserAsAdmin && LoggedInUser && values.members) {
-      values.members.push({ member: { id: LoggedInUser.CollectiveId } });
+    let values;
+    if (excludeAdminFields) {
+      const clonedValues = cloneDeep({ ...formValues, type });
+      const assignAdmin = pick(clonedValues, ['name', 'website', 'type']);
+      values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.CollectiveId } }] });
+    } else {
+      values = cloneDeep({ ...formValues, type });
+      if (addLoggedInUserAsAdmin && LoggedInUser && values.members) {
+        values.members.push({ member: { id: LoggedInUser.CollectiveId } });
+      }
     }
-
     return createCollective({ variables: prepareMutationVariables(values) }).then(({ data }) => {
       return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
     });
