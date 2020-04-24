@@ -266,6 +266,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                     onSuccess={data => this.setState({ organization: data })}
                     LoggedInUser={LoggedInUser}
                     addLoggedInUserAsAdmin
+                    excludeAdminFields
                   />
                 ) : (
                   <CreateNewOrg alignItems="center" onClick={() => this.setState({ miniForm: true })}>

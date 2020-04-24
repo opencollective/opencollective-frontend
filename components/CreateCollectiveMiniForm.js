@@ -150,10 +150,18 @@ const CreateUserMutation = gql`
  * A mini-form to create collectives/orgs/users. Meant to be embed in popups or
  * small component where we want to provide just the essential fields.
  */
-const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAsAdmin, LoggedInUser }) => {
+const CreateCollectiveMiniForm = ({
+  type,
+  onCancel,
+  onSuccess,
+  addLoggedInUserAsAdmin,
+  LoggedInUser,
+  excludeAdminFields,
+}) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
+  const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
   const { formatMessage } = useIntl();
@@ -209,7 +217,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAs
           <Form>
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
             <Box mt={3}>
-              {(isUser || isOrganization) && (
+              {(isUser || isOrganization) && !noAdminFields && (
                 <StyledInputField
                   name={isOrganization ? 'members[0].member.email' : 'email'}
                   htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
@@ -233,7 +241,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAs
                   )}
                 </StyledInputField>
               )}
-              {isOrganization && (
+              {isOrganization && !noAdminFields && (
                 <StyledInputField
                   autoFocus
                   name="members[0].member.name"
@@ -331,6 +339,8 @@ CreateCollectiveMiniForm.propTypes = {
   addLoggedInUserAsAdmin: PropTypes.bool,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
+  /** If true, this does not render the 'admin name' and 'admin email' for create org form */
+  excludeAdminFields: PropTypes.bool,
 };
 
 export default withUser(CreateCollectiveMiniForm);
