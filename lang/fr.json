@@ -820,6 +820,7 @@
   "FinancialContributions": "Contributions financières",
   "Finish": "Terminer",
   "Fiscalhost": "Hôte fiscal",
+  "fiscalHost.allFiscalHosts": "All fiscal hosts",
   "fiscalHost.apply.info": "Avec cette option, vous n'avez pas besoin de créer une entité juridique et un compte bancaire pour votre projet. L'hôte fiscal détiendra des fonds en votre nom et s'occupera de la comptabilité, des factures, des impôts, de l'administration, des paiements et des responsabilités légales. La plupart des hôtes facturent des frais pour ce service (vous pouvez consulter ces détails sur la page de l'hôte avant de confirmer).",
   "Fiscalhost.definition": "Un hôte fiscal est une entité légale qui stocke l'argent et a la responsabilité de l'administration et des taxes pour le collectif.",
   "fiscalHost.interestedInHosting": "Vous êtes intéressé·e par l'hébergement fiscal de Collectifs ?",
