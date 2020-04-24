@@ -25,7 +25,7 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
 
   return (
     <Box {...props}>
-      <Collapse title={<H5>{formatMessage(msg.policies)}</H5>}>
+      <Collapse title={<H5>{formatMessage(msg.policies)}</H5>} defaultIsOpen>
         {host && host.expensePolicy && (
           <Container fontSize="Caption" color="black.800" lineHeight="Paragraph" mb={2}>
             <Markdown source={host.expensePolicy} />
