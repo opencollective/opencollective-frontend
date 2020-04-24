@@ -17,7 +17,6 @@
   "acceptContributions.organization.createNewOrganization": "Create new organization",
   "acceptContributions.organization.myOrgs": "My organizations",
   "acceptContributions.organization.subtitle": "Our organization",
-  "acceptContributions.personalAccount": "Personal account",
   "acceptContributions.picker.header": "Accept financial contributions",
   "acceptContributions.picker.host": "A fiscal host",
   "acceptContributions.picker.hostInfo": "Outsource fundholding to an entity who offers this service ({moreInfo})",
