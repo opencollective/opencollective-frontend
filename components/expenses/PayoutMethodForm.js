@@ -107,12 +107,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, collective }) => {
         </Field>
       )}
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
-        <PayoutBankInformationForm
-          payoutMethod={payoutMethod}
-          isNew={isNew}
-          getFieldName={getFieldName}
-          collective={collective}
-        />
+        <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} collective={collective} />
       )}
       {isNew && (
         <Box mt={3}>
