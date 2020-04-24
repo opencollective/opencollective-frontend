@@ -99,12 +99,13 @@ class StripeOrBankAccountPicker extends React.Component {
 
     const hostOrganization = Collective;
 
-    const isBankAccountAlreadyThere = LoggedInUser
-      ? has(LoggedInUser, 'collective.settings.paymentMethods.manual')
-      : has(hostOrganization, 'settings.paymentMethods.manual');
-    const connectedAccounts = LoggedInUser
-      ? LoggedInUser.collective.connectedAccounts
-      : hostOrganization.connectedAccounts;
+    const isBankAccountAlreadyThere = hostOrganization
+      ? has(hostOrganization, 'settings.paymentMethods.manual')
+      : has(LoggedInUser, 'collective.settings.paymentMethods.manual');
+
+    const connectedAccounts = hostOrganization
+      ? hostOrganization.connectedAccounts
+      : LoggedInUser.collective.connectedAccounts;
     const stripeAccount = find(connectedAccounts, { service: 'stripe' });
 
     return (
