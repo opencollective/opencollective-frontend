@@ -19,7 +19,6 @@ import CommentIcon from '../components/icons/CommentIcon';
 import Page from '../components/Page';
 import { generateNotFoundError, formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 import Container from '../components/Container';
 import { withUser } from '../components/UserProvider';
 import { H5, Span, P, H1 } from '../components/Text';
@@ -247,13 +246,9 @@ class ExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.expense) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return null; // TODO: page for expense not found
-      } else if (!data.expense.account) {
+        return <ErrorPage error={generateNotFoundError(null, true)} log={false} />;
+      } else if (!data.expense.account || this.props.collectiveSlug !== data.expense.account.slug) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
-      } else if (this.props.collectiveSlug !== data.expense.account.slug) {
-        // TODO Error: Not on the righ URL
-        return null;
       }
     }
 
