@@ -395,10 +395,10 @@ class Tiers extends React.Component {
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
     let defaultIsChecked = false;
-    if (this.props.collective.settings.disableCustomContributions === undefined) {
+    if (this.props.collective.settings?.disableCustomContributions === undefined) {
       defaultIsChecked = false;
     } else {
-      defaultIsChecked = this.props.collective.settings.disableCustomContributions;
+      defaultIsChecked = this.props.collective.settings?.disableCustomContributions;
     }
 
     return (
