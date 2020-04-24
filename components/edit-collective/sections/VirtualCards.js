@@ -153,7 +153,7 @@ class VirtualCards extends React.Component {
         {data.loading ? (
           <Loading />
         ) : (
-          <div className="virtualcards-list">
+          <div data-cy="virtualcards-list">
             {paymentMethods.length === 0 && (
               <Flex justifyContent="center" mt="4em">
                 {this.renderNoVirtualCardMessage(onlyConfirmed)}

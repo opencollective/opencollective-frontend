@@ -65,7 +65,7 @@ describe('New expense flow', () => {
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
       cy.getByDataCy('expense-summary-btn').should('be.disabled');
       cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$183.00 USD');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
 
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
