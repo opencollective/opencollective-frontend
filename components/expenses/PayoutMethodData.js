@@ -9,6 +9,9 @@ import Container from '../Container';
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, [key, value]) => {
+    if (typeof value === 'object') {
+      return [...acc, ...renderObject(value)];
+    }
     return [
       ...acc,
       <P key={key} fontSize="11px" lineHeight="Caption">
