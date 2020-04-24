@@ -128,9 +128,6 @@ class StripeOrBankAccountPicker extends React.Component {
                       <P fontWeight="bold">
                         <FormattedMessage id="acceptContributions.stripeConnected" defaultMessage="Stripe connected" />
                       </P>
-                      <P fontSize="Caption" color="black.500" textTransform="uppercase">
-                        <FormattedMessage id="acceptContributions.personalAccount" defaultMessage="Personal account" />
-                      </P>
                     </Flex>
                   </ConnectedAccountCard>
                 ) : (
@@ -186,9 +183,6 @@ class StripeOrBankAccountPicker extends React.Component {
                           id="acceptContributions.bankAccountSetUp"
                           defaultMessage="Bank account set up"
                         />
-                      </P>
-                      <P fontSize="Caption" color="black.500" textTransform="uppercase">
-                        <FormattedMessage id="acceptContributions.personalAccount" defaultMessage="Personal account" />
                       </P>
                     </Flex>
                   </ConnectedAccountCard>

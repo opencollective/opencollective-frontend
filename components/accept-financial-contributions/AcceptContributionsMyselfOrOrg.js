@@ -143,7 +143,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
 
     // Get and filter orgs LoggedInUser is part of
     const memberships = uniqBy(
-      LoggedInUser.memberOf.filter(m => m.role !== 'BACKER'),
+      LoggedInUser.memberOf.filter(m => m.role === 'ADMIN'),
       m => m.collective.id,
     );
 
