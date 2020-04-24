@@ -49,6 +49,10 @@ export const msg = defineMessages({
 export const validateExpenseItem = (expense, item) => {
   const errors = requireFields(item, ['description', 'incurredAt', 'amount']);
 
+  if (isNaN(item.amount)) {
+    errors.amount = createError(ERROR.FORM_FIELD_PATTERN);
+  }
+
   if (!isEmpty(errors)) {
     return errors;
   }
@@ -58,7 +62,7 @@ export const validateExpenseItem = (expense, item) => {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(item.url)) {
-      errors.url = createError(ERROR.FORM_FIELD_BAD_PATTERN);
+      errors.url = createError(ERROR.FORM_FIELD_PATTERN);
     }
   }
 
@@ -139,7 +143,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               mt={3}
             >
               {inputProps => (
-                <Field as={StyledInput} maxHeight={39} {...inputProps}>
+                <Field maxHeight={39} {...inputProps}>
                   {({ field }) => (
                     <StyledInput
                       {...inputProps}
@@ -165,16 +169,20 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               mt={3}
             >
               {inputProps => (
-                <Field
-                  as={StyledInputAmount}
-                  {...inputProps}
-                  currency={currency}
-                  currencyDisplay="CODE"
-                  min="0.01"
-                  maxWidth="100%"
-                  placeholder="0.00"
-                  parseNumbers
-                />
+                <Field as={StyledInputAmount} name={inputProps.name}>
+                  {({ field, form: { setFieldValue } }) => (
+                    <StyledInputAmount
+                      {...field}
+                      {...inputProps}
+                      currency={currency}
+                      currencyDisplay="CODE"
+                      min={1}
+                      maxWidth="100%"
+                      placeholder="0.00"
+                      onChange={(value, e) => setFieldValue(e.target.name, value)}
+                    />
+                  )}
+                </Field>
               )}
             </StyledInputField>
           </Flex>

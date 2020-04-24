@@ -30,8 +30,8 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { isPrepaid } from '../lib/constants/payment-methods';
 import StyledSelectCreatable from './StyledSelectCreatable';
 
-const MIN_AMOUNT = 5;
-const MAX_AMOUNT = 1000000;
+const MIN_AMOUNT = 500;
+const MAX_AMOUNT = 100000000;
 
 const messages = defineMessages({
   emailCustomMessage: {
@@ -228,9 +228,6 @@ class CreateVirtualCardsForm extends Component {
     } else if (fieldName === 'numberOfVirtualCards') {
       const intNumberOfVirtualCards = parseInt(value);
       value = !isNaN(intNumberOfVirtualCards) ? intNumberOfVirtualCards : 1;
-    } else if (fieldName === 'amount') {
-      const amount = parseFloat(value);
-      value = !isNaN(amount) ? amount : MIN_AMOUNT;
     }
 
     // Set value
@@ -264,7 +261,7 @@ class CreateVirtualCardsForm extends Component {
 
       this.setState({ submitting: true });
       const params = {
-        amount: Math.round(values.amount * 100),
+        amount: values.amount,
         PaymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
         batch: values.batch,
@@ -475,7 +472,7 @@ class CreateVirtualCardsForm extends Component {
               id="virtualcard-amount"
               currency={currency}
               prepend={currency}
-              onChange={e => this.onChange('amount', e.target.value)}
+              onChange={value => this.onChange('amount', value)}
               error={this.getError('amount')}
               value={values.amount}
               min={MIN_AMOUNT}

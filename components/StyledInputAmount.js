@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { clamp, isNil } from 'lodash';
+import { isUndefined } from 'lodash';
 
 import StyledInputGroup from './StyledInputGroup';
 import { getCurrencySymbol } from '../lib/utils';
@@ -15,77 +15,92 @@ const getPrepend = (currency, currencyDisplay) => {
   }
 };
 
-const getValue = (value, defaultValue, parseNumbers, min, max) => {
-  // If a default value is defined, don't use controlled mode
-  if (defaultValue !== undefined) {
-    return undefined;
+const parseValueFromEvent = (e, precision, ignoreComma) => {
+  if (e.target.value === '') {
+    return null;
   } else {
-    if (parseNumbers) {
-      return isNil(value) || value === '' ? '' : value / 100;
-    } else {
-      return isNil(value) || value === '' ? '' : clamp(value, !min ? 0 : 1, max);
-    }
+    const parsedNumber = parseFloat(ignoreComma ? e.target.value.replace(',', '') : e.target.value);
+    return isNaN(parsedNumber) ? NaN : parsedNumber.toFixed(precision);
   }
+};
+
+const floatAmountToCents = floatAmount => {
+  if (isNaN(floatAmount) || floatAmount === null) {
+    return floatAmount;
+  } else {
+    return Math.round(floatAmount * 100);
+  }
+};
+
+/** Formats value is valid, fallsback on rawValue otherwise */
+const getValue = (value, rawValue) => {
+  return isNaN(value) || value === null ? rawValue : value / 100;
 };
 
 /**
  * An input for amount inputs. Accepts all props from [StyledInputGroup](/#!/StyledInputGroup).
- * The value returned by this component is always limited by `min` and `max`.
  */
 const StyledInputAmount = ({
   currency,
+  currencyDisplay,
   min,
   max,
-  value,
-  onChange,
-  onBlur,
+  precision,
   defaultValue,
-  parseNumbers,
-  currencyDisplay,
-  name,
+  value,
+  onBlur,
+  onChange,
   ...props
 }) => {
+  const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
+  const isControlled = !isUndefined(value);
+  const dispatchValue = (e, parsedValue) => {
+    if (isControlled) {
+      setRawValue(e.target.value);
+    }
+    if (onChange) {
+      const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
+      if (parsedValue === null || isNaN(parsedValue)) {
+        onChange(parsedValue, e);
+      } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
+        onChange(e.target.value ? NaN : null, e);
+      } else {
+        onChange(floatAmountToCents(parsedValue), e);
+      }
+    }
+  };
+
   return (
     <StyledInputGroup
-      name={name}
       maxWidth="10em"
-      type="number"
       step="0.01"
-      min={min}
-      max={max}
-      value={getValue(value, defaultValue, parseNumbers, min, max)}
-      defaultValue={defaultValue}
+      {...props}
+      min={isUndefined(min) ? min : min / 100}
+      max={isUndefined(max) ? max : max / 100}
       prepend={getPrepend(currency, currencyDisplay)}
+      type="number"
+      inputMode="decimal"
+      defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
+      value={isControlled ? getValue(value, rawValue) : undefined}
+      onChange={e => dispatchValue(e, parseValueFromEvent(e, precision))}
       onBlur={e => {
-        if (parseNumbers && e.target.value !== '' && !isNil(e.target.value)) {
-          if (e.target.value !== '' && !isNil(e.target.value)) {
-            e.target.value = parseFloat(e.target.value).toFixed(2);
-          }
+        // Clean number if valid (ie. 41.1 -> 41.10)
+        const parsedNumber = parseValueFromEvent(e, precision);
+        const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
+        if (
+          e.target.checkValidity() &&
+          !isNaN(parsedNumber) &&
+          parsedNumber !== null &&
+          valueWithIgnoredComma === parsedNumber
+        ) {
+          e.target.value = parsedNumber.toString();
+          dispatchValue(e, parsedNumber);
         }
+
         if (onBlur) {
           onBlur(e);
         }
       }}
-      onChange={e => {
-        const hasValue = e.target.value !== '' && !isNil(e.target.value);
-
-        // We don't cap on min because we want the user to be able to erase the input
-        // and to progressively type the number without forcing a value.
-        if (hasValue) {
-          e.target.value = clamp(e.target.value, 0, max);
-        }
-
-        if (onChange) {
-          if (parseNumbers && hasValue) {
-            const floatValue = parseFloat(e.target.value) || 0;
-            const intValue = Math.round(floatValue * 100);
-            onChange({ ...e, target: { ...e.target, value: intValue, name } });
-          } else {
-            onChange(e);
-          }
-        }
-      }}
-      {...props}
     />
   );
 };
@@ -93,20 +108,20 @@ const StyledInputAmount = ({
 StyledInputAmount.propTypes = {
   /** The currency (eg. `USD`, `EUR`...) */
   currency: PropTypes.string.isRequired,
-  /** OnChange function */
+  /** OnChange function. Gets passed the amount in cents as first param, and the event as second param. */
   onChange: PropTypes.func,
   /** OnChange function */
   onBlur: PropTypes.func,
-  /** Minimum amount */
+  /** Minimum amount (in CENTS) */
   min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  /** Maximum amount */
+  /** Maximum amount (in CENTS) */
   max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   /** Value */
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Currency style */
   currencyDisplay: PropTypes.oneOf(['SYMBOL', 'CODE', 'FULL']),
-  /** Wether amounts returned by onChange should be converted to number values */
-  parseNumbers: PropTypes.bool,
+  /** Number of decimals */
+  precision: PropTypes.number,
   /** Accept all PropTypes from `StyledInputGroup` */
   ...StyledInputGroup.propTypes,
 };
@@ -114,6 +129,7 @@ StyledInputAmount.propTypes = {
 StyledInputAmount.defaultProps = {
   min: 0,
   max: 1000000000,
+  precision: 2,
   currencyDisplay: 'SYMBOL',
   name: 'amount',
 };

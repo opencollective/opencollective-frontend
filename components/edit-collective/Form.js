@@ -405,7 +405,7 @@ class EditCollectiveForm extends React.Component {
               flexWrap="wrap"
             >
               <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
-                <StyledButton>
+                <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                 </StyledButton>
