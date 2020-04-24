@@ -71,18 +71,14 @@ class StripeOrBankAccountPicker extends React.Component {
     });
   }
 
-  connectStripe = () => {
-    const { host } = this.props;
-
+  connectStripe = async () => {
     const service = 'stripe';
-
-    connectAccount(host.id, service)
-      .then(json => {
-        return (window.location.href = json.redirectUrl);
-      })
-      .catch(err => {
-        console.error(`>>> /api/connected-accounts/${service} error`, err);
-      });
+    try {
+      const json = await connectAccount(this.props.host.id, service);
+      window.location.href = json.redirectUrl;
+    } catch (err) {
+      console.error(`>>> /api/connected-accounts/${service} error`, err);
+    }
   };
 
   render() {
