@@ -220,7 +220,13 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                 {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
               </Span>
               <StyledHr flex="1" borderColor="black.300" mx={2} />
-              <StyledButton buttonSize="tiny" type="button" onClick={() => addNewExpenseItem(formik)} minWidth={135}>
+              <StyledButton
+                buttonSize="tiny"
+                type="button"
+                onClick={() => addNewExpenseItem(formik)}
+                minWidth={135}
+                data-cy="expense-add-item-btn"
+              >
                 +&nbsp;{formatMessage(isReceipt ? msg.addNewReceipt : msg.addNewItem)}
               </StyledButton>
             </Flex>
@@ -259,6 +265,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                               inputId={id}
                               collectives={payoutProfiles}
                               getDefaultOptions={build => values.payee && build(values.payee)}
+                              data-cy="select-expense-payee"
                               onChange={({ value }) => {
                                 formik.setFieldValue('payee', value);
                                 formik.setFieldValue('payoutMethod', null);

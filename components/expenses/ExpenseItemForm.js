@@ -106,6 +106,8 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                 >
                   <StyledDropzone
                     {...attachmentDropzoneParams}
+                    data-cy={`${field.name}-dropzone`}
+                    name={field.name}
                     isMulti={false}
                     error={meta.error}
                     onSuccess={url => form.setFieldValue(field.name, url)}
