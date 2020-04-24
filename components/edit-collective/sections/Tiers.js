@@ -434,7 +434,6 @@ class Tiers extends React.Component {
                   loading={loading}
                   onChange={({ target }) => {
                     const updatedCollective = cloneDeep(this.props.collective);
-
                     editSettings({
                       variables: {
                         id: this.props.collective.id,
