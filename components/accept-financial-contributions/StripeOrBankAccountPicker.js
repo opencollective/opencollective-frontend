@@ -15,6 +15,7 @@ import StyledButton from '../StyledButton';
 import Container from '../Container';
 import Link from '../Link';
 import Loading from '../Loading';
+import StyledLink from '../StyledLink';
 import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 
 import { connectAccount } from '../../lib/api';
@@ -45,6 +46,9 @@ const ConnectedAccountCard = styled(Flex)`
 const GreenCheckbox = styled(CheckboxChecked)`
   color: ${themeGet('colors.green.700')};
 `;
+
+const FEES_LINK = 'https://docs.opencollective.com/help/about/pricing';
+const HOST_PLANS_LINK = 'https://opencollective.com/pricing';
 
 class StripeOrBankAccountPicker extends React.Component {
   static propTypes = {
@@ -151,8 +155,15 @@ class StripeOrBankAccountPicker extends React.Component {
                 <Box minHeight={50} px={3}>
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
                     <FormattedMessage
-                      id="acceptContributions.transactionFee"
-                      defaultMessage="5% transaction fee applies"
+                      id="acceptContributions.stripe.info"
+                      defaultMessage="Automatically accept contributions with credit cards from all over the world. {fees}."
+                      values={{
+                        fees: (
+                          <StyledLink href={FEES_LINK} openInNewTab>
+                            <FormattedMessage id="feesApply" defaultMessage="Fees apply" />
+                          </StyledLink>
+                        ),
+                      }}
                     />
                   </P>
                 </Box>
@@ -211,8 +222,15 @@ class StripeOrBankAccountPicker extends React.Component {
                 <Box minHeight={50} px={3}>
                   <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
                     <FormattedMessage
-                      id="acceptContributions.bankAccountUpgradeInfo"
-                      defaultMessage="Your first $1000 is free, then you'll need to upgrade to a paid plan"
+                      id="acceptContributions.bankAccount.info"
+                      defaultMessage="Manually sync contributions received on your bank account with your Collective's budget. It's free up to $1000. {hostPlans}."
+                      values={{
+                        hostPlans: (
+                          <StyledLink href={HOST_PLANS_LINK} openInNewTab>
+                            <FormattedMessage id="hostPlans" defaultMessage="Host plans" />
+                          </StyledLink>
+                        ),
+                      }}
                     />
                   </P>
                 </Box>
@@ -237,7 +255,8 @@ class StripeOrBankAccountPicker extends React.Component {
               window.scrollTo(0, 0);
             }}
           >
-            <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+            <FormattedMessage id="Finish" defaultMessage="Finish" />
+            &nbsp;&rarr;
           </StyledButton>
         )}
       </Flex>

@@ -115,18 +115,38 @@ class SuccessPage extends React.Component {
               <P fontSize="LeadCaption" lineHeight="Paragraph" mb={3} color="black.800">
                 <FormattedMessage
                   id="acceptContributions.tiers.paragraphOne"
-                  defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts."
+                  defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts. {knowMore}."
+                  values={{
+                    knowMore: (
+                      <SmallExternalLink href={TIERS_INFO_LINK} openInNewTab>
+                        <FormattedMessage id="tiers.knowMore" defaultMessage="Know more about tiers" />
+                      </SmallExternalLink>
+                    ),
+                  }}
                 />
               </P>
+              <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
+                <FormattedMessage id="acceptContributions.success.hostSettings" defaultMessage="Fiscal Host Settings" />
+              </H2>
               <P fontSize="LeadCaption" lineHeight="Paragraph" mb={1} color="black.800">
                 <FormattedMessage
-                  id="acceptContributions.tiers.paragraphTwo"
-                  defaultMessage="You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or can be allowed to be flexibly set by contributors."
+                  id="acceptContributions.success.hostSettingsInfo"
+                  defaultMessage="You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}."
+                  values={{
+                    takeMeThere: (
+                      <Link
+                        route="editCollective"
+                        params={{
+                          slug: collective.slug,
+                          section: 'host',
+                        }}
+                      >
+                        <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
+                      </Link>
+                    ),
+                  }}
                 />
               </P>
-              <SmallExternalLink href={TIERS_INFO_LINK} openInNewTab>
-                <FormattedMessage id="tiers.knowMore" defaultMessage="Know more about tiers" />
-              </SmallExternalLink>
             </Flex>
           </Flex>
           <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>
