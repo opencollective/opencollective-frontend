@@ -12,19 +12,21 @@ export const Details = styled(Container).attrs({
   as: 'details',
 })`
   summary {
-    display: flex;
-    cursor: pointer;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: ${themeGet('colors.black.800')};
-    /* Remove arrow on Firefox */
-    list-style: none;
+    > div {
+      display: flex;
+      cursor: pointer;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: ${themeGet('colors.black.800')};
+      /* Remove arrow on Firefox */
+      list-style: none;
 
-    &:hover {
-      color: ${themeGet('colors.black.700')};
+      &:hover {
+        color: ${themeGet('colors.black.700')};
+      }
     }
 
     [data-item='chevron-up'] {
@@ -86,11 +88,13 @@ const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
     <Details open={defaultIsOpen} {...props}>
       {title && (
         <summary>
-          <div>{title}</div>
-          <CollapseBtn size={buttonSize} ml={3}>
-            <ChevronUp size="80%" data-item="chevron-up" />
-            <ChevronDown size="80%" data-item="chevron-down" />
-          </CollapseBtn>
+          <div>
+            <div>{title}</div>
+            <CollapseBtn size={buttonSize} ml={3}>
+              <ChevronUp size="80%" data-item="chevron-up" />
+              <ChevronDown size="80%" data-item="chevron-down" />
+            </CollapseBtn>
+          </div>
         </summary>
       )}
       {children}
