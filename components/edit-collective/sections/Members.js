@@ -242,7 +242,7 @@ class Members extends React.Component {
               {isInvitation && (
                 <Flex alignItems="center" my={1}>
                   <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
-                    <StyledTag display="block" type="info">
+                    <StyledTag textTransform="uppercase" display="block" type="info">
                       <FormattedMessage id="Pending" defaultMessage="Pending" />
                     </StyledTag>
                   </StyledTooltip>

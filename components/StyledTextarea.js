@@ -145,7 +145,7 @@ export default class StyledTextarea extends React.PureComponent {
       <Container position="relative">
         {textarea}
         <Container position="absolute" bottom="1.25em" right="1.5em">
-          <StyledTag>
+          <StyledTag textTransform="uppercase">
             <span>{value.length}</span>
             {props.maxLength && <span> / {props.maxLength}</span>}
           </StyledTag>

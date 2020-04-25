@@ -163,7 +163,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           {!isEvent && (
             <Flex alignItems="center" flexWrap="wrap">
               {isCollective && (
-                <StyledTag mx={2} my={2} mb={2}>
+                <StyledTag textTransform="uppercase" mx={2} my={2} mb={2}>
                   <I18nCollectiveTags
                     tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
                   />

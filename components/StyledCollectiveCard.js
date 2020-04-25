@@ -41,7 +41,7 @@ const StyledCollectiveCard = ({ collective, children, ...props }) => {
               {collective.name}
             </P>
           </LinkCollective>
-          <StyledTag display="inline-block" my={2}>
+          <StyledTag display="inline-block" textTransform="uppercase" my={2}>
             <I18nCollectiveTags
               tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
             />

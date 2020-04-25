@@ -90,7 +90,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected }) => {
         </Flex>
       </LinkCollective>
       <hr />
-      <StyledTag>{formatMemberRole(formatMessage, invitation.role)}</StyledTag>
+      <StyledTag textTransform="uppercase">{formatMemberRole(formatMessage, invitation.role)}</StyledTag>
       {rolesDetails[invitation.role] && (
         <P my={2} color="black.600">
           {formatMessage(rolesDetails[invitation.role])}

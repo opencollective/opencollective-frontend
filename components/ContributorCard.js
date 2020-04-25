@@ -111,7 +111,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
             {truncate(contributor.name, { length: 16 })}
           </H5>
         </LinkContributor>
-        <StyledTag my={2} padding="5px" letterSpacing="0.05em" fontStyle="initial">
+        <StyledTag my={2} padding="5px" letterSpacing="0.05em" fontStyle="initial" textTransform="uppercase">
           {formatMemberRole(intl.formatMessage, getMainContributorRole(contributor))}
         </StyledTag>
         {contributor.totalAmountDonated > 0 && (
