@@ -234,7 +234,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                     onChange={tags =>
                       formik.setFieldValue(
                         'tags',
-                        tags.map(t => t.value.toUpperCase()),
+                        tags.map(t => t.value.toLowerCase()),
                       )
                     }
                     value={values.tags}
