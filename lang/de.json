@@ -227,7 +227,6 @@
   "collective.location.label": "Stadt",
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "Mitgliederzahl",
-  "collective.messages.StripeAccountConnected": "Stripe-Konto erfolgreich verbunden",
   "Collective.New": "Neu",
   "collective.pending": "Collective-Genehmigung ausstehend.",
   "collective.pending.description": "Dieses Collective wartet auf die Genehmigung des Hosts ({host}).",
