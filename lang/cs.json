@@ -227,7 +227,6 @@
   "collective.location.label": "Město",
   "collective.meetup.label": "URL schůzky",
   "collective.members.label": "Počet členů",
-  "collective.messages.StripeAccountConnected": "Stripe účet byl úspěšně připojen",
   "Collective.New": "Nový",
   "collective.pending": "Collective pending approval.",
   "collective.pending.description": "This collective is pending approval from the host ({host}).",
