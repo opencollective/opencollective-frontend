@@ -227,7 +227,6 @@
   "collective.location.label": "시/도",
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "회원수",
-  "collective.messages.StripeAccountConnected": "성공적으로 Stripe 계정이 연결되었습니다.",
   "Collective.New": "추가",
   "collective.pending": "Collective 승인 대기 중.",
   "collective.pending.description": "This collective is pending approval from the host ({host}).",
