@@ -227,7 +227,6 @@
   "collective.location.label": "城市",
   "collective.meetup.label": "Meetup 链接",
   "collective.members.label": "成员数目",
-  "collective.messages.StripeAccountConnected": "Stripe account connected successfully",
   "Collective.New": "新建",
   "collective.pending": "Collective pending approval.",
   "collective.pending.description": "This collective is pending approval from the host ({host}).",

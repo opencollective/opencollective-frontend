@@ -132,18 +132,6 @@ class CreateEvent extends React.Component {
             )}
             {canCreateEvent && (
               <div>
-                {/* Hide event template picker to avoid getting old markdown content into events
-                   while transitioning to the new editor
-                  <div className="EventTemplatePicker">
-                    <div className="field">
-                      <EventTemplatePicker
-                        label="Template"
-                        collectiveSlug={collective.slug}
-                        onChange={this.handleTemplateChange}
-                      />
-                    </div>
-                </div> */}
-
                 <EditEventForm
                   event={this.state.event}
                   onSubmit={this.createEvent}
