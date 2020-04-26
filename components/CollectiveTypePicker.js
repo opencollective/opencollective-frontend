@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
-import { Box } from './Grid';
-
 import { User } from '@styled-icons/feather/User';
+import { useIntl } from 'react-intl';
 
-import formatCollectiveType from '../lib/i18n-collective-type';
 import { CollectiveType } from '../lib/constants/collectives';
-import { Span } from './Text';
-import StyledButton from './StyledButton';
-import Container from './Container';
+import formatCollectiveType from '../lib/i18n-collective-type';
+
 import CollectiveIcon from './icons/CollectiveIcon';
 import OrganizationIcon from './icons/OrganizationIcon';
+import Container from './Container';
+import { Box } from './Grid';
+import StyledButton from './StyledButton';
+import { Span } from './Text';
 
 /** Return the icon associated to a given collective type */
 const getTypeIcon = type => {

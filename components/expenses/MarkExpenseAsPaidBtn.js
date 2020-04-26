@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { isValidEmail } from '../../lib/utils';
 
 import StyledButton from '../StyledButton';
-import StyledTooltip from '../StyledTooltip';
-import { payExpenseMutation } from './graphql/mutations';
 import StyledSpinner from '../StyledSpinner';
+import StyledTooltip from '../StyledTooltip';
+
+import { payExpenseMutation } from './graphql/mutations';
 
 class MarkExpenseAsPaidBtn extends React.Component {
   static propTypes = {

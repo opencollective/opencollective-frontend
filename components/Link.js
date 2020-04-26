@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import router from '../server/pages';
 import { pick } from 'lodash';
 import Scrollchor from 'react-scrollchor';
+
+import router from '../server/pages';
 
 class Link extends React.Component {
   static propTypes = {

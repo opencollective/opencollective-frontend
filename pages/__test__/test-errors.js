@@ -1,8 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
+
 import { IgnorableError } from '../../lib/errors';
-import Page from '../../components/Page';
+
 import { Flex } from '../../components/Grid';
+import Page from '../../components/Page';
 
 class TestErrorsPage extends React.Component {
   static getInitialProps({ query }) {

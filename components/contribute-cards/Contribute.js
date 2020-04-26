@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { Flex, Box } from '../Grid';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 
-import Link from '../Link';
-import StyledTag from '../StyledTag';
-import { P } from '../Text';
-import StyledButton from '../StyledButton';
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
+import StyledTag from '../StyledTag';
+import { P } from '../Text';
 
 /** Max number of contributors on each tier card */
 export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;

@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
+import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { width } from 'styled-system';
-import { FormattedMessage, FormattedDate, injectIntl, defineMessages } from 'react-intl';
+
+import { defaultBackgroundImage } from '../lib/constants/collectives';
+import { imagePreview } from '../lib/image-utils';
+import { firstSentence } from '../lib/utils';
+
+import Container from './Container';
 import Currency from './Currency';
 import Link from './Link';
 import Logo from './Logo';
-import { get } from 'lodash';
-import { firstSentence } from '../lib/utils';
-import { imagePreview } from '../lib/image-utils';
-import { defaultBackgroundImage } from '../lib/constants/collectives';
-import Container from './Container';
 
 const CardWrapper = styled(Container)`
   display: flex;

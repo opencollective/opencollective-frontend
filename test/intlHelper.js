@@ -6,8 +6,9 @@
  */
 
 import React from 'react';
-import { IntlProvider, intlShape } from 'react-intl';
 import { mount, shallow } from 'enzyme';
+import { IntlProvider, intlShape } from 'react-intl';
+
 import messages from '../lang/en.json';
 
 // Create the IntlProvider to retrieve context for wrapping around.

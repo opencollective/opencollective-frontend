@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 
-import { withUser } from './UserProvider';
-
 import Body from '../components/Body';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+
+import { withUser } from './UserProvider';
 
 const Page = ({
   children,

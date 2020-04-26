@@ -1,24 +1,23 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { Radio } from '@material-ui/core';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
+import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Flex, Box } from '../../Grid';
-import { Radio } from '@material-ui/core';
-import { Button } from 'react-bootstrap';
-import { withRouter } from 'next/router';
 
-import { formatCurrency, getQueryParams, formatDate } from '../../../lib/utils';
+import { formatCurrency, formatDate, getQueryParams } from '../../../lib/utils';
 import { Router } from '../../../server/pages';
 
-import HostsWithData from '../../HostsWithData';
 import CollectiveCard from '../../CollectiveCard';
-import Link from '../../Link';
-import { P } from '../../Text';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import HostsWithData from '../../HostsWithData';
+import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import { P } from '../../Text';
 import CreateHostFormWithData from '../CreateHostFormWithData';
 
 const Option = styled.div`

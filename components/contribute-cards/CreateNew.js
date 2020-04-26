@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '../Grid';
 import styled from 'styled-components';
 
-import { CONTRIBUTE_CARD_WIDTH, CONTRIBUTE_CARD_BORDER_RADIUS } from './Contribute';
+import { Flex } from '../Grid';
 import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
+
+import { CONTRIBUTE_CARD_BORDER_RADIUS, CONTRIBUTE_CARD_WIDTH } from './Contribute';
 
 const CreateNewCard = styled.div`
   background: white;

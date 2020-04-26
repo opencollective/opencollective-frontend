@@ -1,23 +1,25 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { get, times } from 'lodash';
 import { Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
-import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
+import { get, times } from 'lodash';
 import { withRouter } from 'next/router';
-import { Box, Flex } from '../components/Grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import { Link } from '../server/pages';
+
+import Container from '../components/Container';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
-import Container from '../components/Container';
-import Page from '../components/Page';
-import { H1, P } from '../components/Text';
-import Pagination from '../components/Pagination';
-import MessageBox from '../components/MessageBox';
-import StyledSelect from '../components/StyledSelect';
-import { Link } from '../server/pages';
-import SearchForm from '../components/SearchForm';
+import { Box, Flex } from '../components/Grid';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import Pagination from '../components/Pagination';
+import SearchForm from '../components/SearchForm';
+import StyledSelect from '../components/StyledSelect';
+import { H1, P } from '../components/Text';
 
 const AllCardsContainer = styled(Flex).attrs({
   flexWrap: 'wrap',

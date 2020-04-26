@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get, groupBy } from 'lodash';
-import { Button } from 'react-bootstrap';
 import { withRouter } from 'next/router';
+import { Button } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Router } from '../../server/pages';
 
+import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 
 import CreateOrganizationForm from './CreateOrganizationForm';

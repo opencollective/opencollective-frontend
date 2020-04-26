@@ -4,14 +4,14 @@ import momentTimezone from 'moment-timezone';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
-import EditEventForm from './EditEventForm';
-import CollectiveNavbar from './CollectiveNavbar';
-
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+
+import Body from './Body';
+import CollectiveNavbar from './CollectiveNavbar';
+import EditEventForm from './EditEventForm';
+import Footer from './Footer';
+import Header from './Header';
 
 class CreateEvent extends React.Component {
   static propTypes = {

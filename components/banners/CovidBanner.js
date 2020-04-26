@@ -1,15 +1,15 @@
-import styled from 'styled-components';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Close as _Close } from '@styled-icons/material/Close';
-import { Box, Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import StyledLink from '../StyledLink';
-import DismissibleMessage from '../DismissibleMessage';
 import { BANNER } from '../../lib/constants/dismissable-help-message';
 
 import Container from '../Container';
+import DismissibleMessage from '../DismissibleMessage';
+import { Box, Flex } from '../Grid';
+import StyledLink from '../StyledLink';
 
 const SPONSORED_COLLECTIVE = 'SPONSORED_COLLECTIVE';
 

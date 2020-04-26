@@ -1,15 +1,16 @@
-import gql from 'graphql-tag';
 import React from 'react';
 import { Query } from '@apollo/react-components';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
+
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import Loading from '../components/Loading';
+import MemberInvitationsList from '../components/MemberInvitationsList';
 import MessageBox from '../components/MessageBox';
 import { H1 } from '../components/Text';
-import MemberInvitationsList from '../components/MemberInvitationsList';
 
 const memberInvitationsPageQuery = gql`
   query MemberInvitationsPage($memberCollectiveId: Int!) {

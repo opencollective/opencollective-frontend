@@ -1,12 +1,12 @@
 import React from 'react';
-import { isEqual } from 'lodash';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/react-hoc';
+import { isEqual } from 'lodash';
 
-import { Router } from '../server/pages';
+import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { removeFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { Router } from '../server/pages';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,

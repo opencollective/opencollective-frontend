@@ -1,7 +1,8 @@
-import styled from 'styled-components';
-import { background, border, flexbox, shadow, color, position, layout, space, typography } from 'styled-system';
-import { cursor, clear, float, overflow, pointerEvents, whiteSpace } from '../lib/styled-system-custom-properties';
 import propTypes from '@styled-system/prop-types';
+import styled from 'styled-components';
+import { background, border, color, flexbox, layout, position, shadow, space, typography } from 'styled-system';
+
+import { clear, cursor, float, overflow, pointerEvents, whiteSpace } from '../lib/styled-system-custom-properties';
 
 const Container = styled.div`
   box-sizing: border-box;

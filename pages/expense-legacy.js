@@ -2,24 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import ExpenseWithData from '../components/expenses/ExpenseWithData';
-
-import { generateNotFoundError } from '../lib/errors';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import { Box, Flex } from '../components/Grid';
-import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
-import ErrorPage from '../components/ErrorPage';
-import Link from '../components/Link';
-
-import { addCollectiveCoverData } from '../lib/graphql/queries';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { generateNotFoundError } from '../lib/errors';
+import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import { withUser } from '../components/UserProvider';
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import ErrorPage from '../components/ErrorPage';
+import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
+import ExpenseWithData from '../components/expenses/ExpenseWithData';
+import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
+import { withUser } from '../components/UserProvider';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId, createSuccess } }) {

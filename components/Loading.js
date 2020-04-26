@@ -1,5 +1,7 @@
 import React from 'react';
+
 import LoadingGrid from '../components/LoadingGrid';
+
 import { Flex } from './Grid';
 
 const Loading = props => {

@@ -1,7 +1,8 @@
-import { Box, Flex } from '../Grid';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+
+import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 

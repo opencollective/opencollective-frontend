@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Markdown from 'react-markdown';
-import { truncate, get } from 'lodash';
-
-import StyledCard from './StyledCard';
+import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import StyledLink from './StyledLink';
+import Markdown from 'react-markdown';
+
 import { Box } from './Grid';
-import { Span } from './Text';
 import HTMLContent from './HTMLContent';
+import StyledCard from './StyledCard';
+import StyledLink from './StyledLink';
+import { Span } from './Text';
 
 const TruncatedLength = 400;
 

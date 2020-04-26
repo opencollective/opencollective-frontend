@@ -1,12 +1,13 @@
-import { Box, Flex } from '../Grid';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
+import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { P, Span } from '../Text';
-import LinkCollective from '../LinkCollective';
 
 /**
  * Displays info about the collective (balance and host on mobile) for the create

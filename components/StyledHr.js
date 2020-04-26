@@ -1,7 +1,7 @@
-import styled from 'styled-components';
-import { space, layout, shadow, border, flex } from 'styled-system';
-import themeGet from '@styled-system/theme-get';
 import propTypes from '@styled-system/prop-types';
+import themeGet from '@styled-system/theme-get';
+import styled from 'styled-components';
+import { border, flex, layout, shadow, space } from 'styled-system';
 
 /**
  * An horizontal line. Control the color and size using border properties.

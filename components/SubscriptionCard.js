@@ -1,24 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import Currency from './Currency';
-import { get, cloneDeep } from 'lodash';
-import Link from './Link';
-import { getErrorFromGraphqlException } from '../lib/errors';
-import { firstSentence, getCurrencySymbol } from '../lib/utils';
-import { imagePreview } from '../lib/image-utils';
-import { getStripe } from '../lib/stripe';
+import gql from 'graphql-tag';
+import { cloneDeep, get } from 'lodash';
+import { Dropdown, MenuItem, OverlayTrigger, Popover } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import colors from '../lib/constants/colors';
-import CancelSubscriptionBtn from './CancelSubscriptionBtn';
-import PaymentMethodChooser from './PaymentMethodChooser';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { getSubscriptionsQuery } from '../lib/graphql/queries';
-import Logo from './Logo';
+import { imagePreview } from '../lib/image-utils';
+import { getStripe } from '../lib/stripe';
+import { firstSentence, getCurrencySymbol } from '../lib/utils';
 
-import { Dropdown, MenuItem, Popover, OverlayTrigger } from 'react-bootstrap';
+import CancelSubscriptionBtn from './CancelSubscriptionBtn';
+import Currency from './Currency';
 import { CustomToggle } from './CustomMenu';
+import Link from './Link';
+import Logo from './Logo';
+import PaymentMethodChooser from './PaymentMethodChooser';
 import SmallButton from './SmallButton';
 
 class SubscriptionCard extends React.Component {

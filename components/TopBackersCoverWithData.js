@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
+
+import { formatCurrency } from '../lib/utils';
+
 import Avatar from './Avatar';
-import Logo from './Logo';
+import Error from './Error';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
-import { formatCurrency } from '../lib/utils';
-import { get } from 'lodash';
+import Logo from './Logo';
 
 class TopBackersCoverWithData extends React.Component {
   static propTypes = {

@@ -1,29 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get, pick, difference } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { isURL } from 'validator';
-import { Close } from '@styled-icons/material/Close';
-import memoizeOne from 'memoize-one';
-import { Flex, Box } from '../../Grid';
 import { Add } from '@styled-icons/material/Add';
+import { Close } from '@styled-icons/material/Close';
+import gql from 'graphql-tag';
+import { difference, get, pick } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { isURL } from 'validator';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import events from '../../../lib/constants/notificationEvents';
-
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { compose } from '../../../lib/utils';
-import { CollectiveType } from '../../../lib/constants/collectives';
 
+import { Box, Flex } from '../../Grid';
 import Loading from '../../Loading';
-import { Span } from '../../Text';
-import StyledHr from '../../StyledHr';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
-import StyledSelect from '../../StyledSelect';
+import StyledHr from '../../StyledHr';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledLink from '../../StyledLink';
+import StyledSelect from '../../StyledSelect';
+import { Span } from '../../Text';
 
 const messages = defineMessages({
   'webhooks.url.label': {

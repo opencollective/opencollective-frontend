@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
 import { has } from 'lodash';
+import styled, { css } from 'styled-components';
 
 /**
  * A background for the gift card redeem(ed) pages

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
-import StyledButton from '../StyledButton';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+
+import StyledButton from '../StyledButton';
 
 class RejectExpenseBtn extends React.Component {
   static propTypes = {

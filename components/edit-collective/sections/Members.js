@@ -1,28 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { get, update, omit } from 'lodash';
-import styled from 'styled-components';
-import { Flex, Box } from '../../Grid';
-import memoizeOne from 'memoize-one';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { get, omit, update } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { Form } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 
-import InputField from '../../InputField';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
-import StyledButton from '../../StyledButton';
-import StyledTooltip from '../../StyledTooltip';
 import Container from '../../Container';
-import { H3, P } from '../../Text';
-import MessageBox from '../../MessageBox';
+import { Box, Flex } from '../../Grid';
+import InputField from '../../InputField';
 import Link from '../../Link';
 import Loading from '../../Loading';
-import WarnIfUnsavedChanges from '../../WarnIfUnsavedChanges';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
 import StyledTag from '../../StyledTag';
+import StyledTooltip from '../../StyledTooltip';
+import { H3, P } from '../../Text';
+import WarnIfUnsavedChanges from '../../WarnIfUnsavedChanges';
 
 /**
  * This pages sets some global styles that are causing troubles in new components. This

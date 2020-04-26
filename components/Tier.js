@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
+import { Button, ButtonGroup } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'react-intl';
+import Markdown from 'react-markdown';
+
 import colors from '../lib/constants/colors';
-import TicketController from './TicketController';
+import { capitalize, formatCurrency, getCurrencySymbol } from '../lib/utils';
+
 import CTAButton from './Button';
 import Currency from './Currency';
-import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
-import { ButtonGroup, Button } from 'react-bootstrap';
 import InputField from './InputField';
-import { getCurrencySymbol, capitalize, formatCurrency } from '../lib/utils';
-import { get } from 'lodash';
-import Markdown from 'react-markdown';
+import TicketController from './TicketController';
 
 class Tier extends React.Component {
   static propTypes = {

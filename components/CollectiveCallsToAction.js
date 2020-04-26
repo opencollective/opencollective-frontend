@@ -1,16 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Box } from './Grid';
-import dynamic from 'next/dynamic';
 import { get } from 'lodash';
+import dynamic from 'next/dynamic';
+import { FormattedMessage } from 'react-intl';
 
+import hasFeature, { FEATURES } from '../lib/allowed-features';
+
+import _ApplyToHostBtn from './ApplyToHostBtn';
 import Container from './Container';
+import { Box } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
-import Link from './Link';
-import _ApplyToHostBtn from './ApplyToHostBtn';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
 
 // Dynamic imports
 const AddFundsModal = dynamic(() => import('./AddFundsModal'));

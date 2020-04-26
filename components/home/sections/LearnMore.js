@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Box } from '../../Grid';
-import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
-import { H3, P } from '../../Text';
 import Container from '../../Container';
-import SectionTitle from '../SectionTitle';
-import Illustration from '../HomeIllustration';
+import { Box } from '../../Grid';
 import StyledLink from '../../StyledLink';
+import { H3, P } from '../../Text';
+import Illustration from '../HomeIllustration';
+import SectionTitle from '../SectionTitle';
 
 const IconWrapper = styled(Box)`
   display: flex;

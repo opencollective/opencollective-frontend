@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { getStripe } from '../lib/stripe';
-import MessageBox from '../components/MessageBox';
-import Container from '../components/Container';
-import { withUser } from '../components/UserProvider';
+
 import AuthenticatedPage from '../components/AuthenticatedPage';
+import Container from '../components/Container';
+import MessageBox from '../components/MessageBox';
+import { withUser } from '../components/UserProvider';
 
 /**
  * Main contribution flow entrypoint. Render all the steps from contributeAs

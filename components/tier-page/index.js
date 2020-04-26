@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
-import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { withRouter } from 'next/router';
 import gql from 'graphql-tag';
+import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 // Open Collective Frontend imports
 import { getWebsiteUrl } from '../../lib/utils';
-import { P, H1, H2 } from '../Text';
-import StyledButton from '../StyledButton';
-import Container from '../Container';
-import Link from '../Link';
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import StyledProgressBar from '../StyledProgressBar';
+
+import { Sections } from '../collective-page/_constants';
 import CollectiveNavbar from '../CollectiveNavbar';
+import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
 import InlineEditField from '../InlineEditField';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
+import StyledProgressBar from '../StyledProgressBar';
+import { H1, H2, P } from '../Text';
 
 // Local tier page imports
 import { Dimensions } from './_constants';
@@ -24,8 +26,8 @@ import ShareButtons from './ShareButtons';
 import TierContributors from './TierContributors';
 import TierLongDescription from './TierLongDescription';
 import TierVideo from './TierVideo';
+
 import BubblesSVG from './Bubbles.svg';
-import { Sections } from '../collective-page/_constants';
 
 const generateBackground = (theme, image) => {
   const color = theme.colors.primary[300];

@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { ThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
-import { IntlProvider } from 'react-intl';
 import { ApolloProvider } from '@apollo/react-components';
+import { IntlProvider } from 'react-intl';
+import { ThemeProvider } from 'styled-components';
+
+import initClient from '../lib/initClient';
+import theme from '../lib/theme';
+import { getBaseApiUrl } from '../lib/utils';
 
 import StripeProvider from '../components/StripeProvider';
-import theme from '../lib/theme';
-import initClient from '../lib/initClient';
-import { getBaseApiUrl } from '../lib/utils';
 import UserProvider from '../components/UserProvider';
 
 const STRIPE_KEY = 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8';

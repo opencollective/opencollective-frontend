@@ -1,19 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
-import { truncate } from 'lodash';
-import { Box } from '../Grid';
-
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
+import { truncate } from 'lodash';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
-import { Span } from '../Text';
-import Link from '../Link';
-import Contribute from './Contribute';
+
 import Container from '../Container';
+import { Box } from '../Grid';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
+
+import Contribute from './Contribute';
 
 const ContributeEvent = ({ collective, event, ...props }) => {
   const { startsAt, endsAt } = event;

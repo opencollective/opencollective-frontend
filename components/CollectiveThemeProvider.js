@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, throttle, clamp } from 'lodash';
+import { clamp, get, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { setLightness, getLuminance, getContrast, darken } from 'polished';
+import { darken, getContrast, getLuminance, setLightness } from 'polished';
 import { ThemeProvider } from 'styled-components';
 import { isHexColor } from 'validator';
 

@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic';
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
-
 import { withUser } from '../components/UserProvider';
 
 const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {

@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get, startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { P } from '../Text';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+
 import Container from '../Container';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import { P } from '../Text';
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, [key, value]) => {

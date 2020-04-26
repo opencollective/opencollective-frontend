@@ -1,10 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
+
 import { H3 } from '../../Text';
 
-import ConnectedAccounts from './ConnectedAccounts';
 import BankTransfer from './BankTransfer';
+import ConnectedAccounts from './ConnectedAccounts';
 
 class ReceivingMoney extends React.Component {
   static propTypes = {

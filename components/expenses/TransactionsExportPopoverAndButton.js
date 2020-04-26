@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import { withApollo } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
-import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
+import moment from 'moment';
+import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
 
-import { getTransactionsQuery } from '../../lib/graphql/queries';
 import { exportFile } from '../../lib/export_file';
+import { getTransactionsQuery } from '../../lib/graphql/queries';
 
 import InputField from '../InputField';
 

@@ -1,25 +1,25 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { Flex } from './Grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 
-import { Settings } from '@styled-icons/feather/Settings';
-import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-
-import { canOrderTicketsFromEvent } from '../lib/events';
-import { CollectiveType } from '../lib/constants/collectives';
-import Container from './Container';
-import { Sections, AllSectionsNames, Dimensions } from './collective-page/_constants';
-import LinkCollective from './LinkCollective';
-import Avatar from './Avatar';
-import Link from './Link';
-import StyledRoundButton from './StyledRoundButton';
-import CollectiveCallsToAction from './CollectiveCallsToAction';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { CollectiveType } from '../lib/constants/collectives';
+import { canOrderTicketsFromEvent } from '../lib/events';
+
+import { AllSectionsNames, Dimensions, Sections } from './collective-page/_constants';
+import Avatar from './Avatar';
+import CollectiveCallsToAction from './CollectiveCallsToAction';
+import Container from './Container';
+import { Flex } from './Grid';
+import Link from './Link';
+import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import StyledRoundButton from './StyledRoundButton';
 
 /** Main container for the entire component */
 const MainContainer = styled.div`

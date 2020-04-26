@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactMde, { ReactMdeCommands as Commands } from 'react-mde';
-import classNames from 'classnames';
-import * as Showdown from 'showdown';
-import { Heading } from '@styled-icons/fa-solid/Heading';
 import { Bold } from '@styled-icons/fa-solid/Bold';
+import { Heading } from '@styled-icons/fa-solid/Heading';
+import { Image } from '@styled-icons/fa-solid/Image';
 import { Italic } from '@styled-icons/fa-solid/Italic';
 import { Link } from '@styled-icons/fa-solid/Link';
-import { Image } from '@styled-icons/fa-solid/Image';
-import { ListUl } from '@styled-icons/fa-solid/ListUl';
 import { ListOl } from '@styled-icons/fa-solid/ListOl';
+import { ListUl } from '@styled-icons/fa-solid/ListUl';
+import classNames from 'classnames';
+import ReactMde, { ReactMdeCommands as Commands } from 'react-mde';
+import * as Showdown from 'showdown';
 
 const EditorIconComponents = {
   heading: Heading,

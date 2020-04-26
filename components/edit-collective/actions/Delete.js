@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { Router } from '../../../server/pages';
 
-import { withUser } from '../../UserProvider';
-import { H2, P } from '../../Text';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../StyledModal';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import { H2, P } from '../../Text';
+import { withUser } from '../../UserProvider';
 
 const getCollectiveType = type => {
   switch (type) {

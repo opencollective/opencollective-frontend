@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { background, border, color, space, typography, layout, position, variant } from 'styled-system';
-
 import { Times } from '@styled-icons/fa-solid/Times';
+import styled from 'styled-components';
+import { background, border, color, layout, position, space, typography, variant } from 'styled-system';
 
 import { textTransform } from '../lib/styled-system-custom-properties';
+
 import { Span } from './Text';
 
 const defaultRoundedStyleProps = {

@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import { formatDate } from '../lib/utils';
+
+import Avatar from './Avatar';
+import Container from './Container';
+import { Box, Flex } from './Grid';
+import Link from './Link';
 import StyledCard from './StyledCard';
 import { H5, Span } from './Text';
-import { Flex, Box } from './Grid';
-import Avatar from './Avatar';
-import Link from './Link';
 import UserCompany from './UserCompany';
-import Container from './Container';
-import { formatDate } from '../lib/utils';
 
 const MainContainer = styled(StyledCard)`
   width: 144px;

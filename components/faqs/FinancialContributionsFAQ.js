@@ -1,8 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import FAQ, { Entry, Title, Content } from './FAQ';
-import StyledLink from '../StyledLink';
+
 import { Box } from '../Grid';
+import StyledLink from '../StyledLink';
+
+import FAQ, { Content, Entry, Title } from './FAQ';
 
 const supportEmail = 'support@opencollective.com';
 

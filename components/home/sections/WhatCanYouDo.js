@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
-import { display } from 'styled-system';
-import { Flex, Box } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { display } from 'styled-system';
 
-import { P, H3, H4 } from '../../Text';
-import Illustration from '../HomeIllustration';
 import Container from '../../Container';
-import SectionTitle from '../SectionTitle';
-import SectionSubTitle from '../SectionSubtitle';
-import StyledButton from '../../StyledButton';
+import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
+import StyledButton from '../../StyledButton';
+import { H3, H4, P } from '../../Text';
+import Illustration from '../HomeIllustration';
+import SectionSubTitle from '../SectionSubtitle';
+import SectionTitle from '../SectionTitle';
 
 const Wrapper = styled(Box)`
   background-image: ${props =>

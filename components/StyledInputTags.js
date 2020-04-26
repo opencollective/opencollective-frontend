@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { useIntl, defineMessages } from 'react-intl';
-import { PriceTags } from '@styled-icons/icomoon/PriceTags';
-import { Times } from '@styled-icons/fa-solid/Times';
 import { Plus } from '@styled-icons/fa-solid/Plus';
+import { Times } from '@styled-icons/fa-solid/Times';
+import { PriceTags } from '@styled-icons/icomoon/PriceTags';
 import { uniqBy } from 'lodash';
-import { Manager, Reference, Popper } from 'react-popper';
+import { defineMessages, useIntl } from 'react-intl';
+import { Manager, Popper, Reference } from 'react-popper';
+import styled, { css } from 'styled-components';
 
-import { Flex, Box } from './Grid';
-import StyledTag from './StyledTag';
-import StyledCard from './StyledCard';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+
+import { Box, Flex } from './Grid';
+import StyledCard from './StyledCard';
+import StyledTag from './StyledTag';
 
 const TagIcon = styled(PriceTags)`
   margin-right: 4px;

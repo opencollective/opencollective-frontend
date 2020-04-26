@@ -1,27 +1,28 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
-import { URLSearchParams } from 'universal-url';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+import { URLSearchParams } from 'universal-url';
 
+import { getGithubRepos } from '../../lib/api';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { getWebsiteUrl } from '../../lib/utils';
+import { Router } from '../../server/pages';
+
+import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import Loading from '../Loading';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
-import { P, H1 } from '../Text';
-import GithubRepositories from './GithubRepositories';
 import StyledInputField from '../StyledInputField';
-import Loading from '../Loading';
-import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
-import { withUser } from '../UserProvider';
-import MessageBox from '../MessageBox';
-import Link from '../Link';
 import StyledLink from '../StyledLink';
+import { H1, P } from '../Text';
+import { withUser } from '../UserProvider';
 
-import { Router } from '../../server/pages';
-import { getGithubRepos } from '../../lib/api';
-import { getWebsiteUrl } from '../../lib/utils';
-import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../../lib/local-storage';
+import GithubRepositories from './GithubRepositories';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};

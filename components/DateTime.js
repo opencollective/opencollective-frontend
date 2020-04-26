@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactDateTime from 'react-datetime';
 import momentTimezone from 'moment-timezone';
+import ReactDateTime from 'react-datetime';
 
 class DateTime extends React.Component {
   static propTypes = {

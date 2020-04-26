@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 
 import AcceptFinancialContributions from '../components/accept-financial-contributions/index.js';
-import ErrorPage from '../components/ErrorPage';
 import AuthenticatedPage from '../components/AuthenticatedPage';
-import { withUser } from '../components/UserProvider';
-import Loading from '../components/Loading';
-import Container from '../components/Container';
-
 import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
+import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
+import Loading from '../components/Loading';
+import { withUser } from '../components/UserProvider';
 
 class AcceptFinancialContributionsPage extends React.Component {
   static async getInitialProps({ query }) {

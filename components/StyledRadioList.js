@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash';
 
-import { Box } from './Grid';
 import Container from './Container';
+import { Box } from './Grid';
 
 /**
  * Returns a function that will return a unique key from iteratee. As we rely on

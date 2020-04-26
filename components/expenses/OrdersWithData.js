@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 
 import Error from '../Error';
+
 import Orders from './Orders';
 
 class OrdersWithData extends React.Component {

@@ -5,6 +5,7 @@ import { graphql } from '@apollo/react-hoc';
 import { getTransactionsQuery } from '../../lib/graphql/queries';
 
 import Error from '../Error';
+
 import Transactions from './Transactions';
 
 class TransactionsWithData extends React.Component {

@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import SubscriptionsWithData from '../components/SubscriptionsWithData';
-
 import colors from '../lib/constants/colors';
 
+import Body from '../components/Body';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import SubscriptionsWithData from '../components/SubscriptionsWithData';
 import { withUser } from '../components/UserProvider';
 
 class SubscriptionsPage extends React.Component {

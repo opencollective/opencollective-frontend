@@ -4,9 +4,9 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { Flex } from './Grid';
-import { TextInput } from './StyledInput';
-import StyledButton from './StyledButton';
 import Link from './Link';
+import StyledButton from './StyledButton';
+import { TextInput } from './StyledInput';
 
 const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
   const { pathname, query, route } = router;

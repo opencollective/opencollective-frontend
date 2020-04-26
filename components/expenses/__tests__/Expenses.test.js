@@ -1,8 +1,9 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import Expenses from '../Expenses';
 import { withRequiredProviders } from '../../../test/providers';
+
+import Expenses from '../Expenses';
 
 describe('Expenses component', () => {
   const host = {

@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import HashLink from 'react-scrollchor';
+
 import colors from '../lib/constants/colors';
 import defaultColors from '../lib/theme/colors';
 import { Router } from '../server/pages';
-import HashLink from 'react-scrollchor';
 
 const star = '/static/images/icons/star.svg';
 

@@ -1,31 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { Flex, Box } from '../components/Grid';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { Router } from '../server/pages';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { generateNotFoundError } from '../lib/errors';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Loading from '../components/Loading';
+import { generateNotFoundError } from '../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { Router } from '../server/pages';
+
+import { Sections } from '../components/collective-page/_constants';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import CollectiveNavbar from '../components/CollectiveNavbar';
+import ConversationsList from '../components/conversations/ConversationsList';
+import { ConversationListFragment } from '../components/conversations/graphql';
+import ErrorPage from '../components/ErrorPage';
+import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
-import { H1, P, H4 } from '../components/Text';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledButton from '../components/StyledButton';
 import StyledTag from '../components/StyledTag';
-import Link from '../components/Link';
-import ConversationsList from '../components/conversations/ConversationsList';
-import MessageBox from '../components/MessageBox';
-import { Sections } from '../components/collective-page/_constants';
-import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import { ConversationListFragment } from '../components/conversations/graphql';
+import { H1, H4, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query

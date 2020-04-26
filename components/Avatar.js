@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { color, border, space, layout } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
-import { Flex } from './Grid';
+import styled from 'styled-components';
+import { border, color, layout, space } from 'styled-system';
 
-import { getCollectiveImage, getAvatarBorderRadius } from '../lib/image-utils';
-import { defaultImage, CollectiveType } from '../lib/constants/collectives';
+import { CollectiveType, defaultImage } from '../lib/constants/collectives';
+import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
+
+import { Flex } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 

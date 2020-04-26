@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 import { Editor, EditorState } from 'draft-js';
-import { omit, uniq, debounce } from 'lodash';
+import { debounce, omit, uniq } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import { getInputBorderColor } from '../lib/styled_components_utils';
 
 import Container from './Container';
 import { Span } from './Text';
-import { getInputBorderColor } from '../lib/styled_components_utils';
-import { FormattedMessage } from 'react-intl';
 
 const InputContainer = styled(Container)`
   .DraftEditor-root {

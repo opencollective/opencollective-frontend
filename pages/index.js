@@ -1,16 +1,16 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { defineMessages, useIntl } from 'react-intl';
 
-import Page from '../components/Page';
-import MakeCommunitySection from '../components/home/sections/MakeCommunity';
-import WhatCanYouDoSection from '../components/home/sections/WhatCanYouDo';
 import FeaturesSection from '../components/home/sections/Features';
-import OCUsersSection from '../components/home/sections/OCUsers';
 import FiscalHostSection from '../components/home/sections/FiscalHost';
-import WeAreOpenSection from '../components/home/sections/WeAreOpen';
-import LearnMoreSection from '../components/home/sections/LearnMore';
 import JoinUsSection from '../components/home/sections/JoinUs';
-import { useIntl, defineMessages } from 'react-intl';
+import LearnMoreSection from '../components/home/sections/LearnMore';
+import MakeCommunitySection from '../components/home/sections/MakeCommunity';
+import OCUsersSection from '../components/home/sections/OCUsers';
+import WeAreOpenSection from '../components/home/sections/WeAreOpen';
+import WhatCanYouDoSection from '../components/home/sections/WhatCanYouDo';
+import Page from '../components/Page';
 
 const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
   ssr: false,

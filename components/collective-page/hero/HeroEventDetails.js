@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { Clock } from '@styled-icons/feather/Clock';
+import { MapPin } from '@styled-icons/feather/MapPin';
+import themeGet from '@styled-system/theme-get';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
-import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
-import themeGet from '@styled-system/theme-get';
-import { MapPin } from '@styled-icons/feather/MapPin';
-import { Clock } from '@styled-icons/feather/Clock';
+import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
+import styled from 'styled-components';
 
-import StyledTooltip from '../../StyledTooltip';
 import Link from '../../Link';
+import StyledTooltip from '../../StyledTooltip';
 
 const StyledEventNote = styled.div`
   display: flex;

@@ -1,35 +1,35 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import slugify from 'slugify';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-import { get } from 'lodash';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import slugify from 'slugify';
+import styled from 'styled-components';
 
-import { getCollectiveQuery } from '../lib/graphql/queries';
-import { withUser } from '../components/UserProvider';
-import { Router } from '../server/pages';
-import { compose } from '../lib/utils';
-import { imagePreview } from '../lib/image-utils';
 import { defaultImage } from '../lib/constants/collectives';
+import { getCollectiveQuery } from '../lib/graphql/queries';
+import { imagePreview } from '../lib/image-utils';
+import { compose } from '../lib/utils';
+import { Router } from '../server/pages';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import { H3, H4, H5, P } from '../components/Text';
-import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
-import StyledInputGroup from '../components/StyledInputGroup';
-import { Box, Flex } from '../components/Grid';
-import Container from '../components/Container';
-import ButtonGroup from '../components/ButtonGroup';
-import Link from '../components/Link';
-import StyledLink from '../components/StyledLink';
-import Currency from '../components/Currency';
 import Avatar from '../components/Avatar';
+import Body from '../components/Body';
+import ButtonGroup from '../components/ButtonGroup';
+import Container from '../components/Container';
+import Currency from '../components/Currency';
+import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
+import StyledInputGroup from '../components/StyledInputGroup';
+import StyledLink from '../components/StyledLink';
+import { H3, H4, H5, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { space, textAlign, width, display, flexbox } from 'styled-system';
+import { display, flexbox, space, textAlign, width } from 'styled-system';
+
 import { listStyle } from '../lib/styled-system-custom-properties';
 
 const ListItem = styled.li`

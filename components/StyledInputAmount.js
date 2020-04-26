@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isUndefined } from 'lodash';
 
-import StyledInputGroup from './StyledInputGroup';
 import { getCurrencySymbol } from '../lib/utils';
+
+import StyledInputGroup from './StyledInputGroup';
 
 const getPrepend = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from './Grid';
-import { FormattedMessage } from 'react-intl';
 import Router from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
+import { Flex } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import { H1, P } from './Text';
-import Link from './Link';
 
 const NotFound = ({ searchTerm }) => {
   return (
