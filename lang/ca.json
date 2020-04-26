@@ -227,7 +227,6 @@
   "collective.location.label": "Ciutat",
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "Nombre de membres",
-  "collective.messages.StripeAccountConnected": "Stripe account connected successfully",
   "Collective.New": "Crea",
   "collective.pending": "Collective pending approval.",
   "collective.pending.description": "This collective is pending approval from the host ({host}).",
