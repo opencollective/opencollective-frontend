@@ -227,7 +227,6 @@
   "collective.location.label": "Ciudad",
   "collective.meetup.label": "URL de reunión",
   "collective.members.label": "Número de miembros",
-  "collective.messages.StripeAccountConnected": "Stripe ha sido conectado con éxito",
   "Collective.New": "Nuevo",
   "collective.pending": "Aprobación de Colectivo pendiente.",
   "collective.pending.description": "Este colectivo está pendiente de aprobación del patrocinador fiscal ({host}).",
