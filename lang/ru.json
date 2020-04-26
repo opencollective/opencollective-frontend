@@ -227,7 +227,6 @@
   "collective.location.label": "Город",
   "collective.meetup.label": "URL митапа",
   "collective.members.label": "Количество членов",
-  "collective.messages.StripeAccountConnected": "Учетная запись Stripe успешно подключена",
   "Collective.New": "Новый",
   "collective.pending": "Коллектив ждёт одобрения.",
   "collective.pending.description": "Коллектив ждёт одобрения от хоста ({host}).",
