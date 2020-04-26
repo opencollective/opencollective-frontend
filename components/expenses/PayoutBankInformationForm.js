@@ -1,21 +1,21 @@
-import { useQuery } from '@apollo/react-hooks';
-import { Box, Flex } from '../Grid';
-import { get } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Field, FastField, useFormikContext } from 'formik';
+import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/react-hooks';
+import { FastField, Field, useFormikContext } from 'formik';
+import { get } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import StyledInputField from '../StyledInputField';
-import StyledInput from '../StyledInput';
-import StyledSpinner from '../StyledSpinner';
-import StyledSelect from '../StyledSelect';
-import { P } from '../Text';
-
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { formatFormErrorMessage } from '../../lib/form-utils';
 import { states } from '../../lib/constants/transferwise';
+import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+
+import { Box, Flex } from '../Grid';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledSelect from '../StyledSelect';
+import StyledSpinner from '../StyledSpinner';
+import { P } from '../Text';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));

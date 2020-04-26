@@ -1,22 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useIntl, defineMessages } from 'react-intl';
-import { Box } from './Grid';
-import { get, pick, cloneDeep } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
+import { Field, Form, Formik } from 'formik';
 import gql from 'graphql-tag';
-import { Formik, Field, Form } from 'formik';
+import { cloneDeep, get, pick } from 'lodash';
+import { defineMessages, useIntl } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../lib/errors';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { isValidEmail } from '../lib/utils';
-import { H5 } from './Text';
-import StyledInputField from './StyledInputField';
-import StyledInput from './StyledInput';
+
 import Container from './Container';
-import StyledButton from './StyledButton';
+import { Box } from './Grid';
 import MessageBox from './MessageBox';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
+import { H5 } from './Text';
 import { withUser } from './UserProvider';
 
 const CreateNewMessages = defineMessages({

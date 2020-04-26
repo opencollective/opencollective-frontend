@@ -1,18 +1,21 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '../Grid';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import umbrellaIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
-import climateIllustration from '../../public/static/images/create-collective/climateIllustration.png';
-import { H1, H2, H3, P } from '../Text';
+import StyledTag from '../../components/StyledTag';
+
+import CollectiveNavbar from '../CollectiveNavbar';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import Container from '../Container';
+import { H1, H2, H3, P } from '../Text';
+
 import HostsContainer from './HostsContainer';
-import StyledTag from '../../components/StyledTag';
-import CollectiveNavbar from '../CollectiveNavbar';
+
+import umbrellaIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
+import climateIllustration from '../../public/static/images/create-collective/climateIllustration.png';
 
 const FISCAL_HOST_LINK = 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host';
 

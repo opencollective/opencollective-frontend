@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import StyledButton from './StyledButton';
+import { defineMessages, useIntl } from 'react-intl';
+
 import Container from './Container';
+import StyledButton from './StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P } from './Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
-import { useIntl, defineMessages } from 'react-intl';
 
 const messages = defineMessages({
   cancel: {

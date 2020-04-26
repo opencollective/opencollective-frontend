@@ -3,19 +3,20 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 import { generateNotFoundError } from '../lib/errors';
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Loading from '../components/Loading';
+import { ssrNotFoundError } from '../lib/nextjs_utils';
+
+import AuthenticatedPage from '../components/AuthenticatedPage';
+import CollectiveContactForm from '../components/CollectiveContactForm';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import AuthenticatedPage from '../components/AuthenticatedPage';
+import ErrorPage from '../components/ErrorPage';
+import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
-import { FormattedMessage } from 'react-intl';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import CollectiveContactForm from '../components/CollectiveContactForm';
+import { withUser } from '../components/UserProvider';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query

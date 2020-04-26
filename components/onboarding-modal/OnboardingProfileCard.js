@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Avatar from '../../components/Avatar';
 import StyledTag from '../../components/StyledTag';
 import StyledTooltip from '../../components/StyledTooltip';
+
+import { Box, Flex } from '../Grid';
 
 const Admin = styled(StyledTag).attrs({ variant: 'rounded-right' })``;
 

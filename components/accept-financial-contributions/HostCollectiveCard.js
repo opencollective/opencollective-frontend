@@ -1,25 +1,25 @@
-import React, { useState, Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '../Grid';
-import { FormattedDate, useIntl, defineMessages, FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
+import { get } from 'lodash';
+import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getCurrencySymbol } from '../../lib/utils';
 import { confettiFireworks } from '../../lib/confettis';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { getCurrencySymbol } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
-import Container from '../Container';
-import { P, H1 } from '../Text';
-import StyledButton from '../StyledButton';
-import StyledCollectiveCard from '../StyledCollectiveCard';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import Avatar from '../Avatar';
+import Container from '../Container';
+import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledLink from '../StyledLink';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import { H1, P } from '../Text';
 
 const messages = defineMessages({
   collectives: {

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 
 class EventTemplatePicker extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {

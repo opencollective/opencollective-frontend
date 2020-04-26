@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import Error from '../Error';
+
 import Expenses from './Expenses';
 
 class ExpensesWithData extends React.Component {

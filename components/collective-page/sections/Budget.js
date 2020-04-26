@@ -1,28 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '../../Grid';
-import { get, orderBy, isEmpty } from 'lodash';
-import gql from 'graphql-tag';
 import { Query } from '@apollo/react-components';
+import gql from 'graphql-tag';
+import { get, isEmpty, orderBy } from 'lodash';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/utils';
-import { P, Span } from '../../Text';
-import Container from '../../Container';
-import StyledButton from '../../StyledButton';
-import StyledCard from '../../StyledCard';
-import Link from '../../Link';
-import DefinedTerm, { Terms } from '../../DefinedTerm';
-import MessageBox from '../../MessageBox';
-
-import ContainerSectionContent from '../ContainerSectionContent';
-import SectionTitle from '../SectionTitle';
 
 import BudgetItemsList, {
+  BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-  BudgetItemExpenseFragment,
 } from '../../BudgetItemsList';
+import Container from '../../Container';
+import DefinedTerm, { Terms } from '../../DefinedTerm';
+import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledCard from '../../StyledCard';
+import { P, Span } from '../../Text';
+import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`

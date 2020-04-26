@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
-import { Box, Flex } from './Grid';
+import { Link } from '../server/pages';
+
 import Container from './Container';
+import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
-import { H5, Span } from './Text';
-import { FormattedMessage } from 'react-intl';
 import StyledLink from './StyledLink';
-import { Link } from '../server/pages';
+import { H5, Span } from './Text';
 
 /**
  * Component for handing user sign-in or redirecting to sign-up.

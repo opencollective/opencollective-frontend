@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import StyledButton from '../StyledButton';
-import InlineEditField from '../InlineEditField';
 import HTMLContent, { isEmptyValue } from '../HTMLContent';
+import InlineEditField from '../InlineEditField';
 import RichTextEditor from '../RichTextEditor';
+import StyledButton from '../StyledButton';
 
 /**
  * Displays the tier long description on the page, with an optional form to edit it

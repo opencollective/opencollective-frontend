@@ -1,19 +1,20 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import Container from '../../Container';
-import { P, H3, Span } from '../../Text';
-import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../../ContributorsGrid';
-import * as ContributorsFilter from '../../ContributorsFilter';
 
 // Local imports
 import { Dimensions } from '../_constants';
-import SectionTitle from '../SectionTitle';
+import Container from '../../Container';
+import * as ContributorsFilter from '../../ContributorsFilter';
+import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../../ContributorsGrid';
+import { H3, P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
+
 import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */

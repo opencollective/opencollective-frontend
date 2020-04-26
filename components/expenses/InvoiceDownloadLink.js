@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { get as fetch } from '../../lib/api';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { collectiveInvoiceURL, invoiceServiceURL, transactionInvoiceURL } from '../../lib/url_helpers';
+
 import { Span } from '../Text';
 
 export default class InvoiceDownloadLink extends Component {

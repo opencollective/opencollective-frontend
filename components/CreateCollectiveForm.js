@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputField from './InputField';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { defaultBackgroundImage } from '../lib/constants/collectives';
-import { Button } from 'react-bootstrap';
-import { get } from 'lodash';
-import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 import fetch from 'fetch-jsonp';
+import { get } from 'lodash';
+import { Button } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
+import { defaultBackgroundImage } from '../lib/constants/collectives';
 import { firstSentence } from '../lib/utils';
+
+import CollectiveCategoryPicker from './CollectiveCategoryPicker';
+import InputField from './InputField';
 
 class CreateCollectiveForm extends React.Component {
   static propTypes = {

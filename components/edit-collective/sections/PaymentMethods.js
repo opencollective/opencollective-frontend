@@ -1,27 +1,26 @@
 import React from 'react';
-import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
+import { Add } from '@styled-icons/material/Add';
+import gql from 'graphql-tag';
 import { get, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '../../Grid';
-import { Add } from '@styled-icons/material/Add';
 
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
-import { compose } from '../../../lib/utils';
 import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
+import { compose } from '../../../lib/utils';
 
-import { H3, Span } from '../../Text';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import Loading from '../../Loading';
-import StyledButton from '../../StyledButton';
-import Container from '../../Container';
-import { withStripeLoader } from '../../StripeProvider';
-import NewCreditCardForm from '../../NewCreditCardForm';
 import MessageBox from '../../MessageBox';
-
+import NewCreditCardForm from '../../NewCreditCardForm';
+import { withStripeLoader } from '../../StripeProvider';
+import StyledButton from '../../StyledButton';
+import { H3, Span } from '../../Text';
 import EditPaymentMethod from '../EditPaymentMethod';
 
 class EditPaymentMethods extends React.Component {

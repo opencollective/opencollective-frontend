@@ -1,29 +1,30 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
 import { Mutation } from '@apollo/react-components';
-import gql from 'graphql-tag';
-import { Flex, Box } from '../Grid';
-import { FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
-
+import { graphql } from '@apollo/react-hoc';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { Github } from '@styled-icons/fa-brands/Github';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
-import { withUser } from '../UserProvider';
-import Loading from '../Loading';
-import StyledCard from '../StyledCard';
-import { Span } from '../Text';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
+
+import Avatar from '../Avatar';
 import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
+import Loading from '../Loading';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
-import Avatar from '../Avatar';
-import MessageBox from '../MessageBox';
+import { Span } from '../Text';
+import { withUser } from '../UserProvider';
+
 import AppRejectionReasonModal from './AppRejectionReasonModal';
-import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
-import { getErrorFromGraphqlException } from '../../lib/errors';
 
 const ApproveCollectiveMutation = gql`
   mutation approveCollective($id: Int!) {

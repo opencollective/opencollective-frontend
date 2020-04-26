@@ -1,19 +1,20 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
 import { truncate } from 'lodash';
-import { Box, Flex } from './Grid';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import formatMemberRole from '../lib/i18n-member-role';
-import { H5, P } from './Text';
-import FormattedMoneyAmount from './FormattedMoneyAmount';
-import StyledCard from './StyledCard';
-import { ContributorAvatar } from './Avatar';
-import StyledTag from './StyledTag';
-import LinkContributor from './LinkContributor';
-import EditPublicMessagePopup from './EditPublicMessagePopup';
 import roles from '../lib/constants/roles';
+import formatMemberRole from '../lib/i18n-member-role';
+
+import { ContributorAvatar } from './Avatar';
+import EditPublicMessagePopup from './EditPublicMessagePopup';
+import FormattedMoneyAmount from './FormattedMoneyAmount';
+import { Box, Flex } from './Grid';
+import LinkContributor from './LinkContributor';
+import StyledCard from './StyledCard';
+import StyledTag from './StyledTag';
+import { H5, P } from './Text';
 
 /** Main card */
 const MainContainer = styled(StyledCard)`

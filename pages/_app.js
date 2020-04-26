@@ -1,17 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { ApolloProvider } from '@apollo/react-components';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
+import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
-import { ApolloProvider } from '@apollo/react-components';
 
-import { RawIntlProvider, createIntlCache, createIntl } from 'react-intl';
-
-import UserProvider from '../components/UserProvider';
-import StripeProviderSSR from '../components/StripeProvider';
-import withData from '../lib/withData';
 import theme from '../lib/theme';
+import withData from '../lib/withData';
+
+import StripeProviderSSR from '../components/StripeProvider';
+import UserProvider from '../components/UserProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'nprogress/nprogress.css';
@@ -19,7 +19,6 @@ import 'react-datetime/css/react-datetime.css';
 import 'react-quill/dist/quill.snow.css';
 import 'react-mde/lib/styles/css/react-mde-all.css';
 import 'trix/dist/trix.css';
-
 import '../public/static/styles/app.css';
 import '../public/static/styles/react-tags.css';
 

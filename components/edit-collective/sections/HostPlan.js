@@ -1,18 +1,18 @@
-import { get } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import themeGet from '@styled-system/theme-get';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 
 import { getCollectiveTiersDescriptionQuery } from '../../../lib/graphql/queries';
 import { parseToBoolean } from '../../../lib/utils';
 
-import StyledTooltip from '../../StyledTooltip';
 import Button from '../../Button';
 import Loading from '../../Loading';
+import StyledTooltip from '../../StyledTooltip';
 import { H3 } from '../../Text';
 
 const isTransferwiseEnabled = parseToBoolean(process.env.TRANSFERWISE_ENABLED);

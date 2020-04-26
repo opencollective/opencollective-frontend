@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { addEditCollectiveMutation } from '../lib/graphql/mutations';
+import { addEventCollectiveData } from '../lib/graphql/queries';
+import { compose } from '../lib/utils';
+
 import EditCollective from '../components/edit-collective';
 import ErrorPage from '../components/ErrorPage';
-
-import { addEventCollectiveData } from '../lib/graphql/queries';
-import { addEditCollectiveMutation } from '../lib/graphql/mutations';
-import { compose } from '../lib/utils';
 import { withUser } from '../components/UserProvider';
 
 class EditEventPage extends React.Component {

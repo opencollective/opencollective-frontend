@@ -9,9 +9,9 @@ import Body from '../components/Body';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import OrdersWithData from '../components/expenses/OrdersWithData';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import OrdersWithData from '../components/expenses/OrdersWithData';
 import SectionTitle from '../components/SectionTitle';
 import { withUser } from '../components/UserProvider';
 

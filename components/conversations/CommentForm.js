@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, useIntl } from 'react-intl';
-import { withRouter } from 'next/router';
-import { get } from 'lodash';
 import { useMutation } from '@apollo/react-hooks';
+import { get } from 'lodash';
+import { withRouter } from 'next/router';
+import { defineMessages, useIntl } from 'react-intl';
 
-import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException, createError, ERROR, formatErrorMessage } from '../../lib/errors';
-import RichTextEditor from '../RichTextEditor';
-import StyledButton from '../StyledButton';
-import { withUser } from '../UserProvider';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
+import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
+import RichTextEditor from '../RichTextEditor';
+import SignInOrJoinFree from '../SignInOrJoinFree';
+import StyledButton from '../StyledButton';
 import { P } from '../Text';
+import { withUser } from '../UserProvider';
+
 import { CommentFieldsFragment } from './graphql';
-import { formatFormErrorMessage } from '../../lib/form-utils';
 
 const createCommentMutation = gqlV2`
   mutation CreateComment($comment: CommentCreateInput!) {

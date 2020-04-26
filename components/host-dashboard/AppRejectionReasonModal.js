@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import gql from 'graphql-tag';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '../StyledModal';
-import Container from '../Container';
-import StyledTextarea from '../StyledTextarea';
-import StyledButton from '../StyledButton';
-import MessageBox from '../MessageBox';
 import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
+
+import Container from '../Container';
+import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledTextarea from '../StyledTextarea';
 
 const rejectCollectiveQuery = gql`
   mutation rejectCollective($id: Int!, $rejectionReason: String) {

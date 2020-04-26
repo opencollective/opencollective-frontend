@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormControl } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
+
 import CollectivePickerAsync from './CollectivePickerAsync';
 
 const messages = defineMessages({

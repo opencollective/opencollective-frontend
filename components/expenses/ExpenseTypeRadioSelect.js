@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '../Grid';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
+
+import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
 
-import receiptIllustration from '../../public/static/images/receipt-animation.gif';
-import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
-import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
 import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
+import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
+import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
+import receiptIllustration from '../../public/static/images/receipt-animation.gif';
 
 const ExpenseTypeLabels = defineMessages({
   [expenseTypes.INVOICE]: {

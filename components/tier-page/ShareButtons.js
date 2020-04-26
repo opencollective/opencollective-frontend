@@ -1,22 +1,22 @@
 import React from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex } from '../Grid';
-import copy from 'copy-to-clipboard';
-
+import { Clipboard } from '@styled-icons/feather/Clipboard';
+import { Facebook } from '@styled-icons/feather/Facebook';
+import { Linkedin } from '@styled-icons/feather/Linkedin';
 // Styled-icons
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { Facebook } from '@styled-icons/feather/Facebook';
-import { Linkedin } from '@styled-icons/feather/Linkedin';
-import { Clipboard } from '@styled-icons/feather/Clipboard';
+import copy from 'copy-to-clipboard';
+import { defineMessages, injectIntl } from 'react-intl';
 
 // Open Collective Frontend imports
-import { facebooKShareURL, tweetURL, linkedInShareURL, mailToURL } from '../../lib/url_helpers';
-import StyledTooltip from '../StyledTooltip';
+import { facebooKShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url_helpers';
+
+import Container from '../Container';
+import { Flex } from '../Grid';
 import StyledLink from '../StyledLink';
 import StyledRoundButton from '../StyledRoundButton';
-import Container from '../Container';
+import StyledTooltip from '../StyledTooltip';
 
 const messages = defineMessages({
   shareTitle: {

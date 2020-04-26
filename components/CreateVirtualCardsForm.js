@@ -1,34 +1,34 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Flex, Box } from './Grid';
-import { get, truncate } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
-import moment from 'moment';
-import gql from 'graphql-tag';
-import memoizeOne from 'memoize-one';
-
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
+import themeGet from '@styled-system/theme-get';
+import gql from 'graphql-tag';
+import { get, truncate } from 'lodash';
+import memoizeOne from 'memoize-one';
+import moment from 'moment';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import { reportValidityHTML5 } from '../lib/utils';
-import MessageBox from './MessageBox';
-import StyledInputAmount from './StyledInputAmount';
-import StyledButton from './StyledButton';
-import PaymentMethodSelect from './PaymentMethodSelect';
-import Loading from './Loading';
-import Link from './Link';
-import StyledMultiEmailInput from './StyledMultiEmailInput';
-import { H3 } from './Text';
-import StyledInput from './StyledInput';
-import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
-import CollectivePicker from './CollectivePicker';
-import CollectivePickerAsync from './CollectivePickerAsync';
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPrepaid } from '../lib/constants/payment-methods';
+import { reportValidityHTML5 } from '../lib/utils';
+
+import CollectivePicker from './CollectivePicker';
+import CollectivePickerAsync from './CollectivePickerAsync';
+import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
+import { Box, Flex } from './Grid';
+import Link from './Link';
+import Loading from './Loading';
+import MessageBox from './MessageBox';
+import PaymentMethodSelect from './PaymentMethodSelect';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
+import StyledInputAmount from './StyledInputAmount';
+import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
+import { H3 } from './Text';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;

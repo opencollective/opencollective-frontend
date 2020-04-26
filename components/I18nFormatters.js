@@ -1,4 +1,5 @@
 import React from 'react';
+
 import StyledLink from './StyledLink';
 
 export const I18nBold = msg => <strong>{msg}</strong>;

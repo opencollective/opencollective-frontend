@@ -1,12 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { Span } from '../Text';
-import StepsProgress from '../StepsProgress';
 import { Router } from '../../server/pages';
+
+import { Flex } from '../Grid';
+import StepsProgress from '../StepsProgress';
+import { Span } from '../Text';
 
 const StepLabel = styled(Span)`
   text-transform: uppercase;

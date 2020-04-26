@@ -1,22 +1,23 @@
-import { Box, Flex } from '../Grid';
-import { get, isEmpty } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { FastField, Field } from 'formik';
+import { get, isEmpty } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { Field, FastField } from 'formik';
 import { isURL } from 'validator';
 
-import { requireFields, formatFormErrorMessage } from '../../lib/form-utils';
 import { createError, ERROR } from '../../lib/errors';
+import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
+import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+
+import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import StyledButton from '../StyledButton';
+import StyledDropzone from '../StyledDropzone';
+import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import { Span } from '../Text';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
-import StyledDropzone from '../StyledDropzone';
-import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
 
 export const msg = defineMessages({
   previewImgAlt: {

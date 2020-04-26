@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '../Grid';
 import { has } from 'lodash';
 
-import Container from '../Container';
-import LinkCollective from '../LinkCollective';
 import Avatar from '../Avatar';
+import Container from '../Container';
+import { Flex } from '../Grid';
+import LinkCollective from '../LinkCollective';
 
 const CollectiveCard = ({ collective, children, size, avatarSize, p, ...props }) => {
   const hasCustomColor = has(collective, 'settings.collectivePage.primaryColor');

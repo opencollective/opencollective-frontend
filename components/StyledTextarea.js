@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { space, layout, border, color, typography } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
+import styled, { css } from 'styled-components';
+import { border, color, layout, space, typography } from 'styled-system';
 
 import { overflow, resize } from '../lib/styled-system-custom-properties';
+
 import Container from './Container';
 import StyledTag from './StyledTag';
 

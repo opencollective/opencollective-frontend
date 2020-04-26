@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
-import { useIntl, FormattedMessage, defineMessages } from 'react-intl';
 import { Span } from '../Text';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 
 const msg = defineMessages({
   notesPlaceholder: {

@@ -1,31 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import { Flex } from '../Grid';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { capitalize, formatCurrency, compose } from '../../lib/utils';
-import { getErrorFromGraphqlException, formatErrorMessage } from '../../lib/errors';
 import colors from '../../lib/constants/colors';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
+import { capitalize, compose, formatCurrency } from '../../lib/utils';
 
 import Avatar from '../Avatar';
-import { Span } from '../Text';
+import ConfirmationModal from '../ConfirmationModal';
+import { Flex } from '../Grid';
 import Link from '../Link';
+import MessageBox from '../MessageBox';
 import Moment from '../Moment';
+import StyledButton from '../StyledButton';
+import { Span } from '../Text';
+
 import AmountCurrency from './AmountCurrency';
+import ApproveExpenseBtn from './ApproveExpenseBtn';
+import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
 import ExpenseDetails from './ExpenseDetails';
 import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
-import ApproveExpenseBtn from './ApproveExpenseBtn';
-import RejectExpenseBtn from './RejectExpenseBtn';
-import PayExpenseBtn from './PayExpenseBtn';
-import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
-import EditPayExpenseFeesForm from './EditPayExpenseFeesForm';
-import ConfirmationModal from '../ConfirmationModal';
-import StyledButton from '../StyledButton';
 import MarkExpenseAsPaidBtn from './MarkExpenseAsPaidBtn';
-import MessageBox from '../MessageBox';
+import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
+import PayExpenseBtn from './PayExpenseBtn';
+import RejectExpenseBtn from './RejectExpenseBtn';
 
 class Expense extends React.Component {
   static propTypes = {

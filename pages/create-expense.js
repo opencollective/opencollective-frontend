@@ -1,23 +1,33 @@
-import { Box, Flex } from '../components/Grid';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import PropTypes from 'prop-types';
-import React from 'react';
-import { graphql } from '@apollo/react-hoc';
 import { FormattedMessage } from 'react-intl';
 
 import expenseTypes from '../lib/constants/expenseTypes';
+import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
-import { getErrorFromGraphqlException, generateNotFoundError } from '../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { Router } from '../server/pages';
+
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
+import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
+import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
+import {
+  expensePageExpenseFieldsFragment,
+  loggedInAccountExpensePayoutFieldsFragment,
+} from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
+import { Box, Flex } from '../components/Grid';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -25,16 +35,8 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { Router } from '../server/pages';
-import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
-import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
-import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
+
 import ExpenseInfoSidebar from './ExpenseInfoSidebar';
-import {
-  loggedInAccountExpensePayoutFieldsFragment,
-  expensePageExpenseFieldsFragment,
-} from '../components/expenses/graphql/fragments';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 

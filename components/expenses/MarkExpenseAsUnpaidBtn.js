@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import gql from 'graphql-tag';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 

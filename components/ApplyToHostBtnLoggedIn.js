@@ -1,20 +1,20 @@
 import React, { Fragment } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get, truncate } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { compose } from '../lib/utils';
 
-import Link from './Link';
-import { P } from './Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
-import StyledCheckbox from './StyledCheckbox';
-import StyledButton from './StyledButton';
 import Container from './Container';
+import Link from './Link';
+import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
 import StyledLink from './StyledLink';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import { P } from './Text';
 
 const CheckboxWrapper = styled(Container)`
   color: #090a0a;

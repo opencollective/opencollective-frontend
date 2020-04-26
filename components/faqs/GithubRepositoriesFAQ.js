@@ -1,8 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import FAQ, { Entry, Title, Content } from './FAQ';
+
 import Link from '../Link';
 import StyledLink from '../StyledLink';
+
+import FAQ, { Content, Entry, Title } from './FAQ';
 
 /**
  * FAQ associated to the `GithubRepositories` component.

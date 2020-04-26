@@ -1,8 +1,11 @@
 import 'cypress-file-upload';
+
+import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
+
+import { CreditCards } from '../../stripe-helpers';
+
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
-import { CreditCards } from '../../stripe-helpers';
 import { disableSmoothScroll } from './helpers';
 
 /**

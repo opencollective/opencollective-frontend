@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { space, display } from 'styled-system';
+import { display, space } from 'styled-system';
 
 import { rotateMixin } from '../../lib/constants/animations';
 

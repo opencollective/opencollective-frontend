@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import NukaCarousel from 'nuka-carousel';
 import styled from 'styled-components';
 
 import { H5, P } from './Text';
-import NukaCarousel from 'nuka-carousel';
 
 const getIndexes = (count, increment) => {
   const indexes = [];

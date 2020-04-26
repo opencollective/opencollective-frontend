@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 
-import ContributionCategoryPicker from './ContributionCategoryPicker';
-import ApplyToHost from './ApplyToHost';
-import SuccessPage from './SuccessPage';
 import AcceptContributionsMyself from './AcceptContributionsMyself';
+import ApplyToHost from './ApplyToHost';
+import ContributionCategoryPicker from './ContributionCategoryPicker';
+import SuccessPage from './SuccessPage';
 
 class AcceptFinancialContributions extends Component {
   static propTypes = {

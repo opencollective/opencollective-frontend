@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from './Grid';
-import { FormattedMessage } from 'react-intl';
-import { useDropzone } from 'react-dropzone';
-import styled, { css } from 'styled-components';
+import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { isNil, omit } from 'lodash';
+import { useDropzone } from 'react-dropzone';
+import { FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { Download as DownloadIcon } from '@styled-icons/feather/Download';
-
 import { uploadImageWithXHR } from '../lib/api';
-import { P } from './Text';
+
 import Container from './Container';
+import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
 import StyledSpinner from './StyledSpinner';
+import { P } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
 const Dropzone = styled(Container)`

@@ -2,23 +2,23 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-
+import languages from '../lib/constants/locales';
 import { loadScriptAsync } from '../lib/utils';
 
-// hardcode loaders for specific files
-import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/sponsor-page/javascripts/scripts.js'; // eslint-disable-line
-import sponsorPageStyle from '!css-loader!../public/sponsor-page/stylesheets/styles.css'; // eslint-disable-line
-import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
-import howItWorksPageStyle from '!css-loader!../public/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
-import holidayGiftCardPageStyle from '!css-loader!../public/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
-import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
-import becomeAFiscalHostStyle from '!css-loader!../public/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
+import Body from '../components/Body';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
 import { withUser } from '../components/UserProvider';
 
-import languages from '../lib/constants/locales';
+import becomeAFiscalHostStyle from '!css-loader!../public/become-a-fiscal-host-page/stylesheets/styles.css'; // eslint-disable-line
+import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
+import holidayGiftCardPageStyle from '!css-loader!../public/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
+import howItWorksPageStyle from '!css-loader!../public/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
+import sponsorPageStyle from '!css-loader!../public/sponsor-page/stylesheets/styles.css'; // eslint-disable-line
+
+import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
+// hardcode loaders for specific files
+import sponsorPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/sponsor-page/javascripts/scripts.js'; // eslint-disable-line
 
 const PAGES = {
   'become-a-sponsor': {

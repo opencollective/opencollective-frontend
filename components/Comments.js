@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Comment from './Comment';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+
 import colors from '../lib/constants/colors';
+
+import Comment from './Comment';
 
 class Comments extends React.Component {
   static propTypes = {

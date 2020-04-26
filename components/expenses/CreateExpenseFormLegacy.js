@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Markdown from 'react-markdown';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { get, omit } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import Markdown from 'react-markdown';
 
-import { getCurrencySymbol } from '../../lib/utils';
 import categories from '../../lib/constants/categories';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { getCurrencySymbol } from '../../lib/utils';
 
-import InputField from '../InputField';
-import SignInOrJoinFree from '../SignInOrJoinFree';
 import Button from '../Button';
 import Container from '../Container';
-import { P } from '../Text';
 import DefinedTerm, { Terms } from '../DefinedTerm';
+import InputField from '../InputField';
+import SignInOrJoinFree from '../SignInOrJoinFree';
+import { P } from '../Text';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {

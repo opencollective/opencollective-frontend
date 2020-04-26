@@ -1,12 +1,14 @@
-import { Flex } from '../Grid';
-import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
-import { University as BankIcon } from '@styled-icons/fa-solid/University';
-import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
-import PropTypes from 'prop-types';
 import React from 'react';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { Span } from '../Text';
+import PropTypes from 'prop-types';
+import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
+import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
+import { University as BankIcon } from '@styled-icons/fa-solid/University';
 import { FormattedMessage } from 'react-intl';
+
+import { PayoutMethodType } from '../../lib/constants/payout-method';
+
+import { Flex } from '../Grid';
+import { Span } from '../Text';
 
 /**
  * Shows the data of the given payout method

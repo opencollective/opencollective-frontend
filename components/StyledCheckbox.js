@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { typography, size } from 'styled-system';
 import themeGet from '@styled-system/theme-get';
+import styled from 'styled-components';
+import { size, typography } from 'styled-system';
+
 import StyledSpinner from './StyledSpinner';
 
 const IconCheckmark = () => {

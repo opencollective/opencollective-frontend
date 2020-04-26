@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Box } from './Grid';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import Link from './Link';
 import Container from './Container';
+import { Box } from './Grid';
+import Link from './Link';
 import { H2 } from './Text';
 
 const LinkAction = styled(Link)`

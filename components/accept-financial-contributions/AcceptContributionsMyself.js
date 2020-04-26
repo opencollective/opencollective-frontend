@@ -1,26 +1,27 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '../Grid';
-import { FormattedMessage } from 'react-intl';
-import { Formik, Field, Form } from 'formik';
 import { graphql } from '@apollo/react-hoc';
-
-import { H1, H2, P } from '../Text';
-import StyledButton from '../StyledButton';
-import Container from '../Container';
-import CollectiveNavbar from '../CollectiveNavbar';
-import Avatar from '../Avatar';
-import StyledTextarea from '../StyledTextarea';
-import StyledInputField from '../StyledInputField';
-import FinancialContributionsFAQ from '../faqs/FinancialContributionsFAQ';
-import MessageBox from '../MessageBox';
-import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
-
+import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
-import { Router } from '../../server/pages';
-import { withUser } from '../UserProvider';
+import { FormattedMessage } from 'react-intl';
+
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { Router } from '../../server/pages';
+
+import Avatar from '../Avatar';
+import CollectiveNavbar from '../CollectiveNavbar';
+import Container from '../Container';
+import FinancialContributionsFAQ from '../faqs/FinancialContributionsFAQ';
+import { Box, Flex } from '../Grid';
+import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
+import StyledInputField from '../StyledInputField';
+import StyledTextarea from '../StyledTextarea';
+import { H1, H2, P } from '../Text';
+import { withUser } from '../UserProvider';
+
+import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 
 class AcceptContributionsMyself extends React.Component {
   static propTypes = {

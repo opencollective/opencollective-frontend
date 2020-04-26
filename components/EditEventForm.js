@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import EditTiers from './edit-collective/sections/Tiers';
 import Button from './Button';
 import InputField from './InputField';
-import EditTiers from './edit-collective/sections/Tiers';
 import TimezonePicker from './TimezonePicker';
 
 class EditEventForm extends React.Component {

@@ -1,7 +1,9 @@
 import * as fs from 'fs';
+
 import { sync as globSync } from 'glob';
+import { difference, has, invertBy, orderBy } from 'lodash';
 import { sync as mkdirpSync } from 'mkdirp';
-import { orderBy, difference, has, invertBy } from 'lodash';
+
 import locales from '../lib/constants/locales';
 
 const MESSAGES_PATTERN = './dist/messages/**/*.json';

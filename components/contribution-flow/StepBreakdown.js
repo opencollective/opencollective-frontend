@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '../Grid';
-import { get } from 'lodash';
-import { checkVATNumberFormat, getVatPercentage, getVatOriginCountry } from '@opencollective/taxes';
-
+import { checkVATNumberFormat, getVatOriginCountry, getVatPercentage } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import tiersTypes from '../../lib/constants/tiers-types';
 import { propTypeCountry } from '../../lib/custom-prop-types';
-import { formatCurrency, capitalize } from '../../lib/utils';
 import getPaymentMethodFees from '../../lib/fees';
 import fetchGeoLocation from '../../lib/geolocation_api';
-import StyledCard from '../StyledCard';
-import { Span } from '../Text';
-import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import InputTypeCountry from '../InputTypeCountry';
+import { capitalize, formatCurrency } from '../../lib/utils';
+
 import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
+import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
+import StyledLink from '../StyledLink';
+import { Span } from '../Text';
 
 const AmountLine = styled(Flex)``;
 AmountLine.defaultProps = {

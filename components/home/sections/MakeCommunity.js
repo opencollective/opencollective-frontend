@@ -1,15 +1,15 @@
-import React, { useState, Fragment } from 'react';
-import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '../../Grid';
+import React, { Fragment, useState } from 'react';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { P, Span, H1, H4 } from '../../Text';
-import Illustration from '../HomeIllustration';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
 import StyledButton from '../../StyledButton';
 import Modal from '../../StyledModal';
-import Container from '../../Container';
-import Link from '../../Link';
+import { H1, H4, P, Span } from '../../Text';
+import Illustration from '../HomeIllustration';
 
 const SustainTextWrapper = styled(Span)`
   background-image: url('/static/images/home/sustain-underline-sm.png');

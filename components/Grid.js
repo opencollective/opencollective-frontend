@@ -3,9 +3,9 @@
  * See https://github.com/opencollective/opencollective/issues/2929 for more info.
  */
 
-import styled from 'styled-components';
-import { space, color, layout, flexbox, typography, compose } from 'styled-system';
 import propTypes from '@styled-system/prop-types';
+import styled from 'styled-components';
+import { color, compose, flexbox, layout, space, typography } from 'styled-system';
 
 const boxProps = compose(space, color, layout, typography, flexbox);
 export const Box = styled('div')(

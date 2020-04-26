@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from './Grid';
-import { fontSize } from 'styled-system';
 import styled from 'styled-components';
+import { fontSize } from 'styled-system';
 
 import { Router } from '../server/pages';
 
+import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 
 const SearchInputContainer = styled(Flex)`

@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import colors from '../lib/constants/colors';
 import { defineMessages, injectIntl } from 'react-intl';
+
+import colors from '../lib/constants/colors';
 
 class CollectiveCategoryPicker extends React.Component {
   static propTypes = {

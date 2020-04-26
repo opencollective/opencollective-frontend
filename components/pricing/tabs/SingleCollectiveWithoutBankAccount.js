@@ -1,21 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
-import styled from 'styled-components';
-import { Box, Flex } from '../../Grid';
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
-import BackButton from '../BackButton';
-import StyledLink from '../../StyledLink';
-import { H1, P, H3, Span } from '../../Text';
 import Currency from '../../Currency';
-import { Router } from '../../../server/pages';
-import StyledCollectiveCard from '../../StyledCollectiveCard';
-import StyledButton from '../../StyledButton';
-import Link from '../../Link';
+import { Box, Flex } from '../../Grid';
 import I18nFormatters, { getI18nLink } from '../../I18nFormatters';
+import Link from '../../Link';
+import StyledButton from '../../StyledButton';
+import StyledCollectiveCard from '../../StyledCollectiveCard';
+import StyledLink from '../../StyledLink';
+import { H1, H3, P, Span } from '../../Text';
+import BackButton from '../BackButton';
 
 const featuredHostsSlugs = ['opensource', 'wwcodeinc', 'paris', 'allforclimate'];
 

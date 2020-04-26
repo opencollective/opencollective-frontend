@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ButtonGroup, Button } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
-import { Box } from '../Grid';
+import { Button, ButtonGroup } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
 
 import colors from '../../lib/constants/colors';
 
-import Expense from './Expense';
+import { Box } from '../Grid';
 import Loading from '../Loading';
+
+import Expense from './Expense';
 
 class Expenses extends React.Component {
   static propTypes = {

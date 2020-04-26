@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
-import Header from '../components/Header';
 import Body from '../components/Body';
 import Footer from '../components/Footer';
-import NewsletterContainer from '../components/NewsletterContainer';
+import Header from '../components/Header';
 import Link from '../components/Link';
-
+import NewsletterContainer from '../components/NewsletterContainer';
 import staticPages from '../components/static-pages';
 import { withUser } from '../components/UserProvider';
 

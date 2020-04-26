@@ -1,29 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
-import { Flex, Box } from './Grid';
-import gql from 'graphql-tag';
-import styled, { css } from 'styled-components';
-import { round, truncate } from 'lodash';
-
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
+import gql from 'graphql-tag';
+import { round, truncate } from 'lodash';
+import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 
-import { i18nPaymentMethodType } from '../lib/i18n-payment-method-type';
 import { TransactionTypes } from '../lib/constants/transactions';
-import { formatCurrency } from './../lib/utils';
 import { i18nExpenseCategory, i18nExpenseType } from '../lib/i18n-expense';
+import { i18nPaymentMethodType } from '../lib/i18n-payment-method-type';
+import { formatCurrency } from './../lib/utils';
+
 import ExpenseStatusTag from './expenses/ExpenseStatusTag';
 import InvoiceDownloadLink from './expenses/InvoiceDownloadLink';
-import { P, Span } from './Text';
-import Container from './Container';
-import DebitCreditList, { DebitItem, CreditItem } from './DebitCreditList';
-import DefinedTerm, { Terms } from './DefinedTerm';
-import LinkCollective from './LinkCollective';
 import Avatar from './Avatar';
-import StyledLink from './StyledLink';
-import StyledButton from './StyledButton';
+import Container from './Container';
+import DebitCreditList, { CreditItem, DebitItem } from './DebitCreditList';
+import DefinedTerm, { Terms } from './DefinedTerm';
+import { Box, Flex } from './Grid';
 import Link from './Link';
+import LinkCollective from './LinkCollective';
+import StyledButton from './StyledButton';
+import StyledLink from './StyledLink';
+import { P, Span } from './Text';
 
 /** A fragment to use for `ExpenseType` items */
 export const BudgetItemExpenseTypeFragment = gql`

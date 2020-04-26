@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-import { Flex } from '../Grid';
 import memoizeOne from 'memoize-one';
+import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
-import Container from '../Container';
-import StyledButtonSet from '../StyledButtonSet';
-import StyledInputField from '../StyledInputField';
-import StyledSelect from '../StyledSelect';
-import { P, Span } from '../Text';
-import Currency from '../Currency';
-import StyledInputAmount from '../StyledInputAmount';
-import StyledInput from '../StyledInput';
-import StyledButton from '../StyledButton';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getNextChargeDate } from '../../lib/date-utils';
 import { getPrecisionFromAmount } from '../../lib/utils';
 import { Router } from '../../server/pages';
+
+import Container from '../Container';
+import Currency from '../Currency';
+import { Flex } from '../Grid';
+import StyledButton from '../StyledButton';
+import StyledButtonSet from '../StyledButtonSet';
+import StyledInput from '../StyledInput';
+import StyledInputAmount from '../StyledInputAmount';
+import StyledInputField from '../StyledInputField';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
+import { P, Span } from '../Text';
 
 const FrequenciesI18n = defineMessages({
   oneTime: {

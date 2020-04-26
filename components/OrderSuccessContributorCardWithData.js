@@ -1,20 +1,20 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
+import themeGet from '@styled-system/theme-get';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { Box, Flex } from './Grid';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 
-import { Span } from './Text';
-import LinkCollective from './LinkCollective';
-import FormattedMoneyAmount from './FormattedMoneyAmount';
-import StyledCard from './StyledCard';
-import Container from './Container';
 import Avatar from './Avatar';
+import Container from './Container';
 import EditPublicMessagePopup from './EditPublicMessagePopup';
+import FormattedMoneyAmount from './FormattedMoneyAmount';
+import { Box, Flex } from './Grid';
+import LinkCollective from './LinkCollective';
+import StyledCard from './StyledCard';
+import { Span } from './Text';
 
 const PublicMessage = styled.p`
   font-size: ${themeGet('fontSizes.Tiny')}px;

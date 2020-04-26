@@ -1,26 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '../Grid';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
-import { has, find } from 'lodash';
-import themeGet from '@styled-system/theme-get';
 import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
-
-import stripeIllustration from '../../public/static/images/create-collective/stripeIllustration.png';
-import bankAccountIllustration from '../../public/static/images/create-collective/bankAccountIllustration.png';
-import { P } from '../Text';
-import StyledButton from '../StyledButton';
-import Container from '../Container';
-import Link from '../Link';
-import Loading from '../Loading';
-import { getCollectivePageQuery } from '../collective-page/graphql/queries';
+import themeGet from '@styled-system/theme-get';
+import { find, has } from 'lodash';
+import { withRouter } from 'next/router';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
 import { Router } from '../../server/pages';
 
-import { withRouter } from 'next/router';
+import { getCollectivePageQuery } from '../collective-page/graphql/queries';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import Loading from '../Loading';
+import StyledButton from '../StyledButton';
+import { P } from '../Text';
+
+import bankAccountIllustration from '../../public/static/images/create-collective/bankAccountIllustration.png';
+import stripeIllustration from '../../public/static/images/create-collective/stripeIllustration.png';
 
 const Image = styled.img`
   @media screen and (min-width: 52em) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import colors from '../lib/constants/colors';
 
 class TicketController extends React.Component {

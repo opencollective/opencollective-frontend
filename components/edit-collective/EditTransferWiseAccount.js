@@ -5,12 +5,12 @@ import { useFormik } from 'formik';
 import { defineMessages } from 'react-intl';
 
 import { GraphQLContext } from '../../lib/graphql/context';
-import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import { P } from '../Text';
 import StyledButton from '../StyledButton';
-import StyledInputField from '../StyledInputField';
 import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import { P } from '../Text';
 
 const createConnectedAccountMutation = gqlV2`
   mutation createConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
