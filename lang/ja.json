@@ -709,6 +709,7 @@
   "expense.expensePolicy.add": "請求ポリシーを追加",
   "expense.hostFeeInCollectiveCurrency": "ホストの手数料",
   "expense.incurredAt": "日付",
+  "Expense.InvoiceAttachments": "Invoice attachments",
   "Expense.InvoiceItems": "Invoice items",
   "expense.markAsUnpaid.btn": "未支払いにする",
   "expense.notes": "Notes",
