@@ -1,27 +1,29 @@
-import { Box, Flex } from '../Grid';
-import PropTypes from 'prop-types';
 import React from 'react';
-import { FormattedMessage, useIntl, FormattedDate } from 'react-intl';
+import PropTypes from 'prop-types';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseTypes from '../../lib/constants/expenseTypes';
 import expenseStatus from '../../lib/constants/expense-status';
+import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { i18nExpenseType } from '../../lib/i18n-expense';
+
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import { H4, P, Span } from '../Text';
-import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
-import PayoutMethodData from './PayoutMethodData';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import ExpenseStatusTag from './ExpenseStatusTag';
 import UploadedFilePreview from '../UploadedFilePreview';
-import StyledCard from '../StyledCard';
-import ExternalLink from '../ExternalLink';
+
+import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
+import ExpenseStatusTag from './ExpenseStatusTag';
+import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
 const CreatedByUserLink = ({ account }) => {
@@ -225,9 +227,9 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
               )}
               {host.website && (
                 <P mt={2} fontSize="11px">
-                  <ExternalLink href={host.website} openInNewTab>
+                  <StyledLink href={host.website} openInNewTab>
                     {host.website}
-                  </ExternalLink>
+                  </StyledLink>
                 </P>
               )}
             </PrivateInfoColumn>
@@ -251,9 +253,9 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
             )}
             {payee.website && (
               <P mt={2} fontSize="11px">
-                <ExternalLink href={payee.website} openInNewTab>
+                <StyledLink href={payee.website} openInNewTab>
                   {payee.website}
-                </ExternalLink>
+                </StyledLink>
               </P>
             )}
           </PrivateInfoColumn>

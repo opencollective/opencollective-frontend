@@ -1,44 +1,45 @@
-import { Box, Flex } from '../components/Grid';
-import { cloneDeep, uniqBy, update, get, sortBy } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { cloneDeep, get, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
+import expenseTypes from '../lib/constants/expenseTypes';
+import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
-import ExpenseSummary from '../components/expenses/ExpenseSummary';
-import CommentIcon from '../components/icons/CommentIcon';
-import Page from '../components/Page';
-import { generateNotFoundError, formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
-import Container from '../components/Container';
-import { withUser } from '../components/UserProvider';
-import { H5, Span, P, H1 } from '../components/Text';
-import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
-import MessageBox from '../components/MessageBox';
+import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
+import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
-import StyledButton from '../components/StyledButton';
-import ExpenseInfoSidebar from './ExpenseInfoSidebar';
-import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
+import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
-  loggedInAccountExpensePayoutFieldsFragment,
   expensePageExpenseFieldsFragment,
+  loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
-import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
-import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
-import expenseTypes from '../lib/constants/expenseTypes';
-import TemporaryNotification from '../components/TemporaryNotification';
+import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
+import { Box, Flex } from '../components/Grid';
 import I18nFormatters from '../components/I18nFormatters';
+import CommentIcon from '../components/icons/CommentIcon';
+import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import StyledButton from '../components/StyledButton';
+import TemporaryNotification from '../components/TemporaryNotification';
+import { H1, H5, P, Span } from '../components/Text';
+import { withUser } from '../components/UserProvider';
+
+import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 
 const messages = defineMessages({
   title: {
@@ -247,13 +248,9 @@ class ExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.expense) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return null; // TODO: page for expense not found
-      } else if (!data.expense.account) {
+        return <ErrorPage error={generateNotFoundError(null, true)} log={false} />;
+      } else if (!data.expense.account || this.props.collectiveSlug !== data.expense.account.slug) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
-      } else if (this.props.collectiveSlug !== data.expense.account.slug) {
-        // TODO Error: Not on the righ URL
-        return null;
       }
     }
 

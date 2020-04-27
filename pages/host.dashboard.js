@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '../components/Grid';
-import { omit } from 'lodash';
-
-import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
-import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
-
+import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
+import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
+import { omit } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
-import { withUser } from '../components/UserProvider';
-import Loading from '../components/Loading';
-import Page from '../components/Page';
+
 import CollectiveNavbar from '../components/CollectiveNavbar';
-import { FormattedMessage } from 'react-intl';
-import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
-import Link from '../components/Link';
+import { Flex } from '../components/Grid';
 import { Dashboard, PendingApplications } from '../components/host-dashboard';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import { withUser } from '../components/UserProvider';
 
 const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
   padding: 4px 20px 0 20px;

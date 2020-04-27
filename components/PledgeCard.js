@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Container from './Container';
-import { P, Span } from './Text';
-import LinkCollective from './LinkCollective';
-import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Avatar from './Avatar';
+import Container from './Container';
+import FormattedMoneyAmount from './FormattedMoneyAmount';
+import LinkCollective from './LinkCollective';
+import { P, Span } from './Text';
 
 const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAmount }) => (
   <Container bg="white" borderRadius="8px" border="1px solid" borderColor="black.transparent.20" minHeight="100%">

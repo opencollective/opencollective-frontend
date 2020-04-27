@@ -1,21 +1,21 @@
-import { useQuery } from '@apollo/react-hooks';
-import { Box, Flex } from '../Grid';
-import { get } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Field, FastField, useFormikContext } from 'formik';
+import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/react-hooks';
+import { FastField, Field, useFormikContext } from 'formik';
+import { get } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import StyledInputField from '../StyledInputField';
-import StyledInput from '../StyledInput';
-import StyledSpinner from '../StyledSpinner';
-import StyledSelect from '../StyledSelect';
-import { P } from '../Text';
-
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { states } from '../../lib/constants/transferwise';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+
+import { Box, Flex } from '../Grid';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledSelect from '../StyledSelect';
+import StyledSpinner from '../StyledSpinner';
+import { P } from '../Text';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
@@ -84,6 +84,10 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
     if (type) {
       formik.setFieldValue(getFieldName('data.type'), type);
     }
+    // Having this effect bein triggered on updates in formik and getFieldName
+    // would result in infinite re-rendering.
+    // This is also not necessary since these props are required.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   if (loading) {
@@ -113,47 +117,68 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
             ? value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`)
             : undefined;
           return (
-            <FastField key={input.key} name={fieldName} validate={validate}>
-              {({ field, meta }) => (
-                <StyledInputField label={input.name} required error={meta.touched && meta.error}>
-                  {() => <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} />}
-                </StyledInputField>
-              )}
-            </FastField>
+            <Box key={input.key} mt={2} flex="1">
+              <FastField name={fieldName} validate={validate}>
+                {({ field, meta }) => (
+                  <StyledInputField label={input.name} required error={meta.touched && meta.error}>
+                    {() => <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} />}
+                  </StyledInputField>
+                )}
+              </FastField>
+            </Box>
           );
         case 'radio':
         case 'select':
           validate = value =>
             input.valuesAllowed.some(v => v.key === value) ? undefined : 'This value is not accepted.';
           return (
-            <FastField key={input.key} name={fieldName} validate={validate}>
-              {({ field, meta }) => (
-                <StyledInputField label={input.name} required error={meta.touched && meta.error}>
-                  {() => {
-                    const options = formatTransferWiseSelectOptions(input.valuesAllowed);
-                    return (
-                      <StyledSelect
-                        name={field.name}
-                        options={options}
-                        disabled={disabled}
-                        onChange={({ value }) => formik.setFieldValue(field.name, value)}
-                        value={options.find(c => c.value === get(formik.values, field.name))}
-                      />
-                    );
-                  }}
-                </StyledInputField>
-              )}
-            </FastField>
+            <Box key={input.key} mt={2} flex="1">
+              <FastField name={fieldName} validate={validate}>
+                {({ field, meta }) => (
+                  <StyledInputField label={input.name} required error={meta.touched && meta.error}>
+                    {() => {
+                      const options = formatTransferWiseSelectOptions(input.valuesAllowed);
+                      return (
+                        <StyledSelect
+                          name={field.name}
+                          options={options}
+                          disabled={disabled}
+                          onChange={({ value }) => formik.setFieldValue(field.name, value)}
+                          value={options.find(c => c.value === get(formik.values, field.name))}
+                        />
+                      );
+                    }}
+                  </StyledInputField>
+                )}
+              </FastField>
+            </Box>
           );
         default:
           return null;
       }
     };
 
+    let groups = field.group;
+    const selectedCountry = get(formik.values, getFieldName(`data.details.address.country`));
+    if (field.group.some(g => g.key === 'address.country') && states[selectedCountry]) {
+      groups = [
+        ...field.group,
+        {
+          example: '',
+          key: 'address.state',
+          name: 'State',
+          required: true,
+          type: 'select',
+          validationRegexp: null,
+          valuesAllowed: states[selectedCountry],
+        },
+      ];
+    }
+
     return (
-      <Box key={i} mt={2} flex="1">
+      <Box key={i} flex="1">
         {hasMultipleInputs && <P fontSize="LeadParagraph">{field.name}</P>}
-        {field.group.filter(f => f.required).map(renderInput)}
+        {groups.filter(f => f.required).map(renderInput)}
       </Box>
     );
   };
@@ -235,14 +260,9 @@ PayoutBankInformationForm.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.string),
       }),
     }),
-  }),
-  payoutMethod: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.oneOf(Object.values(PayoutMethodType)).isRequired,
-    data: PropTypes.object,
-  }),
+  }).isRequired,
   isNew: PropTypes.bool,
-  getFieldName: PropTypes.func,
+  getFieldName: PropTypes.func.isRequired,
   /** A map of errors for this object */
   errors: PropTypes.object,
 };

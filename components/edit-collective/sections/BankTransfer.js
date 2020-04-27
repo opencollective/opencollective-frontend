@@ -1,21 +1,20 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import { Add } from '@styled-icons/material/Add';
+import gql from 'graphql-tag';
 import { get, set } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { Add } from '@styled-icons/material/Add';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
 
-import { compose } from '../../../lib/utils';
 import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
+import { compose } from '../../../lib/utils';
 
-import { Flex, Box } from '../../Grid';
-import { H3, H4, P } from '../../Text';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
-import Container from '../../Container';
-
+import { H3, H4, P } from '../../Text';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 
 class BankTransfer extends React.Component {

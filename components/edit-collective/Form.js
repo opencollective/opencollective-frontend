@@ -1,55 +1,51 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'next/router';
-import { ArrowBack } from '@styled-icons/material/ArrowBack';
-import { get, set, find } from 'lodash';
-import { H3 } from '../Text';
-import { Flex, Box } from '../Grid';
-import { Button } from 'react-bootstrap';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { isMemberOfTheEuropeanUnion } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { ArrowBack } from '@styled-icons/material/ArrowBack';
+import { find, get, set } from 'lodash';
+import { withRouter } from 'next/router';
+import { Button } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { TierTypes } from '../../lib/constants/tiers-types';
-import { defaultBackgroundImage, CollectiveType } from '../../lib/constants/collectives';
-import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
+import { TierTypes } from '../../lib/constants/tiers-types';
+import { VAT_OPTIONS } from '../../lib/constants/vat';
 
+import Container from '../Container';
+import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
+import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
-import Container from '../Container';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
+import { H3 } from '../Text';
 
+import Archive from './actions/Archive';
+import Delete from './actions/Delete';
+// Actions
+import EmptyBalance from './actions/EmptyBalance';
 // Generic Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
-import Updates from './sections/Updates';
 import Conversations from './sections/Conversations';
 import Export from './sections/Export';
-import Host from './sections/Host';
-import Members from './sections/Members';
-import PaymentMethods from './sections/PaymentMethods';
-import Tiers from './sections/Tiers';
-import Tickets from './sections/Tickets';
-import VirtualCards from './sections/VirtualCards';
-import Webhooks from './sections/Webhooks';
-
 // Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
+import Host from './sections/Host';
 import HostPlan from './sections/HostPlan';
 import InvoicesReceipts from './sections/InvoicesReceipts';
-
-// Actions
-import EmptyBalance from './actions/EmptyBalance';
-import Archive from './actions/Archive';
-import Delete from './actions/Delete';
-
-import CreateVirtualCardsForm from '../CreateVirtualCardsForm';
-import EditUserEmailForm from './EditUserEmailForm';
-import SendingMoney from './sections/SendingMoney';
+import Members from './sections/Members';
+import PaymentMethods from './sections/PaymentMethods';
 import ReceivingMoney from './sections/ReceivingMoney';
-
+import SendingMoney from './sections/SendingMoney';
+import Tickets from './sections/Tickets';
+import Tiers from './sections/Tiers';
+import Updates from './sections/Updates';
+import VirtualCards from './sections/VirtualCards';
+import Webhooks from './sections/Webhooks';
+import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
 class EditCollectiveForm extends React.Component {
@@ -405,20 +401,17 @@ class EditCollectiveForm extends React.Component {
               flexWrap="wrap"
             >
               <Link route="editCollective" params={{ slug: collective.slug, section: 'gift-cards' }}>
-                <StyledButton>
+                <StyledButton data-cy="back-to-giftcards-list">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="virtualCards.returnToEdit" defaultMessage="Go back to gift cards list" />
                 </StyledButton>
               </Link>
 
-              <ExternalLink
-                href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq"
-                openInNewTab
-              >
+              <StyledLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
                 <InfoCircle size="1em" />
                 &nbsp;
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
-              </ExternalLink>
+              </StyledLink>
             </Container>
             <CreateVirtualCardsForm
               collectiveId={collective.id}

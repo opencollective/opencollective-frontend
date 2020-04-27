@@ -4,15 +4,14 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
-
-import { imagePreview, getCollectiveImage } from '../../lib/image-utils';
-
-import { Flex } from '../Grid';
-import Container from '../Container';
-import { P, Span } from '../Text';
+import { getCollectiveImage, imagePreview } from '../../lib/image-utils';
 import { Link } from '../../server/pages';
-import StyledLink from '../StyledLink';
+
+import Container from '../Container';
 import Currency from '../Currency';
+import { Flex } from '../Grid';
+import StyledLink from '../StyledLink';
+import { P, Span } from '../Text';
 
 const hasGoals = (settings = {}) => get(settings, 'goals[0].amount', 0) > 0;
 

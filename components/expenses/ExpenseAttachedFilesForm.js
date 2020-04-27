@@ -1,14 +1,16 @@
-import { Box } from '../Grid';
-import { uniqBy } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { attachmentDropzoneParams } from './lib/attachments';
+
+import { Box } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import StyledDropzone from '../StyledDropzone';
 import StyledInputField from '../StyledInputField';
 import { Span } from '../Text';
+
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const PrivateNoteLabel = () => {

@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
-import styled from 'styled-components';
 import { Question } from '@styled-icons/fa-solid/Question';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import ApplyToHostBtnLoggedIn from './ApplyToHostBtnLoggedIn';
-import StyledTooltip from './StyledTooltip';
-import { withUser } from './UserProvider';
 import Link from './Link';
 import StyledButton from './StyledButton';
+import StyledTooltip from './StyledTooltip';
+import { withUser } from './UserProvider';
 
 const IconQuestion = styled(Question).attrs({ size: 18 })`
   padding: 0.2em;

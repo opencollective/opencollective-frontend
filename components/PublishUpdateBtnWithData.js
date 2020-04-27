@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
-
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { compose } from '../lib/utils';
 

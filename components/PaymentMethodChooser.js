@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover, OverlayTrigger } from 'react-bootstrap';
-import { defineMessages, injectIntl } from 'react-intl';
 import { get, isEmpty } from 'lodash';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { defineMessages, injectIntl } from 'react-intl';
+
+import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
+import { getStripeToken } from '../lib/stripe';
 
 import InputField from './InputField';
-import { getStripeToken } from '../lib/stripe';
-import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
-
 import SmallButton from './SmallButton';
 
 class PaymentMethodChooser extends React.Component {

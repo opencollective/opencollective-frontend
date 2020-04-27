@@ -1,18 +1,20 @@
-import { Box, Flex } from '../Grid';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { v4 as uuid } from 'uuid';
-import { isEmpty } from 'lodash';
+
+import expenseTypes from '../../lib/constants/expenseTypes';
+import { toIsoDateStr } from '../../lib/date-utils';
+import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
 
 import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import StyledDropzone from '../StyledDropzone';
 import { P } from '../Text';
+
 import ExpenseItemForm from './ExpenseItemForm';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
-import { toIsoDateStr } from '../../lib/date-utils';
-import expenseTypes from '../../lib/constants/expenseTypes';
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 
 /** Init a new expense item with default attributes */

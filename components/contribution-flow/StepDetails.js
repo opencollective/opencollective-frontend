@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate, defineMessages, injectIntl } from 'react-intl';
 import { get } from 'lodash';
-import { Flex } from '../Grid';
 import memoizeOne from 'memoize-one';
+import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
-import Container from '../Container';
-import StyledButtonSet from '../StyledButtonSet';
-import StyledInputField from '../StyledInputField';
-import StyledSelect from '../StyledSelect';
-import { P, Span } from '../Text';
-import Currency from '../Currency';
-import StyledInputAmount from '../StyledInputAmount';
-import StyledInput from '../StyledInput';
-import StyledButton from '../StyledButton';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../StyledModal';
 import { getNextChargeDate } from '../../lib/date-utils';
 import { getPrecisionFromAmount } from '../../lib/utils';
 import { Router } from '../../server/pages';
+
+import Container from '../Container';
+import Currency from '../Currency';
+import { Flex } from '../Grid';
+import StyledButton from '../StyledButton';
+import StyledButtonSet from '../StyledButtonSet';
+import StyledInput from '../StyledInput';
+import StyledInputAmount from '../StyledInputAmount';
+import StyledInputField from '../StyledInputField';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
+import { P, Span } from '../Text';
 
 const FrequenciesI18n = defineMessages({
   oneTime: {
@@ -114,7 +115,6 @@ const StepDetails = ({
     Router.pushRoute(`/${collectiveSlug}/donate/details`);
   };
   interval = interval || 'oneTime';
-
   return (
     <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap">
       <Flex mb={3}>
@@ -160,16 +160,17 @@ const StepDetails = ({
             }
             htmlFor="custom-amount"
             disabled={disabledAmount}
+            required
           >
             {fieldProps => (
               <StyledInputAmount
                 {...fieldProps}
                 type="number"
                 currency={currency}
-                min={minAmount / 100}
-                value={amount / 100}
+                min={minAmount}
+                value={amount}
                 width={1}
-                onChange={({ target }) => dispatchChange({ amount: Math.round(parseFloat(target.value) * 100) })}
+                onChange={amount => dispatchChange({ amount })}
                 containerProps={{ borderRadius: hasOptions ? '0 4px 4px 0' : 3, ml: '-1px' }}
                 prependProps={{ pl: 2, pr: 0, bg: 'white.full' }}
                 px="2px"

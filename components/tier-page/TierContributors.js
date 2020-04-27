@@ -1,12 +1,12 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Box } from '../Grid';
 import memoizeOne from 'memoize-one';
+import { FormattedMessage } from 'react-intl';
 
-import { P, H2 } from '../Text';
-import ContributorsGrid from '../ContributorsGrid';
 import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
+import ContributorsGrid from '../ContributorsGrid';
+import { Box } from '../Grid';
+import { H2, P } from '../Text';
 
 export default class TierContributors extends React.Component {
   static propTypes = {

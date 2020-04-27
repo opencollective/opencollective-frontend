@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
-import themeGet from '@styled-system/theme-get';
 
 import { textTransform } from '../lib/styled-system-custom-properties';
-import StyledTooltip from './StyledTooltip';
+
 import Link from './Link';
+import StyledTooltip from './StyledTooltip';
 
 /**
  * All the terms defined here must have a matching translation

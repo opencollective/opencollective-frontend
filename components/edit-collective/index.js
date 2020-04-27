@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../../lib/errors';
 
-import Header from '../Header';
 import Body from '../Body';
-import Footer from '../Footer';
-import SignInOrJoinFree from '../SignInOrJoinFree';
 import CollectiveNavbar from '../CollectiveNavbar';
+import Footer from '../Footer';
+import Header from '../Header';
 import NotificationBar from '../NotificationBar';
+import SignInOrJoinFree from '../SignInOrJoinFree';
 
 import Form from './Form';
 

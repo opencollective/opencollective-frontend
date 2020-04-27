@@ -1,19 +1,20 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 
-import Link from '../Link';
 import { capitalize } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
+import DefinedTerm, { Terms } from '../DefinedTerm';
+import { Flex } from '../Grid';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import Moment from '../Moment';
 import { P, Span } from '../Text';
-import TransactionDetails from './TransactionDetails';
+
 import AmountCurrency from './AmountCurrency';
-import DefinedTerm, { Terms } from '../DefinedTerm';
+import TransactionDetails from './TransactionDetails';
 
 class Transaction extends React.Component {
   static propTypes = {

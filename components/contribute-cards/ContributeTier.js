@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { Box, Flex } from '../Grid';
 import { truncate } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount } from '../../lib/utils';
-import Link from '../Link';
-import { P } from '../Text';
+
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import StyledProgressBar from '../StyledProgressBar';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
+import StyledProgressBar from '../StyledProgressBar';
+import { P } from '../Text';
 
 import Contribute from './Contribute';
 

@@ -1,10 +1,12 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import PropTypes from 'prop-types';
-import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
+
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import i18nPayoutMethodType from '../../lib/i18n-payout-method-type';
+
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
 

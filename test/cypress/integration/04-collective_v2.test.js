@@ -1,6 +1,7 @@
-import { disableSmoothScroll } from '../support/helpers';
 import { Sections } from '../../../components/collective-page/_constants';
+
 import mockRecaptcha from '../mocks/recaptcha';
+import { disableSmoothScroll } from '../support/helpers';
 
 const scrollToSection = section => {
   // Wait for new collective page to load before disabling smooth scroll

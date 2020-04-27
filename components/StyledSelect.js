@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { typography, layout, space } from 'styled-system';
-import Select, { components } from 'react-select';
-import { injectIntl, defineMessages } from 'react-intl';
 import propTypes from '@styled-system/prop-types';
 import { truncate } from 'lodash';
+import { defineMessages, injectIntl } from 'react-intl';
+import Select, { components } from 'react-select';
+import styled from 'styled-components';
+import { layout, space, typography } from 'styled-system';
 
 import SearchIcon from './SearchIcon';
 import StyledTag from './StyledTag';

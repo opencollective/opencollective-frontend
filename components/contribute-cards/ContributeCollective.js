@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+
 import Contribute from './Contribute';
 
 /**

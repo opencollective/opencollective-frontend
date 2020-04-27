@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-
-import { Flex } from '../Grid';
+import { get } from 'lodash';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { compose } from '../../lib/utils';
 
+import { Flex } from '../Grid';
 import LoadingGrid from '../LoadingGrid';
+
 import CreateHostForm from './CreateHostForm';
 
 class CreateHostFormWithData extends React.Component {

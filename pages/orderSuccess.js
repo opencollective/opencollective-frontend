@@ -1,31 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { get } from 'lodash';
-import { Box, Flex } from '../components/Grid';
-import styled from 'styled-components';
-
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
-
-import orderSuccessBackgroundUrl from '../public/static/images/order-success-background.svg';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { confettiFireworks } from '../lib/confettis';
-import { tweetURL, facebooKShareURL } from '../lib/url_helpers';
+import { facebooKShareURL, tweetURL } from '../lib/url_helpers';
 import { formatCurrency } from '../lib/utils';
-import Link from '../components/Link';
-import { withUser } from '../components/UserProvider';
-import { H3, P, Span } from '../components/Text';
+
 import ErrorPage from '../components/ErrorPage';
+import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
+import LinkCollective from '../components/LinkCollective';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import OrderSuccessContributorCardWithData from '../components/OrderSuccessContributorCardWithData';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
-import Loading from '../components/Loading';
-import OrderSuccessContributorCardWithData from '../components/OrderSuccessContributorCardWithData';
-import MessageBox from '../components/MessageBox';
-import LinkCollective from '../components/LinkCollective';
+import { H3, P, Span } from '../components/Text';
+import { withUser } from '../components/UserProvider';
+
+import orderSuccessBackgroundUrl from '../public/static/images/order-success-background.svg';
 
 const OrderSuccessContainer = styled(Flex)`
   background: white url(${orderSuccessBackgroundUrl}) 0 0/100% no-repeat;

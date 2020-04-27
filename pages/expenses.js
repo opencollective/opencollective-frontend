@@ -2,22 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import ExpensesWithData from '../components/expenses/ExpensesWithData';
-import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import ErrorPage from '../components/ErrorPage';
-import SectionTitle from '../components/SectionTitle';
-
-import { addCollectiveCoverData } from '../lib/graphql/queries';
-
-import { withUser } from '../components/UserProvider';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError } from '../lib/errors';
+import { addCollectiveCoverData } from '../lib/graphql/queries';
+
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import ErrorPage from '../components/ErrorPage';
+import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
+import ExpensesWithData from '../components/expenses/ExpensesWithData';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import SectionTitle from '../components/SectionTitle';
+import { withUser } from '../components/UserProvider';
 
 class ExpensesPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {

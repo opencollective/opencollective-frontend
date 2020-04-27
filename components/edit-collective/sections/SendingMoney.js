@@ -1,10 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
+
+import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+import { parseToBoolean } from '../../../lib/utils';
+
 import { H3, H4, P } from '../../Text';
 
-import { parseToBoolean } from '../../../lib/utils';
-import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import ConnectedAccounts from './ConnectedAccounts';
 
 class SendingMoney extends React.Component {

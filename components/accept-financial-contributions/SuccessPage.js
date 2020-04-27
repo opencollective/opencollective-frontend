@@ -1,25 +1,26 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
+import themeGet from '@styled-system/theme-get';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
+
+import { confettiFireworks } from '../../lib/confettis';
+
+import Avatar from '../Avatar';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
+import { H1, H2, P } from '../Text';
 
 import nonHostSuccessIllustration from '../../public/static/images/create-collective/original/acceptContributionsNonHostSuccessIllustration.png';
 import placeholderIllustration from '../../public/static/images/create-collective/original/placeholderGraphic.png';
-import { H1, H2, P } from '../Text';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import Avatar from '../Avatar';
-import ExternalLink from '../ExternalLink';
-import Link from '../Link';
-
-import { confettiFireworks } from '../../lib/confettis';
-import { withRouter } from 'next/router';
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
-const SmallExternalLink = styled(ExternalLink)`
+const SmallExternalLink = styled(StyledLink)`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
 

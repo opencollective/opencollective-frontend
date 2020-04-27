@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import Link from './Link';
-import { FormattedMessage } from 'react-intl';
 
 /**
  * Returns event's parent collective slug. If the parent is not available,

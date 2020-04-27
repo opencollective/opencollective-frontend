@@ -1,20 +1,21 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../../Grid';
-import memoizeOne from 'memoize-one';
-import { orderBy } from 'lodash';
-import styled from 'styled-components';
 import css from '@styled-system/css';
+import { orderBy } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
-import HorizontalScroller from '../../HorizontalScroller';
+
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
-import ContributeCardsContainer from '../ContributeCardsContainer';
+import { Box, Flex } from '../../Grid';
+import HorizontalScroller from '../../HorizontalScroller';
 import ContainerSectionContent from '../ContainerSectionContent';
+import ContributeCardsContainer from '../ContributeCardsContainer';
 import SectionTitle from '../SectionTitle';
 
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];

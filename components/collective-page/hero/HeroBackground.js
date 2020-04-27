@@ -1,22 +1,22 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import styled from 'styled-components';
+import { Mutation } from '@apollo/react-components';
+import { Upload } from '@styled-icons/feather/Upload';
+import { get, has, set } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import { Mutation } from '@apollo/react-components';
-import { get, set, has } from 'lodash';
-
-import { Upload } from '@styled-icons/feather/Upload';
+import styled from 'styled-components';
 
 import { upload } from '../../../lib/api';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
+
 import Container from '../../Container';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import MessageBox from '../../MessageBox';
-
 // Local imports
 import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
+
 import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
 
 const BASE_WIDTH = 1368;

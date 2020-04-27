@@ -1,21 +1,22 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { injectIntl, defineMessages } from 'react-intl';
-import { groupBy, sortBy, last, truncate, isEqual } from 'lodash';
+import { groupBy, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { Flex } from './Grid';
-import { Manager, Reference, Popper } from 'react-popper';
+import ReactDOM from 'react-dom';
+import { defineMessages, injectIntl } from 'react-intl';
+import { Manager, Popper, Reference } from 'react-popper';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { mergeRefs } from '../lib/react-utils';
-import StyledSelect from './StyledSelect';
+
 import Avatar from './Avatar';
-import { Span } from './Text';
 import CollectiveTypePicker from './CollectiveTypePicker';
 import Container from './Container';
-import StyledCard from './StyledCard';
 import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
+import { Flex } from './Grid';
+import StyledCard from './StyledCard';
+import StyledSelect from './StyledSelect';
+import { Span } from './Text';
 
 const CollectiveTypesI18n = defineMessages({
   [CollectiveType.COLLECTIVE]: {

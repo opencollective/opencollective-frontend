@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import Error from './Error';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import Membership from './Membership';
 import { Button } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
+
+import Error from './Error';
+import Membership from './Membership';
 
 const MEMBERSHIPS_PER_PAGE = 10;
 

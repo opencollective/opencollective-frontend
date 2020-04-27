@@ -1,9 +1,9 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import SubscriptionCard from '../SubscriptionCard';
-
 import { withRequiredProviders } from '../../test/providers';
+
+import SubscriptionCard from '../SubscriptionCard';
 
 describe('SubscriptionCard.test.js', () => {
   const mountComponent = props => mount(withRequiredProviders(<SubscriptionCard {...props} />));

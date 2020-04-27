@@ -1,20 +1,21 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { Flex } from '../Grid';
 import { Search } from '@styled-icons/octicons/Search';
-import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-
-import { H4 } from '../Text';
-import Container from '../Container';
-import StyledCard from '../StyledCard';
-import StyledRadioList from '../StyledRadioList';
-import StyledInput from '../StyledInput';
-import StyledButton from '../StyledButton';
-import GithubRepositoryEntry from './GithubRepositoryEntry';
+import themeGet from '@styled-system/theme-get';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { escapeInput } from '../../lib/utils';
+
+import Container from '../Container';
+import { Flex } from '../Grid';
+import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
+import StyledInput from '../StyledInput';
+import StyledRadioList from '../StyledRadioList';
+import { H4 } from '../Text';
+
+import GithubRepositoryEntry from './GithubRepositoryEntry';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};

@@ -1,10 +1,12 @@
 import gql from 'graphql-tag';
-import * as fragments from './fragments';
+
 import {
+  BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-  BudgetItemExpenseFragment,
 } from '../../BudgetItemsList';
+
+import * as fragments from './fragments';
 
 export const getCollectivePageQuery = gql`
   query getCollectivePageQuery($slug: String!, $nbContributorsPerContributeCard: Int) {

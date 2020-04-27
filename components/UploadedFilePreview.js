@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { max } from 'lodash';
 import { FileText } from '@styled-icons/feather/FileText';
+import { max } from 'lodash';
+import styled from 'styled-components';
+
 import { imagePreview } from '../lib/image-utils';
-import ExternalLink from './ExternalLink';
+
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import StyledLink from './StyledLink';
 
-const ImageLink = styled(ExternalLink).attrs({ openInNewTab: true })`
+const ImageLink = styled(StyledLink).attrs({ openInNewTab: true })`
   cursor: pointer;
   overflow: hidden;
   display: block;

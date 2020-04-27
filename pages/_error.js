@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ErrorPage from '../components/ErrorPage';
 import { generateNotFoundError } from '../lib/errors';
+
+import ErrorPage from '../components/ErrorPage';
 
 /**
  * This page is shown when NextJS triggers a critical error during server-side

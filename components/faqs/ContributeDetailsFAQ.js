@@ -4,7 +4,8 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
-import FAQ, { Entry, Title, Content } from './FAQ';
+
+import FAQ, { Content, Entry, Title } from './FAQ';
 
 /**
  * FAQ associated to the `ContributeDetails` component.

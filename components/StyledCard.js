@@ -1,18 +1,19 @@
 import PropTypes from 'prop-types';
+import styledPropTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import {
-  compose,
   background,
   border,
-  flexbox,
-  shadow,
   color,
+  compose,
+  flexbox,
   layout,
+  position,
+  shadow,
   space,
   typography,
-  position,
 } from 'styled-system';
-import styledPropTypes from '@styled-system/prop-types';
+
 import { overflow } from '../lib/styled-system-custom-properties';
 
 /**

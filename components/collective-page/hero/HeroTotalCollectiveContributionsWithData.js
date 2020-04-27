@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { Box } from '../../Grid';
 import { FormattedMessage } from 'react-intl';
-import { P } from '../../Text';
+
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import { Box } from '../../Grid';
+import { P } from '../../Text';
 
 const TotalCollectiveContributionsQuery = gql`
   query TotalCollectiveContributions($id: Int) {

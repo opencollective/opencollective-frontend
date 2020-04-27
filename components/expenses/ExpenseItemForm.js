@@ -1,22 +1,23 @@
-import { Box, Flex } from '../Grid';
-import { get, isEmpty } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { FastField, Field } from 'formik';
+import { get, isEmpty } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { Field, FastField } from 'formik';
 import { isURL } from 'validator';
 
-import { requireFields, formatFormErrorMessage } from '../../lib/form-utils';
 import { createError, ERROR } from '../../lib/errors';
+import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
+import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+
+import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import StyledButton from '../StyledButton';
+import StyledDropzone from '../StyledDropzone';
+import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import { Span } from '../Text';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
-import StyledDropzone from '../StyledDropzone';
-import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
 
 export const msg = defineMessages({
   previewImgAlt: {
@@ -49,6 +50,10 @@ export const msg = defineMessages({
 export const validateExpenseItem = (expense, item) => {
   const errors = requireFields(item, ['description', 'incurredAt', 'amount']);
 
+  if (isNaN(item.amount)) {
+    errors.amount = createError(ERROR.FORM_FIELD_PATTERN);
+  }
+
   if (!isEmpty(errors)) {
     return errors;
   }
@@ -58,7 +63,7 @@ export const validateExpenseItem = (expense, item) => {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(item.url)) {
-      errors.url = createError(ERROR.FORM_FIELD_BAD_PATTERN);
+      errors.url = createError(ERROR.FORM_FIELD_PATTERN);
     }
   }
 
@@ -102,6 +107,8 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                 >
                   <StyledDropzone
                     {...attachmentDropzoneParams}
+                    data-cy={`${field.name}-dropzone`}
+                    name={field.name}
                     isMulti={false}
                     error={meta.error}
                     onSuccess={url => form.setFieldValue(field.name, url)}
@@ -139,7 +146,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               mt={3}
             >
               {inputProps => (
-                <Field as={StyledInput} maxHeight={39} {...inputProps}>
+                <Field maxHeight={39} {...inputProps}>
                   {({ field }) => (
                     <StyledInput
                       {...inputProps}
@@ -165,16 +172,20 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               mt={3}
             >
               {inputProps => (
-                <Field
-                  as={StyledInputAmount}
-                  {...inputProps}
-                  currency={currency}
-                  currencyDisplay="CODE"
-                  min="0.01"
-                  maxWidth="100%"
-                  placeholder="0.00"
-                  parseNumbers
-                />
+                <Field as={StyledInputAmount} name={inputProps.name}>
+                  {({ field, form: { setFieldValue } }) => (
+                    <StyledInputAmount
+                      {...field}
+                      {...inputProps}
+                      currency={currency}
+                      currencyDisplay="CODE"
+                      min={1}
+                      maxWidth="100%"
+                      placeholder="0.00"
+                      onChange={(value, e) => setFieldValue(e.target.name, value)}
+                    />
+                  )}
+                </Field>
               )}
             </StyledInputField>
           </Flex>

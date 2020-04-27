@@ -1,20 +1,20 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import dynamic from 'next/dynamic';
-import styled, { css } from 'styled-components';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { Mutation } from '@apollo/react-components';
-
 import { Camera } from '@styled-icons/feather/Camera';
+import dynamic from 'next/dynamic';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
+
 import Avatar from '../../Avatar';
+import Container from '../../Container';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
-import Container from '../../Container';
-import { EditAvatarMutation } from '../graphql/mutations';
 import { Span } from '../../Text';
+import { EditAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
 

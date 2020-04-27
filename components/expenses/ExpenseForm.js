@@ -1,32 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { Box, Flex } from '../Grid';
-import { first, isEmpty, get, pick } from 'lodash';
-import { Formik, Form, Field, FieldArray, FastField } from 'formik';
+import { FastField, Field, FieldArray, Form, Formik } from 'formik';
+import { first, get, isEmpty, pick } from 'lodash';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { i18nExpenseType } from '../../lib/i18n-expense';
-import { P, Span } from '../Text';
-import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
-import StyledInput from '../StyledInput';
-import StyledHr from '../StyledHr';
-import StyledTag from '../StyledTag';
-import StyledInputTags from '../StyledInputTags';
-import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
-import StyledInputField from '../StyledInputField';
-import CollectivePicker from '../CollectivePicker';
-import StyledButton from '../StyledButton';
-import PayoutMethodSelect from './PayoutMethodSelect';
-import StyledTextarea from '../StyledTextarea';
-import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
-import StyledCard from '../StyledCard';
-import { requireFields, formatFormErrorMessage } from '../../lib/form-utils';
 import { ERROR, isErrorType } from '../../lib/errors';
-import { validateExpenseItem } from './ExpenseItemForm';
+import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
+import { i18nExpenseType } from '../../lib/i18n-expense';
+
+import CollectivePicker from '../CollectivePicker';
+import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
+import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledInputTags from '../StyledInputTags';
+import StyledTag from '../StyledTag';
+import StyledTextarea from '../StyledTextarea';
+import { P, Span } from '../Text';
+
+import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
+import { validateExpenseItem } from './ExpenseItemForm';
+import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
+import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
+import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
   descriptionPlaceholder: {
@@ -220,7 +222,13 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                 {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
               </Span>
               <StyledHr flex="1" borderColor="black.300" mx={2} />
-              <StyledButton buttonSize="tiny" type="button" onClick={() => addNewExpenseItem(formik)} minWidth={135}>
+              <StyledButton
+                buttonSize="tiny"
+                type="button"
+                onClick={() => addNewExpenseItem(formik)}
+                minWidth={135}
+                data-cy="expense-add-item-btn"
+              >
                 +&nbsp;{formatMessage(isReceipt ? msg.addNewReceipt : msg.addNewItem)}
               </StyledButton>
             </Flex>
@@ -259,6 +267,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                               inputId={id}
                               collectives={payoutProfiles}
                               getDefaultOptions={build => values.payee && build(values.payee)}
+                              data-cy="select-expense-payee"
                               onChange={({ value }) => {
                                 formik.setFieldValue('payee', value);
                                 formik.setFieldValue('payoutMethod', null);

@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import styled, { css } from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { Flex, Box } from './Grid';
-import { transparentize } from 'polished';
 import { Check } from '@styled-icons/fa-solid/Check';
-import withViewport, { VIEWPORTS } from '../lib/withViewport';
+import themeGet from '@styled-system/theme-get';
+import classNames from 'classnames';
+import { transparentize } from 'polished';
 import { FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
 
-import { P, Span } from './Text';
+import withViewport, { VIEWPORTS } from '../lib/withViewport';
+
+import { Box, Flex } from './Grid';
 import StyledSpinner from './StyledSpinner';
+import { P, Span } from './Text';
 
 const Bubble = styled(Flex)`
   justify-content: center;

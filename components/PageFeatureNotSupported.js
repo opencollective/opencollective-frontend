@@ -1,5 +1,6 @@
 import React from 'react';
-import { useIntl, defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
+
 import { Flex } from './Grid';
 import Page from './Page';
 import { H1, P } from './Text';

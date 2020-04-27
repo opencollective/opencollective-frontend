@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import SearchIcon from './SearchIcon';
-import TopBarProfileMenu from './TopBarProfileMenu';
-import SearchForm from './SearchForm';
 import { FormattedMessage } from 'react-intl';
-import { Link } from '../server/pages';
-
-import Hide from './Hide';
-import { Box, Flex } from './Grid';
 import styled from 'styled-components';
 
 import { rotateMixin } from '../lib/constants/animations';
-import { withUser } from './UserProvider';
 import theme from '../lib/theme';
+import { Link } from '../server/pages';
+
+import { Box, Flex } from './Grid';
+import Hide from './Hide';
+import SearchForm from './SearchForm';
+import SearchIcon from './SearchIcon';
+import TopBarProfileMenu from './TopBarProfileMenu';
+import { withUser } from './UserProvider';
 
 const Logo = styled.img.attrs({
   src: '/static/images/opencollective-icon.svg',

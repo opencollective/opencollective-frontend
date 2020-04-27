@@ -1,20 +1,20 @@
 import React, { Fragment } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get, truncate } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { compose } from '../lib/utils';
 
-import Link from './Link';
-import { P } from './Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
-import StyledCheckbox from './StyledCheckbox';
-import StyledButton from './StyledButton';
 import Container from './Container';
-import ExternalLink from './ExternalLink';
+import Link from './Link';
+import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
+import StyledLink from './StyledLink';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import { P } from './Text';
 
 const CheckboxWrapper = styled(Container)`
   color: #090a0a;
@@ -158,9 +158,9 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                       defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
                       values={{
                         'tos-link': msg => (
-                          <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
+                          <StyledLink href={get(host, 'settings.tos')} openInNewTab>
                             {msg}
-                          </ExternalLink>
+                          </StyledLink>
                         ),
                         hostName: host.name,
                       }}

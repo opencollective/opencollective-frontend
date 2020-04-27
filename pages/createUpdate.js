@@ -1,28 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { Flex, Box } from '../components/Grid';
 import { ArrowBack } from '@styled-icons/boxicons-regular';
+import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { compose } from '../lib/utils';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { compose } from '../lib/utils';
 import { Router } from '../server/pages';
 
-import Header from '../components/Header';
 import Body from '../components/Body';
-import Footer from '../components/Footer';
-import ErrorPage from '../components/ErrorPage';
-import EditUpdateForm from '../components/EditUpdateForm';
 import Button from '../components/Button';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
-import MessageBox from '../components/MessageBox';
+import EditUpdateForm from '../components/EditUpdateForm';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
 import Link from '../components/Link';
+import MessageBox from '../components/MessageBox';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-import CollectiveNavbar from '../components/CollectiveNavbar';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;

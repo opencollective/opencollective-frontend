@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
 
 import Error from '../Error';
+
 import Expenses from './Expenses';
 
 class ExpensesWithData extends React.Component {
@@ -145,9 +146,6 @@ const EXPENSES_PER_PAGE = 10;
 
 const getExpensesVariables = props => {
   const filters = { ...props.filters };
-  if (filters.status === 'READY') {
-    filters.status = 'APPROVED';
-  }
 
   const vars = {
     CollectiveId: props.collective.id,
@@ -161,6 +159,12 @@ const getExpensesVariables = props => {
   } else {
     vars.category = null;
   }
+
+  if (vars.status === 'READY') {
+    vars.status = 'APPROVED';
+    vars.limit = null;
+  }
+
   return vars;
 };
 

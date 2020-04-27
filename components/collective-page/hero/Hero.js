@@ -1,44 +1,43 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Flex } from '../../Grid';
-import styled from 'styled-components';
-import { get } from 'lodash';
-import dynamic from 'next/dynamic';
-
-// Icons
-import { Twitter } from '@styled-icons/feather/Twitter';
-import { Github } from '@styled-icons/feather/Github';
-import { Camera } from '@styled-icons/feather/Camera';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
+import { Camera } from '@styled-icons/feather/Camera';
+import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Settings } from '@styled-icons/feather/Settings';
+// Icons
+import { Twitter } from '@styled-icons/feather/Twitter';
+import { get } from 'lodash';
+import dynamic from 'next/dynamic';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
+import { getCollectiveMainTag } from '../../../lib/collective.lib';
 // General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { getCollectiveMainTag } from '../../../lib/collective.lib';
-import { twitterProfileUrl, githubProfileUrl } from '../../../lib/url_helpers';
-import StyledRoundButton from '../../StyledRoundButton';
-import StyledLink from '../../StyledLink';
-import ExternalLink from '../../ExternalLink';
-import { Span, H1 } from '../../Text';
-import Container from '../../Container';
-import I18nCollectiveTags from '../../I18nCollectiveTags';
-import StyledTag from '../../StyledTag';
-import DefinedTerm, { Terms } from '../../DefinedTerm';
-import LinkCollective from '../../LinkCollective';
-import CollectiveCallsToAction from '../../CollectiveCallsToAction';
-import UserCompany from '../../UserCompany';
-import StyledButton from '../../StyledButton';
+import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url_helpers';
 
+import CollectiveCallsToAction from '../../CollectiveCallsToAction';
+import Container from '../../Container';
+import DefinedTerm, { Terms } from '../../DefinedTerm';
+import { Flex } from '../../Grid';
+import I18nCollectiveTags from '../../I18nCollectiveTags';
+import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledLink from '../../StyledLink';
+import StyledRoundButton from '../../StyledRoundButton';
+import StyledTag from '../../StyledTag';
+import { H1, Span } from '../../Text';
+import UserCompany from '../../UserCompany';
 // Local imports
 import ContainerSectionContent from '../ContainerSectionContent';
-import HeroBackground from './HeroBackground';
-import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
+
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
-import MessageBox from '../../MessageBox';
-import Link from '../../Link';
+import HeroBackground from './HeroBackground';
+import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 
 // Dynamic imports
 const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
@@ -172,7 +171,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               )}
               <Flex my={2}>
                 {collective.twitterHandle && (
-                  <ExternalLink
+                  <StyledLink
                     data-cy="twitterProfileUrl"
                     href={twitterProfileUrl(collective.twitterHandle)}
                     title="Twitter"
@@ -182,10 +181,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledRoundButton size={32} mr={3}>
                       <Twitter size={12} />
                     </StyledRoundButton>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
                 {collective.githubHandle && (
-                  <ExternalLink
+                  <StyledLink
                     data-cy="githubProfileUrl"
                     href={githubProfileUrl(collective.githubHandle)}
                     title="Github"
@@ -195,10 +194,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledRoundButton size={32} mr={3}>
                       <Github size={12} />
                     </StyledRoundButton>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
                 {collective.website && (
-                  <ExternalLink
+                  <StyledLink
                     data-cy="collectiveWebsite"
                     href={collective.website}
                     title={intl.formatMessage(Translations.website)}
@@ -208,7 +207,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     <StyledRoundButton size={32} mr={3}>
                       <Globe size={14} />
                     </StyledRoundButton>
-                  </ExternalLink>
+                  </StyledLink>
                 )}
               </Flex>
               {host && collective.isApproved && !isEvent && (

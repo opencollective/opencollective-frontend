@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import StyledUpdate from './StyledUpdate';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+
 import colors from '../lib/constants/colors';
+
+import StyledUpdate from './StyledUpdate';
 
 class Updates extends React.Component {
   static propTypes = {

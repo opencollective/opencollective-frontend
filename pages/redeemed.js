@@ -1,31 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import sanitizeHtml from 'sanitize-html';
 import styled from 'styled-components';
-import gql from 'graphql-tag';
-import { Flex, Box } from '../components/Grid';
 import { fontSize, maxWidth } from 'styled-system';
-import { FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectivesWithData from '../components/CollectivesWithData';
-import Container from '../components/Container';
-import { P, H1, H5 } from '../components/Text';
-import GiftCard from '../components/GiftCard';
-import SearchForm from '../components/SearchForm';
 
 import withData from '../lib/withData';
 
-import { withUser } from '../components/UserProvider';
-import HappyBackground from '../components/virtual-cards/HappyBackground';
+import Body from '../components/Body';
+import CollectivesWithData from '../components/CollectivesWithData';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import Container from '../components/Container';
+import Footer from '../components/Footer';
+import GiftCard from '../components/GiftCard';
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
+import SearchForm from '../components/SearchForm';
+import { H1, H5, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 import CollectiveCard from '../components/virtual-cards/CollectiveCard';
-import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import { graphql } from '@apollo/react-hoc';
+import HappyBackground from '../components/virtual-cards/HappyBackground';
 
 const paymentMethodQuery = gql`
   query PaymentMethod($code: String) {

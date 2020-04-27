@@ -1,24 +1,22 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Box, Flex } from './Grid';
-import { FormattedMessage } from 'react-intl';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Github } from '@styled-icons/fa-brands/Github';
-import { Blog } from '@styled-icons/icomoon/Blog';
 import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
+import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/material/Mail';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
+import languages from '../lib/constants/locales';
 import { Link } from '../server/pages';
 
-import { P, Span } from './Text';
 import Container from './Container';
+import { Box, Flex } from './Grid';
 import ListItem from './ListItem';
 import StyledLink from './StyledLink';
 import StyledTooltip from './StyledTooltip';
-import ExternalLink from './ExternalLink';
-
-import languages from '../lib/constants/locales';
+import { P, Span } from './Text';
 
 const SocialLink = styled.a`
   align-items: center;
@@ -123,9 +121,9 @@ class Footer extends React.Component {
                       defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
                       values={{
                         crowdinLink: (
-                          <ExternalLink href="https://crowdin.com/project/opencollective" openInNewTab>
+                          <StyledLink href="https://crowdin.com/project/opencollective" openInNewTab>
                             Crowdin
-                          </ExternalLink>
+                          </StyledLink>
                         ),
                       }}
                     />

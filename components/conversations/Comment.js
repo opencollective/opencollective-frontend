@@ -1,26 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
-import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
 import { useMutation } from '@apollo/react-hooks';
-
 import { Edit } from '@styled-icons/feather/Edit';
 import { X } from '@styled-icons/feather/X';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import RichTextEditor from '../RichTextEditor';
-import HTMLContent from '../HTMLContent';
-import LinkCollective from '../LinkCollective';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+
 import Avatar from '../Avatar';
-import { P } from '../Text';
-import Container from '../Container';
-import StyledButton from '../StyledButton';
-import Hide from '../Hide';
 import ConfirmationModal from '../ConfirmationModal';
-import MessageBox from '../MessageBox';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Hide from '../Hide';
+import HTMLContent from '../HTMLContent';
 import InlineEditField from '../InlineEditField';
+import LinkCollective from '../LinkCollective';
+import MessageBox from '../MessageBox';
+import RichTextEditor from '../RichTextEditor';
+import StyledButton from '../StyledButton';
+import { P } from '../Text';
+
 import { CommentFieldsFragment } from './graphql';
 
 const CommentBtn = styled(StyledButton)`

@@ -1,9 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import FAQ, { Entry, Title, Content } from './FAQ';
-import StyledLink from '../StyledLink';
-import ExternalLink from '../ExternalLink';
+
 import { Box } from '../Grid';
+import StyledLink from '../StyledLink';
+
+import FAQ, { Content, Entry, Title } from './FAQ';
 
 const supportEmail = 'support@opencollective.com';
 
@@ -51,7 +52,7 @@ const FinancialContributionsFAQ = props => (
     </Entry>
     <Box mt={2}>
       <StyledLink
-        as={ExternalLink}
+        as={StyledLink}
         href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
         openInNewTab
         fontSize="Caption"

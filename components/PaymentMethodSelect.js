@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
 
-import StyledSelect from './StyledSelect';
 import { paymentMethodLabelWithIcon } from '../lib/payment_method_label';
+
+import StyledSelect from './StyledSelect';
 
 class PaymentMethodSelect extends Component {
   static propTypes = {

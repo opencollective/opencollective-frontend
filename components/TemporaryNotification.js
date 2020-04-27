@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { position } from 'styled-system';
+
+import { Box } from './Grid';
 import StyledButton from './StyledButton';
 
 const Notification = styled.div`
@@ -48,12 +49,13 @@ const TemporaryNotification = ({ children, position, onDismiss }) => {
   }
 
   return (
-    <Notification position={position}>
+    <Notification position={position} data-cy="temporary-notification">
       <Box mr="auto" />
       <Box>{children}</Box>
       <Box ml="auto">
         <DismissButton
           ml={2}
+          data-cy="dismiss-temporary-notification-btn"
           onClick={() => {
             setDismissed(true);
             if (onDismiss) {

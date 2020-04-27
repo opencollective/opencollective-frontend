@@ -1,11 +1,13 @@
 import React from 'react';
-import { get } from 'lodash';
 import PropTypes from 'prop-types';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { get } from 'lodash';
+
+import { BANNER, DISMISSABLE_HELP_MESSAGE_KEY, HELP_MESSAGE } from '../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { withUser } from './UserProvider';
-import { HELP_MESSAGE, BANNER, DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
 import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
+
+import { withUser } from './UserProvider';
 
 const accountSettingsQuery = gqlV2`
   query AccountSettings {

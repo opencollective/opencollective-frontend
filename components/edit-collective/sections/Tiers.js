@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 import { get } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
+
+import { capitalize, getCurrencySymbol } from '../../../lib/utils';
+
 import { Box, Flex } from '../../Grid';
-import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
-
-import { getCurrencySymbol, capitalize } from '../../../lib/utils';
-
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
-import { Span } from '../../Text';
 import MessageBox from '../../MessageBox';
+import { Span } from '../../Text';
 
 class Tiers extends React.Component {
   static propTypes = {

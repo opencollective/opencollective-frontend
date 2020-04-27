@@ -1,5 +1,6 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Span } from '../Text';
 
@@ -8,9 +9,10 @@ import { Span } from '../Text';
  */
 const ExpenseItemsTotalAmount = ({ items, currency }) => {
   const totalAmount = items.reduce((amount, attachment) => amount + (attachment.amount || 0), 0);
+  const isValid = items.every(item => item.amount);
   return (
     <Span color="black.500" fontSize="LeadParagraph" letterSpacing={0} data-cy="expense-items-total-amount">
-      <FormattedMoneyAmount amount={totalAmount} precision={2} currency={currency} />
+      {isValid ? <FormattedMoneyAmount amount={totalAmount} precision={2} currency={currency} /> : '--.--'}
     </Span>
   );
 };

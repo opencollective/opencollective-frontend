@@ -1,21 +1,22 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '../Grid';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import StyledTag from '../../components/StyledTag';
+
+import CollectiveNavbar from '../CollectiveNavbar';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
+import { H1, H2, H3, P } from '../Text';
+
+import HostsContainer from './HostsContainer';
+
 import umbrellaIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
 import climateIllustration from '../../public/static/images/create-collective/climateIllustration.png';
-import { H1, H2, H3, P } from '../Text';
-import StyledButton from '../StyledButton';
-import ExternalLink from '../ExternalLink';
-import Container from '../Container';
-import HostsContainer from './HostsContainer';
-import StyledTag from '../../components/StyledTag';
-import CollectiveNavbar from '../CollectiveNavbar';
-import I18nCollectiveTags from '../I18nCollectiveTags';
 
-const tagList = ['All fiscal hosts', 'climate', 'opensource', 'covid'];
 const FISCAL_HOST_LINK = 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host';
 
 const FilterTag = styled(StyledTag)`
@@ -75,11 +76,21 @@ class ApplyToHost extends React.Component {
         id: 'fiscalHost.seeMoreHosts',
         defaultMessage: 'See more hosts',
       },
+      allFiscalHosts: {
+        id: 'fiscalHost.allFiscalHosts',
+        defaultMessage: 'All fiscal hosts',
+      },
     });
+
+    this.tagList = {
+      all: props.intl.formatMessage(this.messages.allFiscalHosts),
+      opensource: 'Open Source', // No need to translate
+      'covid-19': 'COVID-19', // No need to translate
+    };
   }
 
   setTags = tag => {
-    tag === 'All fiscal hosts' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
+    tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
   };
 
   render() {
@@ -114,9 +125,9 @@ class ApplyToHost extends React.Component {
             </Box>
           </Container>
           <Flex px={[3, 5]} my={4} flexWrap="wrap">
-            {tagList.map(tag => (
-              <FilterTag key={`${tag}-tag`} px={2} mr={2} onClick={() => this.setTags(tag)}>
-                <I18nCollectiveTags tags={tag} />
+            {Object.keys(this.tagList).map(tagKey => (
+              <FilterTag key={`${tagKey}-tag`} px={2} mr={2} onClick={() => this.setTags(tagKey)}>
+                {this.tagList[tagKey]}
               </FilterTag>
             ))}
           </Flex>
@@ -155,11 +166,11 @@ class ApplyToHost extends React.Component {
                 </H3>
               </Box>
               <Box order={[3, 2, 3]}>
-                <ExternalLink href={FISCAL_HOST_LINK} openInNewTab>
+                <StyledLink href={FISCAL_HOST_LINK} openInNewTab>
                   <StyledButton buttonStyle="dark" mt={[2, 3]} mb={3} px={3}>
                     {intl.formatMessage(this.messages.becomeHost)}
                   </StyledButton>
-                </ExternalLink>
+                </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
                 <img src={climateIllustration} width="192px" height="192px" />

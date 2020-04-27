@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import ErrorPage from '../components/ErrorPage';
-import UpdateWithData from '../components/UpdateWithData';
-
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import { withUser } from '../components/UserProvider';
+import Body from '../components/Body';
 import { Sections } from '../components/collective-page/_constants';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import UpdateWithData from '../components/UpdateWithData';
+import { withUser } from '../components/UserProvider';
 
 class UpdatePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, updateSlug } }) {

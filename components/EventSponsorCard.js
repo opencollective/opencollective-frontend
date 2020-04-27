@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
 import { get } from 'lodash';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { getCollectiveImage } from '../lib/image-utils';
 

@@ -1,23 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { get, uniqBy } from 'lodash';
-import { Box, Flex } from './Grid';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-
 import { Settings } from '@styled-icons/feather/Settings';
+import { get, uniqBy } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { Link } from '../server/pages';
-import { formatCurrency, capitalize } from '../lib/utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { withUser } from './UserProvider';
+import { capitalize, formatCurrency } from '../lib/utils';
+import { Link } from '../server/pages';
+
 import Avatar from './Avatar';
-import Hide from './Hide';
-import { P } from './Text';
-import StyledLink from './StyledLink';
-import ListItem from './ListItem';
 import Container from './Container';
+import { Box, Flex } from './Grid';
+import Hide from './Hide';
+import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
+import StyledLink from './StyledLink';
+import { P } from './Text';
+import { withUser } from './UserProvider';
 import StyledRoundButton from './StyledRoundButton';
 import { Plus } from '@styled-icons/boxicons-regular';
 import StyledHr from './StyledHr';

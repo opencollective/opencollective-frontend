@@ -1,24 +1,24 @@
-import { Flex } from '../../Grid';
-import { set, cloneDeep, pick } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
-import { useIntl, defineMessages } from 'react-intl';
+import { cloneDeep, pick, set } from 'lodash';
+import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import hasFeature, { FEATURE_FLAGS, FEATURES } from '../../../lib/allowed-features';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+
+import Container from '../../Container';
+import CreateUpdateFAQ from '../../faqs/CreateUpdateFAQ';
+import { Flex } from '../../Grid';
+import Link from '../../Link';
+import MessageBox from '../../MessageBox';
+import StyledCheckbox from '../../StyledCheckbox';
+import { H3, P } from '../../Text';
+import { updateSettingsMutation } from '../mutations';
 
 import imgPreviewList from '../../../public/static/images/updates/updates-list-preview.png';
 import imgPreviewNewUpdate from '../../../public/static/images/updates/updates-new-preview.png';
-
-import { getErrorFromGraphqlException } from '../../../lib/errors';
-import hasFeature, { FEATURES, FEATURE_FLAGS } from '../../../lib/allowed-features';
-import CreateUpdateFAQ from '../../faqs/CreateUpdateFAQ';
-import Container from '../../Container';
-import MessageBox from '../../MessageBox';
-import { H3, P } from '../../Text';
-import StyledCheckbox from '../../StyledCheckbox';
-import Link from '../../Link';
-
-import { updateSettingsMutation } from '../mutations';
 
 const messages = defineMessages({
   title: {

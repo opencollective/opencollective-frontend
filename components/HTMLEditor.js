@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { upload } from '../lib/api';
+
 import LoadingPlaceholder from './LoadingPlaceholder';
 
 /*

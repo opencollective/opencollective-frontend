@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '../components/Grid';
+import styled from 'styled-components';
 
 import Container from '../components/Container';
+import { Flex } from '../components/Grid';
 import Page from '../components/Page';
-import { withUser } from '../components/UserProvider';
 import { H3, P } from '../components/Text';
-import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
+import { withUser } from '../components/UserProvider';
 
 const Icon = styled(PaperPlane)`
   color: ${themeGet('colors.primary.300')};

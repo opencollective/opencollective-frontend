@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import withViewport, { VIEWPORTS } from '../../lib/withViewport';
 import { Router } from '../../server/pages';
+
 import Container from '../Container';
-import PricingTabs from './PricingTabs';
+
+import HostOrganization from './tabs/HostOrganization';
 import SingleCollectiveWithBankAccount from './tabs/SingleCollectiveWithBankAccount';
 import SingleCollectiveWithoutBankAccount from './tabs/SingleCollectiveWithoutBankAccount';
-import HostOrganization from './tabs/HostOrganization';
-import withViewport, { VIEWPORTS } from '../../lib/withViewport';
+import PricingTabs from './PricingTabs';
 
 class Pricing extends Component {
   static propTypes = {

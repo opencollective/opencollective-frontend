@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { borders, borderRadius } from 'styled-system';
+import { borderRadius, borders } from 'styled-system';
+
 import { Flex } from './Grid';
 
 const computeBorderRadius = ({ index, itemCount }) => {

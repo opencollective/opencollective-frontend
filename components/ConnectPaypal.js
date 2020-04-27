@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../lib/api';
+
 import Currency from './Currency';
-import SmallButton from './SmallButton';
 import MessageBox from './MessageBox';
+import SmallButton from './SmallButton';
 import { P } from './Text';
 
 class ConnectPaypal extends React.Component {

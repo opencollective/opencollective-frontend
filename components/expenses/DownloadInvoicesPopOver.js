@@ -1,18 +1,19 @@
 import React from 'react';
-import classnames from 'classnames';
 import PropTypes from 'prop-types';
-import moment from 'moment';
-import gql from 'graphql-tag';
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import { Popover, OverlayTrigger } from 'react-bootstrap';
-import { uniq, omit, groupBy } from 'lodash';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
+import classnames from 'classnames';
+import gql from 'graphql-tag';
+import { groupBy, omit, uniq } from 'lodash';
+import moment from 'moment';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
 
-import { formatCurrency } from '../../lib/utils';
 import { getCollectiveImage } from '../../lib/image-utils';
+import { formatCurrency } from '../../lib/utils';
 
 import InputField from '../InputField';
+
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 
 class Overlay extends React.Component {

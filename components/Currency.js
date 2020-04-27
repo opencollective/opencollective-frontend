@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getCurrencySymbol, abbreviateNumber, formatCurrency } from '../lib/utils';
+
+import { abbreviateNumber, formatCurrency, getCurrencySymbol } from '../lib/utils';
 
 import { Span } from './Text';
 

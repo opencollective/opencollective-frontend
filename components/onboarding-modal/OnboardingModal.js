@@ -1,25 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { Box, Flex } from '../Grid';
 import { graphql } from '@apollo/react-hoc';
+import { Form, Formik } from 'formik';
 import gql from 'graphql-tag';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Formik, Form } from 'formik';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 import { isURL, matches } from 'validator';
-
-import Modal, { ModalBody, ModalHeader, ModalFooter, ModalOverlay } from '../../components/StyledModal';
-import OnboardingNavButtons from './OnboardingNavButtons';
-import OnboardingStepsProgress from './OnboardingStepsProgress';
-import OnboardingContentBox from './OnboardingContentBox';
-import MessageBox from '../../components/MessageBox';
-import Container from '../../components/Container';
-import { H1, P } from '../../components/Text';
-import StyledButton from '../../components/StyledButton';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { Router } from '../../server/pages';
+
+import Container from '../../components/Container';
+import MessageBox from '../../components/MessageBox';
+import StyledButton from '../../components/StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../components/StyledModal';
+import { H1, P } from '../../components/Text';
+
+import { Box, Flex } from '../Grid';
+
+import OnboardingContentBox from './OnboardingContentBox';
+import OnboardingNavButtons from './OnboardingNavButtons';
+import OnboardingStepsProgress from './OnboardingStepsProgress';
 
 const StepsProgressBox = styled(Box)`
   min-height: 95px;

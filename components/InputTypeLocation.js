@@ -1,11 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import Geosuggest from 'react-geosuggest';
 import classNames from 'classnames';
+import { get } from 'lodash';
+import Geosuggest from 'react-geosuggest';
+import { FormattedMessage } from 'react-intl';
+
 import Location from './Location';
 import MessageBox from './MessageBox';
-import { FormattedMessage } from 'react-intl';
-import { get } from 'lodash';
 
 class InputTypeLocation extends React.Component {
   static propTypes = {

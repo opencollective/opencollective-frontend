@@ -1,37 +1,37 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Flex, Box } from './Grid';
-import { get, truncate } from 'lodash';
 import { graphql } from '@apollo/react-hoc';
-import moment from 'moment';
-import gql from 'graphql-tag';
-import memoizeOne from 'memoize-one';
-
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
+import themeGet from '@styled-system/theme-get';
+import gql from 'graphql-tag';
+import { get, truncate } from 'lodash';
+import memoizeOne from 'memoize-one';
+import moment from 'moment';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import { reportValidityHTML5 } from '../lib/utils';
-import MessageBox from './MessageBox';
-import StyledInputAmount from './StyledInputAmount';
-import StyledButton from './StyledButton';
-import PaymentMethodSelect from './PaymentMethodSelect';
-import Loading from './Loading';
-import Link from './Link';
-import StyledMultiEmailInput from './StyledMultiEmailInput';
-import { H3 } from './Text';
-import StyledInput from './StyledInput';
-import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
-import CollectivePicker from './CollectivePicker';
-import CollectivePickerAsync from './CollectivePickerAsync';
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPrepaid } from '../lib/constants/payment-methods';
-import StyledSelectCreatable from './StyledSelectCreatable';
+import { reportValidityHTML5 } from '../lib/utils';
 
-const MIN_AMOUNT = 5;
-const MAX_AMOUNT = 1000000;
+import CollectivePicker from './CollectivePicker';
+import CollectivePickerAsync from './CollectivePickerAsync';
+import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
+import { Box, Flex } from './Grid';
+import Link from './Link';
+import Loading from './Loading';
+import MessageBox from './MessageBox';
+import PaymentMethodSelect from './PaymentMethodSelect';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
+import StyledInputAmount from './StyledInputAmount';
+import StyledMultiEmailInput from './StyledMultiEmailInput';
+import StyledSelectCreatable from './StyledSelectCreatable';
+import { H3 } from './Text';
+
+const MIN_AMOUNT = 500;
+const MAX_AMOUNT = 100000000;
 
 const messages = defineMessages({
   emailCustomMessage: {
@@ -228,9 +228,6 @@ class CreateVirtualCardsForm extends Component {
     } else if (fieldName === 'numberOfVirtualCards') {
       const intNumberOfVirtualCards = parseInt(value);
       value = !isNaN(intNumberOfVirtualCards) ? intNumberOfVirtualCards : 1;
-    } else if (fieldName === 'amount') {
-      const amount = parseFloat(value);
-      value = !isNaN(amount) ? amount : MIN_AMOUNT;
     }
 
     // Set value
@@ -264,7 +261,7 @@ class CreateVirtualCardsForm extends Component {
 
       this.setState({ submitting: true });
       const params = {
-        amount: Math.round(values.amount * 100),
+        amount: values.amount,
         PaymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
         batch: values.batch,
@@ -475,7 +472,7 @@ class CreateVirtualCardsForm extends Component {
               id="virtualcard-amount"
               currency={currency}
               prepend={currency}
-              onChange={e => this.onChange('amount', e.target.value)}
+              onChange={value => this.onChange('amount', value)}
               error={this.getError('amount')}
               value={values.amount}
               min={MIN_AMOUNT}

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import SectionTitle from './SectionTitle';
+
 import EventsWithData from './EventsWithData';
+import SectionTitle from './SectionTitle';
 
 class EventsSection extends React.Component {
   static propTypes = {

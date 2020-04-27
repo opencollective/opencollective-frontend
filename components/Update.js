@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Lock } from '@styled-icons/fa-solid';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
+import { Lock } from '@styled-icons/fa-solid';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 
 import { compose, formatDate } from '../lib/utils';
+import { Link, Router } from '../server/pages';
 
 import Avatar from './Avatar';
-import Role from './Role';
-import UpdateTextWithData from './UpdateTextWithData';
-import { Router, Link } from '../server/pages';
-import SmallButton from './SmallButton';
 import EditUpdateForm from './EditUpdateForm';
-import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import MessageBox from './MessageBox';
+import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
+import Role from './Role';
+import SmallButton from './SmallButton';
+import UpdateTextWithData from './UpdateTextWithData';
 
 class Update extends React.Component {
   static propTypes = {

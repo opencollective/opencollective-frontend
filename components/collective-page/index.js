@@ -5,24 +5,25 @@ import memoizeOne from 'memoize-one';
 
 // OC Frontend imports
 import { CollectiveType } from '../../lib/constants/collectives';
-import Container from '../Container';
-import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
 
-// Collective page imports
-import { Sections } from './_constants';
+import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
+import Container from '../Container';
+
 import Hero from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionContribute from './sections/Contribute';
-import SectionContributors from './sections/Contributors';
-import SectionGoals from './sections/Goals';
-import SectionUpdates from './sections/Updates';
 import SectionContributions from './sections/Contributions';
+import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
-import SectionTransactions from './sections/Transactions';
-import SectionTickets from './sections/Tickets';
-import SectionParticipants from './sections/SponsorsAndParticipants';
+import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
+import SectionParticipants from './sections/SponsorsAndParticipants';
+import SectionTickets from './sections/Tickets';
+import SectionTransactions from './sections/Transactions';
+import SectionUpdates from './sections/Updates';
+// Collective page imports
+import { Sections } from './_constants';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
 

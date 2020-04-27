@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { orderBy, truncate } from 'lodash';
 import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
 import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import StyledSelect from './StyledSelect';
 

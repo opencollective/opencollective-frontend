@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from './Grid';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { P } from './Text';
-import InputField from './InputField';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import { Flex } from './Grid';
+import InputField from './InputField';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import { P } from './Text';
 
 const Description = styled(P)`
   color: #4e5052;

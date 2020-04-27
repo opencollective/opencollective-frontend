@@ -1,6 +1,7 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import { IntlProvider } from 'react-intl';
+import renderer from 'react-test-renderer';
+
 import { withRequiredProviders } from './providers';
 
 /**

@@ -1,25 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
-import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import { get, set, cloneDeep, uniq, pick, omit } from 'lodash';
+import gql from 'graphql-tag';
+import { cloneDeep, get, omit, pick, set, uniq } from 'lodash';
+import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'react-intl';
 
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { capitalize, getCurrencySymbol, formatCurrency } from '../../lib/utils';
-import { imagePreview } from '../../lib/image-utils';
-import InputField from '../../components/InputField';
 import categories from '../../lib/constants/categories';
-import DefinedTerm, { Terms } from '../DefinedTerm';
-
-import TransactionDetails from './TransactionDetails';
-import { Box, Flex } from '../Grid';
-import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
-import StyledSpinner from '../StyledSpinner';
-import StyledButton from '../StyledButton';
-import MessageBox from '../MessageBox';
 import { formatErrorMessage } from '../../lib/errors';
-import ExternalLink from '../ExternalLink';
+import { imagePreview } from '../../lib/image-utils';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { capitalize, formatCurrency, getCurrencySymbol } from '../../lib/utils';
+
+import InputField from '../../components/InputField';
+
+import DefinedTerm, { Terms } from '../DefinedTerm';
+import { Box, Flex } from '../Grid';
+import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
+import StyledSpinner from '../StyledSpinner';
+
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+import TransactionDetails from './TransactionDetails';
 
 class ExpenseDetails extends React.Component {
   static propTypes = {
@@ -419,13 +421,9 @@ class ExpenseDetails extends React.Component {
                     />
                   )}
                   {!editMode && attachment.url && (
-                    <ExternalLink
-                      href={attachment.url}
-                      openInNewTab
-                      title={this.getAttachmentTitle(expense, attachment)}
-                    >
+                    <StyledLink href={attachment.url} openInNewTab title={this.getAttachmentTitle(expense, attachment)}>
                       <img src={this.getAttachmentPreview(attachment.url)} />
-                    </ExternalLink>
+                    </StyledLink>
                   )}
                   {!editMode && !attachment.url && <img src={this.getAttachmentPreview(attachment.url)} />}
                 </div>
@@ -435,13 +433,13 @@ class ExpenseDetails extends React.Component {
               <div key={attachment.id}>
                 <div className="frame">
                   {attachment.url ? (
-                    <ExternalLink
+                    <StyledLink
                       href={attachment.url}
                       openInNewTab
                       title={intl.formatMessage(this.messages.attachedFile)}
                     >
                       <img src={this.getAttachmentPreview(attachment.url)} />
-                    </ExternalLink>
+                    </StyledLink>
                   ) : (
                     <img src={this.getAttachmentPreview(attachment.url)} />
                   )}

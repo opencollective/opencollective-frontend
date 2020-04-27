@@ -1,16 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { isValidEmail } from '../../lib/utils';
 
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import StyledTooltip from '../StyledTooltip';
-import Link from '../Link';
+
 import { payExpenseMutation } from './graphql/mutations';
 
 class PayExpenseBtn extends React.Component {

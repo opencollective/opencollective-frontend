@@ -1,8 +1,11 @@
 import 'cypress-file-upload';
+
+import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
+
+import { CreditCards } from '../../stripe-helpers';
+
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
-import { CreditCards } from '../../stripe-helpers';
 import { disableSmoothScroll } from './helpers';
 
 /**
@@ -391,7 +394,7 @@ function fillStripeInput(params) {
         return;
       }
 
-      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`);
+      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
     };
 
     fillInput(1, creditCardNumber);
