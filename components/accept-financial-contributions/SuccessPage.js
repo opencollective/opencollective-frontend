@@ -5,8 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
 
-import nonHostSuccessIllustration from '../../public/static/images/create-collective/original/acceptContributionsNonHostSuccessIllustration.png';
-import placeholderIllustration from '../../public/static/images/create-collective/original/placeholderGraphic.png';
+import successIllustration from '../../public/static/images/create-collective/acceptContributionsSuccessIllustration.png';
 import { H1, H2, P } from '../Text';
 import Container from '../Container';
 import StyledButton from '../StyledButton';
@@ -103,11 +102,7 @@ class SuccessPage extends React.Component {
             mx={[2, 4, 0]}
             my={[2, 4]}
           >
-            <img
-              src={path === 'host' ? placeholderIllustration : nonHostSuccessIllustration}
-              width="264px"
-              height="352px"
-            />
+            <img src={successIllustration} width="264px" height="352px" />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
                 <FormattedMessage id="tiers.about" defaultMessage="About contribution tiers" />
@@ -125,28 +120,35 @@ class SuccessPage extends React.Component {
                   }}
                 />
               </P>
-              <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
-                <FormattedMessage id="acceptContributions.success.hostSettings" defaultMessage="Fiscal Host Settings" />
-              </H2>
-              <P fontSize="LeadCaption" lineHeight="Paragraph" mb={1} color="black.800">
-                <FormattedMessage
-                  id="acceptContributions.success.hostSettingsInfo"
-                  defaultMessage="You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}."
-                  values={{
-                    takeMeThere: (
-                      <Link
-                        route="editCollective"
-                        params={{
-                          slug: collective.slug,
-                          section: 'host',
-                        }}
-                      >
-                        <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
-                      </Link>
-                    ),
-                  }}
-                />
-              </P>
+              {path !== 'host' && (
+                <Fragment>
+                  <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
+                    <FormattedMessage
+                      id="acceptContributions.success.hostSettings"
+                      defaultMessage="Fiscal Host Settings"
+                    />
+                  </H2>
+                  <P fontSize="LeadCaption" lineHeight="Paragraph" mb={1} color="black.800">
+                    <FormattedMessage
+                      id="acceptContributions.success.hostSettingsInfo"
+                      defaultMessage="You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}."
+                      values={{
+                        takeMeThere: (
+                          <Link
+                            route="editCollective"
+                            params={{
+                              slug: collective.slug,
+                              section: 'host',
+                            }}
+                          >
+                            <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
+                          </Link>
+                        ),
+                      }}
+                    />
+                  </P>
+                </Fragment>
+              )}
             </Flex>
           </Flex>
           <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>
