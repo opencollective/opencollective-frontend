@@ -21,6 +21,7 @@ import MessageBox from '../MessageBox';
 import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 import StyledHr from '../StyledHr';
 import CreateCollectiveMiniForm from '../CreateCollectiveMiniForm';
+import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 
 import { withRouter } from 'next/router';
 import { Router } from '../../server/pages';
@@ -84,6 +85,8 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
           collective: collectiveInput,
           host: hostInput,
         },
+        refetchQueries: [{ query: getCollectivePageQuery, variables: { slug: this.props.collective.slug } }],
+        awaitRefetchQueries: true,
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;

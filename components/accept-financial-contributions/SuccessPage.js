@@ -137,8 +137,8 @@ class SuccessPage extends React.Component {
                           <Link
                             route="editCollective"
                             params={{
-                              slug: collective.slug,
-                              section: 'host',
+                              slug: collective.host.slug,
+                              section: 'fiscal-hosting',
                             }}
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
