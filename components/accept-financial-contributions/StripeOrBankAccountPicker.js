@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Flex } from '../Grid';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
 import { has, find } from 'lodash';
 import themeGet from '@styled-system/theme-get';
@@ -23,20 +23,12 @@ import { Router } from '../../server/pages';
 
 import { withRouter } from 'next/router';
 
-const Image = styled.img`
-  @media screen and (min-width: 52em) {
-    height: 256px;
-    width: 256px;
-  }
-  @media screen and (max-width: 40em) {
-    height: 192px;
-    width: 192px;
-  }
-  @media screen and (min-width: 40em) and (max-width: 52em) {
-    height: 208px;
-    width: 208px;
-  }
-`;
+const Image = styled.img(
+  css({
+    width: [192, 208, 256],
+    height: [192, 208, 256],
+  }),
+);
 
 const ConnectedAccountCard = styled(Flex)`
   box-shadow: 0 1px 3px 2px rgba(46, 77, 97, 0.1);

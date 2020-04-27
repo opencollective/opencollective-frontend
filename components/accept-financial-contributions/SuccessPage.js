@@ -19,7 +19,7 @@ import { withRouter } from 'next/router';
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
-const SmallExternalLink = styled(StyledLink)`
+const SmallExternalLink = styled(StyledLink).attrs({ openInNewTab: true })`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
 
@@ -118,7 +118,7 @@ class SuccessPage extends React.Component {
                   defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts. {knowMore}."
                   values={{
                     knowMore: (
-                      <SmallExternalLink href={TIERS_INFO_LINK} openInNewTab>
+                      <SmallExternalLink href={TIERS_INFO_LINK}>
                         <FormattedMessage id="tiers.knowMore" defaultMessage="Know more about tiers" />
                       </SmallExternalLink>
                     ),

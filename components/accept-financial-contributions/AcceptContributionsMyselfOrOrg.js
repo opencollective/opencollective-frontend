@@ -4,7 +4,7 @@ import { Box, Flex } from '../Grid';
 import { FormattedMessage } from 'react-intl';
 import { Formik, Field, Form } from 'formik';
 import { graphql } from '@apollo/react-hoc';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { uniqBy } from 'lodash';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 
@@ -43,20 +43,12 @@ const OrgCard = styled(Flex)`
   }
 `;
 
-const Image = styled.img`
-  @media screen and (min-width: 52em) {
-    height: 256px;
-    width: 256px;
-  }
-  @media screen and (max-width: 40em) {
-    height: 192px;
-    width: 192px;
-  }
-  @media screen and (min-width: 40em) and (max-width: 52em) {
-    height: 208px;
-    width: 208px;
-  }
-`;
+const Image = styled.img(
+  css({
+    width: [192, 208, 256],
+    height: [192, 208, 256],
+  }),
+);
 
 class AcceptContributionsMyselfOrOrg extends React.Component {
   static propTypes = {
@@ -272,10 +264,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                   <CreateNewOrg alignItems="center" onClick={() => this.setState({ miniForm: true })}>
                     <PlusCircle size="24" color="gray" />
                     <P fontSize="Caption" color="black.800" ml={2}>
-                      <FormattedMessage
-                        id="acceptContributions.organization.createNewOrganization"
-                        defaultMessage="Create new organization"
-                      />
+                      <FormattedMessage id="Organization.CreateNew" defaultMessage="Create new Organization" />
                     </P>
                   </CreateNewOrg>
                 )}
