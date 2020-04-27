@@ -158,12 +158,10 @@ class ContributionCategoryPicker extends React.Component {
                     />
                   </Box>
                   <Link
-                    route="editCollective"
+                    route="accept-financial-contributions"
                     params={{
                       slug: router.query.slug,
-                      section: 'host',
-                      selectedOption: 'ownHost',
-                      hostType: 'organization',
+                      path: 'organization',
                     }}
                   >
                     <StyledButton
