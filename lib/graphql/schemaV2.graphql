@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue May 05 2020 18:10:24 GMT+0000 (Coordinated Universal Time)
+# timestamp: Wed May 06 2020 16:30:04 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -2345,6 +2345,16 @@ input ExpenseAttachedFileInput {
   url: URL!
 }
 
+"""
+A collection of "Expenses"
+"""
+type ExpenseCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Expense]
+}
+
 input ExpenseCreateInput {
   """
   Main title of the expense
@@ -3636,6 +3646,47 @@ type Query {
     """
     id: String!
   ): Conversation
+  expenses(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    Reference of the account that submitted this expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the account where this expense was submitted
+    """
+    account: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatus
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): ExpenseCollection
   expense(
     """
     Public expense identifier
