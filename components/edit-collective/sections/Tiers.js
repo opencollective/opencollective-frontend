@@ -10,6 +10,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import { capitalize, getCurrencySymbol } from '../../../lib/utils';
+import { H3 } from '../../Text';
 
 import { updateSettingsMutation } from './../mutations';
 
@@ -396,8 +397,7 @@ class Tiers extends React.Component {
 
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
-    let defaultIsChecked = false;
-    const defaultIsChecked = get(collective, 'settings.disableCustomContributions', false);
+    const defaultIsChecked = get(this.props.collective, 'settings.disableCustomContributions', false);
 
     return (
       <Mutation mutation={updateSettingsMutation}>
@@ -421,8 +421,8 @@ class Tiers extends React.Component {
                 }
               `}
             </style>
-            <div className="tiers">
-              <h2>{this.props.title}</h2>
+            <div>
+              <H3>{this.props.title}</H3>
               <Flex flexDirection="column" alignItems="center" justifyContent="center" minWidth={300}>
                 <StyledCheckbox
                   name="custom-contributions"
@@ -441,8 +441,8 @@ class Tiers extends React.Component {
                   }}
                 />
               </Flex>
-              {this.state.tiers.map(this.renderTier)}
             </div>
+            <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
             <div className="editTiersActions">
               <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
                 {intl.formatMessage(this.messages[`${defaultType}.add`])}
