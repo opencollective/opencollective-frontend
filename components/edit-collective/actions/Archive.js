@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../../lib/graphql/mutations';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../../lib/graphql/mutations';
 
-import { H2, P } from '../../Text';
 import Container from '../../Container';
-import StyledButton from '../../StyledButton';
 import MessageBox from '../../MessageBox';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../StyledModal';
+import StyledButton from '../../StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import { H2, P } from '../../Text';
 
 const getCollectiveType = type => {
   switch (type) {

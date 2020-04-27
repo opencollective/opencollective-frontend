@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { FormattedDate, FormattedMessage } from 'react-intl';
+
 import { Router } from '../server/pages';
 
 class EventsWithData extends React.Component {

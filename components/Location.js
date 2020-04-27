@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Map from './Map';
+
 import colors from '../lib/constants/colors';
+
+import Map from './Map';
 import StyledLink from './StyledLink';
 
 class Location extends React.Component {

@@ -1,26 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { Flex } from '../components/Grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { compose, parseToBoolean } from '../lib/utils';
 import { CollectiveType } from '../lib/constants/collectives';
+import { compose, parseToBoolean } from '../lib/utils';
 
-import ErrorPage from '../components/ErrorPage';
-import Page from '../components/Page';
-import Link from '../components/Link';
-import { withStripeLoader } from '../components/StripeProvider';
-import { withUser } from '../components/UserProvider';
-import Loading from '../components/Loading';
-import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
-import StyledButton from '../components/StyledButton';
-
 import ContributionFlow from '../components/contribution-flow';
 import ContributionFlowCover from '../components/contribution-flow/Cover';
+import ErrorPage from '../components/ErrorPage';
+import { Flex } from '../components/Grid';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import { withStripeLoader } from '../components/StripeProvider';
+import StyledButton from '../components/StyledButton';
+import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
   collectiveTitle: {
@@ -167,7 +166,7 @@ class CreateOrderPage extends React.Component {
       return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
     } else if (data.Tier && data.Tier.endsAt && new Date(data.Tier.endsAt) < new Date()) {
       return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
-    } else if (data.Collective.settings.disableCustomContributions) {
+    } else if (data.Collective.settings.disableCustomContributions && !data.Tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
     } else {
       return (

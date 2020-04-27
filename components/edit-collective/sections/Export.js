@@ -5,8 +5,8 @@ import { FormattedMessage } from 'react-intl';
 
 import { exportMembers } from '../../../lib/export_file';
 
-import StyledLink from '../../StyledLink';
 import ExportImages from '../../ExportImages';
+import StyledLink from '../../StyledLink';
 
 class Export extends React.Component {
   static propTypes = {

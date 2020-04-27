@@ -1,23 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, sortBy } from 'lodash';
-import { v4 as uuid } from 'uuid';
-import { Form } from 'react-bootstrap';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Flex } from '../../Grid';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
+import { get, sortBy } from 'lodash';
+import { Form } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { v4 as uuid } from 'uuid';
 
 import { getCurrencySymbol } from '../../../lib/utils';
 
-import InputField from '../../InputField';
-import GoalsCover from '../../GoalsCover';
 import Container from '../../Container';
-import StyledButton from '../../StyledButton';
-import { P, H3 } from '../../Text';
-import StyledCheckbox from '../../StyledCheckbox';
+import GoalsCover from '../../GoalsCover';
+import { Flex } from '../../Grid';
+import InputField from '../../InputField';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledCheckbox from '../../StyledCheckbox';
+import { H3, P } from '../../Text';
 
 const BORDER = '1px solid #efefef';
 

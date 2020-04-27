@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { filter, get, map } from 'lodash';
 import dynamic from 'next/dynamic';
-import { get, filter, map } from 'lodash';
-import { Col, HelpBlock, FormGroup, InputGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
-
-import InputTypeDropzone from './InputTypeDropzone';
-import InputTypeLocation from './InputTypeLocation';
-import InputTypeCreditCard from './InputTypeCreditCard';
-import InputSwitch from './InputSwitch';
-import InputTypeCountry from './InputTypeCountry';
-import TimezonePicker from './TimezonePicker';
+import { Checkbox, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'react-bootstrap';
 
 import { capitalize } from '../lib/utils';
+
+import InputSwitch from './InputSwitch';
+import InputTypeCountry from './InputTypeCountry';
+import InputTypeCreditCard from './InputTypeCreditCard';
+import InputTypeDropzone from './InputTypeDropzone';
+import InputTypeLocation from './InputTypeLocation';
+import TimezonePicker from './TimezonePicker';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest

@@ -227,7 +227,6 @@
   "collective.location.label": "Città",
   "collective.meetup.label": "Meetup URL",
   "collective.members.label": "Numero di membri",
-  "collective.messages.StripeAccountConnected": "Account Stripe connesso correttamente",
   "Collective.New": "Nuovo",
   "collective.pending": "Collettivo in attesa di approvazione.",
   "collective.pending.description": "Questa collettivo è in attesa di approvazione da parte dell'ospite ({host}).",

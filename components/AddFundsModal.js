@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Row, Col } from 'react-bootstrap';
-import gql from 'graphql-tag';
 import { Mutation } from '@apollo/react-components';
+import gql from 'graphql-tag';
 import { pick } from 'lodash';
+import { Col, Modal, Row } from 'react-bootstrap';
 
-import Button from './Button';
 import AddFundsForm from './AddFundsForm';
+import Button from './Button';
 import { withUser } from './UserProvider';
 
 const addFundsToOrgMutation = gql`

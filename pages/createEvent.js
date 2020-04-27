@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CreateEvent from '../components/CreateEvent';
-import ErrorPage from '../components/ErrorPage';
-
 import { addCollectiveData } from '../lib/graphql/queries';
 
+import CreateEvent from '../components/CreateEvent';
+import ErrorPage from '../components/ErrorPage';
 import { withUser } from '../components/UserProvider';
 
 class CreateEventPage extends React.Component {

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import gql from 'graphql-tag';
+import { cloneDeep, pick } from 'lodash';
+import { Col, Form, Row } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
 import InputField from '../InputField';
 import SmallButton from '../SmallButton';
-import { cloneDeep, pick } from 'lodash';
-import { Form, Row, Col } from 'react-bootstrap';
 
 class EditTwitterAccount extends React.Component {
   static propTypes = {

@@ -2,21 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
-import { createGlobalStyle } from 'styled-components';
 import dynamic from 'next/dynamic';
+import { createGlobalStyle } from 'styled-components';
 
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Page from '../components/Page';
-import Loading from '../components/Loading';
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
-import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import CollectivePage from '../components/collective-page';
-import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
-import Container from '../components/Container';
-import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
 import { generateNotFoundError } from '../lib/errors';
+
+import CollectivePage from '../components/collective-page';
+import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
+import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import Container from '../components/Container';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
+import ErrorPage from '../components/ErrorPage';
+import Loading from '../components/Loading';
+import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
+import Page from '../components/Page';
+import { withUser } from '../components/UserProvider';
 
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(

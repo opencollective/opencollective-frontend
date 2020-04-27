@@ -1,21 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
-import { Box, Flex } from '../Grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import Container from '../Container';
-import ConnectPaypal from '../ConnectPaypal';
+import { CollectiveType } from '../../lib/constants/collectives';
+
 import AddFundsForm from '../AddFundsForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import ConnectPaypal from '../ConnectPaypal';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import { CollectiveType } from '../../lib/constants/collectives';
-import { Span, H2 } from '../Text';
-import StyledButton from '../StyledButton';
 import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
+import { H2, Span } from '../Text';
 
 const Disclaimer = styled.div`
   display: inline-block;

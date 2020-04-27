@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
 import { graphql } from '@apollo/react-hoc';
-import { getSubscriptionsQuery } from '../lib/graphql/queries';
-import Subscriptions from './Subscriptions';
 import { cloneDeep } from 'lodash';
+
+import { getSubscriptionsQuery } from '../lib/graphql/queries';
+
+import Error from './Error';
+import Subscriptions from './Subscriptions';
 
 class SubscriptionsWithData extends React.Component {
   static propTypes = {

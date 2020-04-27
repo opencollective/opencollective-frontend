@@ -1,17 +1,17 @@
-import React, { useState, Fragment } from 'react';
-import styled, { css } from 'styled-components';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
-import { Flex, Box } from '../../Grid';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
 
-import { Span, H4, P } from '../../Text';
 import Container from '../../Container';
-import SectionTitle from '../SectionTitle';
-import SectionSubtitle from '../SectionSubtitle';
-import Illustration from '../HomeIllustration';
+import { Box, Flex } from '../../Grid';
 import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
+import { H4, P, Span } from '../../Text';
+import Illustration from '../HomeIllustration';
+import SectionSubtitle from '../SectionSubtitle';
+import SectionTitle from '../SectionTitle';
 
 const SelectFeatureButton = styled.button`
   width: 100%;

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { getNextChargeDate } from '../../lib/date-utils';
 import { formatCurrency } from '../../lib/utils';
-import { Span, P } from '../Text';
+
 import Container from '../Container';
+import { P, Span } from '../Text';
 
 /**
  * When using an order with fixed amount, this function returns the details to

@@ -4,6 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+
 import CollectiveCard from './CollectiveCard';
 import Error from './Error';
 

@@ -1,21 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Flex } from '../components/Grid';
 import { mapValues } from 'lodash';
-
-import { Router } from '../server/pages';
-
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
+import { FormattedMessage } from 'react-intl';
 
 import { isValidRelativeUrl } from '../lib/utils';
+import { Router } from '../server/pages';
 
-import { withUser } from '../components/UserProvider';
+import Body from '../components/Body';
+import Footer from '../components/Footer';
+import { Flex } from '../components/Grid';
+import Header from '../components/Header';
 import Loading from '../components/Loading';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import MessageBox from '../components/MessageBox';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import { withUser } from '../components/UserProvider';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next, form } }) {

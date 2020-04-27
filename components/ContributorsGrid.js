@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FixedSizeGrid } from 'react-window';
 import get from 'lodash/get';
+import { FixedSizeGrid } from 'react-window';
 import styled from 'styled-components';
 
-import withViewport, { VIEWPORTS } from '../lib/withViewport';
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
+import withViewport, { VIEWPORTS } from '../lib/withViewport';
 
-import { fadeIn } from './StyledKeyframes';
 import ContributorCard from './ContributorCard';
+import { fadeIn } from './StyledKeyframes';
 import { withUser } from './UserProvider';
 
 // Define static dimensions

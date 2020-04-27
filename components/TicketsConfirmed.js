@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Modal from './Modal';
 import AddToCalendar from 'react-add-to-calendar';
+import { FormattedDate, FormattedMessage, FormattedTime, injectIntl } from 'react-intl';
 
 import Currency from './Currency';
-import { FormattedMessage, FormattedDate, FormattedTime, injectIntl } from 'react-intl';
+import Modal from './Modal';
 
 class TicketsConfirmed extends React.Component {
   static propTypes = {

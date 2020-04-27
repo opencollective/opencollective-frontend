@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { withApollo } from '@apollo/react-hoc';
-import { Button, Row, Col, Form } from 'react-bootstrap';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { Button, Col, Form, Row } from 'react-bootstrap';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCurrencySymbol, formatCurrency } from '../lib/utils';
-import InputField from './InputField';
-import { AddFundsSourcePickerWithData, AddFundsSourcePickerForUserWithData } from './AddFundsSourcePicker';
 import { CollectiveType } from '../lib/constants/collectives';
 import { OC_FEE_PERCENT } from '../lib/constants/transactions';
+import { formatCurrency, getCurrencySymbol } from '../lib/utils';
+
+import { AddFundsSourcePickerForUserWithData, AddFundsSourcePickerWithData } from './AddFundsSourcePicker';
+import InputField from './InputField';
 
 class AddFundsForm extends React.Component {
   static propTypes = {

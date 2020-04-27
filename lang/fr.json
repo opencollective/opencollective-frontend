@@ -227,7 +227,6 @@
   "collective.location.label": "Lieux",
   "collective.meetup.label": "URL du Meetup",
   "collective.members.label": "Nombre de membres",
-  "collective.messages.StripeAccountConnected": "Compte Stripe connecté avec succès",
   "Collective.New": "Nouveau",
   "collective.pending": "Collectif en attente d'approbation.",
   "collective.pending.description": "Ce collectif est en attente d'approbation de l'hôte ({host}).",

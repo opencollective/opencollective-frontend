@@ -1,12 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl, defineMessages } from 'react-intl';
-import { Flex } from '../Grid';
+import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
+
+import { Flex } from '../Grid';
 import Link from '../Link';
-import { isFeatureAllowedForCollectiveType, FEATURES } from '../../lib/allowed-features';
 
 const MenuDivider = styled.div`
   margin-top: 34px;

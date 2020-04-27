@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
-import Updates from './Updates';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
+
+import Error from './Error';
 import SectionTitle from './SectionTitle';
 import StyledButton from './StyledButton';
+import Updates from './Updates';
 
 class UpdatesWithData extends React.Component {
   static propTypes = {

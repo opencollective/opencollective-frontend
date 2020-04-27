@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Markdown from 'react-markdown';
 import { get, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import Markdown from 'react-markdown';
+
+import colors from '../lib/constants/colors';
+import { formatCurrency } from '../lib/utils';
+import { Link } from '../server/pages';
 
 import Avatar from './Avatar';
 import Currency from './Currency';
-import Logo from './Logo';
-
-import colors from '../lib/constants/colors';
-import { Link } from '../server/pages';
 import LinkCollective from './LinkCollective';
-import { formatCurrency } from '../lib/utils';
+import Logo from './Logo';
 
 class TierCard extends React.Component {
   static propTypes = {

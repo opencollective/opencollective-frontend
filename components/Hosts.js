@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import Header from './Header';
 import Body from './Body';
-import Footer from './Footer';
-import HostsWithData from './HostsWithData';
-
 import Container from './Container';
-import { H1, P } from './Text';
+import Footer from './Footer';
+import Header from './Header';
+import HostsWithData from './HostsWithData';
 import Link from './Link';
+import { H1, P } from './Text';
 
 const CoverSmallCTA = styled.span`
   a:hover {

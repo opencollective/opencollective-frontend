@@ -5,7 +5,6 @@ import { groupBy } from 'lodash';
 import { capitalize } from '../../../lib/utils';
 
 import { H4 } from '../../Text';
-
 import EditConnectedAccount from '../EditConnectedAccount';
 
 const ConnectedAccounts = props => {

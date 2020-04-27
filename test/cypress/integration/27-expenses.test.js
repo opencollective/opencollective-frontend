@@ -1,4 +1,5 @@
 import 'cypress-file-upload';
+
 import { randomEmail } from '../support/faker';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;

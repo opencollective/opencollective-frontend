@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import { Router } from '../server/pages';
 
-import Header from './Header';
 import Body from './Body';
-import Footer from './Footer';
-import CreateCollectiveForm from './CreateCollectiveForm';
-import SignInOrJoinFree from './SignInOrJoinFree';
 import Container from './Container';
+import CreateCollectiveForm from './CreateCollectiveForm';
+import Footer from './Footer';
+import Header from './Header';
+import SignInOrJoinFree from './SignInOrJoinFree';
 import { H1, P } from './Text';
 
 class CreateOrganization extends React.Component {

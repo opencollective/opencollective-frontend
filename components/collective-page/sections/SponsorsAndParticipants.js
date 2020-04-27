@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { uniqBy, get } from 'lodash';
-import { Box } from '../../Grid';
 
+import { exportRSVPs } from '../../../lib/export_file';
+
+import { Box } from '../../Grid';
 import Responses from '../../Responses';
 import Sponsors from '../../Sponsors';
-import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { exportRSVPs } from '../../../lib/export_file';
+import SectionTitle from '../SectionTitle';
 
 const StyledAdminActions = styled.div`
   text-align: center;

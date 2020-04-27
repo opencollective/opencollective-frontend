@@ -1,28 +1,28 @@
 import React, { Component } from 'react';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../components/Grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { URLSearchParams } from 'universal-url';
-
-import Page from '../components/Page';
-import Loading from '../components/Loading';
-import Container from '../components/Container';
-import { withUser } from '../components/UserProvider';
-import { addCreateCollectiveFromGithubMutation } from '../lib/graphql/mutations';
-import StyledCard from '../components/StyledCard';
-import { H3, P, H2 } from '../components/Text';
-import StyledButton from '../components/StyledButton';
-import GithubRepositories from '../components/GithubRepositories';
-import StyledInputField from '../components/StyledInputField';
-import MessageBox from '../components/MessageBox';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
-import { Router } from '../server/pages';
 
 import { getGithubRepos } from '../lib/api';
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { addCreateCollectiveFromGithubMutation } from '../lib/graphql/mutations';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { getWebsiteUrl } from '../lib/utils';
-import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../lib/local-storage';
+import { Router } from '../server/pages';
+
+import Container from '../components/Container';
+import GithubRepositoriesFAQ from '../components/faqs/GithubRepositoriesFAQ';
+import GithubRepositories from '../components/GithubRepositories';
+import { Box, Flex } from '../components/Grid';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import StyledButton from '../components/StyledButton';
+import StyledCard from '../components/StyledCard';
+import StyledInputField from '../components/StyledInputField';
+import { H2, H3, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 class OpenSourceApplyPage extends Component {
   static async getInitialProps({ query }) {

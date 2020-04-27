@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import StyledButton from '../../components/StyledButton';
 import { Router } from '../../server/pages';
+
+import StyledButton from '../../components/StyledButton';
 
 class OnboardingSkipButton extends React.Component {
   static propTypes = {

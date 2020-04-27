@@ -1,7 +1,7 @@
-import React from 'react';
-import { shallow } from 'enzyme';
 import 'jest-styled-components';
 
+import React from 'react';
+import { shallow } from 'enzyme';
 import Router from 'next/router';
 
 import { MockSearchPage } from '../pages/search';

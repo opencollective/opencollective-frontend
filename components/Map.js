@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import StyledLink from './StyledLink';
 import { FormattedMessage } from 'react-intl';
+
+import StyledLink from './StyledLink';
 
 const tile2Long = (tile, zoom) => {
   // see https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#ECMAScript_.28JavaScript.2FActionScript.2C_etc..29

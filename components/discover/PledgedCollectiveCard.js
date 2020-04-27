@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Box } from '../Grid';
-import themeGet from '@styled-system/theme-get';
 
 import Currency from '../Currency';
+import { Box } from '../Grid';
 import Link from '../Link';
+import LinkCollective from '../LinkCollective';
 import Logo from '../Logo';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
-import LinkCollective from '../LinkCollective';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo-card.svg';
 

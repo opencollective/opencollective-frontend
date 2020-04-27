@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from './Grid';
-import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import formatMemberRole from '../lib/i18n-member-role';
 import { formatCurrency } from '../lib/utils';
+
 import Container from './Container';
-import { P, Span } from './Text';
+import { Box } from './Grid';
 import StyledCollectiveCard from './StyledCollectiveCard';
+import { P, Span } from './Text';
 
 /**
  * A card to show a user's membership.

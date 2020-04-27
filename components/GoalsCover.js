@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { get, maxBy, debounce, sortBy, truncate } from 'lodash';
+import { debounce, get, maxBy, sortBy, truncate } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { formatCurrency } from '../lib/utils';
+
 import { fadeIn } from './StyledKeyframes';
 import { P, Span } from './Text';
 

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
+import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'react-intl';
 
 import { capitalize } from '../../lib/utils';
 
 import Link from '../Link';
 import StyledLink from '../StyledLink';
+
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 import RefundTransactionBtn from './RefundTransactionBtn';
 

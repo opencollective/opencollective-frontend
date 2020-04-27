@@ -9,10 +9,10 @@ import Body from '../components/Body';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import OrderWithData from '../components/expenses/OrderWithData';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Link from '../components/Link';
-import OrderWithData from '../components/expenses/OrderWithData';
 import { withUser } from '../components/UserProvider';
 
 class OrderPage extends React.Component {

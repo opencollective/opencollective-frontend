@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { display, layout, space, typography, shadow, color, flexbox, borders } from 'styled-system';
-import themeGet from '@styled-system/theme-get';
-
-import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { CheckCircle } from '@styled-icons/fa-solid/CheckCircle';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
+import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
+import themeGet from '@styled-system/theme-get';
+import styled from 'styled-components';
+import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
 
 import { messageType } from '../lib/theme/variants/message';
-import { Span } from './Text';
+
 import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';
+import { Span } from './Text';
 
 const Message = styled.div`
   border: 1px solid;

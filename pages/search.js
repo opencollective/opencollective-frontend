@@ -1,26 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
-import { Box, Flex } from '../components/Grid';
+import { Search } from '@styled-icons/octicons/Search';
 import { withRouter } from 'next/router';
+import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import colors from '../lib/constants/colors';
+import { addSearchQueryData } from '../lib/graphql/queries';
 import { Link, Router } from '../server/pages';
 
-import Page from '../components/Page';
 import Button from '../components/Button';
 import CollectiveCard from '../components/CollectiveCard';
-import ErrorPage from '../components/ErrorPage';
-import LoadingGrid from '../components/LoadingGrid';
-import StyledLink from '../components/StyledLink';
-import Pagination from '../components/Pagination';
 import Container from '../components/Container';
-import colors from '../lib/constants/colors';
-
-import { addSearchQueryData } from '../lib/graphql/queries';
-
-import { Search } from '@styled-icons/octicons/Search';
-import { FormattedMessage } from 'react-intl';
+import ErrorPage from '../components/ErrorPage';
+import { Box, Flex } from '../components/Grid';
+import LoadingGrid from '../components/LoadingGrid';
+import Page from '../components/Page';
+import Pagination from '../components/Pagination';
+import StyledLink from '../components/StyledLink';
 import { P } from '../components/Text';
 
 const SearchInput = styled(FormControl)`

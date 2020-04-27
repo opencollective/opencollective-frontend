@@ -1,10 +1,11 @@
-import { mount } from 'enzyme';
 import React from 'react';
-import EditEventForm from '../EditEventForm';
+import { mount } from 'enzyme';
 import { ThemeProvider } from 'styled-components';
-import theme from '../../lib/theme';
 
+import theme from '../../lib/theme';
 import eventData from '../../test/mocks/Event.json';
+
+import EditEventForm from '../EditEventForm';
 const event = eventData.data.Collective;
 
 import { IntlProvider } from 'react-intl';

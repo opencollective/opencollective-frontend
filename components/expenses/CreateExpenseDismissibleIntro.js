@@ -1,7 +1,9 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+
 import { HELP_MESSAGE } from '../../lib/constants/dismissable-help-message';
+
 import DismissibleMessage from '../DismissibleMessage';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';

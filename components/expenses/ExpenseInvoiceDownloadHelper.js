@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { saveAs } from 'file-saver';
 
 import { fetchFromPDFService } from '../../lib/api';
-import { invoiceServiceURL, expenseInvoiceUrl } from '../../lib/url_helpers';
 import { getErrorFromPdfService } from '../../lib/errors';
+import { expenseInvoiceUrl, invoiceServiceURL } from '../../lib/url_helpers';
 
 /**
  * An helper to build components that download expense's invoice. Does not check the permissions.

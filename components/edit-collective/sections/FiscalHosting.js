@@ -1,16 +1,16 @@
-import React, { useState, useContext } from 'react';
-import { FormattedMessage } from 'react-intl';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { GraphQLContext } from '../../../lib/graphql/context';
 
-import { H2, P } from '../../Text';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../StyledModal';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import { H2, P } from '../../Text';
 
 const activateCollectiveAsHostQuery = gql`
   mutation activateCollectiveAsHost($id: Int!) {

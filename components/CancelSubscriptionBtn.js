@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
+
 import { getErrorFromGraphqlException } from '../lib/errors';
+
 import SmallButton from './SmallButton';
 
 class CancelSubscriptionBtn extends React.Component {

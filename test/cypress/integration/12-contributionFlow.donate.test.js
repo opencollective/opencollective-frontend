@@ -1,5 +1,5 @@
-import mockRecaptcha from '../mocks/recaptcha';
 import { CreditCards } from '../../stripe-helpers';
+import mockRecaptcha from '../mocks/recaptcha';
 
 const visitParams = { onBeforeLoad: mockRecaptcha };
 

@@ -1,22 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import { Mutation } from '@apollo/react-components';
+
+import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 import { get, set, cloneDeep } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
-import { Mutation } from '@apollo/react-components';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
-import { Box, Flex } from '../../Grid';
-import StyledCheckbox from '../../StyledCheckbox';
-import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 
-import { getCurrencySymbol, capitalize } from '../../../lib/utils';
+import { capitalize, getCurrencySymbol } from '../../../lib/utils';
 
 import { updateSettingsMutation } from './../mutations';
 
+import { Box, Flex } from '../../Grid';
+import StyledCheckbox from '../../StyledCheckbox';
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
-import { Span } from '../../Text';
 import MessageBox from '../../MessageBox';
+import { Span } from '../../Text';
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -395,11 +397,7 @@ class Tiers extends React.Component {
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
     let defaultIsChecked = false;
-    if (this.props.collective.settings?.disableCustomContributions === undefined) {
-      defaultIsChecked = false;
-    } else {
-      defaultIsChecked = this.props.collective.settings?.disableCustomContributions;
-    }
+    const defaultIsChecked = get(collective, 'settings.disableCustomContributions', false);
 
     return (
       <Mutation mutation={updateSettingsMutation}>

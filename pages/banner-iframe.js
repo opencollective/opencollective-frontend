@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Head from 'next/head';
-
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import Head from 'next/head';
+import { FormattedMessage } from 'react-intl';
 
 import MembersWithData from '../components/MembersWithData';
 

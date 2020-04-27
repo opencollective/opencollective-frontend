@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, defineMessages } from 'react-intl';
-import NotificationBar from '../NotificationBar';
-import { CollectiveType } from '../../lib/constants/collectives';
-import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
-import { moneyCanMoveFromEvent } from '../../lib/events';
 import { get } from 'lodash';
+import { defineMessages, injectIntl } from 'react-intl';
+
+import { CollectiveType } from '../../lib/constants/collectives';
+import { moneyCanMoveFromEvent } from '../../lib/events';
+
+import NotificationBar from '../NotificationBar';
+import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 const messages = defineMessages({
   // Created

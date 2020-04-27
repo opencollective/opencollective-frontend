@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { get } from 'lodash';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
+import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import TransactionsWithData from '../components/expenses/TransactionsWithData';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
-import TransactionsWithData from '../components/expenses/TransactionsWithData';
-import { Sections } from '../components/collective-page/_constants';
 import { withUser } from '../components/UserProvider';
 
 const TransactionPageWrapper = styled.div`

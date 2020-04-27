@@ -1,22 +1,23 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { useFormik } from 'formik';
-import { Flex, Box } from '../Grid';
 import { useMutation } from '@apollo/react-hooks';
+import { useFormik } from 'formik';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { gqlV2, API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getErrorFromGraphqlException, ERROR, createError } from '../../lib/errors';
-import StyledInput from '../StyledInput';
-import RichTextEditor from '../RichTextEditor';
-import StyledButton from '../StyledButton';
-import MessageBox from '../MessageBox';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import { P, H4 } from '../Text';
-import StyledInputTags from '../StyledInputTags';
-import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
+import { createError, ERROR, getErrorFromGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+
+import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
+import { Box, Flex } from '../Grid';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
+import RichTextEditor from '../RichTextEditor';
+import StyledButton from '../StyledButton';
+import StyledInput from '../StyledInput';
+import StyledInputTags from '../StyledInputTags';
+import { H4, P } from '../Text';
 
 const CreateConversationMutation = gqlV2`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {

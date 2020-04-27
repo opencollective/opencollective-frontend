@@ -1,25 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Flex } from '../components/Grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { capitalize, compose } from '../lib/utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { capitalize, compose } from '../lib/utils';
 
-import Header from '../components/Header';
 import Body from '../components/Body';
+import Container from '../components/Container';
+import Expense from '../components/expenses/Expense';
 import Footer from '../components/Footer';
+import { Flex } from '../components/Grid';
+import Header from '../components/Header';
+import Link from '../components/Link';
+import LinkCollective from '../components/LinkCollective';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { withUser } from '../components/UserProvider';
-import Container from '../components/Container';
-import Expense from '../components/expenses/Expense';
 import StyledCard from '../components/StyledCard';
-import LinkCollective from '../components/LinkCollective';
-import Link from '../components/Link';
+import { withUser } from '../components/UserProvider';
 
 /** GraphQL */
 

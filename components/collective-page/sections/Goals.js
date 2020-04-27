@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import Container from '../../Container';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const GoalsCoverLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;

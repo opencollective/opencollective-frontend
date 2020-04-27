@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Box } from '../../Grid';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
-import { P, H4 } from '../../Text';
-import Hide from '../../Hide';
-import Illustration from '../HomeIllustration';
-import StyledCarousel from '../../StyledCarousel';
 import Container from '../../Container';
-import SectionTitle from '../SectionTitle';
-import SectionSubtitle from '../SectionSubtitle';
+import { Box } from '../../Grid';
+import Hide from '../../Hide';
 import StyledCard from '../../StyledCard';
+import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
+import { H4, P } from '../../Text';
+import Illustration from '../HomeIllustration';
+import SectionSubtitle from '../SectionSubtitle';
+import SectionTitle from '../SectionTitle';
 
 const Wrapper = styled(Container)`
   background-image: ${props => props.openFeature && `url('/static/images/home/${props.openFeature}-bg-sm.png')`};

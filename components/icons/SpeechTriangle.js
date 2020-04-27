@@ -1,4 +1,5 @@
 import React from 'react';
+
 import CustomStyledIcon from './CustomStyledIcon';
 
 const SpeechTriangle = props => {

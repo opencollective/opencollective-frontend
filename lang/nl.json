@@ -227,7 +227,6 @@
   "collective.location.label": "Stad",
   "collective.meetup.label": "Bijeenkomst URL",
   "collective.members.label": "Aantal leden",
-  "collective.messages.StripeAccountConnected": "Stripe account succesvol gekoppeld",
   "Collective.New": "New",
   "collective.pending": "Collectief wacht op goedkeuring.",
   "collective.pending.description": "Dit collectief wacht op goedkeuring van de beheerder ({host}).",

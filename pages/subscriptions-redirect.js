@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import Link from '../components/Link';
-
 import colors from '../lib/constants/colors';
 
+import Body from '../components/Body';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import Link from '../components/Link';
 import { withUser } from '../components/UserProvider';
 
 class SubscriptionsRedirectPage extends React.Component {

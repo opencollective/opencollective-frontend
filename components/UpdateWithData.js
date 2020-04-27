@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import StyledUpdate from './StyledUpdate';
+
 import NotFound from './NotFound';
+import StyledUpdate from './StyledUpdate';
 
 class UpdateWithData extends React.Component {
   static propTypes = {

@@ -1,20 +1,20 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box } from './Grid';
-import { pick } from 'lodash';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Star } from '@styled-icons/fa-solid/Star';
+import { pick } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
-import { P, Span } from './Text';
+import { Box } from './Grid';
+import Link from './Link';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
-import StyledInput from './StyledInput';
-import StyledButton from './StyledButton';
-import Link from './Link';
-import StyledRadioList from './StyledRadioList';
 import StyledLink from './StyledLink';
-import { FormattedMessage } from 'react-intl';
+import StyledRadioList from './StyledRadioList';
+import { P, Span } from './Text';
 
 const useForm = () => {
   const [state, setState] = useState({ errors: '', useType: 'repository' });

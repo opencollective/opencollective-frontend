@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Header from './Header';
+import { defineMessages, injectIntl } from 'react-intl';
+
+import { IncognitoAvatar } from './Avatar';
 import Body from './Body';
 import Footer from './Footer';
-import { IncognitoAvatar } from './Avatar';
-import { defineMessages, injectIntl } from 'react-intl';
 import { Flex } from './Grid';
+import Header from './Header';
 
 class IncognitoUserCollective extends React.Component {
   static propTypes = {

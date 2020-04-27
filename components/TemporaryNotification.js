@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from './Grid';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { position } from 'styled-system';
+
+import { Box } from './Grid';
 import StyledButton from './StyledButton';
 
 const Notification = styled.div`

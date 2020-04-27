@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Flex } from './Grid';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
-import StyledInputField from './StyledInputField';
-import StyledInput from './StyledInput';
-import StyledTextarea from './StyledTextarea';
-import StyledButton from './StyledButton';
-import { H2, P } from './Text';
-import MessageBox from './MessageBox';
 import { getErrorFromGraphqlException } from '../lib/errors';
+
+import { Flex } from './Grid';
+import MessageBox from './MessageBox';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
+import StyledTextarea from './StyledTextarea';
+import { H2, P } from './Text';
 
 const SendMessageMutation = gql`
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {

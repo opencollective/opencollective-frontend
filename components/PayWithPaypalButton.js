@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getPaypal } from '../lib/paypal';
+
 import { getEnvVar } from '../lib/env-utils';
+import { getPaypal } from '../lib/paypal';
 
 /**
  * Encapsulate Paypal button logic so we don't have to deal with refs in parent

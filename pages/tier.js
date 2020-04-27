@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Page from '../components/Page';
-import Loading from '../components/Loading';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import ErrorPage from '../components/ErrorPage';
+import Loading from '../components/Loading';
+import Page from '../components/Page';
 import TierPageContent from '../components/tier-page';
 import { getTierPageQuery } from '../components/tier-page/graphql/queries';
+import { withUser } from '../components/UserProvider';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query

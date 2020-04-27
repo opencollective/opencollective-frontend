@@ -1,24 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
-import { Flex } from './Grid';
-import { Router } from '../server/pages';
-
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
-import Header from './Header';
+import { Router } from '../server/pages';
+
 import Body from './Body';
-import Footer from './Footer';
-import Loading from './Loading';
-import NotFound from './NotFound';
-import { H1, P } from './Text';
-import StyledButton from './StyledButton';
 import Container from './Container';
-import StyledLink from './StyledLink';
+import Footer from './Footer';
+import { Flex } from './Grid';
+import Header from './Header';
+import Loading from './Loading';
 import MessageBox from './MessageBox';
+import NotFound from './NotFound';
+import StyledButton from './StyledButton';
+import StyledLink from './StyledLink';
+import { H1, P } from './Text';
 import { withUser } from './UserProvider';
 
 /**

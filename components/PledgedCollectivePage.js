@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { useQuery } from '@apollo/react-hooks';
-import { Box, Flex } from './Grid';
-import gql from 'graphql-tag';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
+import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
 
 import { Link } from '../server/pages';
 
-import Page from './Page';
 import Container from './Container';
-import { H2, H3, H5, P } from './Text';
-import PledgeCard from './PledgeCard';
-import StyledLink from './StyledLink';
 import Currency from './Currency';
-import { withUser } from './UserProvider';
+import { Box, Flex } from './Grid';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
+import Page from './Page';
+import PledgeCard from './PledgeCard';
+import StyledLink from './StyledLink';
+import { H2, H3, H5, P } from './Text';
+import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 

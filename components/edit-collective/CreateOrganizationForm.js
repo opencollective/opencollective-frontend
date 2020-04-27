@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import SectionTitle from '../SectionTitle';
 import InputField from '../InputField';
+import SectionTitle from '../SectionTitle';
 
 class CreateOrganizationForm extends React.Component {
   static propTypes = {

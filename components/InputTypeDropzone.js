@@ -1,12 +1,12 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDropzone } from 'react-dropzone';
-import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
 import { themeGet } from '@styled-system/theme-get';
+import { get } from 'lodash';
+import { useDropzone } from 'react-dropzone';
+import { defineMessages, injectIntl } from 'react-intl';
 
-import { imagePreview } from '../lib/image-utils';
 import { upload } from '../lib/api';
+import { imagePreview } from '../lib/image-utils';
 
 const messages = defineMessages({
   placeholder: {

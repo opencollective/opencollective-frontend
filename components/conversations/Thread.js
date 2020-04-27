@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '../Grid';
 import styled, { css, withTheme } from 'styled-components';
 
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import CommentIconLib from '../icons/CommentIcon';
 import { withUser } from '../UserProvider';
+
 import Comment from './Comment';
-import Container from '../Container';
 import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadActivity';
 
 const CommentIcon = styled(CommentIconLib).attrs({

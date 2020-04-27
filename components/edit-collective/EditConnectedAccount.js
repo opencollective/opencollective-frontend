@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { connectAccount, disconnectAccount } from '../../lib/api';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
-import { P } from '../Text';
 import StyledButton from '../StyledButton';
+import { P } from '../Text';
 
-import EditTwitterAccount from './EditTwitterAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
+import EditTwitterAccount from './EditTwitterAccount';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import StyledFilters from './StyledFilters';
 

@@ -1,22 +1,24 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/react-components';
+import { Check } from '@styled-icons/feather/Check';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
+import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
-import { Edit as IconEdit } from '@styled-icons/feather/Edit';
-import { Check } from '@styled-icons/feather/Check';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { Router } from '../../server/pages';
+import expenseTypes from '../../lib/constants/expenseTypes';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import useClipboard from '../../lib/hooks/useClipboard';
+import { Router } from '../../server/pages';
+
+import ConfirmationModal from '../ConfirmationModal';
 import { fadeIn } from '../StyledKeyframes';
 import StyledRoundButton from '../StyledRoundButton';
+
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
-import expenseTypes from '../../lib/constants/expenseTypes';
-import useClipboard from '../../lib/hooks/useClipboard';
-import ConfirmationModal from '../ConfirmationModal';
 
 const deleteExpenseMutation = gqlV2`
   mutation deleteExpense($id: String!) {

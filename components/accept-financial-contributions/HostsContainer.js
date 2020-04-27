@@ -1,17 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '../Grid';
-import styled from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import HostCollectiveCard from './HostCollectiveCard';
-import Loading from '../Loading';
-import HorizontalScroller from '../HorizontalScroller';
+
+import { Flex } from '../Grid';
 import Hide from '../Hide';
+import HorizontalScroller from '../HorizontalScroller';
 import Link from '../Link';
+import Loading from '../Loading';
 import StyledButton from '../StyledButton';
+
+import HostCollectiveCard from './HostCollectiveCard';
 
 const Limit = 12; // nice round number to make even rows of 2, 3, 4
 

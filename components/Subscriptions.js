@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
+import colors from '../lib/constants/colors';
 
 import SubscriptionCard from './SubscriptionCard';
-import colors from '../lib/constants/colors';
 
 class Subscriptions extends React.Component {
   static propTypes = {

@@ -1,24 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { Flex } from '../Grid';
+import gql from 'graphql-tag';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import colors from '../../lib/constants/colors';
 import { capitalize } from '../../lib/utils';
 
 import Avatar from '..//Avatar';
+import ConfirmationModal from '../ConfirmationModal';
+import Container from '../Container';
+import { Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
-import StyledButton from '../StyledButton';
 import Moment from '../Moment';
+import StyledButton from '../StyledButton';
+
 import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
 import OrderDetails from './OrderDetails';
 import TransactionDetails from './TransactionDetails';
-import ConfirmationModal from '../ConfirmationModal';
-import Container from '../Container';
 
 class Order extends React.Component {
   static propTypes = {
