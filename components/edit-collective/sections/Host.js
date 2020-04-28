@@ -7,7 +7,8 @@ import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatCurrency, formatDate, getQueryParams } from '../../../lib/utils';
+import { formatCurrency } from '../../../lib/currency-utils';
+import { formatDate, getQueryParams } from '../../../lib/utils';
 import { Router } from '../../../server/pages';
 
 import CollectiveCard from '../../CollectiveCard';

@@ -9,8 +9,8 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../lib/confettis';
+import { formatCurrency } from '../lib/currency-utils';
 import { facebooKShareURL, tweetURL } from '../lib/url_helpers';
-import { formatCurrency } from '../lib/utils';
 
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';

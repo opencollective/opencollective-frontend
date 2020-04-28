@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Markdown from 'react-markdown';
 
 import colors from '../lib/constants/colors';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
 import { Link } from '../server/pages';
 
 import Avatar from './Avatar';

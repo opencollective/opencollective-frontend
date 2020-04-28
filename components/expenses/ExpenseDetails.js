@@ -6,10 +6,11 @@ import { cloneDeep, get, omit, pick, set, uniq } from 'lodash';
 import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'react-intl';
 
 import categories from '../../lib/constants/categories';
+import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { imagePreview } from '../../lib/image-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { capitalize, formatCurrency, getCurrencySymbol } from '../../lib/utils';
+import { capitalize } from '../../lib/utils';
 
 import InputField from '../../components/InputField';
 

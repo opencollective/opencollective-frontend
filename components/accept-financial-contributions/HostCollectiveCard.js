@@ -5,9 +5,9 @@ import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { confettiFireworks } from '../../lib/confettis';
+import { getCurrencySymbol } from '../../lib/currency-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getCurrencySymbol } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Avatar from '../Avatar';

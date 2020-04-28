@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
 
 import { fadeIn } from './StyledKeyframes';
 import { P, Span } from './Text';

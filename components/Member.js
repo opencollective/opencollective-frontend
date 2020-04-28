@@ -4,7 +4,8 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import colors from '../lib/constants/colors';
-import { capitalize, firstSentence, formatCurrency, formatDate, singular } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
+import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
 
 import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';
