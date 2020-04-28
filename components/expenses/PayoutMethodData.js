@@ -26,7 +26,7 @@ const renderObject = object =>
  * @returns boolean: True if the payout method has displayable data
  */
 export const payoutMethodHasData = payoutMethod => {
-  switch (payoutMethod.type) {
+  switch (payoutMethod?.type) {
     case PayoutMethodType.PAYPAL:
       return Boolean(get(payoutMethod, 'data.email'));
     case PayoutMethodType.OTHER:
@@ -41,7 +41,7 @@ export const payoutMethodHasData = payoutMethod => {
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodData = ({ payoutMethod }) => {
+const PayoutMethodData = ({ payoutMethod, showLabel }) => {
   if (!payoutMethodHasData(payoutMethod)) {
     return null;
   }
@@ -50,37 +50,43 @@ const PayoutMethodData = ({ payoutMethod }) => {
     case PayoutMethodType.PAYPAL:
       return (
         <div>
-          <Container fontSize="11px" fontWeight="500" mb={2}>
-            <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
-            &nbsp;&nbsp;
-            <PrivateInfoIcon color="#969BA3" />
-          </Container>
-          <P fontSize="11px" color="black.700">
+          {showLabel && (
+            <Container fontSize="11px" fontWeight="500" mb={2}>
+              <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
+              &nbsp;&nbsp;
+              <PrivateInfoIcon color="#969BA3" />
+            </Container>
+          )}
+          <Container fontSize="11px" color="black.700">
             {payoutMethod.data.email}
-          </P>
+          </Container>
         </div>
       );
     case PayoutMethodType.OTHER:
       return (
         <div>
-          <Container fontSize="11px" fontWeight="500" mb={2}>
-            <FormattedMessage id="Details" defaultMessage="Details" />
-            &nbsp;&nbsp;
-            <PrivateInfoIcon color="#969BA3" />
-          </Container>
-          <P fontSize="11px" color="black.700">
+          {showLabel && (
+            <Container fontSize="11px" fontWeight="500" mb={2}>
+              <FormattedMessage id="Details" defaultMessage="Details" />
+              &nbsp;&nbsp;
+              <PrivateInfoIcon color="#969BA3" />
+            </Container>
+          )}
+          <Container fontSize="11px" color="black.700">
             {payoutMethod.data.content}
-          </P>
+          </Container>
         </div>
       );
     case PayoutMethodType.BANK_ACCOUNT:
       return (
         <div>
-          <Container fontSize="11px" fontWeight="500" mb={2}>
-            <FormattedMessage id="Details" defaultMessage="Details" />
-            &nbsp;&nbsp;
-            <PrivateInfoIcon color="#969BA3" />
-          </Container>
+          {showLabel && (
+            <Container fontSize="11px" fontWeight="500" mb={2}>
+              <FormattedMessage id="Details" defaultMessage="Details" />
+              &nbsp;&nbsp;
+              <PrivateInfoIcon color="#969BA3" />
+            </Container>
+          )}
           <Container fontSize="11px" color="black.700">
             <FormattedMessage
               id="BankInfo.Type"
@@ -97,11 +103,17 @@ const PayoutMethodData = ({ payoutMethod }) => {
 };
 
 PayoutMethodData.propTypes = {
+  /** If false, only the raw data will be displayed */
+  showLabel: PropTypes.bool,
   payoutMethod: PropTypes.shape({
     id: PropTypes.string,
     type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     data: PropTypes.object,
   }),
+};
+
+PayoutMethodData.defaultProps = {
+  showLabel: true,
 };
 
 // @component
