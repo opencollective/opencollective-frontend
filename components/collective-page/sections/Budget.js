@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import { get, isEmpty, orderBy } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { formatCurrency } from '../../../lib/utils';
+import { formatCurrency } from '../../../lib/currency-utils';
 
 import BudgetItemsList, {
   BudgetItemExpenseFragment,

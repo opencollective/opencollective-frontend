@@ -7,9 +7,10 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
+import { formatCurrency } from '../lib/currency-utils';
 import { getSubscriptionsQuery } from '../lib/graphql/queries';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
-import { compose, formatCurrency } from '../lib/utils';
+import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';

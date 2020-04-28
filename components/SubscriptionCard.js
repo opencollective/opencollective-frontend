@@ -8,11 +8,12 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { defaultBackgroundImage } from '../lib/constants/collectives';
 import colors from '../lib/constants/colors';
+import { getCurrencySymbol } from '../lib/currency-utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { getSubscriptionsQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { getStripe } from '../lib/stripe';
-import { firstSentence, getCurrencySymbol } from '../lib/utils';
+import { firstSentence } from '../lib/utils';
 
 import CancelSubscriptionBtn from './CancelSubscriptionBtn';
 import Currency from './Currency';

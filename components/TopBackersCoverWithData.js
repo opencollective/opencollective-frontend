@@ -4,7 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
 
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
 
 import Avatar from './Avatar';
 import Error from './Error';

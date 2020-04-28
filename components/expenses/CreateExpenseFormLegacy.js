@@ -6,7 +6,7 @@ import Markdown from 'react-markdown';
 
 import categories from '../../lib/constants/categories';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { getCurrencySymbol } from '../../lib/utils';
+import { getCurrencySymbol } from '../../lib/currency-utils';
 
 import Button from '../Button';
 import Container from '../Container';

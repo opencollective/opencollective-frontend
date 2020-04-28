@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isUndefined } from 'lodash';
 
-import { getCurrencySymbol } from '../lib/utils';
+import { getCurrencySymbol } from '../lib/currency-utils';
 
 import StyledInputGroup from './StyledInputGroup';
 

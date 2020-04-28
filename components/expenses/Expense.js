@@ -6,8 +6,9 @@ import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import colors from '../../lib/constants/colors';
+import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
-import { capitalize, compose, formatCurrency } from '../../lib/utils';
+import { capitalize, compose } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';

@@ -13,6 +13,18 @@
         "origin": "AUTHORED",
         "exported": true
     },
+    "opencollective.design-system/components/currency@1.3.0": {
+        "files": [
+            {
+                "relativePath": "components/Currency.js",
+                "test": false,
+                "name": "Currency.js"
+            }
+        ],
+        "mainFile": "components/Currency.js",
+        "origin": "AUTHORED",
+        "exported": true
+    },
     "opencollective.design-system/components/custom-styled-icon@1.2.0": {
         "files": [
             {
@@ -22,6 +34,18 @@
             }
         ],
         "mainFile": "components/icons/CustomStyledIcon.js",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "opencollective.design-system/components/formatted-money-amount@1.3.0": {
+        "files": [
+            {
+                "relativePath": "components/FormattedMoneyAmount.js",
+                "test": false,
+                "name": "FormattedMoneyAmount.js"
+            }
+        ],
+        "mainFile": "components/FormattedMoneyAmount.js",
         "origin": "AUTHORED",
         "exported": true
     },
@@ -325,6 +349,18 @@
         "origin": "AUTHORED",
         "exported": true
     },
+    "opencollective.design-system/constants/currency-precision@1.3.0": {
+        "files": [
+            {
+                "relativePath": "lib/constants/currency-precision.js",
+                "test": false,
+                "name": "currency-precision.js"
+            }
+        ],
+        "mainFile": "lib/constants/currency-precision.js",
+        "origin": "AUTHORED",
+        "exported": true
+    },
     "opencollective.design-system/constants/member-role@1.2.0": {
         "files": [
             {
@@ -385,6 +421,18 @@
         "origin": "AUTHORED",
         "exported": true
     },
+    "opencollective.design-system/lib/currency-utils@1.3.0": {
+        "files": [
+            {
+                "relativePath": "lib/currency-utils.js",
+                "test": false,
+                "name": "currency-utils.js"
+            }
+        ],
+        "mainFile": "lib/currency-utils.js",
+        "origin": "AUTHORED",
+        "exported": true
+    },
     "opencollective.design-system/lib/env-utils@1.2.0": {
         "files": [
             {
@@ -406,6 +454,18 @@
             }
         ],
         "mainFile": "lib/image-utils.js",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "opencollective.design-system/lib/math@1.3.0": {
+        "files": [
+            {
+                "relativePath": "lib/math.js",
+                "test": false,
+                "name": "math.js"
+            }
+        ],
+        "mainFile": "lib/math.js",
         "origin": "AUTHORED",
         "exported": true
     },

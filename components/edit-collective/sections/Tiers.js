@@ -6,7 +6,8 @@ import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { capitalize, getCurrencySymbol } from '../../../lib/utils';
+import { getCurrencySymbol } from '../../../lib/currency-utils';
+import { capitalize } from '../../../lib/utils';
 
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
