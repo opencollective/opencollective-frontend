@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -41,11 +40,9 @@ class UpdateBankDetailsForm extends React.Component {
         defaultMessage: `Please make a bank transfer as follows:
 
 <code>
-    Amount: {amount}
-    Reference/Communication: {OrderId}
-    IBAN/Account Number: BE61310126985517
-    BIC: TRIOBEBB
-    Bank name: Triodos
+Amount: {amount}
+Reference/Communication: {OrderId}
+{account}
 </code>
 
 Please note that it will take a few days to process your payment.`,
@@ -65,24 +62,25 @@ Please note that it will take a few days to process your payment.`,
     return (
       <Flex flexDirection="column">
         <Container as="fieldset" border="none" width={1} py={3}>
-          <Flex flexDirection="row">
-            <Box mb={3}>
+          <Flex flexDirection={['column-reverse', 'row']}>
+            <Box mb={3} flexGrow={1}>
               <StyledTextarea
                 label={intl.formatMessage(this.messages['bankaccount.instructions.label'])}
                 htmlFor="instructions"
-                width={500}
+                width="100%"
                 height={300}
                 onChange={e => this.onChange('instructions', e.target.value)}
-                defaultValue={
-                  get(value, 'instructions') || intl.formatMessage(this.messages['bankaccount.instructions.default'])
-                }
+                defaultValue={value || intl.formatMessage(this.messages['bankaccount.instructions.default'])}
               />
             </Box>
-            <Container fontSize="1.4rem" ml={3}>
+            <Container fontSize="1.4rem" pl={[0, 3]} width={[1, 0.5]}>
               <H4 fontSize="1.4rem">Variables:</H4>
               <P>Make sure you are using the following variables in the instructions.</P>
 
               <List>
+                <li>
+                  <code>&#123;account&#125;</code>: your bank account information added below
+                </li>
                 <li>
                   <code>&#123;amount&#125;</code>: total amount of the order
                 </li>
