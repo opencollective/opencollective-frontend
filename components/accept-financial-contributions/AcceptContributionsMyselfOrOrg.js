@@ -84,10 +84,10 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
   // GraphQL functions
   addHost = async (collective, host) => {
     const collectiveInput = {
-      legacyId: collective.id,
+      slug: collective.slug,
     };
     const hostInput = {
-      legacyId: host.id,
+      slug: host.slug,
     };
     try {
       await this.props.applyToHost({
@@ -107,7 +107,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
   submitBankAccountInformation = async bankAccountInfo => {
     // prepare objects
     const account = {
-      legacyId: this.props.LoggedInUser.CollectiveId,
+      legacyId: this.state.organization ? this.state.organization.id : this.props.LoggedInUser.CollectiveId,
     };
 
     const value = {
@@ -168,7 +168,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
         this.setState({ loading: true });
         const { bankInformation } = values;
         await this.submitBankAccountInformation(bankInformation);
-        await this.addHost(collective, LoggedInUser.collective);
+        await this.addHost(collective, organization ? organization : LoggedInUser.collective);
         await this.props.refetchLoggedInUser();
         await Router.pushRoute('accept-financial-contributions', {
           slug: this.props.collective.slug,
@@ -185,8 +185,8 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     // Conditional rendering
     const noOrganizationPicked = router.query.path === 'organization' && !organization;
     const organizationPicked = router.query.path === 'organization' && organization;
-    const ableToChoseStripeOrBankAccount =
-      organizationPicked || (!router.query.method && router.query.path === 'myself');
+    const ableToChooseStripeOrBankAccount =
+      (organizationPicked && !router.query.method) || (router.query.path === 'myself' && !router.query.method);
 
     return (
       <Fragment>
@@ -383,12 +383,11 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
               </Flex>
             </Flex>
           )}
-          {ableToChoseStripeOrBankAccount && (
+          {ableToChooseStripeOrBankAccount && (
             <StripeOrBankAccountPicker
-              LoggedInUser={LoggedInUser}
-              hostCollectiveSlug={organization ? organization.slug : LoggedInUser.collective.slug}
-              addHost={this.addHost}
               collective={collective}
+              host={organization ? organization : LoggedInUser.collective}
+              addHost={this.addHost}
             />
           )}
         </Container>

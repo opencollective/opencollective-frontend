@@ -9,9 +9,9 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
-import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -55,10 +55,9 @@ class StripeOrBankAccountPicker extends React.Component {
     data: PropTypes.object.isRequired,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
-    hostCollectiveSlug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
+    collective: PropTypes.object.isRequired,
+    host: PropTypes.object.isRequired,
     addHost: PropTypes.func.isRequired,
-    collective: PropTypes.object,
   };
 
   constructor(props) {
@@ -66,6 +65,7 @@ class StripeOrBankAccountPicker extends React.Component {
 
     this.state = {
       loading: null,
+      buttonLoading: false,
     };
 
     this.messages = defineMessages({
@@ -80,37 +80,28 @@ class StripeOrBankAccountPicker extends React.Component {
     });
   }
 
-  connectStripe = () => {
-    const { collective } = this.props.LoggedInUser ? this.props.LoggedInUser : this.props.data.Collective;
+  connectStripe = async () => {
     const service = 'stripe';
-
-    connectAccount(collective.id, service)
-      .then(json => {
-        return (window.location.href = json.redirectUrl);
-      })
-      .catch(err => {
-        console.error(`>>> /api/connected-accounts/${service} error`, err);
-      });
+    try {
+      const json = await connectAccount(this.props.host.id, service);
+      window.location.href = json.redirectUrl;
+    } catch (err) {
+      console.error(`>>> /api/connected-accounts/${service} error`, err);
+    }
   };
 
   render() {
-    const { router, data, LoggedInUser, addHost, collective, intl } = this.props;
-    const { loading, Collective } = data;
+    const { router, addHost, collective, intl, data } = this.props;
+    const { buttonLoading } = this.state;
+
+    const { loading, host } = data;
 
     if (loading) {
       return <Loading />;
     }
 
-    const hostOrganization = Collective;
-
-    const isBankAccountAlreadyThere = hostOrganization
-      ? has(hostOrganization, 'settings.paymentMethods.manual')
-      : has(LoggedInUser, 'collective.settings.paymentMethods.manual');
-
-    const connectedAccounts = hostOrganization
-      ? hostOrganization.connectedAccounts
-      : LoggedInUser.collective.connectedAccounts;
-    const stripeAccount = find(connectedAccounts, { service: 'stripe' });
+    const isBankAccountAlreadyThere = has(host, 'settings.paymentMethods.manual');
+    const stripeAccount = find(host.connectedAccounts, { service: 'stripe' });
 
     return (
       <Flex flexDirection="column" justifyContent="center" alignItems="center" my={[5]}>
@@ -144,7 +135,6 @@ class StripeOrBankAccountPicker extends React.Component {
                     mb={3}
                     minWidth={'145px'}
                     onClick={() => {
-                      const host = hostOrganization ? hostOrganization : LoggedInUser.collective;
                       addHost(collective, host);
                       this.connectStripe();
                     }}
@@ -244,8 +234,9 @@ class StripeOrBankAccountPicker extends React.Component {
             minHeight="36px"
             mt={4}
             minWidth={'145px'}
+            loading={buttonLoading}
             onClick={async () => {
-              const host = hostOrganization ? hostOrganization : LoggedInUser.collective;
+              this.setState({ buttonLoading: true });
               await addHost(collective, host);
               await Router.pushRoute('accept-financial-contributions', {
                 slug: router.query.slug,
@@ -264,12 +255,27 @@ class StripeOrBankAccountPicker extends React.Component {
   }
 }
 
-const getBankAccountInfo = graphql(getCollectivePageQuery, {
+// We query on "account" and not "host" because the account is not necessarily an host yet
+const hostQuery = gqlV2`
+  query host($slug: String!) {
+    host: account(slug: $slug) {
+      id
+      slug
+      connectedAccounts {
+        id
+        service
+      }
+      settings
+  }
+}`;
+
+const addHost = graphql(hostQuery, {
   options: props => ({
+    context: API_V2_CONTEXT,
     variables: {
-      slug: props.hostCollectiveSlug,
+      slug: props.host.slug,
     },
   }),
 });
 
-export default injectIntl(withRouter(getBankAccountInfo(StripeOrBankAccountPicker)));
+export default injectIntl(addHost(withRouter(StripeOrBankAccountPicker)));
