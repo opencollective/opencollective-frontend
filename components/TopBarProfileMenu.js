@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { capitalize, formatCurrency } from '../lib/utils';
+import ComponentLink from '../components/Link';
 import { Link } from '../server/pages';
 
 import Avatar from './Avatar';
@@ -22,6 +23,20 @@ import StyledRoundButton from './StyledRoundButton';
 import { Plus } from '@styled-icons/boxicons-regular';
 import StyledHr from './StyledHr';
 import styled from 'styled-components';
+
+const CollectiveListItem = styled(ListItem)`
+  @media (hover: hover) {
+    :hover .SettingsCogIcon {
+      opacity: 1;
+    }
+  }
+
+  @media (hover: none) {
+    .SettingsCogIcon {
+      opacity: 1;
+    }
+  }
+`;
 
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
@@ -102,17 +117,9 @@ class TopBarProfileMenu extends React.Component {
   renderMembershipLine = membership => {
     const { intl, LoggedInUser } = this.props;
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(membership.collective);
-    const SettingsCogContainer = styled(Settings)`
-      @media (min-width: 420px) {
-        opacity: 0;
-        :hover {
-          opacity: 1;
-        }
-      }
-    `;
 
     return (
-      <ListItem
+      <CollectiveListItem
         key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}
         py={1}
         display="flex"
@@ -140,11 +147,11 @@ class TopBarProfileMenu extends React.Component {
         {isAdmin && (
           <Link route="editCollective" params={{ slug: membership.collective.slug }} passHref>
             <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
-              <SettingsCogContainer size="1.2em" />
+              <Settings className="SettingsCogIcon" opacity="0" size="1.2em" />
             </StyledLink>
           </Link>
         )}
-      </ListItem>
+      </CollectiveListItem>
     );
   };
 
@@ -181,7 +188,6 @@ class TopBarProfileMenu extends React.Component {
         position="absolute"
         right={16}
         top={75}
-        width="max-content"
         zIndex={3000}
         data-cy="user-menu"
       >
@@ -289,11 +295,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="collective" defaultMessage="my collectives" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                <Link route="/create" passHref>
+              <ComponentLink route="/create">
+                <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
-                </Link>
-              </StyledRoundButton>
+                </StyledRoundButton>
+              </ComponentLink>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {collectives.map(this.renderMembershipLine)}
