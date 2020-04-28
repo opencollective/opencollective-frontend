@@ -55,10 +55,21 @@ const Header = styled(Container)`
   justify-content: space-between;
 `;
 
-const Body = styled(Container)`
-  margin-top: 10px;
-  margin-bottom: 30px;
-`;
+export const ModalBody = styled(Container)``;
+
+ModalBody.defaultProps = {
+  mt: '10px',
+  mb: '30px',
+};
+
+ModalBody.propTypes = {
+  /** width of the modal component */
+  width: PropTypes.string,
+  /** height of the modal component */
+  height: PropTypes.string,
+  /** children */
+  children: PropTypes.node,
+};
 
 const Divider = styled.div`
   margin: 2rem 0;
@@ -77,30 +88,19 @@ const CloseIcon = styled(Times)`
 
 export const ModalHeader = ({ children, onClose, ...props }) => (
   <Header {...props}>
-    {children}
+    {children || <div />}
     <CloseIcon onClick={onClose} />
   </Header>
 );
 
 ModalHeader.propTypes = {
   /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
   /** children */
   children: PropTypes.node,
 };
 
 ModalHeader.displayName = 'Header';
-
-export const ModalBody = ({ children, ...props }) => <Body {...props}>{children}</Body>;
-
-ModalBody.propTypes = {
-  /** width of the modal component */
-  width: PropTypes.string,
-  /** height of the modal component */
-  height: PropTypes.string,
-  /** children */
-  children: PropTypes.node,
-};
 
 export const ModalFooter = ({ children, ...props }) => (
   <Container {...props}>
@@ -139,7 +139,7 @@ const StyledModal = ({ children, show, onClose, usePortal, ...props }) => {
         <GlobalModalStyle />
         <ModalWrapper {...props}>
           {React.Children.map(children, child => {
-            if (child.type.displayName === 'Header') {
+            if (child.type?.displayName === 'Header') {
               return React.cloneElement(child, { onClose });
             }
             return child;
@@ -171,8 +171,14 @@ StyledModal.propTypes = {
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
+  /** wether to render the modal at the root with a potal */
+  usePortal: PropTypes.bool,
   /** children */
   children: PropTypes.node,
+};
+
+StyledModal.defaultProps = {
+  usePortal: true,
 };
 
 /** @component */

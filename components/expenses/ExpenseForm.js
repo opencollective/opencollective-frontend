@@ -29,6 +29,7 @@ import { validateExpenseItem } from './ExpenseItemForm';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
+import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 
 const msg = defineMessages({
   descriptionPlaceholder: {
@@ -84,6 +85,7 @@ const msg = defineMessages({
 const getDefaultExpense = (collective, payoutProfiles) => ({
   description: '',
   items: [],
+  attachedFiles: [],
   payee: first(payoutProfiles),
   payoutMethod: undefined,
   privateInfo: '',
@@ -97,16 +99,17 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
 export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
+  const isInvoice = expenseData.type === expenseTypes.INVOICE;
   return {
     ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee: expenseData.payee && { [payeeIdField]: expenseData.payee.id },
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    attachedFiles: expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])),
+    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
     // Omit item's ids that were created for keying purposes
     items: expenseData.items.map(item => {
       return pick(item, [
         ...(item.__isNew ? [] : ['id']),
-        ...(expenseData.type === expenseTypes.INVOICE ? [] : ['url']), // never submit URLs for invoices
+        ...(isInvoice ? [] : ['url']), // never submit URLs for invoices
         'description',
         'incurredAt',
         'amount',
@@ -216,6 +219,14 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
               <P color="red.500" mt={2}>
                 {formatFormErrorMessage(intl, errors.description)}
               </P>
+            )}
+            {values.type === expenseTypes.INVOICE && (
+              <Box my={4}>
+                <ExpenseAttachedFilesForm
+                  onChange={files => formik.setFieldValue('attachedFiles', files)}
+                  defaultValue={values.attachedFiles}
+                />
+              </Box>
             )}
             <Flex alignItems="center" my={24}>
               <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">

@@ -6,8 +6,9 @@ import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import colors from '../../lib/constants/colors';
+import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
-import { capitalize, compose, formatCurrency } from '../../lib/utils';
+import { capitalize, compose } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
@@ -25,7 +26,7 @@ import ExpenseDetails from './ExpenseDetails';
 import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import MarkExpenseAsPaidBtn from './MarkExpenseAsPaidBtn';
 import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
-import PayExpenseBtn from './PayExpenseBtn';
+import PayExpenseBtnLegacy from './PayExpenseBtnLegacy';
 import RejectExpenseBtn from './RejectExpenseBtn';
 
 class Expense extends React.Component {
@@ -366,7 +367,7 @@ class Expense extends React.Component {
             }
 
             @media screen and (max-width: 700px) {
-              .expense .PayExpenseBtn ~ .RejectExpenseBtn {
+              .expense .PayExpenseBtnLegacy ~ .RejectExpenseBtn {
                 flex-grow: 1;
               }
               .expense .SmallButton {
@@ -544,7 +545,7 @@ class Expense extends React.Component {
                           onError={this.handleErrorMessage}
                         />
                         {(get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT' || expense.payoutMethod !== 'other') && (
-                          <PayExpenseBtn
+                          <PayExpenseBtnLegacy
                             expense={expense}
                             collective={collective}
                             host={host}

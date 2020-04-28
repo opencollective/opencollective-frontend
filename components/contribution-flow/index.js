@@ -13,12 +13,13 @@ import { isURL } from 'validator';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { formatCurrency } from '../../lib/currency-utils';
 import { getEnvVar } from '../../lib/env-utils';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { getPaypal } from '../../lib/paypal';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { compose, formatCurrency, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
+import { compose, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../Container';

@@ -6,7 +6,7 @@ import moment from 'moment';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
 
 import GiftCard from './icons/GiftCard';
 import Avatar from './Avatar';

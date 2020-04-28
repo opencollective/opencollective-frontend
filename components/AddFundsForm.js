@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { OC_FEE_PERCENT } from '../lib/constants/transactions';
-import { formatCurrency, getCurrencySymbol } from '../lib/utils';
+import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 
 import { AddFundsSourcePickerForUserWithData, AddFundsSourcePickerWithData } from './AddFundsSourcePicker';
 import InputField from './InputField';

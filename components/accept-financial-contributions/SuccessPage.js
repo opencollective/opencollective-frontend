@@ -15,12 +15,11 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, H2, P } from '../Text';
 
-import nonHostSuccessIllustration from '../../public/static/images/create-collective/original/acceptContributionsNonHostSuccessIllustration.png';
-import placeholderIllustration from '../../public/static/images/create-collective/original/placeholderGraphic.png';
+import successIllustration from '../../public/static/images/create-collective/acceptContributionsSuccessIllustration.png';
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
-const SmallExternalLink = styled(StyledLink)`
+const SmallExternalLink = styled(StyledLink).attrs({ openInNewTab: true })`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
 
@@ -104,11 +103,7 @@ class SuccessPage extends React.Component {
             mx={[2, 4, 0]}
             my={[2, 4]}
           >
-            <img
-              src={path === 'host' ? placeholderIllustration : nonHostSuccessIllustration}
-              width="264px"
-              height="352px"
-            />
+            <img src={successIllustration} width="264px" height="352px" />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
                 <FormattedMessage id="tiers.about" defaultMessage="About contribution tiers" />
@@ -116,18 +111,45 @@ class SuccessPage extends React.Component {
               <P fontSize="LeadCaption" lineHeight="Paragraph" mb={3} color="black.800">
                 <FormattedMessage
                   id="acceptContributions.tiers.paragraphOne"
-                  defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts."
+                  defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts. {knowMore}."
+                  values={{
+                    knowMore: (
+                      <SmallExternalLink href={TIERS_INFO_LINK}>
+                        <FormattedMessage id="tiers.knowMore" defaultMessage="Know more about tiers" />
+                      </SmallExternalLink>
+                    ),
+                  }}
                 />
               </P>
-              <P fontSize="LeadCaption" lineHeight="Paragraph" mb={1} color="black.800">
-                <FormattedMessage
-                  id="acceptContributions.tiers.paragraphTwo"
-                  defaultMessage="You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or can be allowed to be flexibly set by contributors."
-                />
-              </P>
-              <SmallExternalLink href={TIERS_INFO_LINK} openInNewTab>
-                <FormattedMessage id="tiers.knowMore" defaultMessage="Know more about tiers" />
-              </SmallExternalLink>
+              {path !== 'host' && (
+                <Fragment>
+                  <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
+                    <FormattedMessage
+                      id="acceptContributions.success.hostSettings"
+                      defaultMessage="Fiscal Host Settings"
+                    />
+                  </H2>
+                  <P fontSize="LeadCaption" lineHeight="Paragraph" mb={1} color="black.800">
+                    <FormattedMessage
+                      id="acceptContributions.success.hostSettingsInfo"
+                      defaultMessage="You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}."
+                      values={{
+                        takeMeThere: (
+                          <Link
+                            route="editCollective"
+                            params={{
+                              slug: collective.host.slug,
+                              section: 'fiscal-hosting',
+                            }}
+                          >
+                            <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
+                          </Link>
+                        ),
+                      }}
+                    />
+                  </P>
+                </Fragment>
+              )}
             </Flex>
           </Flex>
           <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center" my={3}>

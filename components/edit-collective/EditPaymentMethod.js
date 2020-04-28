@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
-import { capitalize, getCurrencySymbol } from '../../lib/utils';
+import { capitalize } from '../../lib/utils';
 import { Link } from '../../server/pages';
 
 import { Box, Flex } from '../Grid';

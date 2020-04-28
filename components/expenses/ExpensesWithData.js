@@ -98,6 +98,7 @@ const getExpensesQuery = gql`
       PayoutMethod {
         id
         type
+        data
       }
       privateMessage
       userTaxFormRequiredBeforePayment

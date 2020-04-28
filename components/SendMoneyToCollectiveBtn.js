@@ -5,7 +5,8 @@ import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { compose, formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
+import { compose } from '../lib/utils';
 
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';

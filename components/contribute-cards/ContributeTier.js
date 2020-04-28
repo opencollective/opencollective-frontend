@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { formatCurrency, getPrecisionFromAmount } from '../../lib/utils';
+import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';

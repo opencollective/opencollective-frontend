@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { formatCurrency } from '../../../lib/utils';
+import { formatCurrency } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
 import SendMoneyToCollectiveBtn from '../../SendMoneyToCollectiveBtn';

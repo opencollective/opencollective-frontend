@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency } from '../../lib/currency-utils';
 
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';

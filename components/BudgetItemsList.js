@@ -10,7 +10,7 @@ import styled, { css } from 'styled-components';
 import { TransactionTypes } from '../lib/constants/transactions';
 import { i18nExpenseCategory, i18nExpenseType } from '../lib/i18n-expense';
 import { i18nPaymentMethodType } from '../lib/i18n-payment-method-type';
-import { formatCurrency } from './../lib/utils';
+import { formatCurrency } from './../lib/currency-utils';
 
 import ExpenseStatusTag from './expenses/ExpenseStatusTag';
 import InvoiceDownloadLink from './expenses/InvoiceDownloadLink';

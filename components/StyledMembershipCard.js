@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
+import { formatCurrency } from '../lib/currency-utils';
 import formatMemberRole from '../lib/i18n-member-role';
-import { formatCurrency } from '../lib/utils';
 
 import Container from './Container';
 import { Box } from './Grid';
