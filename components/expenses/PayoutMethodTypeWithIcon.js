@@ -13,13 +13,13 @@ import { Span } from '../Text';
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodTypeWithIcon = ({ type }) => {
+const PayoutMethodTypeWithIcon = ({ type, fontSize, iconSize }) => {
   switch (type) {
     case PayoutMethodType.PAYPAL:
       return (
         <Flex alignItems="center">
-          <PaypalIcon size={24} color="#192f86" />
-          <Span ml={2} fontWeight="bold" fontSize="13px" color="black.900">
+          <PaypalIcon size={iconSize} color="#192f86" />
+          <Span ml={2} fontWeight="bold" fontSize={fontSize} color="black.900">
             PayPal
           </Span>
         </Flex>
@@ -27,8 +27,8 @@ const PayoutMethodTypeWithIcon = ({ type }) => {
     case PayoutMethodType.OTHER:
       return (
         <Flex alignItems="center">
-          <OtherIcon size={24} color="#9D9FA3" />
-          <Span ml={2} fontWeight="bold" fontSize="13px" color="black.900">
+          <OtherIcon size={iconSize} color="#9D9FA3" />
+          <Span ml={2} fontWeight="bold" fontSize={fontSize} color="black.900">
             <FormattedMessage id="PayoutMethod.Type.Other" defaultMessage="Other" />
           </Span>
         </Flex>
@@ -36,8 +36,8 @@ const PayoutMethodTypeWithIcon = ({ type }) => {
     case PayoutMethodType.BANK_ACCOUNT:
       return (
         <Flex alignItems="center">
-          <BankIcon size={24} color="#9D9FA3" />
-          <Span ml={2} fontWeight="bold" fontSize="13px" color="black.900">
+          <BankIcon size={iconSize} color="#9D9FA3" />
+          <Span ml={2} fontWeight="bold" fontSize={fontSize} color="black.900">
             <FormattedMessage id="Bank account" defaultMessage="Bank account" />
           </Span>
         </Flex>
@@ -49,6 +49,13 @@ const PayoutMethodTypeWithIcon = ({ type }) => {
 
 PayoutMethodTypeWithIcon.propTypes = {
   type: PropTypes.oneOf(Object.values(PayoutMethodType)),
+  fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+PayoutMethodTypeWithIcon.defaultProps = {
+  fontSize: '13px',
+  iconSize: 24,
 };
 
 // @component

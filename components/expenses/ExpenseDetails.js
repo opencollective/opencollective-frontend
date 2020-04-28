@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { cloneDeep, get, omit, pick, set, uniq } from 'lodash';
-import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import categories from '../../lib/constants/categories';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
@@ -22,6 +22,8 @@ import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+import PayoutMethodData from './PayoutMethodData';
+import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 import TransactionDetails from './TransactionDetails';
 
 class ExpenseDetails extends React.Component {
@@ -256,7 +258,7 @@ class ExpenseDetails extends React.Component {
             }
           `}
         </style>
-        <Flex flexWrap="wrap" alignItems="flex-end">
+        <Flex flexWrap="wrap">
           {editMode && (
             <div className="row">
               <div className="col large">
@@ -318,13 +320,13 @@ class ExpenseDetails extends React.Component {
             </div>
           )}
 
-          <Box mt={2} mr={2}>
-            <label>
-              <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
-            </label>
-            <div className="amountDetails">
-              <span className="amount">
-                {editMode && canEditAmount && (
+          {editMode && canEditAmount && (
+            <Box mt={2} mr={2}>
+              <label>
+                <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
+              </label>
+              <div className="amountDetails">
+                <span className="amount">
                   <InputField
                     name="amount"
                     defaultValue={expense.amount}
@@ -333,37 +335,34 @@ class ExpenseDetails extends React.Component {
                     className="amountField"
                     onChange={amount => this.handleChange('amount', amount)}
                   />
-                )}
-                {!(editMode && canEditAmount) && (
-                  <FormattedNumber value={expense.amount / 100} currency={expense.currency} {...this.currencyStyle} />
-                )}
-              </span>
-            </div>
-          </Box>
-
-          <Box mt={2} mr={2}>
-            <label>
-              <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-            </label>
-            {(!editMode || payoutMethod === 'banktransfer') && (
-              <div>
-                {capitalize(
-                  intl.formatMessage(this.messages[payoutMethod], {
-                    paypalEmail: paypalEmail || (canEditExpense ? 'missing' : 'hidden'),
-                  }),
-                )}
+                </span>
               </div>
-            )}
-            {editMode && payoutMethod !== 'banktransfer' && (
-              <InputField
-                name="payoutMethod"
-                type="select"
-                options={payoutMethodOptions}
-                defaultValue={payoutMethod}
-                onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
-              />
-            )}
-          </Box>
+            </Box>
+          )}
+
+          {(!editMode || payoutMethod !== 'banktransfer') && (
+            <Box mt={2} mr={2}>
+              <label>
+                <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+              </label>
+              {!editMode ? (
+                <div>
+                  <Box mb={2}>
+                    <PayoutMethodTypeWithIcon type={expense.PayoutMethod?.type} fontSize="12px" iconSize={14} />
+                  </Box>
+                  <PayoutMethodData payoutMethod={expense.PayoutMethod} showLabel={false} />
+                </div>
+              ) : (
+                <InputField
+                  name="payoutMethod"
+                  type="select"
+                  options={payoutMethodOptions}
+                  defaultValue={payoutMethod}
+                  onChange={payoutMethod => this.handleChange('payoutMethod', payoutMethod)}
+                />
+              )}
+            </Box>
+          )}
 
           {(expense.privateMessage || ((isAuthor || canEditExpense) && payoutMethod === 'other')) && (
             <div className="col large privateMessage">
@@ -491,6 +490,7 @@ const getExpenseQuery = gql`
       PayoutMethod {
         id
         type
+        data
       }
       type
       privateMessage
