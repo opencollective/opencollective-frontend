@@ -251,9 +251,10 @@ class StripeOrBankAccountPicker extends React.Component {
   }
 }
 
+// We query on "account" and not "host" because the account is not necessarily an host yet
 const hostQuery = gqlV2`
   query host($slug: String!) {
-    host(slug: $slug) {
+    host: account(slug: $slug) {
       id
       slug
       connectedAccounts {
