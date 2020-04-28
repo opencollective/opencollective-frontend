@@ -302,6 +302,9 @@ class ExpensePage extends React.Component {
                     host={host}
                     isLoading={!expense}
                     isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
+                    permissions={expense?.permissions}
+                    collective={collective}
+                    showProcessActions={status !== PAGE_STATUS.EDIT_SUMMARY}
                   />
                   {status !== PAGE_STATUS.EDIT_SUMMARY && (
                     <React.Fragment>

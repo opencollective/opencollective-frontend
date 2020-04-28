@@ -25,6 +25,7 @@ import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
+import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -62,10 +63,12 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
  * Last step of the create expense flow, shows the summary of the expense with
  * the ability to submit it.
  */
-const ExpenseSummary = ({ expense, host, isLoading }) => {
+const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, showProcessActions }) => {
   const intl = useIntl();
   const { payee, createdByAccount } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
+  const existsInAPI = expense && (expense.id || expense.legacyId);
+  const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
 
   return (
     <StyledCard p={[16, 24, 32]}>
@@ -274,6 +277,13 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
           </PrivateInfoColumn>
         </Flex>
       )}
+      {showProcessButtons && (
+        <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
+          <Flex flexWrap="wrap" justifyContent="flex-end">
+            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} />
+          </Flex>
+        </Container>
+      )}
     </StyledCard>
   );
 };
@@ -296,6 +306,7 @@ ExpenseSummary.propTypes = {
   }),
   /** Must be provided if isLoading is false */
   expense: PropTypes.shape({
+    id: PropTypes.string,
     legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
@@ -334,6 +345,12 @@ ExpenseSummary.propTypes = {
       data: PropTypes.object,
     }),
   }),
+  /** Wether process actions (pay, approve, etc.) should be displayed */
+  showProcessActions: PropTypes.bool,
+  /** The account where the expense has been submitted, required to display the process actions */
+  collective: PropTypes.object,
+  /** To know which process buttons to display (if any) */
+  permissions: PropTypes.object,
 };
 
 export default ExpenseSummary;
