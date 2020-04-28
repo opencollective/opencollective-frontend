@@ -11,6 +11,7 @@ import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
+import Loading from '../Loading';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
@@ -45,9 +46,8 @@ const FormFieldsContainer = styled(Flex)`
 `;
 
 const requiredFieldsQuery = gqlV2`
-  query Collective($slug: String, $currency: String!) {
-    collective(slug: $slug) {
-      host {
+  query Host($slug: String, $currency: String!) {
+    host(slug: $slug) {
         transferwise {
           requiredFields(currency: $currency) {
             type
@@ -69,18 +69,17 @@ const requiredFieldsQuery = gqlV2`
             }
           }
         }
-      }
     }
   }
 `;
 
-const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }) => {
+const RequiredFields = ({ disabled, getFieldName, formik, host, currency }) => {
   const { loading, error, data } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: collective.slug, currency },
+    variables: { slug: host.slug, currency },
   });
   React.useEffect(() => {
-    const type = get(data, 'collective.host.transferwise.requiredFields[0].type');
+    const type = get(data, 'host.transferwise.requiredFields[0].type');
     if (type) {
       formik.setFieldValue(getFieldName('data.type'), type);
     }
@@ -97,7 +96,7 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
     return <P>{error.message}</P>;
   }
 
-  const { fields, title } = data.collective.host.transferwise.requiredFields[0];
+  const { fields, title } = data.host.transferwise.requiredFields[0];
   const renderField = (field, i) => {
     const hasMultipleInputs = field.group.length > 1;
     const required = field.group.some(f => f.required);
@@ -121,7 +120,9 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
               <FastField name={fieldName} validate={validate}>
                 {({ field, meta }) => (
                   <StyledInputField label={input.name} required error={meta.touched && meta.error}>
-                    {() => <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} />}
+                    {() => (
+                      <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} width="100%" />
+                    )}
                   </StyledInputField>
                 )}
               </FastField>
@@ -198,7 +199,7 @@ const RequiredFields = ({ disabled, getFieldName, formik, collective, currency }
 
 RequiredFields.propTypes = {
   disabled: PropTypes.bool,
-  collective: PropTypes.shape({
+  host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
   }).isRequired,
   currency: PropTypes.string.isRequired,
@@ -206,14 +207,34 @@ RequiredFields.propTypes = {
   getFieldName: PropTypes.func.isRequired,
 };
 
+const availableCurrenciesQuery = gqlV2`
+  query Host($slug: String) {
+    host(slug: $slug) {
+      transferwise {
+        availableCurrencies
+      }
+    }
+  }
+`;
+
 /**
  * Form for payout bank information. Must be used with Formik.
  */
-const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
+const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
+  const { data } = useQuery(availableCurrenciesQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: host.slug },
+    skip: Boolean(host.transferwise?.availableCurrencies),
+  });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
-  const currencies = formatStringOptions(collective.host?.transferwise?.availableCurrencies);
-  const selectedCurrency = formik.values.payoutMethod?.data?.currency;
+  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
+
+  if (!availableCurrencies) return <Loading />;
+
+  const currencies = formatStringOptions(availableCurrencies);
+  const currencyFieldName = getFieldName('data.currency');
+  const selectedCurrency = get(formik.values, currencyFieldName);
 
   return (
     <React.Fragment>
@@ -242,7 +263,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
       {selectedCurrency && (
         <RequiredFields
           formik={formik}
-          collective={collective}
+          host={host}
           getFieldName={getFieldName}
           currency={selectedCurrency}
           disabled={!isNew}
@@ -253,12 +274,10 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, collective }) => {
 };
 
 PayoutBankInformationForm.propTypes = {
-  collective: PropTypes.shape({
+  host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
-      }),
+    transferwise: PropTypes.shape({
+      availableCurrencies: PropTypes.arrayOf(PropTypes.string),
     }),
   }).isRequired,
   isNew: PropTypes.bool,
