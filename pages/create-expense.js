@@ -6,7 +6,6 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -18,7 +17,6 @@ import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
-import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
@@ -182,10 +180,6 @@ class CreateExpensePage extends React.Component {
     this.setState(state => ({ expense: { ...state.expense, [name]: value } }));
   };
 
-  onAttachedFilesChange = attachedFiles => {
-    this.setState(state => ({ expense: { ...state.expense, attachedFiles } }));
-  };
-
   setTags = tags => {
     this.setState({ tags });
   };
@@ -262,14 +256,6 @@ class CreateExpensePage extends React.Component {
                               }}
                             />
                             <Box mt={24}>
-                              {this.state.expense.type === expenseTypes.INVOICE && (
-                                <Box mb={4}>
-                                  <ExpenseAttachedFilesForm
-                                    onChange={this.onAttachedFilesChange}
-                                    defaultValue={this.state.expense.attachedFiles}
-                                  />
-                                </Box>
-                              )}
                               <ExpenseNotesForm
                                 onChange={this.onNotesChanges}
                                 defaultValue={this.state.expense.privateMessage}

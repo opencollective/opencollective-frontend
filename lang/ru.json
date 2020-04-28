@@ -711,6 +711,7 @@
   "expense.expensePolicy.add": "добавить политику расходов",
   "expense.hostFeeInCollectiveCurrency": "комиссия представителя",
   "expense.incurredAt": "Дата",
+  "Expense.InvoiceAttachments": "Invoice attachments",
   "Expense.InvoiceItems": "Invoice items",
   "expense.markAsUnpaid.btn": "Mark as unpaid",
   "expense.notes": "Notes",

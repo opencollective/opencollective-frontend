@@ -16,7 +16,7 @@ import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 const PrivateNoteLabel = () => {
   return (
     <Span color="black.700">
-      <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+      <FormattedMessage id="Expense.InvoiceAttachments" defaultMessage="Invoice attachments" />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
     </Span>

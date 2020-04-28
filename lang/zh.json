@@ -711,6 +711,7 @@
   "expense.expensePolicy.add": "add an expense policy",
   "expense.hostFeeInCollectiveCurrency": "host fee",
   "expense.incurredAt": "Date",
+  "Expense.InvoiceAttachments": "Invoice attachments",
   "Expense.InvoiceItems": "Invoice items",
   "expense.markAsUnpaid.btn": "Mark as unpaid",
   "expense.notes": "Notes",

@@ -711,6 +711,7 @@
   "expense.expensePolicy.add": "Ajouter des règles de dépense",
   "expense.hostFeeInCollectiveCurrency": "commission de l'hôte",
   "expense.incurredAt": "Date",
+  "Expense.InvoiceAttachments": "Invoice attachments",
   "Expense.InvoiceItems": "Invoice items",
   "expense.markAsUnpaid.btn": "Marquer comme impayé",
   "expense.notes": "Notes",

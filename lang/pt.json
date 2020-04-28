@@ -711,6 +711,7 @@
   "expense.expensePolicy.add": "adicionar uma política de despesas",
   "expense.hostFeeInCollectiveCurrency": "comissão do organizador",
   "expense.incurredAt": "Data",
+  "Expense.InvoiceAttachments": "Invoice attachments",
   "Expense.InvoiceItems": "Invoice items",
   "expense.markAsUnpaid.btn": "Marcar como não pago",
   "expense.notes": "Notas",

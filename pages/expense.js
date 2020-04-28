@@ -5,7 +5,6 @@ import { cloneDeep, get, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
@@ -19,7 +18,6 @@ import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
-import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
@@ -170,10 +168,6 @@ class ExpensePage extends React.Component {
     const name = e.target.name;
     const value = e.target.value;
     this.setState(state => ({ editedExpense: { ...state.editedExpense, [name]: value } }));
-  };
-
-  onAttachedFilesChange = attachedFiles => {
-    this.setState(state => ({ editedExpense: { ...state.editedExpense, attachedFiles } }));
   };
 
   scrollToExpenseTop() {
@@ -334,14 +328,6 @@ class ExpensePage extends React.Component {
                   )}
                   {status === PAGE_STATUS.EDIT_SUMMARY && (
                     <Box mt={24}>
-                      {editedExpense.type === expenseTypes.INVOICE && (
-                        <Box mb={4}>
-                          <ExpenseAttachedFilesForm
-                            onChange={this.onAttachedFilesChange}
-                            defaultValue={editedExpense.attachedFiles}
-                          />
-                        </Box>
-                      )}
                       <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
                       <Flex flexWrap="wrap" mt={4}>
                         <StyledButton
