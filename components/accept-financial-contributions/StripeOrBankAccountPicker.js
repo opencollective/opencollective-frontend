@@ -65,6 +65,7 @@ class StripeOrBankAccountPicker extends React.Component {
 
     this.state = {
       loading: null,
+      buttonLoading: false,
     };
 
     this.messages = defineMessages({
@@ -91,6 +92,7 @@ class StripeOrBankAccountPicker extends React.Component {
 
   render() {
     const { router, addHost, collective, intl, data } = this.props;
+    const { buttonLoading } = this.state;
 
     const { loading, host } = data;
 
@@ -232,7 +234,9 @@ class StripeOrBankAccountPicker extends React.Component {
             minHeight="36px"
             mt={4}
             minWidth={'145px'}
+            loading={buttonLoading}
             onClick={async () => {
+              this.setState({ buttonLoading: true });
               await addHost(collective, host);
               await Router.pushRoute('accept-financial-contributions', {
                 slug: router.query.slug,

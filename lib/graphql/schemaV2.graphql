@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Apr 28 2020 16:04:24 GMT+0200 (Central European Summer Time)
+# timestamp: Tue Apr 28 2020 16:05:24 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
