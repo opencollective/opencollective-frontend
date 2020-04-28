@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -29,6 +30,7 @@ import { Box, Flex } from '../components/Grid';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
@@ -202,6 +204,8 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+      } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
+        return <PageFeatureNotSupported />;
       }
     }
 
