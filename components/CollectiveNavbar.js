@@ -271,7 +271,7 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   // Can't contribute anymore if the collective is archived or has no host
   const hasContribute = collective.isApproved;
   const hasOtherWaysToContribute =
-    !isEvent && (collective.events?.length > 0 || collective.relatedCollectives?.length > 0);
+    !isEvent && (collective.events?.length > 0 || collective.connectedCollectives?.length > 0);
   if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
     toRemove.add(Sections.CONTRIBUTE);
   }

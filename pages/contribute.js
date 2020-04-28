@@ -110,7 +110,7 @@ class TiersPage extends React.Component {
                         </ContributeCardContainer>
                       ))}
 
-                      {collective.relatedCollectives.map(member => {
+                      {collective.connectedCollectives.map(member => {
                         const childCollective = member.collective;
                         return (
                           <ContributeCardContainer key={member.id}>
@@ -250,7 +250,7 @@ const addTiersData = graphql(
             }
           }
         }
-        relatedCollectives: members(role: "RELATED_COLLECTIVE") {
+        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
           id
           collective: member {
             id

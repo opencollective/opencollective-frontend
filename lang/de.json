@@ -438,7 +438,7 @@
   "CP.Contribute.Financial": "Finanzielle Unterstützer",
   "CP.Contribute.Title": "Werde ein Unterstützer",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",
-  "CP.Contributions.RelatedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
+  "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "create-expense.title": "Submit expense",
   "create.collective.placeholder": "Making the world a better place",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",

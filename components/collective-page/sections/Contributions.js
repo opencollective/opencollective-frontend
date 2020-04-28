@@ -121,7 +121,7 @@ class SectionContributions extends React.PureComponent {
             hosted: PropTypes.number,
           }).isRequired,
         }).isRequired,
-        relatedCollectives: PropTypes.arrayOf(
+        connectedCollectives: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.number,
             collective: PropTypes.shape({
@@ -243,9 +243,9 @@ class SectionContributions extends React.PureComponent {
     const filters = this.getFilters(data.Collective.memberOf);
     const memberships = this.getUniqueMemberships(data.Collective.memberOf, selectedFilter);
     const sortedMemberships = this.sortMemberships(memberships);
-    const relatedCollectives = data.Collective.relatedCollectives;
+    const connectedCollectives = data.Collective.connectedCollectives;
     const memberOf = data.Collective.memberOf;
-    const hasContributions = memberOf.length || relatedCollectives.length;
+    const hasContributions = memberOf.length || connectedCollectives.length;
     const isOrganization = collective.type === CollectiveType.ORGANIZATION;
     return (
       <Box pt={5} pb={3}>
@@ -321,7 +321,7 @@ class SectionContributions extends React.PureComponent {
               </React.Fragment>
             )}
 
-            {relatedCollectives.length > 0 && (
+            {connectedCollectives.length > 0 && (
               <Box mt={5}>
                 <ContainerSectionContent>
                   <SectionTitle textAlign="left" mb={4}>
@@ -329,20 +329,20 @@ class SectionContributions extends React.PureComponent {
                       <FormattedMessage
                         id="CP.Contributions.PartOfOrg"
                         defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization"
-                        values={{ n: relatedCollectives.length }}
+                        values={{ n: connectedCollectives.length }}
                       />
                     ) : (
                       <FormattedMessage
-                        id="CP.Contributions.RelatedCollective"
+                        id="CP.Contributions.ConnectedCollective"
                         defaultMessage="{n, plural, one {This Collective is} other {These Collectives are}} part of what we do"
-                        values={{ n: relatedCollectives.length }}
+                        values={{ n: connectedCollectives.length }}
                       />
                     )}
                   </SectionTitle>
                 </ContainerSectionContent>
                 <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
                   <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
-                    {relatedCollectives.map(({ id, collective }) => (
+                    {connectedCollectives.map(({ id, collective }) => (
                       <MembershipCardContainer key={id}>
                         <StyledMembershipCard membership={{ collective }} />
                       </MembershipCardContainer>
@@ -371,7 +371,7 @@ const withData = graphql(
             hosted
           }
         }
-        relatedCollectives: members(role: "RELATED_COLLECTIVE") {
+        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
           id
           collective: member {
             id
