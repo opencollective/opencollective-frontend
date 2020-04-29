@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { getLuminance } from 'polished';
 import styled, { css } from 'styled-components';
-import { typography, space } from 'styled-system';
+import { space, typography } from 'styled-system';
 
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty

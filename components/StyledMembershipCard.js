@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
-import { FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
+import { formatCurrency } from '../lib/currency-utils';
 import formatMemberRole from '../lib/i18n-member-role';
-import { formatCurrency } from '../lib/utils';
+
 import Container from './Container';
-import { P, Span } from './Text';
+import { Box } from './Grid';
 import StyledCollectiveCard from './StyledCollectiveCard';
+import { P, Span } from './Text';
 
 /**
  * A card to show a user's membership.
@@ -37,9 +38,11 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
               </Span>
               <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
-                {/** Ideally we should breakdown amounts donated per currency, but for now
+                {
+                  /** Ideally we should breakdown amounts donated per currency, but for now
                       the API only returns the total amount in collective's currency. */
-                formatCurrency(stats.totalDonations, collective.currency || 'USD', { precision: 0 })}
+                  formatCurrency(stats.totalDonations, collective.currency || 'USD', { precision: 0 })
+                }
               </Span>
             </P>
           ) : (

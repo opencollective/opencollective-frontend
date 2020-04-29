@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
 import { size } from 'lodash';
+import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
-import CommentIcon from '../icons/CommentIcon';
-import StyledCard from '../StyledCard';
-import Container from '../Container';
-import { H5, P } from '../Text';
 import Avatar from '../Avatar';
-import LinkCollective from '../LinkCollective';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
-import { FormattedMessage, FormattedDate, useIntl, defineMessages } from 'react-intl';
+import LinkCollective from '../LinkCollective';
+import StyledCard from '../StyledCard';
+import { H5, P } from '../Text';
+
 import FollowersAvatars from './FollowersAvatars';
 
 const messages = defineMessages({

@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { Clock } from '@styled-icons/feather/Clock';
+import { MapPin } from '@styled-icons/feather/MapPin';
+import themeGet from '@styled-system/theme-get';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
-import { FormattedMessage, FormattedDate, FormattedTime } from 'react-intl';
-import themeGet from '@styled-system/theme-get';
-import { MapPin } from '@styled-icons/feather/MapPin';
-import { Clock } from '@styled-icons/feather/Clock';
+import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
+import styled from 'styled-components';
 
-import StyledTooltip from '../../StyledTooltip';
 import Link from '../../Link';
+import StyledTooltip from '../../StyledTooltip';
 
 const StyledEventNote = styled.div`
   display: flex;
@@ -34,21 +34,19 @@ const StyledEventNote = styled.div`
   }
 `;
 
-const FormattedDateProps = (value, timeZone) => {
-  const props = {
-    value,
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  };
-  return process.browser ? { ...props, timeZone } : props;
-};
+const FormattedDateProps = (value, timeZone) => ({
+  value,
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone,
+});
 
-const FormattedTimeProps = (value, timeZone) => {
-  const props = { value };
-  return process.browser ? { ...props, timeZone } : props;
-};
+const FormattedTimeProps = (value, timeZone) => ({
+  value,
+  timeZone,
+});
 
 const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
   return (
@@ -66,7 +64,7 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
           <FormattedTime {...FormattedTimeProps(endsAt, timezone)} />{' '}
         </Fragment>
       )}
-      {moment().tz(timezone).zoneAbbr()}
+      (UTC{moment().tz(timezone).format('Z')})
     </Fragment>
   );
 };
@@ -129,7 +127,7 @@ class HeroEventDetails extends React.Component {
                         endsAt={endsAt}
                         timezone={moment.tz.guess()}
                         isSameDay={this.isSameDay(startsAt, endsAt, moment.tz.guess())}
-                      />
+                      />{' '}
                       (<FormattedMessage id="EventCover.LocalTime" defaultMessage="Your Time" />)
                     </Fragment>
                   )}

@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { Link } from '../../server/pages';
-import { getCurrencySymbol, capitalize } from '../../lib/utils';
+import { getCurrencySymbol } from '../../lib/currency-utils';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
+import { capitalize } from '../../lib/utils';
+import { Link } from '../../server/pages';
+
+import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 import StyledButton from '../StyledButton';
-import { Flex, Box } from '@rebass/grid';
 import StyledLink from '../StyledLink';
 
 class EditPaymentMethod extends React.Component {

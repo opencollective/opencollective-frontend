@@ -1,22 +1,22 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import styled from 'styled-components';
+import { Mutation } from '@apollo/react-components';
+import { Upload } from '@styled-icons/feather/Upload';
+import { get, has, set } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import { Mutation } from '@apollo/react-components';
-import { get, set, has } from 'lodash';
-
-import { Upload } from '@styled-icons/feather/Upload';
+import styled from 'styled-components';
 
 import { upload } from '../../../lib/api';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
+
 import Container from '../../Container';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import MessageBox from '../../MessageBox';
-
 // Local imports
 import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
+
 import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
 
 const BASE_WIDTH = 1368;
@@ -168,7 +168,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
               {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
                 <div {...getRootProps()}>
                   <input data-cy="heroBackgroundDropzone" {...getInputProps()} />
-                  <StyledButton minWidth={150} disabled={submitting}>
+                  <StyledButton minWidth={150} disabled={submitting} buttonSize="small">
                     {!isDragActive && (
                       <React.Fragment>
                         <Span mr={2}>
@@ -196,6 +196,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
                 ml={3}
                 disabled={submitting}
                 onClick={() => (uploadedImage ? setUploadedImage(null) : setUploadedImage(KEY_IMG_REMOVE))}
+                buttonSize="small"
               >
                 <FormattedMessage id="Remove" defaultMessage="Remove" />
               </StyledButton>
@@ -205,6 +206,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
               minWidth={150}
               disabled={submitting}
               ml={3}
+              buttonSize="small"
               onClick={() => {
                 const base = get(collective.settings, 'collectivePage.background');
                 onCropChange((base && base.crop) || DEFAULT_CROP);
@@ -219,6 +221,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
               data-cy="heroBackgroundDropzoneSave"
               textTransform="capitalize"
               buttonStyle="primary"
+              buttonSize="small"
               ml={3}
               minWidth={150}
               loading={submitting}
@@ -264,7 +267,7 @@ const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
             </StyledButton>
           </Container>
           <Container zIndex={222} position="absolute" right={25} top={75}>
-            <MessageBox type="info" withIcon opacity={0.8} px={2} py={1}>
+            <MessageBox type="info" withIcon opacity={0.9} px={2} py={1}>
               <FormattedMessage
                 id="HeroBackground.Instructions"
                 defaultMessage="Use your mouse wheel or pinch to change the zoom, drag and drop to adjust position."

@@ -1,23 +1,25 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { get, times } from 'lodash';
 import { Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
-import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
+import { get, times } from 'lodash';
 import { withRouter } from 'next/router';
-import { Box, Flex } from '@rebass/grid';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import { Link } from '../server/pages';
+
+import Container from '../components/Container';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
-import Container from '../components/Container';
-import Page from '../components/Page';
-import { H1, P } from '../components/Text';
-import Pagination from '../components/Pagination';
-import MessageBox from '../components/MessageBox';
-import StyledSelect from '../components/StyledSelect';
-import { Link } from '../server/pages';
-import SearchForm from '../components/SearchForm';
+import { Box, Flex } from '../components/Grid';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import Pagination from '../components/Pagination';
+import SearchForm from '../components/SearchForm';
+import StyledSelect from '../components/StyledSelect';
+import { H1, P } from '../components/Text';
 
 const AllCardsContainer = styled(Flex).attrs({
   flexWrap: 'wrap',
@@ -211,7 +213,7 @@ const DiscoverPage = ({ router, intl }) => {
             >
               <Flex width={[1]} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
                 <Flex width={[1, 0.8]} my={2}>
-                  <NavList as="ul" p={0} justifyContent="space-between" width={1} css={{ maxWidth: 650 }}>
+                  <NavList as="ul" p={0} justifyContent="space-between" width={1}>
                     <NavLinkContainer>
                       <Link route="discover" params={{ show: 'all', sort: query.sort }}>
                         <NavLink
@@ -229,8 +231,15 @@ const DiscoverPage = ({ router, intl }) => {
                         <NavLink className={query.show == 'open source' ? 'selected' : ''}>
                           <FormattedMessage
                             id="discover.openSourceCollectives"
-                            defaultMessage="Open source collectives"
+                            defaultMessage="Open Source collectives"
                           />
+                        </NavLink>
+                      </Link>
+                    </NavLinkContainer>
+                    <NavLinkContainer>
+                      <Link route="discover" params={{ show: 'covid-19', sort: query.sort }}>
+                        <NavLink className={query.show == 'covid-19' ? 'selected' : ''}>
+                          <FormattedMessage id="discover.covidCollectives" defaultMessage="COVID-19 collectives" />
                         </NavLink>
                       </Link>
                     </NavLinkContainer>

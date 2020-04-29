@@ -1,28 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
-import { get, orderBy, isEmpty } from 'lodash';
-import gql from 'graphql-tag';
 import { Query } from '@apollo/react-components';
+import gql from 'graphql-tag';
+import { get, isEmpty, orderBy } from 'lodash';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { formatCurrency } from '../../../lib/utils';
-import { P, Span } from '../../Text';
-import Container from '../../Container';
-import StyledButton from '../../StyledButton';
-import StyledCard from '../../StyledCard';
-import Link from '../../Link';
-import DefinedTerm, { Terms } from '../../DefinedTerm';
-import MessageBox from '../../MessageBox';
-
-import ContainerSectionContent from '../ContainerSectionContent';
-import SectionTitle from '../SectionTitle';
+import { formatCurrency } from '../../../lib/currency-utils';
 
 import BudgetItemsList, {
+  BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-  BudgetItemExpenseFragment,
 } from '../../BudgetItemsList';
+import Container from '../../Container';
+import DefinedTerm, { Terms } from '../../DefinedTerm';
+import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledCard from '../../StyledCard';
+import { P, Span } from '../../Text';
+import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch transactions and expenses */
 const TransactionsAndExpensesQuery = gql`
@@ -89,12 +88,11 @@ const SectionBudget = ({ collective, stats }) => {
                     <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
                       <StyledButton
                         data-cy="view-all-transactions-btn"
-                        buttonSize="large"
                         my={2}
                         minWidth={290}
                         width="100%"
+                        buttonSize="small"
                         fontSize="Paragraph"
-                        py="10px"
                       >
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAll"
@@ -107,12 +105,11 @@ const SectionBudget = ({ collective, stats }) => {
                     <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
                       <StyledButton
                         data-cy="view-all-expenses-btn"
-                        buttonSize="large"
                         my={2}
                         minWidth={290}
                         width="100%"
+                        buttonSize="small"
                         fontSize="Paragraph"
-                        py="10px"
                       >
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.ViewAllExpenses"

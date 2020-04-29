@@ -1,20 +1,21 @@
-import { get } from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import PropTypes from 'prop-types';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { Bell } from '@styled-icons/feather/Bell';
+import { BellOff } from '@styled-icons/feather/BellOff';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { Bell } from '@styled-icons/feather/Bell';
-import { BellOff } from '@styled-icons/feather/BellOff';
-
-import { Router } from '../../server/pages';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { Router } from '../../server/pages';
+
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
-import { withUser } from '../UserProvider';
-import Link from '../Link';
 import { Span } from '../Text';
+import { withUser } from '../UserProvider';
+
 import { isUserFollowingConversationQuery } from './graphql';
 
 const followConversationMutation = gqlV2`

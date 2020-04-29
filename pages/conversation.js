@@ -1,39 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { Flex, Box } from '@rebass/grid';
-import { get, isEmpty, cloneDeep, update, uniqBy } from 'lodash';
+import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
+import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
-import { Router } from '../server/pages';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Loading from '../components/Loading';
+import { Router } from '../server/pages';
+
+import { Sections } from '../components/collective-page/_constants';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import Page from '../components/Page';
-import { FormattedMessage } from 'react-intl';
-import { withRouter } from 'next/router';
-import Link from '../components/Link';
-import StyledLink from '../components/StyledLink';
-import MessageBox from '../components/MessageBox';
-import StyledButton from '../components/StyledButton';
-import { H2, H4 } from '../components/Text';
-import StyledTag from '../components/StyledTag';
-import Thread from '../components/conversations/Thread';
-import CommentForm from '../components/conversations/CommentForm';
-import { Sections } from '../components/collective-page/_constants';
-import { CommentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
 import Comment from '../components/conversations/Comment';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
-import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import InlineEditField from '../components/InlineEditField';
+import CommentForm from '../components/conversations/CommentForm';
 import FollowConversationButton from '../components/conversations/FollowConversationButton';
-import CommentIcon from '../components/icons/CommentIcon';
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
+import { CommentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
+import Thread from '../components/conversations/Thread';
+import ErrorPage from '../components/ErrorPage';
+import { Box, Flex } from '../components/Grid';
+import CommentIcon from '../components/icons/CommentIcon';
+import InlineEditField from '../components/InlineEditField';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import StyledButton from '../components/StyledButton';
 import StyledInputTags from '../components/StyledInputTags';
+import StyledLink from '../components/StyledLink';
+import StyledTag from '../components/StyledTag';
+import { H2, H4 } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 const conversationPageQuery = gqlV2`
   query Conversation($collectiveSlug: String!, $id: String!) {
@@ -387,20 +388,23 @@ class ConversationPage extends React.Component {
                                   </H4>
                                   {!isEditing ? (
                                     !isEmpty(conversation.tags) && (
-                                      <Flex flexWrap="wrap">
+                                      <Flex flexWrap="wrap" mx={2}>
                                         {conversation.tags.map(tag => (
-                                          <Box key={tag} m={2}>
-                                            <StyledTag>{tag}</StyledTag>
-                                          </Box>
+                                          <StyledTag key={tag} variant="rounded-right" mb="4px" mr="4px">
+                                            {tag}
+                                          </StyledTag>
                                         ))}
                                       </Flex>
                                     )
                                   ) : (
-                                    <StyledInputTags
-                                      suggestedTags={this.getSuggestedTags(collective)}
-                                      defaultValue={conversation.tags}
-                                      onChange={options => this.handleTagsChange(options, setValue)}
-                                    />
+                                    <Box mx={2}>
+                                      <StyledInputTags
+                                        renderUpdatedTags
+                                        suggestedTags={this.getSuggestedTags(collective)}
+                                        defaultValue={conversation.tags}
+                                        onChange={options => this.handleTagsChange(options, setValue)}
+                                      />
+                                    </Box>
                                   )}
                                 </React.Fragment>
                               )}

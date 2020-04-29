@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { typography, layout, space } from 'styled-system';
-import Select, { components } from 'react-select';
-import { injectIntl, defineMessages } from 'react-intl';
 import propTypes from '@styled-system/prop-types';
 import { truncate } from 'lodash';
+import { defineMessages, injectIntl } from 'react-intl';
+import Select, { components } from 'react-select';
+import styled from 'styled-components';
+import { layout, space, typography } from 'styled-system';
 
 import SearchIcon from './SearchIcon';
 import StyledTag from './StyledTag';
@@ -45,7 +45,7 @@ const MultiValue = ({ children, removeProps }) => {
   }
 
   return (
-    <StyledTag my={2} mr={2} fontSize="8px" closeButtonProps={removeProps}>
+    <StyledTag mr="8px" variant="rounded-right" closeButtonProps={removeProps}>
       {children}
     </StyledTag>
   );
@@ -148,6 +148,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       dropdownIndicator: baseStyles => {
         return hideDropdownIndicator ? STYLES_DISPLAY_NONE : baseStyles;
       },
+      menuPortal: baseStyles => ({
+        ...baseStyles,
+        zIndex: 99999,
+      }),
     },
   }),
 )`

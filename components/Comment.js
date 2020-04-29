@@ -1,14 +1,14 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, FormattedDate, injectIntl } from 'react-intl';
+import { pick } from 'lodash';
+import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
 import Avatar from './Avatar';
-import Link from './Link';
-import SmallButton from './SmallButton';
-import { pick } from 'lodash';
 import ConfirmationModal from './ConfirmationModal';
 import HTMLContent from './HTMLContent';
+import Link from './Link';
 import RichTextEditor from './RichTextEditor';
+import SmallButton from './SmallButton';
 
 class Comment extends React.Component {
   static propTypes = {

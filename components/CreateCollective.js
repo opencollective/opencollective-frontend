@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Header from './Header';
-import Body from './Body';
-import Footer from './Footer';
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
-import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateCollectiveCover from './CreateCollectiveCover';
-import ErrorPage from './ErrorPage';
-import SignInOrJoinFree from './SignInOrJoinFree';
 import { get } from 'lodash';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Router } from '../server/pages';
-import { withUser } from './UserProvider';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { Router } from '../server/pages';
+
+import Body from './Body';
+import CreateCollectiveForm from './CreateCollectiveForm';
+import ErrorPage from './ErrorPage';
+import Footer from './Footer';
+import Header from './Header';
+import SignInOrJoinFree from './SignInOrJoinFree';
+import { withUser } from './UserProvider';
 
 class CreateCollective extends React.Component {
   static propTypes = {
@@ -200,8 +201,6 @@ class CreateCollective extends React.Component {
         />
 
         <Body>
-          <CreateCollectiveCover host={this.host} />
-
           <div className="content">
             {!canApply && (
               <div className="error">

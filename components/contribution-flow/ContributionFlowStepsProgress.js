@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { formatCurrency } from '../../lib/currency-utils';
+
+import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
-import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
 import { Span } from '../Text';
-import { formatCurrency } from '../../lib/utils';
 
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`

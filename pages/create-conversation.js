@@ -1,28 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { Box } from '@rebass/grid';
-import { FormattedMessage } from 'react-intl';
 import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
-import { Router } from '../server/pages';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError } from '../lib/errors';
-import { withUser } from '../components/UserProvider';
-import ErrorPage from '../components/ErrorPage';
-import Loading from '../components/Loading';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { Router } from '../server/pages';
+
+import { Sections } from '../components/collective-page/_constants';
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import Page from '../components/Page';
-import Link from '../components/Link';
-import StyledLink from '../components/StyledLink';
-import CreateConversationForm from '../components/conversations/CreateConversationForm';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import ContainerOverlay from '../components/ContainerOverlay';
-import { Sections } from '../components/collective-page/_constants';
-import hasFeature, { FEATURES } from '../lib/allowed-features';
+import CreateConversationForm from '../components/conversations/CreateConversationForm';
+import ErrorPage from '../components/ErrorPage';
+import { Box } from '../components/Grid';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import StyledLink from '../components/StyledLink';
+import { withUser } from '../components/UserProvider';
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query

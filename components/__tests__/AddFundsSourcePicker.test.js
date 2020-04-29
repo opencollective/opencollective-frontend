@@ -1,10 +1,12 @@
-import React from 'react';
-import { ThemeProvider } from 'styled-components';
 import 'jest-styled-components';
 
+import React from 'react';
+import { ThemeProvider } from 'styled-components';
+
 import theme from '../../lib/theme';
-import { MockAddFundsSourcePicker, MockAddFundsSourcePickerForUser } from '../AddFundsSourcePicker';
 import { snapshotI18n } from '../../test/snapshot-helpers';
+
+import { MockAddFundsSourcePicker, MockAddFundsSourcePickerForUser } from '../AddFundsSourcePicker';
 
 describe('AddFundsSourcePicker component', () => {
   const defaultProps = {

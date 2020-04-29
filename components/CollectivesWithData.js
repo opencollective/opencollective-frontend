@@ -4,6 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+
 import CollectiveCard from './CollectiveCard';
 import Error from './Error';
 
@@ -176,24 +177,22 @@ const getCollectivesQuery = gql`
 `;
 
 export const addCollectivesData = graphql(getCollectivesQuery, {
-  options(props) {
-    return {
-      variables: {
-        ParentCollectiveId: props.ParentCollectiveId,
-        tags: props.tags,
-        HostCollectiveId: props.HostCollectiveId,
-        hostCollectiveSlug: props.hostCollectiveSlug,
-        memberOfCollectiveSlug: props.memberOfCollectiveSlug,
-        slugs: props.slugs,
-        role: props.role,
-        type: props.type,
-        orderBy: props.orderBy,
-        orderDirection: props.orderDirection,
-        offset: 0,
-        limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      ParentCollectiveId: props.ParentCollectiveId,
+      tags: props.tags,
+      HostCollectiveId: props.HostCollectiveId,
+      hostCollectiveSlug: props.hostCollectiveSlug,
+      memberOfCollectiveSlug: props.memberOfCollectiveSlug,
+      slugs: props.slugs,
+      role: props.role,
+      type: props.type,
+      orderBy: props.orderBy,
+      orderDirection: props.orderDirection,
+      offset: 0,
+      limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data, ownProps }) => ({
     data,
     fetchMore: () =>

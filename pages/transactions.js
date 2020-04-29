@@ -3,21 +3,20 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import styled from 'styled-components';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveCover from '../components/CollectiveCover';
-import ErrorPage from '../components/ErrorPage';
-
-import TransactionsWithData from '../components/expenses/TransactionsWithData';
-
 import { CollectiveType } from '../lib/constants/collectives';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import Page from '../components/Page';
-import Loading from '../components/Loading';
-import { withUser } from '../components/UserProvider';
+import Body from '../components/Body';
 import { Sections } from '../components/collective-page/_constants';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
+import TransactionsWithData from '../components/expenses/TransactionsWithData';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import Loading from '../components/Loading';
+import Page from '../components/Page';
+import { withUser } from '../components/UserProvider';
 
 const TransactionPageWrapper = styled.div`
   display: flex;
@@ -80,19 +79,17 @@ class TransactionsPage extends React.Component {
         <Header collective={collective} LoggedInUser={LoggedInUser} />
 
         <Body>
-          <CollectiveCover
-            collective={collective}
-            href={`/${collective.slug}`}
-            LoggedInUser={LoggedInUser}
-            key={collective.slug}
-            selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
-            callsToAction={{
-              hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
-            }}
-            displayContributeLink={
-              collective.isActive && collective.host && !['USER', 'ORGANIZATION'].includes(collective.type)
-            }
-          />
+          <Container mb={4}>
+            <CollectiveNavbar
+              collective={collective}
+              isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
+              showEdit
+              selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
+              callsToAction={{
+                hasSubmitExpense: [CollectiveType.COLLECTIVE, CollectiveType.EVENT].includes(collective.type),
+              }}
+            />
+          </Container>
 
           <div className="content">
             <TransactionsWithData

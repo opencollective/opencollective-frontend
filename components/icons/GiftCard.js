@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { lighten } from 'polished';
+
 import CustomStyledIcon from './CustomStyledIcon';
 
 const GiftCard = props => {

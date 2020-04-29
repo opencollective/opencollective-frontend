@@ -1,20 +1,21 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
-import { FormattedMessage } from 'react-intl';
+import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import { pick } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import * as api from '../lib/api';
+import { getWebsiteUrl } from '../lib/utils';
 import { Router } from '../server/pages';
 
-import Link from './Link';
-import SignIn from './SignIn';
-import CreateProfile from './CreateProfile';
 import CreateProfileFAQ from './faqs/CreateProfileFAQ';
-import { P } from './Text';
+import CreateProfile from './CreateProfile';
+import { Box, Flex } from './Grid';
+import Link from './Link';
 import MessageBox from './MessageBox';
-import { createUserQuery } from '../lib/graphql/mutations';
-import { graphql } from '@apollo/react-hoc';
+import SignIn from './SignIn';
+import { P } from './Text';
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
@@ -51,7 +52,6 @@ class SignInOrJoinFree extends React.Component {
     submitting: false,
     unknownEmailError: false,
     email: '',
-    useLinkForSignUp: false,
   };
 
   switchForm = form => {
@@ -77,7 +77,11 @@ class SignInOrJoinFree extends React.Component {
     try {
       const userExists = await api.checkUserExistence(email);
       if (userExists) {
-        const response = await api.signin({ email }, this.getRedirectURL());
+        const response = await api.signin({
+          user: { email },
+          redirect: this.getRedirectURL(),
+          websiteUrl: getWebsiteUrl(),
+        });
 
         // In dev/test, API directly returns a redirect URL for emails like
         // test*@opencollective.com.
@@ -96,7 +100,7 @@ class SignInOrJoinFree extends React.Component {
     }
   };
 
-  createProfile = data => {
+  createProfile = async data => {
     if (this.state.submitting) {
       return false;
     }
@@ -109,15 +113,22 @@ class SignInOrJoinFree extends React.Component {
     }
 
     this.setState({ submitting: true });
-    this.props
-      .createUser({ user, organization, redirect: this.getRedirectURL() })
-      .then(() => {
-        Router.pushRoute('signinLinkSent', { email: user.email }).then(() => window.scrollTo(0, 0));
-      })
-      .catch(error => {
-        this.setState({ error: error.message, submitting: false });
-        window.scrollTo(0, 0);
+
+    try {
+      await this.props.createUser({
+        variables: {
+          user,
+          organization,
+          redirect: this.getRedirectURL(),
+          websiteUrl: getWebsiteUrl(),
+        },
       });
+      await Router.pushRoute('signinLinkSent', { email: user.email });
+      window.scrollTo(0, 0);
+    } catch (error) {
+      this.setState({ error: error.message, submitting: false });
+      window.scrollTo(0, 0);
+    }
   };
 
   render() {
@@ -177,10 +188,27 @@ class SignInOrJoinFree extends React.Component {
   }
 }
 
-const addCreateUserMutation = graphql(createUserQuery, {
-  props: ({ mutate }) => ({
-    createUser: variables => mutate({ variables }),
-  }),
-});
+const createUserQuery = gql`
+  mutation createUser(
+    $user: UserInputType!
+    $organization: CollectiveInputType
+    $redirect: String
+    $websiteUrl: String
+  ) {
+    createUser(user: $user, organization: $organization, redirect: $redirect, websiteUrl: $websiteUrl) {
+      user {
+        id
+        email
+        name
+      }
+      organization {
+        id
+        slug
+      }
+    }
+  }
+`;
+
+const addCreateUserMutation = graphql(createUserQuery, { name: 'createUser' });
 
 export default addCreateUserMutation(SignInOrJoinFree);

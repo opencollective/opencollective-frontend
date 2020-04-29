@@ -1,8 +1,11 @@
 import 'cypress-file-upload';
+
+import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
+
+import { CreditCards } from '../../stripe-helpers';
+
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
-import { CreditCards } from '../../stripe-helpers';
 import { disableSmoothScroll } from './helpers';
 
 /**
@@ -83,7 +86,7 @@ Cypress.Commands.add('getInbox', () => {
  * Navigate to an email in maildev.
  *
  * API must be configured to use maildev
- * - configured by default in development, e2e and circleci environments
+ * - configured by default in development, e2e and ci environments
  * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
  *
  * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
@@ -391,7 +394,7 @@ function fillStripeInput(params) {
         return;
       }
 
-      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`);
+      return cy.wrap(body).find(`input:eq(${index})`).type(`{selectall}${value}`, { force: true });
     };
 
     fillInput(1, creditCardNumber);

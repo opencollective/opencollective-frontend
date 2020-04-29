@@ -1,27 +1,27 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import { Lock } from '@styled-icons/fa-solid';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
-import ReactTooltip from 'react-tooltip';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { Flex, Box } from '@rebass/grid';
-import { Lock } from '@styled-icons/fa-solid';
-import { get } from 'lodash';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
 import { compose, formatDate } from '../lib/utils';
 import { Router } from '../server/pages';
 
-import Container from './Container';
 import Avatar from './Avatar';
-import Role from './Role';
+import Container from './Container';
+import EditUpdateForm from './EditUpdateForm';
+import { Box, Flex } from './Grid';
 import Link from './Link';
 import MessageBox from './MessageBox';
-import EditUpdateForm from './EditUpdateForm';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
-import UpdateTextWithData from './UpdateTextWithData';
+import Role from './Role';
 import { H3 } from './Text';
+import UpdateTextWithData from './UpdateTextWithData';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;

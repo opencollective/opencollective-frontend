@@ -1,23 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { get, uniqBy } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-
 import { Settings } from '@styled-icons/feather/Settings';
+import { get, uniqBy } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { Link } from '../server/pages';
-import { formatCurrency, capitalize } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { withUser } from './UserProvider';
+import { capitalize } from '../lib/utils';
+import { Link } from '../server/pages';
+
 import Avatar from './Avatar';
-import Hide from './Hide';
-import { P } from './Text';
-import StyledLink from './StyledLink';
-import ListItem from './ListItem';
 import Container from './Container';
+import { Box, Flex } from './Grid';
+import Hide from './Hide';
+import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
+import StyledLink from './StyledLink';
+import { P } from './Text';
+import { withUser } from './UserProvider';
 
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
@@ -186,9 +187,9 @@ class TopBarProfileMenu extends React.Component {
             >
               <FormattedMessage id="collective" defaultMessage="my collectives" />
             </P>
-            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
+            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={35} />
             <Link route="/create" passHref>
-              <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
+              <StyledLink buttonStyle="standard" buttonSize="tiny" display="inline-block" ml={2} whiteSpace="nowrap">
                 + <FormattedMessage id="Collective.New" defaultMessage="New" />
               </StyledLink>
             </Link>
@@ -219,9 +220,9 @@ class TopBarProfileMenu extends React.Component {
             >
               <FormattedMessage id="organization" defaultMessage="my organizations" />
             </P>
-            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={50} />
+            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={35} />
             <Link route="/organizations/new" passHref>
-              <StyledLink buttonStyle="standard" buttonSize="small" display="inline-block" ml={2} whiteSpace="nowrap">
+              <StyledLink buttonStyle="standard" buttonSize="tiny" display="inline-block" ml={2} whiteSpace="nowrap">
                 + <FormattedMessage id="Organization.New" defaultMessage="New" />
               </StyledLink>
             </Link>
@@ -307,7 +308,13 @@ class TopBarProfileMenu extends React.Component {
               </StyledLink>
             </ListItem>
             <ListItem py={1}>
-              <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial" onClick={this.logout}>
+              <StyledLink
+                data-cy="logout"
+                color="#494D52"
+                fontSize="1.2rem"
+                fontFamily="montserratlight, arial"
+                onClick={this.logout}
+              >
                 <FormattedMessage id="menu.logout" defaultMessage="Log out" />
               </StyledLink>
             </ListItem>

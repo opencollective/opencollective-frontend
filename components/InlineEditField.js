@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
 import { Mutation } from '@apollo/react-components';
+import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
-
-import StyledButton from './StyledButton';
 import Container from './Container';
+import { Box, Flex } from './Grid';
 import MessageBox from './MessageBox';
-import StyledTextarea from './StyledTextarea';
+import StyledButton from './StyledButton';
 import { fadeIn } from './StyledKeyframes';
+import StyledTextarea from './StyledTextarea';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 
 /** Container used to show the description to users than can edit it */

@@ -1,20 +1,20 @@
 import React, { Fragment } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get, truncate } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { compose } from '../lib/utils';
 
-import Link from './Link';
-import { P } from './Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
-import StyledCheckbox from './StyledCheckbox';
-import StyledButton from './StyledButton';
 import Container from './Container';
-import ExternalLink from './ExternalLink';
+import Link from './Link';
+import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
+import StyledLink from './StyledLink';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import { P } from './Text';
 
 const CheckboxWrapper = styled(Container)`
   color: #090a0a;
@@ -38,6 +38,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
     data: PropTypes.object,
     editCollective: PropTypes.func,
     buttonStyle: PropTypes.string,
+    buttonSize: PropTypes.string,
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
   };
@@ -71,11 +72,17 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   }
 
   render() {
-    const { host, data, disabled, buttonStyle, minWidth } = this.props;
+    const { host, data, disabled, buttonStyle, buttonSize, minWidth } = this.props;
 
     if (data.loading) {
       return (
-        <StyledButton buttonStyle={buttonStyle} minWidth={minWidth} disabled data-cy="host-apply-btn-loading">
+        <StyledButton
+          buttonStyle={buttonStyle}
+          buttonSize={buttonSize}
+          minWidth={minWidth}
+          disabled
+          data-cy="host-apply-btn-loading"
+        >
           <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
         </StyledButton>
       );
@@ -90,7 +97,13 @@ class ApplyToHostBtnLoggedIn extends React.Component {
         <div className="ApplyToHostBtnLoggedIn">
           {!this.inactiveCollective && (
             <Link route={`/${host.slug}/apply`}>
-              <StyledButton buttonStyle={buttonStyle} disabled={disabled} minWidth={minWidth} data-cy="host-apply-btn">
+              <StyledButton
+                buttonStyle={buttonStyle}
+                buttonSize={buttonSize}
+                disabled={disabled}
+                minWidth={minWidth}
+                data-cy="host-apply-btn"
+              >
                 <FormattedMessage id="host.apply.create.btn" defaultMessage="Apply" />
               </StyledButton>
             </Link>
@@ -145,9 +158,9 @@ class ApplyToHostBtnLoggedIn extends React.Component {
                       defaultMessage="I agree with the <tos-link>terms of fiscal sponsorship of the host</tos-link> ({hostName}) that will collect money on behalf of our collective."
                       values={{
                         'tos-link': msg => (
-                          <ExternalLink href={get(host, 'settings.tos')} openInNewTab>
+                          <StyledLink href={get(host, 'settings.tos')} openInNewTab>
                             {msg}
-                          </ExternalLink>
+                          </StyledLink>
                         ),
                         hostName: host.name,
                       }}
@@ -215,13 +228,11 @@ const editCollectiveMutation = gql`
 `;
 
 const addQuery = graphql(getInactiveCollectivesQuery, {
-  options(props) {
-    return {
-      variables: {
-        memberOfCollectiveSlug: props.LoggedInUser.collective.slug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      memberOfCollectiveSlug: props.LoggedInUser.collective.slug,
+    },
+  }),
 });
 
 const addMutation = graphql(editCollectiveMutation, {

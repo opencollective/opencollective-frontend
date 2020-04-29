@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
-import { Flex } from '@rebass/grid';
 import dynamic from 'next/dynamic';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { Span } from '../../Text';
+
+import Container from '../../Container';
+import { Flex } from '../../Grid';
 import HTMLContent, { isEmptyValue } from '../../HTMLContent';
 import InlineEditField from '../../InlineEditField';
-import Container from '../../Container';
-import StyledButton from '../../StyledButton';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import { Span } from '../../Text';
 import { EditCollectiveLongDescriptionMutation } from '../graphql/mutations';
 import SectionTitle from '../SectionTitle';
 

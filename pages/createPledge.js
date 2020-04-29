@@ -1,35 +1,35 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import slugify from 'slugify';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-import { get } from 'lodash';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 import themeGet from '@styled-system/theme-get';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import slugify from 'slugify';
+import styled from 'styled-components';
 
-import { getCollectiveQuery } from '../lib/graphql/queries';
-import { withUser } from '../components/UserProvider';
-import { Router } from '../server/pages';
-import { compose } from '../lib/utils';
-import { imagePreview } from '../lib/image-utils';
 import { defaultImage } from '../lib/constants/collectives';
+import { getCollectiveQuery } from '../lib/graphql/queries';
+import { imagePreview } from '../lib/image-utils';
+import { compose } from '../lib/utils';
+import { Router } from '../server/pages';
 
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import { H3, H4, H5, P } from '../components/Text';
-import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
-import StyledInputGroup from '../components/StyledInputGroup';
-import { Box, Flex } from '@rebass/grid';
-import Container from '../components/Container';
-import ButtonGroup from '../components/ButtonGroup';
-import Link from '../components/Link';
-import StyledLink from '../components/StyledLink';
-import Currency from '../components/Currency';
 import Avatar from '../components/Avatar';
+import Body from '../components/Body';
+import ButtonGroup from '../components/ButtonGroup';
+import Container from '../components/Container';
+import Currency from '../components/Currency';
+import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
+import StyledInputGroup from '../components/StyledInputGroup';
+import StyledLink from '../components/StyledLink';
+import { H3, H4, H5, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
@@ -84,6 +84,7 @@ const WordCountTextarea = () => {
         as="textarea"
         id="publicMessage"
         name="publicMessage"
+        data-cy="publicMessage"
         placeholder="This will be public and it is also optional"
         onChange={({ target }) => setWordCount(() => 140 - target.value.length)}
         px={2}
@@ -325,7 +326,13 @@ class CreatePledgePage extends React.Component {
               )}
 
               {!loadingLoggedInUser && !LoggedInUser && (
-                <P mt={[5, null, 4]} color="black.700" fontSize="LeadParagraph" lineHeight="LeadParagraph">
+                <P
+                  mt={[5, null, 4]}
+                  color="black.700"
+                  fontSize="LeadParagraph"
+                  lineHeight="LeadParagraph"
+                  data-cy="signupOrLogin"
+                >
                   <FormattedMessage
                     id="createPledge.signinToCreate"
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
@@ -379,7 +386,7 @@ class CreatePledgePage extends React.Component {
                           <P {...labelStyles} htmlFor="name">
                             <FormattedMessage id="Fields.name" defaultMessage="Name" />
                           </P>
-                          <TextInput name="name" id="name" defaultValue={name} />
+                          <TextInput data-cy="nameInput" name="name" id="name" defaultValue={name} />
                         </Flex>
 
                         <Flex flexDirection="column" mb={3}>
@@ -391,6 +398,7 @@ class CreatePledgePage extends React.Component {
                             id="slug"
                             name="slug"
                             defaultValue={slugify(name || '').toLowerCase()}
+                            data-cy="slugInput"
                           />
                         </Flex>
                       </Flex>
@@ -408,6 +416,7 @@ class CreatePledgePage extends React.Component {
                           name="githubHandle"
                           placeholder="i.e. babel/babel"
                           defaultValue={githubHandle || ''}
+                          data-cy="githubHandleInput"
                         />
                       </Flex>
                     </Box>
@@ -467,12 +476,13 @@ class CreatePledgePage extends React.Component {
                     mx={['auto', null, 0]}
                     display="block"
                     disabled={!LoggedInUser || submitting}
+                    data-cy="submit"
                   />
                 </form>
               )}
 
               {errorMessage && (
-                <P color="red.500" mt={3}>
+                <P color="red.500" data-cy="errorMessage" mt={3}>
                   {errorMessage}
                 </P>
               )}
@@ -502,7 +512,7 @@ class CreatePledgePage extends React.Component {
                 </Container>
 
                 <Container float={['none', null, 'right']} px={[3, null, 5]} order={3} mt={5} width={[1, null, 0.5]}>
-                  <H5 textAlign="left" fontWeight="normal" mb={2}>
+                  <H5 textAlign="left" fontWeight="normal" mb={2} data-cy="amountPledgedTotal">
                     <Currency
                       fontWeight="bold"
                       value={pledgeStats.total}
@@ -583,7 +593,7 @@ class CreatePledgePage extends React.Component {
                 FAQs
               </H4>
 
-              <Details>
+              <Details data-cy="whatIsAPledge">
                 <summary>
                   <FormattedMessage id="createPledge.faq.whatSummary" defaultMessage="What is a pledge?" />
                 </summary>
@@ -595,7 +605,7 @@ class CreatePledgePage extends React.Component {
                 />
               </Details>
 
-              <Details>
+              <Details data-cy="WHAIP">
                 <summary>
                   <FormattedMessage
                     id="createPledge.faq.whatHappensSummary"
@@ -609,7 +619,7 @@ class CreatePledgePage extends React.Component {
                 />
               </Details>
 
-              <Details>
+              <Details data-cy="whenDoIPay">
                 <summary>
                   <FormattedMessage id="createPledge.faq.paySummary" defaultMessage="When do I pay?" />
                 </summary>
@@ -619,7 +629,7 @@ class CreatePledgePage extends React.Component {
                 />
               </Details>
 
-              <Details>
+              <Details data-cy="howDoIClaimPledge">
                 <summary>
                   <FormattedMessage
                     id="createPledge.faq.howToClaimSummary"

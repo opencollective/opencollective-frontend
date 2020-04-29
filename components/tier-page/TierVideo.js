@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
-import InlineEditField from '../InlineEditField';
 
+import InlineEditField from '../InlineEditField';
 import VideoPlayer from '../VideoPlayer';
 
 // Dynamicly load heavy inputs only if user can edit the page

@@ -1,21 +1,21 @@
-import React, { useRef, useState, useLayoutEffect } from 'react';
-import styled, { css } from 'styled-components';
-import { createPortal } from 'react-dom';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/react-components';
 import { Times } from '@styled-icons/fa-solid/Times';
-import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages } from 'react-intl';
 import gql from 'graphql-tag';
-import { Box, Flex } from '@rebass/grid';
+import { createPortal } from 'react-dom';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
 
-import { Span } from './Text';
-import StyledButton from './StyledButton';
-import StyledInput from './StyledInput';
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from './contribute-cards/Contribute';
 import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
 import { getTierPageQuery } from '../components/tier-page/graphql/queries';
 
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from './contribute-cards/Contribute';
+import { Box, Flex } from './Grid';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
 import { fadeIn } from './StyledKeyframes';
+import { Span } from './Text';
 
 const POPUP_ARROW_WIDTH = 20;
 

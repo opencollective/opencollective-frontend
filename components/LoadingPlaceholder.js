@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
-import { layout, space, border } from 'styled-system';
+import { border, layout, space } from 'styled-system';
 
 import { flicker } from './StyledKeyframes';
 

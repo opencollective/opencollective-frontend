@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Query, Mutation } from '@apollo/react-components';
-import { Flex, Box } from '@rebass/grid';
-import { get, update, cloneDeep } from 'lodash';
+import { Mutation, Query } from '@apollo/react-components';
+import { cloneDeep, get, update } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { createApplicationMutation, deleteApplicationMutation } from '../lib/graphql/mutations';
 import { getLoggedInUserApplicationsQuery } from '../lib/graphql/queries';
 
-import Loading from '../components/Loading';
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
-import StyledHr from '../components/StyledHr';
-import StyledButton from '../components/StyledButton';
-import StyledLink from '../components/StyledLink';
-import StyledCard from '../components/StyledCard';
+import { Box, Flex } from '../components/Grid';
+import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import StyledButton from '../components/StyledButton';
+import StyledCard from '../components/StyledCard';
+import StyledHr from '../components/StyledHr';
+import StyledLink from '../components/StyledLink';
 
 class Apps extends React.Component {
   static propTypes = {

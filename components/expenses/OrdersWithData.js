@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 
 import Error from '../Error';
+
 import Orders from './Orders';
 
 class OrdersWithData extends React.Component {
@@ -150,12 +151,11 @@ const getOrdersVariables = props => {
 };
 
 const ORDERS_PER_PAGE = 10;
+
 export const addOrdersData = graphql(getOrdersQuery, {
-  options(props) {
-    return {
-      variables: getOrdersVariables(props),
-    };
-  },
+  options: props => ({
+    variables: getOrdersVariables(props),
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

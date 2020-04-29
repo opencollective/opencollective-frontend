@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 import { throttle } from 'lodash';
-import { useIntl, defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import CollectivePicker from './CollectivePicker';
-import gql from 'graphql-tag';
 import formatCollectiveType from '../lib/i18n-collective-type';
+
+import CollectivePicker from './CollectivePicker';
 
 const DEFAULT_SEARCH_QUERY = gql`
   query SearchCollective($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
@@ -79,7 +80,7 @@ const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filte
   const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery);
   const [term, setTerm] = React.useState(null);
   const { formatMessage } = useIntl();
-  const collectives = (data && data.search && data.search.collectives) || [];
+  const collectives = ((term || preload) && data?.search?.collectives) || [];
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
   const placeholder = getPlaceholder(formatMessage, types);
 

@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { get, pick } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import { pick, get } from 'lodash';
-import { Box } from '@rebass/grid';
+import styled from 'styled-components';
 
+import { toIsoDateStr } from '../lib/date-utils';
+import storage from '../lib/storage';
+
+import Container from './Container';
+import { Box } from './Grid';
+import StyledButton from './StyledButton';
+import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import StyledButton from './StyledButton';
-import Container from './Container';
-import StyledCheckbox from './StyledCheckbox';
-
-import storage from '../lib/storage';
-import { toIsoDateStr } from '../lib/date-utils';
 
 const UpdateFormWrapper = styled(Container)`
   width: 100%;

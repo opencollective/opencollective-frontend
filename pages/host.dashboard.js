@@ -1,24 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
-import { omit } from 'lodash';
-
-import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
-import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
-
+import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
+import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
+import { omit } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { addCollectiveCoverData } from '../lib/graphql/queries';
-import { withUser } from '../components/UserProvider';
-import Loading from '../components/Loading';
-import Page from '../components/Page';
-import CollectiveCover from '../components/CollectiveCover';
-import { FormattedMessage } from 'react-intl';
-import MessageBox from '../components/MessageBox';
+
+import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
-import Link from '../components/Link';
+import { Flex } from '../components/Grid';
 import { Dashboard, PendingApplications } from '../components/host-dashboard';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import { withUser } from '../components/UserProvider';
 
 const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
   padding: 4px 20px 0 20px;
@@ -124,22 +123,14 @@ class HostDashboardPage extends React.Component {
     const { LoggedInUser, loadingLoggedInUser, data, view, slug } = this.props;
     const host = data.Collective || {};
 
+    const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
+
     return (
       <Page collective={host} title={host.name || 'Host Dashboard'} LoggedInUser={LoggedInUser}>
         {data.Collective && (
-          <CollectiveCover
-            collective={host}
-            href={`/${host.slug}/dashboard`}
-            className="small"
-            forceLegacy
-            title={
-              <FormattedMessage
-                id="host.dashboard.title"
-                defaultMessage="{collective} - Host Dashboard"
-                values={{ collective: host.name }}
-              />
-            }
-          />
+          <Container mb={4}>
+            <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
+          </Container>
         )}
         {loadingLoggedInUser || data.loading ? (
           <Flex px={2} py={5} justifyContent="center">

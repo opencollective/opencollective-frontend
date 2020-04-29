@@ -1,28 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
-import { P, H3 } from '../../Text';
+
+import { Dimensions } from '../_constants';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import StyledMembershipCard from '../../StyledMembershipCard';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
-import Container from '../../Container';
 import { fadeIn } from '../../StyledKeyframes';
-import MessageBox from '../../MessageBox';
-
+import StyledMembershipCard from '../../StyledMembershipCard';
+import { H3, P } from '../../Text';
+import ContainerSectionContent from '../ContainerSectionContent';
 // Local imports
 import SectionTitle from '../SectionTitle';
-import ContainerSectionContent from '../ContainerSectionContent';
+
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
-import { Dimensions } from '../_constants';
 
 const FILTERS = {
   ALL: 'ALL',
@@ -443,9 +444,9 @@ const withData = graphql(
     }
   `,
   {
-    options(props) {
-      return { variables: { id: props.collective.id } };
-    },
+    options: props => ({
+      variables: { id: props.collective.id },
+    }),
   },
 );
 

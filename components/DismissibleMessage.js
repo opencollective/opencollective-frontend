@@ -1,11 +1,13 @@
 import React from 'react';
-import { get } from 'lodash';
 import PropTypes from 'prop-types';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { get } from 'lodash';
+
+import { BANNER, DISMISSABLE_HELP_MESSAGE_KEY, HELP_MESSAGE } from '../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { withUser } from './UserProvider';
-import { HELP_MESSAGE, BANNER, DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
 import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
+
+import { withUser } from './UserProvider';
 
 const accountSettingsQuery = gqlV2`
   query AccountSettings {
@@ -31,7 +33,14 @@ const editAccountSettingsMutation = gqlV2`
  *
  * Messages will never be displayed if user is not logged in.
  */
-const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, children, dismissedComponent }) => {
+const DismissibleMessage = ({
+  children,
+  dismissedComponent,
+  displayForLoggedOutUser,
+  loadingLoggedInUser,
+  LoggedInUser,
+  messageId,
+}) => {
   const settingsKey = `${DISMISSABLE_HELP_MESSAGE_KEY}.${messageId}`;
   const [isDismissedLocally, setDismissedLocally] = React.useState(getFromLocalStorage(settingsKey));
   const [editAccountSettings] = useMutation(editAccountSettingsMutation, {
@@ -43,10 +52,10 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
     fetchPolicy: 'network-only',
   });
 
-  const loggedInAccount = data?.loggedInAccount;
-  // Still loading or SSR
-  if (typeof window === 'undefined' || (!LoggedInUser && loading)) {
-    null;
+  const loggedInAccount = data?.loggedInAccount || LoggedInUser?.collective;
+  // Hide it if SSR or still loading user
+  if (typeof window === 'undefined' || loading || loadingLoggedInUser) {
+    return null;
   } else if (
     isDismissedLocally ||
     (!loggedInAccount && !displayForLoggedOutUser) ||
@@ -73,10 +82,11 @@ const DismissibleMessage = ({ LoggedInUser, messageId, displayForLoggedOutUser, 
 DismissibleMessage.propTypes = {
   messageId: PropTypes.oneOf([...Object.values(HELP_MESSAGE), ...Object.values(BANNER)]).isRequired,
   displayForLoggedOutUser: PropTypes.bool,
+  loadingLoggedInUser: PropTypes.bool,
   /** A function to render the actual message */
   children: PropTypes.func.isRequired,
   /** A component we can display if the message was already dismissed once */
-  dismissedComponent: PropTypes.func,
+  dismissedComponent: PropTypes.object,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
 };

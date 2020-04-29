@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
-import ReplyToMemberInvitationCard from './ReplyToMemberInvitationCard';
+
+import { Box, Flex } from './Grid';
 import MessageBox from './MessageBox';
+import ReplyToMemberInvitationCard from './ReplyToMemberInvitationCard';
 
 /**
  * Displays a `ReplyToMemberInvitationCard` list, scrolling to the given selected

@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import Container from '../Container';
-import { P, Span } from '../Text';
-import Currency from '../Currency';
-import StyledCollectiveCard from '../StyledCollectiveCard';
 import { CollectiveType } from '../../lib/constants/collectives';
+
+import Container from '../Container';
+import Currency from '../Currency';
+import { Box } from '../Grid';
+import StyledCollectiveCard from '../StyledCollectiveCard';
+import { P, Span } from '../Text';
 
 /**
  * A card to show a collective on the discover page.

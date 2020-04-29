@@ -1,20 +1,20 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
+import themeGet from '@styled-system/theme-get';
 import gql from 'graphql-tag';
 import { get } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
 
-import { Span } from './Text';
-import LinkCollective from './LinkCollective';
-import FormattedMoneyAmount from './FormattedMoneyAmount';
-import StyledCard from './StyledCard';
-import Container from './Container';
 import Avatar from './Avatar';
+import Container from './Container';
 import EditPublicMessagePopup from './EditPublicMessagePopup';
+import FormattedMoneyAmount from './FormattedMoneyAmount';
+import { Box, Flex } from './Grid';
+import LinkCollective from './LinkCollective';
+import StyledCard from './StyledCard';
+import { Span } from './Text';
 
 const PublicMessage = styled.p`
   font-size: ${themeGet('fontSizes.Tiny')}px;
@@ -142,11 +142,13 @@ class OrderSuccessContributorCardWithData extends React.Component {
           <Container
             display="flex"
             mt={2}
+            px={2}
             justifyContent="center"
             fontSize="Paragraph"
             fontWeight="bold"
             lineHeight="Caption"
             color="black.900"
+            textAlign="center"
           >
             <LinkCollective collective={fromCollective}>{fromCollective.name}</LinkCollective>
           </Container>
@@ -204,7 +206,7 @@ class OrderSuccessContributorCardWithData extends React.Component {
 
 export default injectIntl(
   graphql(GetMemberQuery, {
-    options(props) {
+    options: props => {
       const { collective, fromCollective, tier } = props.order;
       const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
       if (tier) {

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Error from './Error';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import CollectiveCard from './CollectiveCard';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+
+import CollectiveCard from './CollectiveCard';
+import Error from './Error';
 
 const COLLECTIVE_CARDS_PER_PAGE = 10;
 
@@ -161,18 +162,16 @@ const getHostsQuery = gql`
 `;
 
 export const addHostsData = graphql(getHostsQuery, {
-  options(props) {
-    return {
-      variables: {
-        tags: props.tags,
-        currency: props.currency,
-        orderBy: props.orderBy,
-        orderDirection: props.orderDirection,
-        offset: 0,
-        limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      tags: props.tags,
+      currency: props.currency,
+      orderBy: props.orderBy,
+      orderDirection: props.orderDirection,
+      offset: 0,
+      limit: props.limit || COLLECTIVE_CARDS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data, ownProps }) => ({
     data,
     fetchMore: () =>

@@ -1,20 +1,20 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
-import { pick } from 'lodash';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Star } from '@styled-icons/fa-solid/Star';
+import { pick } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
-import { P, Span } from './Text';
+import { Box } from './Grid';
+import Link from './Link';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
-import StyledInput from './StyledInput';
-import StyledButton from './StyledButton';
-import Link from './Link';
+import StyledLink from './StyledLink';
 import StyledRadioList from './StyledRadioList';
-import ExternalLink from './ExternalLink';
-import { FormattedMessage } from 'react-intl';
+import { P, Span } from './Text';
 
 const useForm = () => {
   const [state, setState] = useState({ errors: '', useType: 'repository' });
@@ -191,9 +191,9 @@ const RepositoryEntry = ({ onCreateCollective, radio, value, checked, creatingCo
                   'tos-link': msg => <Link route="/tos">{msg}</Link>,
                   // eslint-disable-next-line
                   'host-terms': msg => (
-                    <ExternalLink href={FISCAL_SPONSOR_TERMS} openInNewTab>
+                    <StyledLink href={FISCAL_SPONSOR_TERMS} openInNewTab>
                       {msg}
-                    </ExternalLink>
+                    </StyledLink>
                   ),
                   // eslint-disable-next-line
                   'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,

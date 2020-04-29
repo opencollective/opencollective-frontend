@@ -1,29 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
-import styled from 'styled-components';
 import { graphql } from '@apollo/react-hoc';
-import { maxWidth } from 'styled-system';
-import { Flex, Box } from '@rebass/grid';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
+import { maxWidth } from 'styled-system';
 
-import { withUser } from '../components/UserProvider';
-import Page from '../components/Page';
+import { formatCurrency } from '../lib/currency-utils';
+import { getSubscriptionsQuery } from '../lib/graphql/queries';
+import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
+import { compose } from '../lib/utils';
+
 import Container from '../components/Container';
-import { H1, H5 } from '../components/Text';
-import Link from '../components/Link';
-import NewCreditCardForm from '../components/NewCreditCardForm';
-import Loading from '../components/Loading';
 import ErrorPage from '../components/ErrorPage';
+import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import NewCreditCardForm from '../components/NewCreditCardForm';
+import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';
+import { H1, H5 } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 import HappyBackground from '../components/virtual-cards/HappyBackground';
-
-import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
-import { formatCurrency, compose } from '../lib/utils';
-import { getSubscriptionsQuery } from '../lib/graphql/queries';
 
 const ShadowBox = styled(Box)`
   box-shadow: 0px 8px 16px rgba(20, 20, 20, 0.12);
@@ -337,13 +338,11 @@ export const replaceCreditCard = graphql(
 );
 
 const addSubscriptionsData = graphql(getSubscriptionsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: props.slug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: props.slug,
+    },
+  }),
 
   skip: props => {
     return props.loadingLoggedInUser || !props.LoggedInUser;

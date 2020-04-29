@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { get as fetch } from '../../lib/api';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { collectiveInvoiceURL, invoiceServiceURL, transactionInvoiceURL } from '../../lib/url_helpers';
+
 import { Span } from '../Text';
 
 export default class InvoiceDownloadLink extends Component {
@@ -26,6 +27,8 @@ export default class InvoiceDownloadLink extends Component {
     dateTo: PropTypes.string,
     /** Invoice date to */
     invoice: PropTypes.object,
+    /** Transaction creation date */
+    createdAt: PropTypes.string,
   };
 
   constructor(props) {
@@ -41,9 +44,10 @@ export default class InvoiceDownloadLink extends Component {
   }
 
   getFilename() {
-    const { fromCollectiveSlug, toCollectiveSlug, dateFrom, dateTo } = this.props;
+    const { fromCollectiveSlug, toCollectiveSlug, dateFrom, dateTo, createdAt } = this.props;
     if (this.props.type === 'transaction') {
-      return `transaction-${this.props.transactionUuid}.pdf`;
+      const createdAtString = toIsoDateStr(createdAt ? new Date(createdAt) : new Date());
+      return `${toCollectiveSlug || 'transaction'}_${createdAtString}_${this.props.transactionUuid}.pdf`;
     } else {
       const fromString = toIsoDateStr(dateFrom ? new Date(dateFrom) : new Date());
       const toString = toIsoDateStr(dateTo ? new Date(dateTo) : new Date());

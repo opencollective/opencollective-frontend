@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
+
 import { CollectiveCategory } from '../lib/constants/collectives';
 
 const TranslatedTags = defineMessages({

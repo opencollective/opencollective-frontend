@@ -1,24 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Box, Flex } from '@rebass/grid';
+import { FormattedMessage } from 'react-intl';
 
 import { compose } from '../lib/utils';
+import { Router } from '../server/pages';
 
-import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
-import CreateExpenseForm from '../components/expenses/CreateExpenseFormLegacy';
-
-import ErrorPage from '../components/ErrorPage';
+import Body from '../components/Body';
 import Button from '../components/Button';
 import CollectiveNavbar from '../components/CollectiveNavbar';
-import Header from '../components/Header';
-import Body from '../components/Body';
+import ErrorPage from '../components/ErrorPage';
+import CreateExpenseForm from '../components/expenses/CreateExpenseFormLegacy';
+import ExpensesStatsWithData from '../components/expenses/ExpensesStatsWithData';
 import Footer from '../components/Footer';
-
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
 import { withUser } from '../components/UserProvider';
-import { Router } from '../server/pages';
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, action } }) {

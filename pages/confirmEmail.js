@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import { Email } from '@styled-icons/material/Email';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { Box } from '@rebass/grid';
 
-import { Email } from '@styled-icons/material/Email';
-
-import Page from '../components/Page';
-import MessageBox from '../components/MessageBox';
 import Container from '../components/Container';
+import { Box } from '../components/Grid';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 /**

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import Error from './Error';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import Membership from './Membership';
 import { Button } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
+
+import Error from './Error';
+import Membership from './Membership';
 
 const MEMBERSHIPS_PER_PAGE = 10;
 
@@ -161,17 +162,15 @@ const getMembershipsQuery = gql`
 `;
 
 export const addMembershipsData = graphql(getMembershipsQuery, {
-  options(props) {
-    return {
-      variables: {
-        memberCollectiveSlug: props.memberCollectiveSlug,
-        offset: 0,
-        role: props.role,
-        orderBy: props.orderBy || 'totalDonations',
-        limit: props.limit || MEMBERSHIPS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      memberCollectiveSlug: props.memberCollectiveSlug,
+      offset: 0,
+      role: props.role,
+      orderBy: props.orderBy || 'totalDonations',
+      limit: props.limit || MEMBERSHIPS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

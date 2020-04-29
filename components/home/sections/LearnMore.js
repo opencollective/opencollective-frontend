@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Box } from '@rebass/grid';
-import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
-import { H3, P } from '../../Text';
-import { HomeStandardLink } from '../HomeLinks';
 import Container from '../../Container';
-import SectionTitle from '../SectionTitle';
+import { Box } from '../../Grid';
+import StyledLink from '../../StyledLink';
+import { H3, P } from '../../Text';
 import Illustration from '../HomeIllustration';
+import SectionTitle from '../SectionTitle';
 
 const IconWrapper = styled(Box)`
   display: flex;
@@ -36,7 +36,7 @@ const learningChannels = [
   {
     id: 'slack',
     name: 'Slack channel',
-    link: 'https://opencollective.slack.com',
+    link: 'https://slack.opencollective.com',
   },
 ];
 
@@ -121,9 +121,9 @@ const LearnMore = () => {
                 >
                   {intl.formatMessage(messages[`home.learnMore.${channel.id}`])}
                 </P>
-                <HomeStandardLink href={channel.link}>
+                <StyledLink href={channel.link} buttonStyle="standard" buttonSize="small">
                   {intl.formatMessage(messages[`home.learnMore.${channel.id}.buttonText`])}
-                </HomeStandardLink>
+                </StyledLink>
               </Box>
             </Container>
             <br></br>

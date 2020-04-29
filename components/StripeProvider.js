@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StripeProvider as StripeProviderLib } from 'react-stripe-elements';
+
 import { getStripe } from '../lib/stripe';
 
 export const StripeLoaderContext = React.createContext({

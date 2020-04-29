@@ -1,24 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { ApolloProvider } from '@apollo/react-components';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
+import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
-import { ApolloProvider } from '@apollo/react-components';
 
-// For old browsers without window.Intl
-import 'intl';
-import 'intl/locale-data/jsonp/en.js';
-import 'intl-pluralrules';
-import '@formatjs/intl-relativetimeformat/polyfill';
-import '@formatjs/intl-relativetimeformat/dist/locale-data/en';
-
-import { IntlProvider } from 'react-intl';
-
-import UserProvider from '../components/UserProvider';
-import StripeProviderSSR from '../components/StripeProvider';
-import withData from '../lib/withData';
 import theme from '../lib/theme';
+import withData from '../lib/withData';
+
+import StripeProviderSSR from '../components/StripeProvider';
+import UserProvider from '../components/UserProvider';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'nprogress/nprogress.css';
@@ -26,7 +19,6 @@ import 'react-datetime/css/react-datetime.css';
 import 'react-quill/dist/quill.snow.css';
 import 'react-mde/lib/styles/css/react-mde-all.css';
 import 'trix/dist/trix.css';
-
 import '../public/static/styles/app.css';
 import '../public/static/styles/react-tags.css';
 
@@ -45,10 +37,13 @@ if (!process.browser) {
   global.DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
 }
 
+// This is optional but highly recommended
+// since it prevents memory leak
+const cache = createIntlCache();
+
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
     pageProps: PropTypes.object.isRequired,
-    initialNow: PropTypes.number.isRequired,
     scripts: PropTypes.object.isRequired,
     locale: PropTypes.string,
     messages: PropTypes.object,
@@ -64,7 +59,7 @@ class OpenCollectiveFrontendApp extends App {
       let pageProps = {};
 
       if (Component.getInitialProps) {
-        pageProps = (await Component.getInitialProps(ctx)) || {};
+        pageProps = await Component.getInitialProps(ctx);
       }
 
       const scripts = {};
@@ -83,15 +78,12 @@ class OpenCollectiveFrontendApp extends App {
         }
       }
 
-      // Get react-intl data from props or local data if client side
-      const { locale, messages } = ctx.req || window.__NEXT_DATA__.props;
+      // Get the `locale` and `messages` from the request object on the server.
+      // In the browser, use the same values that the server serialized.
+      const { req } = ctx;
+      const { locale, messages } = req || window.__NEXT_DATA__.props;
 
-      // Store server time to avoid React checksum mistmatch that could happen
-      // with react-intl `FormattedRelative` when server and client time are different.
-      // See https://github.com/formatjs/react-intl/issues/254
-      const initialNow = Date.now();
-
-      return { pageProps, scripts, initialNow, locale, messages };
+      return { pageProps, scripts, locale, messages };
     } catch (error) {
       return { hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
     }
@@ -126,18 +118,20 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { client, Component, pageProps, scripts, initialNow, locale, messages } = this.props;
+    const { client, Component, pageProps, scripts, locale, messages } = this.props;
+
+    const intl = createIntl({ locale, messages }, cache);
 
     return (
       <Fragment>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
-              <IntlProvider initialNow={initialNow} locale={locale || 'en'} messages={messages}>
+              <RawIntlProvider value={intl}>
                 <UserProvider apiKey={process.env.STRIPE_KEY}>
                   <Component {...pageProps} />
                 </UserProvider>
-              </IntlProvider>
+              </RawIntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>

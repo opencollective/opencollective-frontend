@@ -1,24 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { Box, Flex } from '@rebass/grid';
 import { graphql } from '@apollo/react-hoc';
+import { Form, Formik } from 'formik';
 import gql from 'graphql-tag';
-import { FormattedMessage } from 'react-intl';
-import confetti from 'canvas-confetti';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
+import { isURL, matches } from 'validator';
 
-import Modal, { ModalBody, ModalHeader, ModalFooter, ModalOverlay } from '../../components/StyledModal';
+import { confettiFireworks } from '../../lib/confettis';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { Router } from '../../server/pages';
+
+import Container from '../../components/Container';
+import MessageBox from '../../components/MessageBox';
+import StyledButton from '../../components/StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../components/StyledModal';
+import { H1, P } from '../../components/Text';
+
+import { Box, Flex } from '../Grid';
+
+import OnboardingContentBox from './OnboardingContentBox';
 import OnboardingNavButtons from './OnboardingNavButtons';
 import OnboardingStepsProgress from './OnboardingStepsProgress';
-import OnboardingContentBox from './OnboardingContentBox';
-import MessageBox from '../../components/MessageBox';
-import Container from '../../components/Container';
-import { H1, P } from '../../components/Text';
-import StyledButton from '../../components/StyledButton';
-
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { getLoggedInUserQuery } from '../../lib/graphql/queries';
-import { Router } from '../../server/pages';
 
 const StepsProgressBox = styled(Box)`
   min-height: 95px;
@@ -57,6 +60,12 @@ const ResponsiveModalHeader = styled(ModalHeader)`
   }
 `;
 
+const ResponsiveModalBody = styled(ModalBody)`
+  @media screen and (max-width: 40em) {
+    flex-grow: 1;
+  }
+`;
+
 const ResponsiveModalFooter = styled(ModalFooter)`
   @media screen and (max-width: 40em) {
     padding-bottom: 20px;
@@ -80,6 +89,12 @@ const ModalWithImage = styled(ResponsiveModal)`
     background-repeat: no-repeat;
     background-size: 100%;
   }
+`;
+const FormWithStyles = styled(Form)`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const params = {
@@ -107,6 +122,7 @@ class OnboardingModal extends React.Component {
     EditCollectiveContact: PropTypes.func,
     showOnboardingModal: PropTypes.bool,
     setShowOnboardingModal: PropTypes.func,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -118,6 +134,12 @@ class OnboardingModal extends React.Component {
       error: null,
       noOverlay: false,
     };
+
+    this.messages = defineMessages({
+      twitterError: { id: 'onboarding.error.twitter', defaultMessage: 'Please enter a valid Twitter handle.' },
+      githubError: { id: 'onboarding.error.github', defaultMessage: 'Please enter a valid GitHub handle.' },
+      websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
+    });
   }
 
   componentDidMount() {
@@ -146,15 +168,6 @@ class OnboardingModal extends React.Component {
     this.setState({ members });
   };
 
-  addContact = (name, value) => {
-    this.setState(state => ({
-      collective: {
-        ...state.collective,
-        [name]: value,
-      },
-    }));
-  };
-
   submitAdmins = async () => {
     try {
       this.setState({ isSubmitting: true });
@@ -175,9 +188,9 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  submitContact = async () => {
+  submitContact = async values => {
     const collective = {
-      ...this.state.collective,
+      ...values,
       id: this.props.collective.id,
     };
     try {
@@ -191,15 +204,17 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  submitCollectiveInfo = async () => {
+  submitCollectiveInfo = async values => {
     try {
-      await this.submitContact();
+      await this.submitContact(values);
       await this.submitAdmins();
       Router.pushRoute('collective-with-onboarding', {
         mode: this.props.mode,
         slug: this.props.collective.slug,
         step: 'success',
-      }).then(() => this.confetti());
+      }).then(() => {
+        confettiFireworks(5000, { zIndex: 3000 });
+      });
     } catch (e) {
       this.setState({ isSubmitting: false, error: e });
     }
@@ -215,22 +230,27 @@ class OnboardingModal extends React.Component {
     Router.pushRoute('collective', { slug: this.props.collective.slug });
   };
 
-  confetti = () => {
-    const durationInSeconds = 5 * 1000;
-    const animationEnd = Date.now() + durationInSeconds;
-    const randomInRange = (min, max) => Math.random() * (max - min) + min;
-    const confettisParams = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+  validateFormik = values => {
+    const errors = {};
 
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      } else {
-        const particleCount = 50 * (timeLeft / durationInSeconds);
-        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0, 0.3), y: Math.random() - 0.2 } });
-        confetti({ ...confettisParams, particleCount, origin: { x: randomInRange(0.7, 1), y: Math.random() - 0.2 } });
-      }
-    }, 250);
+    if (values.website !== '' && isURL(values.website) === false) {
+      errors.website = this.props.intl.formatMessage(this.messages['websiteError']);
+    }
+
+    // https://github.com/shinnn/github-username-regex
+    if (
+      values.githubHandle !== '' &&
+      matches(values.githubHandle, /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i) === false
+    ) {
+      errors.githubHandle = this.props.intl.formatMessage(this.messages['githubError']);
+    }
+
+    // https://stackoverflow.com/questions/11361044/twitter-name-validation
+    if (values.twitterHandle !== '' && matches(values.twitterHandle, /^[a-zA-Z0-9_]{1,15}$/) === false) {
+      errors.twitterHandle = this.props.intl.formatMessage(this.messages['twitterError']);
+    }
+
+    return errors;
   };
 
   render() {
@@ -317,38 +337,54 @@ class OnboardingModal extends React.Component {
                   </StepsProgressBox>
                 </Flex>
               </ResponsiveModalHeader>
-              <ModalBody>
-                <Flex flexDirection="column" alignItems="center">
-                  <img
-                    width={'160px'}
-                    height={this.getStepParams(step, 'height')}
-                    src={this.getStepParams(step, 'src')}
-                  />
-                  <OnboardingContentBox
-                    step={step}
-                    collective={collective}
-                    LoggedInUser={LoggedInUser}
-                    updateAdmins={this.updateAdmins}
-                    addContact={this.addContact}
-                  />
-                  {error && (
-                    <MessageBox type="error" withIcon mt={2}>
-                      {error.message}
-                    </MessageBox>
-                  )}
-                </Flex>
-              </ModalBody>
-              <ResponsiveModalFooter>
-                <Flex flexDirection="column" alignItems="center">
-                  <OnboardingNavButtons
-                    step={step}
-                    mode={mode}
-                    slug={collective.slug}
-                    submitCollectiveInfo={this.submitCollectiveInfo}
-                    loading={isSubmitting}
-                  />
-                </Flex>
-              </ResponsiveModalFooter>
+              <Formik
+                initialValues={{ website: '', twitterHandle: '', githubHandle: '' }}
+                onSubmit={values => {
+                  this.submitCollectiveInfo(values);
+                }}
+                validate={this.validateFormik}
+                validateOnBlur={true}
+              >
+                {({ values, handleSubmit, errors, touched }) => (
+                  <FormWithStyles>
+                    <ResponsiveModalBody>
+                      <Flex flexDirection="column" alignItems="center">
+                        <img
+                          width={'160px'}
+                          height={this.getStepParams(step, 'height')}
+                          src={this.getStepParams(step, 'src')}
+                        />
+                        <OnboardingContentBox
+                          slug={collective.slug}
+                          step={step}
+                          collective={collective}
+                          LoggedInUser={LoggedInUser}
+                          updateAdmins={this.updateAdmins}
+                          values={values}
+                          errors={errors}
+                          touched={touched}
+                        />
+                        {error && (
+                          <MessageBox type="error" withIcon mt={2}>
+                            {error.message}
+                          </MessageBox>
+                        )}
+                      </Flex>
+                    </ResponsiveModalBody>
+                    <ResponsiveModalFooter>
+                      <Flex flexDirection="column" alignItems="center">
+                        <OnboardingNavButtons
+                          step={step}
+                          mode={mode}
+                          slug={collective.slug}
+                          loading={isSubmitting}
+                          handleSubmit={handleSubmit}
+                        />
+                      </Flex>
+                    </ResponsiveModalFooter>
+                  </FormWithStyles>
+                )}
+              </Formik>
             </ResponsiveModal>
           </React.Fragment>
         )}
@@ -380,8 +416,6 @@ const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
     EditCollectiveMembers: async ({ collectiveId, members }) => {
       return await mutate({
         variables: { collectiveId, members },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
@@ -404,11 +438,9 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
     EditCollectiveContact: async ({ collective }) => {
       return await mutate({
         variables: { collective },
-        awaitRefetchQueries: true,
-        refetchQueries: [{ query: getLoggedInUserQuery }],
       });
     },
   }),
 });
 
-export default addEditCollectiveContactMutation(addEditCoreContributorsMutation(OnboardingModal));
+export default addEditCollectiveContactMutation(addEditCoreContributorsMutation(injectIntl(OnboardingModal)));

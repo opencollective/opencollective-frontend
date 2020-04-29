@@ -1,8 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import FAQ, { Entry, Title, Content } from './FAQ';
+
 import Link from '../Link';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
+
+import FAQ, { Content, Entry, Title } from './FAQ';
 
 /**
  * FAQ associated to the `GithubRepositories` component.
@@ -48,9 +50,9 @@ const GithubRepositoriesFAQ = props => (
           values={{
             'criteria-link': function CriteriaLink(msg) {
               return (
-                <ExternalLink href="https://www.oscollective.org#criteria" openInNewTab>
+                <StyledLink href="https://www.oscollective.org#criteria" openInNewTab>
                   {msg}
-                </ExternalLink>
+                </StyledLink>
               );
             },
             'for-any-community': function CommunityLink(msg) {

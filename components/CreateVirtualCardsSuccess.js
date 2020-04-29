@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CheckCircle } from '@styled-icons/feather/CheckCircle';
+import { Clipboard } from '@styled-icons/feather/Clipboard';
+import { Printer } from '@styled-icons/feather/Printer';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
 
-import { Clipboard } from '@styled-icons/feather/Clipboard';
-import { CheckCircle } from '@styled-icons/feather/CheckCircle';
-import { Printer } from '@styled-icons/feather/Printer';
-
-import { P } from './Text';
-import StyledInput from './StyledInput';
-import StyledButton from './StyledButton';
-import FileDownloader from './FileDownloader';
 import { giftCardsDownloadUrl } from '../lib/url_helpers';
+
+import FileDownloader from './FileDownloader';
+import { Box, Flex } from './Grid';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
+import { P } from './Text';
 
 const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
   width: 95%;

@@ -82,6 +82,14 @@ export default class Body extends React.Component {
               font-size: 1.7rem;
             }
 
+            .content h4 {
+              font-size: 1.6rem;
+            }
+
+            .content h5 {
+              font-size: 1.5rem;
+            }
+
             .content > ul {
               padding-left: 3rem;
             }

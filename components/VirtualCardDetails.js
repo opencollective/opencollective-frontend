@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
+import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
 import moment from 'moment';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
-import themeGet from '@styled-system/theme-get';
+
+import { formatCurrency } from '../lib/currency-utils';
 
 import GiftCard from './icons/GiftCard';
-import Link from './Link';
 import Avatar from './Avatar';
-import { formatCurrency } from '../lib/utils';
+import { Box, Flex } from './Grid';
+import Link from './Link';
 import { Span } from './Text';
 
 const DetailsColumnHeader = styled.span`

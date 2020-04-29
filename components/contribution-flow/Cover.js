@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
 
+import Container from '../Container';
+import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import Logo from '../Logo';
 import { H2, P } from '../Text';
-import Container from '../Container';
 
 /**
  * Cover to display information about the collective in the contribution flow.

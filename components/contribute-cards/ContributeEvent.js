@@ -1,25 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
-import { truncate } from 'lodash';
-import { Box } from '@rebass/grid';
-
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
+import { truncate } from 'lodash';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
-import { canOrderTicketsFromEvent } from '../../lib/events';
-import { Span } from '../Text';
-import Link from '../Link';
-import Contribute from './Contribute';
+import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
+
 import Container from '../Container';
+import { Box } from '../Grid';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
+
+import Contribute from './Contribute';
 
 const ContributeEvent = ({ collective, event, ...props }) => {
   const { startsAt, endsAt } = event;
   const description = truncate(event.description, { length: 100 });
   const isTruncated = description && description.length < event.description.length;
-  const isPassed = !canOrderTicketsFromEvent(event);
+  const isPassed = isPastEvent(event);
+  const canOrderTickets = canOrderTicketsFromEvent(event);
   const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
   const eventRouteParams = { parentCollectiveSlug: collective.slug, eventSlug: event.slug };
   return (
@@ -27,6 +29,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       route="event"
       routeParams={eventRouteParams}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
+      disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}

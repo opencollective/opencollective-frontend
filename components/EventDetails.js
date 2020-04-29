@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Markdown from 'react-markdown';
-import { truncate, get } from 'lodash';
-
-import StyledCard from './StyledCard';
+import { get, truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import StyledLink from './StyledLink';
-import { Box } from '@rebass/grid';
-import { Span } from './Text';
+import Markdown from 'react-markdown';
+
+import { Box } from './Grid';
 import HTMLContent from './HTMLContent';
+import StyledCard from './StyledCard';
+import StyledLink from './StyledLink';
+import { Span } from './Text';
 
 const TruncatedLength = 400;
 
@@ -41,8 +41,10 @@ const EventDetails = ({ event, tier }) => {
             <HTMLContent>
               <Markdown source={truncatedDescription} />
             </HTMLContent>
-          ) : (
+          ) : event.longDescription ? (
             <HTMLContent content={truncatedDescription} />
+          ) : (
+            <HTMLContent>{truncatedDescription}</HTMLContent>
           )}
           {(isExpended || truncatedDescription.length !== description.length) &&
             (isExpended ? (

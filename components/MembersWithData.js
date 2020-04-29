@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import Error from './Error';
 import { graphql } from '@apollo/react-hoc';
+import classNames from 'classnames';
 import gql from 'graphql-tag';
-import Member from './Member';
-import { ButtonGroup, Button } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 import { uniqBy } from 'lodash';
+import { Button, ButtonGroup } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
+
+import Error from './Error';
+import Member from './Member';
 
 const MEMBERS_PER_PAGE = 10;
 
@@ -243,19 +244,17 @@ const getMembersQuery = gql`
 `;
 
 export const addMembersData = graphql(getMembersQuery, {
-  options(props) {
-    return {
-      variables: {
-        CollectiveId: props.collective.id,
-        TierId: props.tier && props.tier.id,
-        offset: 0,
-        type: props.type,
-        role: props.role,
-        orderBy: props.orderBy,
-        limit: props.limit || MEMBERS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      CollectiveId: props.collective.id,
+      TierId: props.tier && props.tier.id,
+      offset: 0,
+      type: props.type,
+      role: props.role,
+      orderBy: props.orderBy,
+      limit: props.limit || MEMBERS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

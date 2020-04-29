@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@rebass/grid';
-
-import { withUser } from '../UserProvider';
-import Container from '../Container';
-import { Span } from '../Text';
-import LinkCollective from '../LinkCollective';
-import Avatar from '../Avatar';
 import { defineMessages, useIntl } from 'react-intl';
+
+import Avatar from '../Avatar';
+import Container from '../Container';
+import { Box } from '../Grid';
+import LinkCollective from '../LinkCollective';
+import { Span } from '../Text';
+import { withUser } from '../UserProvider';
 
 const messages = defineMessages({
   andXOthers: {

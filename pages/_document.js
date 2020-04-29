@@ -1,10 +1,10 @@
 import '../env';
 
 import React from 'react';
+import { pick } from 'lodash';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import flush from 'styled-jsx/server';
-import { pick } from 'lodash';
 
 import { parseToBoolean } from '../lib/utils';
 

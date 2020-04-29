@@ -1,24 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
-import { Router } from '../server/pages';
-
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
+import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
-import Header from './Header';
+import { Router } from '../server/pages';
+
 import Body from './Body';
-import Footer from './Footer';
-import Loading from './Loading';
-import NotFound from './NotFound';
-import { H1, P } from './Text';
-import StyledButton from './StyledButton';
 import Container from './Container';
-import StyledLink from './StyledLink';
+import Footer from './Footer';
+import { Flex } from './Grid';
+import Header from './Header';
+import Loading from './Loading';
 import MessageBox from './MessageBox';
+import NotFound from './NotFound';
+import StyledButton from './StyledButton';
+import StyledLink from './StyledLink';
+import { H1, P } from './Text';
 import { withUser } from './UserProvider';
 
 /**
@@ -122,7 +122,7 @@ class ErrorPage extends React.Component {
     const message = get(this.props, 'data.error.message');
     const stackTrace = get(this.props, 'data.error.stack');
     const expandError = process.env.NODE_ENV !== 'production';
-    const fontSize = ['ci', 'circleci', 'e2e', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
+    const fontSize = ['ci', 'e2e', 'test'].includes(process.env.NODE_ENV) ? 22 : 13;
 
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>

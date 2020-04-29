@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedNumber, FormattedMessage, injectIntl } from 'react-intl';
 import { get } from 'lodash';
+import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'react-intl';
 
 import { capitalize } from '../../lib/utils';
 
 import Link from '../Link';
-import ExternalLink from '../ExternalLink';
+import StyledLink from '../StyledLink';
+
 import InvoiceDownloadLink from './InvoiceDownloadLink';
 import RefundTransactionBtn from './RefundTransactionBtn';
 
@@ -49,6 +50,7 @@ class TransactionDetails extends React.Component {
     intl: PropTypes.object.isRequired,
     mode: PropTypes.string, // open or closed
     fromCollective: PropTypes.object,
+    createdAt: PropTypes.string,
   };
 
   constructor(props) {
@@ -174,6 +176,7 @@ class TransactionDetails extends React.Component {
       isRefund,
       uuid,
       expense,
+      createdAt,
     } = this.props;
 
     const amountDetailsStr = this.formatAmountDetails();
@@ -267,11 +270,16 @@ class TransactionDetails extends React.Component {
             </label>
             <div>
               {expense && expense.attachment ? (
-                <ExternalLink href={expense.attachment} openInNewTab>
+                <StyledLink href={expense.attachment} openInNewTab>
                   <FormattedMessage id="actions.download" defaultMessage="Download" />
-                </ExternalLink>
+                </StyledLink>
               ) : (
-                <InvoiceDownloadLink type="transaction" transactionUuid={uuid}>
+                <InvoiceDownloadLink
+                  type="transaction"
+                  transactionUuid={uuid}
+                  toCollectiveSlug={recipient.slug}
+                  createdAt={createdAt}
+                >
                   {({ loading, download }) => (
                     <a onClick={download}>
                       {loading ? (

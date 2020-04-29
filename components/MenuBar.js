@@ -1,21 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Pencil } from '@styled-icons/octicons/Pencil';
+import { get, throttle, uniqBy } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Sticky from 'react-stickynode';
 import styled from 'styled-components';
-import { get, throttle, uniqBy } from 'lodash';
-
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { animateScroll } from 'react-scrollchor/lib/helpers';
-import { Pencil } from '@styled-icons/octicons/Pencil';
 
 import colors from '../lib/constants/colors';
-import { withUser } from './UserProvider';
+import { animateScroll } from 'react-scrollchor/lib/helpers';
 
-import Avatar from './Avatar';
-import Logo from './Logo';
-import Link from './Link';
-import Button from './Button';
 import AddFundsModal from './AddFundsModal';
+import Avatar from './Avatar';
+import Button from './Button';
+import Link from './Link';
+import Logo from './Logo';
+import { withUser } from './UserProvider';
 
 const PencilIcon = styled(Pencil)`
   margin-right: 8px;

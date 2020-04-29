@@ -1,21 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import css from '@styled-system/css';
+import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';
-import MessageBox from './MessageBox';
-import LoadingPlaceholder from './LoadingPlaceholder';
+
 import HTMLContent from './HTMLContent';
+import LoadingPlaceholder from './LoadingPlaceholder';
+import MessageBox from './MessageBox';
 
 const TrixEditorContainer = styled.div`
   ${props =>
     props.withBorders &&
     css({
       border: '1px solid',
-      borderColor: 'black.300',
+      borderColor: !props.error ? 'black.300' : 'red.300',
       borderRadius: 10,
       padding: 3,
     })}
@@ -143,8 +144,6 @@ export default class RichTextEditor extends React.Component {
     inputName: PropTypes.string,
     /** Change this prop to reset the value */
     reset: PropTypes.any,
-    /** @deprecated A ref for the input. Useful to plug react-hook-form */
-    inputRef: PropTypes.func,
     /** Wether the toolbar should stick to the top */
     withStickyToolbar: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
@@ -273,18 +272,79 @@ export default class RichTextEditor extends React.Component {
       const url = match[1];
       if (isURL(url)) {
         const position = match.index;
-        const range = [position, position + url.length];
+        const urlLength = this.autolinkDelimiter(url);
+        const range = [position, position + urlLength];
         const hrefAtRange = editor.getDocument().getCommonAttributesAtRange(range).href;
-        if (hrefAtRange !== url) {
+        const newURL = url.slice(0, urlLength);
+        if (hrefAtRange !== newURL) {
           this.updateInRange(editor, range, 0, () => {
             if (editor.canActivateAttribute('href')) {
-              editor.activateAttribute('href', url);
+              editor.activateAttribute('href', newURL);
             }
           });
         }
       }
     }
   }
+
+  /** A helper used by autolink to find where the url actually ends
+   * Credits:
+   * https://github.com/github/cmark-gfm/blob/36c1553d2a1f04dc1628e76b18490edeff78b8d0/extensions/autolink.c#L37
+   * https://github.com/vmg/redcarpet/blob/92a7b3ae2241b862e9bf45e0af3cf53ebdfb0afb/ext/redcarpet/autolink.c#L58
+   */
+  autolinkDelimiter = url => {
+    let lastCharacterPosition = url.length;
+
+    while (lastCharacterPosition > 0) {
+      const lastCharacterIndex = lastCharacterPosition - 1;
+      const closingPair = url[lastCharacterIndex];
+
+      let openingPair;
+      if (closingPair === ')') {
+        openingPair = '(';
+      } else if (closingPair === ']') {
+        openingPair = '[';
+      } else if (closingPair === '}') {
+        openingPair = '{';
+      } else if (closingPair === '"') {
+        openingPair = '"';
+      } else if (closingPair === "'") {
+        openingPair = "'";
+      }
+
+      // Ensure single punctuations marks at the end of the URL are not included as part of link
+      if ('?!.,:;*_~'.includes(url[lastCharacterIndex])) {
+        lastCharacterPosition--;
+      } else if (openingPair) {
+        let opening = 0,
+          closing = 0;
+
+        /** Check to ensure that when a URL is enclosed within pair punctuations,
+         * we do not include the closing punctuation as part of the link.
+         * We only want to accept a closing punctuation at the end of the link,
+         * if there is a corresponding opening punctuation within the URL.
+         */
+
+        for (let i = 0; i < lastCharacterPosition; i++) {
+          if (url[i] === openingPair) {
+            opening++;
+          } else if (url[i] === closingPair) {
+            closing++;
+          }
+        }
+
+        if (opening >= closing) {
+          break;
+        }
+
+        lastCharacterPosition--;
+      } else {
+        break;
+      }
+    }
+
+    return lastCharacterPosition;
+  };
 
   /** A trix helper that will apply func in range then restore base range when it's done */
   updateInRange(editor, range, offset = 0, updateFunc) {
@@ -308,7 +368,6 @@ export default class RichTextEditor extends React.Component {
       editorMinHeight,
       withBorders,
       inputName,
-      inputRef,
       disabled,
       error,
       fontSize,
@@ -332,7 +391,7 @@ export default class RichTextEditor extends React.Component {
             {this.state.error.toString()}
           </MessageBox>
         )}
-        <input id={this.state.id} value={defaultValue} type="hidden" name={inputName} ref={inputRef} />
+        <input id={this.state.id} value={defaultValue} type="hidden" name={inputName} />
         <HTMLContent fontSize={fontSize}>
           <trix-editor
             ref={this.editorRef}

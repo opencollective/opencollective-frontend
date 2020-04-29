@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
+import { cloneDeep, get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import { get, cloneDeep } from 'lodash';
 
 import { compose } from '../lib/utils';
 
-import Error from './Error';
-import Comments from './Comments';
 import CommentForm from './CommentForm';
+import Comments from './Comments';
+import Error from './Error';
 import LoginBtn from './LoginBtn';
 
 const gqlV2 = gql; // Needed for lint validation of api v2 schema.
@@ -170,12 +170,10 @@ const getCommentsQueryVariables = ({ expense, limit = COMMENTS_PER_PAGE }) => ({
 
 const COMMENTS_PER_PAGE = 10;
 export const commentsQuery = graphql(getCommentsQuery, {
-  options(props) {
-    return {
-      context: { apiVersion: '2' },
-      variables: getCommentsQueryVariables(props),
-    };
-  },
+  options: props => ({
+    context: { apiVersion: '2' },
+    variables: getCommentsQueryVariables(props),
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

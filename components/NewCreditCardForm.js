@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Elements, CardElement, injectStripe } from 'react-stripe-elements';
-import { Flex } from '@rebass/grid';
 import { defineMessages, injectIntl } from 'react-intl';
+import { CardElement, Elements, injectStripe } from 'react-stripe-elements';
+import styled from 'styled-components';
 
-import { Span } from './Text';
+import { Flex } from './Grid';
 import StyledCheckbox from './StyledCheckbox';
+import { Span } from './Text';
 
 const StyledCardElement = styled(CardElement)`
   min-width: 200px;

@@ -1,6 +1,8 @@
 import React from 'react';
+
 import LoadingGrid from '../components/LoadingGrid';
-import { Flex } from '@rebass/grid';
+
+import { Flex } from './Grid';
 
 const Loading = props => {
   return (

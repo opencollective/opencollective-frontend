@@ -1,21 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Avatar from '../../components/Avatar';
 import StyledTag from '../../components/StyledTag';
 import StyledTooltip from '../../components/StyledTooltip';
 
-const Admin = styled(StyledTag)`
-  font-size: 14px;
-  border-top-right-radius: 50px;
-  border-bottom-right-radius: 50px;
-  text-transform: none;
-  display: flex;
-  align-items: center;
-`;
+import { Box, Flex } from '../Grid';
+
+const Admin = styled(StyledTag).attrs({ variant: 'rounded-right' })``;
 
 class OnboardingProfileCard extends React.Component {
   static propTypes = {
@@ -37,19 +31,13 @@ class OnboardingProfileCard extends React.Component {
           >
             <Admin
               closeButtonProps={{
-                width: '1.5em',
-                height: '1.5em',
-                iconColor: 'black',
-                backgroundColor: 'rgba(0, 0, 0, 0)',
-                display: 'flex',
-                align: 'center',
                 onClick: () => {
                   removeAdmin(collective);
                 },
               }}
             >
               <Flex alignItems="center">
-                <Avatar radius={15} collective={collective} />
+                <Avatar radius={16} collective={collective} />
                 <Box fontSize="Caption" ml={2}>
                   {name}
                 </Box>
@@ -59,21 +47,17 @@ class OnboardingProfileCard extends React.Component {
         ) : (
           <Admin
             closeButtonProps={
-              collective.id !== adminCollective.id && {
-                width: '1.5em',
-                height: '1.5em',
-                iconColor: 'black',
-                backgroundColor: 'rgba(0, 0, 0, 0)',
-                display: 'flex',
-                align: 'center',
-                onClick: () => {
-                  removeAdmin(collective);
-                },
-              }
+              collective.id !== adminCollective.id
+                ? {
+                    onClick: () => {
+                      removeAdmin(collective);
+                    },
+                  }
+                : null
             }
           >
             <Flex alignItems="center">
-              <Avatar radius={15} collective={collective} />
+              <Avatar radius={16} collective={collective} />
               <Box fontSize="Caption" ml={2}>
                 {name}
               </Box>

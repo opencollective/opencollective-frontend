@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { IntlProvider } from 'react-intl';
 import { merge } from 'lodash';
+import { IntlProvider } from 'react-intl';
 
 import PaymentMethodChooser from '../PaymentMethodChooser';
 

@@ -2,24 +2,25 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import ExpensesWithData from '../expenses/ExpensesWithData';
-import OrdersWithData from '../expenses/OrdersWithData';
-import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
-
-import MessageBox from '../MessageBox';
-import { H5 } from '../Text';
-import Loading from '../Loading';
-import HostDashboardActionsBanner from './HostDashboardActionsBanner';
-import { withUser } from '../UserProvider';
 import {
   getFromLocalStorage,
-  setLocalStorage,
   LOCAL_STORAGE_KEYS,
   removeFromLocalStorage,
+  setLocalStorage,
 } from '../../lib/local-storage';
+
+import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
+import ExpensesWithData from '../expenses/ExpensesWithData';
+import OrdersWithData from '../expenses/OrdersWithData';
+import { Flex } from '../Grid';
+import Loading from '../Loading';
+import MessageBox from '../MessageBox';
+import { H5 } from '../Text';
+import { withUser } from '../UserProvider';
+
+import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 
 class HostDashboard extends React.Component {
   static propTypes = {
@@ -232,6 +233,8 @@ const getDataQuery = gql`
       plan {
         addedFunds
         addedFundsLimit
+        transferwisePayouts
+        transferwisePayoutsLimit
         name
       }
     }
@@ -239,13 +242,11 @@ const getDataQuery = gql`
 `;
 
 export const addData = graphql(getDataQuery, {
-  options(props) {
-    return {
-      variables: {
-        hostCollectiveSlug: props.hostCollectiveSlug,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      hostCollectiveSlug: props.hostCollectiveSlug,
+    },
+  }),
 });
 
 export default withUser(addData(HostDashboard));

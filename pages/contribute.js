@@ -1,28 +1,28 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import memoizeOne from 'memoize-one';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import Header from '../components/Header';
 import Body from '../components/Body';
-import Container from '../components/Container';
-import Footer from '../components/Footer';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import Loading from '../components/Loading';
-import ErrorPage from '../components/ErrorPage';
-import { withUser } from '../components/UserProvider';
-import { H2, P } from '../components/Text';
-import MessageBox from '../components/MessageBox';
-import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import { Sections } from '../components/collective-page/_constants';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
-import ContributeCustom from '../components/contribute-cards/ContributeCustom';
-import ContributeTier from '../components/contribute-cards/ContributeTier';
-import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
+import ContributeCustom from '../components/contribute-cards/ContributeCustom';
+import ContributeEvent from '../components/contribute-cards/ContributeEvent';
+import ContributeTier from '../components/contribute-cards/ContributeTier';
+import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import { H2, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 const ContributeCardContainer = styled.div`
   margin: 0 20px 20px 0;

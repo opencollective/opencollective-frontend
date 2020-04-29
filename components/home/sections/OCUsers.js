@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Flex, Box } from '@rebass/grid';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
-import { P } from '../../Text';
-import { HomeStandardLink } from '../HomeLinks';
-import StyledCarousel from '../../StyledCarousel';
 import Container from '../../Container';
-import SectionTitle from '../SectionTitle';
-import SectionSubTitle from '../SectionSubtitle';
+import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
+import StyledCarousel from '../../StyledCarousel';
+import StyledLink from '../../StyledLink';
+import { P } from '../../Text';
+import SectionSubTitle from '../SectionSubtitle';
+import SectionTitle from '../SectionTitle';
 
 const Img = styled.img`
   max-width: 100%;
@@ -115,9 +115,9 @@ const User = ({ id, name, picture, type, collectivePath, learnMorePath }) => {
             {intl.formatMessage(messages[`home.OCusers.${id}`])}
           </P>
         </Box>
-        <HomeStandardLink width="72px" href={learnMorePath}>
+        <StyledLink minWidth="72px" href={learnMorePath} buttonStyle="standard" buttonSize="small">
           <FormattedMessage id="home.more" defaultMessage="More" />
-        </HomeStandardLink>
+        </StyledLink>
       </Container>
     </Container>
   );
@@ -146,9 +146,13 @@ const OCUsers = () => {
           />
         </SectionSubTitle>
         <Box mt={5}>
-          <HomeStandardLink fontSize="14px" lineHeight="18px" href="https://blog.opencollective.com/tag/case-studies/">
+          <StyledLink
+            buttonStyle="standard"
+            buttonSize="medium"
+            href="https://blog.opencollective.com/tag/case-studies/"
+          >
             <FormattedMessage id="home.discover" defaultMessage="Discover more" />
-          </HomeStandardLink>
+          </StyledLink>
         </Box>
       </Container>
       <StyledCarousel options={users} display={[null, null, 'none']} width={1}>

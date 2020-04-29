@@ -1,21 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
-import { isEmpty, get } from 'lodash';
-
 import { graphql } from '@apollo/react-hoc';
+import { get, isEmpty } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import { P } from '../../Text';
-import Link from '../../Link';
-import StyledButton from '../../StyledButton';
-
 import ConversationsList from '../../conversations/ConversationsList';
 import { ConversationListFragment } from '../../conversations/graphql';
-import SectionTitle from '../SectionTitle';
+import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
+import StyledButton from '../../StyledButton';
+import { P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
 
 const conversationsQuery = gqlV2`
   query ConversationSection($collectiveSlug: String!) {
@@ -86,7 +84,7 @@ class SectionConversations extends React.PureComponent {
             <ConversationsList collectiveSlug={collective.slug} conversations={conversations.nodes} />
             {conversations.totalCount > 3 && (
               <Link route="conversations" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton width="100%" mt={4} p="10px">
+                <StyledButton width="100%" mt={4} buttonSize="small" fontSize="Paragraph">
                   <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all conversations" /> →
                 </StyledButton>
               </Link>

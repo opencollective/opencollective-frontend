@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
-import StyledRoundButton from '../../components/StyledRoundButton';
-import StyledButton from '../../components/StyledButton';
-
-import { Router } from '../../server/pages';
 import withViewport, { VIEWPORTS } from '../../lib/withViewport';
+import { Router } from '../../server/pages';
+
+import StyledButton from '../../components/StyledButton';
+import StyledRoundButton from '../../components/StyledRoundButton';
+
+import { Flex } from '../Grid';
 
 const params = {
   0: {
@@ -30,9 +31,9 @@ class OnboardingNavButtons extends React.Component {
     step: PropTypes.number,
     slug: PropTypes.string,
     mode: PropTypes.string,
-    submitCollectiveInfo: PropTypes.func,
     loading: PropTypes.bool,
     viewport: PropTypes.object,
+    handleSubmit: PropTypes.func,
   };
 
   getStepParams = (step, param) => {
@@ -40,14 +41,15 @@ class OnboardingNavButtons extends React.Component {
   };
 
   render() {
-    const { step, mode, slug, submitCollectiveInfo, loading, viewport } = this.props;
+    const { step, mode, slug, loading, viewport, handleSubmit } = this.props;
 
     return (
       <Flex>
         {step === 2 ? (
           <Fragment>
-            {viewport === VIEWPORTS.MOBILE ? (
+            {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
+                type="button"
                 mx={1}
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
@@ -63,6 +65,7 @@ class OnboardingNavButtons extends React.Component {
               </StyledButton>
             ) : (
               <StyledRoundButton
+                type="button"
                 mx={1}
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
@@ -78,14 +81,15 @@ class OnboardingNavButtons extends React.Component {
               </StyledRoundButton>
             )}
 
-            <StyledButton buttonStyle="primary" onClick={submitCollectiveInfo} loading={loading}>
+            <StyledButton buttonStyle="primary" onClick={() => handleSubmit} loading={loading}>
               <FormattedMessage id="Finish" defaultMessage="Finish" />
             </StyledButton>
           </Fragment>
         ) : (
           <Fragment>
-            {viewport === VIEWPORTS.MOBILE ? (
+            {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
+                type="button"
                 mx={1}
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
@@ -101,6 +105,7 @@ class OnboardingNavButtons extends React.Component {
               </StyledButton>
             ) : (
               <StyledRoundButton
+                type="button"
                 mx={1}
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
@@ -115,8 +120,9 @@ class OnboardingNavButtons extends React.Component {
                 ←
               </StyledRoundButton>
             )}
-            {viewport === VIEWPORTS.MOBILE ? (
+            {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
+                type="button"
                 mx={1}
                 buttonStyle="primary"
                 onClick={() => {
@@ -131,6 +137,7 @@ class OnboardingNavButtons extends React.Component {
               </StyledButton>
             ) : (
               <StyledRoundButton
+                type="button"
                 mx={1}
                 size={48}
                 onClick={() => {

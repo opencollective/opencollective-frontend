@@ -1,28 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
-import styled from 'styled-components';
-import { get, isEmpty } from 'lodash';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
-
 import { Lock } from '@styled-icons/fa-solid';
+import gql from 'graphql-tag';
+import { get, isEmpty } from 'lodash';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { formatDate } from '../../../lib/utils';
-import { P, Span } from '../../Text';
-import Container from '../../Container';
-import MessageBox from '../../MessageBox';
-import StyledTooltip from '../../StyledTooltip';
-import StyledCard from '../../StyledCard';
-import Link from '../../Link';
-import Avatar from '../../Avatar';
-import StyledButton from '../../StyledButton';
-import HTMLContent from '../../HTMLContent';
 
-import SectionTitle from '../SectionTitle';
+import Avatar from '../../Avatar';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import HTMLContent from '../../HTMLContent';
+import Link from '../../Link';
+import MessageBox from '../../MessageBox';
+import StyledButton from '../../StyledButton';
+import StyledCard from '../../StyledCard';
+import StyledTooltip from '../../StyledTooltip';
+import { P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import { UpdatesFieldsFragment } from '../graphql/fragments';
+import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch updates */
 const UpdatesQuery = gql`
@@ -229,14 +228,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton
-              data-cy="view-all-updates-btn"
-              buttonSize="large"
-              mt={4}
-              width={1}
-              p="10px"
-              fontSize="Paragraph"
-            >
+            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>
@@ -248,13 +240,11 @@ class SectionUpdates extends React.PureComponent {
 
 export default injectIntl(
   graphql(UpdatesQuery, {
-    options(props) {
-      return {
-        variables: {
-          slug: props.collective.slug,
-          onlyPublishedUpdates: !props.isAdmin,
-        },
-      };
-    },
+    options: props => ({
+      variables: {
+        slug: props.collective.slug,
+        onlyPublishedUpdates: !props.isAdmin,
+      },
+    }),
   })(SectionUpdates),
 );

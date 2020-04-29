@@ -1,14 +1,18 @@
 import React from 'react';
-import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
+import { parseToBoolean } from '../../../lib/utils';
+import { Router } from '../../../server/pages';
+
 import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import I18nFormatters from '../../I18nFormatters';
 import StyledLink from '../../StyledLink';
+import { H1, H3, P, Span } from '../../Text';
 import BackButton from '../BackButton';
 import PricingTable from '../PricingTable';
-import { H1, P, H3, Span } from '../../Text';
-import { Router } from '../../../server/pages';
-import I18nFormatters from '../../I18nFormatters';
+
+const isTransferwiseEnabled = parseToBoolean(process.env.TRANSFERWISE_ENABLED);
 
 const headings = ['', 'starter', 'small', 'medium', 'large', 'network'];
 
@@ -160,6 +164,24 @@ const rows = [
     { type: 'check' },
     { type: 'check' },
   ],
+  isTransferwiseEnabled && [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedMessage
+            id="pricingTable.row.transferwisePayouts"
+            defaultMessage="Enable one-click payout with TransferWise"
+          />
+        );
+      },
+    },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
+    { type: 'check' },
+    { type: 'check' },
+    { type: 'check' },
+    { type: 'check' },
+  ],
   [
     {
       type: 'component',
@@ -178,7 +200,7 @@ const rows = [
     { type: 'check' },
     { type: 'check' },
   ],
-];
+].filter(row => !!row);
 
 const footings = [
   '',
@@ -283,6 +305,15 @@ const HostOrganization = () => (
                 values={I18nFormatters}
               />
             </Box>
+            {isTransferwiseEnabled && (
+              <Box as="li" my={3}>
+                <FormattedMessage
+                  id="pricing.starterPlans.transferwisePayouts"
+                  defaultMessage="Pay expenses in local currency with one-click using the <strong>TransferWise</strong> integration."
+                  values={I18nFormatters}
+                />
+              </Box>
+            )}
           </Box>
           <H3
             my={2}

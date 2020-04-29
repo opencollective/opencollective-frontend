@@ -1,14 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Flex } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
 
+import { parseToBoolean } from '../../../lib/utils';
 import { Router } from '../../../server/pages';
+
 import Container from '../../Container';
-import BackButton from '../BackButton';
-import { H1, P, H3, Span } from '../../Text';
-import PricingTable from '../PricingTable';
+import { Box, Flex } from '../../Grid';
 import I18nFormatters from '../../I18nFormatters';
+import { H1, H3, P, Span } from '../../Text';
+import BackButton from '../BackButton';
+import PricingTable from '../PricingTable';
+
+const isTransferwiseEnabled = parseToBoolean(process.env.TRANSFERWISE_ENABLED);
 
 const headings = ['', 'starter', 'singleCollective'];
 
@@ -86,7 +90,22 @@ const rows = [
     { type: 'html', html: 'Up to <strong>$1,000</strong>' },
     { type: 'check' },
   ],
-];
+  isTransferwiseEnabled && [
+    {
+      type: 'component',
+      render() {
+        return (
+          <FormattedMessage
+            id="pricingTable.row.transferwisePayouts"
+            defaultMessage="Enable one-click payout with TransferWise"
+          />
+        );
+      },
+    },
+    { type: 'html', html: 'Up to <strong>$1,000</strong>' },
+    { type: 'check' },
+  ],
+].filter(row => !!row);
 
 const footings = [
   '',
@@ -179,6 +198,15 @@ const SingleCollectiveWithBankAccount = () => (
                 values={I18nFormatters}
               />
             </Box>
+            {isTransferwiseEnabled && (
+              <Box as="li" my={3}>
+                <FormattedMessage
+                  id="pricing.starterPlans.transferwisePayouts"
+                  defaultMessage="Pay expenses in local currency with one-click using the <strong>TransferWise</strong> integration."
+                  values={I18nFormatters}
+                />
+              </Box>
+            )}
           </Box>
         </Container>
       </Flex>

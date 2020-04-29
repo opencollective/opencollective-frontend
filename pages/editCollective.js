@@ -1,21 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
+import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
+import { GraphQLContext } from '../lib/graphql/context';
+import { addEditCollectiveMutation } from '../lib/graphql/mutations';
+import { getCollectiveToEditQuery } from '../lib/graphql/queries';
+
+import EditCollective from '../components/edit-collective';
+import ErrorPage from '../components/ErrorPage';
+import { Flex } from '../components/Grid';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
-import EditCollective from '../components/edit-collective/EditCollective';
-import ErrorPage from '../components/ErrorPage';
-import MessageBox from '../components/MessageBox';
-
-import { compose } from '../lib/utils';
-import { addCollectiveToEditData } from '../lib/graphql/queries';
-import { addEditCollectiveMutation } from '../lib/graphql/mutations';
-import { GraphQLContext } from '../lib/graphql/context';
-
-import Loading from '../components/Loading';
 
 class EditCollectivePage extends React.Component {
   static getInitialProps({ query, res }) {
@@ -23,13 +22,16 @@ class EditCollectivePage extends React.Component {
       res.set('Cache-Control', 'no-cache');
     }
 
-    const scripts = { googleMaps: true }; // Used in <InputTypeLocation>
-    return { slug: query && query.slug, query, ssr: false, scripts };
+    return {
+      slug: query.slug,
+      scripts: {
+        googleMaps: true, // Used in <InputTypeLocation>
+      },
+    };
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveToEditData
-    ssr: PropTypes.bool,
+    slug: PropTypes.string.isRequired, // for addCollectiveToEditData
     data: PropTypes.object, // from withData
     LoggedInUser: PropTypes.object, // from withLoggedInUser
     loadingLoggedInUser: PropTypes.bool, // from withLoggedInUser
@@ -52,7 +54,7 @@ class EditCollectivePage extends React.Component {
     // during re-hydratation.
     // See https://github.com/opencollective/opencollective/issues/1872
     const currentCollective = get(this.props, 'data.Collective');
-    if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
+    if (currentCollective && get(oldProps, 'data.Collective.id') !== currentCollective.id) {
       this.setState({ Collective: currentCollective });
     }
   }
@@ -90,24 +92,19 @@ class EditCollectivePage extends React.Component {
     return (
       <div>
         <GraphQLContext.Provider value={data}>
-          <EditCollective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            editCollective={editCollective}
-            loggedInEditDataLoaded
-          />
+          <EditCollective collective={collective} LoggedInUser={LoggedInUser} editCollective={editCollective} />
         </GraphQLContext.Provider>
       </div>
     );
   }
 }
 
-const addGraphQL = compose(
-  component =>
-    addCollectiveToEditData(component, {
-      skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
-    }),
-  addEditCollectiveMutation,
-);
+const addCollectiveToEditData = graphql(getCollectiveToEditQuery, {
+  skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
+  // The fetchPolicy is important for an edge case.
+  // Same component, different collective (moving from edit to another edit through the menu)
+  // Reloading data make sure we get the loading state and we re-initialize Form and sub-components
+  options: { fetchPolicy: 'network-only' },
+});
 
-export default withUser(addGraphQL(EditCollectivePage));
+export default withUser(addEditCollectiveMutation(addCollectiveToEditData(EditCollectivePage)));

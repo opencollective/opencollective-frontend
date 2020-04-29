@@ -46,3 +46,28 @@
 <StyledTag type="warning" closeButtonProps={{ onClick: console.log }}>Hello World</StyledTag>{' '}
 <StyledTag type="error" closeButtonProps={{ onClick: console.log }}>Hello World</StyledTag>
 ```
+
+### Rounded variant
+
+```jsx
+import styled from 'styled-components';
+import { PriceTags } from '@styled-icons/icomoon/PriceTags';
+
+const TagIcon = styled(PriceTags)`
+  margin-right: 4px;
+`;
+
+<>
+  <StyledTag variant="rounded-left" type="dark">
+    Receipt
+  </StyledTag>{' '}
+  <StyledTag variant="rounded-right">open source</StyledTag> <StyledTag variant="rounded-right">design</StyledTag>{' '}
+  <StyledTag variant="rounded-right">system</StyledTag>{' '}
+  <StyledTag variant="rounded-right" closeButtonProps={{ onClick: console.log }}>
+    removable
+  </StyledTag>{' '}
+  <StyledTag variant="rounded-right" type="white" border="1px dashed #C4C7CC">
+    <TagIcon size="10px" /> Edit Tags
+  </StyledTag>
+</>;
+```

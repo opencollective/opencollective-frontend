@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { FormattedMessage } from 'react-intl';
 import gql from 'graphql-tag';
 import { get, pick } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
-import { compose, formatCurrency } from '../lib/utils';
+import { formatCurrency } from '../lib/currency-utils';
+import { compose } from '../lib/utils';
 
+import { Flex } from './Grid';
 import StyledButton from './StyledButton';
-import { Flex } from '@rebass/grid';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -112,13 +113,11 @@ const addPaymentMethodsQuery = gql`
 `;
 
 const addPaymentMethods = graphql(addPaymentMethodsQuery, {
-  options(props) {
-    return {
-      variables: {
-        slug: get(props, 'fromCollective.slug'),
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      slug: get(props, 'fromCollective.slug'),
+    },
+  }),
   skip: props => {
     return !props.LoggedInUser;
   },

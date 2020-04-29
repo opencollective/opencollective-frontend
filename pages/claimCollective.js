@@ -1,28 +1,27 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import fetch from 'node-fetch';
-import { get } from 'lodash';
-import { Flex } from '@rebass/grid';
 import { Github } from '@styled-icons/fa-brands/Github';
+import gql from 'graphql-tag';
+import { get } from 'lodash';
+import fetch from 'node-fetch';
 import { URLSearchParams } from 'universal-url';
 
-import { compose, getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { compose, getBaseApiUrl, getWebsiteUrl } from '../lib/utils';
+import { Link, Router } from '../server/pages';
 
-import { Router, Link } from '../server/pages';
-
-import Header from '../components/Header';
 import Body from '../components/Body';
-import Footer from '../components/Footer';
-import { H2, H5, P, Span } from '../components/Text';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import Footer from '../components/Footer';
+import { Flex } from '../components/Grid';
+import Header from '../components/Header';
 import Loading from '../components/Loading';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import StyledLink from '../components/StyledLink';
 import StyledButton from '../components/StyledButton';
+import StyledLink from '../components/StyledLink';
+import { H2, H5, P, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';

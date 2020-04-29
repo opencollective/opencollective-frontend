@@ -10,24 +10,10 @@
 <StyledDropzone onSuccess={console.log}>Hello World</StyledDropzone>
 ```
 
-### Override default message
-
-```jsx
-<StyledDropzone onSuccess={console.log} showDefaultMessage={false}>
-  Hello World
-</StyledDropzone>
-```
-
 ## Custom size
 
 ```jsx
 <StyledDropzone onSuccess={console.log} size={150} />
-```
-
-```jsx
-<StyledDropzone onSuccess={console.log} size={60} showDefaultMessage={false}>
-  DnD
-</StyledDropzone>
 ```
 
 ## Loading state

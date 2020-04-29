@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Flex } from '@rebass/grid';
 
-import { withUser } from './UserProvider';
-import Page from './Page';
+import Container from './Container';
+import { Flex } from './Grid';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
+import Page from './Page';
 import SignInOrJoinFree from './SignInOrJoinFree';
-import Container from './Container';
+import { withUser } from './UserProvider';
 
 /**
  * A wrapper around `Page` that will display a spinner while user is loading.

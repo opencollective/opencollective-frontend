@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
 
+import { Box } from '../../Grid';
 import LocationComponent from '../../Location';
-import SectionTitle from '../SectionTitle';
 import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
 
 const Location = ({ collective: event }) => (
   <Box pt={[4, 5]}>

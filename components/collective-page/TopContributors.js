@@ -1,17 +1,18 @@
 import React from 'react';
-import { FormattedMessage, FormattedDate } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
+import { size, truncate } from 'lodash';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { truncate, size } from 'lodash';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import withViewport from '../../lib/withViewport';
-import { H4, P, Span } from '../Text';
+
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
-import LinkContributor from '../LinkContributor';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
+import LinkContributor from '../LinkContributor';
+import { H4, P, Span } from '../Text';
 
 /** The container for Top Contributors view */
 const TopContributorsContainer = styled.div`

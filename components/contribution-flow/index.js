@@ -1,50 +1,51 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { debounce, findIndex, get, pick, isNil } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
-import styled from 'styled-components';
-import { isURL } from 'validator';
-import { v4 as uuid } from 'uuid';
 import * as LibTaxes from '@opencollective/taxes';
+import gql from 'graphql-tag';
+import { debounce, findIndex, get, isNil, pick } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 import { URLSearchParams } from 'universal-url';
+import { v4 as uuid } from 'uuid';
+import { isURL } from 'validator';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { AmountTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
-import { Router } from '../../server/pages';
-import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { formatCurrency } from '../../lib/currency-utils';
 import { getEnvVar } from '../../lib/env-utils';
-import { compose, formatCurrency, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
+import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { getPaypal } from '../../lib/paypal';
 import { getRecaptcha, getRecaptchaSiteKey, unloadRecaptcha } from '../../lib/recaptcha';
-import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
+import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { compose, parseToBoolean, reportValidityHTML5 } from '../../lib/utils';
+import { Router } from '../../server/pages';
 
-import { H5 } from '../Text';
+import Container from '../Container';
+import EventDetails from '../EventDetails';
 import ContributeAsFAQ from '../faqs/ContributeAsFAQ';
-import StyledInputField from '../StyledInputField';
-import { withStripeLoader } from '../StripeProvider';
-import { withUser } from '../UserProvider';
-import Loading from '../Loading';
-import StyledButton from '../StyledButton';
-import PayWithPaypalButton from '../PayWithPaypalButton';
 import ContributeDetailsFAQ from '../faqs/ContributeDetailsFAQ';
 import ContributePaymentFAQ from '../faqs/ContributePaymentFAQ';
-import Container from '../Container';
-import { fadeIn } from '../StyledKeyframes';
+import { Box, Flex } from '../Grid';
+import Loading from '../Loading';
 import MessageBox from '../MessageBox';
+import PayWithPaypalButton from '../PayWithPaypalButton';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import Steps from '../Steps';
-import EventDetails from '../EventDetails';
+import { withStripeLoader } from '../StripeProvider';
+import StyledButton from '../StyledButton';
+import StyledInputField from '../StyledInputField';
+import { fadeIn } from '../StyledKeyframes';
+import { H5 } from '../Text';
+import { withUser } from '../UserProvider';
 
-import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionDetails from './ContributionDetails';
-import StepProfile from './StepProfile';
-import StepDetails from './StepDetails';
+import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import StepBreakdown from './StepBreakdown';
+import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
+import StepProfile from './StepProfile';
 
 // Styles for the previous, next and submit buttons
 const PrevNextButton = styled(StyledButton)`

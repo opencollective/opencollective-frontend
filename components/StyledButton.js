@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { border, color, layout, typography, space, flexbox, background } from 'styled-system';
+import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
 
-import { textTransform } from '../lib/styled-system-custom-properties';
-import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
-import StyledSpinner from './StyledSpinner';
+import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
+
+import StyledSpinner from './StyledSpinner';
 
 /**
  * styled-component button using styled-system
@@ -45,6 +46,7 @@ const StyledButtonContent = styled.button`
   ${layout}
   ${typography}
   ${textTransform}
+  ${whiteSpace}
 
   /** Special prop to render borderless */
   ${props => {
@@ -76,7 +78,7 @@ const StyledButton = ({ loading, ...props }) =>
     <StyledButtonContent {...props} />
   ) : (
     <StyledButtonContent {...props} onClick={undefined}>
-      <StyledSpinner />
+      <StyledSpinner size="0.9em" />
     </StyledButtonContent>
   );
 

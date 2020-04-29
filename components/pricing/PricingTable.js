@@ -1,16 +1,16 @@
 import React from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
-import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
-import { display } from 'styled-system';
-import { Box } from '@rebass/grid';
 import { Check } from '@styled-icons/fa-solid/Check';
+import themeGet from '@styled-system/theme-get';
 import { isObject } from 'lodash';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
+import { display } from 'styled-system';
 
-import StyledLink from '../StyledLink';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
+import { Box } from '../Grid';
+import StyledLink from '../StyledLink';
 
 const PlanLink = styled(StyledLink).attrs({
   buttonStyle: 'primary',

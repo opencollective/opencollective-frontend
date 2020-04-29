@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { Flex } from '@rebass/grid';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import Page from '../components/Page';
+import ContributionFlow from '../components/contribution-flow';
 import ErrorPage from '../components/ErrorPage';
+import { Flex } from '../components/Grid';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
-import ContributionFlow from '../components/contribution-flow';
+import Page from '../components/Page';
 
 const messages = defineMessages({
   title: {

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import Error from '../Error';
 import MessageBox from '../MessageBox';
+
 import Order from './Order';
 
 class OrderWithData extends React.Component {

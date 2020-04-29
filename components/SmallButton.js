@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from './Button';
+
 import colors from '../lib/constants/colors';
+
+import Button from './Button';
 
 class SmallButton extends React.Component {
   render() {

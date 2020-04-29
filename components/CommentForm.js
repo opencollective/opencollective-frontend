@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, pick } from 'lodash';
-import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
-import SmallButton from './SmallButton';
+import { defineMessages, FormattedDate, FormattedMessage } from 'react-intl';
+
 import Avatar from './Avatar';
+import { Box } from './Grid';
 import Link from './Link';
 import MessageBox from './MessageBox';
 import RichTextEditor from './RichTextEditor';
-import { Box } from '@rebass/grid';
+import SmallButton from './SmallButton';
 
 /**
  * Component to render for for **new** comments. Comment Edit form is created

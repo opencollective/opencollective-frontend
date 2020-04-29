@@ -1,29 +1,33 @@
 import React, { Fragment } from 'react';
-import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
-import memoizeOne from 'memoize-one';
-import { orderBy } from 'lodash';
-import styled from 'styled-components';
 import css from '@styled-system/css';
+import { orderBy } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
-import { H3, P } from '../../Text';
-import StyledButton from '../../StyledButton';
+import { parseToBoolean } from '../../../lib/utils';
+
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import ContributeCollective from '../../contribute-cards/ContributeCollective';
+import ContributeCustom from '../../contribute-cards/ContributeCustom';
+import ContributeEvent from '../../contribute-cards/ContributeEvent';
+import ContributeTier from '../../contribute-cards/ContributeTier';
+import CreateNew from '../../contribute-cards/CreateNew';
+import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
-import ContributeCustom from '../../contribute-cards/ContributeCustom';
-import ContributeTier from '../../contribute-cards/ContributeTier';
-import ContributeEvent from '../../contribute-cards/ContributeEvent';
-import ContributeCollective from '../../contribute-cards/ContributeCollective';
-import CreateNew from '../../contribute-cards/CreateNew';
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
-
-import ContributeCardsContainer from '../ContributeCardsContainer';
+import StyledButton from '../../StyledButton';
+import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-import TopContributors from '../TopContributors';
+import ContributeCardsContainer from '../ContributeCardsContainer';
 import SectionTitle from '../SectionTitle';
+import TopContributors from '../TopContributors';
+
+// link to new fiscal host application flow if flag is on
+const newHostFlow = parseToBoolean(process.env.NEW_HOST_APPLICATION_FLOW);
 
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];
 
@@ -187,11 +191,17 @@ class SectionContribute extends React.PureComponent {
             </Flex>
             <Box my={5}>
               <Link
-                route="editCollective"
-                params={{
-                  slug: collective.slug,
-                  section: 'host',
-                }}
+                route={newHostFlow ? 'accept-financial-contributions' : 'editCollective'}
+                params={
+                  newHostFlow
+                    ? {
+                        slug: collective.slug,
+                      }
+                    : {
+                        slug: collective.slug,
+                        section: 'host',
+                      }
+                }
               >
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
@@ -311,7 +321,7 @@ class SectionContribute extends React.PureComponent {
             {!isEvent && (
               <ContainerSectionContent>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-                  <StyledButton buttonSize="large" mt={3} width={1} p="10px">
+                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="Paragraph">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
                   </StyledButton>
                 </Link>

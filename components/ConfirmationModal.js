@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import StyledButton from './StyledButton';
+import { defineMessages, useIntl } from 'react-intl';
+
 import Container from './Container';
+import StyledButton from './StyledButton';
+import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P } from './Text';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from './StyledModal';
-import { useIntl, defineMessages } from 'react-intl';
 
 const messages = defineMessages({
   cancel: {
@@ -51,7 +52,7 @@ const ConfirmationModal = ({
   return (
     <Modal width="570px" show={show} onClose={onClose}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
-      <ModalBody>{children || <P>{body}</P>}</ModalBody>
+      <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
       <ModalFooter>
         <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
           <StyledButton

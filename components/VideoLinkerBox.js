@@ -1,18 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { FormattedMessage } from 'react-intl';
-import themeGet from '@styled-system/theme-get';
-import { Box } from '@rebass/grid';
-
 import { VideoPlus } from '@styled-icons/boxicons-regular/VideoPlus';
 import { ArrowUpCircle } from '@styled-icons/feather/ArrowUpCircle';
+import themeGet from '@styled-system/theme-get';
+import { FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
 
+import Container from './Container';
+import { Box } from './Grid';
+import StyledInput from './StyledInput';
 import { fadeInUp } from './StyledKeyframes';
 import { P } from './Text';
-import StyledInput from './StyledInput';
 import VideoPlayer, { supportedVideoProviders } from './VideoPlayer';
-import Container from './Container';
 
 const VideoPlaceholder = styled(({ children, ...props }) => (
   <div {...props}>

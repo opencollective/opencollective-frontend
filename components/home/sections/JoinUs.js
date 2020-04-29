@@ -1,14 +1,14 @@
 import React from 'react';
-import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
-import { Flex, Box } from '@rebass/grid';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { H1, P } from '../../Text';
 import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
+import { H1, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
-import Link from '../../Link';
 
 const SectionWrapper = styled(Container)`
   background: url('/static/images/home/joinus-bg-sm.png');

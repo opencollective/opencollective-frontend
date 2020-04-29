@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { Link } from '../server/pages';
+
 import StyledLink from './StyledLink';
-import { withUser } from './UserProvider';
 import StyledSpinner from './StyledSpinner';
+import { withUser } from './UserProvider';
 
 /**
  * A user login button with proper redirect function.

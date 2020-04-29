@@ -1,29 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
-import { useIntl, FormattedMessage, defineMessages } from 'react-intl';
 import { Span } from '../Text';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 
 const msg = defineMessages({
   notesPlaceholder: {
     id: 'ExpenseSummary.addNotesPlaceholder',
-    defaultMessage: 'Add attachments, notes, or any other important thing. ',
+    defaultMessage: 'Add notes',
   },
 });
 
 const PrivateNoteLabel = () => {
   return (
-    <Span fontSize="Caption" color="black.700">
-      <FormattedMessage id="ExpenseSummary.addNotesLabel" defaultMessage="Add notes or attachments" />
+    <Span color="black.700">
+      <FormattedMessage id="ExpenseSummary.addNotesLabel" defaultMessage="Add notes" />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
     </Span>
   );
 };
 
-const ExpenseNotesForm = ({ onChange, disabled }) => {
+const ExpenseNotesForm = ({ onChange, disabled, defaultValue }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledInputField
@@ -31,15 +32,16 @@ const ExpenseNotesForm = ({ onChange, disabled }) => {
       required={false}
       maxWidth={782}
       label={<PrivateNoteLabel />}
-      labelProps={{ fontWeight: 'bold', fontSize: 'SmallCaption', mb: 3 }}
+      labelProps={{ fontWeight: '500', fontSize: 'LeadCaption' }}
     >
       {inputProps => (
         <StyledTextarea
           {...inputProps}
           placeholder={formatMessage(msg.notesPlaceholder)}
-          minHeight={80}
+          minHeight={72}
           onChange={onChange}
           disabled={disabled}
+          defaultValue={defaultValue}
         />
       )}
     </StyledInputField>
@@ -47,6 +49,7 @@ const ExpenseNotesForm = ({ onChange, disabled }) => {
 };
 
 ExpenseNotesForm.propTypes = {
+  defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
 };

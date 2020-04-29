@@ -5,6 +5,7 @@ import { graphql } from '@apollo/react-hoc';
 import { getTransactionsQuery } from '../../lib/graphql/queries';
 
 import Error from '../Error';
+
 import Transactions from './Transactions';
 
 class TransactionsWithData extends React.Component {
@@ -57,15 +58,13 @@ class TransactionsWithData extends React.Component {
 
 const TRANSACTIONS_PER_PAGE = 10;
 export const addTransactionsData = graphql(getTransactionsQuery, {
-  options(props) {
-    return {
-      variables: {
-        CollectiveId: props.collective.id,
-        offset: 0,
-        limit: props.limit || TRANSACTIONS_PER_PAGE * 2,
-      },
-    };
-  },
+  options: props => ({
+    variables: {
+      CollectiveId: props.collective.id,
+      offset: 0,
+      limit: props.limit || TRANSACTIONS_PER_PAGE * 2,
+    },
+  }),
   props: ({ data }) => ({
     data,
     fetchMore: () => {

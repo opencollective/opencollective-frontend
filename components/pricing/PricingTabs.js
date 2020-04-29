@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
+import styled from 'styled-components';
 
-import I18nFormatters from '../I18nFormatters';
-import StyledInputField from '../StyledInputField';
-import StyledCard from '../StyledCard';
-import StyledRadioList from '../StyledRadioList';
 import Container from '../Container';
-import { Span, P, H1 } from '../Text';
+import { Box, Flex } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
+import StyledCard from '../StyledCard';
+import StyledInputField from '../StyledInputField';
+import StyledRadioList from '../StyledRadioList';
+import { H1, P, Span } from '../Text';
 
 const Wrapper = styled(Container)`
   @media screen and (min-width: 64em) {

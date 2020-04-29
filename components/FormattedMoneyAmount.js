@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import Currency from './Currency';
+import { Span } from './Text';
 
 /** Default styles for the amount (not including currency) */
 export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', color: 'black.900' };
@@ -21,15 +23,18 @@ const FormattedMoneyAmount = ({
   amountStyles,
   showCurrencyCode,
 }) => {
-  const formattedAmount = (
-    <Currency
-      value={amount}
-      currency={currency}
-      precision={precision}
-      abbreviate={abbreviateAmount}
-      {...amountStyles}
-    />
-  );
+  const formattedAmount =
+    isNaN(amount) || isNil(amount) ? (
+      <Span {...amountStyles}>--.--</Span>
+    ) : (
+      <Currency
+        value={amount}
+        currency={currency}
+        precision={precision}
+        abbreviate={abbreviateAmount}
+        {...amountStyles}
+      />
+    );
 
   const currencyCode = showCurrencyCode ? currency : '';
   if (!interval) {

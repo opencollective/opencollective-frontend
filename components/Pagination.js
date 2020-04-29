@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { Flex } from '@rebass/grid';
-import { TextInput } from './StyledInput';
-import StyledButton from './StyledButton';
+import { Flex } from './Grid';
 import Link from './Link';
+import StyledButton from './StyledButton';
+import { TextInput } from './StyledInput';
 
 const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
   const { pathname, query, route } = router;

@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { useQuery } from '@apollo/react-hooks';
-import { Box, Flex } from '@rebass/grid';
-import gql from 'graphql-tag';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
+import gql from 'graphql-tag';
+import { FormattedMessage } from 'react-intl';
 
 import { Link } from '../server/pages';
 
-import Page from './Page';
 import Container from './Container';
-import { H2, H3, H5, P } from './Text';
-import PledgeCard from './PledgeCard';
-import StyledLink from './StyledLink';
 import Currency from './Currency';
-import { withUser } from './UserProvider';
+import { Box, Flex } from './Grid';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
+import Page from './Page';
+import PledgeCard from './PledgeCard';
+import StyledLink from './StyledLink';
+import { H2, H3, H5, P } from './Text';
+import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
@@ -109,13 +109,22 @@ const PledgedCollectivePage = ({ collective }) => {
 
       <Container display="flex" justifyContent="center" position="relative" top={-30}>
         <Link route="createCollectivePledge" params={{ slug: collective.slug }} passHref>
-          <StyledLink buttonStyle="primary" buttonSize="large">
+          <StyledLink buttonStyle="primary" buttonSize="large" data-cy="makeAPledgeButton">
             <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
           </StyledLink>
         </Link>
       </Container>
 
-      <Container display="flex" alignItems="center" flexDirection="column" maxWidth={800} mx="auto" mt={4} px={3}>
+      <Container
+        display="flex"
+        alignItems="center"
+        flexDirection="column"
+        maxWidth={800}
+        mx="auto"
+        mt={4}
+        px={3}
+        data-cy="pledgeStats"
+      >
         <H3 fontWeight="normal">
           <FormattedMessage
             id="pledge.stats"
@@ -126,7 +135,13 @@ const PledgedCollectivePage = ({ collective }) => {
               totalCount: pledgeStats.ORGANIZATION + pledgeStats.COLLECTIVE + pledgeStats.USER,
               currency: collective.currency,
               amount: (
-                <Currency fontWeight="bold" value={pledgeStats.total} currency={collective.currency} precision={0} />
+                <Currency
+                  data-cy="currencyAmount"
+                  fontWeight="bold"
+                  value={pledgeStats.total}
+                  currency={collective.currency}
+                  precision={0}
+                />
               ),
             }}
             defaultMessage="{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}"
@@ -145,9 +160,17 @@ const PledgedCollectivePage = ({ collective }) => {
         </P>
       </Container>
 
-      <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3}>
+      <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3} data-cy="contributersGrouped">
         {pledges.map((pledge, index) => (
-          <Container width={[0.5, null, 0.25]} mb={2} position="relative" px={1} minWidth={160} key={pledge.id}>
+          <Container
+            width={[0.5, null, 0.25]}
+            mb={2}
+            position="relative"
+            px={1}
+            minWidth={160}
+            key={pledge.id}
+            data-cy="contributers"
+          >
             {index === 0 && (
               <Container position="absolute" right={15} top={-10}>
                 <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />

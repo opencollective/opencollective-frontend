@@ -1,9 +1,10 @@
-import styled from 'styled-components';
-import { Box } from '@rebass/grid';
-import { bottom, height, left, position, right, top } from 'styled-system';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { bottom, height, left, position, right, top } from 'styled-system';
 
 import { pointerEvents } from '../lib/styled-system-custom-properties';
+
+import { Box } from './Grid';
 
 export const breakpoints = {
   xs: '@media screen and (max-width: 40em)',

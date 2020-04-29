@@ -2,23 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import ExpenseWithData from '../components/expenses/ExpenseWithData';
-
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError } from '../lib/errors';
-import Header from '../components/Header';
-import Body from '../components/Body';
-import Footer from '../components/Footer';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import { Box, Flex } from '@rebass/grid';
-import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
-import ErrorPage from '../components/ErrorPage';
-import Link from '../components/Link';
-
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
-import { withUser } from '../components/UserProvider';
+import Body from '../components/Body';
+import CollectiveNavbar from '../components/CollectiveNavbar';
+import ErrorPage from '../components/ErrorPage';
+import ExpenseNeedsTaxFormMessage from '../components/expenses/ExpenseNeedsTaxFormMessage';
+import ExpenseWithData from '../components/expenses/ExpenseWithData';
+import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
+import Header from '../components/Header';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
+import { withUser } from '../components/UserProvider';
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, ExpenseId, createSuccess } }) {
@@ -96,7 +95,11 @@ class ExpensePage extends React.Component {
                 </StyledButton>
               </Link>
               {!collective.isArchived && (
-                <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
+                <Link
+                  // Redirect to the new Expense flow if the host is using TransferWise
+                  route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
+                  params={{ collectiveSlug: collective.slug }}
+                >
                   <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
                     <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                   </StyledButton>
@@ -117,6 +120,7 @@ class ExpensePage extends React.Component {
               <ExpenseWithData
                 id={ExpenseId}
                 collective={collective}
+                host={collective.host}
                 view="details"
                 LoggedInUser={LoggedInUser}
                 allowPayAction={!this.state.isPayActionLocked}

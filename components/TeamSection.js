@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import SectionTitle from './SectionTitle';
-import { Flex } from '@rebass/grid';
+import { Flex } from './Grid';
 import MemberCard from './MemberCard';
+import SectionTitle from './SectionTitle';
 
 class TeamSection extends React.Component {
   static propTypes = {

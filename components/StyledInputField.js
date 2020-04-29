@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
 import { FormattedMessage } from 'react-intl';
+
+import { Box, Flex } from './Grid';
 import { P, Span } from './Text';
 
 /**
@@ -35,7 +36,7 @@ const StyledInputField = ({
             display="block"
             fontSize={labelFontSize}
             fontWeight="normal"
-            mb={isCheckbox ? 0 : 1}
+            mb={isCheckbox ? 0 : 2}
             mr={2}
             {...labelProps}
           >
@@ -64,7 +65,7 @@ const StyledInputField = ({
             })
           : children}
       </Flex>
-      {error && (
+      {error && typeof error === 'string' && (
         <Span display="block" color="red.500" pt={2} fontSize="Tiny">
           {error}
         </Span>
@@ -78,8 +79,8 @@ StyledInputField.propTypes = {
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
   /** Show disabled state for field */
   disabled: PropTypes.bool,
-  /** text to display below the input */
-  error: PropTypes.string,
+  /** text to display below the input or error status */
+  error: PropTypes.any,
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** By default name is equal to htmlFor, but you can use this prop to override it */

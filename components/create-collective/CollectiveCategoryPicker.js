@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flex, Box } from '@rebass/grid';
-import styled from 'styled-components';
-import { defineMessages, injectIntl } from 'react-intl';
 import themeGet from '@styled-system/theme-get';
+import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import { H1 } from '../Text';
-import StyledButton from '../StyledButton';
 import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import ExternalLink from '../ExternalLink';
+import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
+import { H1 } from '../Text';
 
-const ExamplesLink = styled(ExternalLink)`
+const ExamplesLink = styled(StyledLink)`
   color: ${themeGet('colors.blue.500')};
   font-size: ${themeGet('fontSizes.Caption')}px;
 
@@ -60,11 +60,6 @@ class CollectiveCategoryPicker extends React.Component {
       },
       climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
       covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 initiatives' },
-      waivefees: {
-        id: 'createCollective.waivefees',
-        defaultMessage:
-          'We are waiving our platform fees on COVID-19 related Collectives until the end of June. Take care of each other.',
-      },
       header: { id: 'createCollective.header.create', defaultMessage: 'Create a Collective' },
       examples: { id: 'createCollective.examples', defaultMessage: 'See examples' },
     });

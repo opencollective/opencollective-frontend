@@ -1,30 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { themeGet } from '@styled-system/theme-get';
-
-import Container from './Container';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
+import { themeGet } from '@styled-system/theme-get';
+import styled from 'styled-components';
 import { size, space } from 'styled-system';
+
+import Container from './Container';
 
 export const Details = styled(Container).attrs({
   as: 'details',
 })`
   summary {
-    display: flex;
-    cursor: pointer;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: ${themeGet('colors.black.800')};
-    /* Remove arrow on Firefox */
-    list-style: none;
+    > div {
+      display: flex;
+      cursor: pointer;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: ${themeGet('colors.black.800')};
+      /* Remove arrow on Firefox */
+      list-style: none;
 
-    &:hover {
-      color: ${themeGet('colors.black.700')};
+      &:hover {
+        color: ${themeGet('colors.black.700')};
+      }
     }
 
     [data-item='chevron-up'] {
@@ -81,16 +83,18 @@ const CollapseBtn = styled.div`
 /**
  * A stylized version of the `details` HTML element to hide & show content when clicked.
  */
-const Collapse = ({ children, title, buttonSize, ...props }) => {
+const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
   return (
-    <Details {...props}>
+    <Details open={defaultIsOpen} {...props}>
       {title && (
         <summary>
-          <div>{title}</div>
-          <CollapseBtn size={buttonSize} ml={3}>
-            <ChevronUp size="80%" data-item="chevron-up" />
-            <ChevronDown size="80%" data-item="chevron-down" />
-          </CollapseBtn>
+          <div>
+            <div>{title}</div>
+            <CollapseBtn size={buttonSize} ml={3}>
+              <ChevronUp size="80%" data-item="chevron-up" />
+              <ChevronDown size="80%" data-item="chevron-down" />
+            </CollapseBtn>
+          </div>
         </summary>
       )}
       {children}
@@ -101,6 +105,7 @@ const Collapse = ({ children, title, buttonSize, ...props }) => {
 Collapse.propTypes = {
   title: PropTypes.node,
   children: PropTypes.node,
+  defaultIsOpen: PropTypes.bool,
   buttonSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 

@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
-import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
+
 import Container from './Container';
-import { P, Span } from './Text';
+import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
+import StyledCheckbox from './StyledCheckbox';
+import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledInputGroup from './StyledInputGroup';
-import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
-import StyledCheckbox from './StyledCheckbox';
+import { P, Span } from './Text';
 
 const messages = defineMessages({
   newsletter: {

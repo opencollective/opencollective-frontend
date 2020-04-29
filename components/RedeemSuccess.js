@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import { Flex, Box } from '@rebass/grid';
+import { Check } from '@styled-icons/fa-solid/Check';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Check } from '@styled-icons/fa-solid/Check';
-import { P, H5 } from './Text';
+
+import { Box, Flex } from './Grid';
+import { H5, P } from './Text';
 
 const Title = styled(H5)``;
 

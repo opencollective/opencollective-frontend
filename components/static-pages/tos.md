@@ -102,7 +102,7 @@ Expense Submitters must only submit requests for payment via the Platform for ex
 
 ## 11. Conduct and Content Requirements
 
-You must comply with the Open Collective [Community Guidelines](https://docs.opencollective.com/help/the-open-collective-way/community-guidelines). You will not violate any applicable law, contract, intellectual property or other third-party right or commit a tort, and you are solely responsible for your conduct while accessing or using our Platform. You will not:
+You must comply with the Open Collective [Community Guidelines](https://docs.opencollective.com/help/about/community-guidelines). You will not violate any applicable law, contract, intellectual property or other third-party right or commit a tort, and you are solely responsible for your conduct while accessing or using our Platform. You will not:
 
 - Engage in any harassing, threatening, intimidating, predatory or stalking conduct;
 

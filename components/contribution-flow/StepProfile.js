@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { capitalize, omit, uniqBy, get, remove } from 'lodash';
-import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-import { Box, Flex } from '@rebass/grid';
-
 import { Search } from '@styled-icons/octicons/Search';
+import themeGet from '@styled-system/theme-get';
+import { capitalize, get, omit, remove, uniqBy } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { escapeInput, reportValidityHTML5 } from '../../lib/utils';
+
 import Avatar from '../Avatar';
 import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import Logo from '../Logo';
-import { P } from '../Text';
 import StyledCard from '../StyledCard';
-import StyledRadioList from '../StyledRadioList';
+import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
-import StyledInput from '../StyledInput';
+import StyledRadioList from '../StyledRadioList';
+import { P } from '../Text';
 
 const SearchIcon = styled(Search)`
   color: ${themeGet('colors.black.300')};

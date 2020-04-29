@@ -1,15 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
-import dynamic from 'next/dynamic';
 import { get } from 'lodash';
+import dynamic from 'next/dynamic';
+import { FormattedMessage } from 'react-intl';
 
+import hasFeature, { FEATURES } from '../lib/allowed-features';
+
+import _ApplyToHostBtn from './ApplyToHostBtn';
 import Container from './Container';
+import { Box } from './Grid';
+import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledTooltip from './StyledTooltip';
-import Link from './Link';
-import _ApplyToHostBtn from './ApplyToHostBtn';
 
 // Dynamic imports
 const AddFundsModal = dynamic(() => import('./AddFundsModal'));
@@ -37,28 +39,39 @@ const CollectiveCallsToAction = ({
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
         <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
+          <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="Contact" defaultMessage="Contact" />
           </StyledButton>
         </Link>
       )}
       {hasSubmitExpense && (
-        <Link route="createExpense" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} buttonStyle="secondary" data-cy="submit-expense-btn">
+        <Link
+          // Redirect to the new Expense flow if the host is using TransferWise
+          route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
+          params={{ collectiveSlug: collective.slug }}
+        >
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            buttonStyle="secondary"
+            data-cy="submit-expense-btn"
+          >
             <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
           </StyledButton>
         </Link>
       )}
       {hasManageSubscriptions && (
         <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
+          <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
           </StyledButton>
         </Link>
       )}
       {hasDashboard && collective.plan.hostDashboard && (
         <Link route="host.dashboard" params={{ hostCollectiveSlug: collective.slug }}>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth}>
+          <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
           </StyledButton>
         </Link>
@@ -90,7 +103,13 @@ const CollectiveCallsToAction = ({
       )}
       {addFunds && (
         <Fragment>
-          <StyledButton mx={2} my={1} minWidth={buttonsMinWidth} onClick={() => showAddFundsModal(true)}>
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            onClick={() => showAddFundsModal(true)}
+          >
             <FormattedMessage id="menu.addFunds" defaultMessage="Add funds" />
           </StyledButton>
           <AddFundsModal collective={collective} show={hasAddFundsModal} setShow={showAddFundsModal} />
@@ -105,6 +124,7 @@ CollectiveCallsToAction.propTypes = {
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     plan: PropTypes.object,
+    host: PropTypes.object,
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import FAQ, { Entry, Title, Content } from './FAQ';
+
+import FAQ, { Content, Entry, Title } from './FAQ';
 
 /**
  * FAQ associated to the `CreateProfile` component. Explains differences between

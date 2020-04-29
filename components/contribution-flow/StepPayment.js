@@ -1,31 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import themeGet from '@styled-system/theme-get';
-import { Box, Flex } from '@rebass/grid';
-import { FormattedMessage, FormattedDate } from 'react-intl';
-import { uniqBy, get } from 'lodash';
-
-import { MoneyCheck } from '@styled-icons/fa-solid/MoneyCheck';
 import { ExchangeAlt } from '@styled-icons/fa-solid/ExchangeAlt';
+import { MoneyCheck } from '@styled-icons/fa-solid/MoneyCheck';
+import themeGet from '@styled-system/theme-get';
+import { get, uniqBy } from 'lodash';
+import { FormattedDate, FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { withStripeLoader } from '../StripeProvider';
-import Container from '../Container';
-import Link from '../Link';
-import { P } from '../Text';
-import StyledCard from '../StyledCard';
-import MessageBox from '../MessageBox';
-import StyledRadioList from '../StyledRadioList';
-import { getPaymentMethodName, paymentMethodExpiration } from '../../lib/payment_method_label';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency } from '../../lib/currency-utils';
+import { getPaymentMethodName, paymentMethodExpiration } from '../../lib/payment_method_label';
 
+import Avatar from '../Avatar';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
 import CreditCard from '../icons/CreditCard';
+import CreditCardInactive from '../icons/CreditCardInactive';
 import GiftCard from '../icons/GiftCard';
 import PayPal from '../icons/PayPal';
-import CreditCardInactive from '../icons/CreditCardInactive';
-import Avatar from '../Avatar';
+import Link from '../Link';
+import MessageBox from '../MessageBox';
 import NewCreditCardForm from '../NewCreditCardForm';
+import { withStripeLoader } from '../StripeProvider';
+import StyledCard from '../StyledCard';
+import StyledRadioList from '../StyledRadioList';
+import { P } from '../Text';
 
 const PaymentEntryContainer = styled(Container)`
   display: flex;
@@ -183,14 +182,17 @@ class StepPayment extends React.Component {
   generatePaymentsOptions() {
     const { collective, defaultValue, withPaypal, manual } = this.props;
     // Add collective payment methods
-    const paymentMethodsOptions = (collective.paymentMethods || []).map(pm => ({
-      key: `pm-${pm.id}`,
-      title: getPaymentMethodName(pm),
-      subtitle: getPaymentMethodMetadata(pm),
-      icon: getPaymentMethodIcon(pm, collective),
-      paymentMethod: pm,
-      disabled: pm.balance < minBalance,
-    }));
+    const paymentMethodsOptions = (collective.paymentMethods || [])
+      // Adaptive paymentMethods are for internal use and should never be returned
+      .filter(pm => !(pm.service === 'paypal' && pm.type === 'adaptive'))
+      .map(pm => ({
+        key: `pm-${pm.id}`,
+        title: getPaymentMethodName(pm),
+        subtitle: getPaymentMethodMetadata(pm),
+        icon: getPaymentMethodIcon(pm, collective),
+        paymentMethod: pm,
+        disabled: pm.balance < minBalance,
+      }));
 
     // Add other PMs types (new credit card, bank transfer...etc) if collective is not a `COLLECTIVE`
     if (collective.type !== CollectiveType.COLLECTIVE) {

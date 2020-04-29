@@ -1,12 +1,12 @@
 import React from 'react';
-import { isEqual } from 'lodash';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/react-hoc';
+import { isEqual } from 'lodash';
 
-import { Router } from '../server/pages';
+import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 import withLoggedInUser from '../lib/withLoggedInUser';
-import { removeFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { Router } from '../server/pages';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -24,6 +24,11 @@ class UserProvider extends React.Component {
     client: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     children: PropTypes.node,
+    /**
+     * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
+     * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
+     */
+    skipRouteCheck: PropTypes.bool,
   };
 
   state = {
@@ -36,7 +41,7 @@ class UserProvider extends React.Component {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
-    if (Router.pathname !== '/signin') {
+    if (this.props.skipRouteCheck || Router.pathname !== '/signin') {
       await this.login();
     }
   }

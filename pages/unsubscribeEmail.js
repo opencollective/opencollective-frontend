@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { Box } from '@rebass/grid';
 import { Email } from '@styled-icons/material/Email';
+import { FormattedMessage } from 'react-intl';
+
 import { getBaseApiUrl } from '../lib/utils';
-import Page from '../components/Page';
-import MessageBox from '../components/MessageBox';
+
 import Container from '../components/Container';
+import { Box } from '../components/Grid';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 /**

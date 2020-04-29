@@ -1,9 +1,10 @@
 import React from 'react';
+
 import CustomStyledIcon from './CustomStyledIcon';
 
 const PayPal = props => {
   return (
-    <CustomStyledIcon width={21} height={24} viewBox="0 0 21 24" fill="none" {...props}>
+    <CustomStyledIcon width={21} height={24} viewBox="0 0 21 24" fill="none" {...props} color="blue">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
