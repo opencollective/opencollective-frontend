@@ -27,13 +27,12 @@ import styled from 'styled-components';
 
 const CollectiveListItem = styled(ListItem)`
   @media (hover: hover) {
-    :hover .SettingsCogIcon {
+    :hover svg {
       opacity: 1;
     }
   }
-
   @media (hover: none) {
-    .SettingsCogIcon {
+    svg {
       opacity: 1;
     }
   }
@@ -148,7 +147,7 @@ class TopBarProfileMenu extends React.Component {
         {isAdmin && (
           <Link route="editCollective" params={{ slug: membership.collective.slug }} passHref>
             <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
-              <Settings className="SettingsCogIcon" opacity="0" size="1.2em" />
+              <Settings opacity="0" size="1.2em" />
             </StyledLink>
           </Link>
         )}
@@ -195,7 +194,7 @@ class TopBarProfileMenu extends React.Component {
         <Flex flexWrap="wrap">
           <Box order={[2, 2, 1]} width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
             <Hide xs sm>
-              <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
+              <Avatar collective={LoggedInUser.collective} radius="3rem" mr={2} />
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
               </P>
@@ -203,14 +202,7 @@ class TopBarProfileMenu extends React.Component {
                 {LoggedInUser.email}
               </P>
             </Hide>
-            <P
-              color="#B4BBBF"
-              fontFamily="montserratlight, arial"
-              fontSize="1rem"
-              fontWeight="400"
-              letterSpacing="1px"
-              textTransform="uppercase"
-            >
+            <P color="#B4BBBF" fontSize="1rem" fontWeight="400" letterSpacing="1px" textTransform="uppercase">
               <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
             </P>
             <Box as="ul" p={0} my={2}>
