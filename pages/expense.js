@@ -11,7 +11,6 @@ import { Router } from '../server/pages';
 
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
-import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import Thread from '../components/conversations/Thread';
@@ -264,158 +263,156 @@ class ExpensePage extends React.Component {
             />
           </TemporaryNotification>
         )}
-        <CollectiveThemeProvider collective={collective}>
-          <CollectiveNavbar collective={collective} isLoading={!collective} selected={Sections.BUDGET} />
-          <Flex flexWrap="wrap" my={[4, 5]} data-cy="expense-page-content">
-            <Container
-              display={['none', null, null, 'flex']}
-              justifyContent="flex-end"
-              width={SIDE_MARGIN_WIDTH}
-              minWidth={90}
-              pt={80}
-            >
-              <Flex flexDirection="column" alignItems="center" width={90}>
-                {status === PAGE_STATUS.VIEW && (
-                  <ExpenseAdminActions
-                    expense={expense}
-                    collective={collective}
-                    permissions={expense?.permissions}
-                    onError={error => this.setState({ error })}
-                    onEdit={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
-                  />
+        <CollectiveNavbar collective={collective} isLoading={!collective} selected={Sections.BUDGET} />
+        <Flex flexWrap="wrap" my={[4, 5]} data-cy="expense-page-content">
+          <Container
+            display={['none', null, null, 'flex']}
+            justifyContent="flex-end"
+            width={SIDE_MARGIN_WIDTH}
+            minWidth={90}
+            pt={80}
+          >
+            <Flex flexDirection="column" alignItems="center" width={90}>
+              {status === PAGE_STATUS.VIEW && (
+                <ExpenseAdminActions
+                  expense={expense}
+                  collective={collective}
+                  permissions={expense?.permissions}
+                  onError={error => this.setState({ error })}
+                  onEdit={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
+                />
+              )}
+            </Flex>
+          </Container>
+          <Box flex="1 1 650px" minWidth={300} maxWidth={750} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
+            <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+              <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
+            </H1>
+            {error && (
+              <MessageBox type="error" withIcon mb={4}>
+                {formatErrorMessage(intl, error)}
+              </MessageBox>
+            )}
+            {status !== PAGE_STATUS.EDIT && (
+              <Box mb={3}>
+                <ExpenseSummary
+                  expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
+                  host={host}
+                  isLoading={!expense}
+                  isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
+                  permissions={expense?.permissions}
+                  collective={collective}
+                  showProcessActions={status !== PAGE_STATUS.EDIT_SUMMARY}
+                />
+                {status !== PAGE_STATUS.EDIT_SUMMARY && (
+                  <React.Fragment>
+                    {hasAttachedFiles && (
+                      <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
+                        <H5 fontSize="LeadParagraph" mb={3}>
+                          <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
+                        </H5>
+                        <ExpenseAttachedFiles files={expense.attachedFiles} />
+                      </Container>
+                    )}
+                    {expense?.privateMessage && (
+                      <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
+                        <H5 fontSize="LeadParagraph" mb={3}>
+                          <FormattedMessage id="expense.notes" defaultMessage="Notes" />
+                        </H5>
+                        <PrivateNoteLabel mb={2} />
+                        <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre-wrap">
+                          {expense.privateMessage}
+                        </P>
+                      </Container>
+                    )}
+                  </React.Fragment>
                 )}
-              </Flex>
-            </Container>
-            <Box flex="1 1 650px" minWidth={300} maxWidth={750} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
-              <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
-                <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
-              </H1>
-              {error && (
-                <MessageBox type="error" withIcon mb={4}>
-                  {formatErrorMessage(intl, error)}
-                </MessageBox>
-              )}
-              {status !== PAGE_STATUS.EDIT && (
-                <Box mb={3}>
-                  <ExpenseSummary
-                    expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
-                    host={host}
-                    isLoading={!expense}
-                    isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
-                    permissions={expense?.permissions}
-                    collective={collective}
-                    showProcessActions={status !== PAGE_STATUS.EDIT_SUMMARY}
-                  />
-                  {status !== PAGE_STATUS.EDIT_SUMMARY && (
-                    <React.Fragment>
-                      {hasAttachedFiles && (
-                        <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                          <H5 fontSize="LeadParagraph" mb={3}>
-                            <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
-                          </H5>
-                          <ExpenseAttachedFiles files={expense.attachedFiles} />
-                        </Container>
-                      )}
-                      {expense?.privateMessage && (
-                        <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                          <H5 fontSize="LeadParagraph" mb={3}>
-                            <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                          </H5>
-                          <PrivateNoteLabel mb={2} />
-                          <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre-wrap">
-                            {expense.privateMessage}
-                          </P>
-                        </Container>
-                      )}
-                    </React.Fragment>
-                  )}
-                  {status === PAGE_STATUS.EDIT_SUMMARY && (
-                    <Box mt={24}>
-                      <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
-                      <Flex flexWrap="wrap" mt={4}>
-                        <StyledButton
-                          mt={2}
-                          minWidth={175}
-                          width={['100%', 'auto']}
-                          mx={[2, 0]}
-                          mr={[null, 3]}
-                          whiteSpace="nowrap"
-                          data-cy="edit-expense-btn"
-                          onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
-                          disabled={this.state.isSubmitting}
-                        >
-                          ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
-                        </StyledButton>
-                        <StyledButton
-                          buttonStyle="primary"
-                          mt={2}
-                          minWidth={175}
-                          width={['100%', 'auto']}
-                          mx={[2, 0]}
-                          mr={[null, 3]}
-                          whiteSpace="nowrap"
-                          data-cy="submit-expense-btn"
-                          onClick={this.onSummarySubmit}
-                          loading={this.state.isSubmitting}
-                        >
-                          <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
-                        </StyledButton>
-                      </Flex>
-                    </Box>
-                  )}
-                </Box>
-              )}
-              {status === PAGE_STATUS.EDIT && (
-                <Box mb={3}>
-                  <ExpenseForm
-                    collective={collective}
-                    loading={loadingLoggedInUser}
-                    expense={editedExpense}
-                    payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
-                    onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
-                    validateOnChange
-                    disableSubmitIfUntouched
-                    onSubmit={editedExpense =>
-                      this.setState({
-                        editedExpense,
-                        status: PAGE_STATUS.EDIT_SUMMARY,
-                      })
-                    }
-                  />
-                </Box>
-              )}
-              {expense && (
-                <Box mb={3} pt={3}>
-                  <Thread
-                    collective={collective}
-                    items={this.getThreadItems(expense.comments.nodes, expense.activities)}
-                    onCommentDeleted={this.onCommentDeleted}
-                  />
-                </Box>
-              )}
-              <Flex mt="40px">
-                <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                  <CommentIcon size={24} color="lightgrey" />
-                </Box>
-                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                  <CommentForm
-                    id="new-comment-on-expense"
-                    ExpenseId={expense && expense.id}
-                    disabled={!expense}
-                    onSuccess={this.onCommentAdded}
-                  />
-                </Box>
-              </Flex>
-            </Box>
-            <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
-              <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-                <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+                {status === PAGE_STATUS.EDIT_SUMMARY && (
+                  <Box mt={24}>
+                    <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
+                    <Flex flexWrap="wrap" mt={4}>
+                      <StyledButton
+                        mt={2}
+                        minWidth={175}
+                        width={['100%', 'auto']}
+                        mx={[2, 0]}
+                        mr={[null, 3]}
+                        whiteSpace="nowrap"
+                        data-cy="edit-expense-btn"
+                        onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
+                        disabled={this.state.isSubmitting}
+                      >
+                        ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+                      </StyledButton>
+                      <StyledButton
+                        buttonStyle="primary"
+                        mt={2}
+                        minWidth={175}
+                        width={['100%', 'auto']}
+                        mx={[2, 0]}
+                        mr={[null, 3]}
+                        whiteSpace="nowrap"
+                        data-cy="submit-expense-btn"
+                        onClick={this.onSummarySubmit}
+                        loading={this.state.isSubmitting}
+                      >
+                        <FormattedMessage id="Expense.SaveChanges" defaultMessage="Save changes" />
+                      </StyledButton>
+                    </Flex>
+                  </Box>
+                )}
+              </Box>
+            )}
+            {status === PAGE_STATUS.EDIT && (
+              <Box mb={3}>
+                <ExpenseForm
+                  collective={collective}
+                  loading={loadingLoggedInUser}
+                  expense={editedExpense}
+                  payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                  onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
+                  validateOnChange
+                  disableSubmitIfUntouched
+                  onSubmit={editedExpense =>
+                    this.setState({
+                      editedExpense,
+                      status: PAGE_STATUS.EDIT_SUMMARY,
+                    })
+                  }
+                />
+              </Box>
+            )}
+            {expense && (
+              <Box mb={3} pt={3}>
+                <Thread
+                  collective={collective}
+                  items={this.getThreadItems(expense.comments.nodes, expense.activities)}
+                  onCommentDeleted={this.onCommentDeleted}
+                />
+              </Box>
+            )}
+            <Flex mt="40px">
+              <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                <CommentIcon size={24} color="lightgrey" />
+              </Box>
+              <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                <CommentForm
+                  id="new-comment-on-expense"
+                  ExpenseId={expense && expense.id}
+                  disabled={!expense}
+                  onSuccess={this.onCommentAdded}
+                />
               </Box>
             </Flex>
-            <Box width={SIDE_MARGIN_WIDTH} />
+          </Box>
+          <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
+            <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
+              <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+            </Box>
           </Flex>
-          <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
-        </CollectiveThemeProvider>
+          <Box width={SIDE_MARGIN_WIDTH} />
+        </Flex>
+        <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
       </Page>
     );
   }
