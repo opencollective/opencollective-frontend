@@ -14,6 +14,7 @@ import { i18nExpenseType } from '../../lib/i18n-expense';
 import CollectivePicker from '../CollectivePicker';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import InputTypeCountry from '../InputTypeCountry';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
@@ -24,12 +25,12 @@ import StyledTag from '../StyledTag';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
+import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
 import { validateExpenseItem } from './ExpenseItemForm';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
-import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 
 const msg = defineMessages({
   descriptionPlaceholder: {
@@ -51,6 +52,14 @@ const msg = defineMessages({
   invoiceInfoPlaceholder: {
     id: 'ExpenseForm.InvoiceInfoPlaceholder',
     defaultMessage: 'Tax ID, VAT number, etc. This information will be printed on your invoice.',
+  },
+  country: {
+    id: 'ExpenseForm.ChooseCountry',
+    defaultMessage: 'Choose country',
+  },
+  address: {
+    id: 'ExpenseForm.AddressLabel',
+    defaultMessage: 'Physical address',
   },
   leaveWithUnsavedChanges: {
     id: 'ExpenseForm.UnsavedChangesWarning',
@@ -90,6 +99,10 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
   payoutMethod: undefined,
   privateInfo: '',
   currency: collective.currency,
+  location: {
+    address: '',
+    country: null,
+  },
 });
 
 /**
@@ -104,6 +117,7 @@ export const prepareExpenseForSubmit = expenseData => {
     ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee: expenseData.payee && { [payeeIdField]: expenseData.payee.id },
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
+    payeeLocation: isInvoice ? pick(expenseData.payeeLocation, ['address', 'country']) : null,
     attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
     // Omit item's ids that were created for keying purposes
     items: expenseData.items.map(item => {
@@ -160,6 +174,14 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
       formik.setFieldValue('payee', first(payoutProfiles));
     }
   }, [payoutProfiles]);
+
+  // Pre-fill address based on the payout profile
+  React.useEffect(() => {
+    if (values.payee?.location && !formik.touched.payeeLocation) {
+      formik.setFieldValue('payeeLocation.country', values.payee.location.country);
+      formik.setFieldValue('payeeLocation.address', values.payee.location.address);
+    }
+  }, [values.payee]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -248,7 +270,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
             </Box>
             {stepOneCompleted && (
               <React.Fragment>
-                <Flex alignItems="center" my={24}>
+                <Flex alignItems="center" mt={24} mb={16}>
                   <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
                     {formatMessage(isReceipt ? msg.step2 : msg.step2Invoice)}
                   </Span>
@@ -260,108 +282,151 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
 
                 <Box>
                   <Flex justifyContent="space-between" flexWrap="wrap">
-                    <FastField name="payee">
-                      {({ field }) => (
-                        <StyledInputField
-                          name={field.name}
-                          label={formatMessage(msg.payeeLabel)}
-                          flex="1"
-                          minWidth={250}
-                          mr={fieldsMarginRight}
-                          mt={2}
-                        >
-                          {({ id }) => (
-                            <CollectivePicker
-                              creatable
-                              addLoggedInUserAsAdmin
-                              types={[CollectiveType.ORGANIZATION]}
-                              inputId={id}
-                              collectives={payoutProfiles}
-                              getDefaultOptions={build => values.payee && build(values.payee)}
-                              data-cy="select-expense-payee"
-                              onChange={({ value }) => {
-                                formik.setFieldValue('payee', value);
-                                formik.setFieldValue('payoutMethod', null);
-                              }}
-                            />
-                          )}
-                        </StyledInputField>
-                      )}
-                    </FastField>
-
-                    <Field name="payoutMethod">
-                      {({ field }) => (
-                        <StyledInputField
-                          name={field.name}
-                          htmlFor="payout-method"
-                          flex="1"
-                          mr={fieldsMarginRight}
-                          mt={2}
-                          minWidth={250}
-                          label={formatMessage(msg.payoutOptionLabel)}
-                          error={
-                            isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                              ? formatFormErrorMessage(intl, errors.payoutMethod)
-                              : null
-                          }
-                        >
-                          {({ id, error }) => (
-                            <PayoutMethodSelect
-                              inputId={id}
-                              error={error}
-                              onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
-                              payoutMethod={values.payoutMethod}
-                              payoutMethods={get(values.payee, 'payoutMethods', [])}
-                              disabled={!values.payee}
-                              collective={collective}
-                              default
-                            />
-                          )}
-                        </StyledInputField>
-                      )}
-                    </Field>
-                  </Flex>
-                  <Flex justifyContent="space-between" mt={3} flexWrap="wrap">
-                    {values.type === expenseTypes.INVOICE && (
-                      <FastField name="invoiceInfo">
+                    <Box minWidth={250} flex="1 1 50%">
+                      <FastField name="payee">
                         {({ field }) => (
                           <StyledInputField
                             name={field.name}
-                            label={formatMessage(msg.invoiceInfo)}
-                            required={false}
+                            label={formatMessage(msg.payeeLabel)}
                             flex="1"
-                            minWidth={250}
-                            maxWidth={[null, null, '46%']}
                             mr={fieldsMarginRight}
-                            mt={2}
+                            mt={3}
                           >
-                            {inputProps => (
-                              <Field
-                                as={StyledTextarea}
-                                {...inputProps}
-                                {...field}
-                                minHeight={80}
-                                placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
+                            {({ id }) => (
+                              <CollectivePicker
+                                creatable
+                                addLoggedInUserAsAdmin
+                                types={[CollectiveType.ORGANIZATION]}
+                                inputId={id}
+                                collectives={payoutProfiles}
+                                getDefaultOptions={build => values.payee && build(values.payee)}
+                                data-cy="select-expense-payee"
+                                onChange={({ value }) => {
+                                  formik.setFieldValue('payee', value);
+                                  formik.setFieldValue('payoutMethod', null);
+                                }}
                               />
                             )}
                           </StyledInputField>
                         )}
                       </FastField>
-                    )}
-                    {values.payoutMethod && (
-                      <FastField name="payoutMethod">
-                        {({ field, meta }) => (
-                          <Box mr={fieldsMarginRight} mt={2} flex="1" minWidth={258}>
-                            <PayoutMethodForm
-                              fieldsPrefix="payoutMethod"
-                              payoutMethod={field.value}
-                              collective={collective}
-                              errors={meta.error}
-                            />
-                          </Box>
+                      {values.type === expenseTypes.INVOICE && (
+                        <React.Fragment>
+                          <FastField name="payeeLocation.country">
+                            {({ field }) => (
+                              <StyledInputField
+                                name={field.name}
+                                label={formatMessage(msg.country)}
+                                required
+                                minWidth={250}
+                                mr={fieldsMarginRight}
+                                mt={3}
+                              >
+                                {({ id }) => (
+                                  <InputTypeCountry
+                                    inputId={id}
+                                    onChange={value => formik.setFieldValue(field.name, value)}
+                                    value={field.value}
+                                  />
+                                )}
+                              </StyledInputField>
+                            )}
+                          </FastField>
+                          <FastField name="payeeLocation.address">
+                            {({ field }) => (
+                              <StyledInputField
+                                name={field.name}
+                                label={formatMessage(msg.address)}
+                                required
+                                minWidth={250}
+                                mr={fieldsMarginRight}
+                                mt={3}
+                              >
+                                {inputProps => (
+                                  <Field
+                                    as={StyledTextarea}
+                                    {...inputProps}
+                                    {...field}
+                                    minHeight={100}
+                                    placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
+                                  />
+                                )}
+                              </StyledInputField>
+                            )}
+                          </FastField>
+                          <FastField name="invoiceInfo">
+                            {({ field }) => (
+                              <StyledInputField
+                                name={field.name}
+                                label={formatMessage(msg.invoiceInfo)}
+                                required={false}
+                                minWidth={250}
+                                mr={fieldsMarginRight}
+                                mt={3}
+                              >
+                                {inputProps => (
+                                  <Field
+                                    as={StyledTextarea}
+                                    {...inputProps}
+                                    {...field}
+                                    minHeight={80}
+                                    placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
+                                  />
+                                )}
+                              </StyledInputField>
+                            )}
+                          </FastField>
+                        </React.Fragment>
+                      )}
+                    </Box>
+                    <Box minWidth={250} flex="1 1 50%">
+                      <Field name="payoutMethod">
+                        {({ field }) => (
+                          <StyledInputField
+                            name={field.name}
+                            htmlFor="payout-method"
+                            flex="1"
+                            mr={fieldsMarginRight}
+                            mt={3}
+                            minWidth={250}
+                            label={formatMessage(msg.payoutOptionLabel)}
+                            error={
+                              isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                                ? formatFormErrorMessage(intl, errors.payoutMethod)
+                                : null
+                            }
+                          >
+                            {({ id, error }) => (
+                              <PayoutMethodSelect
+                                inputId={id}
+                                error={error}
+                                onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
+                                payoutMethod={values.payoutMethod}
+                                payoutMethods={get(values.payee, 'payoutMethods', [])}
+                                disabled={!values.payee}
+                                collective={collective}
+                                default
+                              />
+                            )}
+                          </StyledInputField>
                         )}
-                      </FastField>
-                    )}
+                      </Field>
+
+                      {values.payoutMethod && (
+                        <FastField name="payoutMethod">
+                          {({ field, meta }) => (
+                            <Box mr={fieldsMarginRight} mt={3} flex="1" minWidth={258}>
+                              <PayoutMethodForm
+                                fieldsPrefix="payoutMethod"
+                                payoutMethod={field.value}
+                                collective={collective}
+                                errors={meta.error}
+                              />
+                            </Box>
+                          )}
+                        </FastField>
+                      )}
+                    </Box>
                   </Flex>
                 </Box>
               </React.Fragment>
@@ -504,6 +569,10 @@ ExpenseForm.propTypes = {
       id: PropTypes.string,
       name: PropTypes.string,
       slug: PropTypes.string,
+      location: PropTypes.shape({
+        address: PropTypes.string,
+        country: PropTypes.string,
+      }),
       payoutMethods: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.string,

@@ -94,16 +94,16 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
-      location {
-        address
-        country
-      }
       payoutMethods {
         id
         type
         name
         data
       }
+    }
+    payeeLocation {
+      address
+      country
     }
     createdByAccount {
       id
