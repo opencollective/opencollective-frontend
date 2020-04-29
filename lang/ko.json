@@ -454,7 +454,7 @@
   "CP.Contribute.Financial": "재정적 기여",
   "CP.Contribute.Title": "기여자가 되기",
   "CP.Contributions.PartOfOrg": "{n, plural, one {This Collective is} other {These Collectives are}} part of our Organization",
-  "CP.Contributions.SubCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
+  "CP.Contributions.ConnectedCollective": "{n, plural, one {This Collective is} other {These Collectives are}} part of what we do",
   "create-expense.title": "비용 지불",
   "create.collective.placeholder": "세상을 더 나은 곳으로 만들기",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",

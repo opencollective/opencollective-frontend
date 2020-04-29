@@ -137,7 +137,7 @@ export const getCollectivePageQuery = gql`
           }
         }
       }
-      subCollectives: members(role: "SUB_COLLECTIVE") {
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
         collective: member {
           id
