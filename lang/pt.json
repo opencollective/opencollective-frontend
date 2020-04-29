@@ -763,6 +763,8 @@
   "expense.unapprove.btn": "Não aprovado",
   "ExpenseForm.AddLineItem": "Add new item",
   "ExpenseForm.AddReceipt": "Add new receipt",
+  "ExpenseForm.AddressLabel": "Physical address",
+  "ExpenseForm.ChooseCountry": "Choose country",
   "ExpenseForm.DescriptionPlaceholder": "Enter expense title here...",
   "ExpenseForm.InvoiceDescription": "Get reimbursed for a purchase already made.",
   "ExpenseForm.InvoiceInfo": "Informação adicional da fatura",
