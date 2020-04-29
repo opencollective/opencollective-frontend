@@ -158,6 +158,8 @@ const CreateCollectiveMiniForm = ({
   addLoggedInUserAsAdmin,
   LoggedInUser,
   excludeAdminFields,
+  email = '',
+  name = '',
 }) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
@@ -168,9 +170,9 @@ const CreateCollectiveMiniForm = ({
   const { formatMessage } = useIntl();
 
   const initialValues = {
-    members: [{ member: { email: '', name: '' } }],
-    email: '',
-    name: '',
+    members: [{ member: { email, name } }],
+    email,
+    name,
     website: '',
   };
 
@@ -348,6 +350,10 @@ CreateCollectiveMiniForm.propTypes = {
   LoggedInUser: PropTypes.object,
   /** If true, this does not render the 'admin name' and 'admin email' for create org form */
   excludeAdminFields: PropTypes.bool,
+  /** The collective email */
+  email: PropTypes.string,
+  /** The collective name */
+  name: PropTypes.string,
 };
 
 export default withUser(CreateCollectiveMiniForm);

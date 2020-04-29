@@ -5,6 +5,7 @@ import memoizeOne from 'memoize-one';
 import ReactDOM from 'react-dom';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
+import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { mergeRefs } from '../lib/react-utils';
@@ -90,6 +91,7 @@ class CollectivePicker extends React.PureComponent {
       createFormCollectiveType: null,
       menuIsOpen: props.menuIsOpen,
       createdCollectives: [],
+      searchText: '',
     };
   }
 
@@ -178,6 +180,11 @@ class CollectivePicker extends React.PureComponent {
     }
   };
 
+  onInputChange = newTerm => {
+    this.props.onInputChange?.(newTerm);
+    this.setState({ searchText: newTerm });
+  };
+
   setCreateFormCollectiveType = type => {
     this.setState({ createFormCollectiveType: type || null });
   };
@@ -234,9 +241,11 @@ class CollectivePicker extends React.PureComponent {
       addLoggedInUserAsAdmin,
       ...props
     } = this.props;
-    const { createFormCollectiveType, createdCollectives } = this.state;
+    const { createFormCollectiveType, createdCollectives, searchText } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
     const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives, creatable, intl);
+
+    const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
     return (
       <Manager>
@@ -268,6 +277,7 @@ class CollectivePicker extends React.PureComponent {
                   }
                 }}
                 {...props}
+                onInputChange={this.onInputChange}
               />
             </Container>
           )}
@@ -301,6 +311,7 @@ class CollectivePicker extends React.PureComponent {
                           showCreatedCollective: true,
                         }));
                       }}
+                      {...prefillValue}
                     />
                   </StyledCard>
                 </div>
@@ -333,6 +344,8 @@ CollectivePicker.propTypes = {
   sortFunc: PropTypes.func,
   /** Called when value changes */
   onChange: PropTypes.func.isRequired,
+  /** Called when search input text changes  */
+  onInputChange: PropTypes.func,
   /** Get passed the options list, returns the default one */
   getDefaultOptions: PropTypes.func.isRequired,
   /** Use this to control the component */
