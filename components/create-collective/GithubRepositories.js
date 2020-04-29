@@ -146,6 +146,7 @@ const GithubRepositories = ({ repositories, sendRepoInfo, intl, ...fieldProps })
           onClick={() => sendRepoInfo(state.repoInfo)}
           m={2}
           px={[2, 3]}
+          data-cy="connect-github-continue"
         >
           <FormattedMessage id="actions.continue" defaultMessage="Continue" />
         </StyledButton>

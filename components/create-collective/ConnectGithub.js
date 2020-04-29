@@ -144,6 +144,7 @@ class ConnectGithub extends React.Component {
                   fontWeight="bold"
                   textAlign="center"
                   color="black.900"
+                  data-cy="connect-github-header"
                 >
                   {intl.formatMessage(this.messages.repoHeader)}
                 </H1>
