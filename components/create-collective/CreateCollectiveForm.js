@@ -172,7 +172,7 @@ class CreateCollectiveForm extends React.Component {
         </Flex>
         {error && (
           <Flex alignItems="center" justifyContent="center">
-            <MessageBox type="error" withIcon mb={[1, 3]}>
+            <MessageBox type="error" withIcon mb={[1, 3]} data-cy="ccf-error-message">
               {error.replace('GraphQL error: ', 'Error: ')}
             </MessageBox>
           </Flex>
@@ -217,6 +217,7 @@ class CreateCollectiveForm extends React.Component {
                       required
                       mt={4}
                       mb={3}
+                      data-cy="ccf-form-name"
                     >
                       {inputProps => <Field as={StyledInput} {...inputProps} placeholder={placeholders.name} />}
                     </StyledInputField>
@@ -229,6 +230,7 @@ class CreateCollectiveForm extends React.Component {
                       required
                       mt={3}
                       mb={2}
+                      data-cy="ccf-form-slug"
                     >
                       {inputProps => (
                         <Field
@@ -254,6 +256,7 @@ class CreateCollectiveForm extends React.Component {
                       required
                       mt={3}
                       mb={2}
+                      data-cy="ccf-form-description"
                     >
                       {inputProps => (
                         <Field
@@ -322,6 +325,7 @@ class CreateCollectiveForm extends React.Component {
                         type="submit"
                         loading={loading}
                         onSubmit={handleSubmit}
+                        data-cy="ccf-form-submit"
                       >
                         <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" />
                       </StyledButton>
