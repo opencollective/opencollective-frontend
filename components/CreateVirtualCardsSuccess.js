@@ -92,23 +92,25 @@ export default class CreateVirtualCardsSuccess extends React.Component {
               &nbsp;
               <FormattedMessage id="CreateVirtualCardsSuccess.RedeemLinks" defaultMessage="Copy the links" />
             </StyledButton>
-            <FileDownloader
-              url={downloadUrl}
-              filename={filename}
-              buildFetchParams={() => ({
-                method: 'POST',
-                headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cards: this.props.cards }),
-              })}
-            >
-              {({ loading, downloadFile }) => (
-                <StyledButton minWidth={270} m={2} buttonSize="large" loading={loading} onClick={downloadFile}>
-                  <Printer size="1em" />
-                  &nbsp;
-                  <FormattedMessage id="CreateVirtualCardsSuccess.Download" defaultMessage="Download cards" />
-                </StyledButton>
-              )}
-            </FileDownloader>
+            {this.props.cards.length < 300 && (
+              <FileDownloader
+                url={downloadUrl}
+                filename={filename}
+                buildFetchParams={() => ({
+                  method: 'POST',
+                  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ cards: this.props.cards }),
+                })}
+              >
+                {({ loading, downloadFile }) => (
+                  <StyledButton minWidth={270} m={2} buttonSize="large" loading={loading} onClick={downloadFile}>
+                    <Printer size="1em" />
+                    &nbsp;
+                    <FormattedMessage id="CreateVirtualCardsSuccess.Download" defaultMessage="Download cards" />
+                  </StyledButton>
+                )}
+              </FileDownloader>
+            )}
           </Flex>
           <RedeemLinksTextarea
             ref={this.redeemLinkTextareaRef}
