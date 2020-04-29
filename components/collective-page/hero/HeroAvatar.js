@@ -206,7 +206,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
 
                   try {
                     // Upload image if changed or remove it
-                    let imgURL = collective.imageUrl || collective.image;
+                    let imgURL = collective.image;
                     if (uploadedImage) {
                       imgURL = await upload(uploadedImage);
                     }
