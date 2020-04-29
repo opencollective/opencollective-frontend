@@ -65,7 +65,7 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
  */
 const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, showProcessActions }) => {
   const intl = useIntl();
-  const { payee, createdByAccount } = expense || {};
+  const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
@@ -249,9 +249,11 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
                 </Span>
               </Flex>
             </LinkCollective>
-            {payee.location && (
-              <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-                {payee.location.address}
+            {payeeLocation && (
+              <P whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+                {payeeLocation.address}
+                {payeeLocation.address && payeeLocation.country && <br />}
+                {payeeLocation.country}
               </P>
             )}
             {payee.website && (
@@ -328,11 +330,11 @@ ExpenseSummary.propTypes = {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-      location: PropTypes.shape({
-        address: PropTypes.string,
-        country: PropTypes.string,
-      }),
     }).isRequired,
+    payeeLocation: PropTypes.shape({
+      address: PropTypes.string,
+      country: PropTypes.string,
+    }),
     createdByAccount: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,

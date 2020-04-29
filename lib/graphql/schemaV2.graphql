@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Apr 28 2020 16:05:24 GMT+0200 (Central European Summer Time)
+# timestamp: Wed Apr 29 2020 14:12:33 GMT+0200 (GMT+02:00)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -1020,6 +1020,11 @@ type Expense {
   payee: Account!
 
   """
+  The address of the payee
+  """
+  payeeLocation: Location
+
+  """
   The account who created this expense
   """
   createdByAccount: Account
@@ -1132,6 +1137,11 @@ input ExpenseCreateInput {
   Account to reimburse
   """
   payee: AccountReferenceInput!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
 }
 
 """
@@ -1391,6 +1401,11 @@ input ExpenseUpdateInput {
   Account to reimburse
   """
   payee: AccountReferenceInput
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
 }
 
 """
@@ -1693,6 +1708,36 @@ scalar JSON
 Type for Geographic location
 """
 type Location {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
   """
   A short name for the location (eg. Open Collective Headquarters)
   """
