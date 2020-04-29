@@ -294,8 +294,6 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                           >
                             {({ id }) => (
                               <CollectivePicker
-                                creatable
-                                addLoggedInUserAsAdmin
                                 types={[CollectiveType.ORGANIZATION]}
                                 inputId={id}
                                 collectives={payoutProfiles}
