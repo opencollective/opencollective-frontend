@@ -162,7 +162,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.7.7",
-    "@babel/core": "7.7.2",
+    "@babel/core": "7.9.6",
     "@babel/node": "7.7.0",
     "@cypress/code-coverage": "^3.5.1",
     "babel-eslint": "^10.1.0",
