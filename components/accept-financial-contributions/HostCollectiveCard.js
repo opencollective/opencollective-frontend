@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import Markdown from 'react-markdown';
 
 import { confettiFireworks } from '../../lib/confettis';
-import { getCurrencySymbol } from '../../lib/currency-utils';
+import { formatCurrency } from '../../lib/currency-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
@@ -26,9 +27,9 @@ const messages = defineMessages({
     id: 'pricingTable.row.collectives',
     defaultMessage: 'Collectives',
   },
-  budget: {
-    id: 'YearlyBudget',
-    defaultMessage: 'Yearly budget',
+  managed: {
+    id: 'ManagedFunds',
+    defaultMessage: 'Managed funds',
   },
   apply: {
     id: 'host.apply.create.btn',
@@ -123,11 +124,10 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
           </Flex>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
             <P fontSize="LeadParagraph" fontWeight="bold">
-              {getCurrencySymbol(host.currency)}
-              {host.stats.yearlyBudget.value}
+              {formatCurrency(host.stats.yearlyBudget.value * 100, host.currency, { precision: 0 })}
             </P>
             <P ml={2} fontSize="Caption">
-              {host.currency} {formatMessage(messages.budget)}
+              {host.currency} {formatMessage(messages.managed)}
             </P>
           </Flex>
           <StyledButton
@@ -173,7 +173,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
         </ModalHeader>
         <ModalBody>
           <Fragment>
-            {host.description}
+            <Markdown source={host.longDescription} />
             {get(host, 'settings.tos') && (
               <Flex flexDirection="column" mx={1} my={4}>
                 <StyledCheckbox

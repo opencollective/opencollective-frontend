@@ -1004,6 +1004,7 @@
   "loggingout": "desconectando",
   "login.askAnother": "Puede solicitar un nuevo enlace de inicio de sesión utilizando el siguiente formulario.",
   "login.failed": "Registro fallido: {message}.",
+  "ManagedFunds": "Managed funds",
   "map.viewLarger": "View Larger Map",
   "Member.Role.ADMIN": "Collective Admin",
   "Member.Role.ATTENDEE": "Asistente",

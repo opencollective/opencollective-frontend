@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Apr 29 2020 14:11:50 GMT+0200 (GMT+02:00)
+# timestamp: Thu Apr 30 2020 12:11:05 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -893,7 +893,7 @@ enum ContributorRole {
   FUNDRAISER
   ATTENDEE
   FOLLOWER
-  CONNECTED_COLLECTIVE
+  SUB_COLLECTIVE
 }
 
 """

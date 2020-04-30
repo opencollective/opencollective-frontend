@@ -90,7 +90,11 @@ class ApplyToHost extends React.Component {
   }
 
   setTags = tag => {
-    tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
+    tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: tag });
+  };
+
+  getTags = tag => {
+    return tag === null ? 'all' : tag;
   };
 
   render() {
@@ -126,7 +130,13 @@ class ApplyToHost extends React.Component {
           </Container>
           <Flex px={[3, 5]} my={4} flexWrap="wrap">
             {Object.keys(this.tagList).map(tagKey => (
-              <FilterTag key={`${tagKey}-tag`} px={2} mr={2} onClick={() => this.setTags(tagKey)}>
+              <FilterTag
+                key={`${tagKey}-tag`}
+                px={2}
+                mr={2}
+                type={this.getTags(tags) === tagKey ? 'dark' : 'info'}
+                onClick={() => this.setTags(tagKey)}
+              >
                 {this.tagList[tagKey]}
               </FilterTag>
             ))}

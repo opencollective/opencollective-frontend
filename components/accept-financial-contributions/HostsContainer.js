@@ -66,7 +66,7 @@ class HostsContainer extends React.Component {
     const hosts = [...data.hosts.nodes];
 
     return (
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" flexGrow={1}>
         <Hide md lg>
           <HorizontalScroller>
             {ref => (
@@ -128,6 +128,7 @@ query getHosts($tags: [String], $limit: Int) {
       name
       slug
       description
+      longDescription
       currency
       totalHostedCollectives
       hostFeePercent
