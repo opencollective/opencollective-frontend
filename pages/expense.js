@@ -109,6 +109,12 @@ class ExpensePage extends React.Component {
     mutate: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
+    expensesTags: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+        tag: PropTypes.string,
+      }),
+    ),
   };
 
   constructor(props) {
@@ -188,6 +194,11 @@ class ExpensePage extends React.Component {
     const variables = { collectiveSlug, legacyExpenseId };
     const data = cloneDeep(client.readQuery({ query, variables }));
     return [data, query, variables];
+  }
+
+  getSuggestedTags(collective) {
+    const tagsStats = (collective && collective.expensesTags) || null;
+    return tagsStats && tagsStats.map(({ tag }) => tag);
   }
 
   onCommentAdded = comment => {
@@ -369,6 +380,7 @@ class ExpensePage extends React.Component {
                   collective={collective}
                   loading={loadingLoggedInUser}
                   expense={editedExpense}
+                  expensesTags={this.getSuggestedTags(collective)}
                   payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                   onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                   validateOnChange
