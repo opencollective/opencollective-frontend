@@ -45,12 +45,12 @@ const StyledInput = styled.input`
       return props.error
         ? css`
             outline: 1px dashed ${themeGet('colors.red.300')};
-            outline-offset: 0.25em;
+            outline-offset: 0.2em;
           `
         : css`
             &:focus {
               outline: 1px dashed ${themeGet('colors.black.200')};
-              outline-offset: 0.25em;
+              outline-offset: 0.2em;
             }
           `;
     }
