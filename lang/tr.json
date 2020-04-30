@@ -1,6 +1,6 @@
 {
   "Accept": "Kabul et",
-  "acceptContributions.addBankAccount": "Add bank account",
+  "acceptContributions.addBankAccount": "Banka hesabı ekleyin",
   "acceptContributions.bankAccount.info": "Manually sync contributions received on your bank account with your Collective's budget. It's free up to $1000. {hostPlans}.",
   "acceptContributions.bankAccountSetUp": "Bank account set up",
   "acceptContributions.definePaymentInstructions": "Define payment instructions",
