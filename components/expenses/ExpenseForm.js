@@ -243,7 +243,7 @@ const ExpenseFormBody = ({
                     onChange={tags =>
                       formik.setFieldValue(
                         'tags',
-                        tags.map(t => t.value.toUpperCase()),
+                        tags.map(t => t.value.toLowerCase()),
                       )
                     }
                     value={values.tags}

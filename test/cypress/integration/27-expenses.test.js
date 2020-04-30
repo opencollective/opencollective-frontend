@@ -192,7 +192,7 @@ describe('Legacy expense flow', () => {
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
       cy.get('.Expenses .expense:first .status').contains('pending');
-      cy.get('.Expenses .expense:first .meta').contains('TEAM');
+      cy.get('.Expenses .expense:first .meta').contains('Team');
     });
 
     it('submits a new expense other, edit it and approve it', () => {
