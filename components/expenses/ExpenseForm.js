@@ -23,7 +23,7 @@ import StyledInputField from '../StyledInputField';
 import StyledInputTags from '../StyledInputTags';
 import StyledTag from '../StyledTag';
 import StyledTextarea from '../StyledTextarea';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
@@ -219,55 +219,55 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
               fontSize="H4"
               border="0"
               error={errors.description}
-              px={0}
+              px={2}
+              py={1}
               maxLength={255}
               withOutline
             />
-            <Flex alignItems="flex-start">
-              <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
-                {i18nExpenseType(intl, values.type, values.legacyId)}
-              </StyledTag>
-              <StyledInputTags
-                onChange={tags =>
-                  formik.setFieldValue(
-                    'tags',
-                    tags.map(t => t.value.toUpperCase()),
-                  )
-                }
-                value={values.tags}
-              />
-            </Flex>
-            {errors.description && (
-              <P color="red.500" mt={2}>
-                {formatFormErrorMessage(intl, errors.description)}
-              </P>
+            {hasBaseFormFieldsCompleted && (
+              <React.Fragment>
+                <Flex alignItems="flex-start" mt={3}>
+                  <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
+                    {i18nExpenseType(intl, values.type, values.legacyId)}
+                  </StyledTag>
+                  <StyledInputTags
+                    onChange={tags =>
+                      formik.setFieldValue(
+                        'tags',
+                        tags.map(t => t.value.toUpperCase()),
+                      )
+                    }
+                    value={values.tags}
+                  />
+                </Flex>
+                {values.type === expenseTypes.INVOICE && (
+                  <Box my={4}>
+                    <ExpenseAttachedFilesForm
+                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      defaultValue={values.attachedFiles}
+                    />
+                  </Box>
+                )}
+                <Flex alignItems="center" my={24}>
+                  <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
+                    {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
+                  </Span>
+                  <StyledHr flex="1" borderColor="black.300" mx={2} />
+                  <StyledButton
+                    buttonSize="tiny"
+                    type="button"
+                    onClick={() => addNewExpenseItem(formik)}
+                    minWidth={135}
+                    data-cy="expense-add-item-btn"
+                  >
+                    +&nbsp;{formatMessage(isReceipt ? msg.addNewReceipt : msg.addNewItem)}
+                  </StyledButton>
+                </Flex>
+                <Box>
+                  <FieldArray name="items" component={ExpenseFormItems} />
+                </Box>
+              </React.Fragment>
             )}
-            {values.type === expenseTypes.INVOICE && (
-              <Box my={4}>
-                <ExpenseAttachedFilesForm
-                  onChange={files => formik.setFieldValue('attachedFiles', files)}
-                  defaultValue={values.attachedFiles}
-                />
-              </Box>
-            )}
-            <Flex alignItems="center" my={24}>
-              <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
-                {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
-              </Span>
-              <StyledHr flex="1" borderColor="black.300" mx={2} />
-              <StyledButton
-                buttonSize="tiny"
-                type="button"
-                onClick={() => addNewExpenseItem(formik)}
-                minWidth={135}
-                data-cy="expense-add-item-btn"
-              >
-                +&nbsp;{formatMessage(isReceipt ? msg.addNewReceipt : msg.addNewItem)}
-              </StyledButton>
-            </Flex>
-            <Box>
-              <FieldArray name="items" component={ExpenseFormItems} />
-            </Box>
             {stepOneCompleted && (
               <React.Fragment>
                 <Flex alignItems="center" mt={24} mb={16}>
@@ -434,44 +434,46 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
           </StyledCard>
         </Box>
       )}
-      <Flex mt={4} flexWrap="wrap">
-        {onCancel && (
+      {stepOneCompleted && (
+        <Flex mt={4} flexWrap="wrap">
+          {onCancel && (
+            <StyledButton
+              type="button"
+              data-cy="expense-cancel-btn"
+              disabled={formik.isSubmitting}
+              mt={2}
+              minWidth={175}
+              width={['100%', 'auto']}
+              mx={[2, 0]}
+              mr={[null, 3]}
+              whiteSpace="nowrap"
+              onClick={() => {
+                if (!formik.dirty || confirm(formatMessage(msg.leaveWithUnsavedChanges))) {
+                  onCancel();
+                }
+              }}
+            >
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+            </StyledButton>
+          )}
           <StyledButton
-            type="button"
-            data-cy="expense-cancel-btn"
-            disabled={formik.isSubmitting}
-            mt={2}
+            type="submit"
             minWidth={175}
             width={['100%', 'auto']}
             mx={[2, 0]}
             mr={[null, 3]}
+            mt={2}
             whiteSpace="nowrap"
-            onClick={() => {
-              if (!formik.dirty || confirm(formatMessage(msg.leaveWithUnsavedChanges))) {
-                onCancel();
-              }
-            }}
+            data-cy="expense-summary-btn"
+            buttonStyle="primary"
+            disabled={!stepTwoCompleted || !formik.isValid}
+            loading={formik.isSubmitting}
           >
-            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+            <FormattedMessage id="Expense.ReviewSummary" defaultMessage="Review expense summary" />
+            &nbsp;→
           </StyledButton>
-        )}
-        <StyledButton
-          type="submit"
-          minWidth={175}
-          width={['100%', 'auto']}
-          mx={[2, 0]}
-          mr={[null, 3]}
-          mt={2}
-          whiteSpace="nowrap"
-          data-cy="expense-summary-btn"
-          buttonStyle="primary"
-          disabled={!stepTwoCompleted || !formik.isValid}
-          loading={formik.isSubmitting}
-        >
-          <FormattedMessage id="Expense.ReviewSummary" defaultMessage="Review expense summary" />
-          &nbsp;→
-        </StyledButton>
-      </Flex>
+        </Flex>
+      )}
     </Form>
   );
 };
