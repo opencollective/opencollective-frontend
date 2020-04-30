@@ -156,7 +156,8 @@ class InputField extends React.Component {
   handleChange(value) {
     const { type } = this.props;
     if (type === 'number') {
-      value = parseInt(value) || null;
+      const parsed = parseInt(value);
+      value = isNaN(parsed) ? null : parsed;
     } else if (type === 'currency') {
       value = this.roundCurrencyValue(value);
     }
