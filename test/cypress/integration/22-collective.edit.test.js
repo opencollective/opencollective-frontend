@@ -1,3 +1,5 @@
+import { randomEmail } from '../support/faker';
+
 const addTier = tier => {
   cy.get('.addTier').click();
 
@@ -21,13 +23,43 @@ describe('edit collective', () => {
   let collectiveSlug = null;
 
   before(() => {
-    cy.createHostedCollective().then(({ slug }) => {
+    cy.createHostedCollective({ name: 'CollectiveToEdit' }).then(({ slug }) => {
       collectiveSlug = slug;
     });
   });
 
   beforeEach(() => {
     cy.login({ redirect: `/${collectiveSlug}/edit` });
+  });
+
+  it('edit members', () => {
+    const invitedUserEmail = randomEmail();
+
+    // Add a new member by creating it inline with the collective picker
+    cy.getByDataCy('menu-item-members').click();
+    cy.getByDataCy('add-member-btn').click();
+    cy.get('[data-cy="member-1"] [data-cy="member-collective-picker"]').click();
+    cy.getByDataCy('collective-type-picker-USER').click();
+    cy.getByDataCy('create-collective-mini-form').then($form => {
+      cy.wrap($form).find('input[name="email"]').type(invitedUserEmail);
+      cy.wrap($form).find('input[name="name"]').type('AmazingNewUser');
+      cy.wrap($form).find('button[type="submit"]').click();
+    });
+    cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
+    cy.getByDataCy('save-members-btn').click();
+    cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
+
+    // Check invitation email
+    cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
+    cy.contains('Test User Admin just invited you to join CollectiveToEdit with the role "Administrator"');
+
+    // Accept invitation as new user
+    cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });
+    cy.getByDataCy('member-invitation-card').contains('CollectiveToEdit');
+    cy.getByDataCy('member-invitation-accept-btn').click();
+    cy.getByDataCy('member-invitation-card').contains('Accepted');
+    cy.visit(`/${collectiveSlug}/edit/members`);
+    cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
   });
 
   it('edit info', () => {
