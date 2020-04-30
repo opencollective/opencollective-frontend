@@ -131,7 +131,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
             labelFontSize="LeadCaption"
             required
           >
-            {inputProps => <Field as={StyledInput} {...inputProps} />}
+            {inputProps => <Field as={StyledInput} {...inputProps} autoFocus />}
           </StyledInputField>
           <Flex flexWrap="wrap" justifyContent="space-between">
             <StyledInputField

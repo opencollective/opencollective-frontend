@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FastField, Field, FieldArray, Form, Formik } from 'formik';
 import { first, get, isEmpty, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { Check } from '@styled-icons/feather/Check';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -31,6 +32,7 @@ import { validateExpenseItem } from './ExpenseItemForm';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
+import Container from '../Container';
 
 const msg = defineMessages({
   descriptionPlaceholder: {
@@ -161,9 +163,10 @@ const fieldsMarginRight = [2, 3, 4];
 
 const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel, formPersister }) => {
   const intl = useIntl();
+  const [isTitleSaved, setTitleSaved] = React.useState(false);
   const { formatMessage } = intl;
   const { values, handleChange, errors, setValues, dirty } = formik;
-  const hasBaseFormFieldsCompleted = values.type && values.description;
+  const hasBaseFormFieldsCompleted = values.type && values.description && isTitleSaved;
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
   const isReceipt = values.type === expenseTypes.RECEIPT;
@@ -210,20 +213,38 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
       {values.type && (
         <Box width="100%">
           <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-            <Field
-              as={StyledInput}
-              autoFocus={autoFocusTitle}
-              name="description"
-              placeholder={formatMessage(msg.descriptionPlaceholder)}
-              width="100%"
-              fontSize="H4"
-              border="0"
-              error={errors.description}
-              px={2}
-              py={1}
-              maxLength={255}
-              withOutline
-            />
+            <Container position="relative">
+              <Field
+                as={StyledInput}
+                autoFocus={autoFocusTitle && !isTitleSaved}
+                name="description"
+                placeholder={formatMessage(msg.descriptionPlaceholder)}
+                width="100%"
+                fontSize="H4"
+                border="0"
+                error={errors.description}
+                px={2}
+                py={3}
+                maxLength={255}
+                withOutline
+                autoComplete="off"
+                onKeyPress={e => {
+                  const keyCode = e.keyCode || e.which;
+                  if (keyCode == '13') {
+                    setTitleSaved(true);
+                    e.preventDefault();
+                  }
+                }}
+              />
+              {values.description && !isTitleSaved && (
+                <Container position="absolute" right="0" top="4px" textAlign="center">
+                  <StyledButton buttonSize="small" mb={2} minWidth={100} onClick={() => setTitleSaved(true)}>
+                    Ok <Check size="1em" />
+                  </StyledButton>
+                  <Container fontSize="10px">press Enter ↵</Container>
+                </Container>
+              )}
+            </Container>
             {hasBaseFormFieldsCompleted && (
               <React.Fragment>
                 <Flex alignItems="flex-start" mt={3}>
