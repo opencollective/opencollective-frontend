@@ -159,7 +159,15 @@ const validate = expense => {
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
-const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, onCancel, formPersister }) => {
+const ExpenseFormBody = ({
+  formik,
+  payoutProfiles,
+  collective,
+  autoFocusTitle,
+  onCancel,
+  formPersister,
+  expensesTags,
+}) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, handleChange, errors, setValues, dirty } = formik;
@@ -231,6 +239,7 @@ const ExpenseFormBody = ({ formik, payoutProfiles, collective, autoFocusTitle, o
                     {i18nExpenseType(intl, values.type, values.legacyId)}
                   </StyledTag>
                   <StyledInputTags
+                    suggestedTags={expensesTags}
                     onChange={tags =>
                       formik.setFieldValue(
                         'tags',
@@ -482,6 +491,7 @@ ExpenseFormBody.propTypes = {
   autoFocusTitle: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
+  expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     host: PropTypes.shape({
@@ -504,6 +514,7 @@ const ExpenseForm = ({
   onCancel,
   validateOnChange,
   formPersister,
+  expensesTags,
 }) => {
   const [hasValidate, setValidate] = React.useState(validateOnChange);
 
@@ -531,6 +542,7 @@ const ExpenseForm = ({
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
           formPersister={formPersister}
+          expensesTags={expensesTags}
         />
       )}
     </Formik>
@@ -544,6 +556,7 @@ ExpenseForm.propTypes = {
   onCancel: PropTypes.func,
   /** To save draft of form values */
   formPersister: PropTypes.object,
+  expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,

@@ -69,6 +69,7 @@ class CreateExpensePage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
+        expensesTags: PropTypes.arrayOf(PropTypes.string),
       }),
       loggedInAccount: PropTypes.shape({
         adminMemberships: PropTypes.shape({
@@ -185,6 +186,11 @@ class CreateExpensePage extends React.Component {
     this.setState({ tags });
   };
 
+  getSuggestedTags(collective) {
+    const tagsStats = (collective && collective.expensesTags) || null;
+    return tagsStats && tagsStats.map(({ tag }) => tag);
+  }
+
   getPayoutProfiles = memoizeOne(loggedInAccount => {
     if (!loggedInAccount) {
       return [];
@@ -242,6 +248,7 @@ class CreateExpensePage extends React.Component {
                           loading={loadingLoggedInUser}
                           onSubmit={this.onFormSubmit}
                           expense={this.state.expense}
+                          expensesTags={this.getSuggestedTags(collective)}
                           payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                           formPersister={this.state.formPersister}
                           autoFocusTitle
@@ -335,6 +342,11 @@ const getData = graphql(
         twitterHandle
         currency
         expensePolicy
+        expensesTags {
+          id
+          tag
+        }
+
         ... on Collective {
           id
           isApproved
