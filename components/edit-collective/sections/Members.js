@@ -221,7 +221,7 @@ class Members extends React.Component {
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
 
     return (
-      <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER}>
+      <Container key={`member-${index}-${memberKey}`} mt={4} pb={4} borderBottom={BORDER} data-cy={`member-${index}`}>
         <ResetGlobalStyles>
           <Flex mt={2} flexWrap="wrap">
             <div className="col-sm-2" />
@@ -237,10 +237,11 @@ class Members extends React.Component {
                   isDisabled={Boolean(memberCollective)}
                   types={[CollectiveType.USER]}
                   filterResults={collectives => collectives.filter(c => !membersCollectiveIds.includes(c.id))}
+                  data-cy="member-collective-picker"
                 />
               </Box>
               {isInvitation && (
-                <Flex alignItems="center" my={1}>
+                <Flex alignItems="center" my={1} data-cy="member-pending-tag">
                   <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
                     <StyledTag display="block" type="info">
                       <FormattedMessage id="Pending" defaultMessage="Pending" />
@@ -310,7 +311,7 @@ class Members extends React.Component {
             {members.map(this.renderMember)}
           </div>
           <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
-            <StyledButton onClick={() => this.addMember()}>
+            <StyledButton onClick={() => this.addMember()} data-cy="add-member-btn">
               + {intl.formatMessage(this.messages.addMember)}
             </StyledButton>
           </Container>
@@ -332,6 +333,7 @@ class Members extends React.Component {
               disabled={(isSubmitted && !isTouched) || !isValid}
               mx={2}
               minWidth={200}
+              data-cy="save-members-btn"
             >
               {isSubmitted && !isTouched ? (
                 <FormattedMessage id="saved" defaultMessage="Saved" />
