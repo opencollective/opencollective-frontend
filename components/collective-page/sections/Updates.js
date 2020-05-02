@@ -51,6 +51,12 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
   align-items: center;
 `;
 
+const SummaryContent = styled(HTMLContent)`
+  img {
+    max-height: 250px;
+  }
+`;
+
 /**
  * Displays collective's updates.
  */
@@ -168,7 +174,7 @@ class SectionUpdates extends React.PureComponent {
                       </P>
                     </Link>
                     {update.userCanSeeUpdate ? (
-                      <HTMLContent content={update.summary} />
+                      <SummaryContent content={update.summary} />
                     ) : (
                       <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
                         <FormattedMessage
