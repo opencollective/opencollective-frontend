@@ -161,7 +161,13 @@ class CreateOrderPage extends React.Component {
       get(data, 'Collective.platformFeePercent') === 0 && get(data, 'Collective.host.settings.feesOnTop');
     const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
 
-    if (!data.Collective.host) {
+    // Adding that at GraphQL level is buggy
+    // data is coming from CollectiveDataQuery or CollectiveWithTierDataQuery with collectiveFields
+    if (data.Collective.isHost) {
+      data.Collective.host = { ...data.Collective };
+    }
+
+    if (!data.Collective.host && !data.Collective.isHost) {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!data.Collective.isActive) {
       return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
@@ -235,6 +241,7 @@ const collectiveFields = `
   tags
   settings
   isActive
+  isHost
   location {
     country
   }

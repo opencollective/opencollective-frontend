@@ -130,6 +130,14 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         tag
       }
 
+      ... on Organization {
+        id
+        isHost
+        balance
+        # Missing
+        # ...HostFieldsFragment
+      }
+
       ... on Collective {
         id
         isApproved

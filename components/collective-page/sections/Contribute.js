@@ -62,6 +62,7 @@ class SectionContribute extends React.PureComponent {
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       isActive: PropTypes.bool,
+      isHost: PropTypes.bool,
       host: PropTypes.object,
       currency: PropTypes.string,
       settings: PropTypes.object,
@@ -158,6 +159,7 @@ class SectionContribute extends React.PureComponent {
     const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
+    const isHost = collective.isHost;
 
     /*
     cases
@@ -178,7 +180,7 @@ class SectionContribute extends React.PureComponent {
 
     return (
       <Box pt={[4, 5]}>
-        {isAdmin && !hasHost && (
+        {isAdmin && !hasHost && !isHost && (
           <ContainerSectionContent pt={5} pb={3}>
             <SectionTitle mb={24}>
               <FormattedMessage id="contributions" defaultMessage="Contributions" />
@@ -213,7 +215,7 @@ class SectionContribute extends React.PureComponent {
           </ContainerSectionContent>
         )}
 
-        {((isAdmin && hasHost) || (!isAdmin && isActive)) && (
+        {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
           <Fragment>
             <ContainerSectionContent>
               <SectionTitle>
@@ -248,14 +250,13 @@ class SectionContribute extends React.PureComponent {
                             />
                           </ContributeCardContainer>
                         )}
-
                         {sortedTiers.map(tier => (
                           <ContributeCardContainer key={tier.id}>
                             <ContributeTier
                               collective={collective}
                               tier={tier}
                               hideContributors={hasNoContributor}
-                              disableCTA={!collective.isActive}
+                              disableCTA={!isActive}
                             />
                           </ContributeCardContainer>
                         ))}

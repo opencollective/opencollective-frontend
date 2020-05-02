@@ -226,6 +226,11 @@ const EXPENSES_PAGE_QUERY = gqlV2`
         id
         tag
       }
+      ... on Organization {
+        balance
+        # We add that for hasFeature
+        isHost
+      }
       ... on Event {
         balance
         parentCollective {
@@ -251,7 +256,7 @@ const EXPENSES_PAGE_QUERY = gqlV2`
         }
       }
     }
-    expenses(account: {slug: $collectiveSlug}, limit: $limit, offset: $offset, type: $type, tags: $tags) {
+    expenses(account: { slug: $collectiveSlug }, limit: $limit, offset: $offset, type: $type, tags: $tags) {
       totalCount
       offset
       limit

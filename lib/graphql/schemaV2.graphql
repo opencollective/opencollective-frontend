@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu May 21 2020 14:27:46 GMT+0000 (Coordinated Universal Time)
+# timestamp: Tue May 26 2020 15:39:26 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -49,6 +49,16 @@ interface Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
   members(
     limit: Int = 100
     offset: Int = 0
@@ -321,6 +331,16 @@ type Bot implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -452,6 +472,16 @@ type Collective implements Account {
   isArchived: Boolean
 
   """
+  Returns whether this collective is active
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -542,11 +572,6 @@ type Collective implements Account {
   Returns whether this collective is approved
   """
   isApproved: Boolean
-
-  """
-  Returns whether this collective is active
-  """
-  isActive: Boolean
 
   """
   Number of unique financial contributors of the collective.
@@ -2139,6 +2164,16 @@ type Event implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -2733,6 +2768,16 @@ type Host implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -2921,6 +2966,16 @@ type Individual implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -3478,6 +3533,16 @@ type Organization implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -3550,6 +3615,11 @@ type Organization implements Account {
   """
   location: Location
   stats: AccountStats
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
 }
 
