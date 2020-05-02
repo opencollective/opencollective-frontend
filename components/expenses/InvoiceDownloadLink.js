@@ -51,7 +51,7 @@ export default class InvoiceDownloadLink extends Component {
     } else {
       const fromString = toIsoDateStr(dateFrom ? new Date(dateFrom) : new Date());
       const toString = toIsoDateStr(dateTo ? new Date(dateTo) : new Date());
-      return `${fromCollectiveSlug}_${toCollectiveSlug}_${fromString}_${toString}.pdf`;
+      return `${fromCollectiveSlug}-${toCollectiveSlug}-from-${fromString}-to-${toString}.pdf`;
     }
   }
 
