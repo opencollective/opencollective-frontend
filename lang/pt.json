@@ -278,6 +278,8 @@
   "CollectivePage.SectionBudget.Annual.Definition": "Orçamento anual projetado com base no total de contribuições dos últimos 12 meses.",
   "CollectivePage.SectionBudget.Balance": "Balanço de hoje",
   "CollectivePage.SectionBudget.Description": "Veja como o dinheiro circula abertamente através de {collectiveName}. Todas as contribuições e todas as despesas são publicadas em nosso livro caixa transparente. Saiba quem está doando, quanto, para onde está indo esse dinheiro, envie despesas, seja reembolsado e muito mais!",
+  "CollectivePage.SectionBudget.MonthlyRecurringAmount": "Monthly recurring: {amount}",
+  "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Ver todas as transações",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Ver todas as despesas",
   "CollectivePage.SectionContributions.Empty": "{collectiveName} aparentemente está hibernando em uma caverna no Pólo Norte ❄️☃️!",

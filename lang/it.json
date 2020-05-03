@@ -278,6 +278,8 @@
   "CollectivePage.SectionBudget.Annual.Definition": "Il bilancio annuale previsto si basa sul totale dei contributi finanziari degli ultimi 12 mesi.",
   "CollectivePage.SectionBudget.Balance": "Bilancio giornaliero",
   "CollectivePage.SectionBudget.Description": "Scopri come il denaro circola apertamente attraverso {collectiveName}. Tutti i contributi e tutte le spese sono pubblicati nel nostro registro pubblico trasparente. Scopri chi sta donando, quanto e dove vanno i soldi, invia le spese, ricevi i rimborsi e molto altro!",
+  "CollectivePage.SectionBudget.MonthlyRecurringAmount": "Monthly recurring: {amount}",
+  "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Vedi tutte le transazioni",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Vedi tutte le spese",
   "CollectivePage.SectionContributions.Empty": "{collectiveName} sembra stia ibernando in una grotta nel Polo Nord <unk> flake:<unk> man!",

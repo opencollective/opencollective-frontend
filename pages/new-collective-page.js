@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
 
+import { date12MonthsAgo } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 
 import CollectivePage from '../components/collective-page';
@@ -214,6 +215,8 @@ const getCollective = graphql(getCollectivePageQuery, {
     variables: {
       slug: props.slug,
       nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+      endDateForTotalAmountReceived: new Date().toUTCString(),
+      startDateForTotalAmountReceived: date12MonthsAgo(new Date()).toUTCString(),
     },
   }),
 });

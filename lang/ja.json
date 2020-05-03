@@ -278,6 +278,8 @@
   "CollectivePage.SectionBudget.Annual.Definition": "Projected annual budget based on total financial contributions from the past 12 months.",
   "CollectivePage.SectionBudget.Balance": "今日の残高",
   "CollectivePage.SectionBudget.Description": "See how money openly circulates through {collectiveName}. All contributions and all expenses are published in our transparent public ledger. Learn who is donating, how much, where is that money going, submit expenses, get reimbursed and more!",
+  "CollectivePage.SectionBudget.MonthlyRecurringAmount": "Monthly recurring: {amount}",
+  "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "全ての取引を表示する",
   "CollectivePage.SectionBudget.ViewAllExpenses": "全ての経費申請を表示する",
   "CollectivePage.SectionContributions.Empty": "{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!",
