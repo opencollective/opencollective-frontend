@@ -4,13 +4,11 @@ import { Col, Row } from 'react-bootstrap';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import InputField from '../InputField';
-import SectionTitle from '../SectionTitle';
 
 class CreateOrganizationForm extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
-    header: PropTypes.bool,
   };
 
   constructor(props) {
@@ -42,11 +40,10 @@ class CreateOrganizationForm extends React.Component {
   }
 
   render() {
-    const { intl, header } = this.props;
+    const { intl } = this.props;
 
     return (
       <section className="organizationDetailsForm">
-        {header !== false && <SectionTitle section="organizationDetails" />}
         <Row key="organization.name.input">
           <Col sm={12}>
             <InputField
