@@ -4,8 +4,6 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../lib/allowed-features';
-
 import _ApplyToHostBtn from './ApplyToHostBtn';
 import Container from './Container';
 import { Box } from './Grid';
@@ -45,11 +43,7 @@ const CollectiveCallsToAction = ({
         </Link>
       )}
       {hasSubmitExpense && (
-        <Link
-          // Redirect to the new Expense flow if the host is using TransferWise
-          route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
-          params={{ collectiveSlug: collective.slug }}
-        >
+        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
           <StyledButton
             buttonSize="small"
             mx={2}

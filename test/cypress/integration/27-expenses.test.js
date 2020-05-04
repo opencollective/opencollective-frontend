@@ -14,7 +14,7 @@ describe('New expense flow', () => {
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
       cy.createHostedCollective().then(collective => {
-        cy.visit(`/${collective.slug}/expenses/new/v2`);
+        cy.visit(`/${collective.slug}/expenses/new`);
         cy.getByDataCy('signIn-form');
       });
     });
@@ -28,13 +28,13 @@ describe('New expense flow', () => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
-          redirect: `/${collective.slug}/expenses/new/v2`,
+          redirect: `/${collective.slug}/expenses/new`,
         }).then(u => (user = u));
       });
     });
 
     beforeEach(() => {
-      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new/v2` });
+      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new` });
     });
 
     it('has a dismissible help message', () => {
@@ -157,8 +157,7 @@ describe('New expense flow', () => {
 describe('Legacy expense flow', () => {
   describe('new expense when logged out', () => {
     it('requires to login to submit an expense', () => {
-      cy.visit('/testcollective/expenses');
-      cy.containsInDataCy('submit-expense-btn', 'Submit Expense').click();
+      cy.visit('/testcollective/expenses/new/legacy');
       cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
       cy.get('#email').type('testuser+admin@opencollective.com');
       cy.get('[data-cy="signin-btn"]').click();
@@ -169,7 +168,7 @@ describe('Legacy expense flow', () => {
 
   describe('new expense when logged in', () => {
     beforeEach(() => {
-      cy.login({ redirect: '/testcollective/expenses/new' });
+      cy.login({ redirect: '/testcollective/expenses/new/legacy' });
     });
 
     it('submits new expense paypal', () => {

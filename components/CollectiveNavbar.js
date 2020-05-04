@@ -434,12 +434,7 @@ const CollectiveNavbar = ({
               ))}
               {callsToAction.hasSubmitExpense && (
                 <MenuLinkContainer mobileOnly>
-                  <MenuLink
-                    as={Link}
-                    // Redirect to the new Expense flow if the host is using TransferWise
-                    route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
-                    params={{ collectiveSlug: collective.slug }}
-                  >
+                  <MenuLink as={Link} route="create-expense" params={{ collectiveSlug: collective.slug }}>
                     <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
                   </MenuLink>
                 </MenuLinkContainer>
