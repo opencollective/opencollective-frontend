@@ -90,11 +90,12 @@ class ApplyToHost extends React.Component {
   }
 
   setTags = tag => {
-    tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: tag });
+    tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
   };
 
   getTags = tag => {
-    return tag === null ? 'all' : tag;
+    // this will need to be updated if we decide to have more than one tag
+    return tag === null ? 'all' : tag[0];
   };
 
   render() {

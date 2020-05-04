@@ -41,7 +41,7 @@ class HostsContainer extends React.Component {
     onChange: PropTypes.func,
     data: PropTypes.object.isRequired,
     viewport: PropTypes.string,
-    tags: PropTypes.string,
+    tags: PropTypes.array,
     intl: PropTypes.object.isRequired,
   };
 
