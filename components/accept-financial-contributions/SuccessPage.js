@@ -36,7 +36,7 @@ class SuccessPage extends React.Component {
 
   render() {
     const { collective, chosenHost, router } = this.props;
-    const { path } = router;
+    const { path } = router.query;
 
     return (
       <Fragment>

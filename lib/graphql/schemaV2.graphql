@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Apr 29 2020 15:01:06 GMT+0200 (GMT+02:00)
+# timestamp: Mon May 04 2020 11:35:58 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -26,6 +26,7 @@ interface Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -101,12 +102,12 @@ interface Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
@@ -298,6 +299,7 @@ type Bot implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -366,12 +368,12 @@ type Bot implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
@@ -428,6 +430,7 @@ type Collective implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -496,12 +499,12 @@ type Collective implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
@@ -2099,6 +2102,7 @@ type Event implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -2167,12 +2171,12 @@ type Event implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
@@ -2677,6 +2681,7 @@ type Host implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -2745,12 +2750,12 @@ type Host implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
@@ -2866,6 +2871,7 @@ type Individual implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -2934,12 +2940,12 @@ type Individual implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
@@ -3366,6 +3372,7 @@ type Organization implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -3434,12 +3441,12 @@ type Organization implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
-  transferwise: TransferWise
 
   """
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid

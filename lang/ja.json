@@ -1004,6 +1004,7 @@
   "loggingout": "ログアウト",
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.failed": "ログインに失敗しました: {message}",
+  "ManagedFunds": "Managed funds",
   "map.viewLarger": "より大きい地図の表示",
   "Member.Role.ADMIN": "Collective Admin",
   "Member.Role.ATTENDEE": "出席者",
