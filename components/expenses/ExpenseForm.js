@@ -292,7 +292,7 @@ const ExpenseFormBody = ({
                 <Box>
                   <Flex justifyContent="space-between" flexWrap="wrap">
                     <Box minWidth={250} flex="1 1 50%">
-                      <FastField name="payee">
+                      <Field name="payee">
                         {({ field }) => (
                           <StyledInputField
                             name={field.name}
@@ -316,7 +316,7 @@ const ExpenseFormBody = ({
                             )}
                           </StyledInputField>
                         )}
-                      </FastField>
+                      </Field>
                       {values.type === expenseTypes.INVOICE && (
                         <React.Fragment>
                           <FastField name="payeeLocation.country">
