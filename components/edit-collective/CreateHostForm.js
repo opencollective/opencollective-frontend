@@ -183,7 +183,7 @@ class CreateHostForm extends React.Component {
 
         {hostType === 'organization' && !host && (
           <Fragment>
-            <CreateOrganizationForm header={false} onChange={org => this.handleChange('organization', org)} />
+            <CreateOrganizationForm onChange={org => this.handleChange('organization', org)} />
             <Button
               bsStyle="primary"
               type="submit"
