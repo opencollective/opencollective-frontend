@@ -61,7 +61,7 @@ Please note that it will take a few days to process your payment.`,
     const { intl, value, error } = this.props;
     return (
       <Flex flexDirection="column">
-        <Container as="fieldset" border="none" width={1} py={3}>
+        <Container as="fieldset" border="none" width={1}>
           <Flex flexDirection={['column-reverse', 'row']}>
             <Box mb={3} flexGrow={1}>
               <StyledTextarea

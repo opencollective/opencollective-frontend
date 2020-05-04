@@ -67,7 +67,7 @@ const editAccountSettingMutation = gqlV2`
 `;
 
 const BankTransfer = props => {
-  const { loading, data } = useQuery(getHostQuery, {
+  const { loading, data, refetch: refetchHostData } = useQuery(getHostQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
@@ -161,6 +161,7 @@ const BankTransfer = props => {
             setSubmitting(false);
             setShowForm(false);
             props.hideTopsection(false);
+            refetchHostData();
           }}
         >
           {({ handleSubmit, isSubmitting, setFieldValue }) => (
@@ -196,18 +197,6 @@ const BankTransfer = props => {
               </P>
               <H3>
                 <FormattedMessage
-                  id="paymentMethods.manual.instructions.title"
-                  defaultMessage="Define the instructions to make a bank transfer to your account"
-                />
-              </H3>
-              <Box mr={2} flexGrow={1}>
-                <UpdateBankDetailsForm
-                  value={get(data.host, 'settings.paymentMethods.manual.instructions')}
-                  onChange={({ instructions }) => setFieldValue('instructions', instructions)}
-                />
-              </Box>
-              <H3>
-                <FormattedMessage
                   id="paymentMethods.manual.bankInfo.title"
                   defaultMessage="Add your bank account information"
                 />
@@ -219,6 +208,18 @@ const BankTransfer = props => {
                   isNew
                 />
               </Flex>
+              <H3 my="1.5rem">
+                <FormattedMessage
+                  id="paymentMethods.manual.instructions.title"
+                  defaultMessage="Define the instructions to make a bank transfer to your account"
+                />
+              </H3>
+              <Box mr={2} flexGrow={1}>
+                <UpdateBankDetailsForm
+                  value={get(data.host, 'settings.paymentMethods.manual.instructions')}
+                  onChange={({ instructions }) => setFieldValue('instructions', instructions)}
+                />
+              </Box>
               <Box my={3} textAlign={['center', 'left']}>
                 <StyledButton
                   mr={2}
