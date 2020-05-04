@@ -189,6 +189,7 @@ class TopBarProfileMenu extends React.Component {
         right={16}
         top={75}
         zIndex={3000}
+        width="90%"
         data-cy="user-menu"
       >
         <Flex flexWrap="wrap">
