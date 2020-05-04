@@ -251,7 +251,10 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
               <StyledSelect
                 inputId={id}
                 name={field.name}
-                onChange={({ value }) => formik.setFieldValue(field.name, value)}
+                onChange={({ value }) => {
+                  formik.setFieldValue('data', {});
+                  formik.setFieldValue(field.name, value);
+                }}
                 options={currencies}
                 value={currencies.find(c => c.label === selectedCurrency)}
                 disabled={!isNew}
