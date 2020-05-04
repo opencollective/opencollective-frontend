@@ -459,6 +459,7 @@
   "create.collective.placeholder": "Děláme svět lepším místem",
   "create.pledge.stats": "by {orgCount, plural, =0 {} one {# sponsor} other {# sponsors}} {both, plural, =0 {} one { and }} {userCount, plural, =0 {} one {# backer } other {# backers }}",
   "createAccount.alreadyLoggedIn": "It seems like you're already signed in as \"{email}\". If you want to create a new account, please log out first.",
+  "createCollective.acceptTermsOfFiscalSponsorship": "Please accept the terms of fiscal sponsorship",
   "createCollective.category.climate": "Pro iniciativy v oblasti klimatu",
   "createCollective.category.community": "Pro jakoukoliv komunitu",
   "createCollective.category.covid": "Pro iniciativy COVID-19",
