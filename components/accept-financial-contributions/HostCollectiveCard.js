@@ -14,6 +14,7 @@ import { Router } from '../../server/pages';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
@@ -173,7 +174,11 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
         </ModalHeader>
         <ModalBody>
           <Fragment>
-            <Markdown source={host.longDescription} />
+            {host.longDescription !== null && host.longDescription.slice(0, 1) === '<' ? (
+              <HTMLContent content={host.longDescription} />
+            ) : (
+              <Markdown source={host.longDescription} />
+            )}
             {get(host, 'settings.tos') && (
               <Flex flexDirection="column" mx={1} my={4}>
                 <StyledCheckbox

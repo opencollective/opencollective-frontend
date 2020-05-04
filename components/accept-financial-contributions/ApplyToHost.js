@@ -15,7 +15,7 @@ import { H1, H2, H3, P } from '../Text';
 import HostsContainer from './HostsContainer';
 
 import umbrellaIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
-import climateIllustration from '../../public/static/images/create-collective/climateIllustration.png';
+import becomeFiscalHostIllustration from '../../public/static/images/create-collective/becomeFiscalHostIllustration.png';
 
 const FISCAL_HOST_LINK = 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host';
 
@@ -184,7 +184,7 @@ class ApplyToHost extends React.Component {
                 </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
-                <img src={climateIllustration} width="192px" height="192px" />
+                <img src={becomeFiscalHostIllustration} width="192px" height="192px" />
               </Box>
             </InterestedContainer>
           </Container>
