@@ -16,6 +16,7 @@ import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
 import { H3, P } from './Text';
+import { withUser } from './UserProvider';
 
 const rolesDetails = defineMessages({
   [roles.ADMIN]: {
@@ -64,16 +65,17 @@ const replyToInvitationMutation = gql`
  * A card with actions for users to accept or decline an invitation to join the members
  * of a collective.
  */
-const ReplyToMemberInvitationCard = ({ invitation, isSelected }) => {
+const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser }) => {
   const { formatMessage } = useIntl();
   const [accepted, setAccepted] = React.useState();
   const [sendReplyToInvitation, { loading, error, data }] = useMutation(replyToInvitationMutation);
   const isDisabled = loading;
   const hasReplied = data && typeof data.replyToMemberInvitation !== 'undefined';
 
-  const buildReplyToInvitation = accept => () => {
+  const buildReplyToInvitation = accept => async () => {
     setAccepted(accept);
-    sendReplyToInvitation({ variables: { id: invitation.id, accept } });
+    await sendReplyToInvitation({ variables: { id: invitation.id, accept } });
+    await refetchLoggedInUser();
   };
 
   return (
@@ -83,6 +85,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected }) => {
       width="100%"
       maxWidth={400}
       borderColor={isSelected ? 'primary.300' : undefined}
+      data-cy="member-invitation-card"
     >
       <LinkCollective collective={invitation.collective}>
         <Flex flexDirection="column" alignItems="center">
@@ -91,7 +94,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected }) => {
         </Flex>
       </LinkCollective>
       <hr />
-      <StyledTag>{formatMemberRole(formatMessage, invitation.role)}</StyledTag>
+      <StyledTag textTransform="uppercase">{formatMemberRole(formatMessage, invitation.role)}</StyledTag>
       {rolesDetails[invitation.role] && (
         <P my={2} color="black.600">
           {formatMessage(rolesDetails[invitation.role])}
@@ -118,6 +121,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected }) => {
               disabled={isDisabled}
               loading={loading && accepted === false}
               onClick={buildReplyToInvitation(false)}
+              data-cy="member-invitation-decline-btn"
             >
               {formatMessage(messages.decline)}
             </StyledButton>
@@ -128,6 +132,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected }) => {
               disabled={isDisabled}
               loading={loading && accepted === true}
               onClick={buildReplyToInvitation(true)}
+              data-cy="member-invitation-accept-btn"
             >
               {formatMessage(messages.accept)}
             </StyledButton>
@@ -147,6 +152,8 @@ ReplyToMemberInvitationCard.propTypes = {
       name: PropTypes.string,
     }),
   }),
+  /** @ignore form withUser */
+  refetchLoggedInUser: PropTypes.func,
 };
 
-export default ReplyToMemberInvitationCard;
+export default withUser(ReplyToMemberInvitationCard);

@@ -104,6 +104,11 @@ interface Account {
   transferwise: TransferWise
 
   """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+
+  """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
@@ -364,6 +369,11 @@ type Bot implements Account {
   transferwise: TransferWise
 
   """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+
+  """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
@@ -487,6 +497,11 @@ type Collective implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
 
   """
   The list of payout methods that this collective can use to get paid
@@ -2155,6 +2170,11 @@ type Event implements Account {
   transferwise: TransferWise
 
   """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+
+  """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
@@ -2728,6 +2748,11 @@ type Host implements Account {
   transferwise: TransferWise
 
   """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+
+  """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
@@ -2910,6 +2935,11 @@ type Individual implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
 
   """
   The list of payout methods that this collective can use to get paid
@@ -3405,6 +3435,11 @@ type Organization implements Account {
   """
   conversationsTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
 
   """
   The list of payout methods that this collective can use to get paid

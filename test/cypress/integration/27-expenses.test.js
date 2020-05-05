@@ -1,6 +1,5 @@
 import 'cypress-file-upload';
 
-import { randomEmail } from '../support/faker';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
@@ -117,15 +116,6 @@ describe('New expense flow', () => {
         );
       });
       // Change payee - use a new organization
-      cy.getByDataCy('select-expense-payee').click();
-      cy.getByDataCy('collective-type-picker-ORGANIZATION').click();
-      cy.getByDataCy('create-collective-mini-form').then($form => {
-        cy.wrap($form).find('input[name="members[0].member.email"]').type(randomEmail());
-        cy.wrap($form).find('input[name="members[0].member.name"]').type('Jack');
-        cy.wrap($form).find('input[name="name"]').type('PayeeOrg');
-        cy.wrap($form).find('button[type="submit"]').click();
-      });
-      cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test-2@opencollective.com');
@@ -135,7 +125,7 @@ describe('New expense flow', () => {
 
       // Check final expense page
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat edited');
-      cy.getByDataCy('expense-summary-payee').should('contain', 'PayeeOrg');
+      cy.getByDataCy('expense-summary-payee').should('contain', 'Potatoes Lover');
       cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'paypal-test-2@opencollective.com');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'PayPal');
@@ -202,7 +192,7 @@ describe('Legacy expense flow', () => {
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
       cy.get('.Expenses .expense:first .status').contains('pending');
-      cy.get('.Expenses .expense:first .meta').contains('TEAM');
+      cy.get('.Expenses .expense:first .meta').contains('Team');
     });
 
     it('submits a new expense other, edit it and approve it', () => {

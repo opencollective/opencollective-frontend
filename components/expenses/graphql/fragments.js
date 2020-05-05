@@ -123,6 +123,11 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       twitterHandle
       currency
       expensePolicy
+      expensesTags {
+        id
+        tag
+      }
+
       ... on Collective {
         id
         isApproved

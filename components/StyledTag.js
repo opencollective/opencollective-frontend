@@ -20,7 +20,7 @@ const defaultRoundedStyleProps = {
 
 const StyledTagBase = styled.div`
   text-align: center;
-  white-space: nowrap; 
+  white-space: nowrap;
 
   ${variant({
     prop: 'variant',
@@ -49,7 +49,7 @@ const StyledTagBase = styled.div`
   & > * {
     vertical-align: middle;
   }
-  
+
   ${background}
   ${color}
   ${space}
@@ -143,7 +143,6 @@ StyledTag.propTypes = {
 
 StyledTag.defaultProps = {
   variant: 'squared',
-  textTransform: 'uppercase',
   iconHeight: '2.5em',
   iconWidth: '2.5em',
   iconBackgroundColor: 'rgba(33, 33, 33, 1)',
