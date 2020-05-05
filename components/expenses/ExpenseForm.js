@@ -156,6 +156,8 @@ const validate = expense => {
   return errors;
 };
 
+const EMPTY_ARRAY = [];
+
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
@@ -175,6 +177,7 @@ const ExpenseFormBody = ({
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
   const isReceipt = values.type === expenseTypes.RECEIPT;
+  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
@@ -407,12 +410,11 @@ const ExpenseFormBody = ({
                               <PayoutMethodSelect
                                 inputId={id}
                                 error={error}
-                                onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
+                                onChange={setPayoutMethod}
                                 payoutMethod={values.payoutMethod}
-                                payoutMethods={get(values.payee, 'payoutMethods', [])}
+                                payoutMethods={get(values.payee, 'payoutMethods', EMPTY_ARRAY)}
                                 disabled={!values.payee}
                                 collective={collective}
-                                default
                               />
                             )}
                           </StyledInputField>
@@ -420,7 +422,7 @@ const ExpenseFormBody = ({
                       </Field>
 
                       {values.payoutMethod && (
-                        <FastField name="payoutMethod">
+                        <Field name="payoutMethod">
                           {({ field, meta }) => (
                             <Box mr={fieldsMarginRight} mt={3} flex="1" minWidth={258}>
                               <PayoutMethodForm
@@ -431,7 +433,7 @@ const ExpenseFormBody = ({
                               />
                             </Box>
                           )}
-                        </FastField>
+                        </Field>
                       )}
                     </Box>
                   </Flex>
