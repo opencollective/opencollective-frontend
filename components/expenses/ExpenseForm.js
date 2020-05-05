@@ -87,7 +87,7 @@ const msg = defineMessages({
   },
   step2Invoice: {
     id: 'ExpenseForm.Step2Invoice',
-    defaultMessage: 'Vendor information',
+    defaultMessage: 'Payee information',
   },
 });
 

@@ -778,7 +778,7 @@
   "ExpenseForm.Step1": "Ajoutez un ou plusieurs reçus",
   "ExpenseForm.Step1Invoice": "Détails de la facture",
   "ExpenseForm.Step2": "Détails du remboursement",
-  "ExpenseForm.Step2Invoice": "Vendor information",
+  "ExpenseForm.Step2Invoice": "Payee information",
   "ExpenseForm.Submit": "Envoyer la dépense",
   "ExpenseForm.UnsavedChangesWarning": "Si vous annulez maintenant, vous perdrez toutes les modifications apportées à cette dépense. Êtes-vous sûr·e ?",
   "ExpenseFormAttachments.TotalAmount": "Montant total :",
