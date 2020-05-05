@@ -250,7 +250,7 @@ const ExpenseFormBody = ({
                   />
                 </Flex>
                 {values.type === expenseTypes.INVOICE && (
-                  <Box my={4}>
+                  <Box my={40}>
                     <ExpenseAttachedFilesForm
                       onChange={files => formik.setFieldValue('attachedFiles', files)}
                       defaultValue={values.attachedFiles}
