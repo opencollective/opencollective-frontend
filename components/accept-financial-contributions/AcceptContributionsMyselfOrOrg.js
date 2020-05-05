@@ -2,12 +2,13 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
-import { Field, Form, Formik } from 'formik';
-import { uniqBy } from 'lodash';
+import { Form, Formik } from 'formik';
+import { compose, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { TW_API_COLLECTIVE_SLUG } from '../../lib/constants/transferwise';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
@@ -17,13 +18,12 @@ import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import CreateCollectiveMiniForm from '../CreateCollectiveMiniForm';
+import PayoutBankInformationForm from '../expenses/PayoutBankInformationForm';
 import FinancialContributionsFAQ from '../faqs/FinancialContributionsFAQ';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import StyledInputField from '../StyledInputField';
-import StyledTextarea from '../StyledTextarea';
 import { H1, H2, P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -66,8 +66,9 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     collective: PropTypes.object,
     router: PropTypes.object,
     LoggedInUser: PropTypes.object.isRequired,
-    addBankAccount: PropTypes.func,
+    editAccountSettings: PropTypes.func,
     refetchLoggedInUser: PropTypes.func,
+    createPayoutMethod: PropTypes.func,
     applyToHost: PropTypes.func.isRequired,
   };
 
@@ -104,36 +105,40 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     }
   };
 
-  submitBankAccountInformation = async bankAccountInfo => {
+  submitBankAccountInformation = async payoutMethodData => {
     // prepare objects
     const account = {
       legacyId: this.state.organization ? this.state.organization.id : this.props.LoggedInUser.CollectiveId,
     };
 
-    const value = {
-      manual: {
-        title: 'Bank transfer',
-        features: {
-          recurring: false,
+    // try mutation
+    try {
+      await this.props.createPayoutMethod({
+        variables: {
+          payoutMethod: { data: { ...payoutMethodData, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
+          account,
         },
-        instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n
+      });
+      await this.props.editAccountSettings({
+        variables: {
+          account,
+          key: 'paymentMethods',
+          value: {
+            manual: {
+              title: 'Bank transfer',
+              features: {
+                recurring: false,
+              },
+              instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n
       <code>
       Amount: {amount}
       <br/>\n
       Reference: {orderId}
       <br/>\n
-      ${bankAccountInfo}
+      {account}
       </code>`,
-      },
-    };
-
-    // try mutation
-    try {
-      await this.props.addBankAccount({
-        variables: {
-          account,
-          key: 'paymentMethods',
-          value,
+            },
+          },
         },
       });
     } catch (err) {
@@ -160,14 +165,14 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
 
     // Form values and submit
     const initialValues = {
-      bankInformation: '',
+      data: {},
     };
 
     const submit = async values => {
       try {
         this.setState({ loading: true });
-        const { bankInformation } = values;
-        await this.submitBankAccountInformation(bankInformation);
+        const { data } = values;
+        await this.submitBankAccountInformation(data);
         await this.addHost(collective, organization ? organization : LoggedInUser.collective);
         await this.props.refetchLoggedInUser();
         await Router.pushRoute('accept-financial-contributions', {
@@ -317,29 +322,16 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                   </P>
                   <Formik initialValues={initialValues} onSubmit={submit}>
                     {formik => {
-                      const { values, handleSubmit } = formik;
+                      const { handleSubmit } = formik;
 
                       return (
                         <Form>
                           <Box width={['100%', '75%']}>
-                            <StyledInputField
-                              name="bankInformation"
-                              htmlFor="bankInformation"
-                              label="Bank information (account number, name, bank name, etc.)"
-                              value={values.bankInformation}
-                              required
-                              mt={4}
-                              mb={3}
-                            >
-                              {inputProps => (
-                                <Field
-                                  as={StyledTextarea}
-                                  {...inputProps}
-                                  placeholder="Name: Kate Account number: 00000000 Sort: 333333"
-                                  data-cy="afc-add-bank-info-field"
-                                />
-                              )}
-                            </StyledInputField>
+                            <PayoutBankInformationForm
+                              host={{ slug: TW_API_COLLECTIVE_SLUG }}
+                              getFieldName={string => string}
+                              isNew
+                            />
                           </Box>
 
                           {error && (
@@ -403,26 +395,49 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
   }
 }
 
-const bankAccountMutation = gqlV2`
-  mutation addBankAccount($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+const createPayoutMethodMutation = graphql(
+  gqlV2`
+  mutation createPayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
+    createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
+      data
+      id
+      name
+      type
+    }
+  }
+`,
+  {
+    name: 'createPayoutMethod',
+    options: { context: API_V2_CONTEXT },
+  },
+);
+
+const editAccountSettingsMutation = graphql(
+  gqlV2`
+  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
     }
   }
-`;
+`,
+  {
+    name: 'editAccountSettings',
+    options: { context: API_V2_CONTEXT },
+  },
+);
 
 const applyToHostMutation = gqlV2`
-mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
-  applyToHost(collective: $collective, host: $host) {
-    id
-    slug
-    host {
+  mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
+    applyToHost(collective: $collective, host: $host) {
       id
       slug
+      host {
+        id
+        slug
+      }
     }
   }
-}
 `;
 
 const addApplyToHostMutation = graphql(applyToHostMutation, {
@@ -430,9 +445,12 @@ const addApplyToHostMutation = graphql(applyToHostMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const addBankAccountMutation = graphql(bankAccountMutation, {
-  name: 'addBankAccount',
-  options: { context: API_V2_CONTEXT },
-});
+const inject = compose(
+  withUser,
+  withRouter,
+  addApplyToHostMutation,
+  editAccountSettingsMutation,
+  createPayoutMethodMutation,
+);
 
-export default withUser(withRouter(addBankAccountMutation(addApplyToHostMutation(AcceptContributionsMyselfOrOrg))));
+export default inject(AcceptContributionsMyselfOrOrg);
