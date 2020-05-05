@@ -11,7 +11,6 @@ import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
-import Loading from '../Loading';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
@@ -230,7 +229,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
   const { formatMessage } = useIntl();
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
 
-  if (!availableCurrencies) return <Loading />;
+  if (!availableCurrencies) return <StyledSpinner />;
 
   const currencies = formatStringOptions(availableCurrencies);
   const currencyFieldName = getFieldName('data.currency');

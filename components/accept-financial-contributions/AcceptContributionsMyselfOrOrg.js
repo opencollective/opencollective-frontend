@@ -335,14 +335,14 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                           </Box>
 
                           {error && (
-                            <Flex alignItems="center" justifyContent="center">
-                              <MessageBox type="error" withIcon mb={[1, 3]}>
+                            <Flex>
+                              <MessageBox type="error" flexGrow={1} withIcon mt={3}>
                                 {error.message}
                               </MessageBox>
                             </Flex>
                           )}
 
-                          <Flex justifyContent={'center'} my={4}>
+                          <Flex justifyContent={'center'} mt={3}>
                             <StyledButton
                               fontSize="13px"
                               minWidth={'85px'}
