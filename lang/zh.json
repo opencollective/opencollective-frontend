@@ -777,7 +777,7 @@
   "ExpenseForm.Step1": "Upload one or multiple receipt",
   "ExpenseForm.Step1Invoice": "Set invoice details",
   "ExpenseForm.Step2": "Reimbursements details",
-  "ExpenseForm.Step2Invoice": "Vendor information",
+  "ExpenseForm.Step2Invoice": "Payee information",
   "ExpenseForm.Submit": "Submit expense",
   "ExpenseForm.UnsavedChangesWarning": "If you cancel now you will loose any changes made to this expense. Are you sure?",
   "ExpenseFormAttachments.TotalAmount": "Total amount:",
