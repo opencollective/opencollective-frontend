@@ -1,23 +1,17 @@
 describe('Onboarding modal', () => {
-  before(() => {
-    cy.visit('/discover');
+  it.skip('Shows the onboarding modal on the Collective page after we create a Collective', () => {
+    // test here
   });
 
-  describe('Myself', () => {
-    it.skip('', () => {
-      // test here
-    });
+  it.skip('Adds admins to the list when you invite them', () => {
+    // test here
   });
 
-  describe('Organization', () => {
-    it.skip('', () => {
-      // test here
-    });
+  it.skip('Removes admins from the list when you click x to remove them', () => {
+    // test here
   });
 
-  describe('Apply to fiscal host', () => {
-    it.skip('', () => {
-      // test here
-    });
+  it.skip('Adds Github, Twitter, and website links to your Collective page if you add them in the modal', () => {
+    // test here
   });
 });
