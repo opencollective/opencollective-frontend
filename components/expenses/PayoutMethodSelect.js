@@ -158,4 +158,4 @@ class PayoutMethodSelect extends React.Component {
   }
 }
 
-export default injectIntl(PayoutMethodSelect);
+export default React.memo(injectIntl(PayoutMethodSelect));

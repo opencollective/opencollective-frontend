@@ -380,6 +380,7 @@ const getData = graphql(
   {
     options: {
       context: API_V2_CONTEXT,
+      fetchPolicy: 'cache-and-network',
     },
   },
 );
