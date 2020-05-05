@@ -126,6 +126,7 @@ class ExpensePage extends React.Component {
       status: PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
+      successMessageDismissed: false,
     };
   }
 
@@ -230,7 +231,8 @@ class ExpensePage extends React.Component {
   onSuccessMsgDismiss = () => {
     // Replaces the route by the version without `createSuccess=true`
     const { parentCollectiveSlug, collectiveSlug, legacyExpenseId } = this.props;
-    Router.replaceRoute(
+    this.setState({ successMessageDismissed: true });
+    return Router.replaceRoute(
       `expense-v2`,
       {
         parentCollectiveSlug,
@@ -244,9 +246,17 @@ class ExpensePage extends React.Component {
     );
   };
 
+  onEditBtnClick = async () => {
+    if (this.props.createSuccess) {
+      this.onSuccessMsgDismiss();
+    }
+
+    return this.setState({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense });
+  };
+
   render() {
     const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
-    const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
+    const { isRefetchingDataForUser, error, status, editedExpense, successMessageDismissed } = this.state;
 
     if (!data.loading) {
       if (!data || data.error) {
@@ -265,7 +275,7 @@ class ExpensePage extends React.Component {
     const hasAttachedFiles = expense?.attachedFiles?.length > 0;
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
-        {createSuccess && (
+        {createSuccess && !successMessageDismissed && (
           <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
             <FormattedMessage
               id="expense.createSuccess"
@@ -290,7 +300,7 @@ class ExpensePage extends React.Component {
                   collective={collective}
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
-                  onEdit={() => this.setState({ status: PAGE_STATUS.EDIT, editedExpense: expense })}
+                  onEdit={this.onEditBtnClick}
                 />
               )}
             </Flex>
