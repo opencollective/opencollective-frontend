@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from './Container';
@@ -27,107 +26,16 @@ const Subtitle = styled(Container)`
 
 class SectionTitle extends React.Component {
   static propTypes = {
-    section: PropTypes.string,
     title: PropTypes.node,
     subtitle: PropTypes.node,
     values: PropTypes.object,
     action: PropTypes.object, // { label, href }
-    intl: PropTypes.object.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.messages = defineMessages({
-      'memberships.title': {
-        id: 'section.memberships.title',
-        defaultMessage: 'Memberships',
-      },
-      'updates.title': {
-        id: 'section.updates.title',
-        defaultMessage: 'Updates',
-      },
-      'updates.subtitle': {
-        id: 'section.updates.subtitle',
-        defaultMessage: 'Stay up to dates with our latest activities and progress.',
-      },
-      'events.title': { id: 'Events', defaultMessage: 'Events' },
-      'events.subtitle': {
-        id: 'section.events.subtitle',
-        defaultMessage: 'Meet the community!',
-      },
-      'team.title': { id: 'section.team.title', defaultMessage: 'Team' },
-      'team.subtitle': {
-        id: 'section.team.subtitle',
-        defaultMessage: 'Meet the awesome people that are bringing the community together! 🙌',
-      },
-      'budget.title': { id: 'section.budget.title', defaultMessage: 'Budget' },
-      'budget.subtitle': {
-        id: 'section.budget.subtitle',
-        defaultMessage: 'Current balance: {balance}',
-      },
-      'expenses.title': {
-        id: 'section.expenses.title',
-        defaultMessage: 'Expenses',
-      },
-      'expenses.subtitle': {
-        id: 'section.expenses.subtitle',
-        defaultMessage: 'All expenses',
-      },
-      'contributors.title': {
-        id: 'section.contributors.title',
-        defaultMessage: 'Contributors',
-      },
-      'contributors.subtitle': {
-        id: 'section.contributors.subtitle',
-        defaultMessage:
-          '{organizations, plural, one {{organizations} organization and} other {{organizations} organizations and}} {users} {users, plural, one {person is} other {people are}} supporting us.',
-      },
-      'contributionDetails.title': {
-        id: 'tier.order.contributionDetails',
-        defaultMessage: 'Contribution details',
-      },
-      'contributionDetails.subtitle': {
-        id: 'tier.order.contributionDetails.description',
-        defaultMessage: 'Thank you for contributing to our budget! 🙏',
-      },
-      'tickets.title': {
-        id: 'section.tickets.title',
-        defaultMessage: 'Tickets',
-      },
-      'ticketDetails.title': {
-        id: 'tier.order.ticketDetails',
-        defaultMessage: 'Ticket details',
-      },
-      'userDetails.title': {
-        id: 'tier.order.userDetails',
-        defaultMessage: 'Personal details',
-      },
-      'organizationDetails.title': {
-        id: 'tier.order.organizationDetails',
-        defaultMessage: 'Organization details',
-      },
-      'organizationDetails.subtitle': {
-        id: 'tier.order.organizationDetails.description',
-        defaultMessage: 'Create an Organization. You can add more team members later.',
-      },
-      'paymentDetails.title': {
-        id: 'tier.order.paymentDetails',
-        defaultMessage: 'Payment details',
-      },
-    });
-  }
-
   render() {
-    const { section, intl, values, action } = this.props;
-
-    const title =
-      this.props.title ||
-      (this.messages[`${section}.title`] ? intl.formatMessage(this.messages[`${section}.title`]) : section);
-    const subtitle =
-      this.props.subtitle ||
-      (this.messages[`${section}.subtitle`] ? intl.formatMessage(this.messages[`${section}.subtitle`], values) : '');
-
+    const { action } = this.props;
+    const title = this.props.title;
+    const subtitle = this.props.subtitle;
     return (
       <Container textAlign="center" className="SectionTitle">
         <style jsx>
@@ -167,4 +75,4 @@ class SectionTitle extends React.Component {
   }
 }
 
-export default injectIntl(SectionTitle);
+export default SectionTitle;

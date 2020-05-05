@@ -44,6 +44,10 @@ export const msg = defineMessages({
     id: 'expense.RemoveItem',
     defaultMessage: 'Remove item',
   },
+  receiptRequired: {
+    id: 'expense.ReceiptRequired',
+    defaultMessage: 'Receipt required',
+  },
 });
 
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
@@ -101,9 +105,13 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                   mt={2}
                   htmlFor={attachmentKey}
                   label={<AttachmentLabel />}
-                  error={formatFormErrorMessage(intl, meta.error)}
                   data-cy="attachment-url-field"
                   required
+                  error={
+                    meta.error?.type === ERROR.FORM_FIELD_REQUIRED
+                      ? formatMessage(msg.receiptRequired)
+                      : formatFormErrorMessage(intl, meta.error)
+                  }
                 >
                   <StyledDropzone
                     {...attachmentDropzoneParams}
@@ -172,7 +180,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
               mt={3}
             >
               {inputProps => (
-                <Field as={StyledInputAmount} name={inputProps.name}>
+                <Field name={inputProps.name}>
                   {({ field, form: { setFieldValue } }) => (
                     <StyledInputAmount
                       {...field}

@@ -25,6 +25,8 @@ import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
+import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -62,10 +64,12 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
  * Last step of the create expense flow, shows the summary of the expense with
  * the ability to submit it.
  */
-const ExpenseSummary = ({ expense, host, isLoading }) => {
+const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, showProcessActions }) => {
   const intl = useIntl();
-  const { payee, createdByAccount } = expense || {};
+  const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
+  const existsInAPI = expense && (expense.id || expense.legacyId);
+  const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
 
   return (
     <StyledCard p={[16, 24, 32]}>
@@ -207,6 +211,58 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
         <LoadingPlaceholder height={150} mt={3} />
       ) : (
         <Flex flexWrap="wrap">
+          <PrivateInfoColumn data-cy="expense-summary-payee">
+            <PrivateInfoColumnHeader>
+              <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+            </PrivateInfoColumnHeader>
+            <LinkCollective collective={payee}>
+              <Flex alignItems="center">
+                <Avatar collective={payee} radius={24} />
+                <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
+                  {payee.name}
+                </Span>
+              </Flex>
+            </LinkCollective>
+            {payeeLocation && (
+              <P whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+                {payeeLocation.address}
+                {payeeLocation.address && payeeLocation.country && <br />}
+                {payeeLocation.country}
+              </P>
+            )}
+            {payee.website && (
+              <P mt={2} fontSize="11px">
+                <StyledLink href={payee.website} openInNewTab>
+                  {payee.website}
+                </StyledLink>
+              </P>
+            )}
+          </PrivateInfoColumn>
+          <PrivateInfoColumn mr={0}>
+            <PrivateInfoColumnHeader>
+              <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+            </PrivateInfoColumnHeader>
+            <Container fontSize="Caption" color="black.600">
+              <Box mb={3} data-cy="expense-summary-payout-method-type">
+                <PayoutMethodTypeWithIcon type={expense.payoutMethod.type} />
+              </Box>
+              <div data-cy="expense-summary-payout-method-data">
+                <PayoutMethodData payoutMethod={expense.payoutMethod} />
+              </div>
+              {expense.invoiceInfo && (
+                <Box mt={3} data-cy="expense-summary-invoice-info">
+                  <Container fontSize="11px" fontWeight="500" mb={2}>
+                    <FormattedMessage id="ExpenseForm.InvoiceInfo" defaultMessage="Additional invoice information" />
+                    &nbsp;&nbsp;
+                    <PrivateInfoIcon color="#969BA3" />
+                  </Container>
+                  <P fontSize="11px" lineHeight="16px" whiteSpace="pre-wrap">
+                    {expense.invoiceInfo}
+                  </P>
+                </Box>
+              )}
+            </Container>
+          </PrivateInfoColumn>
           {host && (
             <PrivateInfoColumn data-cy="expense-summary-host">
               <PrivateInfoColumnHeader>
@@ -234,45 +290,14 @@ const ExpenseSummary = ({ expense, host, isLoading }) => {
               )}
             </PrivateInfoColumn>
           )}
-          <PrivateInfoColumn data-cy="expense-summary-payee">
-            <PrivateInfoColumnHeader>
-              <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
-            </PrivateInfoColumnHeader>
-            <LinkCollective collective={payee}>
-              <Flex alignItems="center">
-                <Avatar collective={payee} radius={24} />
-                <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
-                  {payee.name}
-                </Span>
-              </Flex>
-            </LinkCollective>
-            {payee.location && (
-              <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-                {payee.location.address}
-              </P>
-            )}
-            {payee.website && (
-              <P mt={2} fontSize="11px">
-                <StyledLink href={payee.website} openInNewTab>
-                  {payee.website}
-                </StyledLink>
-              </P>
-            )}
-          </PrivateInfoColumn>
-          <PrivateInfoColumn mr={0}>
-            <PrivateInfoColumnHeader>
-              <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-            </PrivateInfoColumnHeader>
-            <Container fontSize="Caption" color="black.600">
-              <Box mb={3} data-cy="expense-summary-payout-method-type">
-                <PayoutMethodTypeWithIcon type={expense.payoutMethod.type} />
-              </Box>
-              <div data-cy="expense-summary-payout-method-data">
-                <PayoutMethodData payoutMethod={expense.payoutMethod} />
-              </div>
-            </Container>
-          </PrivateInfoColumn>
         </Flex>
+      )}
+      {showProcessButtons && (
+        <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
+          <Flex flexWrap="wrap" justifyContent="flex-end">
+            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} />
+          </Flex>
+        </Container>
       )}
     </StyledCard>
   );
@@ -296,9 +321,11 @@ ExpenseSummary.propTypes = {
   }),
   /** Must be provided if isLoading is false */
   expense: PropTypes.shape({
+    id: PropTypes.string,
     legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.oneOf(Object.values(expenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
@@ -317,11 +344,11 @@ ExpenseSummary.propTypes = {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-      location: PropTypes.shape({
-        address: PropTypes.string,
-        country: PropTypes.string,
-      }),
     }).isRequired,
+    payeeLocation: PropTypes.shape({
+      address: PropTypes.string,
+      country: PropTypes.string,
+    }),
     createdByAccount: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -334,6 +361,12 @@ ExpenseSummary.propTypes = {
       data: PropTypes.object,
     }),
   }),
+  /** Wether process actions (pay, approve, etc.) should be displayed */
+  showProcessActions: PropTypes.bool,
+  /** The account where the expense has been submitted, required to display the process actions */
+  collective: PropTypes.object,
+  /** To know which process buttons to display (if any) */
+  permissions: PropTypes.object,
 };
 
 export default ExpenseSummary;

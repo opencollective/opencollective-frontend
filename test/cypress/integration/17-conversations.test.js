@@ -46,7 +46,7 @@ describe('Conversations', () => {
       cy.getByDataCy('styled-input-tags-open').click();
       cy.getByDataCy('styled-input-tags-input').type(`${sampleTag}{enter}{enter}`);
       cy.getByDataCy('InlineEditField-Btn-Save').click();
-      cy.contains(`${sampleTag}`.toUpperCase());
+      cy.contains(`${sampleTag}`.toLowerCase());
 
       // Add comment
       cy.get('[data-cy="comment-form"] [data-cy="RichTextEditor"] trix-editor').as('comment-editor');

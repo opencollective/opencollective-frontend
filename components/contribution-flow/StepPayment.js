@@ -8,8 +8,8 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { formatCurrency } from '../../lib/currency-utils';
 import { getPaymentMethodName, paymentMethodExpiration } from '../../lib/payment_method_label';
-import { formatCurrency } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import Container from '../Container';

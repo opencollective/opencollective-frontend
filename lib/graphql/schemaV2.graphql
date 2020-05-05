@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Apr 15 2020 17:06:24 GMT+0200 (GMT+02:00)
+# timestamp: Mon May 04 2020 22:17:41 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -26,6 +26,7 @@ interface Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -43,6 +44,11 @@ interface Account {
   The time of last update
   """
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
   members(
     limit: Int = 100
     offset: Int = 0
@@ -96,12 +102,22 @@ interface Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -283,6 +299,7 @@ type Bot implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -296,6 +313,11 @@ type Bot implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -346,12 +368,22 @@ type Bot implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -398,6 +430,7 @@ type Collective implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -411,6 +444,11 @@ type Collective implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -461,12 +499,22 @@ type Collective implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -477,17 +525,32 @@ type Collective implements Account {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
-  balance: Int
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
-  host: Account
+  host: Host
+
+  """
+  Return this collective approved date
+  """
+  approvedAt: DateTime
 
   """
   Returns whether this collective is approved
   """
   isApproved: Boolean
+
+  """
+  Number of unique financial contributors of the collective.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int
 }
 
 input CollectiveCreateInput {
@@ -540,13 +603,18 @@ input CommentUpdateInput {
 }
 
 """
-Fields for a connected account
+This represents a Connected Account
 """
 type ConnectedAccount {
   """
   Unique identifier for this connected account
   """
   id: String!
+
+  """
+  The internal database identifier of the Connected Account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-05-01: should only be used during the transition to GraphQL API v2.")
 
   """
   The date on which the ConnectedAccount was created
@@ -666,6 +734,1241 @@ type ConversationStats {
   Total number of comments for this conversation
   """
   commentsCount: Int
+}
+
+"""
+Two-letters country code following ISO3166_1
+"""
+enum CountryISO {
+  """
+  Afghanistan
+  """
+  AF
+
+  """
+  Åland Islands
+  """
+  AX
+
+  """
+  Albania
+  """
+  AL
+
+  """
+  Algeria
+  """
+  DZ
+
+  """
+  Andorra
+  """
+  AD
+
+  """
+  Angola
+  """
+  AO
+
+  """
+  Antigua and Barbuda
+  """
+  AG
+
+  """
+  Argentina
+  """
+  AR
+
+  """
+  Armenia
+  """
+  AM
+
+  """
+  Australia
+  """
+  AU
+
+  """
+  Austria
+  """
+  AT
+
+  """
+  Azerbaijan
+  """
+  AZ
+
+  """
+  The Bahamas
+  """
+  BS
+
+  """
+  Bahrain
+  """
+  BH
+
+  """
+  Bangladesh
+  """
+  BD
+
+  """
+  Barbados
+  """
+  BB
+
+  """
+  Belarus
+  """
+  BY
+
+  """
+  Belgium
+  """
+  BE
+
+  """
+  Belize
+  """
+  BZ
+
+  """
+  Benin
+  """
+  BJ
+
+  """
+  Bhutan
+  """
+  BT
+
+  """
+  Bolivia
+  """
+  BO
+
+  """
+  Bosnia and Herzegovina
+  """
+  BA
+
+  """
+  Botswana
+  """
+  BW
+
+  """
+  Brazil
+  """
+  BR
+
+  """
+  Brunei
+  """
+  BN
+
+  """
+  Bulgaria
+  """
+  BG
+
+  """
+  Burkina
+  """
+  BF
+
+  """
+  Burundi
+  """
+  BI
+
+  """
+  Cambodia
+  """
+  KH
+
+  """
+  Cameroon
+  """
+  CM
+
+  """
+  Canada
+  """
+  CA
+
+  """
+  Cape Verde
+  """
+  CV
+
+  """
+  The Central African Republic
+  """
+  CF
+
+  """
+  Chad
+  """
+  TD
+
+  """
+  Chile
+  """
+  CL
+
+  """
+  China
+  """
+  CN
+
+  """
+  Colombia
+  """
+  CO
+
+  """
+  The Comoros
+  """
+  KM
+
+  """
+  The Congo
+  """
+  CG
+
+  """
+  The Democratic Republic of the Congo
+  """
+  CD
+
+  """
+  Costa Rica
+  """
+  CR
+
+  """
+  Côte d'Ivoire
+  """
+  CI
+
+  """
+  Croatia
+  """
+  HR
+
+  """
+  Cuba
+  """
+  CU
+
+  """
+  Cyprus
+  """
+  CY
+
+  """
+  The Czech Republic
+  """
+  CZ
+
+  """
+  Denmark
+  """
+  DK
+
+  """
+  Djibouti
+  """
+  DJ
+
+  """
+  Dominica
+  """
+  DM
+
+  """
+  The Dominican Republic
+  """
+  DO
+
+  """
+  Timor-Leste
+  """
+  TL
+
+  """
+  Ecuador
+  """
+  EC
+
+  """
+  Egypt
+  """
+  EG
+
+  """
+  El Salvador
+  """
+  SV
+
+  """
+  Equatorial Guinea
+  """
+  GQ
+
+  """
+  Eritrea
+  """
+  ER
+
+  """
+  Estonia
+  """
+  EE
+
+  """
+  Ethiopia
+  """
+  ET
+
+  """
+  Fiji
+  """
+  FJ
+
+  """
+  Finland
+  """
+  FI
+
+  """
+  France
+  """
+  FR
+
+  """
+  Gabon
+  """
+  GA
+
+  """
+  The Gambia
+  """
+  GM
+
+  """
+  Georgia
+  """
+  GE
+
+  """
+  Germany
+  """
+  DE
+
+  """
+  Ghana
+  """
+  GH
+
+  """
+  Greece
+  """
+  GR
+
+  """
+  Grenada
+  """
+  GD
+
+  """
+  Guatemala
+  """
+  GT
+
+  """
+  Guernsey
+  """
+  GG
+
+  """
+  Guinea
+  """
+  GN
+
+  """
+  Guinea-Bissau
+  """
+  GW
+
+  """
+  Guyana
+  """
+  GY
+
+  """
+  Haiti
+  """
+  HT
+
+  """
+  The Holy See
+  """
+  VA
+
+  """
+  Honduras
+  """
+  HN
+
+  """
+  Hungary
+  """
+  HU
+
+  """
+  Iceland
+  """
+  IS
+
+  """
+  India
+  """
+  IN
+
+  """
+  Indonesia
+  """
+  ID
+
+  """
+  Iran
+  """
+  IR
+
+  """
+  Iraq
+  """
+  IQ
+
+  """
+  Ireland
+  """
+  IE
+
+  """
+  Isle of Man
+  """
+  IM
+
+  """
+  Israel
+  """
+  IL
+
+  """
+  Italy
+  """
+  IT
+
+  """
+  Jamaica
+  """
+  JM
+
+  """
+  Japan
+  """
+  JP
+
+  """
+  Jersey
+  """
+  JE
+
+  """
+  Jordan
+  """
+  JO
+
+  """
+  Kazakhstan
+  """
+  KZ
+
+  """
+  Kenya
+  """
+  KE
+
+  """
+  Kiribati
+  """
+  KI
+
+  """
+  The Democratic People's Republic of Korea
+  """
+  KP
+
+  """
+  The Republic of Korea
+  """
+  KR
+
+  """
+  Kuwait
+  """
+  KW
+
+  """
+  Kyrgyzstan
+  """
+  KG
+
+  """
+  Laos
+  """
+  LA
+
+  """
+  Latvia
+  """
+  LV
+
+  """
+  Lebanon
+  """
+  LB
+
+  """
+  Lesotho
+  """
+  LS
+
+  """
+  Liberia
+  """
+  LR
+
+  """
+  Libya
+  """
+  LY
+
+  """
+  Liechtenstein
+  """
+  LI
+
+  """
+  Lithuania
+  """
+  LT
+
+  """
+  Luxembourg
+  """
+  LU
+
+  """
+  Madagascar
+  """
+  MG
+
+  """
+  Malawi
+  """
+  MW
+
+  """
+  Malaysia
+  """
+  MY
+
+  """
+  Maldives
+  """
+  MV
+
+  """
+  Mali
+  """
+  ML
+
+  """
+  Malta
+  """
+  MT
+
+  """
+  The Marshall Islands
+  """
+  MH
+
+  """
+  Mauritania
+  """
+  MR
+
+  """
+  Mauritius
+  """
+  MU
+
+  """
+  Mexico
+  """
+  MX
+
+  """
+  Micronesia
+  """
+  FM
+
+  """
+  Moldova
+  """
+  MD
+
+  """
+  Monaco
+  """
+  MC
+
+  """
+  Mongolia
+  """
+  MN
+
+  """
+  Montenegro
+  """
+  ME
+
+  """
+  Morocco
+  """
+  MA
+
+  """
+  Mozambique
+  """
+  MZ
+
+  """
+  Myanmar
+  """
+  MM
+
+  """
+  Namibia
+  """
+  NA
+
+  """
+  Nauru
+  """
+  NR
+
+  """
+  Nepal
+  """
+  NP
+
+  """
+  The Netherlands
+  """
+  NL
+
+  """
+  New Zealand
+  """
+  NZ
+
+  """
+  Nicaragua
+  """
+  NI
+
+  """
+  The Niger
+  """
+  NE
+
+  """
+  Nigeria
+  """
+  NG
+
+  """
+  Norway
+  """
+  NO
+
+  """
+  Oman
+  """
+  OM
+
+  """
+  Pakistan
+  """
+  PK
+
+  """
+  Palau
+  """
+  PW
+
+  """
+  Panama
+  """
+  PA
+
+  """
+  Papua New Guinea
+  """
+  PG
+
+  """
+  Paraguay
+  """
+  PY
+
+  """
+  Peru
+  """
+  PE
+
+  """
+  The Philippines
+  """
+  PH
+
+  """
+  Poland
+  """
+  PL
+
+  """
+  Portugal
+  """
+  PT
+
+  """
+  Qatar
+  """
+  QA
+
+  """
+  Romania
+  """
+  RO
+
+  """
+  Russia
+  """
+  RU
+
+  """
+  Rwanda
+  """
+  RW
+
+  """
+  Saint Kitts and Nevis
+  """
+  KN
+
+  """
+  Saint Lucia
+  """
+  LC
+
+  """
+  Saint Vincent and The Grenadines
+  """
+  VC
+
+  """
+  Samoa
+  """
+  WS
+
+  """
+  San Marino
+  """
+  SM
+
+  """
+  Sao Tome and Principe
+  """
+  ST
+
+  """
+  Saudi Arabia
+  """
+  SA
+
+  """
+  Senegal
+  """
+  SN
+
+  """
+  Serbia
+  """
+  RS
+
+  """
+  Seychelles
+  """
+  SC
+
+  """
+  Sierra Leone
+  """
+  SL
+
+  """
+  Singapore
+  """
+  SG
+
+  """
+  Slovakia
+  """
+  SK
+
+  """
+  Slovenia
+  """
+  SI
+
+  """
+  Solomon Islands
+  """
+  SB
+
+  """
+  Somalia
+  """
+  SO
+
+  """
+  South Africa
+  """
+  ZA
+
+  """
+  Spain
+  """
+  ES
+
+  """
+  Sri Lanka
+  """
+  LK
+
+  """
+  The Sudan
+  """
+  SD
+
+  """
+  Suriname
+  """
+  SR
+
+  """
+  Swaziland
+  """
+  SZ
+
+  """
+  Sweden
+  """
+  SE
+
+  """
+  Switzerland
+  """
+  CH
+
+  """
+  Syria
+  """
+  SY
+
+  """
+  Tajikistan
+  """
+  TJ
+
+  """
+  Tanzania
+  """
+  TZ
+
+  """
+  Thailand
+  """
+  TH
+
+  """
+  Macedonia
+  """
+  MK
+
+  """
+  Togo
+  """
+  TG
+
+  """
+  Tonga
+  """
+  TO
+
+  """
+  Trinidad and Tobago
+  """
+  TT
+
+  """
+  Tunisia
+  """
+  TN
+
+  """
+  Turkey
+  """
+  TR
+
+  """
+  Turkmenistan
+  """
+  TM
+
+  """
+  Tuvalu
+  """
+  TV
+
+  """
+  Uganda
+  """
+  UG
+
+  """
+  Ukraine
+  """
+  UA
+
+  """
+  The United Arab Emirates
+  """
+  AE
+
+  """
+  The United Kingdom
+  """
+  GB
+
+  """
+  The United States
+  """
+  US
+
+  """
+  Uruguay
+  """
+  UY
+
+  """
+  Uzbekistan
+  """
+  UZ
+
+  """
+  Vanuatu
+  """
+  VU
+
+  """
+  Venezuela
+  """
+  VE
+
+  """
+  Viet Nam
+  """
+  VN
+
+  """
+  Yemen
+  """
+  YE
+
+  """
+  Zambia
+  """
+  ZM
+
+  """
+  Zimbabwe
+  """
+  ZW
+
+  """
+  American Samoa
+  """
+  AS
+
+  """
+  Anguilla
+  """
+  AI
+
+  """
+  Antarctica
+  """
+  AQ
+
+  """
+  Aruba
+  """
+  AW
+
+  """
+  Bermuda
+  """
+  BM
+
+  """
+  Bouvet Island
+  """
+  BV
+
+  """
+  The British Indian Ocean Territory
+  """
+  IO
+
+  """
+  Cayman Islands
+  """
+  KY
+
+  """
+  Christmas Island
+  """
+  CX
+
+  """
+  Cocos Islands
+  """
+  CC
+
+  """
+  Cook Islands
+  """
+  CK
+
+  """
+  Falkland Islands
+  """
+  FK
+
+  """
+  Faroe Islands
+  """
+  FO
+
+  """
+  French Guiana
+  """
+  GF
+
+  """
+  French Polynesia
+  """
+  PF
+
+  """
+  The French Southern Territories
+  """
+  TF
+
+  """
+  Gibraltar
+  """
+  GI
+
+  """
+  Greenland
+  """
+  GL
+
+  """
+  Guadeloupe
+  """
+  GP
+
+  """
+  Guam
+  """
+  GU
+
+  """
+  Heard Island and McDonald Islands
+  """
+  HM
+
+  """
+  Hong Kong
+  """
+  HK
+
+  """
+  Macao
+  """
+  MO
+
+  """
+  Martinique
+  """
+  MQ
+
+  """
+  Mayotte
+  """
+  YT
+
+  """
+  Montserrat
+  """
+  MS
+
+  """
+  Netherlands Antilles
+  """
+  AN
+
+  """
+  New Caledonia
+  """
+  NC
+
+  """
+  Niue
+  """
+  NU
+
+  """
+  Norfolk Island
+  """
+  NF
+
+  """
+  Northern Mariana Islands
+  """
+  MP
+
+  """
+  The Occupied Palestinian Territory
+  """
+  PS
+
+  """
+  Pitcairn
+  """
+  PN
+
+  """
+  Puerto Rico
+  """
+  PR
+
+  """
+  Réunion
+  """
+  RE
+
+  """
+  Saint Barthélemy
+  """
+  BL
+
+  """
+  Saint Helena
+  """
+  SH
+
+  """
+  Saint Martin
+  """
+  MF
+
+  """
+  Saint Pierre and Miquelon
+  """
+  PM
+
+  """
+  South Georgia and The South Sandwich Islands
+  """
+  GS
+
+  """
+  Svalbard and Jan Mayen
+  """
+  SJ
+
+  """
+  Taiwan
+  """
+  TW
+
+  """
+  Tokelau
+  """
+  TK
+
+  """
+  Turks and Caicos Islands
+  """
+  TC
+
+  """
+  United States Minor Outlying Islands
+  """
+  UM
+
+  """
+  British Virgin Islands
+  """
+  VG
+
+  """
+  US Virgin Islands
+  """
+  VI
+
+  """
+  Wallis and Futuna
+  """
+  WF
+
+  """
+  Western Sahara
+  """
+  EH
 }
 
 """
@@ -799,6 +2102,7 @@ type Event implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -812,6 +2116,11 @@ type Event implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -862,12 +2171,22 @@ type Event implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -878,12 +2197,12 @@ type Event implements Account {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
-  balance: Int
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
-  host: Account
+  host: Host
 
   """
   Returns whether this collective is approved
@@ -958,6 +2277,11 @@ type Expense {
   The account being paid by this expense
   """
   payee: Account!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: Location
 
   """
   The account who created this expense
@@ -1072,6 +2396,11 @@ input ExpenseCreateInput {
   Account to reimburse
   """
   payee: AccountReferenceInput!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
 }
 
 """
@@ -1151,7 +2480,7 @@ input ExpenseItemInput {
   """
   URL of the file linked to this item. Must be provided if the expense type is RECEIPT.
   """
-  url: String
+  url: URL
 
   """
   When was the money spent?
@@ -1177,6 +2506,61 @@ type ExpensePermissions {
   Whether the current user can the the invoice info for this expense
   """
   canSeeInvoiceInfo: Boolean!
+
+  """
+  Whether the current user can trigger the payment for this expense
+  """
+  canPay: Boolean!
+
+  """
+  Whether the current user can approve this expense
+  """
+  canApprove: Boolean!
+
+  """
+  Whether the current user can unapprove this expense
+  """
+  canUnapprove: Boolean!
+
+  """
+  Whether the current user can reject this expense
+  """
+  canReject: Boolean!
+
+  """
+  Whether the current user can mark this expense as unpaid
+  """
+  canMarkAsUnpaid: Boolean!
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseProcessAction {
+  """
+  To mark the expense as approved
+  """
+  APPROVE
+
+  """
+  To mark the expense as pending after it has been approved
+  """
+  UNAPPROVE
+
+  """
+  To mark the expense as rejected
+  """
+  REJECT
+
+  """
+  To mark the expense as rejected
+  """
+  MARK_AS_UNPAID
+
+  """
+  To trigger the payment
+  """
+  PAY
 }
 
 input ExpenseReferenceInput {
@@ -1276,6 +2660,11 @@ input ExpenseUpdateInput {
   Account to reimburse
   """
   payee: AccountReferenceInput
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
 }
 
 """
@@ -1292,6 +2681,7 @@ type Host implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -1305,6 +2695,11 @@ type Host implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -1355,6 +2750,11 @@ type Host implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -1363,12 +2763,20 @@ type Host implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
   stats: AccountStats
   hostFeePercent: Int
   totalHostedCollectives: Int
+  isOpenToApplications: Boolean
+  termsUrl: URL
+  plan: HostPlan!
 }
 
 """
@@ -1379,6 +2787,66 @@ type HostCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Host]
+}
+
+"""
+The name of the current plan and its characteristics.
+"""
+type HostPlan {
+  """
+  The name of the plan
+  """
+  name: String
+
+  """
+  Number of collectives hosted
+  """
+  hostedCollectives: Int
+
+  """
+  Max number of collectives than can be hosted
+  """
+  hostedCollectivesLimit: Int
+
+  """
+  Wether this plan allows to use the added funds feature
+  """
+  addedFunds: Int
+
+  """
+  Amount limit for the added funds feature under this plan
+  """
+  addedFundsLimit: Int
+
+  """
+  Wether this plan allows to use the host dashboard
+  """
+  hostDashboard: Boolean
+
+  """
+  Wether this plan allows to use the manual payments feature
+  """
+  manualPayments: Boolean
+
+  """
+  Wether this plan allows to use the bank transfers feature
+  """
+  bankTransfers: Int
+
+  """
+  Amount limit for the bank transfers feature under this plan
+  """
+  bankTransfersLimit: Int
+
+  """
+  Wether this plan allows to use the transferwise payouts feature
+  """
+  transferwisePayouts: Int
+
+  """
+  Amount limit for the transferwise payouts feature under this plan
+  """
+  transferwisePayoutsLimit: Int
 }
 
 enum ImageFormat {
@@ -1403,6 +2871,7 @@ type Individual implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -1416,6 +2885,11 @@ type Individual implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -1466,12 +2940,22 @@ type Individual implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   Address. This field is public for hosts, otherwise:
@@ -1509,6 +2993,36 @@ type Location {
   Two letters country code (eg. FR, BE...etc)
   """
   country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
 
   """
   Latitude
@@ -1732,6 +3246,26 @@ type Mutation {
   ): Expense!
 
   """
+  Process the expense with the given action
+  """
+  processExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    The action to trigger
+    """
+    action: ExpenseProcessAction!
+
+    """
+    If action is related to a payment, this object used for the payment parameters
+    """
+    paymentParams: ProcessExpensePaymentParams
+  ): Expense!
+
+  """
   Edit the settings for the given account
   """
   editAccountSetting(
@@ -1838,6 +3372,7 @@ type Organization implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -1851,6 +3386,11 @@ type Organization implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -1901,12 +3441,22 @@ type Organization implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
 
   """
   Address. This field is public for hosts, otherwise:
@@ -1963,51 +3513,108 @@ enum PayoutMethodType {
 }
 
 """
+Parameters for paying an expense
+"""
+input ProcessExpensePaymentParams {
+  """
+  The fee charged by payment processor in collective currency, or the fee refunded when used with MARK_AS_UNPAID
+  """
+  paymentProcessorFee: Int
+
+  """
+  Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
+  """
+  forceManual: Boolean
+}
+
+"""
 This is the root query
 """
 type Query {
   account(
     """
-    The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    The public id identifying the Account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
     """
     id: String
 
     """
-    The slug identifying the account (ie: babel for https://opencollective.com/babel)
+    The slug identifying the Account (ie: babel for https://opencollective.com/babel)
     """
     slug: String
 
     """
-    The githubHandle attached to the account (ie: babel for https://opencollective.com/babel)
+    The githubHandle attached to the Account (ie: babel for https://opencollective.com/babel)
     """
     githubHandle: String
 
     """
-    If false, will return null instead of an error if collective is not found
+    If false, will return null instead of an error if the Account is not found
     """
     throwIfMissing: Boolean = true
   ): Account
   collective(
     """
-    The public id identifying the collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    The public id identifying the Collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
     """
     id: String
 
     """
-    The slug identifying the collective (ie: babel for https://opencollective.com/babel)
+    The slug identifying the Collective (ie: babel for https://opencollective.com/babel)
     """
     slug: String
 
     """
-    The githubHandle attached to the collective (ie: babel for https://opencollective.com/babel)
+    The githubHandle attached to the Collective (ie: babel for https://opencollective.com/babel)
     """
     githubHandle: String
 
     """
-    If false, will return null instead of an error if collective is not found
+    If false, will return null instead of an error if the Collective is not found
     """
     throwIfMissing: Boolean = true
   ): Collective
+  host(
+    """
+    The public id identifying the Host (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The slug identifying the Host (ie: babel for https://opencollective.com/babel)
+    """
+    slug: String
+
+    """
+    The githubHandle attached to the Host (ie: babel for https://opencollective.com/babel)
+    """
+    githubHandle: String
+
+    """
+    If false, will return null instead of an error if the Host is not found
+    """
+    throwIfMissing: Boolean = true
+  ): Host
+  individual(
+    """
+    The public id identifying the Individual (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The slug identifying the Individual (ie: babel for https://opencollective.com/babel)
+    """
+    slug: String
+
+    """
+    The githubHandle attached to the Individual (ie: babel for https://opencollective.com/babel)
+    """
+    githubHandle: String
+
+    """
+    If false, will return null instead of an error if the Individual is not found
+    """
+    throwIfMissing: Boolean = true
+  ): Individual
   conversation(
     """
     The id identifying the conversation
@@ -2160,6 +3767,6 @@ type TransferWiseRequiredField {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL

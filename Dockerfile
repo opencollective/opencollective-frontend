@@ -26,11 +26,8 @@ ENV INTERNAL_API_URL $INTERNAL_API_URL
 ARG IMAGES_URL=https://images-staging.opencollective.com
 ENV IMAGES_URL $IMAGES_URL
 
-ARG INVOICES_URL=https://invoices-staging.opencollective.com
-ENV INVOICES_URL $INVOICES_URL
-
-ARG GIFTCARDS_GENERATOR_URL=https://giftcards-generator-staging.opencollective.com
-ENV GIFTCARDS_GENERATOR_URL $GIFTCARDS_GENERATOR_URL
+ARG PDF_SERVICE_URL=https://invoices-staging.opencollective.com
+ENV PDF_SERVICE_URL $PDF_SERVICE_URL
 
 ARG API_KEY=09u624Pc9F47zoGLlkg1TBSbOl2ydSAq
 ENV API_KEY $API_KEY

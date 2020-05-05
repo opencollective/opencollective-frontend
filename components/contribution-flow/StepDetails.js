@@ -4,8 +4,8 @@ import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
+import { getPrecisionFromAmount } from '../../lib/currency-utils';
 import { getNextChargeDate } from '../../lib/date-utils';
-import { getPrecisionFromAmount } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../Container';

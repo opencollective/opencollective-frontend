@@ -9,8 +9,8 @@ import moment from 'moment';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
+import { formatCurrency } from '../../lib/currency-utils';
 import { getCollectiveImage } from '../../lib/image-utils';
-import { formatCurrency } from '../../lib/utils';
 
 import InputField from '../InputField';
 

@@ -6,19 +6,17 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import expenseTypes from '../lib/constants/expenseTypes';
+import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
 
 import CollectiveNavbar from '../components/CollectiveNavbar';
-import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
-import ExpenseAttachedFilesForm from '../components/expenses/ExpenseAttachedFilesForm';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
@@ -31,6 +29,7 @@ import { Box, Flex } from '../components/Grid';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
@@ -70,6 +69,7 @@ class CreateExpensePage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
+        expensesTags: PropTypes.arrayOf(PropTypes.string),
       }),
       loggedInAccount: PropTypes.shape({
         adminMemberships: PropTypes.shape({
@@ -95,7 +95,6 @@ class CreateExpensePage extends React.Component {
     this.state = {
       step: STEPS.FORM,
       expense: null,
-      tags: null,
       isSubmitting: false,
       formPersister: null,
     };
@@ -150,10 +149,10 @@ class CreateExpensePage extends React.Component {
   onSummarySubmit = async () => {
     try {
       this.setState({ isSubmitting: true, error: null });
-      const { expense, tags } = this.state;
+      const { expense } = this.state;
       const result = await this.props.createExpense({
         account: { id: this.props.data.account.id },
-        expense: { ...prepareExpenseForSubmit(expense), tags: tags },
+        expense: prepareExpenseForSubmit(expense),
       });
 
       // Clear local storage backup if expense submitted successfuly
@@ -182,13 +181,10 @@ class CreateExpensePage extends React.Component {
     this.setState(state => ({ expense: { ...state.expense, [name]: value } }));
   };
 
-  onAttachedFilesChange = attachedFiles => {
-    this.setState(state => ({ expense: { ...state.expense, attachedFiles } }));
-  };
-
-  setTags = tags => {
-    this.setState({ tags });
-  };
+  getSuggestedTags(collective) {
+    const tagsStats = (collective && collective.expensesTags) || null;
+    return tagsStats && tagsStats.map(({ tag }) => tag);
+  }
 
   getPayoutProfiles = memoizeOne(loggedInAccount => {
     if (!loggedInAccount) {
@@ -208,6 +204,8 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+      } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
+        return <PageFeatureNotSupported />;
       }
     }
 
@@ -216,119 +214,102 @@ class CreateExpensePage extends React.Component {
     const loggedInAccount = data && data.loggedInAccount;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
-        <CollectiveThemeProvider collective={collective}>
-          <React.Fragment>
-            <CollectiveNavbar collective={collective} isLoading={!collective} />
-            <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
-              {!loadingLoggedInUser && !LoggedInUser && (
-                <ContainerOverlay p={2} top="0" position={['fixed', null, 'absolute']}>
-                  <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
-                </ContainerOverlay>
-              )}
-              <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
-                <Flex justifyContent="space-between" flexWrap="wrap">
-                  <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[0, 3, 5]} mb={5}>
-                    <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
-                      {step === STEPS.FORM ? (
-                        <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
-                      ) : (
-                        <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
-                      )}
-                    </H1>
-                    {data.loading || loadingLoggedInUser ? (
-                      <LoadingPlaceholder width="100%" height={400} />
+        <React.Fragment>
+          <CollectiveNavbar collective={collective} isLoading={!collective} />
+          <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
+            {!loadingLoggedInUser && !LoggedInUser && (
+              <ContainerOverlay p={2} top="0" position={['fixed', null, 'absolute']}>
+                <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
+              </ContainerOverlay>
+            )}
+            <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
+              <Flex justifyContent="space-between" flexWrap="wrap">
+                <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[0, 3, 5]} mb={5}>
+                  <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+                    {step === STEPS.FORM ? (
+                      <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
                     ) : (
-                      <Box>
-                        <CreateExpenseDismissibleIntro collectiveName={collective.name} />
-                        {step === STEPS.FORM && (
-                          <ExpenseForm
-                            collective={collective}
-                            loading={loadingLoggedInUser}
-                            onSubmit={this.onFormSubmit}
-                            expense={this.state.expense}
-                            payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
-                            formPersister={this.state.formPersister}
-                            autoFocusTitle
-                          />
-                        )}
-                        {step === STEPS.SUMMARY && (
-                          <div>
-                            <ExpenseSummary
-                              host={collective.host}
-                              expense={{
-                                ...this.state.expense,
-                                tags: this.state.tags,
-                                createdByAccount: this.props.data.loggedInAccount,
-                              }}
-                            />
-                            <Box mt={24}>
-                              {this.state.expense.type === expenseTypes.INVOICE && (
-                                <Box mb={4}>
-                                  <ExpenseAttachedFilesForm
-                                    onChange={this.onAttachedFilesChange}
-                                    defaultValue={this.state.expense.attachedFiles}
-                                  />
-                                </Box>
-                              )}
-                              <ExpenseNotesForm
-                                onChange={this.onNotesChanges}
-                                defaultValue={this.state.expense.privateMessage}
-                              />
-                              {this.state.error && (
-                                <MessageBox type="error" withIcon mt={3}>
-                                  {this.state.error.message}
-                                </MessageBox>
-                              )}
-                              <Flex flexWrap="wrap" mt={4}>
-                                <StyledButton
-                                  mt={2}
-                                  minWidth={175}
-                                  width={['100%', 'auto']}
-                                  mx={[2, 0]}
-                                  mr={[null, 3]}
-                                  whiteSpace="nowrap"
-                                  data-cy="edit-expense-btn"
-                                  onClick={() => this.setState({ step: STEPS.FORM })}
-                                  disabled={this.state.isSubmitting}
-                                >
-                                  ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
-                                </StyledButton>
-                                <StyledButton
-                                  buttonStyle="primary"
-                                  mt={2}
-                                  width={['100%', 'auto']}
-                                  mx={[2, 0]}
-                                  whiteSpace="nowrap"
-                                  data-cy="submit-expense-btn"
-                                  onClick={this.onSummarySubmit}
-                                  loading={this.state.isSubmitting}
-                                  minWidth={175}
-                                >
-                                  <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                                </StyledButton>
-                              </Flex>
-                            </Box>
-                          </div>
-                        )}
-                      </Box>
+                      <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
                     )}
-                  </Box>
-                  <Box minWidth={270} width={['100%', null, null, 275]} mt={70}>
-                    <ExpenseInfoSidebar
-                      isLoading={data.loading}
-                      collective={collective}
-                      host={host}
-                      expense={{ tags: this.state.tags }}
-                      onChangeTags={this.setTags}
-                      isEditing={step === STEPS.FORM}
-                    />
-                  </Box>
-                </Flex>
-              </Box>
-              <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
-            </Container>
-          </React.Fragment>
-        </CollectiveThemeProvider>
+                  </H1>
+                  {data.loading || loadingLoggedInUser ? (
+                    <LoadingPlaceholder width="100%" height={400} />
+                  ) : (
+                    <Box>
+                      <CreateExpenseDismissibleIntro collectiveName={collective.name} />
+                      {step === STEPS.FORM && (
+                        <ExpenseForm
+                          collective={collective}
+                          loading={loadingLoggedInUser}
+                          onSubmit={this.onFormSubmit}
+                          expense={this.state.expense}
+                          expensesTags={this.getSuggestedTags(collective)}
+                          payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                          formPersister={this.state.formPersister}
+                          autoFocusTitle
+                        />
+                      )}
+                      {step === STEPS.SUMMARY && (
+                        <div>
+                          <ExpenseSummary
+                            host={collective.host}
+                            expense={{
+                              ...this.state.expense,
+                              createdByAccount: this.props.data.loggedInAccount,
+                            }}
+                          />
+                          <Box mt={24}>
+                            <ExpenseNotesForm
+                              onChange={this.onNotesChanges}
+                              defaultValue={this.state.expense.privateMessage}
+                            />
+                            {this.state.error && (
+                              <MessageBox type="error" withIcon mt={3}>
+                                {this.state.error.message}
+                              </MessageBox>
+                            )}
+                            <Flex flexWrap="wrap" mt={4}>
+                              <StyledButton
+                                mt={2}
+                                minWidth={175}
+                                width={['100%', 'auto']}
+                                mx={[2, 0]}
+                                mr={[null, 3]}
+                                whiteSpace="nowrap"
+                                data-cy="edit-expense-btn"
+                                onClick={() => this.setState({ step: STEPS.FORM })}
+                                disabled={this.state.isSubmitting}
+                              >
+                                ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
+                              </StyledButton>
+                              <StyledButton
+                                buttonStyle="primary"
+                                mt={2}
+                                width={['100%', 'auto']}
+                                mx={[2, 0]}
+                                whiteSpace="nowrap"
+                                data-cy="submit-expense-btn"
+                                onClick={this.onSummarySubmit}
+                                loading={this.state.isSubmitting}
+                                minWidth={175}
+                              >
+                                <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                              </StyledButton>
+                            </Flex>
+                          </Box>
+                        </div>
+                      )}
+                    </Box>
+                  )}
+                </Box>
+                <Box minWidth={270} width={['100%', null, null, 275]} mt={70}>
+                  <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
+                </Box>
+              </Flex>
+            </Box>
+            <MobileCollectiveInfoStickyBar isLoading={data.loading} collective={collective} host={host} />
+          </Container>
+        </React.Fragment>
       </Page>
     );
   }
@@ -348,6 +329,11 @@ const getData = graphql(
         twitterHandle
         currency
         expensePolicy
+        expensesTags {
+          id
+          tag
+        }
+
         ... on Collective {
           id
           isApproved
@@ -394,6 +380,7 @@ const getData = graphql(
   {
     options: {
       context: API_V2_CONTEXT,
+      fetchPolicy: 'cache-and-network',
     },
   },
 );

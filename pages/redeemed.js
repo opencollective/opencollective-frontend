@@ -53,6 +53,7 @@ const paymentMethodQuery = gql`
 
 const Title = styled(H1)`
   color: white;
+  text-align: center;
   ${fontSize};
 `;
 

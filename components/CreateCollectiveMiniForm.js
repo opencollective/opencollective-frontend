@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { Field, Form, Formik } from 'formik';
 import gql from 'graphql-tag';
-import { cloneDeep, get, pick } from 'lodash';
+import { assign, cloneDeep, get, pick } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -151,25 +151,35 @@ const CreateUserMutation = gql`
  * A mini-form to create collectives/orgs/users. Meant to be embed in popups or
  * small component where we want to provide just the essential fields.
  */
-const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAsAdmin, LoggedInUser }) => {
+const CreateCollectiveMiniForm = ({
+  type,
+  onCancel,
+  onSuccess,
+  addLoggedInUserAsAdmin,
+  LoggedInUser,
+  excludeAdminFields,
+  email = '',
+  name = '',
+}) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
+  const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
   const { formatMessage } = useIntl();
 
   const initialValues = {
-    members: [{ member: { email: '', name: '' } }],
-    email: '',
-    name: '',
+    members: [{ member: { email, name } }],
+    email,
+    name,
     website: '',
   };
 
   const validate = values => {
     const errors = {};
 
-    if (isOrganization) {
+    if (isOrganization && !excludeAdminFields) {
       if (!get(values, 'members[0].member.email') || !isValidEmail(get(values, 'members[0].member.email'))) {
         errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
       }
@@ -191,11 +201,17 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAs
   };
 
   const submit = formValues => {
-    const values = cloneDeep({ ...formValues, type });
-    if (addLoggedInUserAsAdmin && LoggedInUser && values.members) {
-      values.members.push({ member: { id: LoggedInUser.CollectiveId } });
+    let values;
+    if (excludeAdminFields) {
+      const clonedValues = cloneDeep({ ...formValues, type });
+      const assignAdmin = pick(clonedValues, ['name', 'website', 'type']);
+      values = assign(assignAdmin, { members: [{ member: { id: LoggedInUser.CollectiveId } }] });
+    } else {
+      values = cloneDeep({ ...formValues, type });
+      if (addLoggedInUserAsAdmin && LoggedInUser && values.members) {
+        values.members.push({ member: { id: LoggedInUser.CollectiveId } });
+      }
     }
-
     return createCollective({ variables: prepareMutationVariables(values) }).then(({ data }) => {
       return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
     });
@@ -210,7 +226,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAs
           <Form data-cy="create-collective-mini-form">
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
             <Box mt={3}>
-              {(isUser || isOrganization) && (
+              {(isUser || isOrganization) && !noAdminFields && (
                 <StyledInputField
                   name={isOrganization ? 'members[0].member.email' : 'email'}
                   htmlFor={isOrganization ? 'members[0].member.email' : 'email'}
@@ -234,7 +250,7 @@ const CreateCollectiveMiniForm = ({ type, onCancel, onSuccess, addLoggedInUserAs
                   )}
                 </StyledInputField>
               )}
-              {isOrganization && (
+              {isOrganization && !noAdminFields && (
                 <StyledInputField
                   autoFocus
                   name="members[0].member.name"
@@ -332,6 +348,12 @@ CreateCollectiveMiniForm.propTypes = {
   addLoggedInUserAsAdmin: PropTypes.bool,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
+  /** If true, this does not render the 'admin name' and 'admin email' for create org form */
+  excludeAdminFields: PropTypes.bool,
+  /** The collective email */
+  email: PropTypes.string,
+  /** The collective name */
+  name: PropTypes.string,
 };
 
 export default withUser(CreateCollectiveMiniForm);

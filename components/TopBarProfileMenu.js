@@ -5,8 +5,9 @@ import { Settings } from '@styled-icons/feather/Settings';
 import { get, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { formatCurrency } from '../lib/currency-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { capitalize, formatCurrency } from '../lib/utils';
+import { capitalize } from '../lib/utils';
 import { Link } from '../server/pages';
 
 import Avatar from './Avatar';

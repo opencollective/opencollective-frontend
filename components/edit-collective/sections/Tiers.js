@@ -9,10 +9,10 @@ import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { capitalize, getCurrencySymbol } from '../../../lib/utils';
-import { H3 } from '../../Text';
-
+import { getCurrencySymbol } from '../../../lib/currency-utils';
+import { capitalize } from '../../../lib/utils';
 import { updateSettingsMutation } from './../mutations';
+import { H3 } from '../../Text';
 
 import { Box, Flex } from '../../Grid';
 import StyledCheckbox from '../../StyledCheckbox';
@@ -397,7 +397,7 @@ class Tiers extends React.Component {
 
   render() {
     const { intl, defaultType = 'TICKET' } = this.props;
-    const defaultIsChecked = get(this.props.collective, 'settings.disableCustomContributions', false);
+    const hasCustomContributionsDisabled = get(this.props.collective, 'settings.disableCustomContributions', false);
 
     return (
       <Mutation mutation={updateSettingsMutation}>
@@ -427,7 +427,7 @@ class Tiers extends React.Component {
                 <StyledCheckbox
                   name="custom-contributions"
                   label={intl.formatMessage(this.messages['customContributions.label'])}
-                  defaultChecked={!defaultIsChecked}
+                  defaultChecked={!hasCustomContributionsDisabled}
                   width="auto"
                   loading={loading}
                   onChange={({ target }) => {

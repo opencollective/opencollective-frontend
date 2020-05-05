@@ -142,11 +142,13 @@ class OrderSuccessContributorCardWithData extends React.Component {
           <Container
             display="flex"
             mt={2}
+            px={2}
             justifyContent="center"
             fontSize="Paragraph"
             fontWeight="bold"
             lineHeight="Caption"
             color="black.900"
+            textAlign="center"
           >
             <LinkCollective collective={fromCollective}>{fromCollective.name}</LinkCollective>
           </Container>

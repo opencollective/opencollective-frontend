@@ -155,7 +155,15 @@ const ContributeCard = ({
   return (
     <StyledContributeCard {...props}>
       <CoverImage image={image} isDisabled={disableCTA}>
-        <StyledTag position="absolute" bottom="8px" left="8px" background="white" color="black.700" fontWeight="600">
+        <StyledTag
+          position="absolute"
+          bottom="8px"
+          left="8px"
+          background="white"
+          color="black.700"
+          fontWeight="600"
+          textTransform="uppercase"
+        >
           {intl.formatMessage(I18nContributionType[type])}
         </StyledTag>
       </CoverImage>

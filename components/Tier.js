@@ -6,7 +6,8 @@ import { defineMessages, FormattedMessage, FormattedNumber, injectIntl } from 'r
 import Markdown from 'react-markdown';
 
 import colors from '../lib/constants/colors';
-import { capitalize, formatCurrency, getCurrencySymbol } from '../lib/utils';
+import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
+import { capitalize } from '../lib/utils';
 
 import CTAButton from './Button';
 import Currency from './Currency';

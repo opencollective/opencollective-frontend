@@ -6,8 +6,9 @@ import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import colors from '../../lib/constants/colors';
+import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
-import { capitalize, compose, formatCurrency } from '../../lib/utils';
+import { capitalize, compose } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
@@ -25,7 +26,7 @@ import ExpenseDetails from './ExpenseDetails';
 import ExpenseNeedsTaxFormBadge from './ExpenseNeedsTaxFormBadge';
 import MarkExpenseAsPaidBtn from './MarkExpenseAsPaidBtn';
 import MarkExpenseAsUnpaidBtn from './MarkExpenseAsUnpaidBtn';
-import PayExpenseBtn from './PayExpenseBtn';
+import PayExpenseBtnLegacy from './PayExpenseBtnLegacy';
 import RejectExpenseBtn from './RejectExpenseBtn';
 
 class Expense extends React.Component {
@@ -257,7 +258,9 @@ class Expense extends React.Component {
         expense.status === 'ERROR' ||
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
-    const canDelete = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'REJECTED';
+    const isCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canDelete =
+      LoggedInUser && expense.status === 'REJECTED' && (isCollectiveAdmin || LoggedInUser.isHostAdmin(collective));
 
     return (
       <div className={`expense ${status} ${this.state.mode}View`} data-cy={`expense-${status}`}>
@@ -366,7 +369,7 @@ class Expense extends React.Component {
             }
 
             @media screen and (max-width: 700px) {
-              .expense .PayExpenseBtn ~ .RejectExpenseBtn {
+              .expense .PayExpenseBtnLegacy ~ .RejectExpenseBtn {
                 flex-grow: 1;
               }
               .expense .SmallButton {
@@ -544,7 +547,7 @@ class Expense extends React.Component {
                           onError={this.handleErrorMessage}
                         />
                         {(get(expense, 'PayoutMethod.type') === 'BANK_ACCOUNT' || expense.payoutMethod !== 'other') && (
-                          <PayExpenseBtn
+                          <PayExpenseBtnLegacy
                             expense={expense}
                             collective={collective}
                             host={host}

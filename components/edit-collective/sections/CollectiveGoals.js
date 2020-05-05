@@ -7,7 +7,7 @@ import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { getCurrencySymbol } from '../../../lib/utils';
+import { getCurrencySymbol } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';

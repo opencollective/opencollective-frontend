@@ -66,6 +66,10 @@ const ExpenseTypeOptionContainer = styled.label`
   margin-top: -1px;
   margin-left: -1px;
 
+  input[type='radio'] {
+    margin-right: 4px;
+  }
+
   // Animate gif on hover by hidding the static illustration
   &:hover {
     ${StaticTypeIllustration} {

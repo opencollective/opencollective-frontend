@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { useQuery } from '@apollo/react-hooks';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+
+import { generateNotFoundError } from '../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
@@ -13,51 +16,49 @@ const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '
   ssr: false,
 });
 
-class CreateCollectivePage extends React.Component {
-  static async getInitialProps({ query }) {
-    return {
-      query,
-      slug: query && query.hostCollectiveSlug,
-    };
-  }
-
-  static propTypes = {
-    query: PropTypes.object,
-    slug: PropTypes.string, // for addCollectiveCoverData
-    data: PropTypes.object, // from withData
-    loadingLoggedInUser: PropTypes.bool,
-  };
-
-  render() {
-    const { data = {}, loadingLoggedInUser, query } = this.props;
-
-    if (loadingLoggedInUser || data.error) {
-      return <ErrorPage loading={loadingLoggedInUser} data={data} />;
-    }
-
-    return (
-      <Page>
-        <CreateCollective host={data.Collective} query={query} />
-        <CovidBanner />
-      </Page>
-    );
-  }
-}
-
-const getHostQuery = gql`
-  query Host($slug: String) {
-    Collective(slug: $slug) {
+const GET_HOST = gqlV2`
+  query host($slug: String!) {
+    host(slug: $slug) {
       id
       type
       slug
       name
       currency
-      settings
-      canApply
+      isOpenToApplications
+      termsUrl
     }
   }
 `;
 
-const addHostData = graphql(getHostQuery, { skip: props => !props.slug });
+const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
+  const router = useRouter();
+  const slug = router.query.hostCollectiveSlug;
+  const skipQuery = !LoggedInUser || !slug;
+  const { loading, error, data } = useQuery(GET_HOST, {
+    context: API_V2_CONTEXT,
+    skip: skipQuery,
+    variables: { slug },
+  });
 
-export default withUser(addHostData(CreateCollectivePage));
+  if (loading || loadingLoggedInUser) {
+    return <ErrorPage loading={true} />;
+  }
+
+  if (!skipQuery && (!data || !data.host)) {
+    return <ErrorPage error={generateNotFoundError(slug, true)} data={{ error }} log={false} />;
+  }
+
+  return (
+    <Page>
+      <CreateCollective host={data && data.host} />
+      <CovidBanner />
+    </Page>
+  );
+};
+
+CreateCollectivePage.propTypes = {
+  loadingLoggedInUser: PropTypes.bool.isRequired,
+  LoggedInUser: PropTypes.object,
+};
+
+export default withUser(CreateCollectivePage);

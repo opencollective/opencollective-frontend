@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Apr 15 2020 17:05:47 GMT+0200 (GMT+02:00)
+# timestamp: Mon May 04 2020 11:35:43 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -242,7 +242,8 @@ type Collective implements CollectiveInterface {
   """
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
-  childCollectives: [Collective] @deprecated(reason: "2020/01/08 - Sub-collectives are now handled through members")
+  childCollectives: [Collective]
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -516,7 +517,8 @@ interface CollectiveInterface {
   """
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
-  childCollectives: [Collective] @deprecated(reason: "2020/01/08 - Sub-collectives are now handled through members")
+  childCollectives: [Collective]
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -893,7 +895,7 @@ enum ContributorRole {
   FUNDRAISER
   ATTENDEE
   FOLLOWER
-  SUB_COLLECTIVE
+  CONNECTED_COLLECTIVE
 }
 
 """
@@ -1135,7 +1137,8 @@ type Event implements CollectiveInterface {
   """
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
-  childCollectives: [Collective] @deprecated(reason: "2020/01/08 - Sub-collectives are now handled through members")
+  childCollectives: [Collective]
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -2395,7 +2398,8 @@ type Organization implements CollectiveInterface {
   """
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
-  childCollectives: [Collective] @deprecated(reason: "2020/01/08 - Sub-collectives are now handled through members")
+  childCollectives: [Collective]
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -3468,7 +3472,8 @@ type User implements CollectiveInterface {
   """
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
-  childCollectives: [Collective] @deprecated(reason: "2020/01/08 - Sub-collectives are now handled through members")
+  childCollectives: [Collective]
+    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int

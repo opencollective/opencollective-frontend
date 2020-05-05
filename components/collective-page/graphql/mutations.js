@@ -24,7 +24,7 @@ export const EditAvatarMutation = gql`
     editCollective(collective: { id: $id, image: $image }) {
       id
       image
-      imageUrl
+      imageUrl(height: 256)
     }
   }
 `;

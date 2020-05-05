@@ -112,6 +112,7 @@ class ApplyToHostBtnLoggedIn extends React.Component {
             (!this.inactiveCollective.host || get(this.inactiveCollective, 'host.id') !== host.id) && (
               <StyledButton
                 buttonStyle={buttonStyle}
+                buttonSize={buttonSize}
                 disabled={disabled}
                 onClick={() => this.handleModalDisplay()}
                 minWidth={minWidth}

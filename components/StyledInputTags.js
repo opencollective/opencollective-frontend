@@ -143,7 +143,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   const handleToggleInput = () => {
     isOpen ? handleClose() : setOpen(true);
   };
-  const addTag = tag => setTags(uniqBy([...tags, { label: tag.toUpperCase(), value: tag.toUpperCase() }], 'value'));
+  const addTag = tag => setTags(uniqBy([...tags, { label: tag.toLowerCase(), value: tag.toLowerCase() }], 'value'));
   const removeTag = (tag, update) => {
     const updatedTags = tags.filter(v => v.value !== tag);
     setTags(updatedTags);

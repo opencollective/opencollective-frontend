@@ -71,7 +71,10 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
           )}
         </ExpenseInvoiceDownloadHelper>
       )}
-      <ButtonWithLabel onClick={() => copy(window.location.href)} disabled={isDisabled}>
+      <ButtonWithLabel
+        onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
+        disabled={isDisabled}
+      >
         {isCopied ? <Check size={18} /> : <IconLink size={18} />}
         <ButtonLabel>
           {isCopied ? (

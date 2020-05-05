@@ -7,10 +7,11 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import tiersTypes from '../../lib/constants/tiers-types';
+import { formatCurrency } from '../../lib/currency-utils';
 import { propTypeCountry } from '../../lib/custom-prop-types';
 import getPaymentMethodFees from '../../lib/fees';
 import fetchGeoLocation from '../../lib/geolocation_api';
-import { capitalize, formatCurrency } from '../../lib/utils';
+import { capitalize } from '../../lib/utils';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';

@@ -5,66 +5,68 @@ import { FormattedMessage } from 'react-intl';
 
 import { attachmentDropzoneParams } from './lib/attachments';
 
-import { Box } from '../Grid';
+import { Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import StyledDropzone from '../StyledDropzone';
-import StyledInputField from '../StyledInputField';
-import { Span } from '../Text';
+import StyledHr from '../StyledHr';
+import { P, Span } from '../Text';
 
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
-
-const PrivateNoteLabel = () => {
-  return (
-    <Span color="black.700">
-      <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
-      &nbsp;&nbsp;
-      <PrivateInfoIcon color="#969BA3" />
-    </Span>
-  );
-};
 
 const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue }) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
 
   return (
-    <StyledInputField
-      name="attachedFiles"
-      required={false}
-      maxWidth={782}
-      label={<PrivateNoteLabel />}
-      labelProps={{ fontWeight: '500', fontSize: 'LeadCaption' }}
-    >
-      {inputProps => (
-        <div>
-          {files?.length > 0 && (
-            <Box mb={2}>
-              <ExpenseAttachedFiles
-                files={files}
-                onRemove={idx => {
-                  const updatedFiles = [...files];
-                  updatedFiles.splice(idx, 1);
-                  setFiles(updatedFiles);
-                  onChange(updatedFiles);
-                }}
-              />
-            </Box>
-          )}
-          <StyledDropzone
-            {...inputProps}
-            {...attachmentDropzoneParams}
-            isMulti
-            disabled={disabled}
-            minHeight={72}
-            onSuccess={urls => {
-              const newFiles = urls.map(url => ({ url }));
-              const updatedFiles = uniqBy([...files, ...newFiles], 'url');
-              setFiles(updatedFiles);
-              onChange(updatedFiles);
+    <div>
+      <Flex alignItems="center" my={16}>
+        <Span color="black.600" fontSize="LeadParagraph" lineHeight="LeadCaption">
+          <FormattedMessage
+            id="OptionalFieldLabel"
+            defaultMessage="{field} (optional)"
+            values={{
+              field: (
+                <Span color="black.900" fontWeight="bold">
+                  <FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />
+                </Span>
+              ),
             }}
           />
-        </div>
+          &nbsp;
+          <PrivateInfoIcon color="#969BA3" size={12} />
+        </Span>
+        <StyledHr flex="1" borderColor="black.300" mx={2} />
+      </Flex>
+      <P fontSize="13px" color="black.600" mb={16}>
+        <FormattedMessage
+          id="UploadInvoiceDescription"
+          defaultMessage="If you already have an invoice upload it here."
+        />
+      </P>
+      {files?.length > 0 ? (
+        <ExpenseAttachedFiles
+          files={files}
+          onRemove={idx => {
+            const updatedFiles = [...files];
+            updatedFiles.splice(idx, 1);
+            setFiles(updatedFiles);
+            onChange(updatedFiles);
+          }}
+        />
+      ) : (
+        <StyledDropzone
+          {...attachmentDropzoneParams}
+          name="attachedFiles"
+          isMulti={false}
+          disabled={disabled}
+          minHeight={72}
+          onSuccess={url => {
+            const newFile = { url };
+            setFiles([newFile]);
+            onChange([newFile]);
+          }}
+        />
       )}
-    </StyledInputField>
+    </div>
   );
 };
 
