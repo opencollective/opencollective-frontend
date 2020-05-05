@@ -141,6 +141,7 @@ class SuccessPage extends React.Component {
                               slug: collective.host.slug,
                               section: 'fiscal-hosting',
                             }}
+                            data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
                           </Link>
@@ -172,6 +173,7 @@ class SuccessPage extends React.Component {
                 slug: collective.slug,
                 section: 'tiers',
               }}
+              data-cy="afc-success-host-tiers-link"
             >
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />

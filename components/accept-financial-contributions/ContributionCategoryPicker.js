@@ -130,6 +130,7 @@ class ContributionCategoryPicker extends React.Component {
                       mt={[2, 3]}
                       mb={3}
                       minWidth={'145px'}
+                      data-cy="afc-picker-myself-button"
                     >
                       {intl.formatMessage(this.messages.myself)}
                     </StyledButton>
@@ -171,6 +172,7 @@ class ContributionCategoryPicker extends React.Component {
                       mt={[2, 3]}
                       mb={3}
                       minWidth={'145px'}
+                      data-cy="afc-picker-organization-button"
                     >
                       {intl.formatMessage(this.messages.organization)}
                     </StyledButton>
@@ -208,6 +210,7 @@ class ContributionCategoryPicker extends React.Component {
                       mt={[2, 3]}
                       mb={3}
                       minWidth={'145px'}
+                      data-cy="afc-picker-host-button"
                     >
                       {intl.formatMessage(this.messages.host)}
                     </StyledButton>

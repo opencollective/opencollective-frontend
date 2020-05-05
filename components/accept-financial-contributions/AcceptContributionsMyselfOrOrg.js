@@ -331,6 +331,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                                   as={StyledTextarea}
                                   {...inputProps}
                                   placeholder="Name: Kate Account number: 00000000 Sort: 333333"
+                                  data-cy="afc-add-bank-info-field"
                                 />
                               )}
                             </StyledInputField>
@@ -368,6 +369,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                               type="submit"
                               loading={loading}
                               onSubmit={handleSubmit}
+                              data-cy="afc-add-bank-info-submit"
                             >
                               <FormattedMessage id="save" defaultMessage="Save" />
                             </StyledButton>
