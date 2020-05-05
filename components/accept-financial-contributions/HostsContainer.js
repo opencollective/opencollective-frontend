@@ -98,6 +98,7 @@ class HostsContainer extends React.Component {
                   host={host}
                   collective={this.props.collective}
                   onChange={onChange}
+                  data-cy="afc-host-collective-card"
                 />
               </CollectiveCardContainer>
             ))}

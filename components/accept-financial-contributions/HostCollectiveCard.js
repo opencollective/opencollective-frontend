@@ -140,6 +140,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
               setShow(true);
               onChange('chosenHost', host);
             }}
+            data-cy="afc-host-apply-button"
           >
             {formatMessage(messages.apply)}
           </StyledButton>
@@ -230,6 +231,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
               mb={2}
               ml={3}
               px={3}
+              data-cy="afc-host-submit-button"
             >
               {formatMessage(messages.submit)}
             </StyledButton>
