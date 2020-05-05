@@ -78,6 +78,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     tags
     amount
     createdAt
+    invoiceInfo
     items {
       id
       incurredAt

@@ -26,6 +26,7 @@ import ExpenseStatusTag from './ExpenseStatusTag';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -210,33 +211,6 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
         <LoadingPlaceholder height={150} mt={3} />
       ) : (
         <Flex flexWrap="wrap">
-          {host && (
-            <PrivateInfoColumn data-cy="expense-summary-host">
-              <PrivateInfoColumnHeader>
-                <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
-              </PrivateInfoColumnHeader>
-              <LinkCollective collective={host}>
-                <Flex alignItems="center">
-                  <Avatar collective={host} radius={24} />
-                  <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
-                    {host.name}
-                  </Span>
-                </Flex>
-              </LinkCollective>
-              {host.location && (
-                <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-                  {host.location.address}
-                </P>
-              )}
-              {host.website && (
-                <P mt={2} fontSize="11px">
-                  <StyledLink href={host.website} openInNewTab>
-                    {host.website}
-                  </StyledLink>
-                </P>
-              )}
-            </PrivateInfoColumn>
-          )}
           <PrivateInfoColumn data-cy="expense-summary-payee">
             <PrivateInfoColumnHeader>
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
@@ -275,8 +249,47 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
               <div data-cy="expense-summary-payout-method-data">
                 <PayoutMethodData payoutMethod={expense.payoutMethod} />
               </div>
+              {expense.invoiceInfo && (
+                <Box mt={3} data-cy="expense-summary-invoice-info">
+                  <Container fontSize="11px" fontWeight="500" mb={2}>
+                    <FormattedMessage id="ExpenseForm.InvoiceInfo" defaultMessage="Additional invoice information" />
+                    &nbsp;&nbsp;
+                    <PrivateInfoIcon color="#969BA3" />
+                  </Container>
+                  <P fontSize="11px" lineHeight="16px" whiteSpace="pre-wrap">
+                    {expense.invoiceInfo}
+                  </P>
+                </Box>
+              )}
             </Container>
           </PrivateInfoColumn>
+          {host && (
+            <PrivateInfoColumn data-cy="expense-summary-host">
+              <PrivateInfoColumnHeader>
+                <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+              </PrivateInfoColumnHeader>
+              <LinkCollective collective={host}>
+                <Flex alignItems="center">
+                  <Avatar collective={host} radius={24} />
+                  <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
+                    {host.name}
+                  </Span>
+                </Flex>
+              </LinkCollective>
+              {host.location && (
+                <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
+                  {host.location.address}
+                </P>
+              )}
+              {host.website && (
+                <P mt={2} fontSize="11px">
+                  <StyledLink href={host.website} openInNewTab>
+                    {host.website}
+                  </StyledLink>
+                </P>
+              )}
+            </PrivateInfoColumn>
+          )}
         </Flex>
       )}
       {showProcessButtons && (
@@ -312,6 +325,7 @@ ExpenseSummary.propTypes = {
     legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.oneOf(Object.values(expenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
