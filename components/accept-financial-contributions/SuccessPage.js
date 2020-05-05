@@ -19,9 +19,13 @@ import successIllustration from '../../public/static/images/create-collective/ac
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
-const SmallExternalLink = styled(StyledLink).attrs({ openInNewTab: true })`
+const SmallExternalLink = styled(StyledLink)`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
+
+SmallExternalLink.defaultProps = {
+  openInNewTab: true,
+};
 
 class SuccessPage extends React.Component {
   static propTypes = {

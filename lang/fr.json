@@ -747,6 +747,7 @@
   "expense.privateNote": "note privée",
   "Expense.PrivateNote": "Note privée",
   "expense.processing": "processing",
+  "expense.ReceiptRequired": "Receipt required",
   "expense.rejected": "refusé",
   "expense.RemoveItem": "Supprimer l'élément",
   "expense.RemoveReceipt": "Retirer le reçu",

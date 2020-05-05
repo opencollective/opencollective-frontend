@@ -747,6 +747,7 @@
   "expense.privateNote": "личная заметка",
   "Expense.PrivateNote": "Private note",
   "expense.processing": "processing",
+  "expense.ReceiptRequired": "Receipt required",
   "expense.rejected": "отказано",
   "expense.RemoveItem": "Remove item",
   "expense.RemoveReceipt": "Remove receipt",

@@ -149,7 +149,7 @@ describe('New expense flow', () => {
       // Switch to receipt and acnkowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('expense-summary-btn').click();
-      cy.getByDataCy('attachment-url-field').should('contain', 'This field is required');
+      cy.getByDataCy('attachment-url-field').should('contain', 'Receipt required');
     });
   });
 });
