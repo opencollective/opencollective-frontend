@@ -747,6 +747,7 @@
   "expense.privateNote": "プライベートノート",
   "Expense.PrivateNote": "Private note",
   "expense.processing": "processing",
+  "expense.ReceiptRequired": "Receipt required",
   "expense.rejected": "拒否されました",
   "expense.RemoveItem": "Remove item",
   "expense.RemoveReceipt": "Remove receipt",

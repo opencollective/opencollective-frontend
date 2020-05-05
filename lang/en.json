@@ -747,6 +747,7 @@
   "expense.privateNote": "private note",
   "Expense.PrivateNote": "Private note",
   "expense.processing": "processing",
+  "expense.ReceiptRequired": "Receipt required",
   "expense.rejected": "rejected",
   "expense.RemoveItem": "Remove item",
   "expense.RemoveReceipt": "Remove receipt",

@@ -11,7 +11,7 @@ import Container from './Container';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledLink from './StyledLink';
 
-const ImageLink = styled(StyledLink).attrs({ openInNewTab: true })`
+const ImageLink = styled(StyledLink)`
   cursor: pointer;
   overflow: hidden;
   display: block;
@@ -19,6 +19,10 @@ const ImageLink = styled(StyledLink).attrs({ openInNewTab: true })`
   height: 100%;
   text-align: center;
 `;
+
+ImageLink.defaultProps = {
+  openInNewTab: true,
+};
 
 const MainContainer = styled(Container)`
   border-radius: 8px;
