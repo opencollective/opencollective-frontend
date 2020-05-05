@@ -95,7 +95,6 @@ class CreateExpensePage extends React.Component {
     this.state = {
       step: STEPS.FORM,
       expense: null,
-      tags: null,
       isSubmitting: false,
       formPersister: null,
     };
@@ -150,10 +149,10 @@ class CreateExpensePage extends React.Component {
   onSummarySubmit = async () => {
     try {
       this.setState({ isSubmitting: true, error: null });
-      const { expense, tags } = this.state;
+      const { expense } = this.state;
       const result = await this.props.createExpense({
         account: { id: this.props.data.account.id },
-        expense: { ...prepareExpenseForSubmit(expense), tags: tags },
+        expense: prepareExpenseForSubmit(expense),
       });
 
       // Clear local storage backup if expense submitted successfuly
@@ -180,10 +179,6 @@ class CreateExpensePage extends React.Component {
     const name = e.target.name;
     const value = e.target.value;
     this.setState(state => ({ expense: { ...state.expense, [name]: value } }));
-  };
-
-  setTags = tags => {
-    this.setState({ tags });
   };
 
   getSuggestedTags(collective) {
@@ -260,7 +255,6 @@ class CreateExpensePage extends React.Component {
                             host={collective.host}
                             expense={{
                               ...this.state.expense,
-                              tags: this.state.tags,
                               createdByAccount: this.props.data.loggedInAccount,
                             }}
                           />
@@ -309,14 +303,7 @@ class CreateExpensePage extends React.Component {
                   )}
                 </Box>
                 <Box minWidth={270} width={['100%', null, null, 275]} mt={70}>
-                  <ExpenseInfoSidebar
-                    isLoading={data.loading}
-                    collective={collective}
-                    host={host}
-                    expense={{ tags: this.state.tags }}
-                    onChangeTags={this.setTags}
-                    isEditing={step === STEPS.FORM}
-                  />
+                  <ExpenseInfoSidebar isLoading={data.loading} collective={collective} host={host} />
                 </Box>
               </Flex>
             </Box>
