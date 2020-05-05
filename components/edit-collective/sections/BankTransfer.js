@@ -81,6 +81,7 @@ const BankTransfer = props => {
   const existingManualPaymentMethod = !!get(data.host, 'settings.paymentMethods.manual');
   const showEditManualPaymentMethod = !showForm && data.host;
   const bankAccount = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
+  const useStructuredForm = !existingManualPaymentMethod || (existingManualPaymentMethod && bankAccount);
 
   return (
     <Flex className="EditPaymentMethods" flexDirection="column">
@@ -145,12 +146,14 @@ const BankTransfer = props => {
           }}
           onSubmit={async (values, { setSubmitting }) => {
             const { data, instructions } = values;
-            await createPayoutMethod({
-              variables: {
-                payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
-                account: { slug: props.collectiveSlug },
-              },
-            });
+            if (data) {
+              await createPayoutMethod({
+                variables: {
+                  payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
+                  account: { slug: props.collectiveSlug },
+                },
+              });
+            }
             await editAccountSetting({
               variables: {
                 key: 'paymentMethods.manual.instructions',
@@ -195,19 +198,24 @@ const BankTransfer = props => {
                   />
                 </Link>
               </P>
-              <H3>
-                <FormattedMessage
-                  id="paymentMethods.manual.bankInfo.title"
-                  defaultMessage="Add your bank account information"
-                />
-              </H3>
-              <Flex mr={2} flexDirection="column" width={[1, 0.5]}>
-                <PayoutBankInformationForm
-                  host={{ slug: TW_API_COLLECTIVE_SLUG }}
-                  getFieldName={string => string}
-                  isNew
-                />
-              </Flex>
+              {useStructuredForm && (
+                <React.Fragment>
+                  <H3>
+                    <FormattedMessage
+                      id="paymentMethods.manual.bankInfo.title"
+                      defaultMessage="Add your bank account information"
+                    />
+                  </H3>
+                  <Flex mr={2} flexDirection="column" width={[1, 0.5]}>
+                    <PayoutBankInformationForm
+                      host={{ slug: TW_API_COLLECTIVE_SLUG }}
+                      getFieldName={string => string}
+                      isNew
+                    />
+                  </Flex>
+                </React.Fragment>
+              )}
+
               <H3 my="1.5rem">
                 <FormattedMessage
                   id="paymentMethods.manual.instructions.title"
@@ -218,6 +226,7 @@ const BankTransfer = props => {
                 <UpdateBankDetailsForm
                   value={get(data.host, 'settings.paymentMethods.manual.instructions')}
                   onChange={({ instructions }) => setFieldValue('instructions', instructions)}
+                  useStructuredForm={useStructuredForm}
                 />
               </Box>
               <Box my={3} textAlign={['center', 'left']}>

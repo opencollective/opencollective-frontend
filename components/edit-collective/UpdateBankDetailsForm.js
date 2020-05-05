@@ -58,7 +58,7 @@ Please note that it will take a few days to process your payment.`,
   }
 
   render() {
-    const { intl, value, error } = this.props;
+    const { intl, value, error, useStructuredForm } = this.props;
     return (
       <Flex flexDirection="column">
         <Container as="fieldset" border="none" width={1}>
@@ -78,9 +78,11 @@ Please note that it will take a few days to process your payment.`,
               <P>Make sure you are using the following variables in the instructions.</P>
 
               <List>
-                <li>
-                  <code>&#123;account&#125;</code>: your bank account information added below
-                </li>
+                {useStructuredForm && (
+                  <li>
+                    <code>&#123;account&#125;</code>: your bank account information added below
+                  </li>
+                )}
                 <li>
                   <code>&#123;amount&#125;</code>: total amount of the order
                 </li>
@@ -108,6 +110,7 @@ Please note that it will take a few days to process your payment.`,
 
 UpdateBankDetailsForm.propTypes = {
   intl: PropTypes.object,
+  useStructuredForm: PropTypes.bool,
 };
 
 export default injectIntl(UpdateBankDetailsForm);
