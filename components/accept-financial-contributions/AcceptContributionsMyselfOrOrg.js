@@ -242,6 +242,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                       key={org.collective.id}
                       my={2}
                       onClick={() => this.setState({ organization: org.collective })}
+                      data-cy="afc-organization-org-card"
                     >
                       <Avatar radius={56} collective={org.collective} />
                       <Flex flexDirection="column" ml={3}>
@@ -274,7 +275,11 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                     excludeAdminFields
                   />
                 ) : (
-                  <CreateNewOrg alignItems="center" onClick={() => this.setState({ miniForm: true })}>
+                  <CreateNewOrg
+                    alignItems="center"
+                    onClick={() => this.setState({ miniForm: true })}
+                    data-cy="afc-organization-create-new"
+                  >
                     <PlusCircle size="24" color="gray" />
                     <P fontSize="Caption" color="black.800" ml={2}>
                       <FormattedMessage id="Organization.CreateNew" defaultMessage="Create new Organization" />
