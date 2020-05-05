@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "Por exemplo: que tipo de despesa será aprovada, quaisquer limitações de valores, que documentação é necessária e com quem entrar em contato em caso de perguntas.",
   "collective.githubflow.created.description": "Já foi aprovado pelo organizador ({host}), você já pode receber doações. Sinta-se livre para customizar seu coletivo, registrar despesas e até criar eventos.",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "Um administrador fiscal é uma entidade jurídica que detém os fundos do Coletivo em sua conta bancária, e pode gerar faturas e recibos para apoiadores e patrocinadores.",
   "collective.hostAccount.deactivate.description": "Depois de desativar sua organização como organizador, você não poderá mais hospedar Coletivos. O perfil permanecerá ativo como um perfil de {type}.",
   "collective.hostAccount.deactivate.isHost": "Você não pode desativar a organização enquanto ainda hospeda outros {hostedCollectives} Coletivos.",

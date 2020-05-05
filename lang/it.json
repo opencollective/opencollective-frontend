@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "Ad esempio: quale tipo di spesa sarà approvato, se ci sono limitazioni degli importi, quale documentazione è richiesta e a chi rivolgersi per eventuali domande.",
   "collective.githubflow.created.description": "È già approvato dall'host ({host}), puoi già ricevere donazioni. Sentiti libero di personalizzare il tuo collettivo, inserire spese e di creare addirittura eventi.",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "Un gestore fiscale è una persona giuridica che detiene i fondi di un collettivo sul suo conto bancario, e può generare fatture e ricevute per contributori e sponsor.",
   "collective.hostAccount.deactivate.description": "Dopo aver disattivato la tua organizzazione come host, non sarai più in grado di ospitare collettivi. Il profilo rimarrà attivo come {type}.",
   "collective.hostAccount.deactivate.isHost": "Non puoi disattivare la gestione fiscale mentre stai ancora ospitando altri {hostedCollectives} collettivi.",

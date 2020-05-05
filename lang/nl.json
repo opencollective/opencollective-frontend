@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "Bijvoorbeeld: wat voor soort onkosten zullen goedgekeurd worden, is er een maximumbedrag, welke documentatie is vereist en wie moet gecontacteerd worden bij vragen.",
   "collective.githubflow.created.description": "Het is al goedgekeurd door de host ({host}), u kunt al donaties ontvangen. Voel je vrij om je collective aan te passen, kosten op te geven en zelfs evenementen te maken.",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "Een fiscale gastheer is een rechtspersoon die fondsen van een Collectief op zijn bankrekening heeft staan. en kan facturen en bonnen voor backers en sponsors genereren.",
   "collective.hostAccount.deactivate.description": "After deactivating your organization as host, you will not be able to host collectives anymore. The profile will remain active as an {type}'s profile.",
   "collective.hostAccount.deactivate.isHost": "You can't deactivate hosting while still hosting {hostedCollectives} other collectives.",

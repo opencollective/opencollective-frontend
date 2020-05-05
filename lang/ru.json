@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "Например: какой тип расходов будет утвержден, какие ограничения на суммы, какие документы необходимо предоставить и к кому обращаться с вопросами.",
   "collective.githubflow.created.description": "Уже одобрено хозяином ({host}), вы можете начать принимать пожертвования. Не стесняйтесь настраивать свой коллектив, издержки и создавать события.",
   "Collective.Hero.Host": "{FiscalHost}:{hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "\"Фискальный хозяин\" - юридическое лицо, которое содержит средства коллектива на своих банковских счетах, выдавает чеки и квитанции спонсорам.",
   "collective.hostAccount.deactivate.description": "После деактивации вашей организации в качестве узла, вы больше не сможете размещать коллективы. Профиль останется активным в качестве профиля {type}.",
   "collective.hostAccount.deactivate.isHost": "Вы не можете деактивировать хостинг, пока на нем размещены {hostedCollectives} другие коллективы.",
