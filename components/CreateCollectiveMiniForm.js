@@ -286,6 +286,7 @@ const CreateCollectiveMiniForm = ({
                         ? 'i.e. Webpack, Babel'
                         : 'i.e. AirBnb, TripleByte'
                     }
+                    data-cy="mini-form-name-field"
                   />
                 )}
               </StyledInputField>
@@ -299,7 +300,13 @@ const CreateCollectiveMiniForm = ({
                   value={values.website}
                 >
                   {inputProps => (
-                    <Field as={StyledInput} {...inputProps} placeholder="i.e. opencollective.com" width="100%" />
+                    <Field
+                      as={StyledInput}
+                      {...inputProps}
+                      placeholder="i.e. opencollective.com"
+                      width="100%"
+                      data-cy="mini-form-website-field"
+                    />
                   )}
                 </StyledInputField>
               )}
@@ -326,6 +333,7 @@ const CreateCollectiveMiniForm = ({
                 minWidth={100}
                 loading={isSubmitting}
                 onSubmit={handleSubmit}
+                data-cy="mini-form-save-button"
               >
                 {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
               </StyledButton>
