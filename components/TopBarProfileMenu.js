@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import ComponentLink from '../components/Link';
 import { capitalize } from '../lib/utils';
 import { Link } from '../server/pages';
 
@@ -19,6 +20,23 @@ import LoginBtn from './LoginBtn';
 import StyledLink from './StyledLink';
 import { P } from './Text';
 import { withUser } from './UserProvider';
+import StyledRoundButton from './StyledRoundButton';
+import { Plus } from '@styled-icons/boxicons-regular';
+import StyledHr from './StyledHr';
+import styled from 'styled-components';
+
+const CollectiveListItem = styled(ListItem)`
+  @media (hover: hover) {
+    :hover svg {
+      opacity: 1;
+    }
+  }
+  @media (hover: none) {
+    svg {
+      opacity: 1;
+    }
+  }
+`;
 
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
@@ -99,8 +117,9 @@ class TopBarProfileMenu extends React.Component {
   renderMembershipLine = membership => {
     const { intl, LoggedInUser } = this.props;
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(membership.collective);
+
     return (
-      <ListItem
+      <CollectiveListItem
         key={`LoggedInMenu-Collective-${get(membership, 'collective.slug')}`}
         py={1}
         display="flex"
@@ -128,11 +147,11 @@ class TopBarProfileMenu extends React.Component {
         {isAdmin && (
           <Link route="editCollective" params={{ slug: membership.collective.slug }} passHref>
             <StyledLink color="black.500" title={intl.formatMessage(this.messages.settings)}>
-              <Settings size="1.2em" />
+              <Settings opacity="0" size="1.2em" />
             </StyledLink>
           </Link>
         )}
-      </ListItem>
+      </CollectiveListItem>
     );
   };
 
@@ -165,161 +184,163 @@ class TopBarProfileMenu extends React.Component {
         borderRadius="12px"
         boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
         minWidth="170px"
-        maxWidth="300px"
+        maxWidth="500px"
         position="absolute"
         right={16}
-        top={40}
-        width="max-content"
+        top={75}
         zIndex={3000}
+        width="90%"
         data-cy="user-menu"
       >
-        <Container p={3}>
-          <Flex alignItems="center">
-            <P
-              color="#B4BBBF"
-              fontFamily="montserratlight, arial"
-              fontSize="1rem"
-              fontWeight="400"
-              letterSpacing="1px"
-              pr={2}
-              textTransform="uppercase"
-              whiteSpace="nowrap"
-            >
-              <FormattedMessage id="collective" defaultMessage="my collectives" />
-            </P>
-            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={35} />
-            <Link route="/create" passHref>
-              <StyledLink buttonStyle="standard" buttonSize="tiny" display="inline-block" ml={2} whiteSpace="nowrap">
-                + <FormattedMessage id="Collective.New" defaultMessage="New" />
-              </StyledLink>
-            </Link>
-          </Flex>
-          <Box as="ul" p={0} my={2}>
-            {collectives.map(this.renderMembershipLine)}
-          </Box>
-          {collectives.length === 0 && (
-            <Box my={2}>
-              <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-                <em>
-                  <FormattedMessage id="menu.collective.none" defaultMessage="No collectives yet" />
-                </em>
+        <Flex flexWrap="wrap">
+          <Box order={[2, 2, 1]} width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
+            <Hide xs sm>
+              <Avatar collective={LoggedInUser.collective} radius="3rem" mr={2} />
+              <P mt={2} color="#313233" fontWeight="500">
+                {LoggedInUser.collective.name}
               </P>
-            </Box>
-          )}
-
-          <Flex alignItems="center" mt={3}>
-            <P
-              color="#B4BBBF"
-              fontFamily="montserratlight, arial"
-              fontSize="1rem"
-              fontWeight="400"
-              letterSpacing="1px"
-              pr={2}
-              textTransform="uppercase"
-              whiteSpace="nowrap"
-            >
-              <FormattedMessage id="organization" defaultMessage="my organizations" />
-            </P>
-            <Container height="0.1rem" bg="#E6E6E6" width={1} minWidth={35} />
-            <Link route="/organizations/new" passHref>
-              <StyledLink buttonStyle="standard" buttonSize="tiny" display="inline-block" ml={2} whiteSpace="nowrap">
-                + <FormattedMessage id="Organization.New" defaultMessage="New" />
-              </StyledLink>
-            </Link>
-          </Flex>
-          <Box as="ul" p={0} my={2}>
-            {orgs.map(this.renderMembershipLine)}
-          </Box>
-          {orgs.length === 0 && (
-            <Box my={2}>
-              <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-                <em>
-                  <FormattedMessage id="menu.organizations.none" defaultMessage="No organizations yet" />
-                </em>
+              <P mt={2} mb={5} color="#9D9FA3">
+                {LoggedInUser.email}
               </P>
-            </Box>
-          )}
-        </Container>
-        <Container height="0.1rem" bg="#E6E6E6" width={1} />
-        <Container p={[3]}>
-          <P
-            color="#B4BBBF"
-            fontFamily="montserratlight, arial"
-            fontSize="1rem"
-            fontWeight="400"
-            letterSpacing="1px"
-            textTransform="uppercase"
-          >
-            <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
-          </P>
-          <Box as="ul" p={0} my={2}>
-            <ListItem py={1}>
-              <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
-                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-                </StyledLink>
-              </Link>
-            </ListItem>
-            {incognitoProfileMembership && (
+            </Hide>
+            <P color="#B4BBBF" fontSize="1rem" fontWeight="400" letterSpacing="1px" textTransform="uppercase">
+              <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
+            </P>
+            <Box as="ul" p={0} my={2}>
               <ListItem py={1}>
-                <Link
-                  route="subscriptions"
-                  params={{ collectiveSlug: incognitoProfileMembership.collective.slug }}
-                  passHref
-                >
+                <Link route="collective" params={{ slug: LoggedInUser.username }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                    <FormattedMessage
-                      id="menu.incognitoProfileSubscriptions"
-                      defaultMessage="Manage incognito Contributions"
-                    />
+                    <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                   </StyledLink>
                 </Link>
               </ListItem>
-            )}
-            <ListItem py={1}>
-              <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
-                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                  <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+              {incognitoProfileMembership && (
+                <ListItem py={1}>
+                  <Link
+                    route="subscriptions"
+                    params={{ collectiveSlug: incognitoProfileMembership.collective.slug }}
+                    passHref
+                  >
+                    <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                      <FormattedMessage
+                        id="menu.incognitoProfileSubscriptions"
+                        defaultMessage="Manage incognito Contributions"
+                      />
+                    </StyledLink>
+                  </Link>
+                </ListItem>
+              )}
+              <ListItem py={1}>
+                <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                    <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
+                  </StyledLink>
+                </Link>
+              </ListItem>
+              <ListItem py={1}>
+                <Link route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                    {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
+                  </StyledLink>
+                </Link>
+              </ListItem>
+              <ListItem py={1}>
+                <Link route="applications" passHref>
+                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                    {capitalize(intl.formatMessage(this.messages['menu.applications']))}
+                  </StyledLink>
+                </Link>
+              </ListItem>
+              <ListItem py={1}>
+                <StyledLink
+                  color="#494D52"
+                  fontSize="1.2rem"
+                  fontFamily="montserratlight, arial"
+                  href="https://docs.opencollective.com"
+                >
+                  <FormattedMessage id="menu.help" defaultMessage="Help" />
                 </StyledLink>
-              </Link>
-            </ListItem>
-            <ListItem py={1}>
-              <Link route="transactions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
-                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                  {capitalize(intl.formatMessage(this.messages['menu.transactions']))}
+              </ListItem>
+              <ListItem py={1}>
+                <StyledLink
+                  data-cy="logout"
+                  color="#494D52"
+                  fontSize="1.2rem"
+                  fontFamily="montserratlight, arial"
+                  onClick={this.logout}
+                >
+                  <FormattedMessage id="menu.logout" defaultMessage="Log out" />
                 </StyledLink>
-              </Link>
-            </ListItem>
-            <ListItem py={1}>
-              <Link route="applications" passHref>
-                <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
-                  {capitalize(intl.formatMessage(this.messages['menu.applications']))}
-                </StyledLink>
-              </Link>
-            </ListItem>
-            <ListItem py={1}>
-              <StyledLink
-                color="#494D52"
-                fontSize="1.2rem"
-                fontFamily="montserratlight, arial"
-                href="https://docs.opencollective.com"
-              >
-                <FormattedMessage id="menu.help" defaultMessage="Help" />
-              </StyledLink>
-            </ListItem>
-            <ListItem py={1}>
-              <StyledLink
-                data-cy="logout"
-                color="#494D52"
-                fontSize="1.2rem"
-                fontFamily="montserratlight, arial"
-                onClick={this.logout}
-              >
-                <FormattedMessage id="menu.logout" defaultMessage="Log out" />
-              </StyledLink>
-            </ListItem>
+              </ListItem>
+            </Box>
           </Box>
-        </Container>
+          <Box order={[1, 1, 2]} width={[1, 1, 1 / 2]} p={3} maxHeight="400px" overflow="scroll">
+            <Flex alignItems="center">
+              <P
+                color="#4E5052"
+                fontFamily="montserratlight, arial"
+                fontSize="1rem"
+                fontWeight="600"
+                letterSpacing="1px"
+                pr={2}
+                textTransform="uppercase"
+                whiteSpace="nowrap"
+              >
+                <FormattedMessage id="collective" defaultMessage="my collectives" />
+              </P>
+              <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+              <ComponentLink route="/create">
+                <StyledRoundButton ml={2} size={24} color="#C4C7CC">
+                  <Plus size={12} color="#76777A" />
+                </StyledRoundButton>
+              </ComponentLink>
+            </Flex>
+            <Box as="ul" p={0} my={2}>
+              {collectives.map(this.renderMembershipLine)}
+            </Box>
+            {collectives.length === 0 && (
+              <Box my={2}>
+                <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
+                  <em>
+                    <FormattedMessage id="menu.collective.none" defaultMessage="No collectives yet" />
+                  </em>
+                </P>
+              </Box>
+            )}
+            <Flex alignItems="center" mt={3}>
+              <P
+                color="#4E5052"
+                fontFamily="montserratlight, arial"
+                fontSize="1rem"
+                fontWeight="600"
+                letterSpacing="1px"
+                pr={2}
+                textTransform="uppercase"
+                whiteSpace="nowrap"
+              >
+                <FormattedMessage id="organization" defaultMessage="my organizations" />
+              </P>
+              <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+              <StyledRoundButton ml={2} size={24} color="#C4C7CC">
+                <Link route="/organizations/new" passHref>
+                  <Plus size={12} color="#76777A" />
+                </Link>
+              </StyledRoundButton>
+            </Flex>
+            <Box as="ul" p={0} my={2}>
+              {orgs.map(this.renderMembershipLine)}
+            </Box>
+            {orgs.length === 0 && (
+              <Box my={2}>
+                <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
+                  <em>
+                    <FormattedMessage id="menu.organizations.none" defaultMessage="No organizations yet" />
+                  </em>
+                </P>
+              </Box>
+            )}
+          </Box>
+        </Flex>
       </Container>
     );
   }
