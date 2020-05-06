@@ -8,6 +8,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { TW_API_COLLECTIVE_SLUG } from '../../lib/constants/transferwise';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -129,14 +130,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
               features: {
                 recurring: false,
               },
-              instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n
-      <code>
-      Amount: {amount}
-      <br/>\n
-      Reference: {orderId}
-      <br/>\n
-      {account}
-      </code>`,
+              instructions: BANK_TRANSFER_DEFAULT_INSTRUCTIONS,
             },
           },
         },

@@ -78,10 +78,11 @@ const BankTransfer = props => {
   if (loading) {
     return <Loading />;
   }
+
   const existingManualPaymentMethod = !!get(data.host, 'settings.paymentMethods.manual');
   const showEditManualPaymentMethod = !showForm && data.host;
   const bankAccount = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
-  const useStructuredForm = !existingManualPaymentMethod || (existingManualPaymentMethod && bankAccount);
+  const useStructuredForm = !existingManualPaymentMethod || (existingManualPaymentMethod && bankAccount) ? true : false;
 
   return (
     <Flex className="EditPaymentMethods" flexDirection="column">
@@ -227,6 +228,7 @@ const BankTransfer = props => {
                   value={get(data.host, 'settings.paymentMethods.manual.instructions')}
                   onChange={({ instructions }) => setFieldValue('instructions', instructions)}
                   useStructuredForm={useStructuredForm}
+                  bankAccount={bankAccount}
                 />
               </Box>
               <Box my={3} textAlign={['center', 'left']}>

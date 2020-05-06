@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { startCase, toUpper } from 'lodash';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledTextarea from '../StyledTextarea';
-import { H4, P, Span } from '../Text';
+import { P, Span } from '../Text';
 
 const List = styled.ul`
   margin: 0;
@@ -22,30 +25,18 @@ class UpdateBankDetailsForm extends React.Component {
     error: PropTypes.string,
     value: PropTypes.string,
     onChange: PropTypes.func,
+    useStructuredForm: PropTypes.bool,
+    bankAccount: PropTypes.object,
   };
-
-  static defaultProps = {};
 
   constructor(props) {
     super(props);
-    this.state = { form: {} };
+    this.state = { form: { instructions: props.value } };
     this.onChange = this.onChange.bind(this);
     this.messages = defineMessages({
       'bankaccount.instructions.label': {
         id: 'paymentMethods.manual.instructions',
         defaultMessage: 'Bank transfer instructions',
-      },
-      'bankaccount.instructions.default': {
-        id: 'paymentMethods.manual.instructions.default',
-        defaultMessage: `Please make a bank transfer as follows:
-
-<code>
-Amount: {amount}
-Reference/Communication: {OrderId}
-{account}
-</code>
-
-Please note that it will take a few days to process your payment.`,
       },
     });
   }
@@ -55,6 +46,50 @@ Please note that it will take a few days to process your payment.`,
     newState.form[field] = value;
     this.setState(newState);
     this.props.onChange(newState.form);
+  }
+
+  formatAccountDetails(payoutMethodData) {
+    const ignoredKeys = ['type', 'isManualBankTransfer', 'currency'];
+    const formatKey = s => {
+      if (toUpper(s) === s) {
+        return s;
+      }
+      return startCase(s);
+    };
+
+    const renderObject = (object, prefix = '') =>
+      Object.entries(object).reduce((acc, [key, value]) => {
+        if (ignoredKeys.includes(key)) {
+          return acc;
+        }
+        if (typeof value === 'object') {
+          return [...acc, formatKey(key), ...renderObject(value, '  ')];
+        }
+        return [...acc, `${prefix}${formatKey(key)}: ${value}`];
+      }, []);
+
+    const { accountHolderName, currency, ...data } = payoutMethodData;
+    const lines = renderObject({ accountHolderName, currency, ...data });
+    return lines.join('\n');
+  }
+
+  renderInstructions() {
+    const formatValues = {
+      account: this.formatAccountDetails(this.props.bankAccount ? this.props.bankAccount.data : {}),
+      reference: '76400',
+      OrderId: '76400',
+      amount: '30$',
+      collective: 'acme',
+    };
+    return this.state.form.instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
+      if (p1) {
+        const key = p1.toLowerCase();
+        if (formatValues[key]) {
+          return formatValues[key];
+        }
+      }
+      return match;
+    });
   }
 
   render() {
@@ -68,31 +103,53 @@ Please note that it will take a few days to process your payment.`,
                 label={intl.formatMessage(this.messages['bankaccount.instructions.label'])}
                 htmlFor="instructions"
                 width="100%"
-                height={300}
+                height={400}
                 onChange={e => this.onChange('instructions', e.target.value)}
-                defaultValue={value || intl.formatMessage(this.messages['bankaccount.instructions.default'])}
+                defaultValue={value || BANK_TRANSFER_DEFAULT_INSTRUCTIONS}
               />
             </Box>
             <Container fontSize="1.4rem" pl={[0, 3]} width={[1, 0.5]}>
-              <H4 fontSize="1.4rem">Variables:</H4>
-              <P>Make sure you are using the following variables in the instructions.</P>
+              <P>
+                <FormattedMessage
+                  id="bankaccount.instructions.variables"
+                  defaultMessage="You can use the following variables in the instructions:"
+                />
+              </P>
 
               <List>
                 {useStructuredForm && (
                   <li>
-                    <code>&#123;account&#125;</code>: your bank account information added below
+                    <code>&#123;account&#125;</code>:{' '}
+                    <FormattedMessage
+                      id="bankaccount.instructions.account"
+                      defaultMessage="bank account details added above"
+                    />
                   </li>
                 )}
                 <li>
-                  <code>&#123;amount&#125;</code>: total amount of the order
+                  <code>&#123;amount&#125;</code>:{' '}
+                  <FormattedMessage id="bankaccount.instructions.amount" defaultMessage="total amount of the order" />
                 </li>
                 <li>
-                  <code>&#123;collective&#125;</code>: slug of the collective for which the donation is earmarked
+                  <code>&#123;collective&#125;</code>:{' '}
+                  <FormattedMessage
+                    id="bankaccount.instructions.collective"
+                    defaultMessage="slug of the collective receiving the order"
+                  />
                 </li>
                 <li>
-                  <code>&#123;OrderId&#125;</code>: unique id of the order to help you mark it as paid when you receive
-                  the money
+                  <code>&#123;reference&#125;</code>:{' '}
+                  <FormattedMessage
+                    id="bankaccount.instructions.reference"
+                    defaultMessage="unique id to track the order when it's received"
+                  />
                 </li>
+
+                <P>
+                  <FormattedMessage id="bankaccount.instructions.preview" defaultMessage="Preview:" />
+                </P>
+
+                <pre style={{ whiteSpace: 'pre-wrap' }}>{this.renderInstructions()}</pre>
               </List>
             </Container>
           </Flex>
@@ -107,10 +164,5 @@ Please note that it will take a few days to process your payment.`,
     );
   }
 }
-
-UpdateBankDetailsForm.propTypes = {
-  intl: PropTypes.object,
-  useStructuredForm: PropTypes.bool,
-};
 
 export default injectIntl(UpdateBankDetailsForm);
