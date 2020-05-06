@@ -91,7 +91,7 @@ class UpdateBankDetailsForm extends React.Component {
       account: this.formatAccountDetails(this.props.bankAccount ? this.props.bankAccount.data : {}),
       reference: '76400',
       OrderId: '76400',
-      amount: '30$',
+      amount: '$30',
       collective: 'acme',
     };
     return this.state.form.instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
