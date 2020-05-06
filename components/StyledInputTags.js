@@ -240,19 +240,20 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
                             </AddTagButton>
                           </TagWrapper>
                         ))}
-                      {tags.map(tag => (
-                        <TagWrapper key={tag.value} px="16px" py="8px" autoFocus>
-                          <StyledTag variant="rounded-right">{tag.label}</StyledTag>
-                          <DeleteTagButton
-                            data-cy={`styled-input-tags-remove-${tag.value}`}
-                            onClick={() => {
-                              removeTag(tag.value);
-                            }}
-                          >
-                            <Times size="10px" />
-                          </DeleteTagButton>
-                        </TagWrapper>
-                      ))}
+                      {!renderUpdatedTags &&
+                        tags.map(tag => (
+                          <TagWrapper key={tag.value} px="16px" py="8px" autoFocus>
+                            <StyledTag variant="rounded-right">{tag.label}</StyledTag>
+                            <DeleteTagButton
+                              data-cy={`styled-input-tags-remove-${tag.value}`}
+                              onClick={() => {
+                                removeTag(tag.value);
+                              }}
+                            >
+                              <Times size="10px" />
+                            </DeleteTagButton>
+                          </TagWrapper>
+                        ))}
                     </Box>
                   )}
                 </StyledCard>
