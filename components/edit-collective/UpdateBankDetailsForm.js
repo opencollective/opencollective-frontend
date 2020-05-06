@@ -154,7 +154,7 @@ class UpdateBankDetailsForm extends React.Component {
                   <code>&#123;reference&#125;</code>:{' '}
                   <FormattedMessage
                     id="bankaccount.instructions.reference"
-                    defaultMessage="unique id to track the order when it's received"
+                    defaultMessage="unique id to track when the order is received"
                   />
                 </li>
 

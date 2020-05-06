@@ -299,7 +299,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                   <P color="black.900" textAlign="left" mt={[2, 3]} fontSize={['Paragraph']}>
                     <FormattedMessage
                       id="acceptContributions.HowDoesItWork.details"
-                      defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective\'s balance."
+                      defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective's balance."
                     />
                   </P>
                   <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize={['Paragraph']}>
