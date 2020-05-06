@@ -9,7 +9,7 @@ describe('Accept financial contributions flow', () => {
       });
     });
 
-    it('Can add bank account info and self host', () => {
+    xit('Can add bank account info and self host', () => {
       cy.visit(`/${collectiveSlug}/accept-financial-contributions`);
       cy.getByDataCy('afc-picker-myself-button').click();
       cy.getByDataCy('afc-add-bank-button').click();
@@ -23,7 +23,7 @@ describe('Accept financial contributions flow', () => {
         .and('include', '/testuseradmin/edit/fiscal-hosting');
     });
 
-    it('Knows if bank account info is already added and can self host', () => {
+    xit('Knows if bank account info is already added and can self host', () => {
       cy.visit(`/${collectiveSlug}/accept-financial-contributions/myself`);
       cy.getByDataCy('afc-finish-button').click();
       cy.url().should('include', '/success');
@@ -53,7 +53,7 @@ describe('Accept financial contributions flow', () => {
         .and('include', '/brusselstogetherasbl/edit/fiscal-hosting');
     });
 
-    it('Creates an org and then hosts with it', () => {
+    xit('Creates an org and then hosts with it', () => {
       cy.visit(`/${collectiveSlug}/accept-financial-contributions/organization`);
       cy.getByDataCy('afc-organization-create-new').click();
       cy.getByDataCy('mini-form-name-field').type('3 Bees');
