@@ -64,9 +64,11 @@ const pages = routes()
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     'expense-legacy',
   )
+  .add('expenses-v2', '/:parentAccountSlug?/:accountType(events)?/:accountSlug/expenses/v2', 'expenses')
   .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
+    'expenses-legacy',
   )
   .add('orders', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders')
   .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')

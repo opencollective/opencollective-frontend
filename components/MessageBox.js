@@ -19,6 +19,10 @@ const Message = styled.div`
   border-radius: 8px;
   padding: ${themeGet('space.3')}px;
 
+  a {
+    text-decoration: underline;
+  }
+
   ${borders}
   ${shadow}
   ${display}

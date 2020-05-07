@@ -50,15 +50,6 @@ const StyledTagBase = styled.div`
     vertical-align: middle;
   }
 
-  ${background}
-  ${color}
-  ${space}
-  ${border}
-  ${typography}
-  ${layout}
-  ${position}
-  ${textTransform}
-
   ${variant({
     prop: 'type',
     variants: {
@@ -93,6 +84,15 @@ const StyledTagBase = styled.div`
       },
     },
   })}
+
+  ${background}
+  ${color}
+  ${space}
+  ${border}
+  ${typography}
+  ${layout}
+  ${position}
+  ${textTransform}
 `;
 
 const CloseButton = styled.button`
@@ -108,11 +108,6 @@ const CloseButton = styled.button`
 
 /** Simple tag to display a short string */
 const StyledTag = ({ closeButtonProps, children, ...props }) => {
-  // Redesigned variants are not capsized by default
-  if (props.variant !== 'squared') {
-    props.textTransform = 'none';
-  }
-
   return !closeButtonProps ? (
     <StyledTagBase {...props}>{children}</StyledTagBase>
   ) : (
@@ -128,7 +123,7 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
 };
 
 StyledTag.propTypes = {
-  closeButtonProps: PropTypes.object,
+  closeButtonProps: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   /** If defined, a close button will be displayed on the tag */
   onClose: PropTypes.func,
   iconWidth: PropTypes.string,

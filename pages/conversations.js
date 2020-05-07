@@ -169,7 +169,7 @@ class ConversationsPage extends React.Component {
                                   key={tag}
                                   type="info"
                                   variant="rounded-right"
-                                  m="4px"
+                                  mb="4px"
                                   mr="4px"
                                   closeButtonProps={{ onClick: this.resetTag }}
                                 >

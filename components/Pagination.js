@@ -8,10 +8,11 @@ import Link from './Link';
 import StyledButton from './StyledButton';
 import { TextInput } from './StyledInput';
 
-const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
-  const { pathname, query, route } = router;
+const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
+  const { pathname, query } = router;
   const totalPages = Math.ceil(total / limit);
   const currentPage = offset / limit + 1;
+  isDisabled = isDisabled || totalPages <= 1;
 
   const changePage = async ({ target, key }) => {
     if (key && key !== 'Enter') {
@@ -33,7 +34,11 @@ const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisab
   return (
     <Flex alignItems="center">
       {currentPage > 1 && (
-        <Link route={route.slice(1)} scroll={scrollToTopOnChange} params={{ ...query, offset: offset - limit }}>
+        <Link
+          route={route || router.route.slice(1)}
+          scroll={scrollToTopOnChange}
+          params={{ ...query, offset: offset - limit }}
+        >
           <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
           </StyledButton>
@@ -58,12 +63,16 @@ const Pagination = ({ router, limit, offset, total, scrollToTopOnChange, isDisab
                 disabled={isDisabled}
               />
             ),
-            total: totalPages,
+            total: totalPages || 1,
           }}
         />
       </Flex>
       {currentPage < totalPages && (
-        <Link route={route.slice(1)} scroll={scrollToTopOnChange} params={{ ...query, offset: offset + limit }}>
+        <Link
+          route={route || router.route.slice(1)}
+          scroll={scrollToTopOnChange}
+          params={{ ...query, offset: offset + limit }}
+        >
           <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
           </StyledButton>
@@ -79,6 +88,7 @@ Pagination.propTypes = {
   offset: PropTypes.number,
   total: PropTypes.number,
   isDisabled: PropTypes.bool,
+  route: PropTypes.string,
   /** Use this to scroll back on top when pagination changes */
   scrollToTopOnChange: PropTypes.bool,
 };

@@ -15,7 +15,7 @@ import { H5, P, Strong } from '../components/Text';
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isLoading, host, collective }) => {
+const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
   return (
     <Box width="100%">
       <Box display={['none', 'block']}>
@@ -23,7 +23,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective }) => {
           <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
         </H5>
         <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
-          {isLoading ? (
+          {isLoading && !collective?.balance ? (
             <LoadingPlaceholder height={28} width={75} />
           ) : (
             <FormattedMoneyAmount
@@ -46,6 +46,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective }) => {
           </P>
         )}
       </Box>
+      {children && <Box my={50}>{children}</Box>}
       <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
       <Box mt={50}>
         <CreateExpenseFAQ withBorderLeft withNewButtons titleProps={{ fontSize: 'H5', fontWeight: 500, mb: 3 }} />
@@ -56,6 +57,10 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective }) => {
 
 ExpenseInfoSidebar.propTypes = {
   isLoading: PropTypes.bool,
+
+  /** To render custom content inside the sidebar */
+  children: PropTypes.node,
+
   /** Must be provided if isLoading is false */
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
