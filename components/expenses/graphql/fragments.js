@@ -19,7 +19,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
       name
       data
     }
-    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION], isHostAccount: false) {
+    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
       nodes {
         id
         account {
