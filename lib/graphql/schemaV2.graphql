@@ -2320,6 +2320,11 @@ type Expense {
   """
   activities: [Activity!]!
   tags: [String]!
+
+  """
+  Returns the list of legal documents required from the payee before the expense can be payed
+  """
+  requiredLegalDocuments: [LegalDocumentType]
 }
 
 """
@@ -2974,6 +2979,16 @@ type Individual implements Account {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9)
+  """
+  US_TAX_FORM
+}
 
 """
 Type for Geographic location

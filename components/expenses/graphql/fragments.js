@@ -79,6 +79,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     amount
     createdAt
     invoiceInfo
+    requiredLegalDocuments
     items {
       id
       incurredAt

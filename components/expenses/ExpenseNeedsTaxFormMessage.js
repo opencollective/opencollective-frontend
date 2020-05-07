@@ -5,8 +5,8 @@ import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import Error from '../Error';
+import { getI18nLink, I18nSupportLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
-import StyledLink from '../StyledLink';
 
 const getIsTaxFormRequiredQuery = gql`
   query Expense($id: Int!) {
@@ -42,15 +42,16 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
     return data.Expense.userTaxFormRequiredBeforePayment ? (
       <MessageBox type="warning" withIcon={true}>
         <FormattedMessage
-          id="expenseNeedsTaxFormMessage.message"
-          defaultMessage="We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. If you have not received the email within 24 hours, or you have any questions, please contact support@opencollective.com. For more info, see our"
-        />{' '}
-        <StyledLink href="https://docs.opencollective.com/help/expenses/tax-information">
-          <FormattedMessage
-            id="expenseNeedsTaxFormMessage.helpDocsAboutTaxes"
-            defaultMessage="help docs about taxes."
-          />
-        </StyledLink>
+          id="expenseNeedsTaxFormMessage.msg"
+          defaultMessage="We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. If you have not received the email within 24 hours, or you have any questions, please contact <I18nSupportLink></I18nSupportLink>. For more info, see our <Link>help docs about taxes</Link>."
+          values={{
+            I18nSupportLink,
+            Link: getI18nLink({
+              href: 'https://docs.opencollective.com/help/expenses/tax-information',
+              openInNewTab: true,
+            }),
+          }}
+        />
       </MessageBox>
     ) : (
       this.props.fallback || null
