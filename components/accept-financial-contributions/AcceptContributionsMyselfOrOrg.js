@@ -9,7 +9,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
-import { TW_API_COLLECTIVE_SLUG } from '../../lib/constants/transferwise';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
@@ -31,6 +30,8 @@ import { withUser } from '../UserProvider';
 import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 
 import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
+
+const { TW_API_COLLECTIVE_SLUG } = process.env;
 
 const CreateNewOrg = styled(Flex)`
   border: 1px solid lightgray;

@@ -31,7 +31,7 @@ class UpdateBankDetailsForm extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { form: { instructions: props.value } };
+    this.state = { form: { instructions: props.value || BANK_TRANSFER_DEFAULT_INSTRUCTIONS } };
     this.onChange = this.onChange.bind(this);
     this.messages = defineMessages({
       'bankaccount.instructions.label': {
@@ -81,14 +81,14 @@ class UpdateBankDetailsForm extends React.Component {
           return [...acc, `${prefix}${formatKey(key)}${value}`];
         }, []);
 
-    const { accountHolderName, currency, ...data } = payoutMethodData;
-    const lines = renderObject({ accountHolderName, currency, ...data });
+    const lines = renderObject(payoutMethodData);
+
     return lines.join('\n');
   }
 
   renderInstructions() {
     const formatValues = {
-      account: this.formatAccountDetails(this.props.bankAccount ? this.props.bankAccount.data : {}),
+      account: this.props.bankAccount ? this.formatAccountDetails(this.props.bankAccount) : '',
       reference: '76400',
       OrderId: '76400',
       amount: '$30',
@@ -97,7 +97,7 @@ class UpdateBankDetailsForm extends React.Component {
     return this.state.form.instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
       if (p1) {
         const key = p1.toLowerCase();
-        if (formatValues[key]) {
+        if (formatValues[key] !== undefined) {
           return formatValues[key];
         }
       }

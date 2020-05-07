@@ -6,7 +6,6 @@ import { Formik } from 'formik';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { TW_API_COLLECTIVE_SLUG } from '../../../lib/constants/transferwise';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
@@ -17,6 +16,8 @@ import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import { H3, H4, P } from '../../Text';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
+
+const { TW_API_COLLECTIVE_SLUG } = process.env;
 
 const getHostQuery = gqlV2`
   query Host($slug: String) {
@@ -168,7 +169,7 @@ const BankTransfer = props => {
             refetchHostData();
           }}
         >
-          {({ handleSubmit, isSubmitting, setFieldValue }) => (
+          {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
             <form onSubmit={handleSubmit}>
               <H3>
                 <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
@@ -228,7 +229,7 @@ const BankTransfer = props => {
                   value={get(data.host, 'settings.paymentMethods.manual.instructions')}
                   onChange={({ instructions }) => setFieldValue('instructions', instructions)}
                   useStructuredForm={useStructuredForm}
-                  bankAccount={bankAccount}
+                  bankAccount={values.data}
                 />
               </Box>
               <Box my={3} textAlign={['center', 'left']}>
