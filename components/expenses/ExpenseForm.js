@@ -242,6 +242,7 @@ const ExpenseFormBody = ({
                     {i18nExpenseType(intl, values.type, values.legacyId)}
                   </StyledTag>
                   <StyledInputTags
+                    renderUpdatedTags
                     suggestedTags={expensesTags}
                     onChange={tags =>
                       formik.setFieldValue(
