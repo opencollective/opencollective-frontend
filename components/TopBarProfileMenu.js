@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import { get, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import ComponentLink from '../components/Link';
 import { capitalize } from '../lib/utils';
 import { Link } from '../server/pages';
+
+import ComponentLink from '../components/Link';
 
 import Avatar from './Avatar';
 import Container from './Container';
@@ -17,13 +20,11 @@ import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
+import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
+import StyledRoundButton from './StyledRoundButton';
 import { P } from './Text';
 import { withUser } from './UserProvider';
-import StyledRoundButton from './StyledRoundButton';
-import { Plus } from '@styled-icons/boxicons-regular';
-import StyledHr from './StyledHr';
-import styled from 'styled-components';
 
 const CollectiveListItem = styled(ListItem)`
   @media (hover: hover) {
@@ -274,7 +275,7 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
             </Box>
           </Box>
-          <Box order={[1, 1, 2]} width={[1, 1, 1 / 2]} p={3} maxHeight="400px" overflow="scroll">
+          <Box order={[1, 1, 2]} width={[1, 1, 1 / 2]} p={3} maxHeight="400px" overflowY="auto">
             <Flex alignItems="center">
               <P
                 color="#4E5052"
