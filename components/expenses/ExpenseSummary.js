@@ -12,6 +12,7 @@ import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
@@ -26,7 +27,6 @@ import ExpenseStatusTag from './ExpenseStatusTag';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 
 const CreatedByUserLink = ({ account }) => {
   return (

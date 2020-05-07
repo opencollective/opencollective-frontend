@@ -229,7 +229,9 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
   const { formatMessage } = useIntl();
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
 
-  if (!availableCurrencies) return <StyledSpinner />;
+  if (!availableCurrencies) {
+    return <StyledSpinner />;
+  }
 
   const currencies = formatStringOptions(availableCurrencies);
   const currencyFieldName = getFieldName('data.currency');
