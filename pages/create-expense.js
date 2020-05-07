@@ -69,7 +69,12 @@ class CreateExpensePage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
-        expensesTags: PropTypes.arrayOf(PropTypes.string),
+        expensesTags: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            tag: PropTypes.string.isRequired,
+          }),
+        ),
       }),
       loggedInAccount: PropTypes.shape({
         adminMemberships: PropTypes.shape({
