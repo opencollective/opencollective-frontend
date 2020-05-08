@@ -4,8 +4,6 @@ import { startCase, toUpper } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
-
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledTextarea from '../StyledTextarea';
@@ -31,7 +29,7 @@ class UpdateBankDetailsForm extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { form: { instructions: props.value || BANK_TRANSFER_DEFAULT_INSTRUCTIONS } };
+    this.state = { form: { instructions: props.value } };
     this.onChange = this.onChange.bind(this);
     this.messages = defineMessages({
       'bankaccount.instructions.label': {
@@ -118,7 +116,7 @@ class UpdateBankDetailsForm extends React.Component {
                 width="100%"
                 height={400}
                 onChange={e => this.onChange('instructions', e.target.value)}
-                defaultValue={value || BANK_TRANSFER_DEFAULT_INSTRUCTIONS}
+                defaultValue={value}
               />
             </Box>
             <Container fontSize="1.4rem" pl={[0, 3]} width={[1, 0.5]}>

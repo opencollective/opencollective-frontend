@@ -219,27 +219,28 @@ const availableCurrenciesQuery = gqlV2`
 /**
  * Form for payout bank information. Must be used with Formik.
  */
-const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
+const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency }) => {
   const { data } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: host.slug },
-    skip: Boolean(host.transferwise?.availableCurrencies),
+    skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
-  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
+  const availableCurrencies =
+    fixedCurrency || host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
+  const currencyFieldName = getFieldName('data.currency');
+  const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
 
   if (!availableCurrencies) {
     return <StyledSpinner />;
   }
 
-  const currencies = formatStringOptions(availableCurrencies);
-  const currencyFieldName = getFieldName('data.currency');
-  const selectedCurrency = get(formik.values, currencyFieldName);
+  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies);
 
   return (
     <React.Fragment>
-      <FastField name={getFieldName('data.currency')}>
+      <FastField name={currencyFieldName}>
         {({ field, meta }) => (
           <StyledInputField
             name={field.name}
@@ -258,7 +259,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
                 }}
                 options={currencies}
                 value={currencies.find(c => c.label === selectedCurrency)}
-                disabled={!isNew}
+                disabled={Boolean(fixedCurrency) || !isNew}
               />
             )}
           </StyledInputField>
@@ -286,6 +287,8 @@ PayoutBankInformationForm.propTypes = {
   }).isRequired,
   isNew: PropTypes.bool,
   getFieldName: PropTypes.func.isRequired,
+  /** Enforces a fixedCurrency */
+  fixedCurrency: PropTypes.string,
   /** A map of errors for this object */
   errors: PropTypes.object,
 };

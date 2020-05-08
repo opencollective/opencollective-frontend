@@ -6,6 +6,7 @@ import { Formik } from 'formik';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../../lib/constants/payout-method';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
@@ -25,7 +26,12 @@ const getHostQuery = gqlV2`
       id
       slug
       legacyId
+      currency
       settings
+      connectedAccounts{
+        id
+        service
+      }
       plan {
         addedFunds
         addedFundsLimit
@@ -82,8 +88,21 @@ const BankTransfer = props => {
 
   const existingManualPaymentMethod = !!get(data.host, 'settings.paymentMethods.manual');
   const showEditManualPaymentMethod = !showForm && data.host;
-  const bankAccount = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
-  const useStructuredForm = !existingManualPaymentMethod || (existingManualPaymentMethod && bankAccount) ? true : false;
+  const existingPayoutMethod = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
+  const useStructuredForm =
+    !existingManualPaymentMethod || (existingManualPaymentMethod && existingPayoutMethod) ? true : false;
+  const instructions =
+    get(data.host, 'settings.paymentMethods.manual.instructions') || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
+  const fixedCurrency =
+    // Fix currency if the existing payout method already matches the collective currency
+    (!existingPayoutMethod || existingPayoutMethod.data.currency === data.host.currency) &&
+    // or if it was already defined by Stripe
+    data.host.connectedAccounts?.find?.(ca => ca.service === 'stripe') &&
+    data.host.currency;
+  const initialValues = {
+    ...(existingPayoutMethod || { data: { currency: fixedCurrency } }),
+    instructions,
+  };
 
   return (
     <Flex className="EditPaymentMethods" flexDirection="column">
@@ -142,10 +161,7 @@ const BankTransfer = props => {
       )}
       {showForm && (
         <Formik
-          initialValues={{
-            ...(bankAccount || {}),
-            instructions: get(data.host, 'settings.paymentMethods.manual.instructions'),
-          }}
+          initialValues={initialValues}
           onSubmit={async (values, { setSubmitting }) => {
             const { data, instructions } = values;
             if (data) {
@@ -212,6 +228,7 @@ const BankTransfer = props => {
                     <PayoutBankInformationForm
                       host={{ slug: TW_API_COLLECTIVE_SLUG }}
                       getFieldName={string => string}
+                      fixedCurrency={fixedCurrency}
                       isNew
                     />
                   </Flex>
@@ -226,7 +243,7 @@ const BankTransfer = props => {
               </H3>
               <Box mr={2} flexGrow={1}>
                 <UpdateBankDetailsForm
-                  value={get(data.host, 'settings.paymentMethods.manual.instructions')}
+                  value={instructions}
                   onChange={({ instructions }) => setFieldValue('instructions', instructions)}
                   useStructuredForm={useStructuredForm}
                   bankAccount={values.data}
