@@ -258,7 +258,7 @@ class OnboardingModal extends React.Component {
     const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
-      <React.Fragment>
+      <React.Fragment data-cy="collective-modal">
         {step === 3 ? (
           <React.Fragment>
             <ModalWithImage
@@ -281,6 +281,7 @@ class OnboardingModal extends React.Component {
                         mt={[6]}
                         mb={[4]}
                         mx={[2, null]}
+                        data-cy="welcome-collective"
                       >
                         <FormattedMessage
                           id="onboarding.success.header"
@@ -309,7 +310,7 @@ class OnboardingModal extends React.Component {
               </ModalBody>
               <ResponsiveModalFooter>
                 <Flex flexDirection="column" alignItems="center">
-                  <StyledButton buttonStyle="primary" onClick={this.onClose}>
+                  <StyledButton buttonStyle="primary" onClick={this.onClose} data-cy="close-button">
                     <FormattedMessage id="Close" defaultMessage="Close" />
                   </StyledButton>
                 </Flex>
