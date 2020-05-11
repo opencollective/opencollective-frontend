@@ -45,7 +45,7 @@ class MarkExpenseAsPaidBtn extends React.Component {
     });
   }
 
-  async handleOnClickPay(forceManual = false) {
+  async handleOnClickPay() {
     const { expense, lock, unlock } = this.props;
 
     lock();
@@ -58,7 +58,7 @@ class MarkExpenseAsPaidBtn extends React.Component {
           paymentProcessorFeeInCollectiveCurrency: this.props.paymentProcessorFeeInCollectiveCurrency,
           hostFeeInCollectiveCurrency: this.props.hostFeeInCollectiveCurrency,
           platformFeeInCollectiveCurrency: this.props.platformFeeInCollectiveCurrency,
-          forceManual: forceManual,
+          forceManual: true,
         },
       });
       this.setState({ loading: false });
@@ -95,7 +95,7 @@ class MarkExpenseAsPaidBtn extends React.Component {
         className="pay"
         buttonStyle="success"
         data-cy="mark-expense-as-paid-btn"
-        onClick={() => this.handleOnClickPay(expense.payoutMethod === 'paypal')}
+        onClick={() => this.handleOnClickPay()}
         disabled={this.props.disabled || disabled}
         mr={2}
         my={1}

@@ -242,6 +242,7 @@ const ExpenseFormBody = ({
                     {i18nExpenseType(intl, values.type, values.legacyId)}
                   </StyledTag>
                   <StyledInputTags
+                    renderUpdatedTags
                     suggestedTags={expensesTags}
                     onChange={tags =>
                       formik.setFieldValue(
@@ -428,7 +429,7 @@ const ExpenseFormBody = ({
                               <PayoutMethodForm
                                 fieldsPrefix="payoutMethod"
                                 payoutMethod={field.value}
-                                collective={collective}
+                                host={collective.host}
                                 errors={meta.error}
                               />
                             </Box>
@@ -563,6 +564,7 @@ ExpenseForm.propTypes = {
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
     host: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.string),
       }),

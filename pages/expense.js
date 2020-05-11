@@ -26,7 +26,7 @@ import {
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
-import I18nFormatters from '../components/I18nFormatters';
+import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import MessageBox from '../components/MessageBox';
@@ -163,7 +163,7 @@ class ExpensePage extends React.Component {
       this.setState({ isSubmitting: true, error: null });
       const { editedExpense } = this.state;
       await this.props.mutate({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
-      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false, editedExpense: undefined });
+      this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false, editedExpense: undefined, error: null });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
       this.scrollToExpenseTop();
@@ -273,6 +273,8 @@ class ExpensePage extends React.Component {
     const collective = expense?.account;
     const host = collective?.host;
     const hasAttachedFiles = expense?.attachedFiles?.length > 0;
+    const showTaxFormMsg = expense?.requiredLegalDocuments.includes('US_TAX_FORM') && expense?.permissions.canEdit;
+    const hasHeaderMsg = error || showTaxFormMsg;
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
         {createSuccess && !successMessageDismissed && (
@@ -291,7 +293,7 @@ class ExpensePage extends React.Component {
             justifyContent="flex-end"
             width={SIDE_MARGIN_WIDTH}
             minWidth={90}
-            pt={80}
+            pt={hasHeaderMsg ? 240 : 80}
           >
             <Flex flexDirection="column" alignItems="center" width={90}>
               {status === PAGE_STATUS.VIEW && (
@@ -312,6 +314,21 @@ class ExpensePage extends React.Component {
             {error && (
               <MessageBox type="error" withIcon mb={4}>
                 {formatErrorMessage(intl, error)}
+              </MessageBox>
+            )}
+            {showTaxFormMsg && (
+              <MessageBox type="warning" withIcon={true} mb={4}>
+                <FormattedMessage
+                  id="expenseNeedsTaxFormMessage.msg"
+                  defaultMessage="We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. If you have not received the email within 24 hours, or you have any questions, please contact <I18nSupportLink></I18nSupportLink>. For more info, see our <Link>help docs about taxes</Link>."
+                  values={{
+                    I18nSupportLink,
+                    Link: getI18nLink({
+                      href: 'https://docs.opencollective.com/help/expenses/tax-information',
+                      openInNewTab: true,
+                    }),
+                  }}
+                />
               </MessageBox>
             )}
             {status !== PAGE_STATUS.EDIT && (

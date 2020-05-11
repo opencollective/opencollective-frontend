@@ -21,7 +21,12 @@ const defaults = {
   ONBOARDING_MODAL: false,
   TRANSFERWISE_ENABLED: true,
   NEW_HOST_APPLICATION_FLOW: false,
+  TW_API_COLLECTIVE_SLUG: 'opencollective-host',
 };
+
+if (process.env.NODE_ENV === 'production') {
+  defaults.TW_API_COLLECTIVE_SLUG = 'opencollectiveinc';
+}
 
 if (process.env.NODE_ENV === 'e2e') {
   defaults.API_URL = 'http://localhost:3060';

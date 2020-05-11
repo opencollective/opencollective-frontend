@@ -204,6 +204,7 @@ class StripeOrBankAccountPicker extends React.Component {
                       mt={[2, 3]}
                       mb={3}
                       minWidth={'145px'}
+                      data-cy="afc-add-bank-button"
                     >
                       <FormattedMessage id="acceptContributions.addBankAccount" defaultMessage="Add bank account" />
                     </StyledButton>
@@ -245,6 +246,7 @@ class StripeOrBankAccountPicker extends React.Component {
               });
               window.scrollTo(0, 0);
             }}
+            data-cy="afc-finish-button"
           >
             <FormattedMessage id="Finish" defaultMessage="Finish" />
             &nbsp;&rarr;

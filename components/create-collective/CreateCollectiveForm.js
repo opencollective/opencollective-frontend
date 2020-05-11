@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
-import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
@@ -298,7 +297,7 @@ class CreateCollectiveForm extends React.Component {
                               defaultMessage="I agree with the the {hosttoslink} of the host that will collect money on behalf of our collective."
                               values={{
                                 hosttoslink: (
-                                  <StyledLink href={get(host, 'settings.tos')} openInNewTab>
+                                  <StyledLink href={host.termsUrl} openInNewTab>
                                     <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
                                   </StyledLink>
                                 ),

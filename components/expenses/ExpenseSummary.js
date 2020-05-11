@@ -1,32 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { i18nExpenseType } from '../../lib/i18n-expense';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
-import StyledTag from '../StyledTag';
 import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import ExpenseStatusTag from './ExpenseStatusTag';
+import ExpenseTags from './ExpenseTags';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -65,7 +64,6 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
  * the ability to submit it.
  */
 const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, showProcessActions }) => {
-  const intl = useIntl();
   const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
@@ -74,7 +72,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
   return (
     <StyledCard p={[16, 24, 32]}>
       <Flex justifyContent="space-between" alignItems="center">
-        <H4 my={2} mr={2}>
+        <H4 my={2} mr={2} fontWeight="500">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>
         {expense?.status && (
@@ -87,20 +85,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
           />
         )}
       </Flex>
-      <Flex flexWrap="wrap">
-        <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
-          {isLoading ? (
-            <LoadingPlaceholder height={12} width={65} />
-          ) : (
-            i18nExpenseType(intl, expense.type, expense.legacyId)
-          )}
-        </StyledTag>
-        {expense?.tags?.map(tag => (
-          <StyledTag variant="rounded-right" mb="4px" mr="4px" key={tag}>
-            {tag}
-          </StyledTag>
-        ))}
-      </Flex>
+      <ExpenseTags expense={expense} isLoading={isLoading} />
       <Flex alignItems="center" mt={3}>
         {isLoading ? (
           <LoadingPlaceholder height={24} width={200} />
