@@ -64,6 +64,7 @@ class SectionContribute extends React.PureComponent {
       isActive: PropTypes.bool,
       host: PropTypes.object,
       currency: PropTypes.string,
+      settings: PropTypes.object,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string.isRequired,
       }),
@@ -234,17 +235,19 @@ class SectionContribute extends React.PureComponent {
                           </Box>
                         </Flex>
                       </ContainerSectionContent>
-
                       <ContributeCardsContainer ref={ref}>
-                        <ContributeCardContainer>
-                          <ContributeCustom
-                            collective={collective}
-                            contributors={financialContributorsWithoutTier}
-                            stats={contributorsStats}
-                            hideContributors={hasNoContributor}
-                            disableCTA={!collective.isActive}
-                          />
-                        </ContributeCardContainer>
+                        {!collective.settings.disableCustomContributions && (
+                          <ContributeCardContainer>
+                            <ContributeCustom
+                              collective={collective}
+                              contributors={financialContributorsWithoutTier}
+                              stats={contributorsStats}
+                              hideContributors={hasNoContributor}
+                              disableCTA={!collective.isActive}
+                            />
+                          </ContributeCardContainer>
+                        )}
+
                         {sortedTiers.map(tier => (
                           <ContributeCardContainer key={tier.id}>
                             <ContributeTier

@@ -1,4 +1,5 @@
 import React from 'react';
+import { MockedProvider } from '@apollo/react-testing';
 import { mount } from 'enzyme';
 import { ThemeProvider } from 'styled-components';
 
@@ -17,11 +18,13 @@ describe('EditEventForm component', () => {
   };
 
   const component = mount(
-    <IntlProvider locale="en">
-      <ThemeProvider theme={theme}>
-        <EditEventForm event={event} onSubmit={onSubmit} />
-      </ThemeProvider>
-    </IntlProvider>,
+    <MockedProvider>
+      <IntlProvider locale="en">
+        <ThemeProvider theme={theme}>
+          <EditEventForm event={event} onSubmit={onSubmit} />
+        </ThemeProvider>
+      </IntlProvider>
+    </MockedProvider>,
   );
 
   // @TODO: update: no need for slug anymore
