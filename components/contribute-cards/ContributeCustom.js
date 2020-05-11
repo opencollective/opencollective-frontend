@@ -22,7 +22,6 @@ const ContributeCustom = ({ intl, collective, contributors, stats, ...props }) =
     <Contribute
       route="orderCollectiveNew"
       routeParams={{ collectiveSlug: collective.slug, verb: 'donate' }}
-      contributeRoute={`/${collective.slug}/donate`}
       type={ContributionTypes.FINANCIAL_CUSTOM}
       title={intl.formatMessage(messages.title)}
       contributors={contributors}

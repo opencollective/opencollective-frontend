@@ -398,6 +398,7 @@ class Tiers extends React.Component {
   render() {
     const { intl, collective, defaultType = 'TICKET' } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
+    const isNew = !collective.id;
 
     return (
       <Mutation mutation={updateSettingsMutation}>
@@ -421,47 +422,50 @@ class Tiers extends React.Component {
                 }
               `}
             </style>
-            <div>
-              <H3>{this.props.title}</H3>
-              <StyledHr my={4} borderColor="black.200" />
-              <H4 mb={3}>
-                <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
-              </H4>
-              <Flex flexWrap="wrap">
-                <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
-                  <ContributeCustom collective={collective} hideContributors />
-                </Box>
-                <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
-                  <P>
-                    <FormattedMessage
-                      id="Tiers.CustomTierDescription"
-                      defaultMessage="The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
+            <H3>{this.props.title}</H3>
+            <StyledHr my={4} borderColor="black.200" />
+            {!isNew && (
+              <React.Fragment>
+                <H4 mb={3}>
+                  <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
+                </H4>
+                <Flex flexWrap="wrap">
+                  <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
+                    <ContributeCustom collective={collective} hideContributors />
+                  </Box>
+                  <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
+                    <P>
+                      <FormattedMessage
+                        id="Tiers.CustomTierDescription"
+                        defaultMessage="The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
+                      />
+                    </P>
+                    <StyledCheckbox
+                      name="custom-contributions"
+                      label={intl.formatMessage(this.messages['customContributions.label'])}
+                      defaultChecked={!hasCustomContributionsDisabled}
+                      width="auto"
+                      isLoading={loading}
+                      onChange={({ target }) => {
+                        const updatedCollective = cloneDeep(this.props.collective);
+                        editSettings({
+                          variables: {
+                            id: this.props.collective.id,
+                            settings: set(updatedCollective.settings, 'disableCustomContributions', !target.value),
+                          },
+                        });
+                      }}
                     />
-                  </P>
-                  <StyledCheckbox
-                    name="custom-contributions"
-                    label={intl.formatMessage(this.messages['customContributions.label'])}
-                    defaultChecked={!hasCustomContributionsDisabled}
-                    width="auto"
-                    isLoading={loading}
-                    onChange={({ target }) => {
-                      const updatedCollective = cloneDeep(this.props.collective);
-                      editSettings({
-                        variables: {
-                          id: this.props.collective.id,
-                          settings: set(updatedCollective.settings, 'disableCustomContributions', !target.value),
-                        },
-                      });
-                    }}
-                  />
+                  </Flex>
                 </Flex>
-              </Flex>
 
-              <StyledHr my={4} borderColor="black.200" />
-            </div>
-            <H4 mb={3}>
-              <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
-            </H4>
+                <StyledHr my={4} borderColor="black.200" />
+                <H4 mb={3}>
+                  <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
+                </H4>
+              </React.Fragment>
+            )}
+
             <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
             <div className="editTiersActions">
               <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
