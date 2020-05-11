@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
+import theme from '../lib/theme';
 import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
 /**
@@ -73,11 +74,11 @@ StyledLink.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonSize: PropTypes.oneOf(['small', 'medium', 'large']),
+  buttonSize: PropTypes.oneOf(Object.keys(theme.buttonSizes)),
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(['primary', 'standard']),
+  buttonStyle: PropTypes.oneOf(Object.keys(theme.buttons)),
   /**
    * styled-system prop: accepts any css 'color' value or theme alias
    * See lib/theme/colors.js for the list of theme colors
