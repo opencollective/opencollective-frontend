@@ -14,19 +14,20 @@ const StyledFilters = ({ filters, getLabel, onChange, selected, minButtonWidth, 
       {filters.map((filter, idx) => {
         const isSelected = filter === selected;
         return (
-          <StyledButton
-            data-cy={`filter-button ${filter.toLowerCase()}`}
-            key={filter}
-            onClick={isSelected ? undefined : () => onChange(filter)}
-            height={32}
-            buttonStyle={isSelected ? 'primary' : 'standard'}
-            minWidth={minButtonWidth}
-            ml={idx === 0 ? 0 : 2}
-            mr={2}
-            py={1}
-          >
-            <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
-          </StyledButton>
+          <Span key={filter}>
+            <StyledButton
+              data-cy={`filter-button ${filter.toLowerCase()}`}
+              onClick={isSelected ? undefined : () => onChange(filter)}
+              height={32}
+              buttonStyle={isSelected ? 'primary' : 'standard'}
+              minWidth={minButtonWidth}
+              ml={idx === 0 ? 0 : 2}
+              mr={2}
+              py={1}
+            >
+              <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
+            </StyledButton>
+          </Span>
         );
       })}
       <Box px={2} />
