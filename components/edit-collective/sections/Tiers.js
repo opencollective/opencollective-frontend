@@ -401,34 +401,34 @@ class Tiers extends React.Component {
     const isNew = !collective.id;
 
     return (
-      <Mutation mutation={updateSettingsMutation}>
-        {(editSettings, { loading }) => (
-          <div className="EditTiers">
-            <style jsx>
-              {`
-                :global(.tierActions) {
-                  text-align: right;
-                  font-size: 1.3rem;
-                }
-                :global(.field) {
-                  margin: 1rem;
-                }
-                .editTiersActions {
-                  text-align: right;
-                  margin-top: -10px;
-                }
-                :global(.tier) {
-                  margin: 3rem 0;
-                }
-              `}
-            </style>
-            <H3>{this.props.title}</H3>
-            <StyledHr my={4} borderColor="black.200" />
-            {!isNew && (
-              <React.Fragment>
-                <H4 mb={3}>
-                  <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
-                </H4>
+      <div className="EditTiers">
+        <style jsx>
+          {`
+            :global(.tierActions) {
+              text-align: right;
+              font-size: 1.3rem;
+            }
+            :global(.field) {
+              margin: 1rem;
+            }
+            .editTiersActions {
+              text-align: right;
+              margin-top: -10px;
+            }
+            :global(.tier) {
+              margin: 3rem 0;
+            }
+          `}
+        </style>
+        <H3>{this.props.title}</H3>
+        <StyledHr my={4} borderColor="black.200" />
+        {!isNew && (
+          <React.Fragment>
+            <H4 mb={3}>
+              <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
+            </H4>
+            <Mutation mutation={updateSettingsMutation}>
+              {(editSettings, { loading }) => (
                 <Flex flexWrap="wrap">
                   <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
                     <ContributeCustom collective={collective} hideContributors />
@@ -458,23 +458,22 @@ class Tiers extends React.Component {
                     />
                   </Flex>
                 </Flex>
-
-                <StyledHr my={4} borderColor="black.200" />
-                <H4 mb={3}>
-                  <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
-                </H4>
-              </React.Fragment>
-            )}
-
-            <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
-            <div className="editTiersActions">
-              <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
-                {intl.formatMessage(this.messages[`${defaultType}.add`])}
-              </Button>
-            </div>
-          </div>
+              )}
+            </Mutation>
+            <StyledHr my={4} borderColor="black.200" />
+            <H4 mb={3}>
+              <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
+            </H4>
+          </React.Fragment>
         )}
-      </Mutation>
+
+        <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
+        <div className="editTiersActions">
+          <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
+            {intl.formatMessage(this.messages[`${defaultType}.add`])}
+          </Button>
+        </div>
+      </div>
     );
   }
 }
