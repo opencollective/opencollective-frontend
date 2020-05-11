@@ -38,7 +38,7 @@ const PayoutMethodTypeWithIcon = ({ type, fontSize, iconSize }) => {
         <Flex alignItems="center">
           <BankIcon size={iconSize} color="#9D9FA3" />
           <Span ml={2} fontWeight="bold" fontSize={fontSize} color="black.900">
-            <FormattedMessage id="Bank account" defaultMessage="Bank account" />
+            <FormattedMessage id="BankAccount" defaultMessage="Bank account" />
           </Span>
         </Flex>
       );

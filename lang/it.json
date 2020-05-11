@@ -93,7 +93,7 @@
   "archive.organization.confirmation": "Sei sicuro di voler archiviare questa organizzazione?",
   "authorization.loginRequired": "Devi essere loggato per continuare.",
   "Back": "Torna indietro",
-  "Bank account": "Bank account",
+  "BankAccount": "Bank account",
   "bankaccount.instructions.account": "bank account details added above",
   "bankaccount.instructions.amount": "total amount of the order",
   "bankaccount.instructions.collective": "slug of the collective receiving the order",

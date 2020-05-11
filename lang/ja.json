@@ -93,7 +93,7 @@
   "archive.organization.confirmation": "Are you sure you want to archive this organization?",
   "authorization.loginRequired": "続けるにはログインする必要があります",
   "Back": "Back",
-  "Bank account": "Bank account",
+  "BankAccount": "Bank account",
   "bankaccount.instructions.account": "bank account details added above",
   "bankaccount.instructions.amount": "total amount of the order",
   "bankaccount.instructions.collective": "slug of the collective receiving the order",
