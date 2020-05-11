@@ -18,8 +18,6 @@ describe('apply to host', () => {
     cy.get('button[type="submit"]').click();
     cy.wait(1000);
     cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
-    cy.get('.NotificationBar h1').contains('success');
-    cy.get('.NotificationBar p').contains('BrusselsTogether ASBL');
     cy.url().then(currentUrl => {
       const CollectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       return cy.visit(`/brusselstogetherasbl/collectives/${CollectiveId}/approve`);
