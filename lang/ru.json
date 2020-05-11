@@ -1431,6 +1431,7 @@
   "TierPage.Share.title": "Help {collective} reach their goal!",
   "TierPage.ShareGoal": "Share this goal",
   "tiers.about": "About contribution tiers",
+  "Tiers.CustomTierDescription": "The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized.",
   "tiers.knowMore": "Know more about tiers",
   "Tooltip.PrivateInfo": "This info is private",
   "TopContributors.Individuals": "Individuals",
