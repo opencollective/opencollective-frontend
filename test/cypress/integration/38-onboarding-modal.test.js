@@ -1,4 +1,4 @@
-import { randomSlug } from '../support/faker';
+import { randomEmail, randomSlug } from '../support/faker';
 
 describe('Onboarding modal', () => {
   before(() => {
@@ -6,6 +6,7 @@ describe('Onboarding modal', () => {
     cy.wait(100);
   });
   it('Edit collective using Onboarding modal', () => {
+    const invitedUserEmail = randomEmail();
     cy.get(`input[name="name"]`).type('New collective');
     cy.get(`input[name="slug"]`).type(randomSlug());
     cy.get(`input[name="description"]`).type('short description for new collective');
@@ -18,10 +19,18 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="step-forward-button"]').click();
     // Current count of admins
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
-    cy.get('[data-cy="admin-picker"]').type('test user{enter}');
+    // cy.get('[data-cy="admin-picker"]').type('test user{enter}');
+    cy.get('[data-cy="admin-picker"]').click();
+    // cy.get('data-cy="admin-picker"]').click();
+    cy.getByDataCy('collective-type-picker-USER').click();
+    cy.getByDataCy('create-collective-mini-form').then($form => {
+      cy.wrap($form).find('input[name="email"]').type(invitedUserEmail);
+      cy.wrap($form).find('input[name="name"]').type('AmazingNewUser');
+      cy.wrap($form).find('button[type="submit"]').click();
+    });
     // Profile card should have length 2 since test user is added
     cy.get('[data-cy="profile-card"]').children().should('have.length', 2);
-    cy.get('[data-cy="name-of-admins"]').contains('Test User');
+    cy.get('[data-cy="name-of-admins"]').contains('AmazingNewUser');
     // Delete test user
     cy.get('[data-cy="remove-user"] > button').click();
     // Again the length shoudl be 1

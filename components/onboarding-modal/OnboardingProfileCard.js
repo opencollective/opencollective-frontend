@@ -35,6 +35,7 @@ class OnboardingProfileCard extends React.Component {
                   removeAdmin(collective);
                 },
               }}
+              data-cy="remove-user"
             >
               <Flex alignItems="center">
                 <Avatar radius={16} collective={collective} />
@@ -55,7 +56,6 @@ class OnboardingProfileCard extends React.Component {
                   }
                 : null
             }
-            data-cy="remove-user"
           >
             <Flex alignItems="center">
               <Avatar radius={16} collective={collective} />
