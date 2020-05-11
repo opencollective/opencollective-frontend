@@ -468,7 +468,7 @@ class CreateOrderPage extends React.Component {
         const stepPayment = {
           ...state.stepPayment,
           paymentMethod: {
-            ...state.stepPayment.paymentMethod,
+            ...state.stepPayment?.paymentMethod,
             token: null,
           },
         };
