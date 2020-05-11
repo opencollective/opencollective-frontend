@@ -58,6 +58,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme }) =>
                       canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       onDelete={onCommentDeleted}
+                      reactions={item.reactions}
                     />
                   </ItemContainer>
                 </Flex>

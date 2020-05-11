@@ -260,6 +260,7 @@ class ConversationPage extends React.Component {
     const collective = data && data.account;
     const conversation = data && data.conversation;
     const body = conversation && conversation.body;
+    const conversationReactions = get(conversation, 'body.reactions', []);
     const comments = get(conversation, 'comments.nodes', []);
     const followers = get(conversation, 'followers');
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
@@ -309,6 +310,7 @@ class ConversationPage extends React.Component {
                           </H2>
                           <Comment
                             comment={body}
+                            reactions={conversationReactions}
                             canEdit={canEdit}
                             canDelete={canDelete}
                             onDelete={this.onConversationDeleted}
