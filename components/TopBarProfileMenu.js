@@ -196,7 +196,7 @@ class TopBarProfileMenu extends React.Component {
         <Flex flexWrap="wrap">
           <Box order={[2, 2, 1]} width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
             <Hide xs sm>
-              <Avatar collective={LoggedInUser.collective} radius="3rem" mr={2} />
+              <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
               </P>
