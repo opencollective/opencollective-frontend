@@ -229,7 +229,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
             </PrivateInfoColumnHeader>
             <Container fontSize="Caption" color="black.600">
               <Box mb={3} data-cy="expense-summary-payout-method-type">
-                <PayoutMethodTypeWithIcon type={expense.payoutMethod.type} />
+                <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
               </Box>
               <div data-cy="expense-summary-payout-method-data">
                 <PayoutMethodData payoutMethod={expense.payoutMethod} />
