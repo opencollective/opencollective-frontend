@@ -215,6 +215,7 @@ class EditEventForm extends React.Component {
             {this.fields.map(field =>
               field.name === 'timezone' ? (
                 <TimezonePicker
+                  key={field.name}
                   label="Timezone"
                   selectedTimezone={this.state.event.timezone}
                   onChange={this.handleTimezoneChange}
