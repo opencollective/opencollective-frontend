@@ -40,10 +40,14 @@ class UpdateBankDetailsForm extends React.Component {
   }
 
   onChange(field, value) {
-    const newState = this.state;
-    newState.form[field] = value;
-    this.setState(newState);
-    this.props.onChange(newState.form);
+    this.setState(
+      state => {
+        return { form: { ...state.form, [field]: value } };
+      },
+      () => {
+        return this.props.onChange(this.state.form);
+      },
+    );
   }
 
   formatAccountDetails(payoutMethodData) {

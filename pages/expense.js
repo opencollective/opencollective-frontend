@@ -251,7 +251,7 @@ class ExpensePage extends React.Component {
       this.onSuccessMsgDismiss();
     }
 
-    return this.setState({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense });
+    return this.setState(() => ({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense }));
   };
 
   render() {

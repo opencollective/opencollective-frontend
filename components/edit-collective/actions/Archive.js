@@ -65,8 +65,6 @@ const unarchiveMessages = defineMessages({
 
 const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
   const collectiveType = getCollectiveType(collective.type);
-  const defaultAction = isArchived ? 'Archive' : 'Unarchive';
-  const [modal, setModal] = useState({ type: defaultAction, show: false });
   const intl = useIntl();
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
@@ -74,8 +72,9 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
     error: null,
     confirmationMsg: '',
   });
-
   const { processing, isArchived, error, confirmationMsg } = archiveStatus;
+  const [modal, setModal] = useState({ type: defaultAction, show: false });
+  const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const handleArchiveCollective = async ({ archiveCollective, id }) => {
     setModal({ type: 'Archive', show: false });
     try {

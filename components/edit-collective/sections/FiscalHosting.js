@@ -60,8 +60,6 @@ const getCollectiveType = type => {
 const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollectiveAsHost }) => {
   const collectiveType = getCollectiveType(collective.type);
   const { refetch } = useContext(GraphQLContext);
-  const defaultAction = isHostAccount ? 'Activate' : 'Deactivate';
-  const [modal, setModal] = useState({ type: defaultAction, show: false });
   const [activationStatus, setaActivationStatus] = useState({
     processing: false,
     isHostAccount: collective.isHost,
@@ -69,7 +67,9 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
     confirmationMsg: '',
   });
 
-  const { processing, isHostAccount, error /* , confirmationMsg */ } = activationStatus;
+  const { processing, isHostAccount, error } = activationStatus;
+  const defaultAction = isHostAccount ? 'Activate' : 'Deactivate';
+  const [modal, setModal] = useState({ type: defaultAction, show: false });
 
   const handleActivateAsHost = async ({ activateCollectiveAsHost, id }) => {
     setModal({ type: 'Activate', show: false });
