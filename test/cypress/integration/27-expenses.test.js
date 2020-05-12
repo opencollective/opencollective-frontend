@@ -120,8 +120,8 @@ describe('New expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test-2@opencollective.com');
       cy.getByDataCy('expense-summary-btn').click();
-      cy.getByDataCy('submit-expense-btn').click();
-      cy.getByDataCy('submit-expense-btn').should('not.exist'); // wait for form to be submitted
+      cy.getByDataCy('save-expense-btn').click();
+      cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
 
       // Check final expense page
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat edited');
