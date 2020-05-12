@@ -220,23 +220,24 @@ const availableCurrenciesQuery = gqlV2`
  * Form for payout bank information. Must be used with Formik.
  */
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency }) => {
-  const { data } = useQuery(availableCurrenciesQuery, {
+  const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: host.slug },
+    // Skip fetching/loading if the currency is fixed or avaialbleCurrencies was pre-loaded
     skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
-  const availableCurrencies =
-    fixedCurrency || host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
-  const currencyFieldName = getFieldName('data.currency');
-  const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
 
-  if (!availableCurrencies) {
+  // Display spinner if loading
+  if (loading) {
     return <StyledSpinner />;
   }
 
+  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
   const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies);
+  const currencyFieldName = getFieldName('data.currency');
+  const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
 
   return (
     <React.Fragment>
