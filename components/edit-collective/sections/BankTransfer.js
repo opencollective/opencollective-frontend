@@ -93,12 +93,13 @@ const BankTransfer = props => {
     !existingManualPaymentMethod || (existingManualPaymentMethod && existingPayoutMethod) ? true : false;
   const instructions =
     get(data.host, 'settings.paymentMethods.manual.instructions') || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
-  const fixedCurrency =
-    // Fix currency if the existing payout method already matches the collective currency
-    (!existingPayoutMethod || existingPayoutMethod.data.currency === data.host.currency) &&
-    // or if it was already defined by Stripe
-    data.host.connectedAccounts?.find?.(ca => ca.service === 'stripe') &&
-    data.host.currency;
+
+  // Fix currency if the existing payout method already matches the collective currency
+  // or if it was already defined by Stripe
+  const existingPayoutMethodMatchesCurrency = existingPayoutMethod?.data?.currency === data.host.currency;
+  const isConnectedToStripe = data.host.connectedAccounts?.find?.(ca => ca.service === 'stripe');
+  const fixedCurrency = (existingPayoutMethodMatchesCurrency || isConnectedToStripe) && data.host.currency;
+
   const initialValues = {
     ...(existingPayoutMethod || { data: { currency: fixedCurrency } }),
     instructions,
