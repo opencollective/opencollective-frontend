@@ -15,6 +15,7 @@ const CreateNewCard = styled.div`
   width: ${CONTRIBUTE_CARD_WIDTH}px;
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px dashed #c0c5cc;
+  padding: 32px;
 
   a {
     text-decoration: none;
