@@ -398,7 +398,7 @@ class Tiers extends React.Component {
   render() {
     const { intl, collective, defaultType = 'TICKET' } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
-    const isNew = !collective.id;
+    const displayCustomContributionsSettings = collective.id && defaultType !== 'TICKET';
 
     return (
       <div className="EditTiers">
@@ -422,7 +422,7 @@ class Tiers extends React.Component {
         </style>
         <H3>{this.props.title}</H3>
         <StyledHr my={4} borderColor="black.200" />
-        {!isNew && (
+        {displayCustomContributionsSettings && (
           <React.Fragment>
             <H4 mb={3}>
               <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
