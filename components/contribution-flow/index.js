@@ -859,7 +859,7 @@ class CreateOrderPage extends React.Component {
               tierName={tier ? tier.name : ''}
               collectiveSlug={collective.slug}
               interval={interval}
-              amount={get(stepDetails, 'amount') || defaultStepDetails.amount}
+              amount={typeof stepDetails?.amount !== 'undefined' ? stepDetails.amount : defaultStepDetails.amount}
               quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
               changeIntervalWarning={Boolean(tier)}
               disabledInterval={Boolean(this.props.fixedInterval)}
