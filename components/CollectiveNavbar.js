@@ -456,11 +456,13 @@ const CollectiveNavbar = ({
             </Container>
           )}
           <div>
-            <CollectiveCallsToAction
-              display={['none', null, 'flex']}
-              collective={collective}
-              callsToAction={callsToAction}
-            />
+            {!isLoading && (
+              <CollectiveCallsToAction
+                display={['none', null, 'flex']}
+                collective={collective}
+                callsToAction={callsToAction}
+              />
+            )}
           </div>
         </Container>
       )}

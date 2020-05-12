@@ -9,6 +9,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
+import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -120,7 +121,12 @@ class ExpensePage extends React.Component {
     const hasFilters = this.props.tag || this.props.type;
     return (
       <Page collective={data.account} {...this.getPageMetaData(data.account)} withoutGlobalStyles>
-        <CollectiveNavbar collective={data.account} isLoading={!data.account} />
+        <CollectiveNavbar
+          collective={data.account}
+          isLoading={!data.account}
+          selected={Sections.BUDGET}
+          callsToAction={{ hasSubmitExpense: true }}
+        />
         <Container position="relative" minHeight={[null, 800]}>
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
             <Flex justifyContent="space-between" flexWrap="wrap">
