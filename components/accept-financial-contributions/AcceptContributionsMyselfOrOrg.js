@@ -182,6 +182,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
       }
     };
 
+    const host = organization ? organization : LoggedInUser.collective;
     // Conditional rendering
     const noOrganizationPicked = router.query.path === 'organization' && !organization;
     const organizationPicked = router.query.path === 'organization' && organization;
@@ -325,6 +326,10 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                             <PayoutBankInformationForm
                               host={{ slug: TW_API_COLLECTIVE_SLUG }}
                               getFieldName={string => string}
+                              // Fix currency if it was already linked to Stripe
+                              fixedCurrency={
+                                host.connectedAccounts?.find?.(ca => ca.service === 'stripe') && host.currency
+                              }
                               isNew
                             />
                           </Box>
@@ -378,11 +383,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
             </Flex>
           )}
           {ableToChooseStripeOrBankAccount && (
-            <StripeOrBankAccountPicker
-              collective={collective}
-              host={organization ? organization : LoggedInUser.collective}
-              addHost={this.addHost}
-            />
+            <StripeOrBankAccountPicker collective={collective} host={host} addHost={this.addHost} />
           )}
         </Container>
       </Fragment>
