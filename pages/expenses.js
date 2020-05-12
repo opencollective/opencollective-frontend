@@ -100,7 +100,7 @@ class ExpensePage extends React.Component {
     const params = this.buildFilterLinkParams({ type: isSelected ? null : type });
     return (
       <Link route="expenses-v2" params={params}>
-        <ExpenseTypeTag background="#4E5052" type={type} closeButtonProps={isSelected} />
+        <ExpenseTypeTag type={type} closeButtonProps={isSelected} />
       </Link>
     );
   }

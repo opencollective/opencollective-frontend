@@ -15,7 +15,7 @@ const ExpenseTypeTag = ({ type, legacyId, isLoading, ...props }) => {
   ) : (
     <StyledTag
       variant="rounded-left"
-      type="dark"
+      type="grey"
       mb="4px"
       mr="10px"
       textTransform="uppercase"
