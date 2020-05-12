@@ -153,7 +153,8 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const sortedTiers = this.sortTiers(this.removeTickets(tiers));
     const isEvent = collective.type === CollectiveType.EVENT;
-    const hasContribute = collective.isActive || isAdmin;
+    const hasCustomContribution = !collective.settings?.disableCustomContributions;
+    const hasContribute = isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution));
     const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
