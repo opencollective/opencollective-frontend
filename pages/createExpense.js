@@ -52,7 +52,7 @@ class CreateExpensePage extends React.Component {
       delete expense.payoutMethod;
       const res = await this.props.createExpense(expense);
       const expenseCreated = res.data.createExpense;
-      Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/?createSuccess=true`);
+      Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/legacy?createSuccess=true`);
     } catch (e) {
       // TODO: this should be reported to the user
       console.error(e);
