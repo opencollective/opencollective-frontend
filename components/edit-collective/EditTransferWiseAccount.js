@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { useFormik } from 'formik';
-import { defineMessages } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { GraphQLContext } from '../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -34,24 +34,6 @@ const deleteConnectedAccountMutation = gqlV2`
 const mutationOptions = { context: API_V2_CONTEXT };
 
 const EditTransferWiseAccount = props => {
-  const messages = defineMessages({
-    button: {
-      id: 'collective.connectedAccounts.transferwise.button',
-      defaultMessage: 'Connect TransferWise',
-    },
-    description: {
-      id: 'collective.create.connectedAccounts.transferwise.description',
-      defaultMessage: 'Connect a TransferWise account to pay expenses with one click.',
-    },
-    connected: {
-      id: 'collective.connectedAccounts.transferwise.connected',
-      defaultMessage: 'TransferWise account connected on {updatedAt, date, short}',
-    },
-    disconnect: {
-      id: 'collective.connectedAccounts.disconnect.button',
-      defaultMessage: 'Disconnect',
-    },
-  });
   const { refetch } = React.useContext(GraphQLContext);
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
@@ -92,7 +74,19 @@ const EditTransferWiseAccount = props => {
     return (
       <form onSubmit={formik.handleSubmit}>
         <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
-          {props.intl.formatMessage(messages.description)}
+          <FormattedMessage
+            id="collective.create.connectedAccounts.transferwise.description"
+            defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TrasnferWise, please, <a>read our documentation</a>."
+            values={{
+              a(...chunks) {
+                return (
+                  <a href="https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise">
+                    {chunks}
+                  </a>
+                );
+              },
+            }}
+          />
         </P>
         <StyledInputField
           name="token"
@@ -105,7 +99,10 @@ const EditTransferWiseAccount = props => {
           )}
         </StyledInputField>
         <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
-          {props.intl.formatMessage(messages.button)}
+          <FormattedMessage
+            id="collective.connectedAccounts.transferwise.button"
+            defaultMessage="Connect TransferWise"
+          />
         </StyledButton>
       </form>
     );
@@ -113,14 +110,18 @@ const EditTransferWiseAccount = props => {
     return (
       <React.Fragment>
         <P lineHeight="0">
-          {props.intl.formatMessage(messages.connected, {
-            username: props.connectedAccount.username,
-            updatedAt: new Date(props.connectedAccount.updatedAt || props.connectedAccount.createdAt),
-          })}
+          <FormattedMessage
+            id="collective.connectedAccounts.transferwise.connected"
+            defaultMessage="TransferWise account connected on {updatedAt, date, short}"
+            values={{
+              username: props.connectedAccount.username,
+              updatedAt: new Date(props.connectedAccount.updatedAt || props.connectedAccount.createdAt),
+            }}
+          />
         </P>
         <P lineHeight="0">
           <StyledButton type="submit" buttonSize="small" loading={isDeleting} onClick={handleDelete}>
-            {props.intl.formatMessage(messages.disconnect)}
+            <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>
       </React.Fragment>
