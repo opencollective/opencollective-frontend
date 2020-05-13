@@ -94,7 +94,12 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
       )}
       {permissions?.canDelete && (
         <React.Fragment>
-          <ButtonWithLabel buttonStyle="danger" disabled={isDisabled} onClick={() => showDeleteConfirm(true)}>
+          <ButtonWithLabel
+            buttonStyle="danger"
+            data-cy="delete-expense-button"
+            disabled={isDisabled}
+            onClick={() => showDeleteConfirm(true)}
+          >
             <IconTrash size={18} />
             <ButtonLabel>
               <FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />

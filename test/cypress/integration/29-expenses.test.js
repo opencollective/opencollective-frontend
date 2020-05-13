@@ -155,10 +155,12 @@ describe('New expense flow', () => {
   });
 
   describe('Actions on expense', () => {
-    it('shows the login screen', () => {
+    let collectiveSlug;
+
+    before(() => {
       cy.login({ redirect: '/brusselstogetherasbl' });
       cy.get('[data-cy="host-apply-btn"]:visible').click();
-      const collectiveSlug = randomSlug();
+      collectiveSlug = randomSlug();
       cy.get(`input[name="name"]`).type('new-collective');
       cy.get(`input[name="slug"]`).type(collectiveSlug);
       cy.get(`input[name="description"]`).type('short description for new collective');
@@ -227,6 +229,9 @@ describe('New expense flow', () => {
       cy.fillStripeInput();
       cy.contains('button', 'Make contribution').click();
       cy.wait(5000);
+    });
+
+    it('Approve, unapprove, reject and pay actions on expense', () => {
       cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
       cy.wait(100);
       cy.get('[data-cy="single-expense"]:nth-child(1) [data-cy="expense-link"]').click({ force: true });
@@ -248,7 +253,34 @@ describe('New expense flow', () => {
       cy.get('[data-cy="expense-status-msg"]').contains('pending');
       cy.getByDataCy('reject-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('rejected');
-      // cy.get('[data-cy="collective-balance"] > span').contains('€1,231');
+      cy.get('[data-cy="collective-balance"] > span').contains('€1,231');
+
+      // Now delete the expense
+      // cy.getByDataCy('delete-expense-button').click();
+      // cy.getByDataCy('confirmation-modal-continue').click();
+      // cy.wait(200);
+      // cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
+      // cy.wait(100);
+      // cy.get('[data-cy="zero-expense-message"]').contains('No expenses');
+    });
+
+    it('Delete actions on expense', () => {
+      cy.login({ email: 'testuser+admin@opencollective.com' });
+      cy.wait(300);
+      cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
+      cy.wait(300);
+      cy.get('[data-cy="single-expense"]:nth-child(1) [data-cy="expense-link"]').click({ force: true });
+      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
+      cy.get('[data-cy="expense-status-msg"]').contains('rejected');
+      cy.get('[data-cy="collective-balance"] > span').contains('€1,231');
+
+      // Now delete the expense
+      cy.getByDataCy('delete-expense-button').click();
+      cy.getByDataCy('confirmation-modal-continue').click();
+      cy.wait(200);
+      cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
+      cy.wait(100);
+      cy.get('[data-cy="zero-expense-message"]').contains('No expenses');
     });
   });
 });
