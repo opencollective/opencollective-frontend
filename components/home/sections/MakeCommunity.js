@@ -46,6 +46,7 @@ const MakeCommunity = () => {
             letterSpacing={['-0.2px', null, '-0.8px']}
             fontSize={['H4', null, 'H1']}
             lineHeight={['H4', null, 'H1']}
+            textAlign="center"
           >
             <Span>
               <FormattedMessage

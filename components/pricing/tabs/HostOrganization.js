@@ -232,7 +232,12 @@ const HostOrganization = () => (
 
     <Container display="flex" flexDirection="column" alignItems="center">
       <Box textAlign="center" my={3}>
-        <H1 fontSize={['H3', null, 'H4']} lineHeight={['40px', null, 'H4']} letterSpacing={['-0.4px', null, '-0.2px']}>
+        <H1
+          fontSize={['H3', null, 'H4']}
+          lineHeight={['40px', null, 'H4']}
+          letterSpacing={['-0.4px', null, '-0.2px']}
+          textAlign="center"
+        >
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
         <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
