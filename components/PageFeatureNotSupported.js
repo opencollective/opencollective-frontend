@@ -27,7 +27,9 @@ const PageFeatureNotSupported = props => {
   return (
     <Page noRobots title={title} {...props}>
       <Flex flexDirection="column" justifyContent="center" alignItems="center" px={2} py={[5, 6]}>
-        <H1 mb={3}>{title}</H1>
+        <H1 mb={3} textAlign="center">
+          {title}
+        </H1>
         <P fontSize="64px" mt={3} mb={5}>
           🙈️
         </P>

@@ -188,7 +188,7 @@ const DiscoverPage = ({ router, intl }) => {
               textAlign="center"
               data-cy="discover-banner"
             >
-              <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']}>
+              <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']} textAlign="center">
                 <FormattedMessage id="discover.title" defaultMessage="Discover awesome collectives to support" />
               </H1>
               <P color="white.full" fontSize="H5" lineHeight="H5" mt={1}>
