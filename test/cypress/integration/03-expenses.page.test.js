@@ -139,6 +139,15 @@ describe('New expsense flow ', () => {
     // No invoice and hence info message
     cy.get('[data-cy="zero-expense-message"]').contains('No expense matches the given filters');
   });
+
+  after(() => {
+    // Delete the collective
+    cy.login({ email: 'testuser+admin@opencollective.com' });
+    cy.visit(`/new-collective${collectiveSlug}/edit/advanced`);
+    cy.contains('button', 'Delete this collective', { timeout: 15000 }).click();
+    cy.get('[data-cy=delete]').click();
+    cy.wait(1000);
+  });
 });
 
 describe('expenses.page.test.js', () => {
