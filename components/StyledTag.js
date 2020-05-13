@@ -18,6 +18,43 @@ const defaultRoundedStyleProps = {
   lineHeight: '18px',
 };
 
+const TAG_TYPE_VARIANTS = {
+  white: {
+    backgroundColor: 'white.full',
+    borderColor: 'black.200',
+  },
+  dark: {
+    backgroundColor: 'black.800',
+    borderColor: 'black.900',
+    color: 'white.full',
+  },
+  grey: {
+    backgroundColor: 'black.300',
+    borderColor: 'black.300',
+    color: 'black.900',
+  },
+  info: {
+    backgroundColor: 'blue.100',
+    borderColor: 'blue.400',
+    color: 'blue.600',
+  },
+  success: {
+    backgroundColor: 'green.100',
+    borderColor: 'green.500',
+    color: 'green.700',
+  },
+  warning: {
+    backgroundColor: 'yellow.200',
+    borderColor: 'yellow.500',
+    color: 'yellow.800',
+  },
+  error: {
+    backgroundColor: 'red.100',
+    borderColor: 'red.500',
+    color: 'red.500',
+  },
+};
+
 const StyledTagBase = styled.div`
   text-align: center;
   white-space: nowrap;
@@ -50,40 +87,7 @@ const StyledTagBase = styled.div`
     vertical-align: middle;
   }
 
-  ${variant({
-    prop: 'type',
-    variants: {
-      white: {
-        backgroundColor: 'white.full',
-        borderColor: 'black.200',
-      },
-      dark: {
-        backgroundColor: 'black.800',
-        borderColor: 'black.900',
-        color: 'white.full',
-      },
-      info: {
-        backgroundColor: 'blue.100',
-        borderColor: 'blue.400',
-        color: 'blue.600',
-      },
-      success: {
-        backgroundColor: 'green.100',
-        borderColor: 'green.500',
-        color: 'green.700',
-      },
-      warning: {
-        backgroundColor: 'yellow.200',
-        borderColor: 'yellow.500',
-        color: 'yellow.800',
-      },
-      error: {
-        backgroundColor: 'red.100',
-        borderColor: 'red.500',
-        color: 'red.500',
-      },
-    },
-  })}
+  ${variant({ prop: 'type', variants: TAG_TYPE_VARIANTS })}
 
   ${background}
   ${color}
@@ -134,6 +138,7 @@ StyledTag.propTypes = {
   iconAlign: PropTypes.string,
   variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left']),
   children: PropTypes.node,
+  type: PropTypes.oneOf(Object.keys(TAG_TYPE_VARIANTS)),
 };
 
 StyledTag.defaultProps = {

@@ -52,19 +52,19 @@ const pages = routes()
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
-  .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new')
-  .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new/v2')
+  .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new/legacy')
+  .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new/:version(v2)?')
   .add(
     'expense-v2',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/v2',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
     'expense',
   )
   .add(
     'expense',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
     'expense-legacy',
   )
-  .add('expenses-v2', '/:parentAccountSlug?/:accountType(events)?/:accountSlug/expenses/v2', 'expenses')
+  .add('expenses-v2', '/:parentAccountSlug?/:accountType(events)?/:accountSlug/expenses/:version(v2)?', 'expenses')
   .add(
     'expenses',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',

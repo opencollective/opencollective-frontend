@@ -286,7 +286,12 @@ class ExpensePage extends React.Component {
             />
           </TemporaryNotification>
         )}
-        <CollectiveNavbar collective={collective} isLoading={!collective} selected={Sections.BUDGET} />
+        <CollectiveNavbar
+          collective={collective}
+          isLoading={!collective}
+          selected={Sections.BUDGET}
+          callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
+        />
         <Flex flexWrap="wrap" my={[4, 5]} data-cy="expense-page-content">
           <Container
             display={['none', null, null, 'flex']}
@@ -390,7 +395,7 @@ class ExpensePage extends React.Component {
                         mx={[2, 0]}
                         mr={[null, 3]}
                         whiteSpace="nowrap"
-                        data-cy="submit-expense-btn"
+                        data-cy="save-expense-btn"
                         onClick={this.onSummarySubmit}
                         loading={this.state.isSubmitting}
                       >

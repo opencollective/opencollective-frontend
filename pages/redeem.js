@@ -174,7 +174,7 @@ class RedeemPage extends React.Component {
       return (
         <CollectiveCard collective={collective} mt={5}>
           <LinkCollective collective={collective}>
-            <H1 color="black.900" fontSize="3rem" lineHeight="1em" wordBreak="break-word" my={2}>
+            <H1 color="black.900" fontSize="3rem" lineHeight="1em" wordBreak="break-word" my={2} textAlign="center">
               {collective.name}
             </H1>
           </LinkCollective>

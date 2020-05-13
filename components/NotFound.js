@@ -24,7 +24,7 @@ const NotFound = ({ searchTerm }) => {
           }
         `}
       </style>
-      <H1>
+      <H1 textAlign="center">
         <FormattedMessage id="notFound" defaultMessage="Not found" />
       </H1>
       <P fontSize="3.6rem" color="primary.500" mt={4} mb={5}>

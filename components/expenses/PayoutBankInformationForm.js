@@ -219,27 +219,29 @@ const availableCurrenciesQuery = gqlV2`
 /**
  * Form for payout bank information. Must be used with Formik.
  */
-const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
-  const { data } = useQuery(availableCurrenciesQuery, {
+const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency }) => {
+  const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: host.slug },
-    skip: Boolean(host.transferwise?.availableCurrencies),
+    // Skip fetching/loading if the currency is fixed or avaialbleCurrencies was pre-loaded
+    skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
-  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
 
-  if (!availableCurrencies) {
+  // Display spinner if loading
+  if (loading) {
     return <StyledSpinner />;
   }
 
-  const currencies = formatStringOptions(availableCurrencies);
+  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
+  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies);
   const currencyFieldName = getFieldName('data.currency');
-  const selectedCurrency = get(formik.values, currencyFieldName);
+  const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
 
   return (
     <React.Fragment>
-      <FastField name={getFieldName('data.currency')}>
+      <FastField name={currencyFieldName}>
         {({ field, meta }) => (
           <StyledInputField
             name={field.name}
@@ -258,7 +260,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host }) => {
                 }}
                 options={currencies}
                 value={currencies.find(c => c.label === selectedCurrency)}
-                disabled={!isNew}
+                disabled={Boolean(fixedCurrency) || !isNew}
               />
             )}
           </StyledInputField>
@@ -286,6 +288,8 @@ PayoutBankInformationForm.propTypes = {
   }).isRequired,
   isNew: PropTypes.bool,
   getFieldName: PropTypes.func.isRequired,
+  /** Enforces a fixedCurrency */
+  fixedCurrency: PropTypes.string,
   /** A map of errors for this object */
   errors: PropTypes.object,
 };

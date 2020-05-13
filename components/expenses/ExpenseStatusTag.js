@@ -32,6 +32,7 @@ const ExpenseStatusTag = ({ status, ...props }) => {
     <StyledTag
       type={getExpenseStatusMsgType(status)}
       fontWeight="600"
+      fontSize="10px"
       letterSpacing="0.8px"
       textTransform="uppercase"
       {...props}

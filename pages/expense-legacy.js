@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError } from '../lib/errors';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
@@ -95,11 +94,7 @@ class ExpensePage extends React.Component {
                 </StyledButton>
               </Link>
               {!collective.isArchived && (
-                <Link
-                  // Redirect to the new Expense flow if the host is using TransferWise
-                  route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
-                  params={{ collectiveSlug: collective.slug }}
-                >
+                <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
                   <StyledButton my={1} mx={3} data-cy="submit-expense-btn">
                     <FormattedMessage id="expenses.sendAnotherExpense" defaultMessage="Submit Another Expense" />
                   </StyledButton>

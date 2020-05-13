@@ -119,7 +119,7 @@ class CreateExpenseForm extends React.Component {
       LoggedInUser &&
       LoggedInUser.collective.payoutMethods.find(pm => pm.type === 'BANK_ACCOUNT') &&
       collective &&
-      collective.host.connectedAccounts.find(ca => ca.service === 'transferwise')
+      collective.host?.connectedAccounts.find(ca => ca.service === 'transferwise')
     ) {
       options.unshift('banktransfer');
     }

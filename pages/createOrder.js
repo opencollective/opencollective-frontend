@@ -46,6 +46,10 @@ const messages = defineMessages({
     id: 'Tier.Past',
     defaultMessage: 'This contribution type is not active anymore.',
   },
+  disableCustomContributions: {
+    id: 'Tier.disableCustomContirbution',
+    defaultMessage: 'This collective requires you to select a tier to contribute.',
+  },
 });
 
 /**
@@ -153,6 +157,9 @@ class CreateOrderPage extends React.Component {
 
   renderPageContent() {
     const { data, intl } = this.props;
+    const feesOnTopAvailable =
+      get(data, 'Collective.platformFeePercent') === 0 && get(data, 'Collective.host.settings.feesOnTop');
+    const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
 
     if (!data.Collective.host) {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
@@ -162,6 +169,8 @@ class CreateOrderPage extends React.Component {
       return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
     } else if (data.Tier && data.Tier.endsAt && new Date(data.Tier.endsAt) < new Date()) {
       return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
+    } else if (data.Collective.settings.disableCustomContributions && !data.Tier) {
+      return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
     } else {
       return (
         <ContributionFlow
@@ -178,6 +187,8 @@ class CreateOrderPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          feesOnTopAvailable={feesOnTopAvailable}
+          taxDeductible={taxDeductible}
         />
       );
     }
@@ -220,6 +231,7 @@ const collectiveFields = `
   backgroundImage
   currency
   hostFeePercent
+  platformFeePercent
   tags
   settings
   isActive
