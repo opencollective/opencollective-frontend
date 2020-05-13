@@ -34,6 +34,7 @@ const ContributionFlowStepsProgress = ({
   goToStep,
   currency,
   isFreeTier,
+  showFeesOnTop,
 }) => {
   return (
     <StepsProgress
@@ -53,7 +54,10 @@ const ContributionFlowStepsProgress = ({
         } else if (step.name === 'details') {
           label = <FormattedMessage id="contribute.step.details" defaultMessage="Details" />;
           if (stepDetails && stepDetails.totalAmount) {
-            const formattedAmount = formatCurrency(stepDetails.amount, currency);
+            const formattedAmount = showFeesOnTop
+              ? formatCurrency(stepDetails.amount + stepDetails.platformFee?.value, currency)
+              : formatCurrency(stepDetails.amount, currency);
+
             const formattedTotalAmount =
               stepDetails.quantity > 1 ? `${formattedAmount} x ${stepDetails.quantity}` : formattedAmount;
             details = !stepDetails.interval ? (
@@ -107,6 +111,7 @@ ContributionFlowStepsProgress.propTypes = {
   lastVisitedStep: PropTypes.object,
   currency: PropTypes.string,
   isFreeTier: PropTypes.bool,
+  showFeesOnTop: PropTypes.bool,
 };
 
 export default ContributionFlowStepsProgress;

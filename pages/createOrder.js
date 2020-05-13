@@ -157,6 +157,9 @@ class CreateOrderPage extends React.Component {
 
   renderPageContent() {
     const { data, intl } = this.props;
+    const feesOnTopAvailable =
+      get(data, 'Collective.platformFeePercent') === 0 && get(data, 'Collective.host.settings.feesOnTop');
+    const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
 
     if (!data.Collective.host) {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
@@ -184,6 +187,8 @@ class CreateOrderPage extends React.Component {
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
           contributeAs={this.props.contributeAs}
+          feesOnTopAvailable={feesOnTopAvailable}
+          taxDeductible={taxDeductible}
         />
       );
     }
@@ -226,6 +231,7 @@ const collectiveFields = `
   backgroundImage
   currency
   hostFeePercent
+  platformFeePercent
   tags
   settings
   isActive
