@@ -98,7 +98,7 @@ class ExpensePage extends React.Component {
     const isSelected = this.props.type === type;
     const params = this.buildFilterLinkParams({ type: isSelected ? null : type });
     return (
-      <Link route="expenses-v2" params={params}>
+      <Link route="expenses-v2" params={params} data-cy="expense-type-tag">
         <ExpenseTypeTag background="#4E5052" type={type} closeButtonProps={isSelected} />
       </Link>
     );
@@ -129,7 +129,7 @@ class ExpensePage extends React.Component {
                   <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
                 </H1>
                 {!data.loading && !data.expenses?.nodes.length ? (
-                  <MessageBox type="info" withIcon>
+                  <MessageBox type="info" withIcon data-cy="zero-expense-message">
                     {hasFilters ? (
                       <FormattedMessage
                         id="ExpensesList.Empty"
@@ -186,12 +186,14 @@ class ExpensePage extends React.Component {
                     expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
                     limit={30}
                     getTagProps={this.getTagProps}
+                    data-cy="expense-tags-title"
                   >
                     {({ key, tag, renderedTag, props }) => (
                       <Link
                         key={key}
                         route="expenses-v2"
                         params={this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag })}
+                        data-cy="expense-tags-link"
                       >
                         {renderedTag}
                       </Link>

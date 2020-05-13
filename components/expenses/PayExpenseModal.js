@@ -181,7 +181,14 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
           </MessageBox>
         )}
         <Flex flexWrap="wrap" justifyContent="space-evenly">
-          <StyledButton buttonStyle="success" minWidth={100} m={1} type="submit" loading={formik.isSubmitting}>
+          <StyledButton
+            buttonStyle="success"
+            minWidth={100}
+            m={1}
+            type="submit"
+            loading={formik.isSubmitting}
+            data-cy="mark-as-paid-button"
+          >
             {hasManualPayment ? (
               <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
             ) : (

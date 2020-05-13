@@ -22,7 +22,14 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
         <H5 mb={3}>
           <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
         </H5>
-        <Container borderLeft="1px solid" borderColor="green.600" pl={3} fontSize="H5" color="black.500">
+        <Container
+          borderLeft="1px solid"
+          borderColor="green.600"
+          pl={3}
+          fontSize="H5"
+          color="black.500"
+          data-cy="collective-balance"
+        >
           {isLoading && !collective?.balance ? (
             <LoadingPlaceholder height={28} width={75} />
           ) : (

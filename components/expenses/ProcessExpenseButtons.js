@@ -77,7 +77,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         </MessageBox>
       )}
       {permissions.canApprove && (
-        <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary">
+        <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary" data-cy="approve-button">
           <ApproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="actions.approve" defaultMessage="Approve" />
@@ -85,7 +85,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         </StyledButton>
       )}
       {permissions.canReject && (
-        <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary">
+        <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
           <RejectIcon size={14} />
           <ButtonLabel>
             <FormattedMessage id="actions.reject" defaultMessage="Reject" />
@@ -102,7 +102,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         />
       )}
       {permissions.canUnapprove && (
-        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary">
+        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
@@ -110,7 +110,11 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         </StyledButton>
       )}
       {permissions.canMarkAsUnpaid && (
-        <StyledButton {...getButtonProps('MARK_AS_UNPAID')} buttonStyle="dangerSecondary">
+        <StyledButton
+          {...getButtonProps('MARK_AS_UNPAID')}
+          buttonStyle="dangerSecondary"
+          data-cy="mark-as-unpaid-button"
+        >
           <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
         </StyledButton>
       )}

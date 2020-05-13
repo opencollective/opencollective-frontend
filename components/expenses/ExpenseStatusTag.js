@@ -35,6 +35,7 @@ const ExpenseStatusTag = ({ status, ...props }) => {
       letterSpacing="0.8px"
       textTransform="uppercase"
       {...props}
+      data-cy="expense-status-msg"
     >
       {i18nExpenseStatus(intl, status)}
     </StyledTag>
