@@ -254,14 +254,6 @@ describe('New expense flow', () => {
       cy.getByDataCy('reject-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('rejected');
       cy.get('[data-cy="collective-balance"] > span').contains('€1,231');
-
-      // Now delete the expense
-      // cy.getByDataCy('delete-expense-button').click();
-      // cy.getByDataCy('confirmation-modal-continue').click();
-      // cy.wait(200);
-      // cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
-      // cy.wait(100);
-      // cy.get('[data-cy="zero-expense-message"]').contains('No expenses');
     });
 
     it('Delete actions on expense', () => {
