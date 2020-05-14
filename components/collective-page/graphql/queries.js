@@ -9,7 +9,12 @@ import {
 import * as fragments from './fragments';
 
 export const getCollectivePageQuery = gql`
-  query getCollectivePageQuery($slug: String!, $nbContributorsPerContributeCard: Int) {
+  query getCollectivePageQuery(
+    $slug: String!
+    $nbContributorsPerContributeCard: Int
+    $startDateForTotalAmountReceived: DateString
+    $endDateForTotalAmountReceived: DateString
+  ) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
       slug
@@ -43,6 +48,8 @@ export const getCollectivePageQuery = gql`
         balance
         yearlyBudget
         updates
+        activeRecurringContributions
+        totalAmountReceived(startDate: $startDateForTotalAmountReceived, endDate: $endDateForTotalAmountReceived)
         backers {
           id
           all

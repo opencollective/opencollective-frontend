@@ -278,6 +278,8 @@
   "CollectivePage.SectionBudget.Annual.Definition": "Budget annuel estimé à partir des contributions financières des 12 derniers mois.",
   "CollectivePage.SectionBudget.Balance": "Solde actuel",
   "CollectivePage.SectionBudget.Description": "Observez comment les fonds de {collectiveName} circulent librement. Tous les contributeurs et toutes les dépenses sont publiées sur notre registre transparent et ouvert. Voyez qui donne, combien, où part l'argent, ajoutez des dépenses, soyez remboursez et plus encore !",
+  "CollectivePage.SectionBudget.MonthlyRecurringAmount": "Monthly recurring: {amount}",
+  "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Voir toutes les transactions",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Voir toutes les dépenses",
   "CollectivePage.SectionContributions.Empty": "{collectiveName} semble endormi·e dans une cave au pôle nord ❄️☃️ !",

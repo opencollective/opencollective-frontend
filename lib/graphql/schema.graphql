@@ -704,10 +704,11 @@ type CollectiveStatsType {
   """
   Net amount received
   """
-  totalAmountReceived: Int
+  totalAmountReceived(startDate: DateString, endDate: DateString): Int
   yearlyBudget: Int
   topExpenses: JSON
   topFundingSources: JSON
+  activeRecurringContributions: JSON
 }
 
 """

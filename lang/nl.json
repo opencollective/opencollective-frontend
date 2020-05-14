@@ -278,6 +278,8 @@
   "CollectivePage.SectionBudget.Annual.Definition": "Verwacht jaarlijks budget op basis van de totale financiële bijdragen van de afgelopen 12 maanden.",
   "CollectivePage.SectionBudget.Balance": "Vandaag's saldo",
   "CollectivePage.SectionBudget.Description": "Bekijk hoe geld openlijk circuleert doorheen {collectiveName}. Alle bijdragen en alle onkosten worden gepubliceerd in onze transparante publieke logboek. Ontdek wie er doneert, welk bedrag, waar gaat het geld naartoe, dien onkostennota's in, wordt vergoed en meer!",
+  "CollectivePage.SectionBudget.MonthlyRecurringAmount": "Monthly recurring: {amount}",
+  "CollectivePage.SectionBudget.TotalAmountReceived": "Total received in the last 12 months: {amount}",
   "CollectivePage.SectionBudget.ViewAll": "Bekijk alle transacties",
   "CollectivePage.SectionBudget.ViewAllExpenses": "Bekijk alle uitgaven",
   "CollectivePage.SectionContributions.Empty": "{collectiveName} lijkt een winterslaap te houden in een grot op de Noordpool ❄️☃️!",

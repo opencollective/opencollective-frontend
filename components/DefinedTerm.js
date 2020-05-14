@@ -104,9 +104,16 @@ const UnderlinedTerm = styled.span`
  * Underlines the given word and show a tooltip with the definition when focused
  * or hovered. Both the term and the definition are translated.
  */
-const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color }) => {
+const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color, extraTooltipContent }) => {
   return (
-    <StyledTooltip content={() => intl.formatMessage(TranslatedDefinitions[term], TranslationParams[term])}>
+    <StyledTooltip
+      content={() => (
+        <React.Fragment>
+          {intl.formatMessage(TranslatedDefinitions[term], TranslationParams[term])}
+          {extraTooltipContent}
+        </React.Fragment>
+      )}
+    >
       {props => (
         <UnderlinedTerm {...props} textTransform={textTransform} color={color} borderColor={color} fontSize={fontSize}>
           {children || intl.formatMessage(TranslatedTerms[term])}
@@ -129,6 +136,8 @@ DefinedTerm.propTypes = {
   children: PropTypes.node,
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
+  /** Extra content to include with term definition */
+  extraTooltipContent: PropTypes.node,
 };
 
 DefinedTerm.defaultProps = {
