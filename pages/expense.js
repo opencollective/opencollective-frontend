@@ -46,7 +46,7 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2`
-  query CreateExpensePage($legacyExpenseId: Int!) {
+  query ExpensePage($legacyExpenseId: Int!) {
     expense(expense: {legacyId: $legacyExpenseId}) {
       ...expensePageExpenseFieldsFragment
     }
