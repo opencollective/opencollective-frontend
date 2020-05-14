@@ -60,6 +60,9 @@ const HostFieldsFragment = gqlV2`
       transferwisePayouts
       transferwisePayoutsLimit
     }
+    transferwise {
+      availableCurrencies
+    }
   }
 `;
 
