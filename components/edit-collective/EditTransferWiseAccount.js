@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { GraphQLContext } from '../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
@@ -76,15 +77,12 @@ const EditTransferWiseAccount = props => {
         <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
           <FormattedMessage
             id="collective.create.connectedAccounts.transferwise.description"
-            defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TrasnferWise, please, <a>read our documentation</a>."
+            defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>."
             values={{
-              a(...chunks) {
-                return (
-                  <a href="https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise">
-                    {chunks}
-                  </a>
-                );
-              },
+              a: getI18nLink({
+                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise',
+                openInNewTab: true,
+              }),
             }}
           />
         </P>
