@@ -174,7 +174,7 @@
   "collective.country.label": "Country",
   "collective.create.button": "Create Collective",
   "collective.create.connectedAccounts.stripe.description": "Connect a Stripe account to start accepting financial contributions.",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TrasnferWise, please, <a>read our documentation</a>.",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>.",
   "collective.create.createOrSignIn": "Create an account (or sign in) to start a collective.",
   "collective.create.description": "The place for your community to collect money and share your finance in full transparency.",
   "collective.create.join": "Join Open Collective",

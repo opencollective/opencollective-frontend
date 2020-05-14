@@ -174,7 +174,7 @@
   "collective.country.label": "Land",
   "collective.create.button": "Maak Collectief aan",
   "collective.create.connectedAccounts.stripe.description": "Koppel een Stripe account om te starten met het accepteren van financiële bijdragen.",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TrasnferWise, please, <a>read our documentation</a>.",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>.",
   "collective.create.createOrSignIn": "Maak een account aan (of log in) om een collectief te starten.",
   "collective.create.description": "De plek voor jouw vereniging om geld in te zamelen en je financiën te delen in volle transparantie.",
   "collective.create.join": "Deelnemen aan Open Collective",
