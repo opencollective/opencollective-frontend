@@ -2,7 +2,7 @@ import { randomEmail, randomSlug } from '../support/faker';
 
 describe('Onboarding modal', () => {
   before(() => {
-    (process.env.ONBOARDING_MODAL = true), cy.login({ redirect: '/create/community' });
+    cy.login({ redirect: '/create/community' });
     cy.wait(100);
   });
   it('Edit collective using Onboarding modal', () => {
@@ -19,9 +19,7 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="step-forward-button"]').click();
     // Current count of admins
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
-    // cy.get('[data-cy="admin-picker"]').type('test user{enter}');
     cy.get('[data-cy="admin-picker"]').click();
-    // cy.get('data-cy="admin-picker"]').click();
     cy.getByDataCy('collective-type-picker-USER').click();
     cy.getByDataCy('create-collective-mini-form').then($form => {
       cy.wrap($form).find('input[name="email"]').type(invitedUserEmail);

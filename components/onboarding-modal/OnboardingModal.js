@@ -258,7 +258,7 @@ class OnboardingModal extends React.Component {
     const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
-      <React.Fragment data-cy="collective-modal">
+      <React.Fragment>
         {step === 3 ? (
           <React.Fragment>
             <ModalWithImage
