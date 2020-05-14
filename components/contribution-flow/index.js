@@ -277,34 +277,14 @@ class CreateOrderPage extends React.Component {
     }
 
     // sets the total amount & fee options correctly when we change the base amount (if fees on top is available)
-    if (
-      prevState.stepDetails?.amount !== this.state.stepDetails?.amount &&
-      this.props.feesOnTopAvailable &&
-      this.state.stepProfile?.type !== 'COLLECTIVE' &&
-      this.props.tier?.type !== 'TICKET'
-    ) {
-      this.setState({ platformFeeOptions: this.createplatformFeeOptions(this.state.stepDetails.amount) });
+    const hasProfileChanged = prevState.stepProfile?.id !== this.state.stepProfile?.id;
+    const hasAmountChanged = prevState.stepDetails?.amount !== this.state.stepDetails?.amount;
+    if ((hasProfileChanged || hasAmountChanged) && this.canHaveFeesOnTop()) {
+      const platformFeeOptions = this.createplatformFeeOptions(this.state.stepDetails.amount);
       this.setState(state => ({
-        stepDetails: {
-          ...state.stepDetails,
-          platformFee: this.createplatformFeeOptions(this.state.stepDetails.amount)[1],
-        },
+        platformFeeOptions: platformFeeOptions,
+        stepDetails: { ...state.stepDetails, platformFee: platformFeeOptions[1] },
       }));
-      // sets the total amount correctly the first time we load step 2 (if fees on top is available)
-      if (
-        prevState.stepDetails?.platformFee !== this.state.stepDetails?.platformFee &&
-        this.props.feesOnTopAvailable &&
-        this.state.stepProfile?.type !== 'COLLECTIVE' &&
-        this.props.tier?.type !== 'TICKET'
-      ) {
-        this.setState(state => ({
-          stepDetails: {
-            ...state.stepDetails,
-            totalAmount:
-              state.stepDetails.totalAmount + this.createplatformFeeOptions(this.state.stepDetails.amount)[1],
-          },
-        }));
-      }
     }
   }
 
@@ -697,17 +677,16 @@ class CreateOrderPage extends React.Component {
     return { amount, quantity, interval, totalAmount };
   }
 
+  canHaveFeesOnTop(props = this.props, state = this.state) {
+    return props.feesOnTopAvailable && state.stepProfile?.type !== 'COLLECTIVE' && props.tier?.type !== 'TICKET';
+  }
+
   /** Get total amount based on stepDetails with taxes from step summary applied */
   getTotalAmountWithTaxes() {
     const quantity = get(this.state, 'stepDetails.quantity', 1);
     const amount = get(this.state, 'stepDetails.amount', 0);
     const taxAmount = get(this.state, 'stepSummary.amount', 0);
-    const platformFeeAmount =
-      this.props.feesOnTopAvailable &&
-      this.state.stepProfile.type !== 'COLLECTIVE' &&
-      this.props.tier?.type !== 'TICKET'
-        ? get(this.state, 'stepDetails.platformFee.value')
-        : 0;
+    const platformFeeAmount = this.canHaveFeesOnTop() ? get(this.state, 'stepDetails.platformFee.value', 0) : 0;
     return quantity * (amount + platformFeeAmount) + taxAmount;
   }
 
@@ -763,7 +742,7 @@ class CreateOrderPage extends React.Component {
     ];
 
     // If amount and interval are forced by a tier or by params, skip StepDetails (except for events)
-    if (!skipStepDetails && (!isFixedContribution || (tier && tier.type === 'TICKET'))) {
+    if (!skipStepDetails && (!isFixedContribution || tier?.type === 'TICKET' || this.canHaveFeesOnTop())) {
       steps.push({
         name: 'details',
         label: intl.formatMessage(stepsLabels.details),
