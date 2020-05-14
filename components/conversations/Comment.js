@@ -65,13 +65,13 @@ const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, o
     <React.Fragment>
       {/** Buttons */}
       {canEdit && (
-        <CommentBtn onClick={onEdit} ml={2} data-cy="Comment-button">
+        <CommentBtn onClick={onEdit} ml={2} data-cy="edit-comment-button">
           <Edit size="1em" />
           <FormattedMessage tagName="span" id="Edit" defaultMessage="Edit" />
         </CommentBtn>
       )}
       {canDelete && (
-        <CommentBtn onClick={() => setDeleting(true)} ml={2} data-cy="Comment-button">
+        <CommentBtn onClick={() => setDeleting(true)} ml={2} data-cy="delete-comment-button">
           <X size="1em" />
           <FormattedMessage tagName="span" id="actions.delete" defaultMessage="Delete" />
         </CommentBtn>

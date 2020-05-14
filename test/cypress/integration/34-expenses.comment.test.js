@@ -17,31 +17,22 @@ describe('New Expense Flow comments', () => {
           const files = [getFile(1), getFile(2)];
           cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
         });
-        cy.getByDataCy('expense-attachment-form').should('have.length', 2);
-        cy.getByDataCy('expense-summary-btn').should('be.disabled');
 
         // Fill info for first attachment
         cy.get('input[name="items[0].description"]').type('Fancy restaurant');
         cy.get('input[name="items[0].amount"]').type('{selectall}13');
-        cy.getByDataCy('expense-summary-btn').should('be.disabled');
-        cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
-        cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
 
         // Select Payout Method
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
         cy.get('[data-cy="payout-other-info"]').type('A simple thanks would work');
-        // cy.get('input[name="privateMessage"]').type('A simple thanks would work');
         cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
         cy.get('input[name="items[1].amount"]').type('{selectall}2.50');
         cy.getByDataCy('expense-summary-btn').click();
 
         // Submit!
         cy.getByDataCy('submit-expense-btn').click();
-        cy.contains('[data-cy="temporary-notification"]', 'Expense submited!');
-        cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
         cy.getByDataCy('dismiss-temporary-notification-btn').click();
-        cy.getByDataCy('temporary-notification').should('not.exist');
       });
     });
     beforeEach(() => {
@@ -63,14 +54,14 @@ describe('New Expense Flow comments', () => {
       // Editing the same comment
 
       cy.get('[data-cy="comment"]:nth-child(1)').within(() => {
-        cy.get('[data-cy="Comment-button"] > span').contains('Edit').click();
+        cy.get('[data-cy="edit-comment-button"] > span').contains('Edit').click();
         cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
         cy.get('@editor').type('Modifying my first comment');
         cy.getByDataCy('InlineEditField-Btn-Save').click();
       });
 
       // Now deleting my comment
-      cy.get('[data-cy="Comment-button"] > span').contains('Delete').click();
+      cy.get('[data-cy="delete-comment-button"] > span').contains('Delete').click();
       cy.getByDataCy('confirmation-modal-continue').click();
 
       // No comments left and hence no thread

@@ -1,7 +1,40 @@
 import { randomSlug } from '../support/faker';
 
-describe('New expsense flow ', () => {
+describe('New expense flow ', () => {
   const collectiveSlug = randomSlug();
+
+  function SubmitExpense(description, tag) {
+    cy.wait(300);
+    cy.visit(`/new-collective${collectiveSlug}/expenses/new/v2`);
+    cy.wait(200);
+    cy.getByDataCy('radio-expense-type-RECEIPT').click();
+    cy.get('input[name="description"]').clear().type(description);
+    cy.getByDataCy('styled-input-tags-open').click();
+    cy.getByDataCy('styled-input-tags-input').type(`${tag}{enter}{enter}`);
+    cy.getByDataCy('styled-input-tags-open').click();
+    cy.getByDataCy('styled-input-tags-input').type('all{enter}{enter}');
+
+    // Upload 2 files to the multi-files dropzone
+    cy.fixture('images/receipt.jpg').then(fileContent => {
+      const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
+      const files = [getFile(1), getFile(2)];
+      cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
+    });
+    // Fill info for first attachment
+    cy.get('input[name="items[0].description"]').type('Fancy restaurant');
+    cy.get('input[name="items[0].amount"]').type('{selectall}123');
+    // Select Payout Method
+    cy.getByDataCy('payout-method-select').click();
+    cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+    cy.get('[data-cy="payout-other-info"]').type('A simple thanks would work');
+    cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
+    cy.get('input[name="items[1].amount"]').type('{selectall}12.50');
+    cy.getByDataCy('expense-summary-btn').click();
+
+    // Submit!
+    cy.getByDataCy('submit-expense-btn').click();
+    cy.getByDataCy('dismiss-temporary-notification-btn').click();
+  }
 
   before(() => {
     // Inital setup Creating a mock collective
@@ -16,90 +49,8 @@ describe('New expsense flow ', () => {
     cy.wait(1000);
 
     // Creating some expense to play around
-
-    cy.visit(`/new-collective${collectiveSlug}/expenses/new/v2`);
-    cy.wait(200);
-    cy.getByDataCy('radio-expense-type-RECEIPT').click();
-    cy.get('input[name="description"]').type('Brussels January team retreat');
-    cy.getByDataCy('styled-input-tags-open').click();
-    cy.getByDataCy('styled-input-tags-input').type('first{enter}{enter}');
-    cy.getByDataCy('styled-input-tags-open').click();
-    cy.getByDataCy('styled-input-tags-input').type('all{enter}{enter}');
-
-    // Upload 2 files to the multi-files dropzone
-    cy.fixture('images/receipt.jpg').then(fileContent => {
-      const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
-      const files = [getFile(1), getFile(2)];
-      cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
-    });
-    cy.getByDataCy('expense-attachment-form').should('have.length', 2);
-    cy.getByDataCy('expense-summary-btn').should('be.disabled');
-
-    // Fill info for first attachment
-    cy.get('input[name="items[0].description"]').type('Fancy restaurant');
-    cy.get('input[name="items[0].amount"]').type('{selectall}13');
-    cy.getByDataCy('expense-summary-btn').should('be.disabled');
-    cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
-    cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
-
-    // Select Payout Method
-    cy.getByDataCy('payout-method-select').click();
-    cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
-    cy.get('[data-cy="payout-other-info"]').type('A simple thanks would work');
-    // cy.get('input[name="privateMessage"]').type('A simple thanks would work');
-    cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-    cy.get('input[name="items[1].amount"]').type('{selectall}2.50');
-    cy.getByDataCy('expense-summary-btn').click();
-
-    // Submit!
-    cy.getByDataCy('submit-expense-btn').click();
-    cy.contains('[data-cy="temporary-notification"]', 'Expense submited!');
-    cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
-    cy.getByDataCy('dismiss-temporary-notification-btn').click();
-    cy.getByDataCy('temporary-notification').should('not.exist');
-
-    // Do this again for second expense
-    cy.wait(300);
-    cy.visit(`/new-collective${collectiveSlug}/expenses/new/v2`);
-    cy.wait(200);
-    cy.getByDataCy('radio-expense-type-RECEIPT').click();
-    cy.get('input[name="description"]').clear().type('May Invoice');
-    cy.getByDataCy('styled-input-tags-open').click();
-    cy.getByDataCy('styled-input-tags-input').type('second{enter}{enter}');
-    cy.getByDataCy('styled-input-tags-open').click();
-    cy.getByDataCy('styled-input-tags-input').type('all{enter}{enter}');
-
-    // Upload 2 files to the multi-files dropzone
-    cy.fixture('images/receipt.jpg').then(fileContent => {
-      const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
-      const files = [getFile(1), getFile(2)];
-      cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
-    });
-    cy.getByDataCy('expense-attachment-form').should('have.length', 2);
-    cy.getByDataCy('expense-summary-btn').should('be.disabled');
-
-    // Fill info for first attachment
-    cy.get('input[name="items[0].description"]').type('Fancy restaurant');
-    cy.get('input[name="items[0].amount"]').type('{selectall}123');
-    cy.getByDataCy('expense-summary-btn').should('be.disabled');
-    cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
-    cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
-
-    // Select Payout Method
-    cy.getByDataCy('payout-method-select').click();
-    cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
-    cy.get('[data-cy="payout-other-info"]').type('A simple thanks would work');
-    // cy.get('input[name="privateMessage"]').type('A simple thanks would work');
-    cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-    cy.get('input[name="items[1].amount"]').type('{selectall}12.50');
-    cy.getByDataCy('expense-summary-btn').click();
-
-    // Submit!
-    cy.getByDataCy('submit-expense-btn').click();
-    cy.contains('[data-cy="temporary-notification"]', 'Expense submited!');
-    cy.contains('[data-cy="expense-page-content"]', 'May Invoice');
-    cy.getByDataCy('dismiss-temporary-notification-btn').click();
-    cy.getByDataCy('temporary-notification').should('not.exist');
+    SubmitExpense('Brussels January team retreat', 'first');
+    SubmitExpense('May Invoice', 'second');
   });
 
   it('shows the /expenses page', () => {
