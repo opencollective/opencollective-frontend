@@ -174,7 +174,7 @@
   "collective.country.label": "国家",
   "collective.create.button": "创建集体",
   "collective.create.connectedAccounts.stripe.description": "连接 Stripe 帐户以开始接受捐助。",
-  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click.",
+  "collective.create.connectedAccounts.transferwise.description": "Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>.",
   "collective.create.createOrSignIn": "创建帐户 (或登录) 以新建集体。",
   "collective.create.description": "The place for your community to collect money and share your finance in full transparency.",
   "collective.create.join": "加入 Open Collective",
