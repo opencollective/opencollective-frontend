@@ -50,6 +50,7 @@ class OnboardingNavButtons extends React.Component {
             {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
                 type="button"
+                data-cy="step-back-button"
                 mx={1}
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
@@ -66,6 +67,7 @@ class OnboardingNavButtons extends React.Component {
             ) : (
               <StyledRoundButton
                 type="button"
+                data-cy="step-back-button"
                 mx={1}
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
@@ -81,7 +83,7 @@ class OnboardingNavButtons extends React.Component {
               </StyledRoundButton>
             )}
 
-            <StyledButton buttonStyle="primary" onClick={() => handleSubmit} loading={loading}>
+            <StyledButton buttonStyle="primary" onClick={() => handleSubmit} loading={loading} data-cy="finish-button">
               <FormattedMessage id="Finish" defaultMessage="Finish" />
             </StyledButton>
           </Fragment>
@@ -90,6 +92,7 @@ class OnboardingNavButtons extends React.Component {
             {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
                 type="button"
+                data-cy="step-back-button"
                 mx={1}
                 buttonStyle="primary"
                 disabled={this.getStepParams(step, 'disabled')}
@@ -106,6 +109,7 @@ class OnboardingNavButtons extends React.Component {
             ) : (
               <StyledRoundButton
                 type="button"
+                data-cy="step-back-button"
                 mx={1}
                 size={48}
                 disabled={this.getStepParams(step, 'disabled')}
@@ -123,6 +127,7 @@ class OnboardingNavButtons extends React.Component {
             {viewport === VIEWPORTS.XSMALL ? (
               <StyledButton
                 type="button"
+                data-cy="step-forward-button"
                 mx={1}
                 buttonStyle="primary"
                 onClick={() => {
@@ -138,6 +143,7 @@ class OnboardingNavButtons extends React.Component {
             ) : (
               <StyledRoundButton
                 type="button"
+                data-cy="step-forward-button"
                 mx={1}
                 size={48}
                 onClick={() => {

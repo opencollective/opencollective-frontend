@@ -18,7 +18,7 @@ const nextConfig = {
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         SENTRY_DSN: null,
-        ONBOARDING_MODAL: null,
+        ONBOARDING_MODAL: true,
         TRANSFERWISE_ENABLED: null,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
