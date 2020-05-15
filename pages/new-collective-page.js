@@ -18,6 +18,7 @@ import Loading from '../components/Loading';
 import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
+import PageNotFound from '../components/PageNotFound';
 
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(
@@ -137,7 +138,7 @@ class NewCollectivePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
+        return <PageNotFound searchTerm={slug} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {

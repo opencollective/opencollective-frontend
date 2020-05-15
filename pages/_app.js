@@ -118,7 +118,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { client, Component, pageProps, scripts, locale, messages } = this.props;
+    const { client, Component, pageProps, scripts, locale, messages, children } = this.props;
 
     const intl = createIntl({ locale, messages }, cache);
 
@@ -128,9 +128,7 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
-                <UserProvider apiKey={process.env.STRIPE_KEY}>
-                  <Component {...pageProps} />
-                </UserProvider>
+                <UserProvider apiKey={process.env.STRIPE_KEY}>{children || <Component {...pageProps} />}</UserProvider>
               </RawIntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
