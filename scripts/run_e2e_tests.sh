@@ -10,7 +10,7 @@ if [ -z "$API_FOLDER" ]; then
 else
   cd $API_FOLDER
 fi
-PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm start &
+PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm run start:e2e:server &
 API_PID=$!
 cd -
 
