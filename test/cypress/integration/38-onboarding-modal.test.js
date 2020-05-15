@@ -31,7 +31,7 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="name-of-admins"]').contains('AmazingNewUser');
     // Delete test user
     cy.get('[data-cy="remove-user"] > button').click();
-    // Again the length shoudl be 1
+    // Again the length should be 1
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
     cy.get('[data-cy="step-forward-button"]').click();
     // Add Github, Twitter, and website links
