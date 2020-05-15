@@ -43,7 +43,7 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="welcome-collective"]').contains('Welcome to your new Collective!');
     // close the modal
     cy.get('[data-cy="close-button"]').click();
-    // Check if the llink have been added
+    // Check if the link have been added
     cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://twitter.com/testCollective');
     cy.get('[data-cy=githubProfileUrl]').should('have.attr', 'href', 'https://github.com/testCollective');
     cy.get('[data-cy=collectiveWebsite]').should('have.attr', 'href', 'https://opencollective.com/testCollective');
