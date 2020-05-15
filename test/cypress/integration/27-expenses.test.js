@@ -186,8 +186,7 @@ describe('Legacy expense flow', () => {
       cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
       cy.get('button[type=submit]').click();
       cy.get('[data-cy="expenseCreated"]').contains('success');
-      cy.get('[data-cy="viewAllExpenses"]').click();
-      cy.wait(300);
+      cy.visit('/testcollective/expenses/legacy');
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
       cy.get('.Expenses .expense:first .status').contains('pending');
@@ -208,8 +207,7 @@ describe('Legacy expense flow', () => {
       cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
       cy.get('button[type=submit]').click();
       cy.get('[data-cy="expenseCreated"]').contains('success');
-      cy.get('[data-cy="viewAllExpenses"]').click();
-      cy.wait(300);
+      cy.visit('/testcollective/expenses/legacy');
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
       cy.get('.Expenses .expense:first .status').contains('pending');

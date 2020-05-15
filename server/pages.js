@@ -62,9 +62,13 @@ const pages = routes()
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
     'expense-legacy',
   )
-  .add('expenses-v2', '/:parentAccountSlug?/:accountType(events)?/:accountSlug/expenses/:version(v2)?', 'expenses')
   .add(
     'expenses',
+    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:version(v2)?',
+    'expenses',
+  )
+  .add(
+    'expenses-legacy',
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
     'expenses-legacy',
   )
