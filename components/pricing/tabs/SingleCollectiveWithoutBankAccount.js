@@ -77,7 +77,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
             <FormattedMessage
               id="pricing.fiscalHost.reasonToJoin"
-              defaultMessage="If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations your raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan."
+              defaultMessage="If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations you raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan."
               values={I18nFormatters}
             />
           </P>

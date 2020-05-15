@@ -1207,7 +1207,7 @@
   "pricing.fiscalHost.featured": "Abaixo estão alguns dos nossos anfitriões mais populares ou <a href='/hosts'>navegar por todos eles</a>.",
   "pricing.fiscalHost.learnMore": "Saiba mais sobre como se tornar um Host Fiscal.",
   "pricing.fiscalHost.more": "Ver mais anfitriões fiscais",
-  "pricing.fiscalHost.reasonToJoin": "Se você se juntar a um Host Fiscal, <strong> você não precisa ir em um Open Collective pago plano</strong>, pois o seu Colectivo já está incluído. Cada Host Fiscal estabelece suas próprias taxas e critérios de aceitação para os Colectivos. O Open Collective mantém 5% das doações que você angariar através de pagamentos com cartão de crédito (Stripe). Todos os outros métodos de pagamento como PayPal e transferências bancárias estão incluídos no plano do seu Anfitrião.",
+  "pricing.fiscalHost.reasonToJoin": "If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations you raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan.",
   "pricing.hostCollective.count": "{count, plural, =0 {Nenhum coletivo} one {{prettyCount} coletivo} other {{prettyCount} colectivos} }",
   "pricing.hostCollective.currency": "{currency} moeda",
   "pricing.hostOrganization.note1": "A sua escolha de plano dependerá do número de Colectivos que acolher.",
