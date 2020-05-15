@@ -97,6 +97,7 @@ const StyledRadioList = ({
                 value={key}
                 defaultChecked={props.defaultValue !== undefined && defaultValueStr === key}
                 disabled={disabled || (value && value.disabled)} // disable a specific option or entire options
+                data-cy="radio-select"
               />
             ),
           })}
