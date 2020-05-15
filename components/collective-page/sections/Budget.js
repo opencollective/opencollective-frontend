@@ -49,6 +49,7 @@ const TransactionsAndExpensesQuery = gql`
 const SectionBudget = ({ collective, stats }) => {
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
+  const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
       <SectionTitle>
@@ -84,7 +85,7 @@ const SectionBudget = ({ collective, stats }) => {
             const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
             return (
               <Container flex="10" mb={3} width="100%" maxWidth={800}>
-                <BudgetItemsList items={budgetItems} isCompact />
+                <BudgetItemsList items={budgetItems} isCompact isFeesOnTop={isFeesOnTop} />
                 <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
                   <Box flex="1 1" mx={[0, 2]}>
                     <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
@@ -184,6 +185,7 @@ SectionBudget.propTypes = {
     name: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     isArchived: PropTypes.bool,
+    platformFeePercent: PropTypes.number,
   }),
 
   /** Stats */
