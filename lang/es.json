@@ -1220,7 +1220,7 @@
   "pricing.fiscalHost.featured": "Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>.",
   "pricing.fiscalHost.learnMore": "Learn more about becoming a Fiscal Host.",
   "pricing.fiscalHost.more": "See more fiscal hosts",
-  "pricing.fiscalHost.reasonToJoin": "If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations your raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan.",
+  "pricing.fiscalHost.reasonToJoin": "If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations you raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan.",
   "pricing.hostCollective.count": "{count, plural, =0 {No collective} one {{prettyCount} collective} other {{prettyCount} collectives} }",
   "pricing.hostCollective.currency": "{currency} currency",
   "pricing.hostOrganization.note1": "Your choice of plan will depend on the number of Collectives you host.",
