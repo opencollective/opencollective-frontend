@@ -37,10 +37,10 @@ const EXPENSES_PER_PAGE = 10;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query }) {
-    const { parentAccountSlug, accountSlug, offset, limit, type, tag } = query;
+    const { parentCollectiveSlug, collectiveSlug, offset, limit, type, tag } = query;
     return {
-      parentAccountSlug,
-      accountSlug,
+      parentCollectiveSlug,
+      collectiveSlug,
       offset: parseInt(offset) || undefined,
       limit: parseInt(limit) || undefined,
       type,
@@ -49,8 +49,8 @@ class ExpensePage extends React.Component {
   }
 
   static propTypes = {
-    accountSlug: PropTypes.string,
-    parentAccountSlug: PropTypes.string,
+    collectiveSlug: PropTypes.string,
+    parentCollectiveSlug: PropTypes.string,
     type: PropTypes.string,
     tag: PropTypes.string,
     /** from injectIntl */
@@ -84,7 +84,7 @@ class ExpensePage extends React.Component {
 
   buildFilterLinkParams(params) {
     return {
-      ...pick(this.props, ['accountSlug', 'limit', 'parentAccountSlug', 'tag', 'type']),
+      ...pick(this.props, ['collectiveSlug', 'limit', 'parentCollectiveSlug', 'tag', 'type']),
       ...params,
     };
   }
@@ -99,20 +99,20 @@ class ExpensePage extends React.Component {
     const isSelected = this.props.type === type;
     const params = this.buildFilterLinkParams({ type: isSelected ? null : type });
     return (
-      <Link route="expenses-v2" params={params}>
+      <Link route="expenses" params={params}>
         <ExpenseTypeTag type={type} closeButtonProps={isSelected} />
       </Link>
     );
   }
 
   render() {
-    const { accountSlug, data } = this.props;
+    const { collectiveSlug, data } = this.props;
 
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account || !data.expenses?.nodes) {
-        return <ErrorPage error={generateNotFoundError(accountSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
       }
@@ -142,7 +142,7 @@ class ExpensePage extends React.Component {
                         defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                         values={{
                           ResetLink: text => (
-                            <Link route="expenses-v2" params={this.buildFilterLinkParams({ tag: null, type: null })}>
+                            <Link route="expenses" params={this.buildFilterLinkParams({ tag: null, type: null })}>
                               {text}
                             </Link>
                           ),
@@ -162,7 +162,7 @@ class ExpensePage extends React.Component {
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
-                        route="expenses-v2"
+                        route="expenses"
                         total={data.expenses?.totalCount}
                         limit={data.variables.limit}
                         offset={data.variables.offset}
@@ -196,7 +196,7 @@ class ExpensePage extends React.Component {
                     {({ key, tag, renderedTag, props }) => (
                       <Link
                         key={key}
-                        route="expenses-v2"
+                        route="expenses"
                         params={this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag })}
                       >
                         {renderedTag}
@@ -214,8 +214,8 @@ class ExpensePage extends React.Component {
 }
 
 const EXPENSES_PAGE_QUERY = gqlV2`
-  query ExpensesPageQuery($accountSlug: String!, $limit: Int!, $offset: Int!, $type: ExpenseType, $tags: [String]) {
-    account(slug: $accountSlug) {
+  query ExpensesPageQuery($collectiveSlug: String!, $limit: Int!, $offset: Int!, $type: ExpenseType, $tags: [String]) {
+    account(slug: $collectiveSlug) {
       id
       slug
       type
@@ -251,7 +251,7 @@ const EXPENSES_PAGE_QUERY = gqlV2`
         }
       }
     }
-    expenses(account: {slug: $accountSlug}, limit: $limit, offset: $offset, type: $type, tags: $tags) {
+    expenses(account: {slug: $collectiveSlug}, limit: $limit, offset: $offset, type: $type, tags: $tags) {
       totalCount
       offset
       limit
@@ -286,7 +286,7 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
     variables: {
-      accountSlug: props.accountSlug,
+      collectiveSlug: props.collectiveSlug,
       offset: props.offset || 0,
       limit: props.limit || EXPENSES_PER_PAGE,
       type: has(expenseTypes, props.type) ? props.type : undefined,
