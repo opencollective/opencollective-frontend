@@ -176,6 +176,8 @@ StyledSelect.propTypes = {
   hideDropdownIndicator: PropTypes.bool,
   /** If true, options list will not be displayed */
   hideMenu: PropTypes.bool,
+  /** Displayes a red border when truthy */
+  error: PropTypes.any,
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   /** Default option */
