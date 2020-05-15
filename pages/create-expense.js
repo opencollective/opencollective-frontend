@@ -4,10 +4,10 @@ import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
@@ -55,6 +55,8 @@ class CreateExpensePage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     /** from withRouter */
     router: PropTypes.object,
+    /** from injectIntl */
+    intl: PropTypes.object,
     /** from apollo */
     createExpense: PropTypes.func.isRequired,
     /** from apollo */
@@ -201,7 +203,7 @@ class CreateExpensePage extends React.Component {
   });
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router, intl } = this.props;
     const { step } = this.state;
 
     if (!data.loading) {
@@ -270,7 +272,7 @@ class CreateExpensePage extends React.Component {
                             />
                             {this.state.error && (
                               <MessageBox type="error" withIcon mt={3}>
-                                {this.state.error.message}
+                                {formatErrorMessage(intl, this.state.error)}
                               </MessageBox>
                             )}
                             <Flex flexWrap="wrap" mt={4}>
@@ -409,4 +411,4 @@ const withCreateExpenseMutation = graphql(
   },
 );
 
-export default withUser(getData(withRouter(withCreateExpenseMutation(CreateExpensePage))));
+export default withUser(getData(withRouter(withCreateExpenseMutation(injectIntl(CreateExpensePage)))));
