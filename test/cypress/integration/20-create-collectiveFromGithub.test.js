@@ -1,5 +1,5 @@
 describe('Create collective from Github', () => {
-  it('Should submit create github page', () => {
+  it.skip('Should submit create github page', () => {
     cy.server();
     cy.route({
       method: 'GET',
