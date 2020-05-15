@@ -153,6 +153,10 @@ const validate = expense => {
     }
   }
 
+  if (expense.type === expenseTypes.INVOICE) {
+    Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
+  }
+
   return errors;
 };
 
@@ -328,16 +332,18 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.country)}
+                                error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
                                 required
                                 minWidth={250}
                                 mr={fieldsMarginRight}
                                 mt={3}
                               >
-                                {({ id }) => (
+                                {({ id, error }) => (
                                   <InputTypeCountry
                                     inputId={id}
                                     onChange={value => formik.setFieldValue(field.name, value)}
                                     value={field.value}
+                                    error={error}
                                   />
                                 )}
                               </StyledInputField>
@@ -348,6 +354,7 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.address)}
+                                error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
                                 required
                                 minWidth={250}
                                 mr={fieldsMarginRight}
