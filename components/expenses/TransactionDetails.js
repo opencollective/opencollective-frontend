@@ -47,6 +47,7 @@ class TransactionDetails extends React.Component {
     }),
     type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
     isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
+    isFeesOnTop: PropTypes.bool, // whether or not this transaction refers to a refund
     intl: PropTypes.object.isRequired,
     mode: PropTypes.string, // open or closed
     fromCollective: PropTypes.object,
@@ -110,10 +111,14 @@ class TransactionDetails extends React.Component {
       currency,
       hostCurrency,
       hostCurrencyFxRate,
+      isFeesOnTop,
+      platformFeeInHostCurrency,
     } = this.props;
 
-    const initialAmount = ['ORGANIZATION', 'USER'].includes(collective.type) ? -netAmountInCollectiveCurrency : amount;
-    let totalAmount = initialAmount;
+    const initialAmount = isFeesOnTop ? amount + platformFeeInHostCurrency : amount;
+    let totalAmount = ['ORGANIZATION', 'USER'].includes(collective.type)
+      ? -netAmountInCollectiveCurrency
+      : initialAmount;
     const amountDetails = [
       intl.formatNumber(initialAmount / 100, {
         currency: currency,
@@ -121,8 +126,8 @@ class TransactionDetails extends React.Component {
       }),
     ];
     if (hostCurrencyFxRate && hostCurrencyFxRate !== 1) {
-      const amountInHostCurrency = amount * hostCurrencyFxRate;
-      totalAmount = amount;
+      const amountInHostCurrency = initialAmount * hostCurrencyFxRate;
+      totalAmount = initialAmount;
       amountDetails.push(
         ` (${intl.formatNumber(amountInHostCurrency / 100, {
           currency: hostCurrency,
@@ -147,7 +152,11 @@ class TransactionDetails extends React.Component {
       });
     };
 
-    addFees(['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
+    addFees(
+      isFeesOnTop
+        ? ['taxAmount', 'hostFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']
+        : ['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency'],
+    );
 
     let amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : '';
 

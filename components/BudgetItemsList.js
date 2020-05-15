@@ -224,7 +224,8 @@ const DetailDescription = styled.p`
   color: #4e5052;
 `;
 
-const getItemInfo = (item, isInverted) => {
+const getItemInfo = (item, isInverted, isFeesOnTop) => {
+  const platformFee = isFeesOnTop ? undefined : item.transaction?.platformFeeInHostCurrency;
   switch (item.__typename) {
     case 'ExpenseType':
       return {
@@ -235,6 +236,7 @@ const getItemInfo = (item, isInverted) => {
         transaction: item.transaction,
         isExpense: true,
         route: `/${item.collective.slug}/expenses/${item.id}`,
+        platformFee,
       };
     case 'Expense':
       return {
@@ -244,14 +246,22 @@ const getItemInfo = (item, isInverted) => {
         paymentMethod: item.paymentMethod,
         transaction: item,
         originCollective: item.type === TransactionTypes.CREDIT ? item.fromCollective : item.collective,
+        platformFee,
       };
     case 'Order':
+      // eslint-disable-next-line no-case-declarations
+      let amount =
+        item.type === TransactionTypes.CREDIT && isInverted ? item.netAmountInCollectiveCurrency : item.amount;
+      if (isFeesOnTop) {
+        amount = item.amount + item.platformFeeInHostCurrency;
+      }
       return {
         isCredit: item.type === TransactionTypes.CREDIT,
-        amount: item.type === TransactionTypes.CREDIT && isInverted ? item.netAmountInCollectiveCurrency : item.amount,
+        amount,
         collective: item.fromCollective,
         paymentMethod: item.paymentMethod,
         transaction: item,
+        platformFee,
       };
   }
 };
@@ -268,16 +278,16 @@ const formatFee = (value, totalAmount, currency, name) => {
   }
 };
 
-const getAmountDetailsStr = (amount, currency, transaction) => {
+const getAmountDetailsStr = (amount, currency, transaction, platformFee) => {
   const totalAmount = formatCurrency(Math.abs(amount), currency);
-  const platformFee = formatFee(transaction.platformFeeInHostCurrency, amount, currency, 'Open Collective fee');
+  const pFee = formatFee(platformFee, amount, currency, 'Open Collective fee');
   const hostFee = formatFee(transaction.hostFeeInHostCurrency, amount, currency, 'host fee');
   const pmFee = formatFee(transaction.paymentProcessorFeeInHostCurrency, amount, currency, 'payment processor fee');
   return (
     <React.Fragment>
       <strong>{totalAmount}</strong>
       {hostFee}
-      {platformFee}
+      {pFee}
       {pmFee}
     </React.Fragment>
   );
@@ -286,13 +296,20 @@ const getAmountDetailsStr = (amount, currency, transaction) => {
 /**
  * A single item
  */
-const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) => {
+const BudgetItem = ({ item, isInverted, isCompact, isFeesOnTop, canDownloadInvoice, intl }) => {
   const [isExpanded, setExpanded] = React.useState(false);
   const { description, createdAt, currency } = item;
-  const { isCredit, amount, paymentMethod, transaction, isExpense, collective, route, originCollective } = getItemInfo(
-    item,
-    isInverted,
-  );
+  const {
+    isCredit,
+    amount,
+    paymentMethod,
+    transaction,
+    isExpense,
+    platformFee,
+    collective,
+    route,
+    originCollective,
+  } = getItemInfo(item, isInverted, isFeesOnTop);
   const ItemContainer = isCredit ? CreditItem : DebitItem;
   const hasRefund = Boolean(transaction && transaction.refundTransaction);
   const hasAccessToInvoice = canDownloadInvoice && transaction && transaction.uuid;
@@ -437,7 +454,7 @@ const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice, intl }) =
               <DetailTitle>
                 <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
               </DetailTitle>
-              <DetailDescription>{getAmountDetailsStr(amount, currency, transaction)}</DetailDescription>
+              <DetailDescription>{getAmountDetailsStr(amount, currency, transaction, platformFee)}</DetailDescription>
             </div>
           )}
           {hasInvoiceBtn && (
@@ -541,6 +558,9 @@ BudgetItem.propTypes = {
   /** Use this if the place where the component is rendered isn't that big to compact it */
   isCompact: PropTypes.bool,
 
+  /** Use this if you want to change how Platform Fees are displayed */
+  isFeesOnTop: PropTypes.bool,
+
   /** If true, a button to download invoice will be displayed when possible */
   canDownloadInvoice: PropTypes.bool,
 
@@ -553,7 +573,7 @@ BudgetItem.propTypes = {
  * types. You must provide items fetched from GraphQL, as the component will use the
  * `__typename` to know how to display item.
  */
-const BudgetItemsList = ({ items, isInverted, isCompact, canDownloadInvoice, intl }) => {
+const BudgetItemsList = ({ items, isInverted, isCompact, canDownloadInvoice, isFeesOnTop, intl }) => {
   return !items || items.length === 0 ? null : (
     <DebitCreditList>
       {items.map(item => (
@@ -562,6 +582,7 @@ const BudgetItemsList = ({ items, isInverted, isCompact, canDownloadInvoice, int
           item={item}
           isInverted={isInverted}
           isCompact={isCompact}
+          isFeesOnTop={isFeesOnTop}
           canDownloadInvoice={canDownloadInvoice}
           intl={intl}
         />
@@ -587,6 +608,9 @@ BudgetItemsList.propTypes = {
 
   /** If true, a button to download invoice will be displayed when possible */
   canDownloadInvoice: PropTypes.bool,
+
+  /** Use this if you want to change how Platform Fees are displayed */
+  isFeesOnTop: PropTypes.bool,
 
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,

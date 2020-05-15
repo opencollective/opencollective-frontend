@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { orderBy } from 'lodash';
+import { get, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -47,6 +47,7 @@ class SectionTransactions extends React.Component {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
+      platformFeePercent: PropTypes.number,
     }).isRequired,
 
     /** Wether user is admin of `collective` */
@@ -137,6 +138,7 @@ class SectionTransactions extends React.Component {
     const { data, intl, collective, isAdmin, isRoot } = this.props;
     const { filter } = this.state;
     let showFilters = true;
+    const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
 
     if (!data || data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
@@ -181,7 +183,12 @@ class SectionTransactions extends React.Component {
         )}
 
         <ContainerSectionContent>
-          <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin || isRoot} isInverted />
+          <BudgetItemsList
+            items={budgetItems}
+            canDownloadInvoice={isAdmin || isRoot}
+            isInverted
+            isFeesOnTop={isFeesOnTop}
+          />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
             <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
