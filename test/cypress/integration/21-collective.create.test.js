@@ -14,7 +14,7 @@ describe('create a collective', () => {
     cy.getByDataCy('ccf-form-description').type('We are going to save the bees');
     cy.get('[data-cy="custom-checkbox"').click();
     cy.get('[data-cy=ccf-form-submit]').click();
-    cy.url().should('include', '?status=collectiveCreated');
+    cy.url().should('include', '/bees-are-neat/onboarding');
   });
 
   it('Cannot create a collective with a slug that is taken', () => {
