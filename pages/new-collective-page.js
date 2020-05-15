@@ -4,6 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
+import { withServerContext } from 'next-server-context';
 
 import { generateNotFoundError } from '../lib/errors';
 
@@ -137,6 +138,11 @@ class NewCollectivePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
+        console.log('no collective', this.props);
+        if (this.props.serverContext) {
+          console.log('EDIT SERVER CONTEXT');
+          this.props.serverContext.response.statusCode = 404;
+        }
         return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
@@ -218,4 +224,4 @@ const getCollective = graphql(getCollectivePageQuery, {
   }),
 });
 
-export default withUser(getCollective(NewCollectivePage));
+export default withUser(getCollective(withServerContext(NewCollectivePage)));
