@@ -65,6 +65,11 @@ module.exports = (server, app) => {
     proxy(baseApiUrl, {
       parseReqBody: false,
       proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+          if (srcReq.headers[key]) {
+            proxyReqOpts.headers[key] = srcReq.headers[key];
+          }
+        }
         proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
         proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
         proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
