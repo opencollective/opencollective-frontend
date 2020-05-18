@@ -69,7 +69,7 @@
     "lodash": "4.17.15",
     "memoize-one": "5.1.1",
     "moment": "2.25.3",
-    "moment-timezone": "0.5.28",
+    "moment-timezone": "0.5.31",
     "next": "9.2.1",
     "next-routes": "1.4.2",
     "node-fetch": "2.6.0",
