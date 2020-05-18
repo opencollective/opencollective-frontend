@@ -207,4 +207,7 @@ pages.add(
   '/:slug/accept-financial-contributions/:path(myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
 );
 
+// testing new recurring contributions page
+pages.add('recurring-contributions', '/:collectiveSlug/recurring-contributions');
+
 module.exports = pages;
