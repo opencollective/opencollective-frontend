@@ -225,7 +225,7 @@ const DetailDescription = styled.p`
 `;
 
 const getItemInfo = (item, isInverted, isFeesOnTop) => {
-  const platformFee = isFeesOnTop ? undefined : item.transaction?.platformFeeInHostCurrency;
+  const platformFee = isFeesOnTop ? undefined : item.platformFeeInHostCurrency;
   switch (item.__typename) {
     case 'ExpenseType':
       return {
