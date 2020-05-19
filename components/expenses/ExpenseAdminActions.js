@@ -23,9 +23,9 @@ import StyledRoundButton from '../StyledRoundButton';
 
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 
-const deleteExpenseMutation = gqlV2`
-  mutation deleteExpense($id: String!) {
-    deleteExpense(expense: {id: $id}) {
+const deleteExpenseMutation = gqlV2/* GraphQL */ `
+  mutation DeleteExpense($id: String!) {
+    deleteExpense(expense: { id: $id }) {
       id
     }
   }

@@ -289,8 +289,8 @@ class ExpensePage extends React.Component {
   }
 }
 
-const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
-  query ExpensesPageQuery(
+const expensesPageQuery = gqlV2/* GraphQL */ `
+  query ExpensesPage(
     $collectiveSlug: String!
     $limit: Int!
     $offset: Int!
@@ -411,7 +411,7 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
   ${expensesListFieldsFragment}
 `;
 
-const getData = graphql(EXPENSES_PAGE_QUERY, {
+const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
     const [dateFrom] = getDateRangeFromPeriod(props.query.period);
@@ -435,4 +435,4 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
   },
 });
 
-export default injectIntl(getData(withUser(ExpensePage)));
+export default injectIntl(addExpensesPageData(withUser(ExpensePage)));

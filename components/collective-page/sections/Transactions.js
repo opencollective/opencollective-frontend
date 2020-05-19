@@ -8,9 +8,9 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { Dimensions } from '../_constants';
 import BudgetItemsList, {
-  BudgetItemExpenseFragment,
-  BudgetItemExpenseTypeFragment,
-  BudgetItemOrderFragment,
+  budgetItemExpenseFragment,
+  budgetItemExpenseTypeFragment,
+  budgetItemOrderFragment,
 } from '../../budget/BudgetItemsList';
 import { Box } from '../../Grid';
 import Link from '../../Link';
@@ -193,28 +193,27 @@ class SectionTransactions extends React.Component {
   }
 }
 
-export default React.memo(
-  graphql(
-    gql`
-      query SectionTransactions($id: Int!, $nbDisplayed: Int!) {
-        contributions: allTransactions(CollectiveId: $id, includeExpenseTransactions: false, limit: $nbDisplayed) {
-          ...BudgetItemExpenseFragment
-          ...BudgetItemOrderFragment
-        }
-        expenses(FromCollectiveId: $id, limit: $nbDisplayed) {
-          entries: expenses {
-            ...BudgetItemExpenseTypeFragment
-          }
-        }
+const transactionsSectionQuery = gql`
+  query TransactionsSection($id: Int!, $nbDisplayed: Int!) {
+    contributions: allTransactions(CollectiveId: $id, includeExpenseTransactions: false, limit: $nbDisplayed) {
+      ...BudgetItemExpenseFragment
+      ...BudgetItemOrderFragment
+    }
+    expenses(FromCollectiveId: $id, limit: $nbDisplayed) {
+      entries: expenses {
+        ...BudgetItemExpenseTypeFragment
       }
-      ${BudgetItemExpenseFragment}
-      ${BudgetItemOrderFragment}
-      ${BudgetItemExpenseTypeFragment}
-    `,
-    {
-      options: props => ({
-        variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED },
-      }),
-    },
-  )(injectIntl(SectionTransactions)),
-);
+    }
+  }
+  ${budgetItemExpenseFragment}
+  ${budgetItemOrderFragment}
+  ${budgetItemExpenseTypeFragment}
+`;
+
+const addTransactionsSectionData = graphql(transactionsSectionQuery, {
+  options: props => ({
+    variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED },
+  }),
+});
+
+export default React.memo(injectIntl(addTransactionsSectionData(SectionTransactions)));

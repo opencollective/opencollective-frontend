@@ -1,4 +1,3 @@
-/* eslint-disable graphql/template-strings */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
@@ -260,42 +259,48 @@ const accountQuery = gqlV2/* GraphQL */ `
 `;
 
 const accountWithTierQuery = gqlV2/* GraphQL */ `
-  query ContributionFlowAccountQuery($collectiveSlug: String!, $tierId: Int!) {
+  query ContributionFlowAccountQuery($collectiveSlug: String!, $tier: TierReferenceInput!) {
     account(slug: $collectiveSlug) {
       ...ContributionFlowAccountFields
     }
-    tier(id: $tierId) {
+    tier(tier: $tier) {
       id
       type
       name
       slug
-      endsAt
       description
-      amount
+      amount {
+        value
+        currency
+      }
       amountType
-      minimumAmount
-      currency
+      minimumAmount {
+        value
+        currency
+      }
       interval
       presets
-      customFields
-      maxQuantity
-      stats {
-        availableQuantity
-      }
     }
   }
   ${accountFieldsFragment}
 `;
 
-const getData = compose(
-  graphql(accountQuery, {
-    skip: props => Boolean(props.tierId),
-    options: { context: API_V2_CONTEXT },
+const addAccountData = graphql(accountQuery, {
+  skip: props => Boolean(props.tierId),
+  options: props => ({
+    variables: { collectiveSlug: props.collectiveSlug },
+    context: API_V2_CONTEXT,
   }),
-  graphql(accountWithTierQuery, {
-    skip: props => !props.tierId,
-    options: { context: API_V2_CONTEXT },
-  }),
-);
+});
 
-export default getData(withUser(withRouter(injectIntl(NewContributionFlowPage))));
+const addAccountWithTierData = graphql(accountWithTierQuery, {
+  skip: props => !props.tierId,
+  options: props => ({
+    variables: { collectiveSlug: props.collectiveSlug, tier: { legacyId: props.tierId } },
+    context: API_V2_CONTEXT,
+  }),
+});
+
+const addGraphql = compose(addAccountData, addAccountWithTierData);
+
+export default addGraphql(withUser(withRouter(injectIntl(NewContributionFlowPage))));

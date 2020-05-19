@@ -50,8 +50,8 @@ class OrdersWithData extends React.Component {
   }
 }
 
-const getOrdersQuery = gql`
-  query allOrders($CollectiveId: Int, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
+const ordersQuery = gql`
+  query Orders($CollectiveId: Int, $status: String, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
     allOrders(
       CollectiveId: $CollectiveId
       status: $status
@@ -153,7 +153,7 @@ const getOrdersVariables = props => {
 
 const ORDERS_PER_PAGE = 10;
 
-export const addOrdersData = graphql(getOrdersQuery, {
+export const addOrdersData = graphql(ordersQuery, {
   options: props => ({
     variables: getOrdersVariables(props),
   }),

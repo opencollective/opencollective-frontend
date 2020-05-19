@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const payExpenseMutation = gql`
-  mutation payExpense(
+  mutation PayExpense(
     $id: Int!
     $paymentProcessorFeeInCollectiveCurrency: Int
     $hostFeeInCollectiveCurrency: Int

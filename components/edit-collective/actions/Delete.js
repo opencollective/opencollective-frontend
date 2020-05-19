@@ -14,16 +14,16 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 import { withUser } from '../../UserProvider';
 
-const DELETE_COLLECTIVE = gql`
-  mutation deleteCollective($id: Int!) {
+const deleteCollectiveMutation = gql`
+  mutation DeleteCollective($id: Int!) {
     deleteCollective(id: $id) {
       id
     }
   }
 `;
 
-const DELETE_USER_COLLECTIVE = gql`
-  mutation deleteUserCollective($id: Int!) {
+const deleteUserCollectiveMutation = gql`
+  mutation DeleteUserCollective($id: Int!) {
     deleteUserCollective(id: $id) {
       id
     }
@@ -34,8 +34,8 @@ const DeleteCollective = ({ collective, ...props }) => {
   const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(DELETE_COLLECTIVE, { variables: { id: collective.id } });
-  const [deleteUserCollective] = useMutation(DELETE_USER_COLLECTIVE, { variables: { id: collective.id } });
+  const [deleteCollective] = useMutation(deleteCollectiveMutation, { variables: { id: collective.id } });
+  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation, { variables: { id: collective.id } });
 
   const handleDelete = async () => {
     try {

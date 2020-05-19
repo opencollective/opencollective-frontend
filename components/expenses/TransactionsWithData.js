@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 
-import { getTransactionsQuery } from '../../lib/graphql/queries';
+import { transactionsQuery } from '../../lib/graphql/queries';
 
 import Error from '../Error';
 
@@ -57,7 +57,8 @@ class TransactionsWithData extends React.Component {
 }
 
 const TRANSACTIONS_PER_PAGE = 10;
-export const addTransactionsData = graphql(getTransactionsQuery, {
+
+export const addTransactionsData = graphql(transactionsQuery, {
   options: props => ({
     variables: {
       CollectiveId: props.collective.id,

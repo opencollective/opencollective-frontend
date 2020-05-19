@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 /**
  * Fields fetched for updates
  */
-export const UpdatesFieldsFragment = gql`
+export const updatesFieldsFragment = gql`
   fragment UpdatesFieldsFragment on UpdateType {
     id
     slug
@@ -26,7 +26,7 @@ export const UpdatesFieldsFragment = gql`
 /**
  * Fields fetched for contributors
  */
-export const ContributorsFieldsFragment = gql`
+export const contributorsFieldsFragment = gql`
   fragment ContributorsFieldsFragment on Contributor {
     id
     name

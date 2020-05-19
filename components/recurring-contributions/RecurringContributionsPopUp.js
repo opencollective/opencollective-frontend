@@ -52,7 +52,7 @@ const MenuSection = styled(Flex).attrs({
 
 // GraphQL
 const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
-  mutation cancelRecurringContribution($order: OrderReferenceInput!) {
+  mutation CancelRecurringContribution($order: OrderReferenceInput!) {
     cancelOrder(order: $order) {
       id
       status

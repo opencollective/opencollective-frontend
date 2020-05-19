@@ -43,7 +43,7 @@ class UpdateWithData extends React.Component {
   }
 }
 
-const getUpdateQuery = gql`
+const updateQuery = gql`
   query Update($collectiveSlug: String, $updateSlug: String) {
     Update(collectiveSlug: $collectiveSlug, updateSlug: $updateSlug) {
       id
@@ -78,6 +78,6 @@ const getUpdateQuery = gql`
   }
 `;
 
-export const addGetUpdate = graphql(getUpdateQuery);
+export const addUpdateData = graphql(updateQuery);
 
-export default addGetUpdate(UpdateWithData);
+export default addUpdateData(UpdateWithData);

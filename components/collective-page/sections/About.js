@@ -13,7 +13,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import { EditCollectiveLongDescriptionMutation } from '../graphql/mutations';
+import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 import SectionTitle from '../SectionTitle';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
@@ -55,7 +55,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
 
       <Container width="100%" maxWidth={700} margin="0 auto">
         <InlineEditField
-          mutation={EditCollectiveLongDescriptionMutation}
+          mutation={editCollectiveLongDescriptionMutation}
           values={collective}
           field="longDescription"
           canEdit={canEdit}

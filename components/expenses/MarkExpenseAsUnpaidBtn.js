@@ -72,8 +72,8 @@ MarkExpenseAsUnpaidBtn.propTypes = {
   onError: PropTypes.func.isRequired,
 };
 
-const markExpenseAsUnpaidQuery = gql`
-  mutation markExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
+const markExpenseAsUnpaidMutation = gql`
+  mutation MarkExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
     markExpenseAsUnpaid(id: $id, processorFeeRefunded: $processorFeeRefunded) {
       id
       status
@@ -81,7 +81,7 @@ const markExpenseAsUnpaidQuery = gql`
   }
 `;
 
-const addMutation = graphql(markExpenseAsUnpaidQuery, {
+const addMarkExpenseAsUnpaidMutation = graphql(markExpenseAsUnpaidMutation, {
   props: ({ mutate }) => ({
     markExpenseAsUnpaid: async (id, processorFeeRefunded) => {
       return await mutate({ variables: { id, processorFeeRefunded } });
@@ -89,4 +89,4 @@ const addMutation = graphql(markExpenseAsUnpaidQuery, {
   }),
 });
 
-export default addMutation(MarkExpenseAsUnpaidBtn);
+export default addMarkExpenseAsUnpaidMutation(MarkExpenseAsUnpaidBtn);

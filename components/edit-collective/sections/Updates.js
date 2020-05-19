@@ -15,7 +15,7 @@ import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledCheckbox from '../../StyledCheckbox';
 import { H3, P } from '../../Text';
-import { updateSettingsMutation } from '../mutations';
+import { editCollectiveSettingsMutation } from '../mutations';
 
 import imgPreviewList from '../../../public/static/images/updates/updates-list-preview.png';
 import imgPreviewNewUpdate from '../../../public/static/images/updates/updates-new-preview.png';
@@ -55,7 +55,7 @@ const ScreenshotPreview = styled.div`
 const Updates = ({ collective }) => {
   const defaultIsChecked = hasFeature(collective, FEATURES.UPDATES);
   const { formatMessage } = useIntl();
-  const [setSettings, { loading, error }] = useMutation(updateSettingsMutation);
+  const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
 
   return (
     <Container>

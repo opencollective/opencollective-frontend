@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
 import { Search } from '@styled-icons/octicons/Search';
+import gql from 'graphql-tag';
 import { withRouter } from 'next/router';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
-import { addSearchQueryData } from '../lib/graphql/queries';
 import { Link, Router } from '../server/pages';
 
 import Button from '../components/Button';
@@ -190,4 +191,43 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export default addSearchQueryData(withRouter(SearchPage));
+export const searchPageQuery = gql`
+  query SearchPage($term: String!, $limit: Int, $offset: Int) {
+    search(term: $term, limit: $limit, offset: $offset) {
+      collectives {
+        id
+        isActive
+        type
+        slug
+        path
+        name
+        company
+        imageUrl
+        backgroundImage
+        description
+        longDescription
+        website
+        currency
+        stats {
+          id
+          balance
+          totalAmountSpent
+          yearlyBudget
+          backers {
+            all
+          }
+        }
+        memberOf(role: "BACKER") {
+          id
+        }
+      }
+      limit
+      offset
+      total
+    }
+  }
+`;
+
+export const addSearchPageData = graphql(searchPageQuery);
+
+export default withRouter(addSearchPageData(SearchPage));

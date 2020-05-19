@@ -11,8 +11,8 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
-const createProjectParentQuery = gqlV2`
-  query CreateProjectParent($slug: String!) {
+const createProjectPageParentAccountQuery = gqlV2`
+  query CreateProjectPageParentAccount($slug: String!) {
     account(slug: $slug) {
       id
       type
@@ -27,7 +27,7 @@ const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const router = useRouter();
   const slug = router.query.parentCollectiveSlug;
   const skipQuery = !LoggedInUser;
-  const { loading, error, data } = useQuery(createProjectParentQuery, {
+  const { loading, error, data } = useQuery(createProjectPageParentAccountQuery, {
     context: API_V2_CONTEXT,
     skip: skipQuery,
     variables: { slug },

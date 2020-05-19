@@ -20,15 +20,15 @@ import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 
 const { TW_API_COLLECTIVE_SLUG } = process.env;
 
-const getHostQuery = gqlV2`
-  query Host($slug: String) {
+const hostQuery = gqlV2/* GraphQL */ `
+  query EditCollectiveBankTransferHost($slug: String) {
     host(slug: $slug) {
       id
       slug
       legacyId
       currency
       settings
-      connectedAccounts{
+      connectedAccounts {
         id
         service
       }
@@ -53,8 +53,11 @@ const getHostQuery = gqlV2`
   }
 `;
 
-const createPayoutMethodMutation = gqlV2`
-  mutation createPayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
+const createPayoutMethodMutation = gqlV2/* GraphQL */ `
+  mutation EditCollectiveBankTransferCreatePayoutMethod(
+    $payoutMethod: PayoutMethodInput!
+    $account: AccountReferenceInput!
+  ) {
     createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
       data
       id
@@ -64,8 +67,8 @@ const createPayoutMethodMutation = gqlV2`
   }
 `;
 
-const editAccountSettingMutation = gqlV2`
-  mutation EditUserSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+const editBankTransferMutation = gqlV2/* GraphQL */ `
+  mutation EditCollectiveBankTransfer($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
@@ -74,12 +77,12 @@ const editAccountSettingMutation = gqlV2`
 `;
 
 const BankTransfer = props => {
-  const { loading, data, refetch: refetchHostData } = useQuery(getHostQuery, {
+  const { loading, data, refetch: refetchHostData } = useQuery(hostQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
   const [createPayoutMethod] = useMutation(createPayoutMethodMutation, { context: API_V2_CONTEXT });
-  const [editAccountSetting] = useMutation(editAccountSettingMutation, { context: API_V2_CONTEXT });
+  const [editBankTransfer] = useMutation(editBankTransferMutation, { context: API_V2_CONTEXT });
   const [showForm, setShowForm] = React.useState(false);
 
   if (loading) {
@@ -173,7 +176,7 @@ const BankTransfer = props => {
                 },
               });
             }
-            await editAccountSetting({
+            await editBankTransfer({
               variables: {
                 key: 'paymentMethods.manual.instructions',
                 value: instructions,

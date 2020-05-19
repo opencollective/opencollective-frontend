@@ -24,7 +24,7 @@ class CreateExpensePage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveData
+    slug: PropTypes.string, // for addcreateExpensePageData
     action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createExpense: PropTypes.func.isRequired, // from addMutation
     data: PropTypes.object.isRequired, // from withData
@@ -98,7 +98,7 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const createExpenseQuery = gql`
+const createExpenseMutation = gql`
   mutation createExpense($expense: ExpenseInputType!) {
     createExpense(expense: $expense) {
       id
@@ -143,8 +143,8 @@ const createExpenseQuery = gql`
   }
 `;
 
-const getCollectiveQuery = gql`
-  query Collective($slug: String) {
+const createExpensePageQuery = gql`
+  query CreateExpensePage($slug: String) {
     Collective(slug: $slug) {
       id
       type
@@ -211,7 +211,7 @@ const getCollectiveQuery = gql`
   }
 `;
 
-const addMutation = graphql(createExpenseQuery, {
+const addCreateExpenseMutation = graphql(createExpenseMutation, {
   props: ({ mutate }) => ({
     createExpense: async expense => {
       return await mutate({ variables: { expense } });
@@ -219,8 +219,8 @@ const addMutation = graphql(createExpenseQuery, {
   }),
 });
 
-const addCollectiveData = graphql(getCollectiveQuery);
+const addCreateExpensePageData = graphql(createExpensePageQuery);
 
-const addData = compose(addCollectiveData, addMutation);
+const addGraphql = compose(addCreateExpensePageData, addCreateExpenseMutation);
 
-export default withUser(addData(CreateExpensePage));
+export default withUser(addGraphql(CreateExpensePage));

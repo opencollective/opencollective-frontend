@@ -84,11 +84,8 @@ class CreateProject extends Component {
   }
 }
 
-const createProjectMutation = gqlV2`
-  mutation CreateProject(
-    $project: ProjectCreateInput!
-    $parent: AccountReferenceInput,
-  ) {
+const createProjectMutation = gqlV2/* GraphQL */ `
+  mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
     createProject(project: $project, parent: $parent) {
       id
       name

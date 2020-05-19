@@ -20,7 +20,6 @@ import { fadeIn } from '../../StyledKeyframes';
 import StyledMembershipCard from '../../StyledMembershipCard';
 import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-// Local imports
 import SectionTitle from '../SectionTitle';
 
 import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
@@ -346,95 +345,94 @@ class SectionContributions extends React.PureComponent {
   }
 }
 
-const withData = graphql(
-  gql`
-    query SectionContributions($id: Int!) {
-      Collective(id: $id) {
+const contributionsSectionQuery = gql`
+  query ContributionsSection($id: Int!) {
+    Collective(id: $id) {
+      id
+      settings
+      stats {
         id
-        settings
-        stats {
+        collectives {
           id
-          collectives {
-            id
-            hosted
-          }
+          hosted
         }
-        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+      }
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+        id
+        collective: member {
           id
-          collective: member {
+          name
+          slug
+          type
+          currency
+          isIncognito
+          description
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
+          tags
+          settings
+          parentCollective {
             id
+            backgroundImageUrl
             name
             slug
-            type
-            currency
-            isIncognito
-            description
-            imageUrl(height: 128)
-            backgroundImageUrl(height: 200)
-            tags
-            settings
-            parentCollective {
-              id
-              backgroundImageUrl
-              name
-              slug
-            }
-            host {
-              id
-            }
-            stats {
-              id
-              backers {
-                id
-                all
-              }
-            }
           }
-        }
-        memberOf(onlyActiveCollectives: true, limit: 1500) {
-          id
-          role
-          since
-          description
+          host {
+            id
+          }
           stats {
             id
-            totalDonations
+            backers {
+              id
+              all
+            }
           }
-          collective {
+        }
+      }
+      memberOf(onlyActiveCollectives: true, limit: 1500) {
+        id
+        role
+        since
+        description
+        stats {
+          id
+          totalDonations
+        }
+        collective {
+          id
+          name
+          slug
+          type
+          currency
+          isIncognito
+          description
+          imageUrl(height: 128)
+          backgroundImageUrl(height: 200)
+          tags
+          parentCollective {
             id
-            name
-            slug
-            type
-            currency
-            isIncognito
-            description
-            imageUrl(height: 128)
             backgroundImageUrl(height: 200)
-            tags
-            parentCollective {
+          }
+          host {
+            id
+          }
+          stats {
+            id
+            backers {
               id
-              backgroundImageUrl(height: 200)
-            }
-            host {
-              id
-            }
-            stats {
-              id
-              backers {
-                id
-                all
-              }
+              all
             }
           }
         }
       }
     }
-  `,
-  {
-    options: props => ({
-      variables: { id: props.collective.id },
-    }),
-  },
-);
+  }
+`;
 
-export default React.memo(injectIntl(withData(SectionContributions)));
+const addContributionsSectionData = graphql(contributionsSectionQuery, {
+  options: props => ({
+    variables: { id: props.collective.id },
+  }),
+});
+
+export default React.memo(injectIntl(addContributionsSectionData(SectionContributions)));

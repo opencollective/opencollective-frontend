@@ -207,8 +207,8 @@ class EditTwitterAccount extends React.Component {
   }
 }
 
-const editConnectedAccountQuery = gql`
-  mutation editConnectedAccount($connectedAccount: ConnectedAccountInputType!) {
+const editConnectedAccountMutation = gql`
+  mutation EditConnectedAccount($connectedAccount: ConnectedAccountInputType!) {
     editConnectedAccount(connectedAccount: $connectedAccount) {
       id
       settings
@@ -216,7 +216,7 @@ const editConnectedAccountQuery = gql`
   }
 `;
 
-const addMutation = graphql(editConnectedAccountQuery, {
+const addEditConnectedAccountMutation = graphql(editConnectedAccountMutation, {
   props: ({ mutate }) => ({
     editConnectedAccount: async connectedAccount => {
       return await mutate({ variables: { connectedAccount } });
@@ -224,4 +224,4 @@ const addMutation = graphql(editConnectedAccountQuery, {
   }),
 });
 
-export default addMutation(injectIntl(EditTwitterAccount));
+export default injectIntl(addEditConnectedAccountMutation(EditTwitterAccount));

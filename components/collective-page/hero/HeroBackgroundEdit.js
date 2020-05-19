@@ -13,7 +13,7 @@ import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
+import { editCollectiveBackgroundMutation } from '../graphql/mutations';
 
 import {
   BASE_HERO_HEIGHT,
@@ -33,7 +33,7 @@ const KEY_IMG_REMOVE = '__REMOVE__';
  */
 const HeroBackgroundEdit = ({ collective, onEditCancel }) => {
   const [isSubmitting, setSubmitting] = React.useState(false);
-  const [editBackground] = useMutation(EditCollectiveBackgroundMutation);
+  const [editBackground] = useMutation(editCollectiveBackgroundMutation);
   const [mediaSize, setMediaSize] = React.useState();
   const [crop, onCropChange] = React.useState(getCrop(collective));
   const [zoom, onZoomChange] = React.useState(getZoom(collective));

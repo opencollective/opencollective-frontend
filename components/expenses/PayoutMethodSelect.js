@@ -245,20 +245,19 @@ class PayoutMethodSelect extends React.Component {
   }
 }
 
-const addRemovePayoutMethodMutation = graphql(
-  gqlV2/* GraphQL */ `
-    mutation removePayoutMethod($id: String!) {
-      removePayoutMethod(payoutMethodId: $id) {
-        id
-        isSaved
-      }
+const removePayoutMethodMutation = gqlV2/* GraphQL */ `
+  mutation removePayoutMethod($id: String!) {
+    removePayoutMethod(payoutMethodId: $id) {
+      id
+      isSaved
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      removePayoutMethod: id => mutate({ variables: { id }, context: API_V2_CONTEXT }),
-    }),
-  },
-);
+  }
+`;
+
+const addRemovePayoutMethodMutation = graphql(removePayoutMethodMutation, {
+  props: ({ mutate }) => ({
+    removePayoutMethod: id => mutate({ variables: { id }, context: API_V2_CONTEXT }),
+  }),
+});
 
 export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect)));

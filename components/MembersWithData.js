@@ -195,7 +195,7 @@ class MembersWithData extends React.Component {
   }
 }
 
-const getMembersQuery = gql`
+const membersQuery = gql`
   query Members(
     $CollectiveId: Int!
     $TierId: Int
@@ -243,7 +243,7 @@ const getMembersQuery = gql`
   }
 `;
 
-export const addMembersData = graphql(getMembersQuery, {
+export const addMembersData = graphql(membersQuery, {
   options: props => ({
     variables: {
       CollectiveId: props.collective.id,

@@ -612,78 +612,75 @@ class Expense extends React.Component {
   }
 }
 
-const deleteExpense = graphql(
-  gql`
-    mutation deleteExpense($id: Int!) {
-      deleteExpense(id: $id) {
-        id
-        status
-      }
+const deleteExpenseMutation = gql`
+  mutation DeleteExpense($id: Int!) {
+    deleteExpense(id: $id) {
+      id
+      status
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      deleteExpense: async id => {
-        return await mutate({ variables: { id } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const unapproveExpense = graphql(
-  gql`
-    mutation unapproveExpense($id: Int!) {
-      unapproveExpense(id: $id) {
-        id
-        status
-      }
+const addDeleteExpenseMutation = graphql(deleteExpenseMutation, {
+  props: ({ mutate }) => ({
+    deleteExpense: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+const unapproveExpenseMutation = gql`
+  mutation UnapproveExpense($id: Int!) {
+    unapproveExpense(id: $id) {
+      id
+      status
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      unapproveExpense: async id => {
-        return await mutate({ variables: { id } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const editExpense = graphql(
-  gql`
-    mutation editExpense($expense: ExpenseInputType!) {
-      editExpense(expense: $expense) {
+const addUnapproveExpenseMutation = graphql(unapproveExpenseMutation, {
+  props: ({ mutate }) => ({
+    unapproveExpense: async id => {
+      return await mutate({ variables: { id } });
+    },
+  }),
+});
+
+const editExpenseMutation = gql`
+  mutation EditExpense($expense: ExpenseInputType!) {
+    editExpense(expense: $expense) {
+      id
+      idV2
+      description
+      amount
+      attachment
+      items {
         id
-        idV2
+        url
         description
         amount
-        attachment
-        items {
-          id
-          url
-          description
-          amount
-        }
-        attachedFiles {
-          id
-          url
-        }
-        category
-        type
-        privateMessage
-        payoutMethod
-        status
       }
+      attachedFiles {
+        id
+        url
+      }
+      category
+      type
+      privateMessage
+      payoutMethod
+      status
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      editExpense: async expense => {
-        return await mutate({ variables: { expense } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const addMutations = compose(unapproveExpense, editExpense, deleteExpense);
+const addEditExpenseMutation = graphql(editExpenseMutation, {
+  props: ({ mutate }) => ({
+    editExpense: async expense => {
+      return await mutate({ variables: { expense } });
+    },
+  }),
+});
 
-export default injectIntl(addMutations(Expense));
+const addGraphql = compose(addUnapproveExpenseMutation, addEditExpenseMutation, addDeleteExpenseMutation);
+
+export default injectIntl(addGraphql(Expense));

@@ -299,8 +299,8 @@ class EditPaymentMethods extends React.Component {
   }
 }
 
-const getPaymentMethods = graphql(gql`
-  query Collective($collectiveSlug: String) {
+const paymentMethodsQuery = gql`
+  query EditCollectivePaymentMethods($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       type
@@ -337,75 +337,74 @@ const getPaymentMethods = graphql(gql`
       }
     }
   }
-`);
+`;
 
-export const addCreditCard = graphql(
-  gql`
-    mutation addCreditCard(
-      $CollectiveId: Int!
-      $name: String!
-      $token: String!
-      $data: StripeCreditCardDataInputType!
-      $monthlyLimitPerMember: Int
+const addPaymentMethodsData = graphql(paymentMethodsQuery);
+
+const createCreditCardMutation = gql`
+  mutation EditCollectiveCreateCreditCard(
+    $CollectiveId: Int!
+    $name: String!
+    $token: String!
+    $data: StripeCreditCardDataInputType!
+    $monthlyLimitPerMember: Int
+  ) {
+    createCreditCard(
+      CollectiveId: $CollectiveId
+      name: $name
+      token: $token
+      data: $data
+      monthlyLimitPerMember: $monthlyLimitPerMember
     ) {
-      createCreditCard(
-        CollectiveId: $CollectiveId
-        name: $name
-        token: $token
-        data: $data
-        monthlyLimitPerMember: $monthlyLimitPerMember
-      ) {
-        id
-        stripeError {
-          message
-          response
-        }
+      id
+      stripeError {
+        message
+        response
       }
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      addCreditCard: variables => mutate({ variables }),
-    }),
-  },
-);
+  }
+`;
 
-const removePaymentMethod = graphql(
-  gql`
-    mutation removePaymentMethod($id: Int!) {
-      removePaymentMethod(id: $id) {
-        id
-      }
+export const addCreateCreditCardMutation = graphql(createCreditCardMutation, {
+  props: ({ mutate }) => ({
+    addCreditCard: variables => mutate({ variables }),
+  }),
+});
+
+const removePaymentMethodMutation = gql`
+  mutation EditCollectiveremovePaymentMethod($id: Int!) {
+    removePaymentMethod(id: $id) {
+      id
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      removePaymentMethod: id => mutate({ variables: { id } }),
-    }),
-  },
-);
+  }
+`;
 
-const updatePaymentMethod = graphql(
-  gql`
-    mutation updatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
-      updatePaymentMethod(id: $id, monthlyLimitPerMember: $monthlyLimitPerMember) {
-        id
-      }
+const addRemovePaymentMethodMutation = graphql(removePaymentMethodMutation, {
+  props: ({ mutate }) => ({
+    removePaymentMethod: id => mutate({ variables: { id } }),
+  }),
+});
+
+const updatePaymentMethodMutation = gql`
+  mutation EditCollectiveupdatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
+    updatePaymentMethod(id: $id, monthlyLimitPerMember: $monthlyLimitPerMember) {
+      id
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      updatePaymentMethod: paymentMethod => mutate({ variables: paymentMethod }),
-    }),
-  },
-);
+  }
+`;
 
-const addData = compose(
-  getPaymentMethods,
-  removePaymentMethod,
-  updatePaymentMethod,
+const addUpdatePaymentMethodMutation = graphql(updatePaymentMethodMutation, {
+  props: ({ mutate }) => ({
+    updatePaymentMethod: paymentMethod => mutate({ variables: paymentMethod }),
+  }),
+});
+
+const addGraphql = compose(
+  addPaymentMethodsData,
+  addRemovePaymentMethodMutation,
+  addUpdatePaymentMethodMutation,
   addEditCollectiveMutation,
-  addCreditCard,
+  addCreateCreditCardMutation,
 );
 
-export default injectIntl(withStripeLoader(addData(EditPaymentMethods)));
+export default injectIntl(withStripeLoader(addGraphql(EditPaymentMethods)));

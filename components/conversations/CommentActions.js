@@ -96,8 +96,8 @@ AdminActionButtons.propTypes = {
   canDelete: PropTypes.bool,
 };
 
-const deleteCommentMutation = gqlV2`
-  mutation deleteComment($id: String!) {
+const deleteCommentMutation = gqlV2/* GraphQL */ `
+  mutation DeleteComment($id: String!) {
     deleteComment(id: $id) {
       id
     }

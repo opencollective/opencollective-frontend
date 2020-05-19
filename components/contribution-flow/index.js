@@ -1289,7 +1289,7 @@ class CreateOrderPage extends React.Component {
   }
 }
 
-const SubmitOrderFragment = gql`
+const submitOrderFragment = gql`
   fragment SubmitOrderFragment on OrderType {
     id
     idV2
@@ -1306,38 +1306,36 @@ const SubmitOrderFragment = gql`
   }
 `;
 
-export const addCreateOrderMutation = graphql(
-  gql`
-    mutation createOrder($order: OrderInputType!) {
-      createOrder(order: $order) {
-        ...SubmitOrderFragment
-      }
+const createOrderMutation = gql`
+  mutation CreateOrder($order: OrderInputType!) {
+    createOrder(order: $order) {
+      ...SubmitOrderFragment
     }
-    ${SubmitOrderFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      createOrder: order => mutate({ variables: { order } }),
-    }),
-  },
-);
+  }
+  ${submitOrderFragment}
+`;
 
-export const addConfirmOrderMutation = graphql(
-  gql`
-    mutation confirmOrder($order: ConfirmOrderInputType!) {
-      confirmOrder(order: $order) {
-        ...SubmitOrderFragment
-      }
+const addCreateOrderMutation = graphql(createOrderMutation, {
+  props: ({ mutate }) => ({
+    createOrder: order => mutate({ variables: { order } }),
+  }),
+});
+
+const confirmOrderMutation = gql`
+  mutation ConfirmOrder($order: ConfirmOrderInputType!) {
+    confirmOrder(order: $order) {
+      ...SubmitOrderFragment
     }
-    ${SubmitOrderFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      confirmOrder: order => mutate({ variables: { order } }),
-    }),
-  },
-);
+  }
+  ${submitOrderFragment}
+`;
 
-const addGraphQL = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);
+const addConfirmOrderMutation = graphql(confirmOrderMutation, {
+  props: ({ mutate }) => ({
+    confirmOrder: order => mutate({ variables: { order } }),
+  }),
+});
 
-export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
+const addGraphql = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);
+
+export default injectIntl(addGraphql(withUser(withStripeLoader(CreateOrderPage))));

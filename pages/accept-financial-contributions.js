@@ -4,7 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 
 import AcceptFinancialContributions from '../components/accept-financial-contributions/index.js';
 import AuthenticatedPage from '../components/AuthenticatedPage';
-import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
+import { collectivePageQuery } from '../components/collective-page/graphql/queries';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -46,12 +46,10 @@ class AcceptFinancialContributionsPage extends React.Component {
   }
 }
 
-const getCollective = graphql(getCollectivePageQuery, {
+const addCollectivePageData = graphql(collectivePageQuery, {
   options: props => ({
-    variables: {
-      slug: props.slug,
-    },
+    variables: { slug: props.slug },
   }),
 });
 
-export default withUser(getCollective(AcceptFinancialContributionsPage));
+export default withUser(addCollectivePageData(AcceptFinancialContributionsPage));

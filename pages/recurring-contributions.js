@@ -177,10 +177,10 @@ class recurringContributionsPage extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsQuery, {
+const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
   options: {
     context: API_V2_CONTEXT,
   },
 });
 
-export default injectIntl(withUser(getData(recurringContributionsPage)));
+export default injectIntl(withUser(addRecurringContributionsPageData(recurringContributionsPage)));

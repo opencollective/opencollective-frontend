@@ -13,6 +13,15 @@ import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 import { AddFundsSourcePickerForUserWithData, AddFundsSourcePickerWithData } from './AddFundsSourcePicker';
 import InputField from './InputField';
 
+const addFundsHostQuery = gql`
+  query AddFundsHost($CollectiveId: Int) {
+    Collective(id: $CollectiveId) {
+      id
+      hostFeePercent
+    }
+  }
+`;
+
 class AddFundsForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
@@ -148,17 +157,9 @@ class AddFundsForm extends React.Component {
   }
 
   retrieveHostFeePercent = async CollectiveId => {
-    const getHostCollectiveQuery = gql`
-      query Collective($CollectiveId: Int) {
-        Collective(id: $CollectiveId) {
-          id
-          hostFeePercent
-        }
-      }
-    `;
     try {
       const result = await this.props.client.query({
-        query: getHostCollectiveQuery,
+        query: addFundsHostQuery,
         variables: { CollectiveId },
       });
       const { hostFeePercent } = result.data.Collective;

@@ -331,30 +331,90 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const getData = graphql(
-  gqlV2`
-    query CreateExpensePage($collectiveSlug: String!) {
-      account(slug: $collectiveSlug, throwIfMissing: false) {
+const createExpensePageQuery = gqlV2/* GraphQL */ `
+  query CreateExpensePage($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      currency
+      expensePolicy
+      expensesTags {
         id
-        slug
-        name
-        type
-        description
-        settings
-        imageUrl
-        twitterHandle
-        currency
-        expensePolicy
-        expensesTags {
-          id
-          tag
-        }
+        tag
+      }
 
-        ... on Organization {
+      ... on Organization {
+        id
+        isHost
+        isActive
+        balance
+        expensePolicy
+        location {
+          address
+          country
+        }
+        transferwise {
+          availableCurrencies
+        }
+      }
+
+      ... on Collective {
+        id
+        isApproved
+        balance
+        host {
           id
-          isHost
-          isActive
-          balance
+          name
+          slug
+          type
+          expensePolicy
+          settings
+          location {
+            address
+            country
+          }
+          transferwise {
+            availableCurrencies
+          }
+        }
+      }
+
+      ... on Fund {
+        id
+        isApproved
+        balance
+        host {
+          id
+          name
+          slug
+          type
+          expensePolicy
+          settings
+          location {
+            address
+            country
+          }
+          transferwise {
+            availableCurrencies
+          }
+        }
+      }
+
+      ... on Event {
+        id
+        isApproved
+        balance
+        host {
+          id
+          name
+          slug
+          type
           expensePolicy
           location {
             address
@@ -364,118 +424,59 @@ const getData = graphql(
             availableCurrencies
           }
         }
-
-        ... on Collective {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            settings
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
-        ... on Fund {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            settings
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
-        ... on Event {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
-        ... on Project {
-          id
-          isApproved
-          balance
-          host {
-            id
-            name
-            slug
-            type
-            expensePolicy
-            location {
-              address
-              country
-            }
-            transferwise {
-              availableCurrencies
-            }
-          }
-        }
       }
-      loggedInAccount {
-        ...loggedInAccountExpensePayoutFieldsFragment
+
+      ... on Project {
+        id
+        isApproved
+        balance
+        host {
+          id
+          name
+          slug
+          type
+          expensePolicy
+          location {
+            address
+            country
+          }
+          transferwise {
+            availableCurrencies
+          }
+        }
       }
     }
+    loggedInAccount {
+      ...LoggedInAccountExpensePayoutFieldsFragment
+    }
+  }
 
-    ${loggedInAccountExpensePayoutFieldsFragment}
-  `,
-  {
-    options: {
-      context: API_V2_CONTEXT,
-      fetchPolicy: 'cache-and-network',
-    },
+  ${loggedInAccountExpensePayoutFieldsFragment}
+`;
+
+const addCreateExpensePageData = graphql(createExpensePageQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+    fetchPolicy: 'cache-and-network',
   },
-);
+});
 
-const withCreateExpenseMutation = graphql(
-  gqlV2`
-  mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+const createExpenseMutation = gqlV2/* GraphQL */ `
+  mutation CreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
     createExpense(expense: $expense, account: $account) {
-      ...expensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFieldsFragment
     }
   }
   ${expensePageExpenseFieldsFragment}
-`,
-  {
-    options: { context: API_V2_CONTEXT },
-    props: ({ mutate }) => ({
-      createExpense: async variables => {
-        return mutate({ variables });
-      },
-    }),
-  },
-);
+`;
 
-export default withUser(getData(withRouter(withCreateExpenseMutation(injectIntl(CreateExpensePage)))));
+const addCreateExpenseMutation = graphql(createExpenseMutation, {
+  options: { context: API_V2_CONTEXT },
+  props: ({ mutate }) => ({
+    createExpense: async variables => {
+      return mutate({ variables });
+    },
+  }),
+});
+
+export default withUser(addCreateExpensePageData(withRouter(addCreateExpenseMutation(injectIntl(CreateExpensePage)))));

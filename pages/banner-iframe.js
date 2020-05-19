@@ -21,7 +21,7 @@ class BannerIframe extends React.Component {
   }
 
   static propTypes = {
-    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveData
+    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveBannerIframeData
     id: PropTypes.string, // from getInitialProps
     style: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
@@ -385,8 +385,8 @@ class BannerIframe extends React.Component {
   }
 }
 
-const getMembersQuery = gql`
-  query Collective($collectiveSlug: String) {
+const collectiveBannerIframeQuery = gql`
+  query CollectiveBannerIfame($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       name
@@ -404,6 +404,6 @@ const getMembersQuery = gql`
   }
 `;
 
-export const addCollectiveData = graphql(getMembersQuery);
+export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery);
 
-export default addCollectiveData(BannerIframe);
+export default addCollectiveBannerIframeData(BannerIframe);

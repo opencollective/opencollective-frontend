@@ -6,7 +6,7 @@ import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { getCollectiveToEditQuery } from '../../lib/graphql/queries';
+import { editCollectivePageQuery } from '../../lib/graphql/queries';
 
 import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -14,7 +14,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 
-const createConnectedAccountMutation = gqlV2`
+const createConnectedAccountMutation = gqlV2/* GraphQL */ `
   mutation createConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
     createConnectedAccount(connectedAccount: $connectedAccount, account: $account) {
       id
@@ -26,7 +26,7 @@ const createConnectedAccountMutation = gqlV2`
   }
 `;
 
-const deleteConnectedAccountMutation = gqlV2`
+const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
   mutation deleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
     deleteConnectedAccount(connectedAccount: $connectedAccount) {
       id
@@ -37,7 +37,7 @@ const deleteConnectedAccountMutation = gqlV2`
 const EditPayPalAccount = props => {
   const mutationOptions = {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: getCollectiveToEditQuery, variables: { slug: props.collective.slug } }],
+    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
     awaitRefetchQueries: true,
   };
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);

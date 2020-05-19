@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation, Query } from '@apollo/react-components';
+import gql from 'graphql-tag';
 import { cloneDeep, get, update } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-
-import { createApplicationMutation, deleteApplicationMutation } from '../lib/graphql/mutations';
-import { getLoggedInUserApplicationsQuery } from '../lib/graphql/queries';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
@@ -17,6 +15,43 @@ import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import StyledLink from '../components/StyledLink';
 
+const loggedInUserApplicationsQuery = gql`
+  query LoggedInUserApplications {
+    LoggedInUser {
+      id
+      collective {
+        id
+        ... on User {
+          id
+          applications {
+            id
+            type
+            apiKey
+          }
+        }
+      }
+    }
+  }
+`;
+
+const createApplicationMutation = gql`
+  mutation CreateApplication($application: ApplicationInput!) {
+    createApplication(application: $application) {
+      id
+      type
+      apiKey
+    }
+  }
+`;
+
+const deleteApplicationMutation = gql`
+  mutation DeleteApplication($id: Int!) {
+    deleteApplication(id: $id) {
+      id
+    }
+  }
+`;
+
 class Apps extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
@@ -27,7 +62,7 @@ class Apps extends React.Component {
     return (
       <AuthenticatedPage title="Applications">
         {() => (
-          <Query query={getLoggedInUserApplicationsQuery}>
+          <Query query={loggedInUserApplicationsQuery}>
             {({ data, loading }) => {
               if (loading) {
                 return (
@@ -63,7 +98,7 @@ class Apps extends React.Component {
                     <Mutation
                       mutation={deleteApplicationMutation}
                       update={(cache, { data: { deleteApplication } }) => {
-                        const { LoggedInUser } = cache.readQuery({ query: getLoggedInUserApplicationsQuery });
+                        const { LoggedInUser } = cache.readQuery({ query: loggedInUserApplicationsQuery });
                         const updatedUser = cloneDeep(LoggedInUser);
 
                         update(updatedUser, 'collective.applications', applications => {
@@ -71,7 +106,7 @@ class Apps extends React.Component {
                         });
 
                         cache.writeQuery({
-                          query: getLoggedInUserApplicationsQuery,
+                          query: loggedInUserApplicationsQuery,
                           data: { LoggedInUser: updatedUser },
                         });
                       }}
@@ -110,14 +145,14 @@ class Apps extends React.Component {
                   <Mutation
                     mutation={createApplicationMutation}
                     update={(cache, { data: { createApplication } }) => {
-                      const { LoggedInUser } = cache.readQuery({ query: getLoggedInUserApplicationsQuery });
+                      const { LoggedInUser } = cache.readQuery({ query: loggedInUserApplicationsQuery });
                       const updatedUser = cloneDeep(LoggedInUser);
 
                       update(updatedUser, 'collective.applications', applications => {
                         return applications ? [...applications, createApplication] : [createApplication];
                       }),
                         cache.writeQuery({
-                          query: getLoggedInUserApplicationsQuery,
+                          query: loggedInUserApplicationsQuery,
                           data: {
                             LoggedInUser: updatedUser,
                           },

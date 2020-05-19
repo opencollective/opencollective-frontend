@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { defaultImage } from '../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { getCollectiveQuery } from '../lib/graphql/queries';
+import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
 import { Router } from '../server/pages';
@@ -26,7 +26,7 @@ import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
-import { CollectivePledgesQuery } from '../components/PledgedCollectivePage';
+import { pledgedCollectivePageQuery } from '../components/PledgedCollectivePage';
 import StyledButtonSet from '../components/StyledButtonSet';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputAmount from '../components/StyledInputAmount';
@@ -673,77 +673,76 @@ class CreatePledgePage extends React.Component {
   }
 }
 
-const addCollectiveData = graphql(
-  gql`
-    query CreatePledgeQuery($slug: String!) {
-      Collective(slug: $slug) {
-        currency
+const createPledgePageQuery = gql`
+  query CreatePledgePage($slug: String!) {
+    Collective(slug: $slug) {
+      currency
+      id
+      name
+      website
+      githubHandle
+      pledges: orders(status: PENDING) {
         id
-        name
-        website
-        githubHandle
-        pledges: orders(status: PENDING) {
-          id
-          totalAmount
-          fromCollective {
-            id
-            imageUrl(height: 128)
-            slug
-            name
-            type
-          }
-        }
-      }
-    }
-  `,
-  {
-    skip: props => !props.slug,
-  },
-);
-
-export const addCreatePledgeMutation = graphql(
-  gql`
-    mutation createOrder($order: OrderInputType!) {
-      createOrder(order: $order) {
-        id
-        createdAt
-        status
-        createdByUser {
-          id
-        }
+        totalAmount
         fromCollective {
           id
+          imageUrl(height: 128)
           slug
-        }
-        collective {
-          id
-          slug
-        }
-        transactions(type: "CREDIT") {
-          id
-          uuid
+          name
+          type
         }
       }
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      createPledge: async (order, collective) => {
-        return await mutate({
-          variables: { order },
-          refetchQueries: !collective
-            ? []
-            : [
-                { query: getCollectiveQuery, variables: { slug: collective.slug } },
-                { query: CollectivePledgesQuery, variables: { id: collective.id } },
-              ],
-        });
-      },
-    }),
-  },
-);
+  }
+`;
 
-const addGraphQL = compose(addCollectiveData, addCreatePledgeMutation);
+const addCreatePledgePageData = graphql(createPledgePageQuery, {
+  skip: props => !props.slug,
+});
+
+const createPledgeMutation = gql`
+  mutation CreatePledge($order: OrderInputType!) {
+    createOrder(order: $order) {
+      id
+      createdAt
+      status
+      createdByUser {
+        id
+      }
+      fromCollective {
+        id
+        slug
+      }
+      collective {
+        id
+        slug
+      }
+      transactions(type: "CREDIT") {
+        id
+        uuid
+      }
+    }
+  }
+`;
+
+/* TODO(GraphQL): refactor unnecessary mutate */
+export const addCreatePledgeMutation = graphql(createPledgeMutation, {
+  props: ({ mutate }) => ({
+    createPledge: async (order, collective) => {
+      return await mutate({
+        variables: { order },
+        refetchQueries: !collective
+          ? []
+          : [
+              { query: legacyCollectiveQuery, variables: { slug: collective.slug } },
+              { query: pledgedCollectivePageQuery, variables: { id: collective.id } },
+            ],
+      });
+    },
+  }),
+});
+
+const addGraphql = compose(addCreatePledgePageData, addCreatePledgeMutation);
 
 export { CreatePledgePage as MockCreatePledgePage };
-export default injectIntl(withUser(addGraphQL(CreatePledgePage)));
+export default injectIntl(withUser(addGraphql(CreatePledgePage)));

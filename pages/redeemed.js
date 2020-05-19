@@ -26,8 +26,8 @@ import { withUser } from '../components/UserProvider';
 import CollectiveCard from '../components/virtual-cards/CollectiveCard';
 import HappyBackground from '../components/virtual-cards/HappyBackground';
 
-const paymentMethodQuery = gql`
-  query PaymentMethod($code: String) {
+const redeemedPaymentMethodQuery = gql`
+  query RedeemedPaymentMethod($code: String) {
     PaymentMethod(code: $code) {
       id
       initialBalance
@@ -125,7 +125,7 @@ class RedeemedPage extends React.Component {
     const { client, code } = this.props;
 
     if (code) {
-      client.query({ query: paymentMethodQuery, variables: { code } }).then(result => {
+      client.query({ query: redeemedPaymentMethodQuery, variables: { code } }).then(result => {
         const { PaymentMethod } = result.data;
         if (PaymentMethod) {
           this.setState({
@@ -311,25 +311,23 @@ class RedeemedPage extends React.Component {
     );
   }
 }
-
-const getCollectiveData = graphql(
-  gql`
-    query RedeemPageData($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug) {
-        id
-        name
-        type
-        slug
-        imageUrl
-        backgroundImageUrl
-        description
-        settings
-      }
+const redeemedPageQuery = gql`
+  query RedeemedPage($collectiveSlug: String!) {
+    Collective(slug: $collectiveSlug) {
+      id
+      name
+      type
+      slug
+      imageUrl
+      backgroundImageUrl
+      description
+      settings
     }
-  `,
-  {
-    skip: props => !props.collectiveSlug,
-  },
-);
+  }
+`;
 
-export default withUser(withData(getCollectiveData(RedeemedPage)));
+const addRedeemedPageData = graphql(redeemedPageQuery, {
+  skip: props => !props.collectiveSlug,
+});
+
+export default withUser(withData(addRedeemedPageData(RedeemedPage)));

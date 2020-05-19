@@ -34,7 +34,7 @@ class TiersPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string, // from getInitialProps, for addCollectiveData
+    slug: PropTypes.string, // from getInitialProps, for addContributePageData
     query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
@@ -146,24 +146,100 @@ class TiersPage extends React.Component {
   }
 }
 
-const addTiersData = graphql(
-  gql`
-    query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
-      Collective(slug: $slug) {
+const contributePageQuery = gql`
+  query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+    Collective(slug: $slug) {
+      id
+      slug
+      path
+      name
+      type
+      currency
+      settings
+      isActive
+      isHost
+      imageUrl
+      host {
+        id
+        name
+        slug
+        type
+      }
+      stats {
+        id
+        backers {
+          id
+          all
+          users
+          organizations
+        }
+      }
+      contributors {
+        id
+        name
+        roles
+        isAdmin
+        isCore
+        isBacker
+        isFundraiser
+        since
+        description
+        collectiveSlug
+        totalAmountDonated
+        type
+        publicMessage
+        isIncognito
+        tiersIds
+      }
+      tiers {
+        id
+        name
+        slug
+        description
+        hasLongDescription
+        goal
+        interval
+        currency
+        amount
+        minimumAmount
+        button
+        amountType
+        endsAt
+        type
+        stats {
+          id
+          totalDonated
+          totalRecurringDonations
+          contributors {
+            id
+            all
+            users
+            organizations
+          }
+        }
+        contributors(limit: $nbContributorsPerContributeCard) {
+          id
+          image
+          collectiveSlug
+          name
+          type
+        }
+      }
+      events(includePastEvents: true, includeInactive: true) {
         id
         slug
-        path
         name
-        type
-        currency
-        settings
-        isHost
+        description
+        image
         isActive
-        imageUrl
-        host {
+        startsAt
+        endsAt
+        backgroundImageUrl(height: 208)
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
           id
+          image
+          collectiveSlug
           name
-          slug
           type
         }
         stats {
@@ -175,43 +251,19 @@ const addTiersData = graphql(
             organizations
           }
         }
-        contributors {
+      }
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+        id
+        collective: member {
           id
-          name
-          roles
-          isAdmin
-          isCore
-          isBacker
-          isFundraiser
-          since
-          description
-          collectiveSlug
-          totalAmountDonated
-          type
-          publicMessage
-          isIncognito
-          tiersIds
-        }
-        tiers {
-          id
-          name
           slug
-          description
-          hasLongDescription
-          goal
-          interval
-          currency
-          amount
-          minimumAmount
-          button
-          amountType
-          endsAt
+          name
           type
+          description
+          backgroundImageUrl(height: 208)
           stats {
             id
-            totalDonated
-            totalRecurringDonations
-            contributors {
+            backers {
               id
               all
               users
@@ -226,71 +278,18 @@ const addTiersData = graphql(
             type
           }
         }
-        events(includePastEvents: true, includeInactive: true) {
-          id
-          slug
-          name
-          description
-          image
-          isActive
-          startsAt
-          endsAt
-          backgroundImageUrl(height: 208)
-          contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
-            id
-            image
-            collectiveSlug
-            name
-            type
-          }
-          stats {
-            id
-            backers {
-              id
-              all
-              users
-              organizations
-            }
-          }
-        }
-        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
-          id
-          collective: member {
-            id
-            slug
-            name
-            type
-            description
-            backgroundImageUrl(height: 208)
-            stats {
-              id
-              backers {
-                id
-                all
-                users
-                organizations
-              }
-            }
-            contributors(limit: $nbContributorsPerContributeCard) {
-              id
-              image
-              collectiveSlug
-              name
-              type
-            }
-          }
-        }
       }
     }
-  `,
-  {
-    options: props => ({
-      variables: {
-        slug: props.slug,
-        nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-      },
-    }),
-  },
-);
+  }
+`;
 
-export default withUser(addTiersData(TiersPage));
+const addContributePageData = graphql(contributePageQuery, {
+  options: props => ({
+    variables: {
+      slug: props.slug,
+      nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+    },
+  }),
+});
+
+export default withUser(addContributePageData(TiersPage));

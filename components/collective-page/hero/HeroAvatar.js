@@ -14,7 +14,7 @@ import Container from '../../Container';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
-import { EditAvatarMutation } from '../graphql/mutations';
+import { editCollectiveAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
 
@@ -163,7 +163,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
-      <Mutation mutation={EditAvatarMutation}>
+      <Mutation mutation={editCollectiveAvatarMutation}>
         {editAvatar => (
           <Fragment>
             <EditingAvatarContainer borderRadius={borderRadius}>

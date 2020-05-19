@@ -8,7 +8,7 @@ import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import TierPageContent from '../components/tier-page';
-import { getTierPageQuery } from '../components/tier-page/graphql/queries';
+import { tierPageQuery } from '../components/tier-page/graphql/queries';
 import { withUser } from '../components/UserProvider';
 
 /**
@@ -81,6 +81,6 @@ class TierPage extends React.Component {
   }
 }
 
-const getTierData = graphql(getTierPageQuery);
+const addTierPageData = graphql(tierPageQuery);
 
-export default withUser(getTierData(TierPage));
+export default withUser(addTierPageData(TierPage));

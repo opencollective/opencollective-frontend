@@ -32,7 +32,7 @@ const messages = defineMessages({
 });
 
 const updateOrderMutation = gqlV2/* GraphQL */ `
-  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: AmountInput, $tier: TierReferenceInput) {
+  mutation UpdateOrder($order: OrderReferenceInput!, $amount: AmountInput, $tier: TierReferenceInput) {
     updateOrder(order: $order, amount: $amount, tier: $tier) {
       id
       status
@@ -48,8 +48,8 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const getTiersQuery = gqlV2/* GraphQL */ `
-  query UpdateOrderPopUpQuery($slug: String!) {
+const tiersQuery = gqlV2/* GraphQL */ `
+  query UpdateOrderPopUpTiers($slug: String!) {
     collective(slug: $slug) {
       id
       slug
@@ -91,10 +91,8 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
   const [submitUpdateOrder, { loading: loadingUpdateOrder }] = useMutation(updateOrderMutation, {
     context: API_V2_CONTEXT,
   });
-  const { data } = useQuery(getTiersQuery, {
-    variables: {
-      slug: contribution.toAccount.slug,
-    },
+  const { data } = useQuery(tiersQuery, {
+    variables: { slug: contribution.toAccount.slug },
     context: API_V2_CONTEXT,
   });
 

@@ -324,8 +324,8 @@ class Webhooks extends React.Component {
   }
 }
 
-const getCollectiveWithNotificationsQuery = gql`
-  query CollectiveNotifications($collectiveSlug: String) {
+const editCollectiveWebhooksQuery = gql`
+  query EditCollectiveWebhooks($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       type
@@ -341,37 +341,38 @@ const getCollectiveWithNotificationsQuery = gql`
   }
 `;
 
-const editWebhooks = graphql(
-  gql`
-    mutation editWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
-      editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
-        id
-        type
-        active
-        webhookUrl
-      }
+const editCollectiveWebhooksMutation = gql`
+  mutation EditCollectiveWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
+    editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
+      id
+      type
+      active
+      webhookUrl
     }
-  `,
-  {
-    props: ({ mutate, ownProps }) => ({
-      editWebhooks: variables =>
-        mutate({
-          variables,
-          update: (cache, { data: { editWebhooks } }) => {
-            const { Collective } = cache.readQuery({
-              query: getCollectiveWithNotificationsQuery,
-              variables: { collectiveSlug: ownProps.collectiveSlug },
-            });
-            cache.writeQuery({
-              query: getCollectiveWithNotificationsQuery,
-              data: { Collective: { ...Collective, notifications: editWebhooks } },
-            });
-          },
-        }),
-    }),
-  },
-);
+  }
+`;
 
-const addData = compose(graphql(getCollectiveWithNotificationsQuery), editWebhooks);
+const addEditCollectiveWebhooksData = graphql(editCollectiveWebhooksQuery);
 
-export default injectIntl(addData(Webhooks));
+const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
+  props: ({ mutate, ownProps }) => ({
+    editWebhooks: variables =>
+      mutate({
+        variables,
+        update: (cache, { data: { editWebhooks } }) => {
+          const { Collective } = cache.readQuery({
+            query: editCollectiveWebhooksQuery,
+            variables: { collectiveSlug: ownProps.collectiveSlug },
+          });
+          cache.writeQuery({
+            query: editCollectiveWebhooksQuery,
+            data: { Collective: { ...Collective, notifications: editWebhooks } },
+          });
+        },
+      }),
+  }),
+});
+
+const addGraphql = compose(addEditCollectiveWebhooksData, editEditCollectiveWebhooksMutation);
+
+export default injectIntl(addGraphql(Webhooks));

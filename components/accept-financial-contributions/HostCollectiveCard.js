@@ -62,17 +62,17 @@ const messages = defineMessages({
   },
 });
 
-const applyToHostMutation = gqlV2`
-mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
-  applyToHost(collective: $collective, host: $host) {
-    id
-    slug
-    host {
+const applyToHostMutation = gqlV2/* GraphQL */ `
+  mutation ApplyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
+    applyToHost(collective: $collective, host: $host) {
       id
       slug
+      host {
+        id
+        slug
+      }
     }
   }
-}
 `;
 
 const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {

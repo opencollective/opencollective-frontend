@@ -6,8 +6,6 @@ import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { addUpdateUserEmailMutation } from '../../lib/graphql/mutations';
-
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -160,21 +158,38 @@ class EditUserEmailForm extends React.Component {
   }
 }
 
-const withUserEmail = graphql(
-  gql`
-    query LoggedInUserEmail {
-      LoggedInUser {
-        id
-        email
-        emailWaitingForValidation
-      }
+const loggedInUserEmailQuery = gql`
+  query LoggedInUserEmail {
+    LoggedInUser {
+      id
+      email
+      emailWaitingForValidation
     }
-  `,
-  {
-    options: {
-      fetchPolicy: 'network-only',
-    },
-  },
-);
+  }
+`;
 
-export default addUpdateUserEmailMutation(withUserEmail(EditUserEmailForm));
+const addloggedInUserEmailData = graphql(loggedInUserEmailQuery, {
+  options: {
+    fetchPolicy: 'network-only',
+  },
+});
+
+const updateUserEmailMutation = gql`
+  mutation UpdateUserEmail($email: String!) {
+    updateUserEmail(email: $email) {
+      id
+      email
+      emailWaitingForValidation
+    }
+  }
+`;
+
+const addUpdateUserEmailMutation = graphql(updateUserEmailMutation, {
+  props: ({ mutate }) => ({
+    updateUserEmail: email => {
+      return mutate({ variables: { email } });
+    },
+  }),
+});
+
+export default addUpdateUserEmailMutation(addloggedInUserEmailData(EditUserEmailForm));

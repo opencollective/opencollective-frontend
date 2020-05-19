@@ -74,7 +74,7 @@ const ProgressInfoContainer = styled.div`
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
-const EditTierMutation = gql`
+const editTierMutation = gql`
   mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
     editTier(
       tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
@@ -204,7 +204,7 @@ class TierPage extends Component {
                 </P>
                 <H1 fontSize="H2" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
                   <InlineEditField
-                    mutation={EditTierMutation}
+                    mutation={editTierMutation}
                     canEdit={canEdit}
                     values={tier}
                     field="name"
@@ -222,7 +222,7 @@ class TierPage extends Component {
                   wordBreak="break-word"
                 >
                   <InlineEditField
-                    mutation={EditTierMutation}
+                    mutation={editTierMutation}
                     canEdit={canEdit}
                     values={tier}
                     field="description"
@@ -234,7 +234,7 @@ class TierPage extends Component {
                 </H2>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
-                    <TierLongDescription tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                    <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </div>
                   <Container
                     position={['relative', null, null, 'absolute']}
@@ -243,7 +243,7 @@ class TierPage extends Component {
                     mb={[4, 5]}
                     top={[0, null, null, -50]}
                   >
-                    <TierVideo tier={tier} editMutation={EditTierMutation} canEdit={canEdit} />
+                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
                   </Container>
                 </Container>
                 <Container display={['block', null, null, 'none']} mt={2} maxWidth={275}>

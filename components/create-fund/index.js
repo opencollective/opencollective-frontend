@@ -106,11 +106,8 @@ class CreateFund extends Component {
   }
 }
 
-const createFundMutation = gqlV2`
-  mutation CreateFund(
-    $fund: FundCreateInput!
-    $host: AccountReferenceInput,
-  ) {
+const createFundMutation = gqlV2/* GraphQL */ `
+  mutation CreateFund($fund: FundCreateInput!, $host: AccountReferenceInput) {
     createFund(fund: $fund, host: $host) {
       id
       name

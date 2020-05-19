@@ -270,16 +270,16 @@ const collectiveFields = `
 `;
 
 /* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
-const CollectiveDataQuery = gql`
-  query Collective($collectiveSlug: String!) {
+const createOrderPageQuery = gql`
+  query CreateOrderPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug) {
       ${collectiveFields}
     }
   }
 `;
 
-const CollectiveWithTierDataQuery = gql`
-  query CollectiveWithTier($collectiveSlug: String!, $tierId: Int!) {
+const createOrderPageWithTierQuery = gql`
+  query CreateOrderPageWithTier($collectiveSlug: String!, $tierId: Int!) {
     Collective(slug: $collectiveSlug) {
       ${collectiveFields}
     }
@@ -305,9 +305,10 @@ const CollectiveWithTierDataQuery = gql`
   }
 `;
 
-const addGraphQL = compose(
-  graphql(CollectiveDataQuery, { skip: props => props.tierId }),
-  graphql(CollectiveWithTierDataQuery, { skip: props => !props.tierId }),
-);
+const addCreateOrderPageData = graphql(createOrderPageQuery, { skip: props => props.tierId });
 
-export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));
+const addCreateOrderPageWithTierData = graphql(createOrderPageWithTierQuery, { skip: props => !props.tierId });
+
+const addGraphql = compose(addCreateOrderPageData, addCreateOrderPageWithTierData);
+
+export default injectIntl(withUser(withStripeLoader(addGraphql(CreateOrderPage))));

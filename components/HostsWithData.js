@@ -121,8 +121,8 @@ class HostsWithData extends React.Component {
   }
 }
 
-const getHostsQuery = gql`
-  query allHosts(
+const hostsQuery = gql`
+  query Hosts(
     $tags: [String]
     $currency: String
     $limit: Int
@@ -161,7 +161,7 @@ const getHostsQuery = gql`
   }
 `;
 
-export const addHostsData = graphql(getHostsQuery, {
+export const addHostsData = graphql(hostsQuery, {
   options: props => ({
     variables: {
       tags: props.tags,

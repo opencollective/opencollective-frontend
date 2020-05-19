@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { GraphQLContext } from '../lib/graphql/context';
 import { addEditCollectiveMutation } from '../lib/graphql/mutations';
-import { getCollectiveToEditQuery } from '../lib/graphql/queries';
+import { editCollectivePageQuery } from '../lib/graphql/queries';
 
 import EditCollective from '../components/edit-collective';
 import ErrorPage from '../components/ErrorPage';
@@ -100,7 +100,7 @@ class EditCollectivePage extends React.Component {
   }
 }
 
-const addCollectiveToEditData = graphql(getCollectiveToEditQuery, {
+const addEditCollectivePageData = graphql(editCollectivePageQuery, {
   skip: props => props.loadingLoggedInUser || !props.LoggedInUser,
   // The fetchPolicy is important for an edge case.
   // Same component, different collective (moving from edit to another edit through the menu)
@@ -108,4 +108,4 @@ const addCollectiveToEditData = graphql(getCollectiveToEditQuery, {
   options: { fetchPolicy: 'network-only' },
 });
 
-export default withUser(addEditCollectiveMutation(addCollectiveToEditData(EditCollectivePage)));
+export default withUser(addEditCollectiveMutation(addEditCollectivePageData(EditCollectivePage)));

@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import ConversationsList from '../../conversations/ConversationsList';
-import { ConversationListFragment } from '../../conversations/graphql';
+import { conversationListFragment } from '../../conversations/graphql';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
@@ -15,8 +15,8 @@ import { P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-const conversationsQuery = gqlV2`
-  query ConversationSection($collectiveSlug: String!) {
+const conversationsSectionQuery = gqlV2/* GraphQL */ `
+  query ConversationsSection($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       conversations(limit: 3) {
@@ -24,7 +24,7 @@ const conversationsQuery = gqlV2`
       }
     }
   }
-  ${ConversationListFragment}
+  ${conversationListFragment}
 `;
 
 /**
@@ -96,9 +96,11 @@ class SectionConversations extends React.PureComponent {
   }
 }
 
-export default graphql(conversationsQuery, {
+const addConversationsSectionData = graphql(conversationsSectionQuery, {
   options: props => ({
     variables: { collectiveSlug: props.collective.slug },
     context: API_V2_CONTEXT,
   }),
-})(SectionConversations);
+});
+
+export default addConversationsSectionData(SectionConversations);

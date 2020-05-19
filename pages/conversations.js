@@ -15,7 +15,7 @@ import CollectiveNavbar from '../components/CollectiveNavbar';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ConversationsList from '../components/conversations/ConversationsList';
-import { ConversationListFragment } from '../components/conversations/graphql';
+import { conversationListFragment } from '../components/conversations/graphql';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
@@ -198,40 +198,39 @@ class ConversationsPage extends React.Component {
   }
 }
 
-const getData = graphql(
-  gqlV2` 
-    query ConversationsPage($collectiveSlug: String!, $tag: String) {
-      account(slug: $collectiveSlug, throwIfMissing: false) {
+const conversationsPageQuery = gqlV2/* GraphQL */ `
+  query ConversationsPage($collectiveSlug: String!, $tag: String) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      conversations(tag: $tag) {
+        ...ConversationListFragment
+      }
+      conversationsTags {
         id
-        slug
-        name
-        type
-        description
-        settings
-        imageUrl
-        twitterHandle
-        conversations(tag: $tag) {
-          ...ConversationListFragment
-        }
-        conversationsTags {
-          id
-          tag
-        }
-        ... on Collective {
-          isApproved
-        }
+        tag
+      }
+      ... on Collective {
+        isApproved
       }
     }
-    ${ConversationListFragment}
-  `,
-  {
-    options: {
-      // Because this list is updated often, using this option ensures that the list gets
-      // properly updated when doing things like redirecting after a conversation delete.
-      fetchPolicy: 'cache-and-network',
-      context: API_V2_CONTEXT,
-    },
-  },
-);
+  }
+  ${conversationListFragment}
+`;
 
-export default withUser(getData(withRouter(ConversationsPage)));
+const addConversationsPageData = graphql(conversationsPageQuery, {
+  options: {
+    // Because this list is updated often, using this option ensures that the list gets
+    // properly updated when doing things like redirecting after a conversation delete.
+    fetchPolicy: 'cache-and-network',
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default withUser(withRouter(addConversationsPageData(ConversationsPage)));

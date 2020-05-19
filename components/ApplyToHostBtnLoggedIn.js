@@ -191,8 +191,8 @@ class ApplyToHostBtnLoggedIn extends React.Component {
   }
 }
 
-const getInactiveCollectivesQuery = gql`
-  query allCollectives($memberOfCollectiveSlug: String) {
+const inactiveCollectivesQuery = gql`
+  query ApplyToHostInactiveCollectives($memberOfCollectiveSlug: String) {
     allCollectives(
       memberOfCollectiveSlug: $memberOfCollectiveSlug
       role: "ADMIN"
@@ -215,8 +215,8 @@ const getInactiveCollectivesQuery = gql`
   }
 `;
 
-const editCollectiveMutation = gql`
-  mutation editCollective($collective: CollectiveInputType!) {
+const applyToHostMutation = gql`
+  mutation ApplyToHost($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
       isActive
@@ -228,7 +228,7 @@ const editCollectiveMutation = gql`
   }
 `;
 
-const addQuery = graphql(getInactiveCollectivesQuery, {
+const addInactiveCollectivesData = graphql(inactiveCollectivesQuery, {
   options: props => ({
     variables: {
       memberOfCollectiveSlug: props.LoggedInUser.collective.slug,
@@ -236,7 +236,7 @@ const addQuery = graphql(getInactiveCollectivesQuery, {
   }),
 });
 
-const addMutation = graphql(editCollectiveMutation, {
+const addApplyToHostMutation = graphql(applyToHostMutation, {
   props: ({ mutate }) => ({
     editCollective: async CollectiveInputType => {
       return await mutate({ variables: { collective: CollectiveInputType } });
@@ -244,6 +244,6 @@ const addMutation = graphql(editCollectiveMutation, {
   }),
 });
 
-const addGraphQL = compose(addQuery, addMutation);
+const addGraphql = compose(addInactiveCollectivesData, addApplyToHostMutation);
 
-export default addGraphQL(ApplyToHostBtnLoggedIn);
+export default addGraphql(ApplyToHostBtnLoggedIn);

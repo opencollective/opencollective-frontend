@@ -123,8 +123,8 @@ class CollectivesWithData extends React.Component {
   }
 }
 
-const getCollectivesQuery = gql`
-  query allCollectives(
+const collectivesQuery = gql`
+  query Collectives(
     $HostCollectiveId: Int
     $hostCollectiveSlug: String
     $ParentCollectiveId: Int
@@ -176,7 +176,7 @@ const getCollectivesQuery = gql`
   }
 `;
 
-export const addCollectivesData = graphql(getCollectivesQuery, {
+export const addCollectivesData = graphql(collectivesQuery, {
   options: props => ({
     variables: {
       ParentCollectiveId: props.ParentCollectiveId,

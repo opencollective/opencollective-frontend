@@ -52,8 +52,8 @@ const CollectiveLogoContainer = styled(Flex)`
   }
 `;
 
-const GetMemberQuery = gql`
-  query OrderMember($collectiveId: Int!, $memberCollectiveId: Int!, $tierId: Int) {
+const orderSuccessMemberQuery = gql`
+  query OrderSuccessMember($collectiveId: Int!, $memberCollectiveId: Int!, $tierId: Int) {
     member(CollectiveId: $collectiveId, MemberCollectiveId: $memberCollectiveId, TierId: $tierId) {
       id
       publicMessage
@@ -191,15 +191,15 @@ class OrderSuccessContributorCardWithData extends React.Component {
   }
 }
 
-export default injectIntl(
-  graphql(GetMemberQuery, {
-    options: props => {
-      const { collective, fromCollective, tier } = props.order;
-      const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
-      if (tier) {
-        variables.tierId = tier.id;
-      }
-      return { variables };
-    },
-  })(OrderSuccessContributorCardWithData),
-);
+const addOrderSuccessMemberData = graphql(orderSuccessMemberQuery, {
+  options: props => {
+    const { collective, fromCollective, tier } = props.order;
+    const variables = { collectiveId: collective.id, memberCollectiveId: fromCollective.id };
+    if (tier) {
+      variables.tierId = tier.id;
+    }
+    return { variables };
+  },
+});
+
+export default injectIntl(addOrderSuccessMemberData(OrderSuccessContributorCardWithData));

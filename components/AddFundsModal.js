@@ -13,7 +13,7 @@ import Button from './Button';
 import { withUser } from './UserProvider';
 
 const addFundsToOrgMutation = gql`
-  mutation addFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
+  mutation AddFundsToOrg($totalAmount: Int!, $CollectiveId: Int!, $HostCollectiveId: Int!, $description: String) {
     addFundsToOrg(
       totalAmount: $totalAmount
       CollectiveId: $CollectiveId

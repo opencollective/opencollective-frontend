@@ -205,8 +205,8 @@ class HostDashboard extends React.Component {
   }
 }
 
-const getDataQuery = gql`
-  query Collective($hostCollectiveSlug: String) {
+const hostDashboardQuery = gql`
+  query HostDashboard($hostCollectiveSlug: String) {
     Collective(slug: $hostCollectiveSlug) {
       id
       slug
@@ -242,7 +242,7 @@ const getDataQuery = gql`
   }
 `;
 
-export const addData = graphql(getDataQuery, {
+const addHostDashboardData = graphql(hostDashboardQuery, {
   options: props => ({
     variables: {
       hostCollectiveSlug: props.hostCollectiveSlug,
@@ -250,4 +250,4 @@ export const addData = graphql(getDataQuery, {
   }),
 });
 
-export default withUser(addData(HostDashboard));
+export default withUser(addHostDashboardData(HostDashboard));

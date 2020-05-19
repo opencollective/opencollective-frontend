@@ -48,14 +48,14 @@ const messages = defineMessages({
   },
 });
 
-const expensePageQuery = gqlV2`
+const expensePageQuery = gqlV2/* GraphQL */ `
   query ExpensePage($legacyExpenseId: Int!) {
     expense(expense: { legacyId: $legacyExpenseId }) {
-      ...expensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFieldsFragment
     }
 
     loggedInAccount {
-      ...loggedInAccountExpensePayoutFieldsFragment
+      ...LoggedInAccountExpensePayoutFieldsFragment
     }
   }
 
@@ -63,10 +63,10 @@ const expensePageQuery = gqlV2`
   ${expensePageExpenseFieldsFragment}
 `;
 
-const editExpenseMutation = gqlV2`
-  mutation editExpense($expense: ExpenseUpdateInput!) {
+const editExpenseMutation = gqlV2/* GraphQL */ `
+  mutation EditExpense($expense: ExpenseUpdateInput!) {
     editExpense(expense: $expense) {
-      ...expensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFieldsFragment
     }
   }
 
@@ -536,16 +536,16 @@ class ExpensePage extends React.Component {
   }
 }
 
-const getData = graphql(expensePageQuery, {
+const addExpensePageData = graphql(expensePageQuery, {
   options: {
     context: API_V2_CONTEXT,
   },
 });
 
-const withEditExpenseMutation = graphql(editExpenseMutation, {
+const addEditExpenseMutation = graphql(editExpenseMutation, {
   options: {
     context: API_V2_CONTEXT,
   },
 });
 
-export default injectIntl(getData(withApollo(withUser(withEditExpenseMutation(ExpensePage)))));
+export default injectIntl(addExpensePageData(withApollo(withUser(addEditExpenseMutation(ExpensePage)))));

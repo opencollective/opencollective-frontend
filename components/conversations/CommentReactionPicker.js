@@ -13,7 +13,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledRoundButton from '../StyledRoundButton';
 
-const addCommentReactionMutation = gqlV2`
+const addCommentReactionMutation = gqlV2/* GraphQL */ `
   mutation AddCommentReaction($emoji: String!, $comment: CommentReferenceInput!) {
     addCommentReaction(emoji: $emoji, comment: $comment) {
       id
@@ -23,7 +23,7 @@ const addCommentReactionMutation = gqlV2`
   }
 `;
 
-const removeCommentReactionMutation = gqlV2`
+const removeCommentReactionMutation = gqlV2/* GraphQL */ `
   mutation RemoveCommentReaction($emoji: String!, $comment: CommentReferenceInput!) {
     removeCommentReaction(emoji: $emoji, comment: $comment) {
       id
