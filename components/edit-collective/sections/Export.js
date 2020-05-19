@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
-import { exportMembers, exportHosts } from '../../../lib/export_file';
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { exportHosts, exportMembers } from '../../../lib/export_file';
 
 import ExportImages from '../../ExportImages';
 import StyledLink from '../../StyledLink';
