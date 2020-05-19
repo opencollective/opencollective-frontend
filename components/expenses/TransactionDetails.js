@@ -115,10 +115,13 @@ class TransactionDetails extends React.Component {
       platformFeeInHostCurrency,
     } = this.props;
 
-    const initialAmount = isFeesOnTop ? amount + platformFeeInHostCurrency : amount;
-    let totalAmount = ['ORGANIZATION', 'USER'].includes(collective.type)
-      ? -netAmountInCollectiveCurrency
-      : initialAmount;
+    let initialAmount = amount;
+    if (['ORGANIZATION', 'USER'].includes(collective.type)) {
+      initialAmount = -netAmountInCollectiveCurrency;
+    } else if (isFeesOnTop) {
+      initialAmount = amount + platformFeeInHostCurrency;
+    }
+    let totalAmount = initialAmount;
     const amountDetails = [
       intl.formatNumber(initialAmount / 100, {
         currency: currency,
@@ -126,8 +129,11 @@ class TransactionDetails extends React.Component {
       }),
     ];
     if (hostCurrencyFxRate && hostCurrencyFxRate !== 1) {
-      const amountInHostCurrency = initialAmount * hostCurrencyFxRate;
-      totalAmount = initialAmount;
+      let amountInHostCurrency = amount * hostCurrencyFxRate;
+      totalAmount = amount;
+      if (isFeesOnTop) {
+        amountInHostCurrency = amountInHostCurrency + platformFeeInHostCurrency;
+      }
       amountDetails.push(
         ` (${intl.formatNumber(amountInHostCurrency / 100, {
           currency: hostCurrency,
@@ -152,11 +158,11 @@ class TransactionDetails extends React.Component {
       });
     };
 
-    addFees(
-      isFeesOnTop
-        ? ['taxAmount', 'hostFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']
-        : ['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency'],
-    );
+    if (isFeesOnTop) {
+      addFees(['taxAmount', 'hostFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
+    } else {
+      addFees(['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
+    }
 
     let amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : '';
 
