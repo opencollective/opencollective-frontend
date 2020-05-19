@@ -374,6 +374,9 @@ const getData = graphql(
               address
               country
             }
+            transferwise {
+              availableCurrencies
+            }
           }
         }
       }
