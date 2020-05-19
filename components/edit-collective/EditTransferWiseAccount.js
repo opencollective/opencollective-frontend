@@ -20,6 +20,7 @@ const createConnectedAccountMutation = gqlV2`
       settings
       service
       createdAt
+      updatedAt
     }
   }
 `;
@@ -36,6 +37,7 @@ const mutationOptions = { context: API_V2_CONTEXT };
 
 const EditTransferWiseAccount = props => {
   const { refetch } = React.useContext(GraphQLContext);
+  const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
     mutationOptions,
@@ -49,13 +51,16 @@ const EditTransferWiseAccount = props => {
       token: '',
     },
     async onSubmit(values) {
-      await createConnectedAccount({
+      const {
+        data: { createConnectedAccount: createdAccount },
+      } = await createConnectedAccount({
         variables: {
           connectedAccount: { token: values.token, service: 'transferwise' },
           account: { slug: props.collective.slug },
         },
       });
-      await refetch();
+      refetch();
+      setConnectedAccount(createdAccount);
     },
     validate(values) {
       const errors = {};
@@ -68,10 +73,11 @@ const EditTransferWiseAccount = props => {
 
   const handleDelete = async () => {
     await deleteConnectedAccount({ variables: { connectedAccount: { legacyId: props.connectedAccount.id } } });
-    await refetch();
+    refetch();
+    setConnectedAccount();
   };
 
-  if (!props.connectedAccount) {
+  if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
         <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
@@ -112,8 +118,7 @@ const EditTransferWiseAccount = props => {
             id="collective.connectedAccounts.transferwise.connected"
             defaultMessage="TransferWise account connected on {updatedAt, date, short}"
             values={{
-              username: props.connectedAccount.username,
-              updatedAt: new Date(props.connectedAccount.updatedAt || props.connectedAccount.createdAt),
+              updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
             }}
           />
         </P>
