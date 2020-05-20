@@ -8,9 +8,4 @@ describe('widgets', () => {
     cy.visit('/xdamman/widget.html');
     cy.get('.CollectiveCard').should('have.length', 16);
   });
-
-  it('shows the latest events', () => {
-    cy.visit('/veganizerbxl/events.html');
-    cy.get('.pastEvents li').should('have.length', 6);
-  });
 });
