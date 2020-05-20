@@ -1,5 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -12,6 +14,9 @@ import {
 import ExpensesStatsWithData from '../expenses/ExpensesStatsWithData';
 import ExpensesWithData from '../expenses/ExpensesWithData';
 import OrdersWithData from '../expenses/OrdersWithData';
+import { Flex } from '../Grid';
+import Loading from '../Loading';
+import MessageBox from '../MessageBox';
 import { H5 } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -19,9 +24,10 @@ import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 
 class HostDashboard extends React.Component {
   static propTypes = {
+    hostCollectiveSlug: PropTypes.string, // for addData
     view: PropTypes.oneOf(['expenses', 'donations']).isRequired,
     LoggedInUser: PropTypes.object,
-    host: PropTypes.object.isRequired,
+    data: PropTypes.object, // from addData
   };
 
   constructor(props) {
@@ -59,7 +65,8 @@ class HostDashboard extends React.Component {
   }
 
   renderExpenses(selectedCollective, includeHostedCollectives) {
-    const { LoggedInUser, host } = this.props;
+    const { LoggedInUser, data } = this.props;
+    const host = data.Collective;
 
     return (
       <Fragment>
@@ -109,8 +116,23 @@ class HostDashboard extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, host, view } = this.props;
+    const { LoggedInUser, data, view } = this.props;
 
+    if (data.loading) {
+      return (
+        <Flex py={5} justifyContent="center">
+          <Loading />
+        </Flex>
+      );
+    } else if (!data.Collective) {
+      return (
+        <MessageBox my={5} type="error" withIcon>
+          <FormattedMessage id="notFound" defaultMessage="Not found" />
+        </MessageBox>
+      );
+    }
+
+    const host = data.Collective;
     const selectedCollective = this.state.selectedCollective || host;
     const includeHostedCollectives = selectedCollective.id === host.id;
 
@@ -183,4 +205,48 @@ class HostDashboard extends React.Component {
   }
 }
 
-export default withUser(HostDashboard);
+const getDataQuery = gql`
+  query Collective($hostCollectiveSlug: String) {
+    Collective(slug: $hostCollectiveSlug) {
+      id
+      slug
+      name
+      isHost
+      currency
+      paymentMethods(includeHostCollectivePaymentMethod: true) {
+        id
+        uuid
+        service
+        name
+        createdAt
+        expiryDate
+        balance
+        currency
+      }
+      stats {
+        id
+        collectives {
+          id
+          hosted
+        }
+      }
+      plan {
+        addedFunds
+        addedFundsLimit
+        transferwisePayouts
+        transferwisePayoutsLimit
+        name
+      }
+    }
+  }
+`;
+
+export const addData = graphql(getDataQuery, {
+  options: props => ({
+    variables: {
+      hostCollectiveSlug: props.hostCollectiveSlug,
+    },
+  }),
+});
+
+export default withUser(addData(HostDashboard));

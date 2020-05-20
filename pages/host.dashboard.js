@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
-import gql from 'graphql-tag';
 import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
+
+import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
@@ -115,7 +115,7 @@ class HostDashboardPage extends React.Component {
     if (view === 'pending-applications') {
       return <PendingApplications hostCollectiveSlug={host.slug} />;
     } else {
-      return <Dashboard view={view} host={host} LoggedInUser={LoggedInUser} />;
+      return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
     }
   }
 
@@ -183,48 +183,4 @@ class HostDashboardPage extends React.Component {
   }
 }
 
-const hostDashboardQuery = gql`
-  query HostDashboard($slug: String) {
-    Collective(slug: $slug) {
-      id
-      type
-      slug
-      name
-      currency
-      isHost
-      paymentMethods(includeHostCollectivePaymentMethod: true) {
-        id
-        uuid
-        service
-        name
-        createdAt
-        expiryDate
-        balance
-        currency
-      }
-      stats {
-        id
-        collectives {
-          id
-          hosted
-        }
-      }
-      plan {
-        name
-        addedFunds
-        addedFundsLimit
-        transferwisePayouts
-        transferwisePayoutsLimit
-        hostDashboard
-      }
-    }
-  }
-`;
-
-const addHostDashboardData = graphql(hostDashboardQuery, {
-  options: props => ({
-    variables: { slug: props.slug },
-  }),
-});
-
-export default withUser(addHostDashboardData(HostDashboardPage));
+export default withUser(addCollectiveCoverData(HostDashboardPage));
