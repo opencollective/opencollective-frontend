@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu May 21 2020 13:20:42 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu May 21 2020 14:27:46 GMT+0000 (Coordinated Universal Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -2059,6 +2059,11 @@ enum Currency {
   Naira
   """
   NGN
+
+  """
+  Czech Koruna
+  """
+  CZK
 }
 
 scalar DateString
