@@ -69,5 +69,6 @@ const TagIcon = styled(PriceTags)`
   <StyledTag variant="rounded-right" type="white" border="1px dashed #C4C7CC">
     <TagIcon size="10px" /> Edit Tags
   </StyledTag>
+  <StyledTag variant="rounded">rounded</StyledTag>{' '}
 </>;
 ```

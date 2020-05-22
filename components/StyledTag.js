@@ -80,6 +80,11 @@ const StyledTagBase = styled.div`
         borderRadius: '12px 2px 2px 12px',
         padding: '3px 6px 3px 10px',
       },
+      rounded: {
+        ...defaultRoundedStyleProps,
+        borderRadius: '12px 12px 12px 12px',
+        padding: '3px 6px 3px 10px',
+      },
     },
   })}
 
@@ -136,7 +141,7 @@ StyledTag.propTypes = {
   iconColor: PropTypes.string,
   iconDisplay: PropTypes.string,
   iconAlign: PropTypes.string,
-  variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left']),
+  variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left', 'rounded']),
   children: PropTypes.node,
   type: PropTypes.oneOf(Object.keys(TAG_TYPE_VARIANTS)),
 };
