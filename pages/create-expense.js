@@ -351,6 +351,7 @@ const getData = graphql(
             slug
             type
             expensePolicy
+            settings
             location {
               address
               country
