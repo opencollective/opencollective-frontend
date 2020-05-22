@@ -16,7 +16,7 @@ const CollectiveCardContainer = styled.div`
   padding: 20px 15px;
 `;
 
-const RecurringContributionsContainer = ({ recurringContributions, filter, createNotification }) => {
+const RecurringContributionsContainer = ({ recurringContributions, filter, createNotification, account }) => {
   const [isHovering, setHovering] = useState(null);
 
   const activeRecurringContributions = recurringContributions.nodes.filter(
@@ -60,6 +60,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
             onMouseLeave={() => setHovering(null)}
             style={{ position: 'relative' }}
             createNotification={createNotification}
+            account={account}
           />
         </CollectiveCardContainer>
       ))}
@@ -71,6 +72,7 @@ RecurringContributionsContainer.propTypes = {
   recurringContributions: PropTypes.object.isRequired,
   filter: PropTypes.string.isRequired,
   createNotification: PropTypes.func,
+  account: PropTypes.object.isRequired,
 };
 
 export default RecurringContributionsContainer;

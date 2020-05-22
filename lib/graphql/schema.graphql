@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu May 28 2020 16:05:08 GMT+0200 (Central European Summer Time)
+# timestamp: Thu Jun 04 2020 13:22:51 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -1360,6 +1360,7 @@ enum ExpenseStatus {
   PROCESSING
   ERROR
   PAID
+  SCHEDULED_FOR_PAYMENT
 }
 
 """

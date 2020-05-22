@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu May 28 2020 16:05:29 GMT+0200 (Central European Summer Time)
+# timestamp: Thu Jun 04 2020 13:23:07 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -265,6 +265,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_TRANSACTION_CREATED
@@ -2625,6 +2626,11 @@ enum ExpenseProcessAction {
   MARK_AS_UNPAID
 
   """
+  To schedule the expense for payment
+  """
+  SCHEDULE_FOR_PAYMENT
+
+  """
   To trigger the payment
   """
   PAY
@@ -2649,6 +2655,7 @@ enum ExpenseStatus {
   PROCESSING
   ERROR
   PAID
+  SCHEDULED_FOR_PAYMENT
 }
 
 """
@@ -3431,6 +3438,36 @@ type Mutation {
     """
     order: OrderReferenceInput!
   ): Order
+
+  """
+  Update an Order's amount, tier, or payment method
+  """
+  updateOrder(
+    """
+    Reference to the Order to update
+    """
+    order: OrderReferenceInput!
+
+    """
+    Reference to a Payment Method to update the order with
+    """
+    paymentMethod: PaymentMethodReferenceInput
+  ): Order
+
+  """
+  Add a new payment method to be used with an Order
+  """
+  addStripeCreditCard(
+    """
+    A Payment Method to add to an Account
+    """
+    paymentMethod: PaymentMethodCreateInput
+
+    """
+    Account to add Payment Method to
+    """
+    account: AccountReferenceInput
+  ): PaymentMethod
 }
 
 """
@@ -3454,6 +3491,7 @@ type Order {
   in calculating this.
   """
   totalDonations: Amount
+  paymentMethod: PaymentMethod
 }
 
 """
@@ -3622,6 +3660,38 @@ type Organization implements Account {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
+}
+
+"""
+PaymentMethod model
+"""
+type PaymentMethod {
+  id: String
+  legacyId: Int
+  name: String
+}
+
+input PaymentMethodCreateInput {
+  data: PaymentMethodDataInput
+  name: String
+  token: String
+}
+
+input PaymentMethodDataInput {
+  brand: String!
+  country: String!
+  expMonth: Int!
+  expYear: Int!
+  fullName: String
+  funding: String
+  zip: String
+}
+
+input PaymentMethodReferenceInput {
+  """
+  The legacy id assigned to the payment method
+  """
+  legacyId: Int
 }
 
 """
