@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu May 28 2020 16:05:29 GMT+0200 (Central European Summer Time)
+# timestamp: Thu May 28 2020 19:07:33 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -3431,6 +3431,64 @@ type Mutation {
     """
     order: OrderReferenceInput!
   ): Order
+
+  """
+  Update an Order's amount, tier, payment method, or frequency
+  """
+  updateOrder(
+    """
+    Object matching the OrderReferenceInput (id)
+    """
+    order: OrderReferenceInput!
+
+    """
+    Amount in cents of the order
+    """
+    amount: Int
+
+    """
+    Frequency of the recurring order, either MONTHLY or YEARLY
+    """
+    frequency: String
+
+    """
+    The tier of the recurring contribution, like Backer or Sponsor
+    """
+    tier: String
+
+    """
+    Object matching the PaymentMethodReferenceInput (uuid)
+    """
+    paymentMethod: PaymentMethodReferenceInput
+  ): Order
+
+  """
+  Add a new payment method to be used with an Order
+  """
+  addPaymentMethod(
+    """
+    Object matching the NewPaymentMethodInput
+    """
+    newPaymentMethod: NewPaymentMethodInput
+  ): Order
+}
+
+input NewPaymentMethodDataInput {
+  brand: String!
+  country: String!
+  expMonth: Int!
+  expYear: Int!
+  fullName: String
+  funding: String
+  zip: String
+}
+
+input NewPaymentMethodInput {
+  data: NewPaymentMethodDataInput!
+  name: String!
+  service: String!
+  token: String!
+  type: String!
 }
 
 """
@@ -3454,6 +3512,7 @@ type Order {
   in calculating this.
   """
   totalDonations: Amount
+  legacyPaymentMethodId: Int
 }
 
 """
@@ -3622,6 +3681,18 @@ type Organization implements Account {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
+}
+
+input PaymentMethodReferenceInput {
+  """
+  The uuid string assigned to the payment method
+  """
+  uuid: String
+
+  """
+  The Collective Id that owns the payment method
+  """
+  CollectiveId: Int
 }
 
 """

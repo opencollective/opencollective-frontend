@@ -49,7 +49,15 @@ const messages = defineMessages({
   },
 });
 
-const RecurringContributionsCard = ({ collective, status, contribution, hover, createNotification, ...props }) => {
+const RecurringContributionsCard = ({
+  collective,
+  status,
+  contribution,
+  hover,
+  createNotification,
+  account,
+  ...props
+}) => {
   const [showPopup, setShowPopup] = useState(false);
 
   const { formatMessage } = useIntl();
@@ -125,6 +133,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, hover, c
           status={status}
           setShowPopup={setShowPopup}
           createNotification={createNotification}
+          account={account}
         />
       )}
     </StyledCard>
@@ -139,6 +148,7 @@ RecurringContributionsCard.propTypes = {
   LoggedInUser: PropTypes.object.isRequired,
   hover: PropTypes.bool,
   createNotification: PropTypes.func,
+  account: PropTypes.object.isRequired,
 };
 
 export default withUser(withRouter(RecurringContributionsCard));
