@@ -33,7 +33,7 @@ const deleteConnectedAccountMutation = gqlV2`
   }
 `;
 
-const EditTransferWiseAccount = props => {
+const EditPayPalAccount = props => {
   const mutationOptions = {
     context: API_V2_CONTEXT,
     refetchQueries: [{ query: getCollectiveToEditQuery, variables: { slug: props.collective.slug } }],
@@ -51,13 +51,14 @@ const EditTransferWiseAccount = props => {
   const formik = useFormik({
     initialValues: {
       token: '',
+      clientId: '',
     },
     async onSubmit(values) {
       const {
         data: { createConnectedAccount: createdAccount },
       } = await createConnectedAccount({
         variables: {
-          connectedAccount: { token: values.token, service: 'transferwise' },
+          connectedAccount: { token: values.token, clientId: values.clientId, service: 'paypal' },
           account: { slug: props.collective.slug },
         },
       });
@@ -67,6 +68,9 @@ const EditTransferWiseAccount = props => {
       const errors = {};
       if (!values.token) {
         errors.token = 'Required';
+      }
+      if (!values.clientId) {
+        errors.clientId = 'Required';
       }
       return errors;
     },
@@ -80,19 +84,32 @@ const EditTransferWiseAccount = props => {
   if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
+        <P fontSize="Caption" color="black.600" fontWeight="normal">
           <FormattedMessage
-            id="collective.create.connectedAccounts.transferwise.description"
-            defaultMessage="Connect a TransferWise account to pay expenses with one click. For instructions on how to connect to TransferWise, please, <a>read our documentation</a>."
+            id="collective.create.connectedAccounts.paypal.description"
+            defaultMessage="Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>."
             values={{
               a: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise',
+                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-paypal',
                 openInNewTab: true,
               }),
             }}
           />
         </P>
         <StyledInputField
+          name="clientId"
+          label="Client ID"
+          error={
+            (formik.touched.clientId && formik.errors.clientId) || createError?.message.replace('GraphQL error: ', '')
+          }
+          disabled={isCreating}
+        >
+          {inputProps => (
+            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.clientId} />
+          )}
+        </StyledInputField>
+        <StyledInputField
+          mt={2}
           name="token"
           label="Token"
           error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
@@ -103,27 +120,24 @@ const EditTransferWiseAccount = props => {
           )}
         </StyledInputField>
         <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>
-          <FormattedMessage
-            id="collective.connectedAccounts.transferwise.button"
-            defaultMessage="Connect TransferWise"
-          />
+          <FormattedMessage id="collective.connectedAccounts.paypal.button" defaultMessage="Connect PayPal" />
         </StyledButton>
       </form>
     );
   } else {
     return (
       <React.Fragment>
-        <P lineHeight="0">
+        <P>
           <FormattedMessage
-            id="collective.connectedAccounts.transferwise.connected"
-            defaultMessage="TransferWise account connected on {updatedAt, date, short}"
+            id="collective.connectedAccounts.paypal.connected"
+            defaultMessage="PayPal account connected on {updatedAt, date, short}"
             values={{
               updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
             }}
           />
         </P>
-        <P lineHeight="0">
-          <StyledButton type="submit" buttonSize="small" loading={isDeleting} onClick={handleDelete}>
+        <P>
+          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>
@@ -132,10 +146,10 @@ const EditTransferWiseAccount = props => {
   }
 };
 
-EditTransferWiseAccount.propTypes = {
+EditPayPalAccount.propTypes = {
   connectedAccount: PropTypes.object,
   collective: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };
 
-export default EditTransferWiseAccount;
+export default EditPayPalAccount;
