@@ -87,6 +87,15 @@ const getMainContributorRole = contributor => {
   }
 };
 
+const ContributorTag = styled(StyledTag)`
+  margin: 8px 0;
+  padding: 5px;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
 /**
  * A single contributor card, exported as a PureComponent to improve performances.
  * Accept all the props from [StyledCard](/#/Atoms?id=styledcard).
@@ -112,9 +121,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
             {truncate(contributor.name, { length: 16 })}
           </H5>
         </LinkContributor>
-        <StyledTag my={2} padding="5px" letterSpacing="0.05em" fontStyle="initial" textTransform="uppercase">
-          {formatMemberRole(intl.formatMessage, getMainContributorRole(contributor))}
-        </StyledTag>
+        <ContributorTag>{formatMemberRole(intl.formatMessage, getMainContributorRole(contributor))}</ContributorTag>
         {contributor.totalAmountDonated > 0 && (
           <React.Fragment>
             <P fontSize="Tiny" lineHeight="Caption" color="black.500">
