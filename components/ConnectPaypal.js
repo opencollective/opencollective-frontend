@@ -72,7 +72,7 @@ class ConnectPaypal extends React.Component {
       return (
         <P fontSize="Caption" color="black.500" mt={3}>
           <FormattedMessage
-            id="collective.connectedAccounts.paypal.connected"
+            id="collective.paymentMethod.paypal.connected"
             defaultMessage="Paypal account {paypalEmail} connected on {createdAt, date, short}, token will expire on {expiryDate, date, short}"
             values={{
               createdAt: new Date(paymentMethod.createdAt),
@@ -167,7 +167,7 @@ class ConnectPaypal extends React.Component {
               </SmallButton>
               <div className="description">
                 <FormattedMessage
-                  id="collective.connectedAccounts.paypal.description"
+                  id="collective.paymentMethod.paypal.description"
                   defaultMessage="Connect a PayPal account to reimburse approved expenses in one click"
                 />
               </div>

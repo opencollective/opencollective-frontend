@@ -9,6 +9,7 @@ import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 
+import EditPayPalAccount from './EditPayPalAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -138,6 +139,8 @@ class EditConnectedAccount extends React.Component {
       return (
         <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
       );
+    } else if (service === 'paypal') {
+      return <EditPayPalAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
     }
 
     return (
