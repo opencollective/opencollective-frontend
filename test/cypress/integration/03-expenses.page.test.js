@@ -3,7 +3,7 @@ import { randomSlug } from '../support/faker';
 describe('New expense flow ', () => {
   const collectiveSlug = randomSlug();
 
-  function SubmitExpense(description, tag) {
+  function submitExpense(description, tag) {
     cy.wait(300);
     cy.visit(`/new-collective${collectiveSlug}/expenses/new/v2`);
     cy.wait(200);
@@ -49,8 +49,8 @@ describe('New expense flow ', () => {
     cy.wait(1000);
 
     // Creating some expense to play around
-    SubmitExpense('Brussels January team retreat', 'first');
-    SubmitExpense('May Invoice', 'second');
+    submitExpense('Brussels January team retreat', 'first');
+    submitExpense('May Invoice', 'second');
   });
 
   it('shows the /expenses page', () => {
