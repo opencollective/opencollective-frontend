@@ -4,8 +4,8 @@ import { useMutation } from '@apollo/react-hooks';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { GraphQLContext } from '../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { getCollectiveToEditQuery } from '../../lib/graphql/queries';
 
 import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -33,10 +33,12 @@ const deleteConnectedAccountMutation = gqlV2`
   }
 `;
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 const EditPayPalAccount = props => {
-  const { refetch } = React.useContext(GraphQLContext);
+  const mutationOptions = {
+    context: API_V2_CONTEXT,
+    refetchQueries: [{ query: getCollectiveToEditQuery, variables: { slug: props.collective.slug } }],
+    awaitRefetchQueries: true,
+  };
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
@@ -60,7 +62,6 @@ const EditPayPalAccount = props => {
           account: { slug: props.collective.slug },
         },
       });
-      refetch();
       setConnectedAccount(createdAccount);
     },
     validate(values) {
@@ -77,7 +78,6 @@ const EditPayPalAccount = props => {
 
   const handleDelete = async () => {
     await deleteConnectedAccount({ variables: { connectedAccount: { legacyId: props.connectedAccount.id } } });
-    refetch();
     setConnectedAccount();
   };
 
