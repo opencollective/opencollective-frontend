@@ -19,19 +19,16 @@ const pages = routes()
   .add('confirmEmail', '/confirm/email/:token')
   .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')
   .add('create-account', '/:form(create-account)', 'signin')
-  .add('test-errors', '/test-errors')
   .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
   .add('search', '/search')
   .add('hosts', '/hosts')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
   .add('createOrganization', '/organizations/new')
-  .add('events-iframe', '/:collectiveSlug/events.html')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
   .add('editCollective', '/:slug/edit/:section?')
-  .add('events', '/:collectiveSlug/events')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/contact')
   .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
@@ -40,12 +37,6 @@ const pages = routes()
     '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|donations)?',
     'host.dashboard',
   )
-  .add(
-    'host.expenses.approve',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/:table(expenses)/:id/:action(approve|reject)',
-    'action',
-  )
-  .add('host.collectives.approve', '/:hostCollectiveSlug/:table(collectives)/:id/:action(approve)', 'action')
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactions')
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
@@ -72,10 +63,7 @@ const pages = routes()
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
     'expenses-legacy',
   )
-  .add('orders', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders')
-  .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
-  .add('markOrderAsPaid', '/orders/:id([0-9]+)/mark-as-paid')
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
 

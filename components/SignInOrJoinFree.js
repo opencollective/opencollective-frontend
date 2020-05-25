@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import * as api from '../lib/api';
+import { checkUserExistence, signin } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
 import { Router } from '../server/pages';
 
@@ -75,9 +75,9 @@ class SignInOrJoinFree extends React.Component {
     this.setState({ submitting: true });
 
     try {
-      const userExists = await api.checkUserExistence(email);
+      const userExists = await checkUserExistence(email);
       if (userExists) {
-        const response = await api.signin({
+        const response = await signin({
           user: { email },
           redirect: this.getRedirectURL(),
           websiteUrl: getWebsiteUrl(),
