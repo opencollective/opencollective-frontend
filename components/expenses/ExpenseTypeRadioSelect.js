@@ -27,12 +27,12 @@ const ExpenseTypeLabels = defineMessages({
 
 const ExpenseTypeDescription = defineMessages({
   [expenseTypes.RECEIPT]: {
-    id: 'ExpenseForm.InvoiceDescription',
+    id: 'ExpenseForm.ReceiptDescription',
     defaultMessage: 'Get reimbursed for a purchase already made.',
   },
   [expenseTypes.INVOICE]: {
-    id: 'ExpenseForm.ReceiptDescription',
-    defaultMessage: 'Create an invoice to get paid or to pay a vendor directly.',
+    id: 'ExpenseForm.InvoiceDescription',
+    defaultMessage: 'Bill for your time or a service.',
   },
 });
 
