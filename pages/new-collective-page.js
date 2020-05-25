@@ -19,6 +19,7 @@ import Loading from '../components/Loading';
 import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
+import withError from '../components/withError';
 
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(
@@ -138,11 +139,7 @@ class NewCollectivePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        console.log('no collective', this.props);
-        if (this.props.serverContext) {
-          console.log('EDIT SERVER CONTEXT');
-          this.props.serverContext.response.statusCode = 404;
-        }
+        console.log('call', this.props.raiseError?.());
         return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
@@ -217,6 +214,12 @@ class NewCollectivePage extends React.Component {
 
 const getCollective = graphql(getCollectivePageQuery, {
   options: props => ({
+    // onCompleted: data => {
+    //   console.log('Completed');
+    //   if (!data.Collective) {
+    //     props.raiseError('NOT FOUND');
+    //   }
+    // },
     variables: {
       slug: props.slug,
       nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
@@ -224,4 +227,4 @@ const getCollective = graphql(getCollectivePageQuery, {
   }),
 });
 
-export default withUser(getCollective(withServerContext(NewCollectivePage)));
+export default withUser(getCollective(NewCollectivePage));

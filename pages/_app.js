@@ -59,7 +59,9 @@ class OpenCollectiveFrontendApp extends App {
       let pageProps = {};
 
       if (Component.getInitialProps) {
+        console.log('GET INIT');
         pageProps = await Component.getInitialProps(ctx);
+        console.log('/GET INIT');
       }
 
       const scripts = {};
@@ -82,9 +84,10 @@ class OpenCollectiveFrontendApp extends App {
       // In the browser, use the same values that the server serialized.
       const { req } = ctx;
       const { locale, messages } = req || window.__NEXT_DATA__.props;
-
+      console.log('END INIT');
       return { pageProps, scripts, locale, messages };
     } catch (error) {
+      console.log('CATCHED ERROR', error);
       return { hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
     }
   }
@@ -99,6 +102,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   componentDidCatch(error, errorInfo) {
+    console.log('CATCHED ERROR (comp)');
     const errorEventId = sentryLib.captureException(error, { errorInfo });
     this.setState({ hasError: true, errorEventId });
     super.componentDidCatch(error, errorInfo);
@@ -118,7 +122,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { client, Component, pageProps, scripts, locale, messages } = this.props;
+    const { client, Component, pageProps, scripts, locale, messages, raiseError } = this.props;
 
     const intl = createIntl({ locale, messages }, cache);
 
@@ -129,7 +133,7 @@ class OpenCollectiveFrontendApp extends App {
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
                 <UserProvider apiKey={process.env.STRIPE_KEY}>
-                  <Component {...pageProps} />
+                  <Component {...pageProps} raiseError={raiseError} />
                 </UserProvider>
               </RawIntlProvider>
             </StripeProviderSSR>
