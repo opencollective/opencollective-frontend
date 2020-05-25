@@ -134,7 +134,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
             <React.Fragment key={attachment.id}>
               <Flex justifyContent="space-between" alignItems="center" my={24}>
                 <Flex>
-                  {isReceipt && (
+                  {(isReceipt || attachment.url) && (
                     <Box mr={3}>
                       <UploadedFilePreview
                         url={attachment.url}
