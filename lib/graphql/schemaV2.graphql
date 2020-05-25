@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed May 06 2020 16:30:04 GMT+0200 (GMT+02:00)
+# timestamp: Thu May 21 2020 14:27:46 GMT+0000 (Coordinated Universal Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -262,6 +262,7 @@ enum ActivityType {
   COLLECTIVE_USER_ADDED
   COLLECTIVE_CONTACT
   ORGANIZATION_COLLECTIVE_CREATED
+  SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
@@ -541,6 +542,11 @@ type Collective implements Account {
   Returns whether this collective is approved
   """
   isApproved: Boolean
+
+  """
+  Returns whether this collective is active
+  """
+  isActive: Boolean
 
   """
   Number of unique financial contributors of the collective.
@@ -2048,6 +2054,16 @@ enum Currency {
   New Zealand Dollar
   """
   NZD
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Czech Koruna
+  """
+  CZK
 }
 
 scalar DateString
@@ -2322,7 +2338,7 @@ type Expense {
   tags: [String]!
 
   """
-  Returns the list of legal documents required from the payee before the expense can be payed
+  Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in.
   """
   requiredLegalDocuments: [LegalDocumentType]
 }
@@ -3339,6 +3355,26 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): PayoutMethod
+
+  """
+  Cancel an order
+  """
+  cancelOrder(
+    """
+    Object matching the OrderReferenceInput (id)
+    """
+    order: OrderReferenceInput!
+  ): Order
+
+  """
+  Reactivate a cancelled order
+  """
+  activateOrder(
+    """
+    Object matching the OrderReferenceInput (id)
+    """
+    order: OrderReferenceInput!
+  ): Order
 }
 
 """
@@ -3357,7 +3393,9 @@ type Order {
   updatedAt: DateTime
 
   """
-  UNSUPPORTED: Total amount donated between collectives
+  WARNING: Total amount donated between collectives, though there will be edge
+  cases especially when looking on the Order level, as the order id is not used
+  in calculating this.
   """
   totalDonations: Amount
 }
@@ -3384,6 +3422,13 @@ enum OrderFrequency {
   MONTHLY
   YEARLY
   ONETIME
+}
+
+input OrderReferenceInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
 }
 
 """

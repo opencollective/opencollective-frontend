@@ -123,6 +123,8 @@ class PayoutMethodSelect extends React.Component {
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
       if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
         return false;
+      } else if (type === PayoutMethodType.PAYPAL && this.props.collective.host?.settings?.disablePaypalPayouts) {
+        return false;
       } else {
         return true;
       }

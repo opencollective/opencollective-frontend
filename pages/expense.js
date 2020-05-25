@@ -46,7 +46,7 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2`
-  query CreateExpensePage($legacyExpenseId: Int!) {
+  query ExpensePage($legacyExpenseId: Int!) {
     expense(expense: {legacyId: $legacyExpenseId}) {
       ...expensePageExpenseFieldsFragment
     }
@@ -281,7 +281,7 @@ class ExpensePage extends React.Component {
           <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
             <FormattedMessage
               id="expense.createSuccess"
-              defaultMessage="<strong>Expense submited!</strong> You can edit or review updates on the expense feed."
+              defaultMessage="<strong>Expense submited!</strong> You can edit or review updates on this page."
               values={I18nFormatters}
             />
           </TemporaryNotification>

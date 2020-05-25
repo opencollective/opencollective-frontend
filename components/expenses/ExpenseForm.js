@@ -23,7 +23,7 @@ import StyledInputField from '../StyledInputField';
 import StyledInputTags from '../StyledInputTags';
 import StyledTag from '../StyledTag';
 import StyledTextarea from '../StyledTextarea';
-import { Span } from '../Text';
+import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
@@ -153,6 +153,10 @@ const validate = expense => {
     }
   }
 
+  if (expense.type === expenseTypes.INVOICE) {
+    Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
+  }
+
   return errors;
 };
 
@@ -221,6 +225,15 @@ const ExpenseFormBody = ({
       {values.type && (
         <Box width="100%">
           <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
+            <P color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
+              <FormattedMessage id="Expense.ExpenseTitle" defaultMessage="Expense Title" />
+            </P>
+            <P fontSize="12px" color="black.600">
+              <FormattedMessage
+                id="Expense.PrivacyWarning"
+                defaultMessage="This information is public. Do not enter any personal information."
+              />
+            </P>
             <Field
               as={StyledInput}
               autoFocus={autoFocusTitle}
@@ -230,6 +243,7 @@ const ExpenseFormBody = ({
               fontSize="H4"
               border="0"
               error={errors.description}
+              mt={4}
               px={2}
               py={1}
               maxLength={255}
@@ -328,16 +342,18 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.country)}
+                                error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
                                 required
                                 minWidth={250}
                                 mr={fieldsMarginRight}
                                 mt={3}
                               >
-                                {({ id }) => (
+                                {({ id, error }) => (
                                   <InputTypeCountry
                                     inputId={id}
                                     onChange={value => formik.setFieldValue(field.name, value)}
                                     value={field.value}
+                                    error={error}
                                   />
                                 )}
                               </StyledInputField>
@@ -348,6 +364,7 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.address)}
+                                error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
                                 required
                                 minWidth={250}
                                 mr={fieldsMarginRight}

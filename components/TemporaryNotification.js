@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { position } from 'styled-system';
@@ -12,15 +13,14 @@ const Notification = styled.div`
   box-sizing: border-box;
   width: 100%;
   padding: 12px 24px;
-  background: #1869f5;
   font-size: 14px;
   line-height: 21px;
   color: white;
   display: flex;
   align-items: center;
   z-index: 99;
-
-  ${position}
+  background: ${props => (props.type === 'error' ? themeGet('colors.red.600') : '#1869f5')};
+  ${position};
 `;
 
 const DismissButton = styled(StyledButton).attrs({
@@ -41,7 +41,7 @@ const DismissButton = styled(StyledButton).attrs({
 /**
  * Displays a temporary notification that can be dismissed by the user.
  */
-const TemporaryNotification = ({ children, position, onDismiss }) => {
+const TemporaryNotification = ({ children, position, onDismiss, type }) => {
   const [isDismissed, setDismissed] = React.useState(false);
 
   if (isDismissed) {
@@ -49,7 +49,7 @@ const TemporaryNotification = ({ children, position, onDismiss }) => {
   }
 
   return (
-    <Notification position={position} data-cy="temporary-notification">
+    <Notification position={position} type={type} data-cy="temporary-notification">
       <Box mr="auto" />
       <Box>{children}</Box>
       <Box ml="auto">
@@ -76,10 +76,13 @@ TemporaryNotification.propTypes = {
   position: PropTypes.string,
   /** The content of the notification */
   children: PropTypes.node,
+  /** Default to make banner info blue, error to make it red */
+  type: PropTypes.string,
 };
 
 TemporaryNotification.defaultProps = {
   position: 'fixed',
+  type: 'default',
 };
 
 export default TemporaryNotification;

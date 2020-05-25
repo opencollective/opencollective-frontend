@@ -34,6 +34,7 @@ export const getCollectivePageQuery = gql`
       isHost
       isIncognito
       hostFeePercent
+      platformFeePercent
       image
       imageUrl(height: 256)
       canApply
@@ -43,6 +44,8 @@ export const getCollectivePageQuery = gql`
         balance
         yearlyBudget
         updates
+        activeRecurringContributions
+        totalAmountReceived(periodInMonths: 12)
         backers {
           id
           all

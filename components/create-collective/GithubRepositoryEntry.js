@@ -63,6 +63,7 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
                 onChange={({ key }) => {
                   changeRepoInfo(key, value);
                 }}
+                data-cy="use-type-radio"
               >
                 {props => {
                   return (

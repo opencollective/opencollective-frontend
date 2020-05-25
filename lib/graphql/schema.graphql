@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Mon May 04 2020 16:05:00 GMT+0200 (GMT+02:00)
+# timestamp: Wed May 20 2020 20:42:11 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -96,6 +96,7 @@ type Collective implements CollectiveInterface {
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
+  platformFeePercent: Int
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -390,6 +391,7 @@ interface CollectiveInterface {
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
+  platformFeePercent: Int
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -704,10 +706,19 @@ type CollectiveStatsType {
   """
   Net amount received
   """
-  totalAmountReceived: Int
+  totalAmountReceived(
+    startDate: DateString
+    endDate: DateString
+
+    """
+    Computes contributions from the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+  ): Int
   yearlyBudget: Int
   topExpenses: JSON
   topFundingSources: JSON
+  activeRecurringContributions: JSON
 }
 
 """
@@ -991,6 +1002,7 @@ type Event implements CollectiveInterface {
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
+  platformFeePercent: Int
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2076,6 +2088,7 @@ input OrderInputType {
   totalAmount: Int
   hostFeePercent: Int
   platformFeePercent: Int
+  platformFee: Int
   currency: String
   interval: String
   description: String
@@ -2252,6 +2265,7 @@ type Organization implements CollectiveInterface {
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
+  platformFeePercent: Int
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3326,6 +3340,7 @@ type User implements CollectiveInterface {
   timezone: String
   maxAmount: Int
   hostFeePercent: Int
+  platformFeePercent: Int
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3539,7 +3554,14 @@ type UserDetails {
   image: String
   email: String
   emailWaitingForValidation: String
-  memberOf: [Member]
+  memberOf(
+    roles: [String]
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): [Member]
   paypalEmail: String @deprecated(reason: "2020-01-20 - Payout methods are now attached to collectives")
 
   """

@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const debug = require('debug');
 const dotenv = require('dotenv');
 
@@ -18,10 +20,13 @@ const defaults = {
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
   RECAPTCHA_ENABLED: false,
   CLIENT_ANALYTICS_ENABLED: false,
-  ONBOARDING_MODAL: false,
+  ONBOARDING_MODAL: true,
   TRANSFERWISE_ENABLED: true,
   NEW_HOST_APPLICATION_FLOW: false,
   TW_API_COLLECTIVE_SLUG: 'opencollective-host',
+  OC_APPLICATION: 'frontend',
+  OC_ENV: process.env.NODE_ENV || 'development',
+  OC_SECRET: crypto.randomBytes(16).toString('hex'),
 };
 
 if (process.env.NODE_ENV === 'production') {

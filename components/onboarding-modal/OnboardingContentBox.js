@@ -79,6 +79,7 @@ class OnboardingContentBox extends React.Component {
               textAlign="center"
               mb={[4]}
               mx={[2, null]}
+              data-cy="onboarding-collective-created"
             >
               <FormattedMessage
                 id="onboarding.collective.created"
@@ -108,7 +109,7 @@ class OnboardingContentBox extends React.Component {
               </Flex>
             </Flex>
             {admins.length > 0 && (
-              <Flex px={3} width="100%" flexWrap="wrap">
+              <Flex px={3} width="100%" flexWrap="wrap" data-cy="profile-card">
                 {admins.map(admin => (
                   <OnboardingProfileCard
                     key={admin.member.id}
@@ -134,6 +135,7 @@ class OnboardingContentBox extends React.Component {
                 creatable
                 collective={null}
                 types={['USER']}
+                data-cy="admin-picker"
                 onChange={option => {
                   // only assign admins if they are not in the list already
                   const duplicates = admins.filter(admin => admin.member.id === option.value.id);

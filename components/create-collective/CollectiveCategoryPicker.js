@@ -133,7 +133,15 @@ const CollectiveCategoryPicker = () => {
                     category: 'community',
                   }}
                 >
-                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
+                  <StyledButton
+                    fontSize="13px"
+                    buttonStyle="primary"
+                    minHeight="36px"
+                    mt={[2, 3]}
+                    mb={3}
+                    px={3}
+                    data-cy="ccf-category-picker-button-community"
+                  >
                     {formatMessage(messages.community)}
                   </StyledButton>
                 </Link>
