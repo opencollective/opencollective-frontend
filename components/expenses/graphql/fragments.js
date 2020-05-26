@@ -52,6 +52,10 @@ const HostFieldsFragment = gqlV2`
     type
     expensePolicy
     website
+    connectedAccounts {
+      id
+      service
+    }
     location {
       address
       country

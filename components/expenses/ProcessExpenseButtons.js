@@ -95,7 +95,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY', false)}
-          onSubmit={paymentParams => triggerAction('PAY', paymentParams)}
+          onSubmit={triggerAction}
           expense={expense}
           collective={collective}
           error={error && getErrorFromGraphqlException(error).message}
