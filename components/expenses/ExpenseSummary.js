@@ -237,7 +237,7 @@ const ExpenseSummary = ({
                 <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
               </Box>
               <div data-cy="expense-summary-payout-method-data">
-                <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoadingLoggedInUser} />
+                <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoading || isLoadingLoggedInUser} />
               </div>
               {expense.invoiceInfo && (
                 <Box mt={3} data-cy="expense-summary-invoice-info">
