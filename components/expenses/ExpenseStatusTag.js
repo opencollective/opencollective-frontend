@@ -13,6 +13,7 @@ const getExpenseStatusMsgType = status => {
       return 'error';
     case expenseStatus.PENDING:
       return 'warning';
+    case expenseStatus.SCHEDULED_FOR_PAYMENT:
     case expenseStatus.APPROVED:
       return 'info';
     case expenseStatus.PAID:
