@@ -103,7 +103,7 @@ class EditCollectiveForm extends React.Component {
       },
       'tags.description': {
         id: 'collective.tags.edit.description',
-        defaultMessage: 'Make your Collective more discoverable (comma separated)',
+        defaultMessage: 'Make your Collective more discoverable',
       },
       'company.label': {
         id: 'collective.company.label',
