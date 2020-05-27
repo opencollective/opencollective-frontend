@@ -14,6 +14,7 @@ import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import LocationAddress from '../LocationAddress';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
@@ -63,7 +64,15 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
  * Last step of the create expense flow, shows the summary of the expense with
  * the ability to submit it.
  */
-const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, showProcessActions }) => {
+const ExpenseSummary = ({
+  expense,
+  collective,
+  host,
+  isLoading,
+  isLoadingLoggedInUser,
+  permissions,
+  showProcessActions,
+}) => {
   const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
@@ -138,7 +147,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
                     <Box mr={3}>
                       <UploadedFilePreview
                         url={attachment.url}
-                        isLoading={isLoading}
+                        isLoading={isLoading || isLoadingLoggedInUser}
                         isPrivate={!attachment.url && !isLoading}
                         size={48}
                       />
@@ -208,13 +217,9 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
                 </Span>
               </Flex>
             </LinkCollective>
-            {payeeLocation && (
-              <P whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
-                {payeeLocation.address}
-                {payeeLocation.address && payeeLocation.country && <br />}
-                {payeeLocation.country}
-              </P>
-            )}
+            <P whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+              <LocationAddress location={payeeLocation} isLoading={isLoading || isLoadingLoggedInUser} />
+            </P>
             {payee.website && (
               <P mt={2} fontSize="11px">
                 <StyledLink href={payee.website} openInNewTab>
@@ -232,7 +237,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
                 <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
               </Box>
               <div data-cy="expense-summary-payout-method-data">
-                <PayoutMethodData payoutMethod={expense.payoutMethod} />
+                <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoading || isLoadingLoggedInUser} />
               </div>
               {expense.invoiceInfo && (
                 <Box mt={3} data-cy="expense-summary-invoice-info">
