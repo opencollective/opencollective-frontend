@@ -121,7 +121,7 @@ module.exports = {
     optimization: {
       minimize: false, // See https://github.com/terser/terser/issues/567
     },
-    plugins: [new CopyPlugin([{ from: 'public/static/fonts', to: 'static/fonts' }])],
+    plugins: [new CopyPlugin({ patterns: [{ from: 'public/static/fonts', to: 'static/fonts' }] })],
     module: {
       rules: [
         {
