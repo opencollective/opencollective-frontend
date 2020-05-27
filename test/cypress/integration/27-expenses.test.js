@@ -1,6 +1,5 @@
 import 'cypress-file-upload';
 
-import { randomEmail } from '../support/faker';
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
 
@@ -15,7 +14,7 @@ describe('New expense flow', () => {
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
       cy.createHostedCollective().then(collective => {
-        cy.visit(`/${collective.slug}/expenses/new/v2`);
+        cy.visit(`/${collective.slug}/expenses/new`);
         cy.getByDataCy('signIn-form');
       });
     });
@@ -29,13 +28,13 @@ describe('New expense flow', () => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
-          redirect: `/${collective.slug}/expenses/new/v2`,
+          redirect: `/${collective.slug}/expenses/new`,
         }).then(u => (user = u));
       });
     });
 
     beforeEach(() => {
-      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new/v2` });
+      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new` });
     });
 
     it('has a dismissible help message', () => {
@@ -117,25 +116,16 @@ describe('New expense flow', () => {
         );
       });
       // Change payee - use a new organization
-      cy.getByDataCy('select-expense-payee').click();
-      cy.getByDataCy('collective-type-picker-ORGANIZATION').click();
-      cy.getByDataCy('create-collective-mini-form').then($form => {
-        cy.wrap($form).find('input[name="members[0].member.email"]').type(randomEmail());
-        cy.wrap($form).find('input[name="members[0].member.name"]').type('Jack');
-        cy.wrap($form).find('input[name="name"]').type('PayeeOrg');
-        cy.wrap($form).find('button[type="submit"]').click();
-      });
-      cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test-2@opencollective.com');
       cy.getByDataCy('expense-summary-btn').click();
-      cy.getByDataCy('submit-expense-btn').click();
-      cy.getByDataCy('submit-expense-btn').should('not.exist'); // wait for form to be submitted
+      cy.getByDataCy('save-expense-btn').click();
+      cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
 
       // Check final expense page
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat edited');
-      cy.getByDataCy('expense-summary-payee').should('contain', 'PayeeOrg');
+      cy.getByDataCy('expense-summary-payee').should('contain', 'Potatoes Lover');
       cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'paypal-test-2@opencollective.com');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'PayPal');
@@ -159,7 +149,7 @@ describe('New expense flow', () => {
       // Switch to receipt and acnkowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('expense-summary-btn').click();
-      cy.getByDataCy('attachment-url-field').should('contain', 'This field is required');
+      cy.getByDataCy('attachment-url-field').should('contain', 'Receipt required');
     });
   });
 });
@@ -167,8 +157,7 @@ describe('New expense flow', () => {
 describe('Legacy expense flow', () => {
   describe('new expense when logged out', () => {
     it('requires to login to submit an expense', () => {
-      cy.visit('/testcollective/expenses');
-      cy.containsInDataCy('submit-expense-btn', 'Submit Expense').click();
+      cy.visit('/testcollective/expenses/new/legacy');
       cy.get('.CreateExpenseForm').contains('Sign up or login to submit an expense');
       cy.get('#email').type('testuser+admin@opencollective.com');
       cy.get('[data-cy="signin-btn"]').click();
@@ -179,7 +168,7 @@ describe('Legacy expense flow', () => {
 
   describe('new expense when logged in', () => {
     beforeEach(() => {
-      cy.login({ redirect: '/testcollective/expenses/new' });
+      cy.login({ redirect: '/testcollective/expenses/new/legacy' });
     });
 
     it('submits new expense paypal', () => {
@@ -197,12 +186,11 @@ describe('Legacy expense flow', () => {
       cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
       cy.get('button[type=submit]').click();
       cy.get('[data-cy="expenseCreated"]').contains('success');
-      cy.get('[data-cy="viewAllExpenses"]').click();
-      cy.wait(300);
+      cy.visit('/testcollective/expenses/legacy');
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
       cy.get('.Expenses .expense:first .status').contains('pending');
-      cy.get('.Expenses .expense:first .meta').contains('TEAM');
+      cy.get('.Expenses .expense:first .meta').contains('Team');
     });
 
     it('submits a new expense other, edit it and approve it', () => {
@@ -219,8 +207,7 @@ describe('Legacy expense flow', () => {
       cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
       cy.get('button[type=submit]').click();
       cy.get('[data-cy="expenseCreated"]').contains('success');
-      cy.get('[data-cy="viewAllExpenses"]').click();
-      cy.wait(300);
+      cy.visit('/testcollective/expenses/legacy');
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
       cy.get('.Expenses .expense:first .status').contains('pending');

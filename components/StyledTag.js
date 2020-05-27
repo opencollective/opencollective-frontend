@@ -18,9 +18,46 @@ const defaultRoundedStyleProps = {
   lineHeight: '18px',
 };
 
+const TAG_TYPE_VARIANTS = {
+  white: {
+    backgroundColor: 'white.full',
+    borderColor: 'black.200',
+  },
+  dark: {
+    backgroundColor: 'black.800',
+    borderColor: 'black.900',
+    color: 'white.full',
+  },
+  grey: {
+    backgroundColor: 'black.300',
+    borderColor: 'black.300',
+    color: 'black.900',
+  },
+  info: {
+    backgroundColor: 'blue.100',
+    borderColor: 'blue.400',
+    color: 'blue.600',
+  },
+  success: {
+    backgroundColor: 'green.100',
+    borderColor: 'green.500',
+    color: 'green.700',
+  },
+  warning: {
+    backgroundColor: 'yellow.200',
+    borderColor: 'yellow.500',
+    color: 'yellow.800',
+  },
+  error: {
+    backgroundColor: 'red.100',
+    borderColor: 'red.500',
+    color: 'red.500',
+  },
+};
+
 const StyledTagBase = styled.div`
   text-align: center;
-  white-space: nowrap; 
+  white-space: nowrap;
 
   ${variant({
     prop: 'variant',
@@ -43,13 +80,20 @@ const StyledTagBase = styled.div`
         borderRadius: '12px 2px 2px 12px',
         padding: '3px 6px 3px 10px',
       },
+      rounded: {
+        ...defaultRoundedStyleProps,
+        borderRadius: '12px 12px 12px 12px',
+        padding: '3px 6px 3px 10px',
+      },
     },
   })}
 
   & > * {
     vertical-align: middle;
   }
-  
+
+  ${variant({ prop: 'type', variants: TAG_TYPE_VARIANTS })}
+
   ${background}
   ${color}
   ${space}
@@ -58,41 +102,6 @@ const StyledTagBase = styled.div`
   ${layout}
   ${position}
   ${textTransform}
-
-  ${variant({
-    prop: 'type',
-    variants: {
-      white: {
-        backgroundColor: 'white.full',
-        borderColor: 'black.200',
-      },
-      dark: {
-        backgroundColor: 'black.800',
-        borderColor: 'black.900',
-        color: 'white.full',
-      },
-      info: {
-        backgroundColor: 'blue.100',
-        borderColor: 'blue.400',
-        color: 'blue.600',
-      },
-      success: {
-        backgroundColor: 'green.100',
-        borderColor: 'green.500',
-        color: 'green.700',
-      },
-      warning: {
-        backgroundColor: 'yellow.200',
-        borderColor: 'yellow.500',
-        color: 'yellow.800',
-      },
-      error: {
-        backgroundColor: 'red.100',
-        borderColor: 'red.500',
-        color: 'red.500',
-      },
-    },
-  })}
 `;
 
 const CloseButton = styled.button`
@@ -108,11 +117,6 @@ const CloseButton = styled.button`
 
 /** Simple tag to display a short string */
 const StyledTag = ({ closeButtonProps, children, ...props }) => {
-  // Redesigned variants are not capsized by default
-  if (props.variant !== 'squared') {
-    props.textTransform = 'none';
-  }
-
   return !closeButtonProps ? (
     <StyledTagBase {...props}>{children}</StyledTagBase>
   ) : (
@@ -128,7 +132,7 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
 };
 
 StyledTag.propTypes = {
-  closeButtonProps: PropTypes.object,
+  closeButtonProps: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   /** If defined, a close button will be displayed on the tag */
   onClose: PropTypes.func,
   iconWidth: PropTypes.string,
@@ -137,13 +141,13 @@ StyledTag.propTypes = {
   iconColor: PropTypes.string,
   iconDisplay: PropTypes.string,
   iconAlign: PropTypes.string,
-  variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left']),
+  variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left', 'rounded']),
   children: PropTypes.node,
+  type: PropTypes.oneOf(Object.keys(TAG_TYPE_VARIANTS)),
 };
 
 StyledTag.defaultProps = {
   variant: 'squared',
-  textTransform: 'uppercase',
   iconHeight: '2.5em',
   iconWidth: '2.5em',
   iconBackgroundColor: 'rgba(33, 33, 33, 1)',

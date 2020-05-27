@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import Avatar from '../Avatar';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
-import Logo from '../Logo';
 import { H2, P } from '../Text';
 
 /**
@@ -16,7 +16,9 @@ const Cover = ({ collective, tier }) => {
     <Container pt={[4, 48]} mb={28}>
       <Flex alignItems="center" flexDirection="column" mx="auto" width="100%" maxWidth={320}>
         <LinkCollective collective={collective}>
-          <Logo collective={collective} className="logo" height="10rem" style={{ margin: '0 auto' }} />
+          <Flex justifyContent="center">
+            <Avatar collective={collective} radius="10rem" />
+          </Flex>
           <H2 as="h1" color="black.900" textAlign="center">
             {collective.name}
           </H2>

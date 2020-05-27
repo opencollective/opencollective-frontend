@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Apr 28 2020 16:05:24 GMT+0200 (Central European Summer Time)
+# timestamp: Tue May 26 2020 15:39:26 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -26,6 +26,7 @@ interface Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -48,6 +49,16 @@ interface Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
   members(
     limit: Int = 100
     offset: Int = 0
@@ -101,6 +112,11 @@ interface Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -256,6 +272,7 @@ enum ActivityType {
   COLLECTIVE_USER_ADDED
   COLLECTIVE_CONTACT
   ORGANIZATION_COLLECTIVE_CREATED
+  SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
@@ -293,6 +310,7 @@ type Bot implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -311,6 +329,16 @@ type Bot implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -361,6 +389,11 @@ type Bot implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -418,6 +451,7 @@ type Collective implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -436,6 +470,16 @@ type Collective implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this collective is active
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -486,6 +530,11 @@ type Collective implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -512,7 +561,7 @@ type Collective implements Account {
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
-  host: Account
+  host: Host
 
   """
   Return this collective approved date
@@ -719,6 +768,1241 @@ type ConversationStats {
 }
 
 """
+Two-letters country code following ISO3166_1
+"""
+enum CountryISO {
+  """
+  Afghanistan
+  """
+  AF
+
+  """
+  Åland Islands
+  """
+  AX
+
+  """
+  Albania
+  """
+  AL
+
+  """
+  Algeria
+  """
+  DZ
+
+  """
+  Andorra
+  """
+  AD
+
+  """
+  Angola
+  """
+  AO
+
+  """
+  Antigua and Barbuda
+  """
+  AG
+
+  """
+  Argentina
+  """
+  AR
+
+  """
+  Armenia
+  """
+  AM
+
+  """
+  Australia
+  """
+  AU
+
+  """
+  Austria
+  """
+  AT
+
+  """
+  Azerbaijan
+  """
+  AZ
+
+  """
+  The Bahamas
+  """
+  BS
+
+  """
+  Bahrain
+  """
+  BH
+
+  """
+  Bangladesh
+  """
+  BD
+
+  """
+  Barbados
+  """
+  BB
+
+  """
+  Belarus
+  """
+  BY
+
+  """
+  Belgium
+  """
+  BE
+
+  """
+  Belize
+  """
+  BZ
+
+  """
+  Benin
+  """
+  BJ
+
+  """
+  Bhutan
+  """
+  BT
+
+  """
+  Bolivia
+  """
+  BO
+
+  """
+  Bosnia and Herzegovina
+  """
+  BA
+
+  """
+  Botswana
+  """
+  BW
+
+  """
+  Brazil
+  """
+  BR
+
+  """
+  Brunei
+  """
+  BN
+
+  """
+  Bulgaria
+  """
+  BG
+
+  """
+  Burkina
+  """
+  BF
+
+  """
+  Burundi
+  """
+  BI
+
+  """
+  Cambodia
+  """
+  KH
+
+  """
+  Cameroon
+  """
+  CM
+
+  """
+  Canada
+  """
+  CA
+
+  """
+  Cape Verde
+  """
+  CV
+
+  """
+  The Central African Republic
+  """
+  CF
+
+  """
+  Chad
+  """
+  TD
+
+  """
+  Chile
+  """
+  CL
+
+  """
+  China
+  """
+  CN
+
+  """
+  Colombia
+  """
+  CO
+
+  """
+  The Comoros
+  """
+  KM
+
+  """
+  The Congo
+  """
+  CG
+
+  """
+  The Democratic Republic of the Congo
+  """
+  CD
+
+  """
+  Costa Rica
+  """
+  CR
+
+  """
+  Côte d'Ivoire
+  """
+  CI
+
+  """
+  Croatia
+  """
+  HR
+
+  """
+  Cuba
+  """
+  CU
+
+  """
+  Cyprus
+  """
+  CY
+
+  """
+  The Czech Republic
+  """
+  CZ
+
+  """
+  Denmark
+  """
+  DK
+
+  """
+  Djibouti
+  """
+  DJ
+
+  """
+  Dominica
+  """
+  DM
+
+  """
+  The Dominican Republic
+  """
+  DO
+
+  """
+  Timor-Leste
+  """
+  TL
+
+  """
+  Ecuador
+  """
+  EC
+
+  """
+  Egypt
+  """
+  EG
+
+  """
+  El Salvador
+  """
+  SV
+
+  """
+  Equatorial Guinea
+  """
+  GQ
+
+  """
+  Eritrea
+  """
+  ER
+
+  """
+  Estonia
+  """
+  EE
+
+  """
+  Ethiopia
+  """
+  ET
+
+  """
+  Fiji
+  """
+  FJ
+
+  """
+  Finland
+  """
+  FI
+
+  """
+  France
+  """
+  FR
+
+  """
+  Gabon
+  """
+  GA
+
+  """
+  The Gambia
+  """
+  GM
+
+  """
+  Georgia
+  """
+  GE
+
+  """
+  Germany
+  """
+  DE
+
+  """
+  Ghana
+  """
+  GH
+
+  """
+  Greece
+  """
+  GR
+
+  """
+  Grenada
+  """
+  GD
+
+  """
+  Guatemala
+  """
+  GT
+
+  """
+  Guernsey
+  """
+  GG
+
+  """
+  Guinea
+  """
+  GN
+
+  """
+  Guinea-Bissau
+  """
+  GW
+
+  """
+  Guyana
+  """
+  GY
+
+  """
+  Haiti
+  """
+  HT
+
+  """
+  The Holy See
+  """
+  VA
+
+  """
+  Honduras
+  """
+  HN
+
+  """
+  Hungary
+  """
+  HU
+
+  """
+  Iceland
+  """
+  IS
+
+  """
+  India
+  """
+  IN
+
+  """
+  Indonesia
+  """
+  ID
+
+  """
+  Iran
+  """
+  IR
+
+  """
+  Iraq
+  """
+  IQ
+
+  """
+  Ireland
+  """
+  IE
+
+  """
+  Isle of Man
+  """
+  IM
+
+  """
+  Israel
+  """
+  IL
+
+  """
+  Italy
+  """
+  IT
+
+  """
+  Jamaica
+  """
+  JM
+
+  """
+  Japan
+  """
+  JP
+
+  """
+  Jersey
+  """
+  JE
+
+  """
+  Jordan
+  """
+  JO
+
+  """
+  Kazakhstan
+  """
+  KZ
+
+  """
+  Kenya
+  """
+  KE
+
+  """
+  Kiribati
+  """
+  KI
+
+  """
+  The Democratic People's Republic of Korea
+  """
+  KP
+
+  """
+  The Republic of Korea
+  """
+  KR
+
+  """
+  Kuwait
+  """
+  KW
+
+  """
+  Kyrgyzstan
+  """
+  KG
+
+  """
+  Laos
+  """
+  LA
+
+  """
+  Latvia
+  """
+  LV
+
+  """
+  Lebanon
+  """
+  LB
+
+  """
+  Lesotho
+  """
+  LS
+
+  """
+  Liberia
+  """
+  LR
+
+  """
+  Libya
+  """
+  LY
+
+  """
+  Liechtenstein
+  """
+  LI
+
+  """
+  Lithuania
+  """
+  LT
+
+  """
+  Luxembourg
+  """
+  LU
+
+  """
+  Madagascar
+  """
+  MG
+
+  """
+  Malawi
+  """
+  MW
+
+  """
+  Malaysia
+  """
+  MY
+
+  """
+  Maldives
+  """
+  MV
+
+  """
+  Mali
+  """
+  ML
+
+  """
+  Malta
+  """
+  MT
+
+  """
+  The Marshall Islands
+  """
+  MH
+
+  """
+  Mauritania
+  """
+  MR
+
+  """
+  Mauritius
+  """
+  MU
+
+  """
+  Mexico
+  """
+  MX
+
+  """
+  Micronesia
+  """
+  FM
+
+  """
+  Moldova
+  """
+  MD
+
+  """
+  Monaco
+  """
+  MC
+
+  """
+  Mongolia
+  """
+  MN
+
+  """
+  Montenegro
+  """
+  ME
+
+  """
+  Morocco
+  """
+  MA
+
+  """
+  Mozambique
+  """
+  MZ
+
+  """
+  Myanmar
+  """
+  MM
+
+  """
+  Namibia
+  """
+  NA
+
+  """
+  Nauru
+  """
+  NR
+
+  """
+  Nepal
+  """
+  NP
+
+  """
+  The Netherlands
+  """
+  NL
+
+  """
+  New Zealand
+  """
+  NZ
+
+  """
+  Nicaragua
+  """
+  NI
+
+  """
+  The Niger
+  """
+  NE
+
+  """
+  Nigeria
+  """
+  NG
+
+  """
+  Norway
+  """
+  NO
+
+  """
+  Oman
+  """
+  OM
+
+  """
+  Pakistan
+  """
+  PK
+
+  """
+  Palau
+  """
+  PW
+
+  """
+  Panama
+  """
+  PA
+
+  """
+  Papua New Guinea
+  """
+  PG
+
+  """
+  Paraguay
+  """
+  PY
+
+  """
+  Peru
+  """
+  PE
+
+  """
+  The Philippines
+  """
+  PH
+
+  """
+  Poland
+  """
+  PL
+
+  """
+  Portugal
+  """
+  PT
+
+  """
+  Qatar
+  """
+  QA
+
+  """
+  Romania
+  """
+  RO
+
+  """
+  Russia
+  """
+  RU
+
+  """
+  Rwanda
+  """
+  RW
+
+  """
+  Saint Kitts and Nevis
+  """
+  KN
+
+  """
+  Saint Lucia
+  """
+  LC
+
+  """
+  Saint Vincent and The Grenadines
+  """
+  VC
+
+  """
+  Samoa
+  """
+  WS
+
+  """
+  San Marino
+  """
+  SM
+
+  """
+  Sao Tome and Principe
+  """
+  ST
+
+  """
+  Saudi Arabia
+  """
+  SA
+
+  """
+  Senegal
+  """
+  SN
+
+  """
+  Serbia
+  """
+  RS
+
+  """
+  Seychelles
+  """
+  SC
+
+  """
+  Sierra Leone
+  """
+  SL
+
+  """
+  Singapore
+  """
+  SG
+
+  """
+  Slovakia
+  """
+  SK
+
+  """
+  Slovenia
+  """
+  SI
+
+  """
+  Solomon Islands
+  """
+  SB
+
+  """
+  Somalia
+  """
+  SO
+
+  """
+  South Africa
+  """
+  ZA
+
+  """
+  Spain
+  """
+  ES
+
+  """
+  Sri Lanka
+  """
+  LK
+
+  """
+  The Sudan
+  """
+  SD
+
+  """
+  Suriname
+  """
+  SR
+
+  """
+  Swaziland
+  """
+  SZ
+
+  """
+  Sweden
+  """
+  SE
+
+  """
+  Switzerland
+  """
+  CH
+
+  """
+  Syria
+  """
+  SY
+
+  """
+  Tajikistan
+  """
+  TJ
+
+  """
+  Tanzania
+  """
+  TZ
+
+  """
+  Thailand
+  """
+  TH
+
+  """
+  Macedonia
+  """
+  MK
+
+  """
+  Togo
+  """
+  TG
+
+  """
+  Tonga
+  """
+  TO
+
+  """
+  Trinidad and Tobago
+  """
+  TT
+
+  """
+  Tunisia
+  """
+  TN
+
+  """
+  Turkey
+  """
+  TR
+
+  """
+  Turkmenistan
+  """
+  TM
+
+  """
+  Tuvalu
+  """
+  TV
+
+  """
+  Uganda
+  """
+  UG
+
+  """
+  Ukraine
+  """
+  UA
+
+  """
+  The United Arab Emirates
+  """
+  AE
+
+  """
+  The United Kingdom
+  """
+  GB
+
+  """
+  The United States
+  """
+  US
+
+  """
+  Uruguay
+  """
+  UY
+
+  """
+  Uzbekistan
+  """
+  UZ
+
+  """
+  Vanuatu
+  """
+  VU
+
+  """
+  Venezuela
+  """
+  VE
+
+  """
+  Viet Nam
+  """
+  VN
+
+  """
+  Yemen
+  """
+  YE
+
+  """
+  Zambia
+  """
+  ZM
+
+  """
+  Zimbabwe
+  """
+  ZW
+
+  """
+  American Samoa
+  """
+  AS
+
+  """
+  Anguilla
+  """
+  AI
+
+  """
+  Antarctica
+  """
+  AQ
+
+  """
+  Aruba
+  """
+  AW
+
+  """
+  Bermuda
+  """
+  BM
+
+  """
+  Bouvet Island
+  """
+  BV
+
+  """
+  The British Indian Ocean Territory
+  """
+  IO
+
+  """
+  Cayman Islands
+  """
+  KY
+
+  """
+  Christmas Island
+  """
+  CX
+
+  """
+  Cocos Islands
+  """
+  CC
+
+  """
+  Cook Islands
+  """
+  CK
+
+  """
+  Falkland Islands
+  """
+  FK
+
+  """
+  Faroe Islands
+  """
+  FO
+
+  """
+  French Guiana
+  """
+  GF
+
+  """
+  French Polynesia
+  """
+  PF
+
+  """
+  The French Southern Territories
+  """
+  TF
+
+  """
+  Gibraltar
+  """
+  GI
+
+  """
+  Greenland
+  """
+  GL
+
+  """
+  Guadeloupe
+  """
+  GP
+
+  """
+  Guam
+  """
+  GU
+
+  """
+  Heard Island and McDonald Islands
+  """
+  HM
+
+  """
+  Hong Kong
+  """
+  HK
+
+  """
+  Macao
+  """
+  MO
+
+  """
+  Martinique
+  """
+  MQ
+
+  """
+  Mayotte
+  """
+  YT
+
+  """
+  Montserrat
+  """
+  MS
+
+  """
+  Netherlands Antilles
+  """
+  AN
+
+  """
+  New Caledonia
+  """
+  NC
+
+  """
+  Niue
+  """
+  NU
+
+  """
+  Norfolk Island
+  """
+  NF
+
+  """
+  Northern Mariana Islands
+  """
+  MP
+
+  """
+  The Occupied Palestinian Territory
+  """
+  PS
+
+  """
+  Pitcairn
+  """
+  PN
+
+  """
+  Puerto Rico
+  """
+  PR
+
+  """
+  Réunion
+  """
+  RE
+
+  """
+  Saint Barthélemy
+  """
+  BL
+
+  """
+  Saint Helena
+  """
+  SH
+
+  """
+  Saint Martin
+  """
+  MF
+
+  """
+  Saint Pierre and Miquelon
+  """
+  PM
+
+  """
+  South Georgia and The South Sandwich Islands
+  """
+  GS
+
+  """
+  Svalbard and Jan Mayen
+  """
+  SJ
+
+  """
+  Taiwan
+  """
+  TW
+
+  """
+  Tokelau
+  """
+  TK
+
+  """
+  Turks and Caicos Islands
+  """
+  TC
+
+  """
+  United States Minor Outlying Islands
+  """
+  UM
+
+  """
+  British Virgin Islands
+  """
+  VG
+
+  """
+  US Virgin Islands
+  """
+  VI
+
+  """
+  Wallis and Futuna
+  """
+  WF
+
+  """
+  Western Sahara
+  """
+  EH
+}
+
+"""
 This represents a Credit transaction
 """
 type Credit implements Transaction {
@@ -795,6 +2079,16 @@ enum Currency {
   New Zealand Dollar
   """
   NZD
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Czech Koruna
+  """
+  CZK
 }
 
 scalar DateString
@@ -849,6 +2143,7 @@ type Event implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -867,6 +2162,16 @@ type Event implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -917,6 +2222,11 @@ type Event implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -943,7 +2253,7 @@ type Event implements Account {
   """
   Get the host collective that is receiving the money on behalf of this collective
   """
-  host: Account
+  host: Host
 
   """
   Returns whether this collective is approved
@@ -1020,6 +2330,11 @@ type Expense {
   payee: Account!
 
   """
+  The address of the payee
+  """
+  payeeLocation: Location
+
+  """
   The account who created this expense
   """
   createdByAccount: Account
@@ -1056,6 +2371,11 @@ type Expense {
   """
   activities: [Activity!]!
   tags: [String]!
+
+  """
+  Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in.
+  """
+  requiredLegalDocuments: [LegalDocumentType]
 }
 
 """
@@ -1079,6 +2399,16 @@ input ExpenseAttachedFileInput {
   URL of the file
   """
   url: URL!
+}
+
+"""
+A collection of "Expenses"
+"""
+type ExpenseCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Expense]
 }
 
 input ExpenseCreateInput {
@@ -1132,6 +2462,11 @@ input ExpenseCreateInput {
   Account to reimburse
   """
   payee: AccountReferenceInput!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
 }
 
 """
@@ -1391,6 +2726,11 @@ input ExpenseUpdateInput {
   Account to reimburse
   """
   payee: AccountReferenceInput
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
 }
 
 """
@@ -1407,6 +2747,7 @@ type Host implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -1425,6 +2766,16 @@ type Host implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -1475,6 +2826,11 @@ type Host implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -1591,6 +2947,7 @@ type Individual implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -1609,6 +2966,16 @@ type Individual implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -1659,6 +3026,11 @@ type Individual implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -1690,6 +3062,16 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 """
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9)
+  """
+  US_TAX_FORM
+}
+
+"""
 Type for Geographic location
 """
 type Location {
@@ -1707,6 +3089,36 @@ type Location {
   Two letters country code (eg. FR, BE...etc)
   """
   country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
 
   """
   Latitude
@@ -1983,6 +3395,41 @@ type Mutation {
     """
     host: AccountReferenceInput!
   ): Collective!
+
+  """
+  Create a new Payout Method to get paid through the platform
+  """
+  createPayoutMethod(
+    """
+    Payout Method data
+    """
+    payoutMethod: PayoutMethodInput!
+
+    """
+    Account where the payout method will be associated
+    """
+    account: AccountReferenceInput!
+  ): PayoutMethod
+
+  """
+  Cancel an order
+  """
+  cancelOrder(
+    """
+    Object matching the OrderReferenceInput (id)
+    """
+    order: OrderReferenceInput!
+  ): Order
+
+  """
+  Reactivate a cancelled order
+  """
+  activateOrder(
+    """
+    Object matching the OrderReferenceInput (id)
+    """
+    order: OrderReferenceInput!
+  ): Order
 }
 
 """
@@ -2001,7 +3448,9 @@ type Order {
   updatedAt: DateTime
 
   """
-  UNSUPPORTED: Total amount donated between collectives
+  WARNING: Total amount donated between collectives, though there will be edge
+  cases especially when looking on the Order level, as the order id is not used
+  in calculating this.
   """
   totalDonations: Amount
 }
@@ -2030,6 +3479,13 @@ enum OrderFrequency {
   ONETIME
 }
 
+input OrderReferenceInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+}
+
 """
 All order statuses
 """
@@ -2056,6 +3512,7 @@ type Organization implements Account {
   type: AccountType
   name: String
   description: String
+  longDescription: String
   tags: [String]
   website: String
   twitterHandle: String
@@ -2074,6 +3531,16 @@ type Organization implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
 
   """
   Get all members (admins, members, backers, followers)
@@ -2124,6 +3591,11 @@ type Organization implements Account {
   Returns conversation's tags for collective sorted by popularity
   """
   conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
   transferwise: TransferWise
 
   """
@@ -2143,6 +3615,11 @@ type Organization implements Account {
   """
   location: Location
   stats: AccountStats
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
 }
 
@@ -2299,6 +3776,47 @@ type Query {
     """
     id: String!
   ): Conversation
+  expenses(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    Reference of the account that submitted this expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the account where this expense was submitted
+    """
+    account: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatus
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): ExpenseCollection
   expense(
     """
     Public expense identifier

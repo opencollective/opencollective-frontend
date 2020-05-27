@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Mutation } from '@apollo/react-components';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
-import { get } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
@@ -9,11 +10,16 @@ import { v4 as uuid } from 'uuid';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { capitalize } from '../../../lib/utils';
 
+import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import InputFieldPresets from '../../InputFieldPresets';
 import MessageBox from '../../MessageBox';
-import { Span } from '../../Text';
+import StyledCheckbox from '../../StyledCheckbox';
+import StyledHr from '../../StyledHr';
+import { H3, H4, P, Span } from '../../Text';
+
+import { updateSettingsMutation } from './../mutations';
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -150,6 +156,10 @@ class Tiers extends React.Component {
       'maxQuantity.description': {
         id: 'tier.maxQuantity.description',
         defaultMessage: 'Leave it empty for unlimited',
+      },
+      'customContributions.label': {
+        id: 'tier.customContributions.label',
+        defaultMessage: 'Enable custom contributions',
       },
       forceLongDescription: {
         id: 'tier.forceLongDescription',
@@ -314,7 +324,6 @@ class Tiers extends React.Component {
     const hasVat = Boolean(get(collective, 'settings.VAT.type'));
     const vatOriginCountry = hasVat && getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
     const vatPercentage = hasVat ? getStandardVatRate(tier.type, vatOriginCountry) : 0;
-
     if (!tier.amountType) {
       tier.amountType = tier.presets ? 'FLEXIBLE' : 'FIXED';
     }
@@ -387,7 +396,9 @@ class Tiers extends React.Component {
   }
 
   render() {
-    const { intl, defaultType = 'TICKET' } = this.props;
+    const { intl, collective, defaultType = 'TICKET' } = this.props;
+    const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
+    const displayCustomContributionsSettings = collective.id && defaultType !== 'TICKET';
 
     return (
       <div className="EditTiers">
@@ -409,11 +420,54 @@ class Tiers extends React.Component {
             }
           `}
         </style>
+        <H3>{this.props.title}</H3>
+        <StyledHr my={4} borderColor="black.200" />
+        {displayCustomContributionsSettings && (
+          <React.Fragment>
+            <H4 mb={3}>
+              <FormattedMessage id="ContributionType.Custom" defaultMessage="Custom contribution" />
+            </H4>
+            <Mutation mutation={updateSettingsMutation}>
+              {(editSettings, { loading }) => (
+                <Flex flexWrap="wrap">
+                  <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
+                    <ContributeCustom collective={collective} hideContributors />
+                  </Box>
+                  <Flex flexDirection="column" minWidth={200} maxWidth={600} mt={2}>
+                    <P>
+                      <FormattedMessage
+                        id="Tiers.CustomTierDescription"
+                        defaultMessage="The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
+                      />
+                    </P>
+                    <StyledCheckbox
+                      name="custom-contributions"
+                      label={intl.formatMessage(this.messages['customContributions.label'])}
+                      defaultChecked={!hasCustomContributionsDisabled}
+                      width="auto"
+                      isLoading={loading}
+                      onChange={({ target }) => {
+                        const updatedCollective = cloneDeep(this.props.collective);
+                        editSettings({
+                          variables: {
+                            id: this.props.collective.id,
+                            settings: set(updatedCollective.settings, 'disableCustomContributions', !target.value),
+                          },
+                        });
+                      }}
+                    />
+                  </Flex>
+                </Flex>
+              )}
+            </Mutation>
+            <StyledHr my={4} borderColor="black.200" />
+            <H4 mb={3}>
+              <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />
+            </H4>
+          </React.Fragment>
+        )}
 
-        <div className="tiers">
-          <h2>{this.props.title}</h2>
-          {this.state.tiers.map(this.renderTier)}
-        </div>
+        <div className="tiers">{this.state.tiers.map(this.renderTier)}</div>
         <div className="editTiersActions">
           <Button className="addTier" bsStyle="primary" onClick={() => this.addTier({})}>
             {intl.formatMessage(this.messages[`${defaultType}.add`])}

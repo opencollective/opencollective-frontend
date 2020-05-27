@@ -10,6 +10,9 @@ describe('Contribution Flow: Create profile', () => {
     cy.get('[data-cy="join-conditions"] a[href="/tos"]');
     cy.get('[data-cy="join-conditions"] a[href="/privacypolicy"]');
 
+    // Set name
+    cy.get('[data-cy="cf-content"] input[name=name]').type('Dummy Name');
+
     // Test frontend validations
     cy.get('[data-cy="cf-content"] input[name=email]').type('IncorrectValue');
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
@@ -34,6 +37,9 @@ describe('Contribution Flow: Create profile', () => {
 
     // Select "Create oganization"
     cy.get('[data-cy="cf-content"]').contains('Contribute as an organization').click();
+
+    // Set name
+    cy.get('[data-cy="cf-content"] input[name=name]').type('Dummy Name');
 
     // Test frontend validations
     cy.get('[data-cy="cf-content"] input[name=orgName]').type('Test Organization');

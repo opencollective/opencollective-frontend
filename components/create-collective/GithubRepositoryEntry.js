@@ -63,6 +63,7 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
                 onChange={({ key }) => {
                   changeRepoInfo(key, value);
                 }}
+                data-cy="use-type-radio"
               >
                 {props => {
                   return (
@@ -96,12 +97,12 @@ RepositoryEntry.propTypes = {
   value: PropTypes.shape({
     description: PropTypes.string,
     owner: PropTypes.object,
-    stargazers_count: PropTypes.number,
-    full_name: PropTypes.string,
+    stargazers_count: PropTypes.number, // eslint-disable-line camelcase
+    full_name: PropTypes.string, // eslint-disable-line camelcase
     name: PropTypes.string,
   }),
   checked: PropTypes.bool,
-  changeRepoInfo: PropTypes.func,
+  changeRepoInfo: PropTypes.func.isRequired,
 };
 
 export default RepositoryEntry;

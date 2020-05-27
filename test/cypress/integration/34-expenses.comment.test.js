@@ -16,7 +16,7 @@ describe('Expense Comments', () => {
       userEmail: user.email,
       user: { paypalEmail: 'paypal@test.com', id: user.id },
       collective: { id: collective.id },
-    }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
+    }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}/legacy`));
   });
 
   function SubmitComment(description) {

@@ -81,33 +81,20 @@ class OrderSuccessContributorCardWithData extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      messageDraft: this.getPublicMessage(props),
-      hasPopup: true,
-    };
+    this.state = { hasPopup: true };
     this.mainContainerRef = createRef();
   }
 
   componentDidMount() {
-    this.initDraftFromData();
-  }
-
-  componentDidUpdate(oldProps) {
-    if (this.getPublicMessage(oldProps) !== this.getPublicMessage(this.props)) {
-      this.initDraftFromData();
-    }
+    // Force updating to provide the ref after mounting
+    this.forceUpdate();
   }
 
   getPublicMessage(props) {
     return get(props, 'data.member.publicMessage') || '';
   }
 
-  initDraftFromData() {
-    this.setState({ messageDraft: this.getPublicMessage(this.props) });
-  }
-
   showPopup = () => {
-    this.initDraftFromData();
     this.setState({ hasPopup: true });
   };
 

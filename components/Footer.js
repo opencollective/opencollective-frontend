@@ -67,7 +67,7 @@ const navigation = {
     Support: '/support',
   },
   COMPANY: {
-    About: 'https://docs.opencollective.com/help/about',
+    About: 'https://docs.opencollective.com/help/about/introduction',
     Blog: 'https://blog.opencollective.com/',
     Hiring: '/hiring',
     'Terms of Service': '/tos',

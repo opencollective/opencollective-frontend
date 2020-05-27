@@ -50,6 +50,7 @@ const getChangeFromState = state => ({
   amount: state.amount,
   quantity: state.quantity,
   totalAmount: state.amount * (state.quantity || 1),
+  platformFee: state.platformFee,
   interval: state.interval === 'oneTime' ? null : state.interval,
 });
 
@@ -80,6 +81,7 @@ const StepDetails = ({
   tierName,
   collectiveSlug,
   minAmount,
+  platformFee,
   amount,
   interval,
   quantity,
@@ -105,7 +107,7 @@ const StepDetails = ({
     }
   };
   const dispatchChange = values => {
-    onChange(getChangeFromState({ amount, interval, quantity, ...values }));
+    onChange(getChangeFromState({ amount, interval, quantity, platformFee, ...values }));
   };
   const intervalOptions = generateOptions(intl);
 
@@ -312,6 +314,8 @@ StepDetails.propTypes = {
   collectiveSlug: PropTypes.string.isRequired,
   /** If true, the input for amount will be disabled */
   disabledAmount: PropTypes.bool,
+  /** value for platform fee, defaults to 10% of chosen base amount */
+  platformFee: PropTypes.object,
   /** value for frequency select, defaults to one time. */
   interval: PropTypes.string,
   /** value for amount options, defaults to the first option */

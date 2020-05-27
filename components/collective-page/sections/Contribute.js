@@ -50,7 +50,7 @@ class SectionContribute extends React.PureComponent {
         contributors: PropTypes.arrayOf(PropTypes.object),
       }),
     ),
-    subCollectives: PropTypes.arrayOf(
+    connectedCollectives: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,
         collective: PropTypes.shape({
@@ -62,8 +62,10 @@ class SectionContribute extends React.PureComponent {
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       isActive: PropTypes.bool,
+      isHost: PropTypes.bool,
       host: PropTypes.object,
       currency: PropTypes.string,
+      settings: PropTypes.object,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string.isRequired,
       }),
@@ -145,17 +147,19 @@ class SectionContribute extends React.PureComponent {
   }
 
   render() {
-    const { collective, tiers, events, subCollectives, contributors, contributorsStats, isAdmin } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, contributorsStats, isAdmin } = this.props;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const financialContributorsWithoutTier = this.getFinancialContributorsWithoutTier(contributors);
     const hasNoContributor = !this.hasContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const sortedTiers = this.sortTiers(this.removeTickets(tiers));
     const isEvent = collective.type === CollectiveType.EVENT;
-    const hasContribute = collective.isActive || isAdmin;
-    const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || subCollectives.length > 0);
+    const hasCustomContribution = !collective.settings?.disableCustomContributions;
+    const hasContribute = isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution));
+    const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
+    const isHost = collective.isHost;
 
     /*
     cases
@@ -163,7 +167,7 @@ class SectionContribute extends React.PureComponent {
     1. admin + no host = Contribute Section and 'Start accepting financial contributions' ✅
     2a. admin + host = normal Contribute section ✅
     2b. not admin + Collective active = normal Contribute section ???
-    3. not admin + Collective not active + no subcollectives/events = display nothing ✅
+    3. not admin + Collective not active + no connectedcollectives/events = display nothing ✅
     */
 
     const createContributionTierRoute = isEvent
@@ -176,7 +180,7 @@ class SectionContribute extends React.PureComponent {
 
     return (
       <Box pt={[4, 5]}>
-        {isAdmin && !hasHost && (
+        {isAdmin && !hasHost && !isHost && (
           <ContainerSectionContent pt={5} pb={3}>
             <SectionTitle mb={24}>
               <FormattedMessage id="contributions" defaultMessage="Contributions" />
@@ -211,7 +215,7 @@ class SectionContribute extends React.PureComponent {
           </ContainerSectionContent>
         )}
 
-        {((isAdmin && hasHost) || (!isAdmin && isActive)) && (
+        {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
           <Fragment>
             <ContainerSectionContent>
               <SectionTitle>
@@ -234,24 +238,25 @@ class SectionContribute extends React.PureComponent {
                           </Box>
                         </Flex>
                       </ContainerSectionContent>
-
                       <ContributeCardsContainer ref={ref}>
-                        <ContributeCardContainer>
-                          <ContributeCustom
-                            collective={collective}
-                            contributors={financialContributorsWithoutTier}
-                            stats={contributorsStats}
-                            hideContributors={hasNoContributor}
-                            disableCTA={!collective.isActive}
-                          />
-                        </ContributeCardContainer>
+                        {!collective.settings.disableCustomContributions && (
+                          <ContributeCardContainer>
+                            <ContributeCustom
+                              collective={collective}
+                              contributors={financialContributorsWithoutTier}
+                              stats={contributorsStats}
+                              hideContributors={hasNoContributor}
+                              disableCTA={!collective.isActive}
+                            />
+                          </ContributeCardContainer>
+                        )}
                         {sortedTiers.map(tier => (
                           <ContributeCardContainer key={tier.id}>
                             <ContributeTier
                               collective={collective}
                               tier={tier}
                               hideContributors={hasNoContributor}
-                              disableCTA={!collective.isActive}
+                              disableCTA={!isActive}
                             />
                           </ContributeCardContainer>
                         ))}
@@ -275,7 +280,7 @@ class SectionContribute extends React.PureComponent {
                     <ContainerSectionContent>
                       <Flex justifyContent="space-between" alignItems="center" mb={3}>
                         <H3 fontSize="H5" fontWeight="600" color="black.700">
-                          {subCollectives.length > 0 ? (
+                          {connectedCollectives.length > 0 ? (
                             <FormattedMessage
                               id="SectionContribute.MoreWays"
                               defaultMessage="More ways to contribute"
@@ -291,7 +296,7 @@ class SectionContribute extends React.PureComponent {
                     </ContainerSectionContent>
 
                     <ContributeCardsContainer ref={ref}>
-                      {subCollectives.map(({ id, collective }) => (
+                      {connectedCollectives.map(({ id, collective }) => (
                         <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
                           <ContributeCollective collective={collective} />
                         </Box>

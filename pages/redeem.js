@@ -150,7 +150,7 @@ class RedeemPage extends React.Component {
       return (
         <React.Fragment>
           <Box mt={5}>
-            <H1 color="white.full" fontSize={['3rem', null, '4rem']}>
+            <H1 color="white.full" textAlign="center" fontSize={['3rem', null, '4rem']}>
               <FormattedMessage id="redeem.title" defaultMessage="Redeem Gift Card" />
             </H1>
           </Box>
@@ -174,7 +174,7 @@ class RedeemPage extends React.Component {
       return (
         <CollectiveCard collective={collective} mt={5}>
           <LinkCollective collective={collective}>
-            <H1 color="black.900" fontSize="3rem" lineHeight="1em" wordBreak="break-word" my={2}>
+            <H1 color="black.900" fontSize="3rem" lineHeight="1em" wordBreak="break-word" my={2} textAlign="center">
               {collective.name}
             </H1>
           </LinkCollective>

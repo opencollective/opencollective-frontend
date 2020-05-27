@@ -1,48 +1,30 @@
-const collectiveName = 'New collective';
-
 describe('create a collective', () => {
-  it('edit info', () => {
-    cy.signup({ redirect: '/create/legacy' });
-    cy.get('.CollectiveCategoryPicker .category').first().click();
-    cy.fillInputField('name', collectiveName);
-    cy.fillInputField('description', 'short description for new collective');
-    cy.fillInputField('website', 'https://newcollective.org');
-    cy.wait(100);
-    cy.get('.actions button').click();
-    cy.get('.error').contains('Please accept the terms of service');
-    cy.get('.tos input[name="tos"]').click();
-    cy.get('.actions button').click();
-    cy.get('.result').contains('Collective created successfully');
-    cy.wait(800);
-    cy.get('#ownHost input[type="radio"]', { timeout: 20000 }).click();
-    cy.get('#ownHost .CreateHostForm');
-    cy.get('select[name="hostType"]').select('organization');
-    cy.fillInputField('organization_name', 'new org');
-    cy.fillInputField('organization_website', 'newco.com');
-    cy.wait(300);
-    cy.get('#ownHost .createOrganizationBtn').click();
-    cy.wait(300);
-    cy.get('#ownHost .inputField.hostId', {
-      timeout: 10000,
-    }).contains('new org');
-    cy.get('#ownHost .EditConnectedAccount [data-cy="connect-stripe-button"]').contains('Connect Stripe');
-    cy.get('#findHost input[type="radio"]').click();
-    cy.get('#findHost a[href="/hosts"]').click();
-    cy.get('.CollectiveCard', { timeout: 10000 }).should('have.length', 11);
-    cy.get('.CollectiveCard').first().contains('collectives hosted');
-    cy.get('.CollectiveCard').first().click();
-    cy.wait(300);
-    cy.contains('Host fee: 0%');
-    cy.get('[data-cy="host-apply-btn"]').should('not.be.disabled');
-    cy.contains('[data-cy="host-apply-btn"]:visible', 'Apply with New collective').click();
-    cy.get('.ApplyToHostBtn').contains(`Application pending for ${collectiveName}`);
-    // Go back to collective page
-    cy.get('.ApplyToHostBtn:visible a').first().click();
-    // Click on edit collective
-    cy.get('[data-cy="edit-collective-btn"]').click();
-    cy.getByDataCy('menu-item-host', { timeout: 10000 }).click();
-    cy.get('.removeHostBtn').click();
-    cy.get('[data-cy=continue]').click();
-    cy.get('#noHost input:checked');
+  beforeEach(() => {
+    cy.signup({ redirect: '/create' });
+  });
+
+  it('Picks a category and fills out the Create Collective Form', () => {
+    cy.getByDataCy('ccf-category-picker-button-community').click();
+    cy.getByDataCy('ccf-form-name').type('Bees are neat');
+    cy.getByDataCy('ccf-form-slug')
+      .first()
+      .find('input')
+      .invoke('val')
+      .then(sometext => expect(sometext).to.equal('bees-are-neat'));
+    cy.getByDataCy('ccf-form-description').type('We are going to save the bees');
+    cy.get('[data-cy="custom-checkbox"').click();
+    cy.get('[data-cy=ccf-form-submit]').click();
+    cy.url().should('include', '/bees-are-neat/onboarding');
+  });
+
+  it('Cannot create a collective with a slug that is taken', () => {
+    cy.getByDataCy('ccf-category-picker-button-community').click();
+    cy.getByDataCy('ccf-form-name').type('Bees are neat');
+    cy.getByDataCy('ccf-form-description').type('I just really like them');
+    cy.get('[data-cy="custom-checkbox"').click();
+    cy.get('[data-cy=ccf-form-submit]').click();
+    cy.get('[data-cy=ccf-error-message]').contains(
+      'The slug bees-are-neat is already taken. Please use another slug for your collective.',
+    );
   });
 });

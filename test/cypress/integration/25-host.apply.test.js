@@ -18,15 +18,11 @@ describe('apply to host', () => {
     cy.get('button[type="submit"]').click();
     cy.wait(1000);
     cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
-    cy.get('.NotificationBar h1').contains('success');
-    cy.get('.NotificationBar p').contains('BrusselsTogether ASBL');
     cy.url().then(currentUrl => {
-      const CollectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
-      return cy.visit(`/brusselstogetherasbl/collectives/${CollectiveId}/approve`);
+      const collectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
+      cy.login({ redirect: `/brusselstogetherasbl/dashboard/pending-applications#application-${collectiveId}` });
+      cy.contains(`#application-${collectiveId} button`, 'Approve').click();
+      cy.get('[data-cy*="-approved"]').should('exist');
     });
-    cy.get('[data-cy="error-message"]').contains('Failed to approve collective for brusselstogetherasbl');
-    cy.get('[data-cy="error-message"]').contains(
-      'You need to be logged in as an admin of the host of this collective to approve it',
-    );
   });
 });

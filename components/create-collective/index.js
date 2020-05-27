@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -18,47 +19,27 @@ import { withUser } from '../UserProvider';
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 import ConnectGithub from './ConnectGithub';
 import CreateCollectiveForm from './CreateCollectiveForm';
+import CreateOpenSourceCollective from './CreateOpenSourceCollective';
 
 class CreateCollective extends Component {
   static propTypes = {
     host: PropTypes.object,
-    query: PropTypes.object,
     LoggedInUser: PropTypes.object, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    intl: PropTypes.object.isRequired,
-    createCollective: PropTypes.func,
+    router: PropTypes.object.isRequired, // from withRouter
+    createCollective: PropTypes.func.isRequired, // addCreateCollectiveMutation
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      collective: {},
-      result: {},
-      github: null,
-      form: false,
       error: null,
-      status: null,
       creating: false,
+      githubInfo: null,
     };
 
     this.createCollective = this.createCollective.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-
-    this.messages = defineMessages({
-      joinOC: {
-        id: 'collective.create.join',
-        defaultMessage: 'Join Open Collective',
-      },
-      createOrSignIn: {
-        id: 'collective.create.createOrSignIn',
-        defaultMessage: 'Create an account (or sign in) to start a collective.',
-      },
-    });
-  }
-
-  handleChange(key, value) {
-    this.setState({ [key]: value });
   }
 
   async createCollective(collective) {
@@ -69,7 +50,7 @@ class CreateCollective extends Component {
       });
       return;
     }
-    if (this.props.host && this.props.host.settings.tos && !collective.hostTos) {
+    if (this.props.host && this.props.host.termsUrl && !collective.hostTos) {
       this.setState({
         error: 'Please accept the terms of fiscal sponsorship',
       });
@@ -81,9 +62,9 @@ class CreateCollective extends Component {
 
     // prepare object
 
-    collective.tags = [this.props.query.category];
-    if (this.state.github) {
-      collective.githubHandle = this.state.github.handle;
+    collective.tags = [this.props.router.query.category];
+    if (this.state.githubInfo) {
+      collective.githubHandle = this.state.githubInfo.handle;
     }
     delete collective.tos;
     delete collective.hostTos;
@@ -91,15 +72,13 @@ class CreateCollective extends Component {
     // try mutation
     try {
       const res = await this.props.createCollective({
-        collective,
-        host: this.props.host ? { slug: this.props.host.slug } : null,
-        automateApprovalWithGithub: this.state.github ? true : false,
+        variables: {
+          collective,
+          host: this.props.host ? { slug: this.props.host.slug } : null,
+          automateApprovalWithGithub: this.state.githubInfo ? true : false,
+        },
       });
       const newCollective = res.data.createCollective;
-      this.setState({
-        status: 'idle',
-        result: { success: 'Collective created successfully' },
-      });
       await this.props.refetchLoggedInUser();
       // don't show banner if we show the modal and vice versa
       if (parseToBoolean(process.env.ONBOARDING_MODAL) === true) {
@@ -119,16 +98,16 @@ class CreateCollective extends Component {
       }
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ status: 'idle', error: errorMsg, creating: false });
+      this.setState({ error: errorMsg, creating: false });
     }
   }
 
   render() {
-    const { LoggedInUser, query, intl, host } = this.props;
+    const { LoggedInUser, host, router } = this.props;
     const { error } = this.state;
-    const { category, step, token } = query;
+    const { category, step, token } = router.query;
 
-    if (host && !host.canApply) {
+    if (host && !host.isOpenToApplications) {
       return (
         <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
           <Flex flexDirection="column" p={4} mt={3}>
@@ -156,12 +135,15 @@ class CreateCollective extends Component {
           <Flex flexDirection="column" p={4} mt={2}>
             <Box mb={3}>
               <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
-                {intl.formatMessage(this.messages.joinOC)}
+                <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
               </H1>
             </Box>
             <Box textAlign="center">
               <P fontSize="Paragraph" color="black.600" mb={1}>
-                {intl.formatMessage(this.messages.createOrSignIn)}
+                <FormattedMessage
+                  id="collective.create.createOrSignIn"
+                  defaultMessage="Create an account (or sign in) to start a collective."
+                />
               </P>
             </Box>
           </Flex>
@@ -171,29 +153,31 @@ class CreateCollective extends Component {
     }
 
     if (!host && !category) {
-      return <CollectiveCategoryPicker query={query} onChange={this.handleChange} />;
+      return <CollectiveCategoryPicker />;
     }
 
     if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
-      return <ConnectGithub token={token} query={query} onChange={this.handleChange} />;
+      if (token) {
+        return <ConnectGithub updateGithubInfo={githubInfo => this.setState({ githubInfo })} />;
+      } else {
+        return <CreateOpenSourceCollective />;
+      }
     }
 
     return (
       <CreateCollectiveForm
         host={host}
-        collective={this.state.collective}
-        github={this.state.github}
+        github={this.state.githubInfo}
         onSubmit={this.createCollective}
         onChange={this.handleChange}
         loading={this.state.creating}
         error={error}
-        query={query}
       />
     );
   }
 }
 
-const createCollectiveQuery = gqlV2`
+const createCollective = gqlV2`
   mutation createCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
@@ -210,17 +194,9 @@ const createCollectiveQuery = gqlV2`
   }
 `;
 
-const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
-  props: ({ mutate }) => ({
-    createCollective: async ({ collective, host, automateApprovalWithGithub }) => {
-      return await mutate({
-        variables: { collective, host, automateApprovalWithGithub },
-      });
-    },
-  }),
+const addCreateCollectiveMutation = graphql(createCollective, {
+  name: 'createCollective',
+  options: { context: API_V2_CONTEXT },
 });
 
-export default injectIntl(withUser(addCreateCollectiveMutation(CreateCollective)));
+export default withRouter(withUser(addCreateCollectiveMutation(CreateCollective)));

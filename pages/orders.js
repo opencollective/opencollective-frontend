@@ -106,7 +106,11 @@ class OrdersPage extends React.Component {
           </Container>
 
           <div className="content">
-            <SectionTitle section="orders" subtitle={subtitle} action={action} />
+            <SectionTitle
+              title={<FormattedMessage id="Orders" defaultMessage="Orders" />}
+              subtitle={subtitle}
+              action={action}
+            />
 
             <div className=" columns">
               <div className="col large">

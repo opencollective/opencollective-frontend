@@ -95,6 +95,7 @@ describe('signin', () => {
     cy.contains('a', 'Join Free').click();
 
     // Test frontend validations
+    cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type('IncorrectValue');
     cy.get('button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
@@ -117,6 +118,7 @@ describe('signin', () => {
     const gmail_email = randomGmailEmail(false);
     cy.visit('/signin');
     cy.contains('a', 'Join Free').click();
+    cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${gmail_email}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
@@ -133,6 +135,7 @@ describe('signin', () => {
     const hotmail = randomHotMail(false);
     cy.visit('/signin');
     cy.contains('a', 'Join Free').click();
+    cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${hotmail}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
@@ -150,6 +153,7 @@ describe('signin', () => {
     cy.contains('Create Organization Profile').click();
 
     // Test frontend validations
+    cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=orgName]').type('Test Organization');
     cy.get('input[name=email]').type('IncorrectValue');
     cy.get('button[type=submit]').click();

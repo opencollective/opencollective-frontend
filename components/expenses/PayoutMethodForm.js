@@ -65,7 +65,7 @@ export const validatePayoutMethod = payoutMethod => {
  * This component is **fully controlled**, you need to call `validatePayoutMethod`
  * to proceed with the validation and pass the result with the `errors` prop.
  */
-const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, collective }) => {
+const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
@@ -108,7 +108,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, collective }) => {
         </Field>
       )}
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
-        <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} collective={collective} />
+        <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
       )}
       {isNew && (
         <Box mt={3}>
@@ -122,12 +122,10 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, collective }) => {
 };
 
 PayoutMethodForm.propTypes = {
-  collective: PropTypes.shape({
+  host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
-      }),
+    transferwise: PropTypes.shape({
+      availableCurrencies: PropTypes.arrayOf(PropTypes.string),
     }),
   }).isRequired,
   /** Set this to nil to create a new one */

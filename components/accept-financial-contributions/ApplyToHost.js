@@ -15,7 +15,7 @@ import { H1, H2, H3, P } from '../Text';
 import HostsContainer from './HostsContainer';
 
 import umbrellaIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
-import climateIllustration from '../../public/static/images/create-collective/climateIllustration.png';
+import becomeFiscalHostIllustration from '../../public/static/images/create-collective/becomeFiscalHostIllustration.png';
 
 const FISCAL_HOST_LINK = 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host';
 
@@ -93,6 +93,11 @@ class ApplyToHost extends React.Component {
     tag === 'all' ? this.setState({ tags: null }) : this.setState({ tags: [tag] });
   };
 
+  getTags = tag => {
+    // this will need to be updated if we decide to have more than one tag
+    return tag === null ? 'all' : tag[0];
+  };
+
   render() {
     const { intl, onChange, collective } = this.props;
     const { tags } = this.state;
@@ -126,7 +131,13 @@ class ApplyToHost extends React.Component {
           </Container>
           <Flex px={[3, 5]} my={4} flexWrap="wrap">
             {Object.keys(this.tagList).map(tagKey => (
-              <FilterTag key={`${tagKey}-tag`} px={2} mr={2} onClick={() => this.setTags(tagKey)}>
+              <FilterTag
+                key={`${tagKey}-tag`}
+                px={2}
+                mr={2}
+                type={this.getTags(tags) === tagKey ? 'dark' : 'info'}
+                onClick={() => this.setTags(tagKey)}
+              >
                 {this.tagList[tagKey]}
               </FilterTag>
             ))}
@@ -173,7 +184,7 @@ class ApplyToHost extends React.Component {
                 </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
-                <img src={climateIllustration} width="192px" height="192px" />
+                <img src={becomeFiscalHostIllustration} width="192px" height="192px" />
               </Box>
             </InterestedContainer>
           </Container>

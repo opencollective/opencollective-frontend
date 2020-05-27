@@ -29,7 +29,14 @@ const getExpenseStatusMsgType = status => {
 const ExpenseStatusTag = ({ status, ...props }) => {
   const intl = useIntl();
   return (
-    <StyledTag type={getExpenseStatusMsgType(status)} fontWeight="600" letterSpacing="0.8px" {...props}>
+    <StyledTag
+      type={getExpenseStatusMsgType(status)}
+      fontWeight="600"
+      fontSize="10px"
+      letterSpacing="0.8px"
+      textTransform="uppercase"
+      {...props}
+    >
       {i18nExpenseStatus(intl, status)}
     </StyledTag>
   );

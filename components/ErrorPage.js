@@ -99,7 +99,7 @@ class ErrorPage extends React.Component {
   networkError() {
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={6}>
-        <H1 fontSize={30}>
+        <H1 fontSize={30} textAlign="center">
           <FormattedMessage
             id="page.error.networkError"
             defaultMessage="The Open Collective Server is momentarily unreachable"
@@ -126,7 +126,7 @@ class ErrorPage extends React.Component {
 
     return (
       <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
-        <H1 fontSize={30}>
+        <H1 fontSize={30} textAlign="center">
           <FormattedMessage id="error.unexpected" defaultMessage="Ooops, an unexpected error seems to have occurred" />
           &nbsp; 🤕
         </H1>

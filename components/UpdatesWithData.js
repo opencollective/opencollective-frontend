@@ -5,6 +5,8 @@ import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import Error from './Error';
+import { Box, Flex } from './Grid';
+import Link from './Link';
 import SectionTitle from './SectionTitle';
 import StyledButton from './StyledButton';
 import Updates from './Updates';
@@ -45,20 +47,6 @@ class UpdatesWithData extends React.Component {
     }
 
     const updates = data.allUpdates;
-
-    let action;
-    if (LoggedInUser && LoggedInUser.canEditCollective(collective)) {
-      action = {
-        href: `/${collective.slug}/updates/new`,
-        label: (
-          <StyledButton buttonStyle="primary">
-            {' '}
-            <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />{' '}
-          </StyledButton>
-        ),
-      };
-    }
-
     return (
       <div className="UpdatesContainer">
         <style jsx>
@@ -75,18 +63,36 @@ class UpdatesWithData extends React.Component {
 
         {!compact && (
           <div className="FullPage">
-            <SectionTitle section="updates" action={action} />
+            <SectionTitle
+              title={<FormattedMessage id="updates" defaultMessage="Updates" />}
+              subtitle={
+                <FormattedMessage
+                  id="section.updates.subtitle"
+                  defaultMessage="Stay up to dates with our latest activities and progress."
+                />
+              }
+            />
           </div>
         )}
-
-        <Updates
-          collective={collective}
-          updates={updates}
-          editable={!compact}
-          fetchMore={this.props.fetchMore}
-          LoggedInUser={LoggedInUser}
-          includeHostedCollectives={includeHostedCollectives}
-        />
+        {LoggedInUser?.canEditCollective(collective) && (
+          <Flex justifyContent="center">
+            <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
+              <StyledButton buttonStyle="primary" buttonSize="small">
+                <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
+              </StyledButton>
+            </Link>
+          </Flex>
+        )}
+        <Box my={5}>
+          <Updates
+            collective={collective}
+            updates={updates}
+            editable={!compact}
+            fetchMore={this.props.fetchMore}
+            LoggedInUser={LoggedInUser}
+            includeHostedCollectives={includeHostedCollectives}
+          />
+        </Box>
       </div>
     );
   }

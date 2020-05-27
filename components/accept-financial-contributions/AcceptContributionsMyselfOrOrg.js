@@ -2,12 +2,13 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
-import { Field, Form, Formik } from 'formik';
-import { uniqBy } from 'lodash';
+import { Form, Formik } from 'formik';
+import { compose, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
@@ -17,19 +18,20 @@ import { getCollectivePageQuery } from '../collective-page/graphql/queries';
 import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import CreateCollectiveMiniForm from '../CreateCollectiveMiniForm';
+import PayoutBankInformationForm from '../expenses/PayoutBankInformationForm';
 import FinancialContributionsFAQ from '../faqs/FinancialContributionsFAQ';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import StyledInputField from '../StyledInputField';
-import StyledTextarea from '../StyledTextarea';
 import { H1, H2, P } from '../Text';
 import { withUser } from '../UserProvider';
 
 import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 
 import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
+
+const { TW_API_COLLECTIVE_SLUG } = process.env;
 
 const CreateNewOrg = styled(Flex)`
   border: 1px solid lightgray;
@@ -66,8 +68,9 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     collective: PropTypes.object,
     router: PropTypes.object,
     LoggedInUser: PropTypes.object.isRequired,
-    addBankAccount: PropTypes.func,
+    editAccountSettings: PropTypes.func,
     refetchLoggedInUser: PropTypes.func,
+    createPayoutMethod: PropTypes.func,
     applyToHost: PropTypes.func.isRequired,
   };
 
@@ -104,36 +107,33 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     }
   };
 
-  submitBankAccountInformation = async bankAccountInfo => {
+  submitBankAccountInformation = async payoutMethodData => {
     // prepare objects
     const account = {
       legacyId: this.state.organization ? this.state.organization.id : this.props.LoggedInUser.CollectiveId,
     };
 
-    const value = {
-      manual: {
-        title: 'Bank transfer',
-        features: {
-          recurring: false,
-        },
-        instructions: `Please make a bank transfer as follows: <br/>\n<br/>\n
-      <code>
-      Amount: {amount}
-      <br/>\n
-      Reference: {orderId}
-      <br/>\n
-      ${bankAccountInfo}
-      </code>`,
-      },
-    };
-
     // try mutation
     try {
-      await this.props.addBankAccount({
+      await this.props.createPayoutMethod({
+        variables: {
+          payoutMethod: { data: { ...payoutMethodData, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
+          account,
+        },
+      });
+      await this.props.editAccountSettings({
         variables: {
           account,
           key: 'paymentMethods',
-          value,
+          value: {
+            manual: {
+              title: 'Bank transfer',
+              features: {
+                recurring: false,
+              },
+              instructions: BANK_TRANSFER_DEFAULT_INSTRUCTIONS,
+            },
+          },
         },
       });
     } catch (err) {
@@ -160,14 +160,14 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
 
     // Form values and submit
     const initialValues = {
-      bankInformation: '',
+      data: {},
     };
 
     const submit = async values => {
       try {
         this.setState({ loading: true });
-        const { bankInformation } = values;
-        await this.submitBankAccountInformation(bankInformation);
+        const { data } = values;
+        await this.submitBankAccountInformation(data);
         await this.addHost(collective, organization ? organization : LoggedInUser.collective);
         await this.props.refetchLoggedInUser();
         await Router.pushRoute('accept-financial-contributions', {
@@ -182,6 +182,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
       }
     };
 
+    const host = organization ? organization : LoggedInUser.collective;
     // Conditional rendering
     const noOrganizationPicked = router.query.path === 'organization' && !organization;
     const organizationPicked = router.query.path === 'organization' && organization;
@@ -242,6 +243,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                       key={org.collective.id}
                       my={2}
                       onClick={() => this.setState({ organization: org.collective })}
+                      data-cy="afc-organization-org-card"
                     >
                       <Avatar radius={56} collective={org.collective} />
                       <Flex flexDirection="column" ml={3}>
@@ -274,7 +276,11 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                     excludeAdminFields
                   />
                 ) : (
-                  <CreateNewOrg alignItems="center" onClick={() => this.setState({ miniForm: true })}>
+                  <CreateNewOrg
+                    alignItems="center"
+                    onClick={() => this.setState({ miniForm: true })}
+                    data-cy="afc-organization-create-new"
+                  >
                     <PlusCircle size="24" color="gray" />
                     <P fontSize="Caption" color="black.800" ml={2}>
                       <FormattedMessage id="Organization.CreateNew" defaultMessage="Create new Organization" />
@@ -295,7 +301,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                   <P color="black.900" textAlign="left" mt={[2, 3]} fontSize={['Paragraph']}>
                     <FormattedMessage
                       id="acceptContributions.HowDoesItWork.details"
-                      defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective\'s balance."
+                      defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective's balance."
                     />
                   </P>
                   <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize={['Paragraph']}>
@@ -312,39 +318,31 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                   </P>
                   <Formik initialValues={initialValues} onSubmit={submit}>
                     {formik => {
-                      const { values, handleSubmit } = formik;
+                      const { handleSubmit } = formik;
 
                       return (
                         <Form>
                           <Box width={['100%', '75%']}>
-                            <StyledInputField
-                              name="bankInformation"
-                              htmlFor="bankInformation"
-                              label="Bank information (account number, name, bank name, etc.)"
-                              value={values.bankInformation}
-                              required
-                              mt={4}
-                              mb={3}
-                            >
-                              {inputProps => (
-                                <Field
-                                  as={StyledTextarea}
-                                  {...inputProps}
-                                  placeholder="Name: Kate Account number: 00000000 Sort: 333333"
-                                />
-                              )}
-                            </StyledInputField>
+                            <PayoutBankInformationForm
+                              host={{ slug: TW_API_COLLECTIVE_SLUG }}
+                              getFieldName={string => string}
+                              // Fix currency if it was already linked to Stripe
+                              fixedCurrency={
+                                host.connectedAccounts?.find?.(ca => ca.service === 'stripe') && host.currency
+                              }
+                              isNew
+                            />
                           </Box>
 
                           {error && (
-                            <Flex alignItems="center" justifyContent="center">
-                              <MessageBox type="error" withIcon mb={[1, 3]}>
+                            <Flex>
+                              <MessageBox type="error" flexGrow={1} withIcon mt={3}>
                                 {error.message}
                               </MessageBox>
                             </Flex>
                           )}
 
-                          <Flex justifyContent={'center'} my={4}>
+                          <Flex justifyContent={'center'} mt={3}>
                             <StyledButton
                               fontSize="13px"
                               minWidth={'85px'}
@@ -368,6 +366,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                               type="submit"
                               loading={loading}
                               onSubmit={handleSubmit}
+                              data-cy="afc-add-bank-info-submit"
                             >
                               <FormattedMessage id="save" defaultMessage="Save" />
                             </StyledButton>
@@ -384,11 +383,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
             </Flex>
           )}
           {ableToChooseStripeOrBankAccount && (
-            <StripeOrBankAccountPicker
-              collective={collective}
-              host={organization ? organization : LoggedInUser.collective}
-              addHost={this.addHost}
-            />
+            <StripeOrBankAccountPicker collective={collective} host={host} addHost={this.addHost} />
           )}
         </Container>
       </Fragment>
@@ -396,26 +391,49 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
   }
 }
 
-const bankAccountMutation = gqlV2`
-  mutation addBankAccount($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+const createPayoutMethodMutation = graphql(
+  gqlV2`
+  mutation createPayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
+    createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
+      data
+      id
+      name
+      type
+    }
+  }
+`,
+  {
+    name: 'createPayoutMethod',
+    options: { context: API_V2_CONTEXT },
+  },
+);
+
+const editAccountSettingsMutation = graphql(
+  gqlV2`
+  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
     }
   }
-`;
+`,
+  {
+    name: 'editAccountSettings',
+    options: { context: API_V2_CONTEXT },
+  },
+);
 
 const applyToHostMutation = gqlV2`
-mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
-  applyToHost(collective: $collective, host: $host) {
-    id
-    slug
-    host {
+  mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
+    applyToHost(collective: $collective, host: $host) {
       id
       slug
+      host {
+        id
+        slug
+      }
     }
   }
-}
 `;
 
 const addApplyToHostMutation = graphql(applyToHostMutation, {
@@ -423,9 +441,12 @@ const addApplyToHostMutation = graphql(applyToHostMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const addBankAccountMutation = graphql(bankAccountMutation, {
-  name: 'addBankAccount',
-  options: { context: API_V2_CONTEXT },
-});
+const inject = compose(
+  withUser,
+  withRouter,
+  addApplyToHostMutation,
+  editAccountSettingsMutation,
+  createPayoutMethodMutation,
+);
 
-export default withUser(withRouter(addBankAccountMutation(addApplyToHostMutation(AcceptContributionsMyselfOrOrg))));
+export default inject(AcceptContributionsMyselfOrOrg);

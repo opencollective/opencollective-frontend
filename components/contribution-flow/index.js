@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import * as LibTaxes from '@opencollective/taxes';
+import { themeGet } from '@styled-system/theme-get';
 import gql from 'graphql-tag';
 import { debounce, findIndex, get, isNil, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -35,9 +36,11 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import Steps from '../Steps';
 import { withStripeLoader } from '../StripeProvider';
 import StyledButton from '../StyledButton';
+import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import { fadeIn } from '../StyledKeyframes';
-import { H5 } from '../Text';
+import StyledSelect from '../StyledSelect';
+import { H5, P } from '../Text';
 import { withUser } from '../UserProvider';
 
 import ContributionDetails from './ContributionDetails';
@@ -78,6 +81,14 @@ PaypalButtonContainer.defaultProps = {
   m: PrevNextButton.defaultProps.m,
 };
 
+// Styles for Fees on Top container
+
+const FeesOnTopContainer = styled(Container)`
+  border-radius: 15px;
+  border: 1px ${themeGet('colors.black.300')} solid;
+  width: 100%;
+`;
+
 const recaptchaEnabled = parseToBoolean(getEnvVar('RECAPTCHA_ENABLED'));
 
 const messages = defineMessages({
@@ -98,6 +109,14 @@ const messages = defineMessages({
   createOrgLabel: {
     id: 'ContributionFlow.CreateOrganizationLabel',
     defaultMessage: 'Contribute as an organization',
+  },
+  platformFeeOther: {
+    id: 'platformFee.Other',
+    defaultMessage: 'Other',
+  },
+  platformFeeNoContribution: {
+    id: 'platformFee.noContribution',
+    defaultMessage: "I don't want to contribute",
   },
 });
 
@@ -189,6 +208,8 @@ class CreateOrderPage extends React.Component {
     loadStripe: PropTypes.func.isRequired, // from withStripe
     intl: PropTypes.object.isRequired, // from injectIntl
     contributeAs: PropTypes.string,
+    feesOnTopAvailable: PropTypes.bool,
+    taxDeductible: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -212,6 +233,8 @@ class CreateOrderPage extends React.Component {
       error: null,
       stripe: null,
       customData: {},
+      feesOnTop: {},
+      feesOnTopOptions: [],
     };
   }
 
@@ -232,7 +255,7 @@ class CreateOrderPage extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     // Set user as default profile when loggin in
     if (!prevProps.LoggedInUser && this.props.LoggedInUser && !this.state.stepProfile) {
       this.setState({ stepProfile: this.getLoggedInUserDefaultContibuteProfile() });
@@ -251,6 +274,17 @@ class CreateOrderPage extends React.Component {
       if (this.hasPaypal()) {
         getPaypal();
       }
+    }
+
+    // sets the total amount & fee options correctly when we change the base amount (if fees on top is available)
+    const hasProfileChanged = prevState.stepProfile?.id !== this.state.stepProfile?.id;
+    const hasAmountChanged = prevState.stepDetails?.amount !== this.state.stepDetails?.amount;
+    if ((hasProfileChanged || hasAmountChanged) && this.canHaveFeesOnTop()) {
+      const platformFeeOptions = this.createplatformFeeOptions(this.state.stepDetails.amount);
+      this.setState(state => ({
+        platformFeeOptions: platformFeeOptions,
+        stepDetails: { ...state.stepDetails, platformFee: platformFeeOptions[1] },
+      }));
     }
   }
 
@@ -440,6 +474,7 @@ class CreateOrderPage extends React.Component {
       recaptchaToken,
       id: pledge ? pledge.id : null,
       totalAmount: this.getTotalAmountWithTaxes(),
+      platformFee: get(stepDetails, 'platformFee.value'),
       taxAmount: get(stepSummary, 'amount', 0),
       countryISO: get(stepSummary, 'countryISO'),
       taxIDNumber: get(stepSummary, 'number'),
@@ -468,7 +503,7 @@ class CreateOrderPage extends React.Component {
         const stepPayment = {
           ...state.stepPayment,
           paymentMethod: {
-            ...state.stepPayment.paymentMethod,
+            ...state.stepPayment?.paymentMethod,
             token: null,
           },
         };
@@ -642,12 +677,17 @@ class CreateOrderPage extends React.Component {
     return { amount, quantity, interval, totalAmount };
   }
 
+  canHaveFeesOnTop(props = this.props, state = this.state) {
+    return props.feesOnTopAvailable && state.stepProfile?.type !== 'COLLECTIVE' && props.tier?.type !== 'TICKET';
+  }
+
   /** Get total amount based on stepDetails with taxes from step summary applied */
   getTotalAmountWithTaxes() {
     const quantity = get(this.state, 'stepDetails.quantity', 1);
     const amount = get(this.state, 'stepDetails.amount', 0);
     const taxAmount = get(this.state, 'stepSummary.amount', 0);
-    return quantity * amount + taxAmount;
+    const platformFeeAmount = this.canHaveFeesOnTop() ? get(this.state, 'stepDetails.platformFee.value', 0) : 0;
+    return quantity * (amount + platformFeeAmount) + taxAmount;
   }
 
   /** Returns true if the price and interval of the current contribution cannot be changed */
@@ -702,7 +742,7 @@ class CreateOrderPage extends React.Component {
     ];
 
     // If amount and interval are forced by a tier or by params, skip StepDetails (except for events)
-    if (!skipStepDetails && (!isFixedContribution || (tier && tier.type === 'TICKET'))) {
+    if (!skipStepDetails && (!isFixedContribution || tier?.type === 'TICKET' || this.canHaveFeesOnTop())) {
       steps.push({
         name: 'details',
         label: intl.formatMessage(stepsLabels.details),
@@ -798,15 +838,35 @@ class CreateOrderPage extends React.Component {
     return get(this.state, 'stepProfile.settings.hideCreditCardPostalCode', false);
   }
 
+  createplatformFeeOptions = amount => {
+    const map = new Map([
+      ['10%', 0.1],
+      ['15%', 0.15],
+      ['20%', 0.2],
+    ]);
+    const platformFeeArray = Array.from(map, x => ({
+      label: `${formatCurrency(x[1] * amount, this.getCurrency())} (${x[0]})`,
+      value: x[1] * amount,
+    }));
+    platformFeeArray.push(
+      { label: this.props.intl.formatMessage(messages.platformFeeNoContribution), value: 0 },
+      { label: this.props.intl.formatMessage(messages.platformFeeOther), value: 100 },
+    );
+    return platformFeeArray;
+  };
+
   renderStep(step) {
-    const { collective, tier, host } = this.props;
-    const { stepProfile, stepDetails, stepPayment, customData } = this.state;
+    const { collective, tier, host, feesOnTopAvailable, taxDeductible } = this.props;
+    const { stepProfile, stepDetails, stepPayment, customData, platformFeeOptions } = this.state;
     const personalProfile = this.getPersonalProfile();
     const otherProfiles = this.getOtherProfiles();
     const customFields = tier && tier.customFields ? tier.customFields : [];
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
     const isIncognito = get(stepProfile, 'isIncognito');
+    const showFeesOnTop =
+      feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+
     if (step.name === 'contributeAs') {
       return (
         <Flex justifyContent="center" width={1}>
@@ -858,8 +918,9 @@ class CreateOrderPage extends React.Component {
               onChange={this.updateDetails}
               tierName={tier ? tier.name : ''}
               collectiveSlug={collective.slug}
+              platformFee={get(stepDetails, 'platformFee')}
               interval={interval}
-              amount={get(stepDetails, 'amount') || defaultStepDetails.amount}
+              amount={typeof stepDetails?.amount !== 'undefined' ? stepDetails.amount : defaultStepDetails.amount}
               quantity={get(stepDetails, 'quantity') || defaultStepDetails.quantity}
               changeIntervalWarning={Boolean(tier)}
               disabledInterval={Boolean(this.props.fixedInterval)}
@@ -872,6 +933,105 @@ class CreateOrderPage extends React.Component {
               customData={customData}
               onCustomFieldsChange={this.handleCustomFieldsChange}
             />
+            {showFeesOnTop && (
+              <Fragment>
+                <FeesOnTopContainer p={3} mt={3}>
+                  <Box maxWidth={['100%', '75%']}>
+                    <P fontSize="Caption" my={2}>
+                      <FormattedMessage
+                        defaultMessage="Open Collective has waived 100% of our fees for COVID-19 Relief Collectives. We rely on the generosity
+                of contributors like you to keep offering this to Collectives."
+                        id="platformFee.info"
+                      />
+                    </P>
+                  </Box>
+                  <Flex mt={3} flexDirection={['column', 'row']}>
+                    <Box maxWidth="50%">
+                      <P fontSize="Caption" fontWeight="600" my={2}>
+                        <FormattedMessage
+                          defaultMessage="Thank you for supporting us with a contribution:"
+                          id="platformFee.support"
+                        />
+                      </P>
+                    </Box>
+                    <Flex flexGrow={1} flexDirection="column">
+                      <StyledSelect
+                        onChange={value => {
+                          this.setState(state => ({
+                            stepDetails: {
+                              ...state.stepDetails,
+                              platformFee: value,
+                              totalAmount: state.stepDetails.totalAmount + value.value,
+                            },
+                          }));
+                        }}
+                        value={stepDetails.platformFee}
+                        options={platformFeeOptions}
+                        my={2}
+                        width="100%"
+                      />
+                      <P fontSize="Caption" color="colors.black.300" mt={1} textAlign={['right', null]}>
+                        <FormattedMessage
+                          defaultMessage="Total contribution: {amount} {frequency}"
+                          id="platformFee.totalContribution"
+                          values={{
+                            amount: formatCurrency(
+                              get(this.state, 'stepDetails.amount') + get(this.state, 'stepDetails.platformFee.value'),
+                              this.getCurrency(),
+                            ),
+                            frequency: stepDetails.interval ? `per ${stepDetails.interval}` : '',
+                          }}
+                        />
+                      </P>
+                    </Flex>
+                  </Flex>
+                  {stepDetails.platformFee.label === 'Other' && (
+                    <Box>
+                      <StyledInputField
+                        label="Other amount"
+                        htmlFor="feesOnTopOtherAmount"
+                        name="feesOnTopOtherAmount"
+                        required
+                      >
+                        {fieldProps => (
+                          <StyledInputAmount
+                            {...fieldProps}
+                            type="number"
+                            currency={this.getCurrency()}
+                            min={100}
+                            value={stepDetails.platformFee.value}
+                            width={1}
+                            onChange={value => {
+                              this.setState(state => ({
+                                stepDetails: {
+                                  ...state.stepDetails,
+                                  platformFee: {
+                                    ...state.stepDetails.platformFee,
+                                    value: value,
+                                  },
+                                  totalAmount: state.stepDetails.amount + value,
+                                },
+                              }));
+                            }}
+                            px="2px"
+                          />
+                        )}
+                      </StyledInputField>
+                    </Box>
+                  )}
+                </FeesOnTopContainer>
+                {taxDeductible && (
+                  <Box p={1} mt={2}>
+                    <P fontSize="LeadCaption" color="colors.black.300">
+                      <FormattedMessage
+                        defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contributione will be tax-deductible to the extent allowed by the law."
+                        id="platformFee.taxDeductible"
+                      />
+                    </P>
+                  </Box>
+                )}
+              </Fragment>
+            )}
             {tier && tier.type === 'TICKET' && <EventDetails event={collective} tier={tier} />}
           </Container>
           {interval || isIncognito ? (
@@ -1059,7 +1219,10 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { loadingLoggedInUser, LoggedInUser } = this.props;
+    const { loadingLoggedInUser, LoggedInUser, feesOnTopAvailable, tier } = this.props;
+    const showFeesOnTop =
+      feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+
     return (
       <Steps
         steps={this.getSteps()}
@@ -1084,6 +1247,7 @@ class CreateOrderPage extends React.Component {
                   loading={loadingLoggedInUser || this.state.loading || this.state.submitting}
                   currency={this.getCurrency()}
                   isFreeTier={this.getOrderMinAmount() === 0}
+                  showFeesOnTop={showFeesOnTop}
                 />
               </StepsProgressBox>
             )}

@@ -84,12 +84,12 @@ describe('Pledges', () => {
 });
 
 describe('check FAQ context in each pledge is valid or not', () => {
-  it('verift what is pledge ?', () => {
+  it('verify what is pledge ?', () => {
     cy.get('[data-cy="whatIsAPledge"]').click();
     cy.get('[data-cy="whatIsAPledge"]').should('contain', 'towards a collective that hasn’t been created yet. If you');
   });
 
-  it('verift how do i claim a pledge ?', () => {
+  it('verify how do i claim a pledge ?', () => {
     cy.get('[data-cy="howDoIClaimPledge"]').click();
     cy.get('[data-cy="howDoIClaimPledge"]').should('contain', 'authenticate with the github profile that owns');
   });

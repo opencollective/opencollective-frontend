@@ -35,7 +35,9 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
       </Box>
       <div>
         <Link route="conversation" params={{ collectiveSlug, slug, id }}>
-          <H5>{title}</H5>
+          <H5 wordBreak="break-word" mb={2}>
+            {title}
+          </H5>
         </Link>
         <P color="black.500" fontSize="Caption">
           <FormattedMessage

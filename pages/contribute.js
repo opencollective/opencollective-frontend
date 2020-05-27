@@ -95,14 +95,16 @@ class TiersPage extends React.Component {
                   </P>
                   {canContribute ? (
                     <Container display="flex" flexWrap="wrap">
-                      <ContributeCardContainer>
-                        <ContributeCustom
-                          hideContributors={!hasContributors}
-                          collective={collective}
-                          contributors={financialContributorsWithoutTier}
-                          stats={collective.stats.backers}
-                        />
-                      </ContributeCardContainer>
+                      {!collective.settings.disableCustomContributions && (
+                        <ContributeCardContainer>
+                          <ContributeCustom
+                            hideContributors={!hasContributors}
+                            collective={collective}
+                            contributors={financialContributorsWithoutTier}
+                            stats={collective.stats.backers}
+                          />
+                        </ContributeCardContainer>
+                      )}
 
                       {collective.tiers.map(tier => (
                         <ContributeCardContainer key={`tier-${tier.id}`} data-cy="contribute-tier">
@@ -110,7 +112,7 @@ class TiersPage extends React.Component {
                         </ContributeCardContainer>
                       ))}
 
-                      {collective.subCollectives.map(member => {
+                      {collective.connectedCollectives.map(member => {
                         const childCollective = member.collective;
                         return (
                           <ContributeCardContainer key={member.id}>
@@ -250,7 +252,7 @@ const addTiersData = graphql(
             }
           }
         }
-        subCollectives: members(role: "SUB_COLLECTIVE") {
+        connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
           id
           collective: member {
             id

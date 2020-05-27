@@ -19,7 +19,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
       name
       data
     }
-    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION], isHostAccount: false) {
+    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
       nodes {
         id
         account {
@@ -78,6 +78,8 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     tags
     amount
     createdAt
+    invoiceInfo
+    requiredLegalDocuments
     items {
       id
       incurredAt
@@ -94,16 +96,16 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
-      location {
-        address
-        country
-      }
       payoutMethods {
         id
         type
         name
         data
       }
+    }
+    payeeLocation {
+      address
+      country
     }
     createdByAccount {
       id
@@ -123,6 +125,19 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       twitterHandle
       currency
       expensePolicy
+      expensesTags {
+        id
+        tag
+      }
+
+      ... on Organization {
+        id
+        isHost
+        balance
+        # Missing
+        # ...HostFieldsFragment
+      }
+
       ... on Collective {
         id
         isApproved
@@ -152,7 +167,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       type
       data
     }
-    comments {
+    comments(limit: 300) {
       nodes {
         ...CommentFields
       }

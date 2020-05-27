@@ -27,12 +27,12 @@ const ExpenseTypeLabels = defineMessages({
 
 const ExpenseTypeDescription = defineMessages({
   [expenseTypes.RECEIPT]: {
-    id: 'ExpenseForm.InvoiceDescription',
+    id: 'ExpenseForm.ReceiptDescription',
     defaultMessage: 'Get reimbursed for a purchase already made.',
   },
   [expenseTypes.INVOICE]: {
-    id: 'ExpenseForm.ReceiptDescription',
-    defaultMessage: 'Create an invoice to get paid or to pay a vendor directly.',
+    id: 'ExpenseForm.InvoiceDescription',
+    defaultMessage: 'Bill for your time or a service.',
   },
 });
 
@@ -65,6 +65,10 @@ const ExpenseTypeOptionContainer = styled.label`
   border-left: 1px solid #dcdee0;
   margin-top: -1px;
   margin-left: -1px;
+
+  input[type='radio'] {
+    margin-right: 4px;
+  }
 
   // Animate gif on hover by hidding the static illustration
   &:hover {

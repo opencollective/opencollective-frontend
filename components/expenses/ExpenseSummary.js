@@ -1,28 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { i18nExpenseType } from '../../lib/i18n-expense';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import LocationAddress from '../LocationAddress';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
-import StyledTag from '../StyledTag';
 import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseItemsTotalAmount from './ExpenseItemsTotalAmount';
 import ExpenseStatusTag from './ExpenseStatusTag';
+import ExpenseTags from './ExpenseTags';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
@@ -63,9 +64,16 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
  * Last step of the create expense flow, shows the summary of the expense with
  * the ability to submit it.
  */
-const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, showProcessActions }) => {
-  const intl = useIntl();
-  const { payee, createdByAccount } = expense || {};
+const ExpenseSummary = ({
+  expense,
+  collective,
+  host,
+  isLoading,
+  isLoadingLoggedInUser,
+  permissions,
+  showProcessActions,
+}) => {
+  const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
@@ -73,7 +81,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
   return (
     <StyledCard p={[16, 24, 32]}>
       <Flex justifyContent="space-between" alignItems="center">
-        <H4 my={2} mr={2}>
+        <H4 my={2} mr={2} fontWeight="500">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>
         {expense?.status && (
@@ -86,20 +94,7 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
           />
         )}
       </Flex>
-      <Flex flexWrap="wrap">
-        <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
-          {isLoading ? (
-            <LoadingPlaceholder height={12} width={65} />
-          ) : (
-            i18nExpenseType(intl, expense.type, expense.legacyId)
-          )}
-        </StyledTag>
-        {expense?.tags?.map(tag => (
-          <StyledTag variant="rounded-right" mb="4px" mr="4px" key={tag}>
-            {tag}
-          </StyledTag>
-        ))}
-      </Flex>
+      <ExpenseTags expense={expense} isLoading={isLoading} />
       <Flex alignItems="center" mt={3}>
         {isLoading ? (
           <LoadingPlaceholder height={24} width={200} />
@@ -148,11 +143,11 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
             <React.Fragment key={attachment.id}>
               <Flex justifyContent="space-between" alignItems="center" my={24}>
                 <Flex>
-                  {isReceipt && (
+                  {(isReceipt || attachment.url) && (
                     <Box mr={3}>
                       <UploadedFilePreview
                         url={attachment.url}
-                        isLoading={isLoading}
+                        isLoading={isLoading || isLoadingLoggedInUser}
                         isPrivate={!attachment.url && !isLoading}
                         size={48}
                       />
@@ -210,6 +205,54 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
         <LoadingPlaceholder height={150} mt={3} />
       ) : (
         <Flex flexWrap="wrap">
+          <PrivateInfoColumn data-cy="expense-summary-payee">
+            <PrivateInfoColumnHeader>
+              <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+            </PrivateInfoColumnHeader>
+            <LinkCollective collective={payee}>
+              <Flex alignItems="center">
+                <Avatar collective={payee} radius={24} />
+                <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
+                  {payee.name}
+                </Span>
+              </Flex>
+            </LinkCollective>
+            <P whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+              <LocationAddress location={payeeLocation} isLoading={isLoading || isLoadingLoggedInUser} />
+            </P>
+            {payee.website && (
+              <P mt={2} fontSize="11px">
+                <StyledLink href={payee.website} openInNewTab>
+                  {payee.website}
+                </StyledLink>
+              </P>
+            )}
+          </PrivateInfoColumn>
+          <PrivateInfoColumn mr={0}>
+            <PrivateInfoColumnHeader>
+              <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+            </PrivateInfoColumnHeader>
+            <Container fontSize="Caption" color="black.600">
+              <Box mb={3} data-cy="expense-summary-payout-method-type">
+                <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
+              </Box>
+              <div data-cy="expense-summary-payout-method-data">
+                <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoading || isLoadingLoggedInUser} />
+              </div>
+              {expense.invoiceInfo && (
+                <Box mt={3} data-cy="expense-summary-invoice-info">
+                  <Container fontSize="11px" fontWeight="500" mb={2}>
+                    <FormattedMessage id="ExpenseForm.InvoiceInfo" defaultMessage="Additional invoice information" />
+                    &nbsp;&nbsp;
+                    <PrivateInfoIcon color="#969BA3" />
+                  </Container>
+                  <P fontSize="11px" lineHeight="16px" whiteSpace="pre-wrap">
+                    {expense.invoiceInfo}
+                  </P>
+                </Box>
+              )}
+            </Container>
+          </PrivateInfoColumn>
           {host && (
             <PrivateInfoColumn data-cy="expense-summary-host">
               <PrivateInfoColumnHeader>
@@ -237,44 +280,6 @@ const ExpenseSummary = ({ expense, collective, host, isLoading, permissions, sho
               )}
             </PrivateInfoColumn>
           )}
-          <PrivateInfoColumn data-cy="expense-summary-payee">
-            <PrivateInfoColumnHeader>
-              <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
-            </PrivateInfoColumnHeader>
-            <LinkCollective collective={payee}>
-              <Flex alignItems="center">
-                <Avatar collective={payee} radius={24} />
-                <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
-                  {payee.name}
-                </Span>
-              </Flex>
-            </LinkCollective>
-            {payee.location && (
-              <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-                {payee.location.address}
-              </P>
-            )}
-            {payee.website && (
-              <P mt={2} fontSize="11px">
-                <StyledLink href={payee.website} openInNewTab>
-                  {payee.website}
-                </StyledLink>
-              </P>
-            )}
-          </PrivateInfoColumn>
-          <PrivateInfoColumn mr={0}>
-            <PrivateInfoColumnHeader>
-              <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-            </PrivateInfoColumnHeader>
-            <Container fontSize="Caption" color="black.600">
-              <Box mb={3} data-cy="expense-summary-payout-method-type">
-                <PayoutMethodTypeWithIcon type={expense.payoutMethod.type} />
-              </Box>
-              <div data-cy="expense-summary-payout-method-data">
-                <PayoutMethodData payoutMethod={expense.payoutMethod} />
-              </div>
-            </Container>
-          </PrivateInfoColumn>
         </Flex>
       )}
       {showProcessButtons && (
@@ -310,6 +315,7 @@ ExpenseSummary.propTypes = {
     legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.oneOf(Object.values(expenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
@@ -328,11 +334,11 @@ ExpenseSummary.propTypes = {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-      location: PropTypes.shape({
-        address: PropTypes.string,
-        country: PropTypes.string,
-      }),
     }).isRequired,
+    payeeLocation: PropTypes.shape({
+      address: PropTypes.string,
+      country: PropTypes.string,
+    }),
     createdByAccount: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,

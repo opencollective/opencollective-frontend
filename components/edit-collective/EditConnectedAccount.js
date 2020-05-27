@@ -5,9 +5,11 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { connectAccount, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
+import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 
+import EditPayPalAccount from './EditPayPalAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -137,12 +139,14 @@ class EditConnectedAccount extends React.Component {
       return (
         <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
       );
+    } else if (service === 'paypal') {
+      return <EditPayPalAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
     }
 
     return (
-      <div className="EditConnectedAccount">
+      <Flex className="EditConnectedAccount">
         {!connectedAccount && (
-          <div>
+          <Box>
             <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
             </P>
@@ -153,23 +157,25 @@ class EditConnectedAccount extends React.Component {
             >
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}
             </StyledButton>
-          </div>
+          </Box>
         )}
         {connectedAccount && (
-          <div>
-            <div>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</div>
-            <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
-              {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
-            </StyledButton>{' '}
-            <StyledButton buttonSize="small" onClick={() => this.disconnect(service)}>
-              {intl.formatMessage(this.messages['collective.connectedAccounts.disconnect.button'])}
-            </StyledButton>
-          </div>
+          <Flex flexDirection="column">
+            <Box>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</Box>
+            <Box mt={1}>
+              <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
+                {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
+              </StyledButton>{' '}
+              <StyledButton buttonSize="small" onClick={() => this.disconnect(service)}>
+                {intl.formatMessage(this.messages['collective.connectedAccounts.disconnect.button'])}
+              </StyledButton>
+            </Box>
+          </Flex>
         )}
         {connectedAccount && connectedAccount.service === 'twitter' && collective.type === 'ORGANIZATION' && (
           <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
         )}
-      </div>
+      </Flex>
     );
   }
 }

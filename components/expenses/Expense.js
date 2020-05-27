@@ -258,7 +258,9 @@ class Expense extends React.Component {
         expense.status === 'ERROR' ||
         (expense.status === 'REJECTED' && Date.now() - new Date(expense.updatedAt).getTime() < 60 * 1000 * 15)); // we can approve an expense for up to 10mn after rejecting it
 
-    const canDelete = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'REJECTED';
+    const isCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canDelete =
+      LoggedInUser && expense.status === 'REJECTED' && (isCollectiveAdmin || LoggedInUser.isHostAdmin(collective));
 
     return (
       <div className={`expense ${status} ${this.state.mode}View`} data-cy={`expense-${status}`}>

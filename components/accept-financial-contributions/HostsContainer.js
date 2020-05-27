@@ -41,7 +41,7 @@ class HostsContainer extends React.Component {
     onChange: PropTypes.func,
     data: PropTypes.object.isRequired,
     viewport: PropTypes.string,
-    tags: PropTypes.string,
+    tags: PropTypes.array,
     intl: PropTypes.object.isRequired,
   };
 
@@ -66,7 +66,7 @@ class HostsContainer extends React.Component {
     const hosts = [...data.hosts.nodes];
 
     return (
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" flexGrow={1}>
         <Hide md lg>
           <HorizontalScroller>
             {ref => (
@@ -98,6 +98,7 @@ class HostsContainer extends React.Component {
                   host={host}
                   collective={this.props.collective}
                   onChange={onChange}
+                  data-cy="afc-host-collective-card"
                 />
               </CollectiveCardContainer>
             ))}
@@ -128,6 +129,7 @@ query getHosts($tags: [String], $limit: Int) {
       name
       slug
       description
+      longDescription
       currency
       totalHostedCollectives
       hostFeePercent

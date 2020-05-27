@@ -19,9 +19,13 @@ import successIllustration from '../../public/static/images/create-collective/ac
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
-const SmallExternalLink = styled(StyledLink).attrs({ openInNewTab: true })`
+const SmallExternalLink = styled(StyledLink)`
   font-size: ${themeGet('fontSizes.LeadCaption')}px;
 `;
+
+SmallExternalLink.defaultProps = {
+  openInNewTab: true,
+};
 
 class SuccessPage extends React.Component {
   static propTypes = {
@@ -36,7 +40,7 @@ class SuccessPage extends React.Component {
 
   render() {
     const { collective, chosenHost, router } = this.props;
-    const { path } = router;
+    const { path } = router.query;
 
     return (
       <Fragment>
@@ -141,6 +145,7 @@ class SuccessPage extends React.Component {
                               slug: collective.host.slug,
                               section: 'fiscal-hosting',
                             }}
+                            data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
                           </Link>
@@ -172,6 +177,7 @@ class SuccessPage extends React.Component {
                 slug: collective.slug,
                 section: 'tiers',
               }}
+              data-cy="afc-success-host-tiers-link"
             >
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create custom tiers" />

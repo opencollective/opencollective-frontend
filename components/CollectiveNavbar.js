@@ -220,11 +220,13 @@ const i18nSection = defineMessages({
 // Define default sections based on collective type
 const DEFAULT_SECTIONS = {
   [CollectiveType.ORGANIZATION]: [
+    Sections.CONTRIBUTE,
     Sections.CONTRIBUTIONS,
     Sections.CONTRIBUTORS,
     Sections.UPDATES,
     Sections.CONVERSATIONS,
     Sections.TRANSACTIONS,
+    Sections.BUDGET,
     Sections.ABOUT,
   ],
   [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
@@ -269,8 +271,9 @@ export const getSectionsForCollective = (collective, isAdmin) => {
   const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  const hasContribute = collective.isApproved;
-  const hasOtherWaysToContribute = !isEvent && (collective.events?.length > 0 || collective.subCollectives?.length > 0);
+  const hasContribute = collective.isActive;
+  const hasOtherWaysToContribute =
+    !isEvent && (collective.events?.length > 0 || collective.connectedCollectives?.length > 0);
   if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
     toRemove.add(Sections.CONTRIBUTE);
   }
@@ -297,15 +300,21 @@ export const getSectionsForCollective = (collective, isAdmin) => {
       toRemove.add(Sections.ABOUT);
     }
   }
+
   if (collective.type === CollectiveType.ORGANIZATION) {
     if (!hasFeature(collective, FEATURES.UPDATES)) {
       toRemove.add(Sections.UPDATES);
+    }
+    if (!collective.isActive) {
+      toRemove.add(Sections.BUDGET);
+    } else {
+      toRemove.add(Sections.TRANSACTIONS);
     }
   }
 
   if (isEvent) {
     // Should not see tickets section if you can't order them
-    if ((!collective.isApproved && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
+    if ((!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
       toRemove.add(Sections.TICKETS);
     }
 
@@ -433,12 +442,7 @@ const CollectiveNavbar = ({
               ))}
               {callsToAction.hasSubmitExpense && (
                 <MenuLinkContainer mobileOnly>
-                  <MenuLink
-                    as={Link}
-                    // Redirect to the new Expense flow if the host is using TransferWise
-                    route={hasFeature(collective.host, FEATURES.TRANSFERWISE) ? 'create-expense' : 'createExpense'}
-                    params={{ collectiveSlug: collective.slug }}
-                  >
+                  <MenuLink as={Link} route="create-expense" params={{ collectiveSlug: collective.slug }}>
                     <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
                   </MenuLink>
                 </MenuLinkContainer>
@@ -460,11 +464,13 @@ const CollectiveNavbar = ({
             </Container>
           )}
           <div>
-            <CollectiveCallsToAction
-              display={['none', null, 'flex']}
-              collective={collective}
-              callsToAction={callsToAction}
-            />
+            {!isLoading && (
+              <CollectiveCallsToAction
+                display={['none', null, 'flex']}
+                collective={collective}
+                callsToAction={callsToAction}
+              />
+            )}
           </div>
         </Container>
       )}

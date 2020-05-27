@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
-import { assign, get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
 import styled from 'styled-components';
@@ -39,105 +39,75 @@ const placeholders = {
   slug: 'agora',
 };
 
+const messages = defineMessages({
+  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
+  suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
+  descriptionLabel: {
+    id: 'createCollective.form.descriptionLabel',
+    defaultMessage: 'What does your collective do?',
+  },
+  descriptionHint: {
+    id: 'createCollective.form.descriptionHint',
+    defaultMessage: 'Write a short description of your Collective (150 characters max)',
+  },
+  descriptionPlaceholder: {
+    id: 'create.collective.placeholder',
+    defaultMessage: 'Making the world a better place',
+  },
+  errorName: {
+    id: 'createCollective.form.error.name',
+    defaultMessage: 'Please use fewer than 50 characters',
+  },
+  errorDescription: {
+    id: 'createCollective.form.error.description',
+    defaultMessage: 'Please use fewer than 160 characters',
+  },
+  errorSlug: {
+    id: 'createCollective.form.error.slug',
+    defaultMessage: 'Please use fewer than 30 characters',
+  },
+});
+
+const formatGithubRepoName = repoName => {
+  // replaces dash and underscore with space, then capitalises the words
+  return repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
+};
+
 class CreateCollectiveForm extends React.Component {
   static propTypes = {
     error: PropTypes.string,
     host: PropTypes.object,
-    query: PropTypes.object,
-    collective: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     github: PropTypes.object,
+    router: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
-    this.githubRepoHelper = this.githubRepoHelper.bind(this);
-
-    const collective = { ...props.collective }; // {}
 
     this.state = {
-      collective,
-      tosChecked: false,
-      hostTosChecked: false,
+      tos: false,
+      hostTos: false,
     };
-
-    this.messages = defineMessages({
-      introduceSubtitle: {
-        id: 'createCollective.subtitle.introduce',
-        defaultMessage: 'Introduce your Collective to the community.',
-      },
-      back: {
-        id: 'Back',
-        defaultMessage: 'Back',
-      },
-      header: { id: 'home.create', defaultMessage: 'Create a Collective' },
-      nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: "What's the name of your collective?" },
-      slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
-      suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
-      descriptionLabel: {
-        id: 'createCollective.form.descriptionLabel',
-        defaultMessage: 'What does your collective do?',
-      },
-      descriptionHint: {
-        id: 'createCollective.form.descriptionHint',
-        defaultMessage: 'Write a short description of your Collective (150 characters max)',
-      },
-      createButton: {
-        id: 'collective.create.button',
-        defaultMessage: 'Create Collective',
-      },
-      descriptionPlaceholder: {
-        id: 'create.collective.placeholder',
-        defaultMessage: 'Making the world a better place',
-      },
-      errorName: {
-        id: 'createCollective.form.error.name',
-        defaultMessage: 'Please use fewer than 50 characters',
-      },
-      errorDescription: {
-        id: 'createCollective.form.error.description',
-        defaultMessage: 'Please use fewer than 160 characters',
-      },
-      errorSlug: {
-        id: 'createCollective.form.error.slug',
-        defaultMessage: 'Please use fewer than 30 characters',
-      },
-    });
   }
 
   componentDidMount() {
-    const { category, step, hostTos } = this.props.query;
+    const { category, step, hostTos } = this.props.router.query;
     // first condition is if they are coming from Github stars, second is if they are coming from request manual verification
     if ((category === 'opensource' && step === 'form') || hostTos) {
-      this.setState({ hostTosChecked: true });
-      this.handleChange('hostTos', true);
+      this.setState({ hostTos: true });
     }
   }
 
-  handleChange(fieldname, value) {
-    this.setState(state => ({
-      collective: {
-        ...state.collective,
-        [fieldname]: value,
-      },
-    }));
-  }
-
-  githubRepoHelper(repoName) {
-    // replaces dash and underscore with space, then capitalises the words
-    const formattedName = repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
-    return formattedName;
-  }
-
   render() {
-    const { intl, error, host, loading, github, query } = this.props;
+    const { intl, error, host, loading, github, router } = this.props;
 
     const initialValues = {
-      name: github ? this.githubRepoHelper(github.repo) : '',
+      name: github ? formatGithubRepoName(github.repo) : '',
       description: '',
       slug: github ? github.repo : '',
     };
@@ -146,15 +116,15 @@ class CreateCollectiveForm extends React.Component {
       const errors = {};
 
       if (values.name.length > 50) {
-        errors.name = intl.formatMessage(this.messages.errorName);
+        errors.name = intl.formatMessage(messages.errorName);
       }
 
       if (values.slug.length > 30) {
-        errors.slug = intl.formatMessage(this.messages.errorSlug);
+        errors.slug = intl.formatMessage(messages.errorSlug);
       }
 
       if (values.description.length > 160) {
-        errors.description = intl.formatMessage(this.messages.errorDescription);
+        errors.description = intl.formatMessage(messages.errorDescription);
       }
 
       return errors;
@@ -162,13 +132,8 @@ class CreateCollectiveForm extends React.Component {
 
     const submit = values => {
       const { description, name, slug } = values;
-      const collective = {
-        name,
-        description,
-        slug,
-      };
-      assign(collective, this.state.collective);
-      this.props.onSubmit(collective);
+      const { tos, hostTos } = this.state;
+      this.props.onSubmit({ name, description, slug, tos, hostTos });
     };
 
     return (
@@ -181,7 +146,8 @@ class CreateCollectiveForm extends React.Component {
         <Flex flexDirection="column" my={[2, 4]}>
           <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
-              ←&nbsp;{intl.formatMessage(this.messages.back)}
+              ←&nbsp;
+              <FormattedMessage id="Back" defaultMessage="Back" />
             </BackButton>
           </Box>
           <Box mb={[2, 3]}>
@@ -192,18 +158,21 @@ class CreateCollectiveForm extends React.Component {
               textAlign="center"
               color="black.900"
             >
-              {intl.formatMessage(this.messages.header)}
+              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
             </H1>
           </Box>
           <Box textAlign="center" minHeight={['24px']}>
             <P fontSize="LeadParagraph" color="black.600" mb={2}>
-              {intl.formatMessage(this.messages.introduceSubtitle)}
+              <FormattedMessage
+                id="createCollective.subtitle.introduce"
+                defaultMessage="Introduce your Collective to the community."
+              />
             </P>
           </Box>
         </Flex>
         {error && (
           <Flex alignItems="center" justifyContent="center">
-            <MessageBox type="error" withIcon mb={[1, 3]}>
+            <MessageBox type="error" withIcon mb={[1, 3]} data-cy="ccf-error-message">
               {error.replace('GraphQL error: ', 'Error: ')}
             </MessageBox>
           </Flex>
@@ -242,12 +211,13 @@ class CreateCollectiveForm extends React.Component {
                       name="name"
                       htmlFor="name"
                       error={touched.name && errors.name}
-                      label={intl.formatMessage(this.messages.nameLabel)}
+                      label={intl.formatMessage(messages.nameLabel)}
                       value={values.name}
                       onChange={handleSlugChange}
                       required
                       mt={4}
                       mb={3}
+                      data-cy="ccf-form-name"
                     >
                       {inputProps => <Field as={StyledInput} {...inputProps} placeholder={placeholders.name} />}
                     </StyledInputField>
@@ -255,11 +225,12 @@ class CreateCollectiveForm extends React.Component {
                       name="slug"
                       htmlFor="slug"
                       error={touched.slug && errors.slug}
-                      label={intl.formatMessage(this.messages.slugLabel)}
+                      label={intl.formatMessage(messages.slugLabel)}
                       value={values.slug}
                       required
                       mt={3}
                       mb={2}
+                      data-cy="ccf-form-slug"
                     >
                       {inputProps => (
                         <Field
@@ -274,27 +245,28 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
                     {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny">{intl.formatMessage(this.messages.suggestedLabel)}</P>
+                      <P fontSize="Tiny">{intl.formatMessage(messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
                       error={touched.description && errors.description}
-                      label={intl.formatMessage(this.messages.descriptionLabel)}
+                      label={intl.formatMessage(messages.descriptionLabel)}
                       value={values.description}
                       required
                       mt={3}
                       mb={2}
+                      data-cy="ccf-form-description"
                     >
                       {inputProps => (
                         <Field
                           as={StyledInput}
                           {...inputProps}
-                          placeholder={intl.formatMessage(this.messages.descriptionPlaceholder)}
+                          placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
                         />
                       )}
                     </StyledInputField>
-                    <P fontSize="SmallCaption">{intl.formatMessage(this.messages.descriptionHint)}</P>
+                    <P fontSize="SmallCaption">{intl.formatMessage(messages.descriptionHint)}</P>
 
                     <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox
@@ -315,11 +287,10 @@ class CreateCollectiveForm extends React.Component {
                         required
                         checked={this.state.tosChecked}
                         onChange={({ checked }) => {
-                          this.handleChange('tos', checked);
-                          this.setState({ tosChecked: checked });
+                          this.setState({ tos: checked });
                         }}
                       />
-                      {!query.hostTos && get(host, 'settings.tos') && (
+                      {!router.query.hostTos && host && host.termsUrl && (
                         <StyledCheckbox
                           alignItems="flex-start"
                           name="hostTos"
@@ -329,7 +300,7 @@ class CreateCollectiveForm extends React.Component {
                               defaultMessage="I agree with the the {hosttoslink} of the host that will collect money on behalf of our collective."
                               values={{
                                 hosttoslink: (
-                                  <StyledLink href={get(host, 'settings.tos')} openInNewTab>
+                                  <StyledLink href={host.termsUrl} openInNewTab>
                                     <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
                                   </StyledLink>
                                 ),
@@ -339,8 +310,7 @@ class CreateCollectiveForm extends React.Component {
                           required
                           checked={this.state.hostTosChecked}
                           onChange={({ checked }) => {
-                            this.handleChange('hostTos', checked);
-                            this.setState({ hostTosChecked: checked });
+                            this.setState({ hostTos: checked });
                           }}
                         />
                       )}
@@ -355,8 +325,9 @@ class CreateCollectiveForm extends React.Component {
                         type="submit"
                         loading={loading}
                         onSubmit={handleSubmit}
+                        data-cy="ccf-form-submit"
                       >
-                        {intl.formatMessage(this.messages.createButton)}
+                        <FormattedMessage id="collective.create.button" defaultMessage="Create Collective" />
                       </StyledButton>
                     </Flex>
                   </Form>
@@ -378,4 +349,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default injectIntl(CreateCollectiveForm);
+export default injectIntl(withRouter(CreateCollectiveForm));
