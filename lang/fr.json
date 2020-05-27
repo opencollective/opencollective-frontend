@@ -285,6 +285,7 @@
   "CollectiveType.Event": "{count, plural, one {Événement} other {Événements}}",
   "CollectiveType.Organization": "{count, plural, one {Organisation} other {Organisations}}",
   "CollectiveType.User": "{count, plural, one {Utilisateur} other {Utilisateurs}}",
+  "comment.actions": "Comment Actions",
   "comment.btn": "Poster",
   "Comment.DeleteConfirmTitle": "Supprimer ce commentaire ?",
   "comment.login": "Connectez-vous pour commenter",
