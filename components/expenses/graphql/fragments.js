@@ -159,7 +159,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       type
       data
     }
-    comments {
+    comments(limit: 300) {
       nodes {
         ...CommentFields
       }
