@@ -186,7 +186,12 @@ const CreateProfile = ({
           method="POST"
         >
           <Box mb={24}>
-            <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
+            <StyledInputField
+              htmlFor="name"
+              label={formatMessage(messages.nameLabel)}
+              error={getFieldError('name')}
+              required
+            >
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e John Doe" />
               )}
@@ -220,7 +225,7 @@ const CreateProfile = ({
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!email}
+            disabled={!email || !state.name}
             width={1}
             type="submit"
             fontWeight="600"
@@ -253,7 +258,12 @@ const CreateProfile = ({
             <FormattedMessage id="CreateProfile.PersonalInfo" defaultMessage="Your personal information" />
           </P>
           <Box mb={24}>
-            <StyledInputField htmlFor="name" label={formatMessage(messages.nameLabel)} error={getFieldError('name')}>
+            <StyledInputField
+              htmlFor="name"
+              label={formatMessage(messages.nameLabel)}
+              error={getFieldError('name')}
+              required
+            >
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
               )}
@@ -353,7 +363,7 @@ const CreateProfile = ({
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!email || !state.orgName}
+            disabled={!email || !state.name || !state.orgName}
             width={1}
             type="submit"
             fontWeight="600"
