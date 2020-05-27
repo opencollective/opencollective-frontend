@@ -47,7 +47,7 @@ const messages = defineMessages({
 
 const expensePageQuery = gqlV2`
   query ExpensePage($legacyExpenseId: Int!) {
-    expense(expense: {legacyId: $legacyExpenseId}) {
+    expense(expense: { legacyId: $legacyExpenseId }) {
       ...expensePageExpenseFieldsFragment
     }
 
@@ -275,6 +275,13 @@ class ExpensePage extends React.Component {
     const hasAttachedFiles = expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = expense?.requiredLegalDocuments.includes('US_TAX_FORM') && expense?.permissions.canEdit;
     const hasHeaderMsg = error || showTaxFormMsg;
+
+    // Adding that at GraphQL level is buggy
+    // data is coming from expensePageQuery and expensePageExpenseFieldsFragment
+    if (expense && expense.account.isHost) {
+      expense.account.host = { ...expense.account };
+    }
+
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
         {createSuccess && !successMessageDismissed && (

@@ -341,6 +341,20 @@ const getData = graphql(
           tag
         }
 
+        ... on Organization {
+          id
+          isHost
+          balance
+          expensePolicy
+          location {
+            address
+            country
+          }
+          transferwise {
+            availableCurrencies
+          }
+        }
+
         ... on Collective {
           id
           isApproved
