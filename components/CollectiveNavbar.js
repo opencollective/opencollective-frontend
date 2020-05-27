@@ -278,6 +278,11 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
+  // Disallow Organizations to see contribute if not already "active"
+  if (!hasContribute && collective.type === CollectiveType.ORGANIZATION) {
+    toRemove.add(Sections.CONTRIBUTE);
+  }
+
   // Check opt-in features
   if (!hasFeature(collective, FEATURES.COLLECTIVE_GOALS)) {
     toRemove.add(Sections.GOALS);
