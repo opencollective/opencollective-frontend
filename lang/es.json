@@ -1243,6 +1243,7 @@
   "RoleDetails.MEMBER": "Core contributors are major contributors and represent the Collective with their face on the Collective page as part of the team.",
   "save": "Guardar",
   "saved": "Guardado",
+  "Saving": "Saving...",
   "Search": "Buscar",
   "search.ifYouDontSee": "If you don't see the collective you're looking for:",
   "search.noResult": "No collectives found matching your query: \"{query}\"",

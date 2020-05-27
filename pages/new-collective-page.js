@@ -209,12 +209,16 @@ class NewCollectivePage extends React.Component {
   }
 }
 
+export const getCollectivePageQueryVariables = collectiveSlug => {
+  return {
+    slug: collectiveSlug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+  };
+};
+
 const getCollective = graphql(getCollectivePageQuery, {
   options: props => ({
-    variables: {
-      slug: props.slug,
-      nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-    },
+    variables: getCollectivePageQueryVariables(props.slug),
   }),
 });
 

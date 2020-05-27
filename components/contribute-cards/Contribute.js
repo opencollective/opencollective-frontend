@@ -27,6 +27,7 @@ const StyledContributeCard = styled.div`
   height: 100%;
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
+  background: white;
 `;
 
 /** Tier card banner */
@@ -162,6 +163,7 @@ const ContributeCard = ({
           background="white"
           color="black.700"
           fontWeight="600"
+          letterSpacing="0.5px"
           textTransform="uppercase"
         >
           {intl.formatMessage(I18nContributionType[type])}

@@ -1243,6 +1243,7 @@
   "RoleDetails.MEMBER": "Colaboradores Centrais são os principais contribuintes e representam o Coletivo com seu rosto na página do Coletivo como parte da equipe.",
   "save": "Salvar",
   "saved": "Salvo",
+  "Saving": "Saving...",
   "Search": "Procurar",
   "search.ifYouDontSee": "Se você não encontrar o Coletivo que procura:",
   "search.noResult": "Nenhum Coletivo encontrado com esta busca: \"{query}\"",
