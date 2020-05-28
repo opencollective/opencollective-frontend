@@ -28,9 +28,6 @@ Router.onRouteChangeComplete = () => NProgress.done();
 
 Router.onRouteChangeError = () => NProgress.done();
 
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import sentryLib from '../server/sentry';
 
@@ -132,9 +129,7 @@ class OpenCollectiveFrontendApp extends App {
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
                 <UserProvider apiKey={process.env.STRIPE_KEY}>
-                  <DndProvider backend={HTML5Backend}>
-                    <Component {...pageProps} />
-                  </DndProvider>
+                  <Component {...pageProps} />
                 </UserProvider>
               </RawIntlProvider>
             </StripeProviderSSR>

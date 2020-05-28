@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import css, { get } from '@styled-system/css';
+import { get } from '@styled-system/css';
 import { cloneDeep, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
+import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
@@ -17,15 +17,16 @@ import { getCollectivePageQueryVariables } from '../../../pages/new-collective-p
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
-import DraggableContributeCardWrapper from '../../contribute-cards/DraggableContributeCardWrapper';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
@@ -36,17 +37,18 @@ import { getCollectivePageQuery } from '../graphql/queries';
 import SectionTitle from '../SectionTitle';
 import TopContributors from '../TopContributors';
 
+// Dynamic imports
+const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
+  ssr: false,
+  loading() {
+    return <LoadingPlaceholder height={400} />;
+  },
+});
+
 // link to new fiscal host application flow if flag is on
 const newHostFlow = parseToBoolean(process.env.NEW_HOST_APPLICATION_FLOW);
 
-const CONTRIBUTE_CARD_PADDING_X = [15, 18];
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
-
-const ContributeCardContainer = styled(Box).attrs({ px: CONTRIBUTE_CARD_PADDING_X })(
-  css({
-    scrollSnapAlign: ['center', null, 'start'],
-  }),
-);
 
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
@@ -95,9 +97,21 @@ class SectionContribute extends React.PureComponent {
   };
 
   state = {
+    showTiersAdmin: false,
     draggingContributionsOrder: null,
     isSaving: false,
   };
+
+  componentDidUpdate() {
+    if (!this.state.showTiersAdmin && !this.showTiersAdminTimeout) {
+      // Allow some time for the tiers admin component to load
+      this.showTiersAdminTimeout = setTimeout(() => this.setState({ showTiersAdmin: true }), 1500);
+    }
+  }
+
+  componentWillUnmount() {
+    this.showTiersAdminTimeout = null;
+  }
 
   getTopContributors = memoizeOne(contributors => {
     const topOrgs = [];
@@ -246,23 +260,9 @@ class SectionContribute extends React.PureComponent {
     });
   });
 
-  getContributeCard(Component, index, componentProps) {
-    return this.props.isAdmin ? (
-      <DraggableContributeCardWrapper
-        Component={Component}
-        componentProps={componentProps}
-        index={index}
-        onMove={this.onContributionCardMove}
-        onDrop={this.onContributionCardDrop}
-      />
-    ) : (
-      <Component {...componentProps} />
-    );
-  }
-
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
-    const { draggingContributionsOrder, isSaving } = this.state;
+    const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
     const [topOrganizations, topIndividuals] = this.getTopContributors(contributors);
     const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
@@ -284,10 +284,6 @@ class SectionContribute extends React.PureComponent {
     2b. not admin + Collective active = normal Contribute section ???
     3. not admin + Collective not active + no connectedcollectives/events = display nothing ✅
     */
-
-    const createContributionTierRoute = isEvent
-      ? `/${collective.parentCollective.slug}/events/${collective.slug}/edit#tiers`
-      : `/${collective.slug}/edit/tiers`;
 
     if (!hasContribute && !hasOtherWaysToContribute) {
       return null;
@@ -353,23 +349,25 @@ class SectionContribute extends React.PureComponent {
                             </P>
                           </ContainerOverlay>
                         )}
-                        <ContributeCardsContainer ref={ref} disableScrollSnapping={Boolean(draggingContributionsOrder)}>
-                          {waysToContribute.map(({ key, Component, componentProps }, index) => (
-                            <ContributeCardContainer key={key}>
-                              {this.getContributeCard(Component, index, componentProps)}
-                            </ContributeCardContainer>
-                          ))}
-                          {isAdmin && (
-                            <ContributeCardContainer>
-                              <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
-                                <FormattedMessage
-                                  id="Contribute.CreateTier"
-                                  defaultMessage="Create Contribution Tier"
-                                />
-                              </CreateNew>
-                            </ContributeCardContainer>
-                          )}
-                        </ContributeCardsContainer>
+                        {!showTiersAdmin && (
+                          <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
+                            {waysToContribute.map(({ key, Component, componentProps }) => (
+                              <ContributeCardContainer key={key}>
+                                <Component {...componentProps} />
+                              </ContributeCardContainer>
+                            ))}
+                          </ContributeCardsContainer>
+                        )}
+                        {isAdmin && (
+                          <Container display={showTiersAdmin ? 'block' : 'none'}>
+                            <AdminContributeCardsContainer
+                              collective={collective}
+                              cards={waysToContribute}
+                              onContributionCardMove={this.onContributionCardMove}
+                              onContributionCardDrop={this.onContributionCardDrop}
+                            />
+                          </Container>
+                        )}
                       </Container>
                     </div>
                   )}

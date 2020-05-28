@@ -36,8 +36,8 @@ ContainerOverlay.propTypes = {
   backgroundOpacity: PropTypes.number,
 };
 
-ContainerOverlay.propTypes = {
-  backgroundType: 'dark',
+ContainerOverlay.defaultProps = {
+  backgroundType: 'white',
 };
 
 export default ContainerOverlay;
