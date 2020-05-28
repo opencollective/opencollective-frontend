@@ -157,6 +157,7 @@ const addTiersData = graphql(
         type
         currency
         settings
+        isHost
         isActive
         imageUrl
         host {

@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
-import Currency from '../../Currency';
 import { Box, Flex } from '../../Grid';
 import I18nFormatters, { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
@@ -145,16 +144,6 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
                         }}
                       />
                     </P>
-                    {collective.stats.yearlyBudget > 0 && (
-                      <P my={3} mx={3} fontSize="Caption">
-                        <Span fontSize="Caption">
-                          <FormattedMessage id="YearlyBudget" defaultMessage="Yearly budget" />
-                        </Span>
-                        <Span fontSize="LeadParagraph" fontWeight="bold">
-                          <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
-                        </Span>
-                      </P>
-                    )}
                     <Box mx={3} my={3}>
                       <Link route={`/${collective.slug}/apply`}>
                         <ApplyButton buttonStyle="primary" data-cy="host-apply-btn">

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
-// OC Frontend imports
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
@@ -22,7 +21,6 @@ import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
 import SectionTransactions from './sections/Transactions';
 import SectionUpdates from './sections/Updates';
-// Collective page imports
 import { Sections } from './_constants';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
@@ -134,10 +132,12 @@ class CollectivePage extends Component {
     return {
       hasContact: !isAdmin && canContact,
       hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
-      hasApply: canApply,
+      // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
+      hasApply: canApply && !isAdmin,
       hasDashboard: isHost && isAdmin,
       hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
-      addFunds: isRoot && type === CollectiveType.ORGANIZATION,
+      // Don't display "Add Funds" if it's an Host and you're the Admin
+      addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
     };
   });
 

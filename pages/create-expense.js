@@ -219,6 +219,13 @@ class CreateExpensePage extends React.Component {
     const collective = data && data.account;
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
+
+    // Adding that at GraphQL level is buggy
+    // data is coming from CreateExpensePage
+    if (collective && collective.isHost) {
+      collective.host = { ...collective };
+    }
+
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <React.Fragment>
@@ -344,6 +351,7 @@ const getData = graphql(
         ... on Organization {
           id
           isHost
+          isActive
           balance
           expensePolicy
           location {
