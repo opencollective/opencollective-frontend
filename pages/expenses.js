@@ -230,6 +230,7 @@ const EXPENSES_PAGE_QUERY = gqlV2`
         balance
         # We add that for hasFeature
         isHost
+        isActive
       }
       ... on Event {
         balance

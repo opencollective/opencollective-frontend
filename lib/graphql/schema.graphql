@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue May 26 2020 15:39:06 GMT+0200 (Central European Summer Time)
+# timestamp: Thu May 28 2020 16:05:08 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -717,6 +717,7 @@ type CollectiveStatsType {
     periodInMonths: Int
   ): Int
   yearlyBudget: Int
+  yearlyBudgetManaged: Int
   topExpenses: JSON
   topFundingSources: JSON
   activeRecurringContributions: JSON

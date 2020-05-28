@@ -134,7 +134,7 @@ query getHosts($tags: [String], $limit: Int) {
       totalHostedCollectives
       hostFeePercent
       stats {
-        yearlyBudget {
+        yearlyBudgetManaged {
           value
         }
       }

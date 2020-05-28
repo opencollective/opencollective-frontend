@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue May 26 2020 15:39:26 GMT+0200 (Central European Summer Time)
+# timestamp: Thu May 28 2020 16:05:29 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -202,6 +202,7 @@ type AccountStats {
   """
   totalAmountReceived: Amount
   yearlyBudget: Amount
+  yearlyBudgetManaged: Amount
 }
 
 """

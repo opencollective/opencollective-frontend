@@ -344,7 +344,7 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   return {
     hasContact: collective.canContact,
-    hasApply: collective.canApply,
+    hasApply: collective.canApply && !isAdmin,
     hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
   };
 };
