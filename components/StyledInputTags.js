@@ -53,6 +53,7 @@ const Input = styled.input`
   border: 0;
   margin-left: 10px;
   outline: none;
+  width: auto;
   ::placeholder {
     color: ${props => props.theme.colors.black[400]};
   }
