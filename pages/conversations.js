@@ -91,7 +91,7 @@ class ConversationsPage extends React.Component {
             <MessageBox mb={4} type="info" withIcon>
               <FormattedMessage
                 id="conversations.noMatch"
-                defaultMessage="No conversation matching the given criterias."
+                defaultMessage="No conversation matching the given criteria."
               />
             </MessageBox>
           )}
