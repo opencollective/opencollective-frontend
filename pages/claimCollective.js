@@ -271,7 +271,7 @@ class ClaimCollectivePage extends React.Component {
                         Validation unsuccessful
                       </H5>
                       <P textAlign="center" color="black.600" mb={4}>
-                        Sorry, we were unable to succesfully validated your admin status. Try again, or if you believe
+                        Sorry, we were unable to successfully validated your admin status. Try again, or if you believe
                         this is a mistake, please get in touch with the repository owners. Make sure you granted us
                         access as an organization if that&apos;s what you are trying to onboard.
                       </P>
@@ -313,7 +313,7 @@ class ClaimCollectivePage extends React.Component {
                         Congratulations!
                       </H5>
                       <P textAlign="center" color="black.600" mb={4}>
-                        We have succesfully validated your admin status. Press the button below to activate this open
+                        We have successfully validated your admin status. Press the button below to activate this open
                         collective. It will also email all pledgers to fulfill their pledges.
                       </P>
                       <StyledButton
