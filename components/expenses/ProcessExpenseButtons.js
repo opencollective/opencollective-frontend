@@ -132,7 +132,7 @@ ProcessExpenseButtons.propTypes = {
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
-  /** Props passed to all buttons. Usefull to customize sizes, spaces, etc. */
+  /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
 };
 
