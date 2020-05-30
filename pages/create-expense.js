@@ -162,7 +162,7 @@ class CreateExpensePage extends React.Component {
         expense: prepareExpenseForSubmit(expense),
       });
 
-      // Clear local storage backup if expense submitted successfuly
+      // Clear local storage backup if expense submitted successfully
       if (this.state.formPersister) {
         this.state.formPersister.clearValues();
       }
