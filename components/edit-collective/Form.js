@@ -263,7 +263,7 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = { ...state.collective };
 
-      // GraphQL schema has address embeded within location
+      // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
       if (['address', 'country'].includes(fieldname)) {
         collective.location = collective.location || {};
