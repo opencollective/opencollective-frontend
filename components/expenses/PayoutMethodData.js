@@ -39,13 +39,13 @@ export const payoutMethodHasData = payoutMethod => {
   }
 };
 
-const PRIVATE_DATA_PLACEHOLER = '********';
+const PRIVATE_DATA_PLACEHOLDER = '********';
 
 const getPmData = (payoutMethod, field, isLoading) => {
   if (isLoading) {
     return <LoadingPlaceholder height={15} />;
   } else {
-    return get(payoutMethod, `data.${field}`, PRIVATE_DATA_PLACEHOLER);
+    return get(payoutMethod, `data.${field}`, PRIVATE_DATA_PLACEHOLDER);
   }
 };
 
@@ -112,7 +112,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
           ) : isLoading ? (
             <LoadingPlaceholder height="1.5em" />
           ) : (
-            PRIVATE_DATA_PLACEHOLER
+            PRIVATE_DATA_PLACEHOLDER
           )}
         </div>
       );
