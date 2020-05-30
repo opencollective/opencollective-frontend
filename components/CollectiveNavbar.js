@@ -285,6 +285,10 @@ export const getSectionsForCollective = (collective, isAdmin) => {
     toRemove.add(Sections.CONVERSATIONS);
   }
 
+  if (!hasFeature(collective, FEATURES.UPDATES)) {
+    toRemove.add(Sections.UPDATES);
+  }
+
   // Some sections are hidden for non-admins (usually when there's no data)
   if (!isAdmin) {
     const { updates, transactions, balance } = collective.stats || {};
