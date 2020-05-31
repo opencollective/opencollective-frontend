@@ -97,7 +97,7 @@
     "react-swipeable": "5.5.1",
     "react-tooltip": "4.2.6",
     "react-window": "1.8.5",
-    "sanitize-html": "1.24.0",
+    "sanitize-html": "1.25.0",
     "showdown": "1.9.1",
     "slugify": "1.4.0",
     "styled-components": "5.1.1",
