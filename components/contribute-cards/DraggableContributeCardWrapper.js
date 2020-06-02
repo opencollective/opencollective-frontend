@@ -4,8 +4,6 @@ import { Move as MoveIcon } from '@styled-icons/feather/Move';
 import { useDrag, useDrop } from 'react-dnd';
 import styled, { css } from 'styled-components';
 
-import StyledRoundButton from '../StyledRoundButton';
-
 const MainContainer = styled.div`
   position: relative;
   display: flex;
@@ -28,9 +26,9 @@ const MainContainer = styled.div`
 `;
 
 const DragHandle = React.forwardRef((props, ref) => (
-  <StyledRoundButton size={32} {...props} ref={ref}>
+  <div {...props} ref={ref}>
     <MoveIcon size={10} />
-  </StyledRoundButton>
+  </div>
 ));
 
 DragHandle.displayName = 'DragHandle';
@@ -41,6 +39,17 @@ const StyledDragHandle = styled(DragHandle)`
   top: 8px;
   margin-left: 270px;
   box-shadow: 0px 4px 6px rgba(26, 27, 31, 0.16);
+  height: 32px;
+  width: 32px;
+  background: white;
+  border: 1px solid #dcdee0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:hover {
+    background: #f7f8fa;
+  }
 `;
 
 const ITEM_TYPE = 'ContributeCard';
