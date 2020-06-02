@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, groupBy } from 'lodash';
+import { get, groupBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, injectIntl } from 'react-intl';
 
@@ -28,6 +28,8 @@ const newPayoutMethodMsg = defineMessages({
     defaultMessage: 'New {pmType}',
   },
 });
+
+const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
 
 /**
  * An overset of `StyledSelect` specialized for payout methods. Accepts all the props
@@ -83,6 +85,10 @@ class PayoutMethodSelect extends React.Component {
         } else {
           return `${payoutMethod.data.accountHolderName} (${payoutMethod.data.currency})`;
         }
+      } else if (payoutMethod.type === PayoutMethodType.OTHER) {
+        const content = payoutMethod.data?.content?.replace(/\n|\t/g, ' ');
+        const i18nType = i18nPayoutMethodType(formatMessage, payoutMethod.type);
+        return content ? `${i18nType} - ${truncate(content, { length: MAX_PAYOUT_OPTION_DATA_LENGTH })}` : i18nType;
       } else {
         return i18nPayoutMethodType(formatMessage, payoutMethod.type);
       }
@@ -101,6 +107,12 @@ class PayoutMethodSelect extends React.Component {
     }
   };
 
+  getPayoutMethodTitle = pm => {
+    if (pm.type === PayoutMethodType.OTHER && pm.data?.content?.length > MAX_PAYOUT_OPTION_DATA_LENGTH) {
+      return pm.data.content;
+    }
+  };
+
   getDefaultData(payoutMethodType) {
     switch (payoutMethodType) {
       case PayoutMethodType.PAYPAL:
@@ -115,6 +127,7 @@ class PayoutMethodSelect extends React.Component {
   getOptionFromPayoutMethod = pm => ({
     value: pm,
     label: this.getPayoutMethodLabel(pm),
+    title: this.getPayoutMethodTitle(pm),
   });
 
   getOptions = memoizeOne(payoutMethods => {
