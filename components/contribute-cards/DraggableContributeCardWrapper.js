@@ -50,6 +50,11 @@ const StyledDragHandle = styled(DragHandle)`
   &:hover {
     background: #f7f8fa;
   }
+
+  /** Hide on touchscreens */
+  @media (hover: none) {
+    display: none;
+  }
 `;
 
 const ITEM_TYPE = 'ContributeCard';
