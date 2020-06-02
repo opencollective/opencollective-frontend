@@ -23,8 +23,12 @@ const getDisabledMessage = (expense, collective, payoutMethod) => {
   } else if (!payoutMethod) {
     return null;
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
-    const { transferwisePayouts, transferwisePayoutsLimit } = host.plan;
-    if (transferwisePayoutsLimit !== null && transferwisePayouts >= transferwisePayoutsLimit) {
+    // In some cases, host.plan might not be available (Host Organization account)
+    if (
+      host.plan &&
+      host.plan.transferwisePayoutsLimit !== null &&
+      host.plan.transferwisePayouts >= host.plan.transferwisePayoutsLimit
+    ) {
       return (
         <FormattedMessage
           id="expense.pay.transferwise.planlimit"
