@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Query } from '@apollo/react-components';
+import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { get, isEmpty, orderBy } from 'lodash';
+import { debounce, get, isEmpty, orderBy } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
@@ -42,6 +42,63 @@ const TransactionsAndExpensesQuery = gql`
   ${BudgetItemExpenseTypeFragment}
 `;
 
+const renderBudget = (collective, data) => {
+  const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
+
+  const expenses = get(data, 'Collective.expenses');
+  const transactions = get(data, 'Collective.transactions');
+  if (isEmpty(expenses) && isEmpty(transactions)) {
+    return (
+      <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="Paragraph">
+        <FormattedMessage
+          id="SectionBudget.Empty"
+          defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
+                  financial contributors or when someone creates an expense."
+        />
+      </MessageBox>
+    );
+  }
+
+  // Merge items, filter expenses that already have a transaction as they'll already be
+  // included in `transactions`.
+  const budgetItemsUnsorted = [...transactions, ...expenses];
+  const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
+  return (
+    <Container flex="10" mb={3} width="100%" maxWidth={800}>
+      <BudgetItemsList items={budgetItems} isCompact isFeesOnTop={isFeesOnTop} />
+      <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
+        <Box flex="1 1" mx={[0, 2]}>
+          <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+            <StyledButton
+              data-cy="view-all-transactions-btn"
+              my={2}
+              minWidth={290}
+              width="100%"
+              buttonSize="small"
+              fontSize="Paragraph"
+            >
+              <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" />
+            </StyledButton>
+          </Link>
+        </Box>
+        <Box flex="1 1" mx={[0, 2]}>
+          <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
+            <StyledButton
+              data-cy="view-all-expenses-btn"
+              my={2}
+              minWidth={290}
+              width="100%"
+              buttonSize="small"
+              fontSize="Paragraph"
+            >
+              <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />
+            </StyledButton>
+          </Link>
+        </Box>
+      </Flex>
+    </Container>
+  );
+};
 /**
  * The budget section. Shows the expenses, the latests transactions and some statistics
  * abut the global budget of the collective.
@@ -49,7 +106,43 @@ const TransactionsAndExpensesQuery = gql`
 const SectionBudget = ({ collective, stats }) => {
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
-  const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
+
+  const { data, startPolling, stopPolling } = useQuery(TransactionsAndExpensesQuery, {
+    variables: { slug: collective.slug },
+  });
+
+  useEffect(() => {
+    console.log('useEffect');
+    const interval = 60;
+    let timeout, pollingStarted;
+    const handlePolling = debounce(() => {
+      console.log('Handle Polling');
+      if (!pollingStarted) {
+        console.log('startPolling');
+        startPolling(interval * 1000);
+        pollingStarted = true;
+      } else {
+        console.log('Polling already started');
+      }
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        console.log('stopPolling');
+        stopPolling();
+        pollingStarted = false;
+      }, interval * 1000);
+    }, 100);
+    handlePolling();
+    document.addEventListener('mousemove', handlePolling);
+    document.addEventListener('keypress', handlePolling);
+    return () => {
+      console.log('useEffect clean');
+      clearTimeout(timeout);
+      stopPolling();
+      document.removeEventListener('mousemove', handlePolling);
+      document.removeEventListener('keypress', handlePolling);
+    };
+  }, [startPolling, stopPolling]);
+
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
       <SectionTitle>
@@ -63,70 +156,7 @@ const SectionBudget = ({ collective, stats }) => {
         />
       </P>
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
-        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }} pollInterval={60000}>
-          {({ data }) => {
-            const expenses = get(data, 'Collective.expenses');
-            const transactions = get(data, 'Collective.transactions');
-            if (isEmpty(expenses) && isEmpty(transactions)) {
-              return (
-                <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="Paragraph">
-                  <FormattedMessage
-                    id="SectionBudget.Empty"
-                    defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
-                  financial contributors or when someone creates an expense."
-                  />
-                </MessageBox>
-              );
-            }
-
-            // Merge items, filter expenses that already have a transaction as they'll already be
-            // included in `transactions`.
-            const budgetItemsUnsorted = [...transactions, ...expenses];
-            const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
-            return (
-              <Container flex="10" mb={3} width="100%" maxWidth={800}>
-                <BudgetItemsList items={budgetItems} isCompact isFeesOnTop={isFeesOnTop} />
-                <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
-                  <Box flex="1 1" mx={[0, 2]}>
-                    <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-                      <StyledButton
-                        data-cy="view-all-transactions-btn"
-                        my={2}
-                        minWidth={290}
-                        width="100%"
-                        buttonSize="small"
-                        fontSize="Paragraph"
-                      >
-                        <FormattedMessage
-                          id="CollectivePage.SectionBudget.ViewAll"
-                          defaultMessage="View all transactions"
-                        />
-                      </StyledButton>
-                    </Link>
-                  </Box>
-                  <Box flex="1 1" mx={[0, 2]}>
-                    <Link route="expenses" params={{ collectiveSlug: collective.slug }}>
-                      <StyledButton
-                        data-cy="view-all-expenses-btn"
-                        my={2}
-                        minWidth={290}
-                        width="100%"
-                        buttonSize="small"
-                        fontSize="Paragraph"
-                      >
-                        <FormattedMessage
-                          id="CollectivePage.SectionBudget.ViewAllExpenses"
-                          defaultMessage="View all expenses"
-                        />
-                      </StyledButton>
-                    </Link>
-                  </Box>
-                </Flex>
-              </Container>
-            );
-          }}
-        </Query>
-
+        {renderBudget(collective, data)}
         <Box width="32px" flex="1" />
 
         <StyledCard
