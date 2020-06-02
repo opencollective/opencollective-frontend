@@ -16,6 +16,7 @@ const MenuDivider = styled.div`
 export const EDIT_COLLECTIVE_SECTIONS = {
   INFO: 'info', // First on purpose
   COLLECTIVE_GOALS: 'goals',
+  COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
@@ -46,6 +47,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: {
     id: 'editCollective.menu.goals',
     defaultMessage: 'Collective Goals',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: {
+    id: 'editCollective.menu.collectivePage',
+    defaultMessage: 'Collective Page',
   },
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: {
     id: 'editCollective.menu.connectedAccounts',
@@ -149,6 +154,7 @@ const isOneOfTypes = (...collectiveTypes) => ({ type }) => collectiveTypes.inclu
 const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveType(type, feature);
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: collective =>
     collective.isHost || collective.type == CollectiveType.COLLECTIVE,

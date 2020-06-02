@@ -4,6 +4,8 @@ import { Move as MoveIcon } from '@styled-icons/feather/Move';
 import { useDrag, useDrop } from 'react-dnd';
 import styled, { css } from 'styled-components';
 
+import DRAG_AND_DROP_TYPES from '../../lib/constants/drag-and-drop';
+
 const MainContainer = styled.div`
   position: relative;
   display: flex;
@@ -57,8 +59,6 @@ const StyledDragHandle = styled(DragHandle)`
   }
 `;
 
-const ITEM_TYPE = 'ContributeCard';
-
 /**
  * A wrapper arround contribute cards that makes them draggable
  */
@@ -66,12 +66,12 @@ const DraggableContributeCardWrapper = ({ Component, componentProps, index, onMo
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
-    accept: ITEM_TYPE,
+    accept: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD,
     hover: item => onMove(item.index, index),
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: ITEM_TYPE, index },
+    item: { type: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD, index },
     end: item => onDrop(item.index, index),
     collect: monitor => ({ isDragging: monitor.isDragging() }),
   });
