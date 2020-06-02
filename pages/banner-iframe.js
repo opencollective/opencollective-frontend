@@ -9,7 +9,7 @@ import MembersWithData from '../components/MembersWithData';
 
 class BannerIframe extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id, style }, res }) {
-    // Allow to be embeded as Iframe everywhere
+    // Allow to be embedded as Iframe everywhere
     if (res) {
       res.removeHeader('X-Frame-Options');
     }
