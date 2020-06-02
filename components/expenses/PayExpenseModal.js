@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
@@ -56,6 +57,7 @@ const generatePayoutOptions = (intl, payoutMethodType, collective) => {
       },
     ];
     if (
+      hasFeature(collective.host, FEATURES.PAYPAL_PAYOUTS) &&
       payoutMethodType === PayoutMethodType.PAYPAL &&
       collective.host?.connectedAccounts?.find(ca => ca?.service === 'paypal')
     ) {
