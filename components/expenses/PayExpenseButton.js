@@ -86,7 +86,8 @@ const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...p
           onClose={() => showModal(false)}
           error={error}
           onSubmit={async values => {
-            await onSubmit(values);
+            const { action, ...data } = values;
+            await onSubmit(action, data);
             showModal(false);
           }}
         />

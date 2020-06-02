@@ -51,6 +51,10 @@ const ACTIVITIES_INFO = {
     type: 'info',
     icon: CogsIcon,
   },
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
+    type: 'info',
+    icon: CogsIcon,
+  },
   COLLECTIVE_EXPENSE_ERROR: {
     type: 'error',
     icon: ErrorIcon,
@@ -85,6 +89,10 @@ const MESSAGES = defineMessages({
   COLLECTIVE_EXPENSE_PROCESSING: {
     id: 'Expense.Activity.Processing',
     defaultMessage: 'Expense processing',
+  },
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
+    id: 'Expense.Activity.ScheduledForPayment',
+    defaultMessage: 'Expense scheduled for payment',
   },
   COLLECTIVE_EXPENSE_ERROR: {
     id: 'Expense.Activity.Error',

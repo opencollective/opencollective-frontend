@@ -123,7 +123,7 @@ const EditTransferWiseAccount = props => {
           />
         </P>
         <P lineHeight="0">
-          <StyledButton type="submit" buttonSize="small" loading={isDeleting} onClick={handleDelete}>
+          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>
