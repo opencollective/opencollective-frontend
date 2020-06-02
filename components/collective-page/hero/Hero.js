@@ -165,7 +165,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               {isCollective && (
                 <StyledTag textTransform="uppercase" mx={2} my={2} mb={2}>
                   <I18nCollectiveTags
-                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+                    tags={getCollectiveMainTag(
+                      get(collective, 'host.id'),
+                      collective.tags,
+                      collective.type,
+                      collective.settings,
+                    )}
                   />
                 </StyledTag>
               )}

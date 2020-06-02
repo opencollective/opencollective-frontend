@@ -126,11 +126,12 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply, canContact, isArchived, isActive) => {
+  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply, canContact, isArchived, isActive, isFund) => {
     const isCollective = type === CollectiveType.COLLECTIVE;
     const isEvent = type === CollectiveType.EVENT;
     return {
       hasContact: !isAdmin && canContact,
+      hasContribute: isFund && isActive,
       hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
       // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
       hasApply: canApply && !isAdmin,
@@ -222,9 +223,10 @@ class CollectivePage extends Component {
 
   render() {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
-    const { type, isHost, canApply, canContact, isActive } = collective;
+    const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin);
+    const isFund = settings?.fund === true; // Funds MVP, to refactor
     const callsToAction = this.getCallsToAction(
       type,
       isHost,
@@ -234,6 +236,7 @@ class CollectivePage extends Component {
       canContact,
       collective.isArchived,
       isActive,
+      isFund,
     );
 
     return (

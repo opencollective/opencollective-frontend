@@ -20,7 +20,15 @@ const AddFundsModal = dynamic(() => import('./AddFundsModal'));
 const CollectiveCallsToAction = ({
   collective,
   buttonsMinWidth,
-  callsToAction: { hasSubmitExpense, hasContact, hasApply, hasDashboard, hasManageSubscriptions, addFunds },
+  callsToAction: {
+    hasContribute,
+    hasSubmitExpense,
+    hasContact,
+    hasApply,
+    hasDashboard,
+    hasManageSubscriptions,
+    addFunds,
+  },
   ...props
 }) => {
   const [hasAddFundsModal, showAddFundsModal] = React.useState(false);
@@ -39,6 +47,20 @@ const CollectiveCallsToAction = ({
         <Link route="collective-contact" params={{ collectiveSlug: collective.slug }}>
           <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="Contact" defaultMessage="Contact" />
+          </StyledButton>
+        </Link>
+      )}
+      {hasContribute && (
+        <Link route="orderCollectiveNew" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
+          <StyledButton
+            buttonSize="small"
+            mx={2}
+            my={1}
+            minWidth={buttonsMinWidth}
+            buttonStyle="secondary"
+            data-cy="donate-btn"
+          >
+            <FormattedMessage id="menu.contributeMoney" defaultMessage="Contribute Money" />
           </StyledButton>
         </Link>
       )}
@@ -123,6 +145,8 @@ CollectiveCallsToAction.propTypes = {
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */
     hasContact: PropTypes.bool,
+    /** Donate / Send Money button */
+    hasContribute: PropTypes.bool,
     /** Submit new expense button */
     hasSubmitExpense: PropTypes.bool,
     /** Hosts "Apply" button */

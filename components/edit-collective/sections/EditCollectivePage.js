@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
-import { cloneDeep, get, isEqual, set, uniqBy } from 'lodash';
+import { cloneDeep, difference, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -122,7 +122,13 @@ export const isCollectiveSectionEnabled = (collective, section) => {
  */
 const loadSectionsForCollective = collective => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
-  const defaultSections = getDefaultSectionsForCollectiveType(collective.type);
+  let defaultSections = getDefaultSectionsForCollectiveType(collective.type);
+
+  // Funds MVP, to refactor
+  if (collective.settings?.fund === true) {
+    defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
+  }
+
   const transformLegacySection = section => {
     return typeof section === 'string'
       ? { section, isEnabled: isCollectiveSectionEnabled(collective, section) }
@@ -177,7 +183,7 @@ const EditCollectivePage = ({ collective }) => {
         <P color="black.600">
           <FormattedMessage
             id="EditCollectivePage.SectionsDescription"
-            defaultMessage="In this section you can use drag and drop to reorder the Collective Page sections."
+            defaultMessage="In this section you can use drag and drop to reorder the Profile Page sections."
           />
         </P>
       </Box>
@@ -245,7 +251,7 @@ const EditCollectivePage = ({ collective }) => {
                 <Box m={2}>
                   <Link route="collective" params={{ slug: collective.slug }}>
                     <Span fontSize="14px">
-                      <FormattedMessage id="ViewCollectivePage" defaultMessage="View Collective page" />
+                      <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
                     </Span>
                   </Link>
                 </Box>
