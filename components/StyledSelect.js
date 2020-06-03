@@ -27,7 +27,8 @@ const Messages = defineMessages({
 
 // eslint-disable-next-line react/prop-types
 const Option = ({ innerProps, ...props }) => (
-  <components.Option {...props} innerProps={{ ...innerProps, 'data-cy': 'select-option' }} />
+  // eslint-disable-next-line react/prop-types
+  <components.Option {...props} innerProps={{ ...innerProps, 'data-cy': 'select-option', title: props.data.title }} />
 );
 
 // eslint-disable-next-line react/prop-types
