@@ -160,8 +160,9 @@ describe('Contribution Flow: Donate', () => {
     // Rejecting the validation should produce an error
     cy.get(iframeSelector).then($3dSecureIframe => {
       const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
-      const cyChallenge = cy.wrap($challengeIframe.contents().find('body'));
-      cyChallenge.find('#test-source-fail-3ds').click();
+      const $acsIframe = $challengeIframe.contents().find('iframe[name="acsFrame"]');
+      const $finalContent = $acsIframe.contents().find('body');
+      $finalContent.find('#test-source-fail-3ds').click();
     });
     cy.contains(
       'We are unable to authenticate your payment method. Please choose a different payment method and try again.',
@@ -177,8 +178,9 @@ describe('Contribution Flow: Donate', () => {
     // Approving the validation should create the order
     cy.get(iframeSelector).then($3dSecureIframe => {
       const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
-      const cyChallenge = cy.wrap($challengeIframe.contents().find('body'));
-      cyChallenge.find('#test-source-authorize-3ds').click();
+      const $acsIframe = $challengeIframe.contents().find('iframe[name="acsFrame"]');
+      const $finalContent = $acsIframe.contents().find('body');
+      $finalContent.find('#test-source-authorize-3ds').click();
     });
 
     cy.contains("You're now a backer of APEX!", { timeout: 15000 });
