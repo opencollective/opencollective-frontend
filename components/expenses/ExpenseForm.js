@@ -194,7 +194,8 @@ const ExpenseFormBody = ({
   React.useEffect(() => {
     if (values.payee?.location && !formik.touched.payeeLocation) {
       formik.setFieldValue('payeeLocation.country', values.payee.location.country);
-      formik.setFieldValue('payeeLocation.address', values.payee.location.address);
+      formik.setFieldValue('payeeLocation.country', values.payee.location.country || null);
+      formik.setFieldValue('payeeLocation.address', values.payee.location.address || '');
     }
   }, [values.payee]);
 
@@ -371,8 +372,7 @@ const ExpenseFormBody = ({
                                 mt={3}
                               >
                                 {inputProps => (
-                                  <Field
-                                    as={StyledTextarea}
+                                  <StyledTextarea
                                     {...inputProps}
                                     {...field}
                                     minHeight={100}
