@@ -265,7 +265,7 @@ const CreateProfile = ({
               required
             >
               {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e Jhon Doe" />
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="i.e John Doe" />
               )}
             </StyledInputField>
           </Box>
