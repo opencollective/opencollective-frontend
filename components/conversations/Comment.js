@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
-import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
 import themeGet from '@styled-system/theme-get';
@@ -17,6 +16,7 @@ import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
+import RoundHoriztonalDotsIcon from '../icons/RoundHorizontalDotsIcon';
 import InlineEditField from '../InlineEditField';
 import LinkCollective from '../LinkCollective';
 import MessageBox from '../MessageBox';
@@ -30,7 +30,7 @@ import { CommentFieldsFragment } from './graphql';
 
 const CommentBtn = styled(StyledButton)`
   padding: 3px 5px;
-  margin: 12px 0;
+  margin: 5px 0;
   width: 100%;
   text-align: left;
   border: none;
@@ -60,6 +60,8 @@ const ActionButton = styled(StyledButton)`
   padding: 4px 12px;
   height: 24px;
   color: #dadada;
+  display: flex;
+  justify-content: center;
   border-color: ${themeGet('colors.black.200')};
 
   &:active {
@@ -183,7 +185,7 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
 
   const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
   const { styles, attributes, state } = usePopper(refElement, popperElement, {
-    placement: 'right',
+    placement: 'bottom-start',
     modifiers: REACT_POPPER_MODIFIERS,
   });
   useClosePopper(state, closePopup);
@@ -214,7 +216,7 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
         </Flex>
         {hasActions && (
           <ActionButton ref={setRefElement} onClick={() => setShowAdminActions(!showAdminActions)}>
-            <DotsHorizontalRounded size="16" />
+            <RoundHoriztonalDotsIcon size="16" />
           </ActionButton>
         )}
         {showAdminActions && hasActions && (
