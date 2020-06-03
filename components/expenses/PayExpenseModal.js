@@ -113,12 +113,14 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
         <H4 fontSize="20px" fontWeight="bold" mb={3}>
           <FormattedMessage id="Expense.PayoutAndFees" defaultMessage="Payout method and fees" />
         </H4>
-        <P fontSize="13px" lineHeight="19px" mb={3}>
-          <FormattedMessage
-            id="Expense.PayoutAndFeesDetails"
-            defaultMessage="Please add the corresponding fees according to the payout option selected."
-          />
-        </P>
+        {formik.values.forceManual && (
+          <P fontSize="13px" lineHeight="19px" mb={3}>
+            <FormattedMessage
+              id="Expense.PayoutAndFeesDetails"
+              defaultMessage="Please add the corresponding fees according to the payout option selected."
+            />
+          </P>
+        )}
         <StyledInputField
           htmlFor="payExpenseModalPayoutMethod"
           label={<FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />}
