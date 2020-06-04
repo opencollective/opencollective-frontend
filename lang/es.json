@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "Por ejemplo: qué tipo de gastos se aprobarán, cualquier limitaciones en el monto, qué documentación se necesita, y quién contactar con preguntas.",
   "collective.githubflow.created.description": "Ya está aprobado por el patrocinador ({host}), ya puede recibir donaciones. Siéntase libre de personalizar su colectivo, archivar gastos e incluso crear eventos.",
   "Collective.Hero.Host": "{FiscalHost}: {hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "Un anfitrión fiscal es una entidad legal que mantiene los fondos del Colectivo en su cuenta bancaria y que puede generar facturas y recibos para los contribuyentes y patrocinadores.",
   "collective.hostAccount.deactivate.description": "Después de desactivar su organización como anfitrión, usted no será capaz de alojar colectivos. El perfil permanecerá activo como un perfil de tipo {type}.",
   "collective.hostAccount.deactivate.isHost": "No puede desactivar el alojamiento mientras siga alojando {hostedCollectives} colectivos.",

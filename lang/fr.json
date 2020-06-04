@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "Par exemple : quel type de dépenses seront acceptées, les limites sur le montant, les documents requis et qui contacter s'il y a des questions.",
   "collective.githubflow.created.description": "Il a été approuvé par l'hôte ({host}), vous pouvez déjà recevoir des dons. N'hésitez pas à personnaliser votre page de collectif, à créer des dépenses ou des événements.",
   "Collective.Hero.Host": "{FiscalHost} : {hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "Un hôte fiscal est une entité juridique qui détient les fonds d'un Collectif sur son compte bancaire et peut générer des factures et des reçus pour les contributeurs et les sponsors.",
   "collective.hostAccount.deactivate.description": "Après avoir désactivé le mode hôte, vous ne pourrez plus héberger de collectifs. Le profil restera actif en tant que profil de {type}.",
   "collective.hostAccount.deactivate.isHost": "Vous ne pouvez pas désactiver le mode hôte alors que vous hébergez encore {hostedCollectives} collectifs.",

@@ -205,6 +205,7 @@
   "collective.expensePolicy.placeholder": "For example: what type of expenses will be approved, any limitations on amounts, what documentation is required, and who to contact with questions.",
   "collective.githubflow.created.description": "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   "Collective.Hero.Host": "{FiscalHost}：{hostName}",
+  "Collective.Hero.Parent": "Part of: {parentName}",
   "collective.hostAccount.activate.description": "A fiscal host is a legal entity who holds a Collective’s funds in their bank account, and can generate invoices and receipts for backers and sponsors.",
   "collective.hostAccount.deactivate.description": "在停用组织作为主持人的身份后，您将无法继续管理该组织。该配置将作为一个 {type} 的个人资料被使用。",
   "collective.hostAccount.deactivate.isHost": "You can't deactivate hosting while still hosting {hostedCollectives} other collectives.",
