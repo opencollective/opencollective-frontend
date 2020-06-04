@@ -155,11 +155,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: isFeatureAllowed(FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
   [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isOneOfTypes(
-    CollectiveType.COLLECTIVE,
-    CollectiveType.ORGANIZATION,
-    CollectiveType.USER,
-  ),
+  [EDIT_COLLECTIVE_SECTIONS.EXPORT]: collective => collective.isHost || collective.type == CollectiveType.COLLECTIVE,
   [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
   [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),

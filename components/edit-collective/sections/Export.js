@@ -4,7 +4,10 @@ import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { getEnvVar } from '../../../lib/env-utils';
 import { exportHosts, exportMembers } from '../../../lib/export_file';
+
+import { P } from '../../../components/Text';
 
 import ExportImages from '../../ExportImages';
 import StyledLink from '../../StyledLink';
@@ -18,196 +21,163 @@ class Export extends React.Component {
     super(props);
   }
 
-  generateExports(collective, widgetCode) {
-    if (collective.type === CollectiveType.COLLECTIVE) {
-      return (
-        <Fragment>
-          <h1>
-            <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
-          </h1>
-          <div className="code">{widgetCode}</div>
+  renderStyledLink(path) {
+    const restURL = getEnvVar('REST_URL');
+    const URL = `${restURL}${path}`;
+    return (
+      <StyledLink display="block" href={URL}>
+        {URL}
+      </StyledLink>
+    );
+  }
 
-          <ExportImages collective={collective} />
+  renderCollectivesExport(collective, widgetCode) {
+    return (
+      <Fragment>
+        <h1>
+          <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
+        </h1>
+        <div className="code">{widgetCode}</div>
 
-          <h1>
+        <ExportImages collective={collective} />
+
+        <h1>
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+        </h1>
+        <p>
+          <FormattedMessage
+            id="ExportContributors.Description"
+            defaultMessage="Export your contributors data in {format} format"
+            values={{ format: 'CSV' }}
+          />
+        </p>
+        <div className="actions">
+          <Button onClick={async () => await exportMembers(collective.slug)}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-          </h1>
-          <p>
+          </Button>
+        </div>
+
+        <h1>
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
+        </h1>
+        <p>
+          <FormattedMessage
+            id="ExportContributors.Description"
+            defaultMessage="Export your contributors data in {format} format"
+            values={{ format: 'JSON' }}
+          />
+        </p>
+        <ul>
+          <li>
             <FormattedMessage
-              id="ExportContributors.Description"
-              defaultMessage="Export your contributors data in {format} format"
-              values={{ format: 'CSV' }}
+              id="ExportContributors.All"
+              defaultMessage="All contributors: {link}"
+              values={{ link: this.renderStyledLink(`/${collective.slug}/members/all.json`) }}
             />
-          </p>
-          <div className="actions">
-            <Button onClick={async () => await exportMembers(collective.slug)}>
-              <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-            </Button>
+          </li>
+          <li>
+            <FormattedMessage
+              id="ExportContributors.OnlyIndividuals"
+              defaultMessage="Only individuals: {link}"
+              values={{ link: this.renderStyledLink(`/${collective.slug}/members/users.json`) }}
+            />
+          </li>
+          <li>
+            <FormattedMessage
+              id="ExportContributors.OnlyOrganizations"
+              defaultMessage="Only organizations: {link}"
+              values={{ link: this.renderStyledLink(`/${collective.slug}/members/organizations.json`) }}
+            />
+          </li>
+        </ul>
+
+        <h2>
+          <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
+        </h2>
+        <table>
+          <tbody>
+            <tr>
+              <td className="param">limit</td>
+              <td>
+                <FormattedMessage id="export.json.parameters.limit" defaultMessage="number of contributors to return" />
+              </td>
+            </tr>
+            <tr>
+              <td className="param">offset</td>
+              <td>
+                <FormattedMessage
+                  id="export.json.parameters.offset"
+                  defaultMessage="number of contributors to skip (for paging)"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="param">TierId</td>
+              <td>
+                <FormattedMessage
+                  id="export.json.parameters.TierId"
+                  defaultMessage="only return contributors that belong to this TierID, which you can find in the URL after selecting a tier on your Collective page."
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        {collective.tiers[0] && (
+          <div>
+            e.g.
+            {this.renderStyledLink(
+              `/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`,
+            )}
           </div>
+        )}
+        {!collective.tiers[0] && (
+          <div>
+            e.g.
+            {this.renderStyledLink(`/${collective.slug}/members/all.json?limit=10&offset=0`)}
+          </div>
+        )}
+      </Fragment>
+    );
+  }
 
-          <h1>
-            <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
-          </h1>
-          <p>
-            <FormattedMessage
-              id="ExportContributors.Description"
-              defaultMessage="Export your contributors data in {format} format"
-              values={{ format: 'JSON' }}
-            />
-          </p>
-          <ul>
-            <li>
-              <FormattedMessage
-                id="ExportContributors.All"
-                defaultMessage="All contributors: {link}"
-                values={{
-                  link: (
-                    <StyledLink display="block" href={`/${collective.slug}/members/all.json`}>
-                      https://opencollective.com/
-                      {collective.slug}
-                      /members/all.json
-                    </StyledLink>
-                  ),
-                }}
-              />
-            </li>
-            <li>
-              <FormattedMessage
-                id="ExportContributors.OnlyIndividuals"
-                defaultMessage="Only individuals: {link}"
-                values={{
-                  link: (
-                    <StyledLink display="block" href={`/${collective.slug}/members/users.json`}>
-                      https://opencollective.com/
-                      {collective.slug}
-                      /members/users.json
-                    </StyledLink>
-                  ),
-                }}
-              />
-            </li>
-            <li>
-              <FormattedMessage
-                id="ExportContributors.OnlyOrganizations"
-                defaultMessage="Only organizations: {link}"
-                values={{
-                  link: (
-                    <StyledLink display="block" href={`/${collective.slug}/members/organizations.json`}>
-                      https://opencollective.com/
-                      {collective.slug}
-                      /members/organizations.json
-                    </StyledLink>
-                  ),
-                }}
-              />
-            </li>
-          </ul>
-
-          <h2>
-            <FormattedMessage id="export.json.parameters.title" defaultMessage="Parameters" />
-          </h2>
-          <table>
-            <tbody>
-              <tr>
-                <td className="param">limit</td>
-                <td>
-                  <FormattedMessage
-                    id="export.json.parameters.limit"
-                    defaultMessage="number of contributors to return"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="param">offset</td>
-                <td>
-                  <FormattedMessage
-                    id="export.json.parameters.offset"
-                    defaultMessage="number of contributors to skip (for paging)"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="param">TierId</td>
-                <td>
-                  <FormattedMessage
-                    id="export.json.parameters.TierId"
-                    defaultMessage="only return contributors that belong to this TierID, which you can find in the URL after selecting a tier on your Collective page."
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          {collective.tiers[0] && (
-            <div>
-              e.g.
-              <br />
-              <a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>
-                https://opencollective.com/
-                {collective.slug}
-                /members/all.json?limit=10&offset=0&TierId=
-                {collective.tiers[0].id}
-              </a>
-            </div>
-          )}
-          {!collective.tiers[0] && (
-            <div>
-              e.g.
-              <br />
-              <a href={`/${collective.slug}/members/all.json?limit=10&offset=0`}>
-                https://opencollective.com/
-                {collective.slug}
-                /members/all.json?limit=10&offset=0
-              </a>
-            </div>
-          )}
-        </Fragment>
-      );
-    } else {
-      return (
-        <Fragment>
-          <h1>
+  renderHostExports(collective) {
+    return (
+      <Fragment>
+        <h1>
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+        </h1>
+        <P textAlign="center">
+          <FormattedMessage
+            id="ExportHostedCollectives.Description"
+            defaultMessage="Export your hosted collectives data in {format} format"
+            values={{ format: 'CSV' }}
+          />
+        </P>
+        <div className="actions">
+          <Button onClick={async () => await exportHosts(collective.slug, 'csv')}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-          </h1>
-          <p>
-            <FormattedMessage
-              id="ExportHostedCollectives.Description"
-              defaultMessage="Export your hosted collectives data in {format} format"
-              values={{ format: 'CSV' }}
-            />
-          </p>
-          <div className="actions">
-            <Button onClick={async () => await exportHosts(collective.slug, 'csv')}>
-              <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-            </Button>
-          </div>
+          </Button>
+        </div>
 
-          <h1>
+        <hr />
+
+        <h1>
+          <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
+        </h1>
+        <P textAlign="center">
+          <FormattedMessage
+            id="ExportHostedCollectives.Description"
+            defaultMessage="Export your hosted collectives data in {format} format"
+            values={{ format: 'JSON' }}
+          />
+        </P>
+        <div className="actions">
+          <Button onClick={async () => await exportHosts(collective.slug, 'json')}>
             <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
-          </h1>
-          <p>
-            <FormattedMessage
-              id="ExportHostedCollectives.Description"
-              defaultMessage="Export your hosted collectives data in {format} format"
-              values={{ format: 'JSON' }}
-            />
-          </p>
-          <p>
-            <FormattedMessage
-              id="ExportHostedCollectives.All"
-              defaultMessage="All Hosted Collectives: {link}"
-              values={{
-                link: (
-                  <StyledLink display="block" href={`/v2/${collective.slug}.json`}>
-                    https://opencollective.com/v2/
-                    {collective.slug}/hosted.json
-                  </StyledLink>
-                ),
-              }}
-            />
-          </p>
-        </Fragment>
-      );
-    }
+          </Button>
+        </div>
+      </Fragment>
+    );
   }
 
   render() {
@@ -239,8 +209,9 @@ class Export extends React.Component {
             }
           `}
         </style>
-
-        {this.generateExports(collective, widgetCode)}
+        {collective.type === CollectiveType.COLLECTIVE
+          ? this.renderCollectivesExport(collective, widgetCode)
+          : this.renderHostExports(collective)}
       </div>
     );
   }
