@@ -1,8 +1,19 @@
 import gql from 'graphql-tag';
 
+import { gqlV2 } from '../../../lib/graphql/helpers';
+
 export const EditCollectiveSettingsMutation = gql`
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
     editCollective(collective: { id: $id, settings: $settings }) {
+      id
+      settings
+    }
+  }
+`;
+
+export const EditAccountSettingMutation = gqlV2`
+  mutation EditAccountSetting($collectiveId: Int!, $key: AccountSettingsKey!, $value: JSON!) {
+    editAccountSetting(account: { legacyId: $collectiveId }, key: $key, value: $value) {
       id
       settings
     }
