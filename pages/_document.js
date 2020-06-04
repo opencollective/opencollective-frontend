@@ -72,6 +72,7 @@ export default class IntlDocument extends Document {
     // They can later be read with getEnvVar()
     // Please, NEVER SECRETS!
     props.__NEXT_DATA__.env = pick(process.env, [
+      'REST_URL',
       'IMAGES_URL',
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
