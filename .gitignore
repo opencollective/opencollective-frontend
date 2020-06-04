@@ -25,5 +25,3 @@ styleguide/static/fonts
 
 # Git time manager
 .gtm
-
- build/config.gypi:
