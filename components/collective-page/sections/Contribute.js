@@ -349,7 +349,7 @@ class SectionContribute extends React.PureComponent {
                             </P>
                           </ContainerOverlay>
                         )}
-                        {!showTiersAdmin && (
+                        {!(isAdmin && showTiersAdmin) && (
                           <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
                             {waysToContribute.map(({ key, Component, componentProps }) => (
                               <ContributeCardContainer key={key}>
