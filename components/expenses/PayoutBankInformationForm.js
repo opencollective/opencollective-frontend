@@ -232,6 +232,8 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
+  } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
+    return null;
   }
 
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
