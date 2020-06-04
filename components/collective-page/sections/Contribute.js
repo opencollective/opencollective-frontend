@@ -279,6 +279,7 @@ class SectionContribute extends React.PureComponent {
     const hasHost = collective.host;
     const isHost = collective.isHost;
     const waysToContribute = this.getFinancialContributions(sortedTiers);
+    const canMoveTiers = isAdmin && waysToContribute.length > 1;
 
     /*
     cases
@@ -353,7 +354,7 @@ class SectionContribute extends React.PureComponent {
                             </P>
                           </ContainerOverlay>
                         )}
-                        {!(isAdmin && showTiersAdmin) && (
+                        {!(canMoveTiers && showTiersAdmin) && (
                           <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
                             {waysToContribute.map(({ key, Component, componentProps }) => (
                               <ContributeCardContainer key={key}>
@@ -362,7 +363,7 @@ class SectionContribute extends React.PureComponent {
                             ))}
                           </ContributeCardsContainer>
                         )}
-                        {isAdmin && (
+                        {canMoveTiers && (
                           <Container display={showTiersAdmin ? 'block' : 'none'}>
                             <AdminContributeCardsContainer
                               collective={collective}
