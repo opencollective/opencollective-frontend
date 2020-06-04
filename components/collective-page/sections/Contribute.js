@@ -230,10 +230,12 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const isActive = collective.isActive;
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
-    return sortedTiers.map(tier => {
+    const waysToContribute = [];
+
+    sortedTiers.forEach(tier => {
       if (tier === 'custom') {
         if (hasCustomContribution) {
-          return {
+          waysToContribute.push({
             key: 'custom',
             Component: ContributeCustom,
             componentProps: {
@@ -243,10 +245,10 @@ class SectionContribute extends React.PureComponent {
               hideContributors: hasNoContributor,
               disableCTA: !isActive,
             },
-          };
+          });
         }
       } else {
-        return {
+        waysToContribute.push({
           key: tier.id,
           Component: ContributeTier,
           componentProps: {
@@ -255,9 +257,11 @@ class SectionContribute extends React.PureComponent {
             hideContributors: hasNoContributor,
             disableCTA: !isActive,
           },
-        };
+        });
       }
     });
+
+    return waysToContribute;
   });
 
   render() {
