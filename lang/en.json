@@ -1159,7 +1159,7 @@
   "PayoutMethod.Type.Paypal": "PayPal",
   "Pending": "Pending",
   "PlatformFee": "Platform fee",
-  "platformFee.info": "Open Collective has waived 100% of our fees for COVID-19 Relief Collectives. We rely on the generosity\n                of contributors like you to keep offering this to Collectives.",
+  "platformFee.info": "Open Collective is free for COVID-19 Relief Collectives. We rely on the generosity of contributors like you to keep this possible!",
   "platformFee.noContribution": "I don't want to contribute",
   "platformFee.Other": "Other",
   "platformFee.support": "Thank you for supporting us with a contribution:",

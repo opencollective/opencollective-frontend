@@ -940,8 +940,7 @@ class CreateOrderPage extends React.Component {
                   <Box maxWidth={['100%', '75%']}>
                     <P fontSize="Caption" my={2}>
                       <FormattedMessage
-                        defaultMessage="Open Collective has waived 100% of our fees for COVID-19 Relief Collectives. We rely on the generosity
-                of contributors like you to keep offering this to Collectives."
+                        defaultMessage="Open Collective is free for COVID-19 Relief Collectives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
                       />
                     </P>
