@@ -4,7 +4,7 @@ import { User } from '@styled-icons/feather/User';
 import { useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import formatCollectiveType from '../lib/i18n-collective-type';
+import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectiveIcon from './icons/CollectiveIcon';
 import OrganizationIcon from './icons/OrganizationIcon';
@@ -30,7 +30,7 @@ const getTypeIcon = type => {
  * A component showing big buttons to pick between collective types (user, org...etc)
  */
 const CollectiveTypePicker = ({ types, onChange }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
   const marginBetweenButtons = 0.025;
   const buttonWidth = 1 / (types.length || 1) - marginBetweenButtons;
   const buttonFlex = `0 0 ${buttonWidth * 100}%`;
@@ -48,7 +48,7 @@ const CollectiveTypePicker = ({ types, onChange }) => {
           data-cy={`collective-type-picker-${type}`}
         >
           <Box mb={2}>{getTypeIcon(type)}</Box>
-          <Span fontSize="Caption">{formatCollectiveType(formatMessage, type)}</Span>
+          <Span fontSize="Caption">{formatCollectiveType(intl, type)}</Span>
         </StyledButton>
       ))}
     </Container>

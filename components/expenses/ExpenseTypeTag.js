@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { i18nExpenseType } from '../../lib/i18n-expense';
+import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledTag from '../StyledTag';

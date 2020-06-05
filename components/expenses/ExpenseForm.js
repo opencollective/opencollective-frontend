@@ -9,7 +9,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
-import { i18nExpenseType } from '../../lib/i18n-expense';
+import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import CollectivePicker from '../CollectivePicker';
 import { Box, Flex } from '../Grid';

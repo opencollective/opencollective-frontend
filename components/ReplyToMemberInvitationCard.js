@@ -6,7 +6,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import formatMemberRole from '../lib/i18n-member-role';
+import formatMemberRole from '../lib/i18n/member-role';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -66,7 +66,8 @@ const replyToInvitationMutation = gql`
  * of a collective.
  */
 const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUser }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
+  const { formatMessage } = intl;
   const [accepted, setAccepted] = React.useState();
   const [sendReplyToInvitation, { loading, error, data }] = useMutation(replyToInvitationMutation);
   const isDisabled = loading;
@@ -94,7 +95,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
         </Flex>
       </LinkCollective>
       <hr />
-      <StyledTag textTransform="uppercase">{formatMemberRole(formatMessage, invitation.role)}</StyledTag>
+      <StyledTag textTransform="uppercase">{formatMemberRole(intl, invitation.role)}</StyledTag>
       {rolesDetails[invitation.role] && (
         <P my={2} color="black.600">
           {formatMessage(rolesDetails[invitation.role])}
