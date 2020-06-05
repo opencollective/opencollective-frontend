@@ -88,7 +88,6 @@ const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...p
           onSubmit={async values => {
             const { action, ...data } = values;
             await onSubmit(action, data);
-            showModal(false);
           }}
         />
       </React.Fragment>

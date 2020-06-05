@@ -288,7 +288,7 @@ class ExpensePage extends React.Component {
           <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
             <FormattedMessage
               id="expense.createSuccess"
-              defaultMessage="<strong>Expense submited!</strong> You can edit or review updates on this page."
+              defaultMessage="<strong>Expense submitted!</strong> You can edit or review updates on this page."
               values={I18nFormatters}
             />
           </TemporaryNotification>
