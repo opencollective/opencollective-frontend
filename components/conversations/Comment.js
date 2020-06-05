@@ -23,7 +23,6 @@ import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
 
 import { CommentFieldsFragment } from './graphql';
@@ -46,13 +45,12 @@ const CommentBtn = styled(StyledButton)`
 
 const AdminActionsPopupContainer = styled(Flex)`
   flex-direction: column;
-  background: ${themeGet('colors.white.full')};
+  background: #ffffff;
   border: 1px solid rgba(49, 50, 51, 0.1);
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
   width: 184px;
   padding: 16px;
-  animation: ${fadeIn} 0.3s ease-in-out;
   z-index: 1;
 `;
 
