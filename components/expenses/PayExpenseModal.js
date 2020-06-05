@@ -44,7 +44,7 @@ const getPayoutLabel = (intl, type) => {
 const generatePayoutOptions = (intl, payoutMethodType, collective) => {
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   if (payoutMethodType === PayoutMethodType.OTHER) {
-    return [{ label: payoutMethodLabel, value: PayoutMethodType.OTHER }];
+    return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
   } else {
     const defaultTypes = [
       {
