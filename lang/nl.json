@@ -285,6 +285,7 @@
   "CollectiveType.Event": "{count, plural, one {Evenement} other {Evenementen}}",
   "CollectiveType.Organization": "{count, plural, one {Organisatie} other {Organisaties}}",
   "CollectiveType.User": "{count, plural, one {Gebruiker} other {Gebruikers}}",
+  "comment.actions": "Comment Actions",
   "comment.btn": "Reactie",
   "Comment.DeleteConfirmTitle": "Deze reactie verwijderen?",
   "comment.login": "Meld u aan om te reageren",

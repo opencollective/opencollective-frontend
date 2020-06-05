@@ -285,6 +285,7 @@
   "CollectiveType.Event": "{count, plural, one {Событие} few {События} many {Событий} other {Событий}}",
   "CollectiveType.Organization": "{count, plural, one {Организация} few {Организации} many {Организаций} other {Организаций}}",
   "CollectiveType.User": "{count, plural, one {Пользователь} few {Пользователя} many {Пользователей} other {Пользователей}}",
+  "comment.actions": "Comment Actions",
   "comment.btn": "Комментировать",
   "Comment.DeleteConfirmTitle": "Удалить этот комментарий?",
   "comment.login": "Войдите чтобы комментировать",
