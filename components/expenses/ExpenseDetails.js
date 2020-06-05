@@ -389,7 +389,7 @@ class ExpenseDetails extends React.Component {
             {expense.type === expenseTypes.INVOICE && itemsWithFiles.length === 0 && (
               <ExpenseInvoiceDownloadHelper
                 collective={expense.collective}
-                expense={{ id: expense.idV2, legacyId: expense.id }}
+                expense={{ ...expense, id: expense.idV2, legacyId: expense.id }}
               >
                 {({ downloadInvoice, error, isLoading, filename }) => (
                   <div>

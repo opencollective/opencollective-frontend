@@ -6,13 +6,23 @@ import { fetchFromPDFService } from '../../lib/api';
 import { getErrorFromPdfService } from '../../lib/errors';
 import { expenseInvoiceUrl, invoiceServiceURL } from '../../lib/url_helpers';
 
+const getPrettyDate = expense => {
+  if (!expense?.createdAt) {
+    return '';
+  }
+
+  const utc = new Date(expense.createdAt).toISOString();
+  return `-${utc.split('T')[0]}`;
+};
+
 /**
  * An helper to build components that download expense's invoice. Does not check the permissions.
  */
 const ExpenseInvoiceDownloadHelper = ({ children, expense, collective, onError }) => {
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-  const filename = `Expense-${expense.legacyId}-${collective?.slug}-invoice.pdf`;
+  const prettyDate = getPrettyDate(expense);
+  const filename = `Expense-${expense.legacyId}-${collective?.slug}-invoice${prettyDate}.pdf`;
 
   return children({
     error,
