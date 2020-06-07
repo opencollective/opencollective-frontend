@@ -1233,6 +1233,8 @@
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
   "profilemenu.memberships.tooltip.balance": "Balance {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} pending expenses",
+  "RecurringContributions.customAmount": "Custom amount",
+  "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "redeem.card.authenticated": "You are currently authenticated. Sign Out first if you want to redeem with another account.",
   "redeem.card.info": "It's easy! Just enter your name, email address and gift code. We will create an account for you if you don't already have one. You'll be able to select the gift card as the payment method when making a contribution.",
   "redeem.card.success.instructions": "We’ve sent an email to {email} with instructions to verify your new Open Collective account and credit it with the amount of your gift card.",

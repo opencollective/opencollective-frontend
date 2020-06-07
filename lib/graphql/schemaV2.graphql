@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Jun 04 2020 13:23:07 GMT+0100 (British Summer Time)
+# timestamp: Sun Jun 07 2020 23:50:46 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -3452,6 +3452,16 @@ type Mutation {
     Reference to a Payment Method to update the order with
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Reference to a Tier to update the order with
+    """
+    tier: TierReferenceInput
+
+    """
+    Reference to an Amount to update the order to
+    """
+    amount: Int
   ): Order
 
   """
@@ -3951,6 +3961,23 @@ type Tier {
   Get all orders
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
+}
+
+input TierReferenceInput {
+  """
+  The legacy id assigned to the Tier
+  """
+  legacyId: Int
+
+  """
+  Boolen indicated whether a tier's amount is FLEXIBLE (true) or FIXED (false)
+  """
+  flexible: Boolean
+
+  """
+  The minimum amount in cents of the Tier
+  """
+  minimumAmount: Int
 }
 
 """

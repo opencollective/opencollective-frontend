@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
 import gql from 'graphql-tag';
@@ -94,7 +95,7 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
 const addPaymentMethodMutation = gqlV2/* GraphQL */ `
   mutation addPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
     addStripeCreditCard(paymentMethod: $paymentMethod, account: $account) {
-      id
+      legacyId
     }
   }
 `;
@@ -118,6 +119,7 @@ const UpdatePaymentMethodPopUp = ({
   const [stripeIsReady, setStripeIsReady] = useState(false);
   const [stripe, setStripe] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
+  const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
 
   // GraphQL mutations and queries
   const { data } = useQuery(getPaymentMethodsQuery, {
@@ -171,6 +173,8 @@ const UpdatePaymentMethodPopUp = ({
         first(paymentOptions.filter(option => option.id === contribution.paymentMethod.legacyId)),
       );
       setLoadingDefaultPaymentMethod(false);
+    } else if (paymentOptions && addedPaymentMethod) {
+      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.legacyId));
     }
   }, [paymentOptions]);
 
@@ -185,11 +189,15 @@ const UpdatePaymentMethodPopUp = ({
         <Flex flexGrow={1} alignItems="center">
           <StyledHr width="100%" mx={2} />
         </Flex>
-        <PlusCircle
-          size={20}
-          onClick={() => setShowAddPaymentMethod(true)}
-          data-cy="recurring-contribution-add-pm-button"
-        />
+        {showAddPaymentMethod ? (
+          <Lock size={20} />
+        ) : (
+          <PlusCircle
+            size={20}
+            onClick={() => setShowAddPaymentMethod(true)}
+            data-cy="recurring-contribution-add-pm-button"
+          />
+        )}
       </Flex>
       {showAddPaymentMethod ? (
         <NewCreditCardForm
@@ -278,7 +286,7 @@ const UpdatePaymentMethodPopUp = ({
                 const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
                 const newPaymentMethod = pick(newStripePaymentMethod, ['name', 'token', 'data']);
                 try {
-                  await submitAddPaymentMethod({
+                  const res = await submitAddPaymentMethod({
                     variables: { paymentMethod: newPaymentMethod, account: { id: account.id } },
                     refetchQueries: [
                       {
@@ -287,6 +295,7 @@ const UpdatePaymentMethodPopUp = ({
                       },
                     ],
                   });
+                  setAddedPaymentMethod(res.data.addStripeCreditCard);
                   setShowAddPaymentMethod(false);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
