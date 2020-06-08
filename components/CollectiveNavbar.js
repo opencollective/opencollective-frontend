@@ -454,7 +454,7 @@ const CollectiveNavbar = ({
               )}
               {callsToAction.hasContact && (
                 <MenuLinkContainer mobileOnly>
-                  <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
+                  <MenuLink as={Link} route="collective-contact" params={{ collectiveSlug: collective.slug }}>
                     <FormattedMessage id="Contact" defaultMessage="Contact" />
                   </MenuLink>
                 </MenuLinkContainer>
