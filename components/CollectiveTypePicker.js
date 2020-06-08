@@ -1,26 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { User } from '@styled-icons/feather/User';
-import { useIntl } from 'react-intl';
+import { Plus } from '@styled-icons/fa-solid/Plus';
+import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import formatCollectiveType from '../lib/i18n/collective-type';
 
-import CollectiveIcon from './icons/CollectiveIcon';
-import OrganizationIcon from './icons/OrganizationIcon';
 import Container from './Container';
-import { Box } from './Grid';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 
-/** Return the icon associated to a given collective type */
-const getTypeIcon = type => {
+/** Return the caption associated to a given collective type */
+const getTypeCaption = type => {
   if (type === CollectiveType.USER) {
-    return <User size="1.5em" />;
+    return <FormattedMessage id="user.create" defaultMessage="Create new user" />;
   } else if (type === CollectiveType.ORGANIZATION) {
-    return <OrganizationIcon size="1.5em" />;
+    return <FormattedMessage id="organization.create" defaultMessage="Create organization" />;
   } else if (type === CollectiveType.COLLECTIVE) {
-    return <CollectiveIcon size="1.5em" />;
+    return <FormattedMessage id="collective.create" defaultMessage="Create collective" />;
   } else {
     return null;
   }
@@ -30,7 +26,6 @@ const getTypeIcon = type => {
  * A component showing big buttons to pick between collective types (user, org...etc)
  */
 const CollectiveTypePicker = ({ types, onChange }) => {
-  const intl = useIntl();
   const marginBetweenButtons = 0.025;
   const buttonWidth = 1 / (types.length || 1) - marginBetweenButtons;
   const buttonFlex = `0 0 ${buttonWidth * 100}%`;
@@ -46,9 +41,24 @@ const CollectiveTypePicker = ({ types, onChange }) => {
           borderRadius={8}
           onClick={() => onChange(type)}
           data-cy={`collective-type-picker-${type}`}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
         >
-          <Box mb={2}>{getTypeIcon(type)}</Box>
-          <Span fontSize="Caption">{formatCollectiveType(intl, type)}</Span>
+          <Container
+            mb={2}
+            size={24}
+            border="1px solid #C4C7CC"
+            borderRadius="100px"
+            textAlign="center"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            p={0}
+          >
+            <Plus size={12} color="black.500" />
+          </Container>
+          <Span fontSize="Tiny">{getTypeCaption(type)}</Span>
         </StyledButton>
       ))}
     </Container>
