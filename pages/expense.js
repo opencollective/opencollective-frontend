@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { cloneDeep, get, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -128,6 +128,12 @@ class ExpensePage extends React.Component {
       isSubmitting: false,
       successMessageDismissed: false,
     };
+
+    this.pollingInterval = 60;
+    this.pollingTimeout = null;
+    this.pollingStarted = false;
+    this.pollingPaused = false;
+    this.handlePolling = debounce(this.handlePolling.bind(this), 100);
   }
 
   componentDidMount() {
@@ -135,6 +141,9 @@ class ExpensePage extends React.Component {
     if (this.props.LoggedInUser) {
       this.refetchDataForUser();
     }
+
+    this.handlePolling();
+    document.addEventListener('mousemove', this.handlePolling);
   }
 
   componentDidUpdate(oldProps, oldState) {
@@ -147,6 +156,40 @@ class ExpensePage extends React.Component {
     if (oldState.status !== this.state.status) {
       this.scrollToExpenseTop();
     }
+  }
+
+  componentWillUnmount() {
+    if (this.props.data?.stopPolling) {
+      this.props.data.stopPolling();
+    }
+
+    document.removeEventListener('mousemove', this.handlePolling);
+  }
+
+  handlePolling() {
+    if (!this.pollingStarted) {
+      if (this.pollingPaused) {
+        // The polling was paused, so we immediately refetch
+        if (this.props.data?.refetch) {
+          this.props.data.refetch();
+        }
+        this.pollingPaused = false;
+      }
+      if (this.props.data?.startPolling(this.pollingInterval * 1000)) {
+        this.props.data.stopPolling();
+      }
+      this.pollingStarted = true;
+    }
+
+    clearTimeout(this.pollingTimeout);
+    this.pollingTimeout = setTimeout(() => {
+      // No mouse movement was detected since 60sec, we stop polling
+      if (this.props.data?.stopPolling) {
+        this.props.data.stopPolling();
+      }
+      this.pollingStarted = false;
+      this.pollingPaused = true;
+    }, this.pollingInterval * 1000);
   }
 
   async refetchDataForUser() {
@@ -472,7 +515,6 @@ class ExpensePage extends React.Component {
 const getData = graphql(expensePageQuery, {
   options: {
     context: API_V2_CONTEXT,
-    pollInterval: 60000, // Will refresh the data every 60s to get new comments
   },
 });
 
