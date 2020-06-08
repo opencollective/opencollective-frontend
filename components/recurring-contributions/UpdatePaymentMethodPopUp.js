@@ -185,7 +185,11 @@ const UpdatePaymentMethodPopUp = ({
         <Flex flexGrow={1} alignItems="center">
           <StyledHr width="100%" mx={2} />
         </Flex>
-        <PlusCircle size={20} onClick={() => setShowAddPaymentMethod(true)} />
+        <PlusCircle
+          size={20}
+          onClick={() => setShowAddPaymentMethod(true)}
+          data-cy="recurring-contribution-add-pm-button"
+        />
       </Flex>
       {showAddPaymentMethod ? (
         <NewCreditCardForm
@@ -209,7 +213,7 @@ const UpdatePaymentMethodPopUp = ({
           value={selectedPaymentMethod}
         >
           {({ radio, value: { title, subtitle, icon } }) => (
-            <PaymentMethodBox minheight={50} p={2} bg="white.full">
+            <PaymentMethodBox minheight={50} p={2} bg="white.full" data-cy="recurring-contribution-pm-box">
               <Flex alignItems="center">
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
@@ -256,6 +260,7 @@ const UpdatePaymentMethodPopUp = ({
               disabled={newPaymentMethodInfo ? !newPaymentMethodInfo?.value.complete : true}
               type="submit"
               loading={loadingAddPaymentMethod}
+              data-cy="recurring-contribution-submit-pm-button"
               onClick={async () => {
                 if (!stripe) {
                   createNotification(
@@ -308,6 +313,7 @@ const UpdatePaymentMethodPopUp = ({
               buttonStyle="secondary"
               loading={loadingUpdatePaymentMethod}
               disabled={!selectedPaymentMethod}
+              data-cy="recurring-contribution-update-pm-button"
               onClick={async () => {
                 try {
                   await submitUpdatePaymentMethod({

@@ -146,7 +146,14 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
   const activateMenu = menuState === 'mainMenu' && status === 'CANCELLED';
 
   return (
-    <PopUpMenu minHeight={160} maxHeight={360} width={'100%'} overflowY={'auto'} ref={popupNode}>
+    <PopUpMenu
+      minHeight={160}
+      maxHeight={360}
+      width={'100%'}
+      overflowY={'auto'}
+      ref={popupNode}
+      data-cy="recurring-contribution-menu"
+    >
       {mainMenu && (
         <MenuSection>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
@@ -165,6 +172,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             onClick={() => {
               setMenuState('paymentMethodMenu');
             }}
+            data-cy="recurring-contribution-menu-payment-option"
           >
             <Flex width={1 / 6}>
               <CreditCard size={20} />
@@ -201,6 +209,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             onClick={() => {
               setMenuState('cancelMenu');
             }}
+            data-cy="recurring-contribution-menu-cancel-option"
           >
             <Flex width={1 / 6}>
               <RedXCircle size={20} />
@@ -215,7 +224,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       )}
 
       {cancelMenu && (
-        <MenuSection>
+        <MenuSection data-cy="recurring-contribution-cancel-menu">
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
               {formatMessage(messages.cancelContribution)}
@@ -238,6 +247,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             <StyledButton
               buttonSize="tiny"
               loading={loadingCancellation}
+              data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
                 try {
                   await submitCancellation({
@@ -266,6 +276,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
               onClick={() => {
                 setMenuState('mainMenu');
               }}
+              data-cy="recurring-contribution-cancel-no"
             >
               {formatMessage(messages.noWait)}
             </StyledButton>
@@ -297,6 +308,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             <StyledButton
               buttonSize="tiny"
               loading={loadingActivation}
+              data-cy="recurring-contribution-activate-yes"
               onClick={async () => {
                 try {
                   await submitActivation({
@@ -333,7 +345,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       )}
 
       {paymentMethodMenu && (
-        <MenuSection>
+        <MenuSection data-cy="recurring-contribution-payment-menu">
           <UpdatePaymentMethodPopUp
             setMenuState={setMenuState}
             contribution={contribution}
