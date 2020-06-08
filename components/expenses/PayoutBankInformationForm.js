@@ -209,6 +209,7 @@ RequiredFields.propTypes = {
 const availableCurrenciesQuery = gqlV2`
   query Host($slug: String) {
     host(slug: $slug) {
+      slug
       transferwise {
         availableCurrencies
       }
@@ -228,6 +229,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
   });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
+  host = data?.host || host;
 
   // Display spinner if loading
   if (loading) {
