@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import i18nPayoutMethodType from '../../lib/i18n-payout-method-type';
+import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
@@ -67,7 +67,6 @@ class PayoutMethodSelect extends React.Component {
   };
 
   getPayoutMethodLabel = payoutMethod => {
-    const { formatMessage } = this.props.intl;
     if (payoutMethod.id) {
       if (payoutMethod.name) {
         return payoutMethod.name;
@@ -87,10 +86,10 @@ class PayoutMethodSelect extends React.Component {
         }
       } else if (payoutMethod.type === PayoutMethodType.OTHER) {
         const content = payoutMethod.data?.content?.replace(/\n|\t/g, ' ');
-        const i18nType = i18nPayoutMethodType(formatMessage, payoutMethod.type);
+        const i18nType = i18nPayoutMethodType(this.props.intl, payoutMethod.type);
         return content ? `${i18nType} - ${truncate(content, { length: MAX_PAYOUT_OPTION_DATA_LENGTH })}` : i18nType;
       } else {
-        return i18nPayoutMethodType(formatMessage, payoutMethod.type);
+        return i18nPayoutMethodType(this.props.intl, payoutMethod.type);
       }
     } else {
       return (
@@ -100,8 +99,8 @@ class PayoutMethodSelect extends React.Component {
           </Span>
           &nbsp;
           {newPayoutMethodMsg[payoutMethod.type]
-            ? formatMessage(newPayoutMethodMsg[payoutMethod.type])
-            : formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })}
+            ? this.props.intl.formatMessage(newPayoutMethodMsg[payoutMethod.type])
+            : this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })}
         </React.Fragment>
       );
     }
@@ -131,7 +130,6 @@ class PayoutMethodSelect extends React.Component {
   });
 
   getOptions = memoizeOne(payoutMethods => {
-    const { formatMessage } = this.props.intl;
     const groupedPms = groupBy(payoutMethods, 'type');
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
       if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
@@ -144,7 +142,7 @@ class PayoutMethodSelect extends React.Component {
     });
 
     return pmTypes.map(pmType => ({
-      label: i18nPayoutMethodType(formatMessage, pmType),
+      label: i18nPayoutMethodType(this.props.intl, pmType),
       options: [
         // Add existing payout methods for this type
         ...get(groupedPms, pmType, []).map(this.getOptionFromPayoutMethod),
