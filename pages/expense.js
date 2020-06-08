@@ -137,11 +137,6 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
-    // LoggedInUser is not set during SSR, we refetch for permissions
-    if (this.props.LoggedInUser) {
-      this.refetchDataForUser();
-    }
-
     this.handlePolling();
     document.addEventListener('mousemove', this.handlePolling);
   }
