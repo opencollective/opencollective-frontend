@@ -63,7 +63,7 @@ const SectionBudget = ({ collective, stats }) => {
         />
       </P>
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
-        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }} pollInterval={60000}>
+        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }}>
           {({ data }) => {
             const expenses = get(data, 'Collective.expenses');
             const transactions = get(data, 'Collective.transactions');
