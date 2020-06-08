@@ -32,15 +32,10 @@ export default class IntlDocument extends Document {
     }
 
     try {
-      // The new recommended way to process Styled Components
-      // unfortunately not compatible with styled-jsx as is
-      // ctx.renderPage = () =>
-      //   originalRenderPage({
-      //     enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
-      //   })
-
-      // The old recommended way to process Styled Components
-      const page = originalRenderPage(App => props => sheet.collectStyles(<App {...props} />));
+      ctx.renderPage = () =>
+        originalRenderPage({
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />),
+        });
 
       const styledJsxStyles = flush();
       const styledComponentsStyles = sheet.getStyleElement();
@@ -49,7 +44,6 @@ export default class IntlDocument extends Document {
 
       return {
         ...initialProps,
-        ...page,
         locale,
         localeDataScript,
         clientAnalytics,
