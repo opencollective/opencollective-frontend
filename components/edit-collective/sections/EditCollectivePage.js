@@ -17,6 +17,7 @@ import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section
 import { Sections } from '../../collective-page/_constants';
 import { getDefaultSectionsForCollectiveType } from '../../CollectiveNavbar';
 import Container from '../../Container';
+import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -179,75 +180,82 @@ const EditCollectivePage = ({ collective }) => {
           />
         </P>
       </Box>
-      {loading || !displayedSections ? (
-        <LoadingPlaceholder maxWidth={436} height={400} />
-      ) : (
-        <div>
-          <StyledCard mb={4} maxWidth={436}>
-            {displayedSections.map(({ section, isEnabled }, index) => (
-              <React.Fragment key={section}>
-                <CollectiveSectionEntry
-                  intl={intl}
-                  section={section}
-                  index={index}
-                  isEnabled={isEnabled}
-                  onMove={(dragIndex, hoverIndex) => {
-                    const newSections = getNewSections(sections, dragIndex, hoverIndex);
-                    if (!isEqual(tmpSections, newSections)) {
-                      setTmpSections(newSections);
-                    }
-                  }}
-                  onDrop={(dragIndex, hoverIndex) => {
-                    setTmpSections(null);
-                    setSections(getNewSections(sections, dragIndex, hoverIndex));
-                    setDirty(true);
-                  }}
-                  onSectionToggle={(selectedSection, isEnabled) => {
-                    const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
-                    const newSections = set(cloneDeep(sections), `${sectionIdx}.isEnabled`, isEnabled);
-                    setSections(newSections);
-                    setDirty(true);
-                  }}
-                />
-                {index !== displayedSections.length - 1 && <StyledHr borderColor="#DCDEE0" />}
-              </React.Fragment>
-            ))}
-          </StyledCard>
-          <Flex flexWrap="wrap" alignItems="center" justifyContent={['center', 'flex-start']}>
-            <StyledButton
-              buttonStyle="primary"
-              m={2}
-              minWidth={150}
-              loading={isSubmitting}
-              disabled={!isDirty}
-              onClick={async () => {
-                await submitSetting({
-                  variables: {
-                    account: { id: data.account.id },
-                    key: 'collectivePage',
-                    value: {
-                      ...data.account.settings.collectivePage,
-                      sections,
-                      showGoals: sections.some(({ section }) => section === Sections.GOALS),
-                    },
-                  },
-                });
+      <Flex flexWrap="wrap">
+        <Box width="100%" maxWidth={436}>
+          {loading || !displayedSections ? (
+            <LoadingPlaceholder height={400} />
+          ) : (
+            <div>
+              <StyledCard mb={4}>
+                {displayedSections.map(({ section, isEnabled }, index) => (
+                  <React.Fragment key={section}>
+                    <CollectiveSectionEntry
+                      intl={intl}
+                      section={section}
+                      index={index}
+                      isEnabled={isEnabled}
+                      onMove={(dragIndex, hoverIndex) => {
+                        const newSections = getNewSections(sections, dragIndex, hoverIndex);
+                        if (!isEqual(tmpSections, newSections)) {
+                          setTmpSections(newSections);
+                        }
+                      }}
+                      onDrop={(dragIndex, hoverIndex) => {
+                        setTmpSections(null);
+                        setSections(getNewSections(sections, dragIndex, hoverIndex));
+                        setDirty(true);
+                      }}
+                      onSectionToggle={(selectedSection, isEnabled) => {
+                        const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
+                        const newSections = set(cloneDeep(sections), `${sectionIdx}.isEnabled`, isEnabled);
+                        setSections(newSections);
+                        setDirty(true);
+                      }}
+                    />
+                    {index !== displayedSections.length - 1 && <StyledHr borderColor="#DCDEE0" />}
+                  </React.Fragment>
+                ))}
+              </StyledCard>
+              <Flex flexWrap="wrap" alignItems="center" justifyContent={['center', 'flex-start']}>
+                <StyledButton
+                  buttonStyle="primary"
+                  m={2}
+                  minWidth={150}
+                  loading={isSubmitting}
+                  disabled={!isDirty}
+                  onClick={async () => {
+                    await submitSetting({
+                      variables: {
+                        account: { id: data.account.id },
+                        key: 'collectivePage',
+                        value: {
+                          ...data.account.settings.collectivePage,
+                          sections,
+                          showGoals: sections.some(({ section }) => section === Sections.GOALS),
+                        },
+                      },
+                    });
 
-                setDirty(false);
-              }}
-            >
-              <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
-            <Box m={2}>
-              <Link route="collective" params={{ slug: collective.slug }}>
-                <Span fontSize="14px">
-                  <FormattedMessage id="ViewCollectivePage" defaultMessage="View Collective page" />
-                </Span>
-              </Link>
-            </Box>
-          </Flex>
-        </div>
-      )}
+                    setDirty(false);
+                  }}
+                >
+                  <FormattedMessage id="save" defaultMessage="Save" />
+                </StyledButton>
+                <Box m={2}>
+                  <Link route="collective" params={{ slug: collective.slug }}>
+                    <Span fontSize="14px">
+                      <FormattedMessage id="ViewCollectivePage" defaultMessage="View Collective page" />
+                    </Span>
+                  </Link>
+                </Box>
+              </Flex>
+            </div>
+          )}
+        </Box>
+        <Box ml={[0, null, null, 42]} maxWidth={400} width="100%">
+          <EditCollectivePageFAQ withNewButtons withBorderLeft />
+        </Box>
+      </Flex>
     </DndProvider>
   );
 };
