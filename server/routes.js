@@ -19,8 +19,10 @@ const maxAge = (maxAge = 60) => {
   };
 };
 
-module.exports = (server, app) => {
-  server.use((req, res, next) => {
+module.exports = (expressApp, nextApp) => {
+  const app = expressApp;
+
+  app.use((req, res, next) => {
     if (!req.language && req.locale !== 'en') {
       // Prevent server side caching of non english content
       res.set('Cache-Control', 'no-store, no-cache, max-age=0');
@@ -32,12 +34,12 @@ module.exports = (server, app) => {
     next();
   });
 
-  server.use('/_next/static', (req, res, next) => {
+  app.use('/_next/static', (req, res, next) => {
     res.set('Cache-Control', 'public, max-age=31536000, immutable');
     next();
   });
 
-  server.use((req, res, next) => {
+  app.use((req, res, next) => {
     if (req.query.language && intl.supportedLanguages.includes(req.query.language) && req.query.set) {
       res.cookie('language', req.language);
       const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
@@ -50,17 +52,17 @@ module.exports = (server, app) => {
   });
 
   // Support older assets from website
-  server.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
+  app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 
-  server.get('/static/*', maxAge(7200));
+  app.get('/static/*', maxAge(7200));
 
-  server.get('/favicon.*', maxAge(300000), (req, res) => {
+  app.get('/favicon.*', maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
   });
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
-  server.use(
+  app.use(
     '/api',
     proxy(baseApiUrl, {
       parseReqBody: false,
@@ -88,7 +90,7 @@ module.exports = (server, app) => {
    * Prevent indexation from search engines
    * (out of 'production' environment)
    */
-  server.get('/robots.txt', (req, res) => {
+  app.get('/robots.txt', (req, res) => {
     res.setHeader('Content-Type', 'text/plain');
     if (process.env.NODE_ENV !== 'production' || process.env.ROBOTS_DISALLOW) {
       res.send('User-agent: *\nDisallow: /');
@@ -99,7 +101,7 @@ module.exports = (server, app) => {
 
   // This is used by Cypress to collect server side coverage
   if (process.env.NODE_ENV === 'e2e' || process.env.E2E_TEST) {
-    server.get('/__coverage__', (req, res) => {
+    app.get('/__coverage__', (req, res) => {
       res.json({
         coverage: global.__coverage__ || null,
       });
@@ -107,14 +109,14 @@ module.exports = (server, app) => {
     });
   }
 
-  server.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
+  app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';
     res.sendFile(
       path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
     );
   });
 
-  server.get('/:collectiveSlug/:verb(contribute|donate)/button.js', (req, res) => {
+  app.get('/:collectiveSlug/:verb(contribute|donate)/button.js', (req, res) => {
     const content = fs.readFileSync(path.join(__dirname, './templates/button.js'), 'utf8');
     const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
     res.setHeader('content-type', 'application/javascript');
@@ -128,7 +130,7 @@ module.exports = (server, app) => {
     );
   });
 
-  server.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', (req, res) => {
+  app.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', (req, res) => {
     const content = fs.readFileSync(path.join(__dirname, './templates/widget.js'), 'utf8');
     const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
     res.setHeader('content-type', 'application/javascript');
@@ -143,5 +145,5 @@ module.exports = (server, app) => {
     );
   });
 
-  return pages.getRequestHandler(app);
+  return pages.getRequestHandler(nextApp);
 };
