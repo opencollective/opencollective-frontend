@@ -121,7 +121,11 @@ const RecurringContributionsCard = ({
             </P>
           </Flex>
           {userIsAdmin && (
-            <StyledButton buttonSize="tiny" onClick={() => setShowPopup(true)}>
+            <StyledButton
+              buttonSize="tiny"
+              onClick={() => setShowPopup(true)}
+              data-cy="recurring-contribution-edit-activate-button"
+            >
               {buttonText}
             </StyledButton>
           )}

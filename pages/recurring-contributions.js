@@ -181,6 +181,7 @@ class recurringContributionsPage extends React.Component {
                   minWidth="180px"
                   mx={2}
                   onClick={() => this.setState({ filter: 'active' })}
+                  data-cy="recurring-contribution-filter-tag-active"
                 >
                   <FormattedMessage id="Subscriptions.Active" defaultMessage="Active" />
                 </FilterTag>
@@ -190,6 +191,7 @@ class recurringContributionsPage extends React.Component {
                   minWidth="180px"
                   mx={2}
                   onClick={() => this.setState({ filter: 'monthly' })}
+                  data-cy="recurring-contribution-filter-tag-monthly"
                 >
                   <FormattedMessage id="Frequency.Monthly" defaultMessage="Monthly" />
                 </FilterTag>
@@ -199,6 +201,7 @@ class recurringContributionsPage extends React.Component {
                   minWidth="180px"
                   mx={2}
                   onClick={() => this.setState({ filter: 'yearly' })}
+                  data-cy="recurring-contribution-filter-tag-yearly"
                 >
                   <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />
                 </FilterTag>
@@ -207,6 +210,7 @@ class recurringContributionsPage extends React.Component {
                   variant="rounded"
                   mx={2}
                   onClick={() => this.setState({ filter: 'cancelled' })}
+                  data-cy="recurring-contribution-filter-tag-cancelled"
                 >
                   <FormattedMessage id="Subscriptions.Cancelled" defaultMessage="Cancelled" />
                 </FilterTag>

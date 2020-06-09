@@ -61,6 +61,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
             style={{ position: 'relative' }}
             createNotification={createNotification}
             account={account}
+            data-cy="recurring-contribution-card"
           />
         </CollectiveCardContainer>
       ))}
