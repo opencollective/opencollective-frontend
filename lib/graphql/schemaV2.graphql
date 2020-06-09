@@ -125,6 +125,16 @@ interface Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(
+    """
+    Filter on given types (creditcard, virtualcard...)
+    """
+    types: [String]
+  ): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -404,6 +414,11 @@ type Bot implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -543,6 +558,11 @@ type Collective implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -2238,6 +2258,11 @@ type Event implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -2848,6 +2873,11 @@ type Host implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -3046,6 +3076,11 @@ type Individual implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3654,6 +3689,11 @@ type Organization implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -3680,6 +3720,16 @@ type PaymentMethod {
   id: String
   legacyId: Int
   name: String
+  service: String
+  type: String
+
+  """
+  Returns the balance in the currency of this paymentMethod
+  """
+  balance: Int
+  currency: String
+  account: Account
+  data: JSON
 }
 
 input PaymentMethodCreateInput {
@@ -3700,9 +3750,9 @@ input PaymentMethodDataInput {
 
 input PaymentMethodReferenceInput {
   """
-  The legacy id assigned to the payment method
+  The encrypted id assigned to the payment method
   """
-  legacyId: Int
+  id: String
 }
 
 """

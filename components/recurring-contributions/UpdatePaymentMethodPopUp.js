@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { first, get, pick, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -52,31 +51,19 @@ const messages = defineMessages({
   },
 });
 
-const getPaymentMethodsQuery = gql`
+const getPaymentMethodsQuery = gqlV2`
   query UpdatePaymentMethodPopUpQuery($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
+    account(slug: $collectiveSlug) {
       id
-      type
-      slug
-      name
-      currency
-      isHost
-      settings
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
         id
-        uuid
         name
         data
-        monthlyLimitPerMember
         service
         type
         balance
         currency
-        expiryDate
-        collective {
-          id
-        }
-        subscriptions: orders(hasActiveSubscription: true) {
+        account {
           id
         }
       }
@@ -95,7 +82,8 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
 const addPaymentMethodMutation = gqlV2/* GraphQL */ `
   mutation addPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
     addStripeCreditCard(paymentMethod: $paymentMethod, account: $account) {
-      legacyId
+      id
+      name
     }
   }
 `;
@@ -126,6 +114,7 @@ const UpdatePaymentMethodPopUp = ({
     variables: {
       collectiveSlug: router.query.collectiveSlug,
     },
+    context: API_V2_CONTEXT,
   });
   const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
     updatePaymentMethodMutation,
@@ -146,7 +135,7 @@ const UpdatePaymentMethodPopUp = ({
   // data handling
   const minBalance = 50; // Minimum usable balance for virtual card
 
-  const paymentMethods = get(data, 'Collective.paymentMethods', null);
+  const paymentMethods = get(data, 'account.paymentMethods', null);
   const paymentOptions = React.useMemo(() => {
     if (!paymentMethods) {
       return null;
@@ -159,19 +148,17 @@ const UpdatePaymentMethodPopUp = ({
       paymentMethod: pm,
       disabled: pm.balance < minBalance,
       id: pm.id,
-      CollectiveId: pm.collective.id,
+      CollectiveId: pm.account.id,
     }));
-    const uniquePMs = uniqBy(paymentMethodsOptions, 'key');
+    const uniquePMs = uniqBy(paymentMethodsOptions, 'id');
     // put the PM that matches this recurring contribution on top of the list
-    const sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod.legacyId);
+    const sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod.id);
     return sortedPMs;
   }, [paymentMethods]);
 
   useEffect(() => {
     if (paymentOptions && defaultPaymentMethod === null) {
-      setDefaultPaymentMethod(
-        first(paymentOptions.filter(option => option.id === contribution.paymentMethod.legacyId)),
-      );
+      setDefaultPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
       setLoadingDefaultPaymentMethod(false);
     } else if (paymentOptions && addedPaymentMethod) {
       setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.legacyId));
@@ -329,7 +316,7 @@ const UpdatePaymentMethodPopUp = ({
                     variables: {
                       order: { id: contribution.id },
                       paymentMethod: {
-                        legacyId: selectedPaymentMethod.value.paymentMethod.id,
+                        id: selectedPaymentMethod.value.paymentMethod.id,
                       },
                     },
                   });

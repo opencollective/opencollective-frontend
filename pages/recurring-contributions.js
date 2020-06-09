@@ -35,7 +35,7 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
         nodes {
           id
           paymentMethod {
-            legacyId
+            id
           }
           amount {
             value
