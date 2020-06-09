@@ -119,16 +119,13 @@ export const prepareExpenseForSubmit = expenseData => {
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
     payeeLocation: isInvoice ? pick(expenseData.payeeLocation, ['address', 'country']) : null,
     attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
-    // Omit item's ids that were created for keying purposes
-    items: expenseData.items.map(item => {
-      return pick(item, [
-        ...(item.__isNew ? [] : ['id']),
-        ...(isInvoice ? [] : ['url']), // never submit URLs for invoices
-        'description',
-        'incurredAt',
-        'amount',
-      ]);
-    }),
+    items: expenseData.items.map(item => ({
+      id: item.__isNew ? undefined : item.id, // Omit item's ids that were created for keying purposes
+      url: isInvoice ? null : item.url, // never submit URLs for invoices
+      description: item.description,
+      incurredAt: item.incurredAt,
+      amount: item.amount,
+    })),
   };
 };
 
