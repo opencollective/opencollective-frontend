@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { CurrencyPrecision } from '../lib/constants/currency-precision';
+
 import Container from '../components/Container';
 import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
 import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
@@ -30,6 +32,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
               currency={collective.currency}
               amount={collective.balance}
               amountStyles={{ color: 'black.800' }}
+              precision={CurrencyPrecision.DEFAULT}
             />
           )}
         </Container>
