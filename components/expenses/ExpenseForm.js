@@ -97,9 +97,10 @@ const getDefaultExpense = (collective, payoutProfiles) => ({
   attachedFiles: [],
   payee: first(payoutProfiles),
   payoutMethod: undefined,
-  privateInfo: '',
+  privateMessage: '',
+  invoiceInfo: '',
   currency: collective.currency,
-  location: {
+  payeeLocation: {
     address: '',
     country: null,
   },
@@ -165,6 +166,11 @@ const EMPTY_ARRAY = [];
 // Margin x between inline fields, not displayed on mobile
 const fieldsMarginRight = [2, 3, 4];
 
+const setLocationFromPayee = (formik, payee) => {
+  formik.setFieldValue('payeeLocation.country', payee.location.country || null);
+  formik.setFieldValue('payeeLocation.address', payee.location.address || '');
+};
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -173,6 +179,7 @@ const ExpenseFormBody = ({
   onCancel,
   formPersister,
   expensesTags,
+  shouldLoadValuesFromPersister,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -192,16 +199,14 @@ const ExpenseFormBody = ({
 
   // Pre-fill address based on the payout profile
   React.useEffect(() => {
-    if (values.payee?.location && !formik.touched.payeeLocation) {
-      formik.setFieldValue('payeeLocation.country', values.payee.location.country);
-      formik.setFieldValue('payeeLocation.country', values.payee.location.country || null);
-      formik.setFieldValue('payeeLocation.address', values.payee.location.address || '');
+    if (!values.payeeLocation?.address && values.payee?.location) {
+      setLocationFromPayee(formik, values.payee);
     }
-  }, [values.payee]);
+  }, [values.payee, values.payeeLocation?.address]);
 
   // Load values from localstorage
   React.useEffect(() => {
-    if (formPersister && !dirty) {
+    if (shouldLoadValuesFromPersister && formPersister && !dirty) {
       const formValues = formPersister.loadValues();
       if (formValues) {
         // Reset payoutMethod if host is no longer connected to TransferWise
@@ -330,6 +335,7 @@ const ExpenseFormBody = ({
                                 onChange={({ value }) => {
                                   formik.setFieldValue('payee', value);
                                   formik.setFieldValue('payoutMethod', null);
+                                  setLocationFromPayee(formik, value);
                                 }}
                               />
                             )}
@@ -509,6 +515,7 @@ ExpenseFormBody.propTypes = {
   formik: PropTypes.object,
   payoutProfiles: PropTypes.array,
   autoFocusTitle: PropTypes.bool,
+  shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
@@ -535,6 +542,7 @@ const ExpenseForm = ({
   validateOnChange,
   formPersister,
   expensesTags,
+  shouldLoadValuesFromPersister,
 }) => {
   const [hasValidate, setValidate] = React.useState(validateOnChange);
 
@@ -563,6 +571,7 @@ const ExpenseForm = ({
           onCancel={onCancel}
           formPersister={formPersister}
           expensesTags={expensesTags}
+          shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
         />
       )}
     </Formik>
@@ -573,6 +582,7 @@ ExpenseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,
+  shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   /** To save draft of form values */
   formPersister: PropTypes.object,
