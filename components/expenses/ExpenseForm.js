@@ -9,7 +9,6 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
-import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import CollectivePicker from '../CollectivePicker';
 import { Box, Flex } from '../Grid';
@@ -21,7 +20,6 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputTags from '../StyledInputTags';
-import StyledTag from '../StyledTag';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
@@ -29,6 +27,7 @@ import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
 import { validateExpenseItem } from './ExpenseItemForm';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
+import ExpenseTypeTag from './ExpenseTypeTag';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
@@ -226,25 +225,48 @@ const ExpenseFormBody = ({
       {values.type && (
         <Box width="100%">
           <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-            <P color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
-              <FormattedMessage id="Expense.ExpenseTitle" defaultMessage="Expense Title" />
-            </P>
+            <Flex alignItems="center" mb={10}>
+              <P
+                as="label"
+                htmlFor="expense-description"
+                color="black.900"
+                fontSize="16px"
+                lineHeight="24px"
+                fontWeight="bold"
+              >
+                <FormattedMessage
+                  id="Expense.EnterExpenseTitle"
+                  defaultMessage="Enter expense title <small>(Public)</small>"
+                  values={{
+                    small(msg) {
+                      return (
+                        <Span fontWeight="normal" color="black.600">
+                          {msg}
+                        </Span>
+                      );
+                    },
+                  }}
+                />
+              </P>
+              <StyledHr flex="1" borderColor="black.300" ml={2} />
+            </Flex>
             <P fontSize="12px" color="black.600">
               <FormattedMessage
                 id="Expense.PrivacyWarning"
-                defaultMessage="This information is public. Do not enter any personal information."
+                defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
               />
             </P>
             <Field
               as={StyledInput}
               autoFocus={autoFocusTitle}
+              id="expense-description"
               name="description"
               placeholder={formatMessage(msg.descriptionPlaceholder)}
               width="100%"
               fontSize="H4"
               border="0"
               error={errors.description}
-              mt={4}
+              mt={3}
               px={2}
               py={1}
               maxLength={255}
@@ -253,9 +275,7 @@ const ExpenseFormBody = ({
             {hasBaseFormFieldsCompleted && (
               <React.Fragment>
                 <Flex alignItems="flex-start" mt={3}>
-                  <StyledTag variant="rounded-left" type="dark" mb="4px" mr="4px">
-                    {i18nExpenseType(intl, values.type, values.legacyId)}
-                  </StyledTag>
+                  <ExpenseTypeTag type={values.type} mr="4px" />
                   <StyledInputTags
                     renderUpdatedTags
                     suggestedTags={expensesTags}
