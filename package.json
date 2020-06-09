@@ -19,7 +19,7 @@
     "@formatjs/intl-relativetimeformat": "5.2.6",
     "@material-ui/core": "4.10.1",
     "@opencollective/taxes": "2.4.0",
-    "@popperjs/core": "2.4.0",
+    "@popperjs/core": "2.4.1",
     "@sentry/browser": "5.17.0",
     "@sentry/node": "5.17.0",
     "@styled-icons/boxicons-regular": "10.0.0",
