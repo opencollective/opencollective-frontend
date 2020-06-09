@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 
 import { fetchFromPDFService } from '../../lib/api';
 import { getErrorFromPdfService } from '../../lib/errors';
-import { expenseInvoiceUrl, invoiceServiceURL } from '../../lib/url_helpers';
+import { expenseInvoiceUrl } from '../../lib/url_helpers';
 
 const getPrettyDate = expense => {
   if (!expense?.createdAt) {
@@ -34,10 +34,9 @@ const ExpenseInvoiceDownloadHelper = ({ children, expense, collective, onError }
       }
 
       const invoiceUrl = expenseInvoiceUrl(expense.id);
-      const fetchParams = { format: 'blob', allowExternal: invoiceServiceURL };
       setLoading(true);
       try {
-        const file = await fetchFromPDFService(invoiceUrl, fetchParams);
+        const file = await fetchFromPDFService(invoiceUrl);
         return saveAs(file, filename);
       } catch (e) {
         const error = getErrorFromPdfService(e);

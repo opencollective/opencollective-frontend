@@ -96,7 +96,7 @@ class TopBarProfileMenu extends React.Component {
   };
 
   toggleProfileMenu = e => {
-    this.setState({ showProfileMenu: !this.state.showProfileMenu });
+    this.setState(state => ({ showProfileMenu: !state.showProfileMenu }));
     // don't propagate to onClickOutside
     e.nativeEvent.stopImmediatePropagation();
   };

@@ -64,7 +64,6 @@ class StripeOrBankAccountPicker extends React.Component {
     super(props);
 
     this.state = {
-      loading: null,
       buttonLoading: false,
     };
 

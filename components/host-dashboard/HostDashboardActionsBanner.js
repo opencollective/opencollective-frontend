@@ -118,7 +118,7 @@ class HostDashboardActionsBanner extends React.Component {
   };
 
   toggleAddFunds = () => {
-    this.setState({ showAddFunds: !this.state.showAddFunds });
+    this.setState(state => ({ showAddFunds: !state.showAddFunds }));
   };
 
   onChange = ({ value: collective }) => {
