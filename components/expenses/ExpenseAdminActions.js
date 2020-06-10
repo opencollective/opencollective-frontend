@@ -7,11 +7,13 @@ import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { FormattedMessage } from 'react-intl';
+import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
+import { useHover } from '../../lib/hooks/useHover';
 import { Router } from '../../server/pages';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -29,25 +31,51 @@ const deleteExpenseMutation = gqlV2`
 `;
 
 const ButtonLabel = styled.div`
-  position: absolute;
   background: rgba(10, 10, 10, 0.9);
-  right: 50px;
-  top: 5px;
-  width: 154px;
+  min-width: 154px;
   padding: 6px;
   color: white;
   border-radius: 4px;
-  display: none;
+  text-align: center;
   animation: ${fadeIn} 0.2s;
 `;
 
-const ButtonWithLabel = styled(StyledRoundButton).attrs({ size: 40, m: 2 })`
-  position: relative;
+const REACT_POPPER_MODIFIERS = [
+  {
+    name: 'offset',
+    options: {
+      offset: [0, 8],
+    },
+  },
+];
 
-  &:hover ${ButtonLabel} {
-    display: block;
-  }
-`;
+const ButtonWithLabel = ({ label, icon, ...props }) => {
+  const [isHovered, hoverProps] = useHover();
+  const [referenceElement, setReferenceElement] = React.useState(null);
+  const [popperElement, setPopperElement] = React.useState(null);
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    modifiers: REACT_POPPER_MODIFIERS,
+    placement: 'left',
+  });
+
+  return (
+    <React.Fragment>
+      <StyledRoundButton ref={setReferenceElement} size={40} m={2} {...hoverProps} {...props}>
+        {icon}
+      </StyledRoundButton>
+      {isHovered && (
+        <ButtonLabel ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+          {label}
+        </ButtonLabel>
+      )}
+    </React.Fragment>
+  );
+};
+
+ButtonWithLabel.propTypes = {
+  label: PropTypes.node,
+  icon: PropTypes.node,
+};
 
 /**
  * Admin buttons for the expense, displayed in a React fragment to let parent
@@ -62,44 +90,46 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
       {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
         <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
           {({ isLoading, downloadInvoice }) => (
-            <ButtonWithLabel loading={isLoading} onClick={downloadInvoice} disabled={isDisabled}>
-              <IconDownload size={18} />
-              <ButtonLabel>
-                <FormattedMessage id="actions.download" defaultMessage="Download" />
-              </ButtonLabel>
-            </ButtonWithLabel>
+            <ButtonWithLabel
+              loading={isLoading}
+              onClick={downloadInvoice}
+              disabled={isDisabled}
+              label={<FormattedMessage id="actions.download" defaultMessage="Download" />}
+              icon={<IconDownload size={18} />}
+            />
           )}
         </ExpenseInvoiceDownloadHelper>
       )}
       <ButtonWithLabel
         onClick={() => copy(window.location.href.replace('?createSuccess=true', ''))}
         disabled={isDisabled}
-      >
-        {isCopied ? <Check size={18} /> : <IconLink size={18} />}
-        <ButtonLabel>
-          {isCopied ? (
+        icon={isCopied ? <Check size={18} /> : <IconLink size={18} />}
+        label={
+          isCopied ? (
             <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
           ) : (
             <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
-          )}
-        </ButtonLabel>
-      </ButtonWithLabel>
+          )
+        }
+      />
       {permissions?.canEdit && (
-        <ButtonWithLabel onClick={onEdit} disabled={isDisabled} data-cy="edit-expense-btn">
-          <IconEdit size={16} />
-          <ButtonLabel>
-            <FormattedMessage id="Edit" defaultMessage="Edit" />
-          </ButtonLabel>
-        </ButtonWithLabel>
+        <ButtonWithLabel
+          onClick={onEdit}
+          disabled={isDisabled}
+          data-cy="edit-expense-btn"
+          icon={<IconEdit size={16} />}
+          label={<FormattedMessage id="Edit" defaultMessage="Edit" />}
+        />
       )}
       {permissions?.canDelete && (
         <React.Fragment>
-          <ButtonWithLabel buttonStyle="danger" disabled={isDisabled} onClick={() => showDeleteConfirm(true)}>
-            <IconTrash size={18} />
-            <ButtonLabel>
-              <FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />
-            </ButtonLabel>
-          </ButtonWithLabel>
+          <ButtonWithLabel
+            buttonStyle="danger"
+            disabled={isDisabled}
+            onClick={() => showDeleteConfirm(true)}
+            icon={<IconTrash size={18} />}
+            label={<FormattedMessage id="Expense.delete" defaultMessage="Delete expense" />}
+          />
           {hasDeleteConfirm && (
             <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT}>
               {deleteExpense => (
