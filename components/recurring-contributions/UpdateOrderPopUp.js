@@ -34,7 +34,7 @@ const messages = defineMessages({
 });
 
 const updateOrderMutation = gqlV2/* GraphQL */ `
-  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: Int, $tier: TierReferenceInput) {
+  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: Int, $tier: TierUpdateInput) {
     updateOrder(order: $order, amount: $amount, tier: $tier) {
       id
     }

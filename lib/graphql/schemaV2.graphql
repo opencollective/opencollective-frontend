@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Sun Jun 07 2020 23:50:46 GMT+0100 (British Summer Time)
+# timestamp: Wed Jun 10 2020 13:06:27 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -3456,7 +3456,7 @@ type Mutation {
     """
     Reference to a Tier to update the order with
     """
-    tier: TierReferenceInput
+    tier: TierUpdateInput
 
     """
     Reference to an Amount to update the order to
@@ -3963,7 +3963,7 @@ type Tier {
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
 }
 
-input TierReferenceInput {
+input TierUpdateInput {
   """
   The legacy id assigned to the Tier
   """
