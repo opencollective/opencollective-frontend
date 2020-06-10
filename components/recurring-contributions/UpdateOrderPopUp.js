@@ -68,7 +68,7 @@ const getTiersQuery = gql`
   }
 `;
 
-const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setShowPopup, router }) => {
+const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setShowPopup }) => {
   const intl = useIntl();
 
   // state management
