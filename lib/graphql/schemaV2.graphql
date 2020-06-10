@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Jun 10 2020 15:28:25 GMT+0100 (British Summer Time)
+# timestamp: Wed Jun 10 2020 20:26:06 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)

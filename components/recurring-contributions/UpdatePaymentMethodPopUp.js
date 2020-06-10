@@ -279,6 +279,7 @@ const UpdatePaymentMethodPopUp = ({
                       {
                         query: getPaymentMethodsQuery,
                         variables: { collectiveSlug: router.query.collectiveSlug },
+                        context: API_V2_CONTEXT,
                       },
                     ],
                   });
