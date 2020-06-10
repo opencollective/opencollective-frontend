@@ -281,12 +281,6 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                     minimumAmount: selectedTier.minimumAmount,
                   },
                 },
-                refetchQueries: [
-                  {
-                    query: getTiersQuery,
-                    variables: { collectiveSlug: router.query.collectiveSlug },
-                  },
-                ],
               });
               createNotification('update');
               setShowPopup(false);
