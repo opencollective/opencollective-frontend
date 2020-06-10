@@ -4,12 +4,13 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { CollectiveType } from '../lib/constants/collectives';
 import { canOrderTicketsFromEvent } from '../lib/events';
+import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
 
 import { AllSectionsNames, Dimensions, Sections } from './collective-page/_constants';
 import Avatar from './Avatar';
@@ -166,57 +167,6 @@ const CollectiveName = styled.h1`
   }
 `;
 
-const i18nSection = defineMessages({
-  [Sections.CONTRIBUTE]: {
-    id: 'Contribute',
-    defaultMessage: 'Contribute',
-  },
-  [Sections.CONVERSATIONS]: {
-    id: 'conversations',
-    defaultMessage: 'Conversations',
-  },
-  [Sections.BUDGET]: {
-    id: 'section.budget.title',
-    defaultMessage: 'Budget',
-  },
-  [Sections.CONTRIBUTORS]: {
-    id: 'section.contributors.title',
-    defaultMessage: 'Contributors',
-  },
-  [Sections.ABOUT]: {
-    id: 'collective.about.title',
-    defaultMessage: 'About',
-  },
-  [Sections.UPDATES]: {
-    id: 'section.updates.title',
-    defaultMessage: 'Updates',
-  },
-  [Sections.CONTRIBUTIONS]: {
-    id: 'Contributions',
-    defaultMessage: 'Contributions',
-  },
-  [Sections.TRANSACTIONS]: {
-    id: 'SectionTransactions.Title',
-    defaultMessage: 'Transactions',
-  },
-  [Sections.GOALS]: {
-    id: 'Goals',
-    defaultMessage: 'Goals',
-  },
-  [Sections.TICKETS]: {
-    id: 'section.tickets.title',
-    defaultMessage: 'Tickets',
-  },
-  [Sections.LOCATION]: {
-    id: 'SectionLocation.Title',
-    defaultMessage: 'Location',
-  },
-  [Sections.PARTICIPANTS]: {
-    id: 'CollectivePage.NavBar.Participants',
-    defaultMessage: 'Participants',
-  },
-});
-
 // Define default sections based on collective type
 const DEFAULT_SECTIONS = {
   [CollectiveType.ORGANIZATION]: [
@@ -249,8 +199,29 @@ const DEFAULT_SECTIONS = {
   ],
 };
 
-const getDefaultSections = collective => {
-  return get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[get(collective, 'type')] || [];
+/** Returns the default sections for collective */
+export const getDefaultSectionsForCollectiveType = type => {
+  return DEFAULT_SECTIONS[type] || [];
+};
+
+/** Returns the sections from collective's settings, fallbacks on default sections for type */
+export const getSectionsForCollective = collective => {
+  const collectiveSections = get(collective, 'settings.collectivePage.sections');
+  if (!collectiveSections) {
+    return getDefaultSectionsForCollectiveType(get(collective, 'type'));
+  }
+
+  // Convert legacy sections to the new format
+  const sections = [];
+  collectiveSections.forEach(sectionData => {
+    if (typeof sectionData === 'string') {
+      sections.push(sectionData);
+    } else if (sectionData.isEnabled) {
+      sections.push(sectionData.section);
+    }
+  });
+
+  return sections;
 };
 
 /**
@@ -264,8 +235,8 @@ const getDefaultSections = collective => {
  *    - `stats` {object} with following properties: `updates`, (`balance` or `transactions`)
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
-export const getSectionsForCollective = (collective, isAdmin) => {
-  const sections = getDefaultSections(collective);
+export const getFilteredSectionsForCollective = (collective, isAdmin) => {
+  const sections = getSectionsForCollective(collective);
   const toRemove = new Set();
   collective = collective || {};
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -441,7 +412,7 @@ const CollectiveNavbar = ({
                     as={LinkComponent}
                     collectivePath={collective.path || `/${collective.slug}`}
                     section={section}
-                    label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
+                    label={i18nCollectivePageSection(intl, section)}
                   />
                 </MenuLinkContainer>
               ))}

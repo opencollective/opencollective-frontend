@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
+import CollectiveNavbar, { getFilteredSectionsForCollective } from '../CollectiveNavbar';
 import Container from '../Container';
 
 import Hero from './hero/Hero';
@@ -75,8 +75,8 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  getSections = memoizeOne(props => {
-    return getSectionsForCollective(props.collective, props.isAdmin);
+  getSections = memoizeOne((collective, isAdmin) => {
+    return getFilteredSectionsForCollective(collective, isAdmin);
   });
 
   onScroll = throttle(() => {
@@ -97,7 +97,7 @@ class CollectivePage extends Component {
     // Get the currently section that is at the top of the screen.
     const distanceThreshold = 200;
     const breakpoint = window.scrollY + distanceThreshold;
-    const sections = this.getSections(this.props);
+    const sections = this.getSections(this.props.collective, this.props.isAdmin);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
@@ -224,7 +224,7 @@ class CollectivePage extends Component {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
     const { type, isHost, canApply, canContact, isActive } = collective;
     const { isFixed, selectedSection } = this.state;
-    const sections = this.getSections(this.props);
+    const sections = this.getSections(this.props.collective, this.props.isAdmin);
     const callsToAction = this.getCallsToAction(
       type,
       isHost,
