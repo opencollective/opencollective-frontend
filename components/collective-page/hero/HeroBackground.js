@@ -46,11 +46,16 @@ const StyledBackground = styled.div`
   top: 0;
   height: 100%;
   width: 100%;
-  max-width: 1368px; // Should match SVG's viewbox
+  max-width: ${BASE_WIDTH}px; // Should match SVG's viewbox
   z-index: ${props => (props.isEditing ? 0 : -1)};
 
   img {
     margin: 0;
+  }
+
+  .reactEasyCrop_Image {
+    max-width: none;
+    max-height: none;
   }
 
   @supports (mask-size: cover) {
