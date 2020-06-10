@@ -615,13 +615,6 @@ input CollectiveCreateInput {
   settings: JSON
 }
 
-input CollectiveReferenceInput {
-  """
-  The public id identifying the collective
-  """
-  id: String
-}
-
 """
 This represents an Comment
 """
@@ -656,53 +649,6 @@ input CommentCreateInput {
   expense: ExpenseReferenceInput
   ExpenseId: Int
   ConversationId: String
-}
-
-"""
-This represents an Comment Reaction
-"""
-type CommentReaction {
-  """
-  An unique identifier for this comment reaction
-  """
-  id: String
-
-  """
-  The emoji associated with this user and comment
-  """
-  emoji: String
-
-  """
-  The account associated with this reaction
-  """
-  fromAccount: Account
-
-  """
-  The time this comment was created
-  """
-  createdAt: DateTime
-
-  """
-  The time this comment reaction was last updated
-  """
-  updatedAt: DateTime
-}
-
-input CommentReactionCreateInput {
-  """
-  The emoji associated with the reaction
-  """
-  emoji: String
-
-  """
-  A unique identifier for the comment id associated with this comment reaction
-  """
-  comment: CommentReferenceInput
-
-  """
-  A unique identifier for the collection associated with this comment
-  """
-  fromCollectiveId: CollectiveReferenceInput
 }
 
 input CommentReferenceInput {
@@ -3328,8 +3274,23 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
-  addCommentReaction(commentReaction: CommentReactionCreateInput!): CommentReaction
-  removeCommentReaction(id: String!): CommentReaction
+  addCommentReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this comment reaction
+    """
+    comment: CommentReferenceInput!
+
+    """
+    A unique identifier for the account associated with this reaction
+    """
+    fromAccount: AccountReferenceInput!
+  ): Comment!
+  removeCommentReaction(id: String!): Comment!
 
   """
   Connect external account to Open Collective Account

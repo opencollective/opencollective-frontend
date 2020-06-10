@@ -10,13 +10,16 @@ import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 
 import Container from './Container';
 import { Box } from './Grid';
-import StyledLink from './StyledLink';
+import StyledButton from './StyledButton';
+import StyledCard from './StyledCard';
+import StyledRoundButton from './StyledRoundButton';
 import { Span } from './Text';
 
 const createCommentReactionMutation = gqlV2`
-  mutation CreateCommentReaction($commentReaction: CommentReactionCreateInput!) {
-    addCommentReaction(commentReaction: $commentReaction) {
+  mutation CreateCommentReaction($emoji: String!, $comment: CommentReferenceInput!, $fromAccount: AccountReferenceInput!) {
+    addCommentReaction(emoji: $emoji, comment: $comment, fromAccount: $fromAccount) {
       id
+      reactions
     }
   }
 `;
@@ -48,7 +51,6 @@ const CommentReactionPicker = ({ comment, reactions }) => {
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
   const wrapperRef = React.useRef();
-  const [selectedReactions, setSelectedReactions] = React.useState(reactions);
   const [createCommentReaction] = useMutation(createCommentReactionMutation, mutationOptions);
 
   useGlobalBlur(wrapperRef, outside => {
@@ -58,23 +60,19 @@ const CommentReactionPicker = ({ comment, reactions }) => {
   });
 
   const handleEmojiSelect = async emoji => {
-    const commentReaction = {
-      emoji: emoji,
-      comment: { id: comment.id },
-      fromCollectiveId: { id: comment.fromCollective.id },
-    };
     setOpen(false);
-    const response = await createCommentReaction({ variables: { commentReaction } });
-    if (response.data) {
-      const updatedEmojiCount = {};
-      updatedEmojiCount[emoji] = selectedReactions[emoji] ? selectedReactions[emoji] + 1 : 1;
-      setSelectedReactions({ ...selectedReactions, ...updatedEmojiCount });
-    }
+    await createCommentReaction({
+      variables: {
+        emoji: emoji,
+        comment: { id: comment.id },
+        fromAccount: { id: comment.fromCollective.id },
+      },
+    });
   };
 
   return (
     <Container>
-      {Object.entries(selectedReactions).map(([emoji, count]) => {
+      {Object.entries(reactions).map(([emoji, count]) => {
         return (
           <EmojiLabel key={emoji} display="inline-block" mt={3} mr={2}>
             {`${emoji} ${count}`}
@@ -85,9 +83,7 @@ const CommentReactionPicker = ({ comment, reactions }) => {
         <span ref={wrapperRef}>
           <Reference>
             {({ ref }) => (
-              <StyledLink
-                textAlign="center"
-                buttonStyle="standard"
+              <StyledButton
                 buttonSize="tiny"
                 display="inline-block"
                 mt={3}
@@ -96,57 +92,54 @@ const CommentReactionPicker = ({ comment, reactions }) => {
                 ref={ref}
               >
                 <InsertEmoticon size="1.2em" />
-              </StyledLink>
+              </StyledButton>
             )}
           </Reference>
           {open && (
             <Popper placement="bottom">
               {({ placement, ref, style }) => (
-                <Container
-                  border="0.1px solid #dadada"
+                <StyledCard
+                  boxShadow="-2px -1px 3px 0px #e8e8e8"
+                  zIndex={9999}
                   data-placement={placement}
                   ref={ref}
-                  style={{
-                    backgroundColor: 'white',
-                    zIndex: 9999,
-                    ...style,
-                  }}
+                  style={style}
                 >
                   <Box>
                     {emojiFirstRow.map(emoji => {
                       return (
-                        <StyledLink
+                        <StyledRoundButton
                           key={emoji}
-                          buttonStyle="borderless"
+                          isBorderless
                           buttonSize="small"
-                          mt={1}
-                          mb={1}
+                          m={1}
                           display="inline-block"
                           whiteSpace="nowrap"
                           onClick={() => handleEmojiSelect(emoji)}
                         >
                           {emoji}
-                        </StyledLink>
+                        </StyledRoundButton>
                       );
                     })}
                   </Box>
                   <Box>
                     {emojiSecondRow.map(emoji => {
                       return (
-                        <StyledLink
+                        <StyledRoundButton
                           key={emoji}
-                          buttonStyle="borderless"
+                          m={1}
+                          isBorderless
                           buttonSize="small"
                           display="inline-block"
                           whiteSpace="nowrap"
                           onClick={() => handleEmojiSelect(emoji)}
                         >
                           {emoji}
-                        </StyledLink>
+                        </StyledRoundButton>
                       );
                     })}
                   </Box>
-                </Container>
+                </StyledCard>
               )}
             </Popper>
           )}
