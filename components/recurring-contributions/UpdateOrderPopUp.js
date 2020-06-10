@@ -34,7 +34,7 @@ const messages = defineMessages({
 });
 
 const updateOrderMutation = gqlV2/* GraphQL */ `
-  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: Int, $tier: TierUpdateInput) {
+  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: Int, $tier: TierReferenceInput) {
     updateOrder(order: $order, amount: $amount, tier: $tier) {
       id
     }
@@ -277,8 +277,6 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                   amount: selectedAmountOption.label === 'Other' ? inputAmountValue : selectedAmountOption.value,
                   tier: {
                     legacyId: selectedTier.value ? selectedTier.value.id : selectedTier.id,
-                    flexible: selectedTier.flexible,
-                    minimumAmount: selectedTier.minimumAmount,
                   },
                 },
               });
