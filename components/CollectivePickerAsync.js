@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -28,9 +28,9 @@ const DEFAULT_SEARCH_QUERY = gql`
 `;
 
 /** Throttle search function to limit invocations while typing */
-const throttledSearch = throttle((searchFunc, variables) => {
+const throttledSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
-}, 500);
+}, 750);
 
 const Messages = defineMessages({
   searchForType: {
