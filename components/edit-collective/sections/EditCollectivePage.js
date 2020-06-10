@@ -130,8 +130,9 @@ const loadSectionsForCollective = collective => {
   };
 
   if (collectiveSections) {
-    const sections = [...collectiveSections, ...defaultSections].map(transformLegacySection);
-    return uniqBy(sections, 'section');
+    const existingSections = collectiveSections.map(transformLegacySection);
+    const addedSections = defaultSections.map(section => ({ section, isEnabled: false }));
+    return uniqBy([...existingSections, ...addedSections], 'section');
   } else {
     return defaultSections.map(transformLegacySection);
   }
