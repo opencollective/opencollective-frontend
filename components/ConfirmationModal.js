@@ -45,12 +45,13 @@ const ConfirmationModal = ({
   continueLabel,
   cancelHandler,
   continueHandler,
+  ...props
 }) => {
   const [submitting, setSubmitting] = React.useState(false);
   const { formatMessage } = useIntl();
 
   return (
-    <Modal width="570px" show={show} onClose={onClose}>
+    <Modal width="570px" show={show} onClose={onClose} {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
       <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
       <ModalFooter>

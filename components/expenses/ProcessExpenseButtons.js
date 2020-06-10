@@ -14,6 +14,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
 const PROCESS_EXPENSE_MUTATION = gqlV2`
@@ -110,9 +111,14 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         </StyledButton>
       )}
       {permissions.canMarkAsUnpaid && (
-        <StyledButton {...getButtonProps('MARK_AS_UNPAID')} buttonStyle="dangerSecondary">
-          <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
-        </StyledButton>
+        <MarkExpenseAsUnpaidButton
+          {...getButtonProps('MARK_AS_UNPAID', false)}
+          onConfirm={hasPaymentProcessorFeesRefunded =>
+            triggerAction('MARK_AS_UNPAID', {
+              paymentProcessorFee: hasPaymentProcessorFeesRefunded ? 1 : 0,
+            })
+          }
+        />
       )}
     </React.Fragment>
   );
