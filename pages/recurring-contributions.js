@@ -44,6 +44,7 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
           status
           frequency
           tier {
+            id
             name
           }
           totalDonations {
@@ -101,6 +102,7 @@ class recurringContributionsPage extends React.Component {
     } else {
       this.setState({ notificationType: type });
     }
+    window.scrollTo(0, 0);
   };
 
   dismissNotification = () => {

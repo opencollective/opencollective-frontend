@@ -1235,6 +1235,8 @@
   "profile.incognito.description": "Garder cette contribution privée (voir la FAQ pour + d'infos)",
   "profilemenu.memberships.tooltip.balance": "Solde {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} dépenses en attente",
+  "RecurringContributions.customAmount": "Custom amount",
+  "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "redeem.card.authenticated": "Vous êtes déjà connecté à votre compte. Déconnectez-vous si vous désirez recevoir cette carte cadeau sur un autre compte.",
   "redeem.card.info": "C’est facile. Entrez juste votre nom, prénom et l’adresse mail, puis tapez le code de votre carte-cadeau et votre compte de collectif sera créé (si nécessaire). La carte-cadeau sera automatiquement attachée à votre compte.",
   "redeem.card.success.instructions": "Nous avons envoyé un e-mail à {email} avec des instructions pour vérifier votre nouveau compte Open Collective et le créditer avec le montant de votre carte cadeau.",

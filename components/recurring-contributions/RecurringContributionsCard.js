@@ -49,16 +49,9 @@ const messages = defineMessages({
   },
 });
 
-const RecurringContributionsCard = ({
-  collective,
-  status,
-  contribution,
-  hover,
-  createNotification,
-  account,
-  ...props
-}) => {
+const RecurringContributionsCard = ({ collective, status, contribution, createNotification, account, ...props }) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [isHovering, setHovering] = useState(false);
 
   const { formatMessage } = useIntl();
   const statusTag = `${status} contribution`;
@@ -68,7 +61,7 @@ const RecurringContributionsCard = ({
   const userIsAdmin = userIsLoggedInUser; // || userIsAdminOfCollectiveOrOrg
 
   return (
-    <StyledCard {...props}>
+    <StyledCard onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)} {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
           <LinkCollective collective={collective}>
@@ -78,7 +71,7 @@ const RecurringContributionsCard = ({
       </Container>
       <Flex flexDirection="column" justifyContent="space-around" height={260}>
         <Container p={2}>
-          {hover && !showPopup ? (
+          {isHovering && !showPopup ? (
             <Fragment>
               <P fontSize="Caption" fontWeight="bold">
                 {formatMessage(messages.ourPurpose)}

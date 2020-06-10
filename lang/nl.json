@@ -1235,6 +1235,8 @@
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
   "profilemenu.memberships.tooltip.balance": "Balance {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} pending expenses",
+  "RecurringContributions.customAmount": "Custom amount",
+  "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "redeem.card.authenticated": "You are currently authenticated. Sign Out first if you want to redeem with another account.",
   "redeem.card.info": "Het is gemakkelijk! Geef gewoon je naam, e-mailadres en cadeaucode in. Wij zullen een account aanmaken voor jou als je er nog geen hebt. Je zal in staat zijn om de cadeaubon te selecteren als betaalmethode wanneer je een bijdrage levert.",
   "redeem.card.success.instructions": "We hebben een e-mail gestuurd naar {email} met instructies om je nieuwe Open Collectief account te verifiëren en het bedrag van je cadeaubon er aan toe te kennen.",

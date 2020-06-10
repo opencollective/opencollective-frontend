@@ -19,6 +19,7 @@ import StyledHr from '../StyledHr';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
+import UpdateOrderPopUp from './UpdateOrderPopUp';
 import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
 
 const messages = defineMessages({
@@ -121,9 +122,11 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
   });
 
   // detect click outside menu to close it - https://medium.com/@pitipatdop/little-neat-trick-to-capture-click-outside-with-react-hook-ba77c37c7e82
-  const popupNode = useRef();
+  const popupNode = useRef(null);
   const handleClick = e => {
-    if (popupNode.current.contains(e.target)) {
+    // we include 'react-select' because the dropdown in UpdateOrderPopUp portals to the
+    // document.body, so if we don't inlude this it closes the menu
+    if (popupNode.current.contains(e.target) || e.target.id.includes('react-select')) {
       // inside click
       return;
     }
@@ -358,27 +361,12 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
 
       {updateTierMenu && (
         <MenuSection>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
-            <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
-              {formatMessage(messages.updateTier)}
-            </P>
-            <Flex flexGrow={1} alignItems="center">
-              <StyledHr width="100%" ml={2} />
-            </Flex>
-          </Flex>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center">
-            <StyledButton
-              buttonSize="small"
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
-            >
-              {formatMessage(messages.cancel)}
-            </StyledButton>
-            <StyledButton buttonSize="small" buttonStyle="secondary">
-              {formatMessage(messages.update)}
-            </StyledButton>
-          </Flex>
+          <UpdateOrderPopUp
+            setMenuState={setMenuState}
+            contribution={contribution}
+            createNotification={createNotification}
+            setShowPopup={setShowPopup}
+          />
         </MenuSection>
       )}
     </PopUpMenu>

@@ -83,7 +83,10 @@ const StyledInputAmount = ({
       inputMode="decimal"
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={isControlled ? getValue(value, rawValue) : undefined}
-      onChange={e => dispatchValue(e, parseValueFromEvent(e, precision))}
+      onChange={e => {
+        e.stopPropagation();
+        dispatchValue(e, parseValueFromEvent(e, precision));
+      }}
       onBlur={e => {
         // Clean number if valid (ie. 41.1 -> 41.10)
         const parsedNumber = parseValueFromEvent(e, precision);

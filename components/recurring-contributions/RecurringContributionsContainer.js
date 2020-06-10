@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -17,8 +17,6 @@ const CollectiveCardContainer = styled.div`
 `;
 
 const RecurringContributionsContainer = ({ recurringContributions, filter, createNotification, account }) => {
-  const [isHovering, setHovering] = useState(null);
-
   const activeRecurringContributions = recurringContributions.nodes.filter(
     contribution => contribution.status === 'ACTIVE',
   );
@@ -55,9 +53,6 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
             collective={contribution.toAccount}
             status={contribution.status}
             contribution={contribution}
-            hover={isHovering === contribution.id}
-            onMouseEnter={() => setHovering(contribution.id)}
-            onMouseLeave={() => setHovering(null)}
             style={{ position: 'relative' }}
             createNotification={createNotification}
             account={account}

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Jun 04 2020 13:23:07 GMT+0100 (British Summer Time)
+# timestamp: Wed Jun 10 2020 15:28:25 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -592,6 +592,7 @@ input CollectiveCreateInput {
   description: String!
   tags: [String]
   githubHandle: String
+  settings: JSON
 }
 
 """
@@ -3452,6 +3453,16 @@ type Mutation {
     Reference to a Payment Method to update the order with
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Reference to a Tier to update the order with
+    """
+    tier: TierReferenceInput
+
+    """
+    An Amount to update the order to
+    """
+    amount: Int
   ): Order
 
   """
@@ -3951,6 +3962,13 @@ type Tier {
   Get all orders
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
+}
+
+input TierReferenceInput {
+  """
+  The legacy id assigned to the Tier
+  """
+  legacyId: Int
 }
 
 """

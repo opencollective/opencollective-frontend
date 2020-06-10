@@ -1235,6 +1235,8 @@
   "profile.incognito.description": "Manter minha contribuição anônima (veja a FAQ para mais informações)",
   "profilemenu.memberships.tooltip.balance": "Saldo {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} despesas pendentes",
+  "RecurringContributions.customAmount": "Custom amount",
+  "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "redeem.card.authenticated": "Você está autenticado. Saia primeiro se você quer reivindicar com outra conta.",
   "redeem.card.info": "É fácil! Basta digitar seu nome, endereço de email e código do vale-presente. Criaremos uma conta para você, se ainda não tiver uma. Você poderá selecionar o vale-presente como forma de pagamento ao fazer uma contribuição.",
   "redeem.card.success.instructions": "Enviamos um e-mail para {email} com instruções para verificar sua nova conta do Open Collective e creditar o valor do seu vale-presente.",
