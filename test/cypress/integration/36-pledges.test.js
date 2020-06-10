@@ -58,7 +58,7 @@ describe('Pledges', () => {
     cy.get('[data-cy="submit"]').click();
     cy.url().should('contain', '/pledges/new');
 
-    cy.get('[data-cy="errorMessage"]').should('contain', 'Error:  We could not verify the GitHub organization exists');
+    cy.get('[data-cy="errorMessage"]').should('contain', 'Error: We could not verify the GitHub organization exists');
   });
 
   it('creating a pledge unable to verify the repository', () => {
@@ -68,7 +68,7 @@ describe('Pledges', () => {
     cy.get('[data-cy=publicMessage]').clear().type('publicMessage');
     cy.get('[data-cy="submit"]').click();
     cy.url().should('contain', '/pledges/new');
-    cy.get('[data-cy="errorMessage"]').should('contain', 'Error:  We could not verify the GitHub repository exists');
+    cy.get('[data-cy="errorMessage"]').should('contain', 'Error: We could not verify the GitHub repository exists');
   });
 
   it('creating a pledge unable to verify the repository', () => {
