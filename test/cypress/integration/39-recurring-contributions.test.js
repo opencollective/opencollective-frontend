@@ -50,7 +50,7 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
     });
   });
-  
+
   it.skip('Can reactivate a cancelled contribution', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
