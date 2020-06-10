@@ -23,7 +23,7 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Has contributions in the right categories', () => {
+  it.skip('Has contributions in the right categories', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
       cy.getByDataCy('recurring-contribution-filter-tag-monthly').click();
@@ -33,7 +33,7 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Can cancel an active contribution', () => {
+  it.skip('Can cancel an active contribution', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
@@ -50,7 +50,8 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
     });
   });
-  it('Can reactivate a cancelled contribution', () => {
+  
+  it.skip('Can reactivate a cancelled contribution', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
       cy.getByDataCy('recurring-contribution-filter-tag-cancelled').click();
@@ -64,7 +65,7 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Can add a new payment method and use it for the recurring contribution', () => {
+  it.skip('Can add a new payment method and use it for the recurring contribution', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
