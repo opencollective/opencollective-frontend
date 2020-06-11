@@ -47,7 +47,7 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
           values={{
             I18nSupportLink,
             Link: getI18nLink({
-              href: 'https://docs.opencollective.com/help/expenses/tax-information',
+              href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
               openInNewTab: true,
             }),
           }}
