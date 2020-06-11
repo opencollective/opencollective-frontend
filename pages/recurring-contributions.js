@@ -19,7 +19,15 @@ import TemporaryNotification from '../components/TemporaryNotification';
 import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
+const FilterTag = styled(StyledTag)`
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  cursor: pointer;
+  min-width: 180px;
+`;
+
+export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
   query RecurringContributions($collectiveSlug: String) {
     account(slug: $collectiveSlug) {
       id
@@ -35,7 +43,7 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
         nodes {
           id
           paymentMethod {
-            legacyId
+            id
           }
           amount {
             value
@@ -64,14 +72,6 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
       }
     }
   }
-`;
-
-const FilterTag = styled(StyledTag)`
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  cursor: pointer;
-  min-width: 180px;
 `;
 
 class recurringContributionsPage extends React.Component {

@@ -11,7 +11,6 @@ import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { recurringContributionsPageQuery } from '../../lib/graphql/queries';
 
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -100,6 +99,7 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
   mutation cancelRecurringContribution($order: OrderReferenceInput!) {
     cancelOrder(order: $order) {
       id
+      status
     }
   }
 `;
@@ -108,11 +108,12 @@ const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
   mutation activateRecurringContribution($order: OrderReferenceInput!) {
     activateOrder(order: $order) {
       id
+      status
     }
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, account, ...props }) => {
+const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, account }) => {
   const [menuState, setMenuState] = useState('mainMenu');
   const [submitCancellation, { loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
@@ -255,13 +256,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
                 try {
                   await submitCancellation({
                     variables: { order: { id: contribution.id } },
-                    refetchQueries: [
-                      {
-                        query: recurringContributionsPageQuery,
-                        variables: { collectiveSlug: props.router.query.collectiveSlug },
-                        context: API_V2_CONTEXT,
-                      },
-                    ],
                   });
                   createNotification('cancel');
                 } catch (error) {
@@ -316,13 +310,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
                 try {
                   await submitActivation({
                     variables: { order: { id: contribution.id } },
-                    refetchQueries: [
-                      {
-                        query: recurringContributionsPageQuery,
-                        variables: { collectiveSlug: props.router.query.collectiveSlug },
-                        context: API_V2_CONTEXT,
-                      },
-                    ],
                   });
                   createNotification('activate');
                 } catch (error) {
