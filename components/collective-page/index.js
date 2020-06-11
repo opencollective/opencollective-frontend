@@ -126,21 +126,23 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply, canContact, isArchived, isActive, isFund) => {
-    const isCollective = type === CollectiveType.COLLECTIVE;
-    const isEvent = type === CollectiveType.EVENT;
-    return {
-      hasContact: !isAdmin && canContact,
-      hasContribute: isFund && isActive,
-      hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
-      // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
-      hasApply: canApply && !isAdmin,
-      hasDashboard: isHost && isAdmin,
-      hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
-      // Don't display "Add Funds" if it's an Host and you're the Admin
-      addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
-    };
-  });
+  getCallsToAction = memoizeOne(
+    (type, isHost, isAdmin, isRoot, isAuthenticated, canApply, canContact, isArchived, isActive, isFund) => {
+      const isCollective = type === CollectiveType.COLLECTIVE;
+      const isEvent = type === CollectiveType.EVENT;
+      return {
+        hasContact: !isAdmin && canContact && (!isFund || isAuthenticated),
+        hasContribute: isFund && isActive,
+        hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
+        // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
+        hasApply: canApply && !isAdmin,
+        hasDashboard: isHost && isAdmin,
+        hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
+        // Don't display "Add Funds" if it's an Host and you're the Admin
+        addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+      };
+    },
+  );
 
   onCollectiveClick = () => {
     window.scrollTo(0, 0);
@@ -222,16 +224,18 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
+    const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser } = this.props;
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin);
     const isFund = settings?.fund === true; // Funds MVP, to refactor
+    const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(
       type,
       isHost,
       isAdmin,
       isRoot,
+      isAuthenticated,
       canApply,
       canContact,
       collective.isArchived,
