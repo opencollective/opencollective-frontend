@@ -73,7 +73,9 @@ const RedXCircle = styled(XCircle)`
   color: ${themeGet('colors.red.500')};
 `;
 
-const MenuItem = styled(Flex)`
+const MenuItem = styled(Flex).attrs({
+  px: 3,
+})`
   cursor: pointer;
 `;
 
@@ -90,8 +92,6 @@ const PopUpMenu = styled(Flex)`
 const MenuSection = styled(Flex).attrs({
   flexDirection: 'column',
   width: 1,
-  px: 1,
-  py: 1,
 })``;
 
 // GraphQL
@@ -151,16 +151,17 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
 
   return (
     <PopUpMenu
-      minHeight={160}
+      minHeight={180}
       maxHeight={360}
       width={'100%'}
       overflowY={'auto'}
+      py={1}
       ref={popupNode}
       data-cy="recurring-contribution-menu"
     >
       {mainMenu && (
         <MenuSection>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
+          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" px={3}>
             <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
               {formatMessage(messages.options)}
             </P>
@@ -195,6 +196,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             onClick={() => {
               setMenuState('updateTierMenu');
             }}
+            data-cy="recurring-contribution-menu-tier-option"
           >
             <Flex width={1 / 6}>
               <Dollar size={20} />
@@ -229,7 +231,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
 
       {cancelMenu && (
         <MenuSection data-cy="recurring-contribution-cancel-menu">
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
+          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" px={3}>
             <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
               {formatMessage(messages.cancelContribution)}
             </P>
@@ -250,6 +252,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <StyledButton
               buttonSize="tiny"
+              minWidth={75}
               loading={loadingCancellation}
               data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
@@ -268,6 +271,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             </StyledButton>
             <StyledButton
               ml={2}
+              minWidth={95}
               buttonSize="tiny"
               buttonStyle="secondary"
               onClick={() => {
@@ -283,7 +287,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
 
       {activateMenu && (
         <MenuSection>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
+          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" px={3}>
             <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
               {formatMessage(messages.activateContribution)}
             </P>
@@ -304,6 +308,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <StyledButton
               buttonSize="tiny"
+              minWidth={75}
               loading={loadingActivation}
               data-cy="recurring-contribution-activate-yes"
               onClick={async () => {
@@ -322,6 +327,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             </StyledButton>
             <StyledButton
               ml={2}
+              minWidth={95}
               buttonSize="tiny"
               buttonStyle="secondary"
               onClick={() => {
@@ -347,7 +353,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       )}
 
       {updateTierMenu && (
-        <MenuSection>
+        <MenuSection data-cy="recurring-contribution-order-menu">
           <UpdateOrderPopUp
             setMenuState={setMenuState}
             contribution={contribution}

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Thu Jun 11 2020 14:05:33 GMT+0100 (British Summer Time)
+# timestamp: Mon Jun 15 2020 19:54:12 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -1390,6 +1390,10 @@ type ExpenseType {
   userTaxFormRequiredBeforePayment: Boolean
   user: UserDetails
   fromCollective: CollectiveInterface
+
+  """
+  Returns the list of comments for this expense, or `null` if user is not allowed to see them
+  """
   comments(limit: Int, offset: Int): CommentListType
   collective: CollectiveInterface
 

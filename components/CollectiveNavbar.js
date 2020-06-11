@@ -179,7 +179,12 @@ const DEFAULT_SECTIONS = {
     Sections.BUDGET,
     Sections.ABOUT,
   ],
-  [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.USER]: [
+    Sections.CONTRIBUTIONS,
+    Sections.TRANSACTIONS,
+    Sections.RECURRING_CONTRIBUTIONS,
+    Sections.ABOUT,
+  ],
   [CollectiveType.COLLECTIVE]: [
     Sections.GOALS,
     Sections.CONTRIBUTE,

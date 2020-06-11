@@ -56,7 +56,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
   const { formatMessage } = useIntl();
   const statusTag = `${status} contribution`;
   const buttonText = status === 'ACTIVE' ? formatMessage(messages.manage) : formatMessage(messages.activate);
-  const userIsLoggedInUser = props.LoggedInUser.collective.slug === props.router.query.collectiveSlug;
+  const userIsLoggedInUser = props.LoggedInUser.collective.slug === props.router.query.slug;
   // const userIsAdminOfCollectiveOrOrg
   const userIsAdmin = userIsLoggedInUser; // || userIsAdminOfCollectiveOrOrg
 
@@ -94,7 +94,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
             <P fontSize="Paragraph" fontWeight="400">
               {formatMessage(messages.amountContributed)}
             </P>
-            <P fontSize="Paragraph" fontWeight="bold">
+            <P fontSize="Paragraph" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
                 amount={contribution.amount.value * 100}
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}

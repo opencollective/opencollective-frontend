@@ -52,8 +52,8 @@ const messages = defineMessages({
 });
 
 const getPaymentMethodsQuery = gqlV2`
-  query UpdatePaymentMethodPopUpQuery($collectiveSlug: String) {
-    account(slug: $collectiveSlug) {
+  query UpdatePaymentMethodPopUpQuery($slug: String) {
+    account(slug: $slug) {
       id
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
         id
@@ -117,7 +117,7 @@ const UpdatePaymentMethodPopUp = ({
   // GraphQL mutations and queries
   const { data } = useQuery(getPaymentMethodsQuery, {
     variables: {
-      collectiveSlug: router.query.collectiveSlug,
+      slug: router.query.slug,
     },
     context: API_V2_CONTEXT,
   });
@@ -172,7 +172,7 @@ const UpdatePaymentMethodPopUp = ({
 
   return (
     <Fragment>
-      <Flex width={1} alignItems="center" justifyContent="center" minHeight={45}>
+      <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
         <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
           {showAddPaymentMethod
             ? intl.formatMessage(messages.addPaymentMethod)
@@ -188,18 +188,21 @@ const UpdatePaymentMethodPopUp = ({
             size={20}
             onClick={() => setShowAddPaymentMethod(true)}
             data-cy="recurring-contribution-add-pm-button"
+            style={{ cursor: 'pointer' }}
           />
         )}
       </Flex>
       {showAddPaymentMethod ? (
-        <NewCreditCardForm
-          name="newCreditCardInfo"
-          profileType={'USER'}
-          // error={errors.newCreditCardInfo}
-          onChange={setNewPaymentMethodInfo}
-          onReady={({ stripe }) => setStripe(stripe)}
-          hasSaveCheckBox={false}
-        />
+        <Box px={3} pt={2} pb={3}>
+          <NewCreditCardForm
+            name="newCreditCardInfo"
+            profileType={'USER'}
+            // error={errors.newCreditCardInfo}
+            onChange={setNewPaymentMethodInfo}
+            onReady={({ stripe }) => setStripe(stripe)}
+            hasSaveCheckBox={false}
+          />
+        </Box>
       ) : loadingDefaultPaymentMethod ? (
         <LoadingPlaceholder height={100} />
       ) : (
@@ -213,7 +216,7 @@ const UpdatePaymentMethodPopUp = ({
           value={selectedPaymentMethod}
         >
           {({ radio, value: { title, subtitle, icon } }) => (
-            <PaymentMethodBox minheight={50} p={2} bg="white.full" data-cy="recurring-contribution-pm-box">
+            <PaymentMethodBox minheight={50} py={2} bg="white.full" data-cy="recurring-contribution-pm-box" px={3}>
               <Flex alignItems="center">
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
@@ -241,11 +244,12 @@ const UpdatePaymentMethodPopUp = ({
           <StyledHr width="100%" />
         </Flex>
       </Flex>
-      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={45}>
+      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={50}>
         {showAddPaymentMethod ? (
           <Fragment>
             <StyledButton
               buttonSize="tiny"
+              minWidth={75}
               onClick={() => {
                 setShowAddPaymentMethod(false);
                 setNewPaymentMethodInfo(null);
@@ -255,6 +259,7 @@ const UpdatePaymentMethodPopUp = ({
             </StyledButton>
             <StyledButton
               ml={2}
+              minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
               disabled={newPaymentMethodInfo ? !newPaymentMethodInfo?.value.complete : true}
@@ -283,7 +288,7 @@ const UpdatePaymentMethodPopUp = ({
                     refetchQueries: [
                       {
                         query: getPaymentMethodsQuery,
-                        variables: { collectiveSlug: router.query.collectiveSlug },
+                        variables: { slug: router.query.slug },
                         context: API_V2_CONTEXT,
                       },
                     ],
@@ -303,6 +308,7 @@ const UpdatePaymentMethodPopUp = ({
           <Fragment>
             <StyledButton
               buttonSize="tiny"
+              minWidth={75}
               onClick={() => {
                 setMenuState('mainMenu');
               }}
@@ -311,6 +317,7 @@ const UpdatePaymentMethodPopUp = ({
             </StyledButton>
             <StyledButton
               ml={2}
+              minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
               loading={loadingUpdatePaymentMethod}
