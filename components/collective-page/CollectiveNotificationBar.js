@@ -10,7 +10,7 @@ import NotificationBar from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 const messages = defineMessages({
-  // Created
+  // Collective Created
   collectiveCreated: {
     id: 'collective.created',
     defaultMessage: 'Your collective has been created with success.',
@@ -25,6 +25,20 @@ const messages = defineMessages({
     defaultMessage:
       "It's already approved by the host ({host}), you can already receive donations. Feel free to customize your collective, file expenses and even create events.",
   },
+  // Fund Created
+  fundCreated: {
+    id: 'createFund.created',
+    defaultMessage: 'Your fund has been successfully created.',
+  },
+  fundCreatedDescription: {
+    id: 'createFund.created.description',
+    defaultMessage: 'We will reach out to you for approval shortly.',
+  },
+  fundCreatedApprovedDescription: {
+    id: 'createFund.createdApproved.description',
+    defaultMessage: "It's already approved by the host ({host}), you can already contribute money and submit expenses.",
+  },
+  // Organization Created
   organizationCreated: {
     id: 'organization.created',
     defaultMessage: 'Your Organization has been created.',
@@ -87,6 +101,17 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
           description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
         };
     }
+  } else if (status === 'fundCreated') {
+    if (collective.isApproved) {
+      return {
+        title: intl.formatMessage(messages.fundCreated),
+        description: intl.formatMessage(messages.fundCreatedApprovedDescription, { host: host.name }),
+      };
+    }
+    return {
+      title: intl.formatMessage(messages.fundCreated),
+      description: host ? intl.formatMessage(messages.fundCreatedDescription, { host: host.name }) : '',
+    };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
@@ -153,7 +178,7 @@ CollectiveNotificationBar.propTypes = {
     name: PropTypes.string,
   }),
   /** A special status to show the notification bar (collective created, archived...etc) */
-  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   /** from withUser */

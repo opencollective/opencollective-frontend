@@ -50,7 +50,7 @@ const SECTION_LABELS = defineMessages({
   },
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: {
     id: 'editCollective.menu.collectivePage',
-    defaultMessage: 'Collective Page',
+    defaultMessage: 'Profile Page',
   },
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: {
     id: 'editCollective.menu.connectedAccounts',
@@ -149,34 +149,32 @@ const MenuItem = styled(Link)`
 `;
 
 // Some condition helpers
-const isType = collectiveType => ({ type }) => type === collectiveType;
-const isOneOfTypes = (...collectiveTypes) => ({ type }) => collectiveTypes.includes(type);
-const isFeatureAllowed = feature => ({ type }) => isFeatureAllowedForCollectiveType(type, feature);
+const isType = (c, collectiveType) => c.type === collectiveType;
+const isOneOfTypes = (c, ...collectiveTypes) => collectiveTypes.includes(c.type);
+const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.type, feature);
+const isFund = c => c.settings?.fund === true; // Funds MVP, to refactor
+const isHost = c => c.isHost === true;
+const isCollective = c => c.type === CollectiveType.COLLECTIVE;
+
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: collective =>
-    collective.isHost || collective.type == CollectiveType.COLLECTIVE,
-  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: isFeatureAllowed(FEATURES.UPDATES),
-  [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: isFeatureAllowed(FEATURES.CONVERSATIONS),
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.EXPORT]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.HOST]: isType(CollectiveType.COLLECTIVE),
-  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: isOneOfTypes(CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: isOneOfTypes(CollectiveType.USER, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: isType(CollectiveType.EVENT),
-  [EDIT_COLLECTIVE_SECTIONS.TIERS]: isOneOfTypes(
-    CollectiveType.COLLECTIVE,
-    CollectiveType.EVENT,
-    CollectiveType.ORGANIZATION,
-  ),
-  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: isType(CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: isOneOfTypes(
-    CollectiveType.COLLECTIVE,
-    CollectiveType.ORGANIZATION,
-    CollectiveType.USER,
-  ),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c) && !isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
+  [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
+  [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: c => isFeatureAllowed(c, FEATURES.CONVERSATIONS) && !isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c) && !isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c =>
+    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION) && !isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
+  [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
+    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
+    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION, CollectiveType.USER) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,

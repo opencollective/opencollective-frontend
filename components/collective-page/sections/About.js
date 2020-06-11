@@ -40,6 +40,7 @@ const messages = defineMessages({
 const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
+  const isFund = collective.settings?.fund === true; // Funds MVP, to refactor
   canEdit = collective.isArchived ? false : canEdit;
 
   return (
@@ -88,7 +89,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                 <Flex justifyContent="center">
                   {canEdit ? (
                     <Flex flexDirection="column" alignItems="center">
-                      {isCollective && (
+                      {isCollective && !isFund && (
                         <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
                           <FormattedMessage
                             id="SectionAbout.Why"
@@ -137,6 +138,7 @@ SectionAbout.propTypes = {
     name: PropTypes.string,
     type: PropTypes.string,
     isArchived: PropTypes.bool,
+    settings: PropTypes.object,
   }).isRequired,
 
   /** Can user edit the description? */
