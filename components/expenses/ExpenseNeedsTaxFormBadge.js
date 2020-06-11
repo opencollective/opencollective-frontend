@@ -39,7 +39,7 @@ class ExpenseNeedsTaxFormBadge extends React.Component {
             <MessageBox type="warning" display="inline" css={{ padding: '4px', borderRadius: '5px' }} withIcon={true}>
               <StyledLink
                 css={{ textTransform: 'uppercase' }}
-                href="https://docs.opencollective.com/help/expenses/tax-information"
+                href="https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information"
               >
                 {message}
               </StyledLink>
