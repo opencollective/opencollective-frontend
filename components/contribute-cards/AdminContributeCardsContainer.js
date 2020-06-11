@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
+import DndProviderHTML5Backend from '../DndProviderHTML5Backend';
 
 import ContributeCardContainer from './ContributeCardContainer';
 import CreateNew from './CreateNew';
@@ -22,7 +21,7 @@ const AdminContributeCardsContainer = ({ collective, cards, onContributionCardMo
     : `/${collective.slug}/edit/tiers`;
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProviderHTML5Backend>
       <ContributeCardsContainer>
         {cards.map(({ key, Component, componentProps }, index) => (
           <ContributeCardContainer key={key}>
@@ -42,7 +41,7 @@ const AdminContributeCardsContainer = ({ collective, cards, onContributionCardMo
           </CreateNew>
         </ContributeCardContainer>
       </ContributeCardsContainer>
-    </DndProvider>
+    </DndProviderHTML5Backend>
   );
 };
 
