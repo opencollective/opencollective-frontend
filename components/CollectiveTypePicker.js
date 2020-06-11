@@ -58,7 +58,7 @@ const CollectiveTypePicker = ({ types, onChange }) => {
           >
             <Plus size={12} color="black.500" />
           </Container>
-          <Span fontSize="Tiny">{getTypeCaption(type)}</Span>
+          <Span fontSize="Tiny" lineHeight="15px">{getTypeCaption(type)}</Span>
         </StyledButton>
       ))}
     </Container>
