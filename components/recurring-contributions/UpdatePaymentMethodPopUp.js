@@ -14,7 +14,6 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 import { stripeTokenToPaymentMethod } from '../../lib/stripe';
-import { recurringContributionsPageQuery } from '../../lib/graphql/queries';
 
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -62,8 +61,10 @@ const getPaymentMethodsQuery = gqlV2`
         data
         service
         type
-        balance
-        currency
+        balance {
+          value
+          currency
+        }
         account {
           id
         }
@@ -150,7 +151,7 @@ const UpdatePaymentMethodPopUp = ({
       subtitle: getPaymentMethodMetadata(pm),
       icon: getPaymentMethodIcon(pm),
       paymentMethod: pm,
-      disabled: pm.balance < minBalance,
+      disabled: pm.balance.amount < minBalance,
       id: pm.id,
       CollectiveId: pm.account.id,
     }));

@@ -11,7 +11,6 @@ import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { recurringContributionsPageQuery } from '../../lib/graphql/queries';
 
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -114,7 +113,7 @@ const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, account, ...props }) => {
+const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, account }) => {
   const [menuState, setMenuState] = useState('mainMenu');
   const [submitCancellation, { loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
