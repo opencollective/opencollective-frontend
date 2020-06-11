@@ -53,7 +53,7 @@ class Hosts extends React.Component {
 
     const findOutMoreLink = (
       <CoverSmallCTA>
-        <Link route="https://docs.opencollective.com/help/hosts/become-host">{findOutMoreMessage}</Link>
+        <Link route="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</Link>
       </CoverSmallCTA>
     );
 
