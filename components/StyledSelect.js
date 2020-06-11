@@ -7,8 +7,11 @@ import Select, { components } from 'react-select';
 import styled from 'styled-components';
 import { layout, space, typography } from 'styled-system';
 
+import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
+import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
+import { P } from './Text';
 
 const Messages = defineMessages({
   loading: {
@@ -69,10 +72,30 @@ DropdownSearchIndicator.propTypes = {
   isDisabled: PropTypes.bool,
 };
 
+// eslint-disable-next-line react/prop-types
+const GroupHeading = ({ children, ...props }) => (
+  <components.GroupHeading {...props}>
+    <Flex justifyContent="space-between" alignItems="center" mr={2}>
+      <P
+        fontWeight="600"
+        fontSize="H6"
+        lineHeight="H6"
+        textTransform="uppercase"
+        letterSpacing="0.6px"
+        whiteSpace="nowrap"
+        pr={3}
+      >
+        {children}
+      </P>
+      <StyledHr flex="1" borderStyle="solid" borderColor="black.300" />
+    </Flex>
+  </components.GroupHeading>
+);
+
 /**
  * A map to override the default components of react-select
  */
-export const customComponents = { SelectContainer, Option, MultiValue };
+export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading };
 export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
 
 /**
