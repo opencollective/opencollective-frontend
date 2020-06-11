@@ -37,7 +37,7 @@ const CollectiveTypePicker = ({ types, onChange }) => {
           key={type}
           flex={buttonFlex}
           px={2}
-          py={4}
+          py="28px"
           borderRadius={8}
           onClick={() => onChange(type)}
           data-cy={`collective-type-picker-${type}`}
@@ -58,7 +58,9 @@ const CollectiveTypePicker = ({ types, onChange }) => {
           >
             <Plus size={12} color="black.500" />
           </Container>
-          <Span fontSize="Tiny" lineHeight="15px">{getTypeCaption(type)}</Span>
+          <Span fontSize="Tiny" fontWeight="500" lineHeight="15px">
+            {getTypeCaption(type)}
+          </Span>
         </StyledButton>
       ))}
     </Container>
