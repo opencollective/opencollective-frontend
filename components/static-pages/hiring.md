@@ -33,7 +33,7 @@ Watch this 2 minute explainer video about what we do and why we are passionate a
 
  - You are excited about contributing to our mission!
 
-Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/the-open-collective-way) to learn more about how we operate and what we stand for.
+Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to learn more about how we operate and what we stand for.
 
 We are a fully remote team - with team members in New Zealand (Wellington), Mexico (Guadalajara), Spain (Madrid), Belgium (Brussels), Germany (Berlin) and France (South Coast).
 -->

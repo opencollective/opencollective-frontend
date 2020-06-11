@@ -421,7 +421,10 @@ class EditCollectiveForm extends React.Component {
                 </StyledButton>
               </Link>
 
-              <StyledLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
+              <StyledLink
+                href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards#faq"
+                openInNewTab
+              >
                 <InfoCircle size="1em" />
                 &nbsp;
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
