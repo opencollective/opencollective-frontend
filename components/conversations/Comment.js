@@ -12,7 +12,6 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
-import CommentReactionPicker from '../CommentReactionPicker';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -26,6 +25,8 @@ import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
 
+import CommentReactionPicker from './CommentReactionPicker';
+import CommentReactions from './CommentReactions';
 import { CommentFieldsFragment } from './graphql';
 
 const CommentBtn = styled(StyledButton)`
@@ -177,6 +178,7 @@ const Comment = ({
   isConversationRoot,
   onDelete,
   reactions,
+  canReply,
 }) => {
   const [isEditing, setEditing] = React.useState(false);
   const [isDeleting, setDeleting] = React.useState(null);
@@ -324,7 +326,14 @@ const Comment = ({
             )
           }
         </InlineEditField>
-        <CommentReactionPicker comment={comment} reactions={reactions} />
+        <Flex mt={3}>
+          <CommentReactions reactions={reactions} />
+          {canReply && (
+            <Box ml={1}>
+              <CommentReactionPicker comment={comment} reactions={reactions} />
+            </Box>
+          )}
+        </Flex>
       </Box>
     </Container>
   );
@@ -346,6 +355,7 @@ Comment.propTypes = {
   canEdit: PropTypes.bool,
   /** Can current user delete this comment? */
   canDelete: PropTypes.bool,
+  canReply: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
   /** Set this to true to disable actions */

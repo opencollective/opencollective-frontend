@@ -7,6 +7,7 @@ export const CommentFieldsFragment = gqlV2`
     createdAt
     html
     reactions
+    userReactions
     fromCollective {
       id
       type

@@ -57,6 +57,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme }) =>
                       comment={item}
                       canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
                       canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                      canReply={Boolean(LoggedInUser)}
                       onDelete={onCommentDeleted}
                       reactions={item.reactions}
                     />
