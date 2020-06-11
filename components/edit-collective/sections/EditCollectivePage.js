@@ -4,8 +4,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, difference, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useDrag, useDrop } from 'react-dnd';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -17,6 +16,7 @@ import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section
 import { Sections } from '../../collective-page/_constants';
 import { getDefaultSectionsForCollectiveType } from '../../CollectiveNavbar';
 import Container from '../../Container';
+import DndProviderHTML5Backend from '../../DndProviderHTML5Backend';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
@@ -175,7 +175,7 @@ const EditCollectivePage = ({ collective }) => {
 
   const displayedSections = tmpSections || sections;
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProviderHTML5Backend>
       <H3>
         <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Page sections" />
       </H3>
@@ -263,7 +263,7 @@ const EditCollectivePage = ({ collective }) => {
           <EditCollectivePageFAQ withNewButtons withBorderLeft />
         </Box>
       </Flex>
-    </DndProvider>
+    </DndProviderHTML5Backend>
   );
 };
 
