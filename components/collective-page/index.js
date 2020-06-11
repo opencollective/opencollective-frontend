@@ -17,6 +17,7 @@ import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
+import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
 import SectionTransactions from './sections/Transactions';
@@ -218,6 +219,10 @@ class CollectivePage extends Component {
         return <SectionParticipants collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
       case Sections.LOCATION:
         return <SectionLocation collective={this.props.collective} />;
+      case Sections.RECURRING_CONTRIBUTIONS:
+        return (
+          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
+        );
       default:
         return null;
     }
@@ -228,6 +233,7 @@ class CollectivePage extends Component {
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin);
+
     const isFund = settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(
