@@ -14,7 +14,7 @@ const EmojiLabel = styled(Span)`
   padding: 5px 14px 5px 14px;
   font-size: 12px;
   line-height: 14px;
-  margin-right: 4px;
+  margin: 4px 8px 4px 0;
 
   &:disabled {
     cursor: not-allowed;

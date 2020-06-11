@@ -127,7 +127,7 @@ const CommentReactionPicker = ({ comment }) => {
 
   return (
     <Manager>
-      <span ref={wrapperRef}>
+      <div ref={wrapperRef}>
         <Reference>
           {({ ref }) => (
             <StyledButton
@@ -136,6 +136,7 @@ const CommentReactionPicker = ({ comment }) => {
               whiteSpace="nowrap"
               onClick={() => setOpen(true)}
               ref={ref}
+              margin="4px 8px 4px 0"
             >
               <AddReactionIcon />
             </StyledButton>
@@ -165,7 +166,7 @@ const CommentReactionPicker = ({ comment }) => {
             )}
           </Popper>
         )}
-      </span>
+      </div>
     </Manager>
   );
 };

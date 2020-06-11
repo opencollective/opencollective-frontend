@@ -326,13 +326,9 @@ const Comment = ({
             )
           }
         </InlineEditField>
-        <Flex mt={3}>
+        <Flex mt={3} flexWrap="wrap">
           <CommentReactions reactions={reactions} />
-          {canReply && (
-            <Box ml={1}>
-              <CommentReactionPicker comment={comment} reactions={reactions} />
-            </Box>
-          )}
+          {canReply && <CommentReactionPicker comment={comment} reactions={reactions} />}
         </Flex>
       </Box>
     </Container>
