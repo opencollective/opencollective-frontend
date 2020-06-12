@@ -172,7 +172,6 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           )}
         </ModalHeader>
         <ModalBody>
-          const collectiveType = getCollectiveType(collective);
           <P>
             {modal.type !== 'Unarchive' && (
               <FormattedMessage
