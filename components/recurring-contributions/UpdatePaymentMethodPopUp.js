@@ -6,7 +6,7 @@ import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
 import { first, get, pick, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -29,14 +29,6 @@ const PaymentMethodBox = styled(Flex)`
 `;
 
 const messages = defineMessages({
-  cancel: {
-    id: 'actions.cancel',
-    defaultMessage: 'Cancel',
-  },
-  update: {
-    id: 'subscription.updateAmount.update.btn',
-    defaultMessage: 'Update',
-  },
   updatePaymentMethod: {
     id: 'subscription.menu.editPaymentMethod',
     defaultMessage: 'Update payment method',
@@ -44,10 +36,6 @@ const messages = defineMessages({
   addPaymentMethod: {
     id: 'subscription.menu.addPaymentMethod',
     defaultMessage: 'Add new payment method',
-  },
-  save: {
-    id: 'save',
-    defaultMessage: 'Save',
   },
 });
 
@@ -225,7 +213,7 @@ const UpdatePaymentMethodPopUp = ({
                   {icon}
                 </Flex>
                 <Flex flexDirection="column">
-                  <P fontWeight={subtitle ? 600 : 400} color="black.900">
+                  <P fontSize="12px" fontWeight={subtitle ? 600 : 400} color="black.900">
                     {title}
                   </P>
                   {subtitle && (
@@ -255,7 +243,7 @@ const UpdatePaymentMethodPopUp = ({
                 setNewPaymentMethodInfo(null);
               }}
             >
-              {intl.formatMessage(messages.cancel)}
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
               ml={2}
@@ -301,7 +289,7 @@ const UpdatePaymentMethodPopUp = ({
                 }
               }}
             >
-              {intl.formatMessage(messages.save)}
+              <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           </Fragment>
         ) : (
@@ -313,7 +301,7 @@ const UpdatePaymentMethodPopUp = ({
                 setMenuState('mainMenu');
               }}
             >
-              {intl.formatMessage(messages.cancel)}
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
               ml={2}
@@ -341,7 +329,7 @@ const UpdatePaymentMethodPopUp = ({
                 }
               }}
             >
-              {intl.formatMessage(messages.update)}
+              <FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" />
             </StyledButton>
           </Fragment>
         )}

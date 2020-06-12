@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -27,14 +27,6 @@ const getBackground = collective => {
 };
 
 const messages = defineMessages({
-  amountContributed: {
-    id: 'Subscriptions.AmountContributed',
-    defaultMessage: 'Amount contributed',
-  },
-  contributedToDate: {
-    id: 'Subscriptions.ContributedToDate',
-    defaultMessage: 'Contributed to date',
-  },
   manage: {
     id: 'Subscriptions.Edit',
     defaultMessage: 'Edit',
@@ -42,10 +34,6 @@ const messages = defineMessages({
   activate: {
     id: 'Subscriptions.Activate',
     defaultMessage: 'Activate',
-  },
-  ourPurpose: {
-    id: 'SubscriptionsCard.ourPurpose',
-    defaultMessage: 'Our purpose',
   },
 });
 
@@ -71,10 +59,10 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
       </Container>
       <Flex flexDirection="column" justifyContent="space-around" height={260}>
         <Container p={2}>
-          {isHovering && !showPopup ? (
+          {1 !== 1 && isHovering && !showPopup ? (
             <Fragment>
               <P fontSize="Caption" fontWeight="bold">
-                {formatMessage(messages.ourPurpose)}
+                <FormattedMessage id="SubscriptionsCard.ourPurpose" defaultMessage="Our purpose" />
               </P>
               <P fontSize="Caption" color="black.800">
                 {collective.description}
@@ -92,7 +80,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
         <Container p={2} flexGrow={1} display="flex" flexDirection="column" justifyContent="space-around">
           <Flex flexDirection="column">
             <P fontSize="Paragraph" fontWeight="400">
-              {formatMessage(messages.amountContributed)}
+              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
             </P>
             <P fontSize="Paragraph" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
@@ -104,7 +92,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
           </Flex>
           <Flex flexDirection="column" mb={2}>
             <P fontSize="Paragraph" fontWeight="400">
-              {formatMessage(messages.contributedToDate)}
+              <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />
             </P>
             <P fontSize="Paragraph">
               <FormattedMoneyAmount

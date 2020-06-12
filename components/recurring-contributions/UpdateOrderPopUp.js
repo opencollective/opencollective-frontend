@@ -181,7 +181,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
     <Fragment>
       <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
         <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
-          <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
+          <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update amount" />
         </P>
         <Flex flexGrow={1} alignItems="center">
           <StyledHr width="100%" mx={2} />
