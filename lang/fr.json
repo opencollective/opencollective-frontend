@@ -1451,7 +1451,6 @@
   "transaction.invoice": "facture",
   "transaction.netAmountInCollectiveCurrency.description": "montant net ajouté à {collective}",
   "transaction.paymentMethod": "moyen de paiement",
-  "transaction.paymentProcessorFeeInHostCurrency": "{percentage} de commission du processeur de paiement",
   "transaction.platformFeeInHostCurrency": "{percentage} de frais Open Collective",
   "transaction.refund.btn": "rembourser",
   "transaction.refund.yes.btn": "Oui, rembourser!",

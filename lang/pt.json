@@ -1451,7 +1451,6 @@
   "transaction.invoice": "fatura",
   "transaction.netAmountInCollectiveCurrency.description": "saldo líquido para {collective}",
   "transaction.paymentMethod": "método de pagamento",
-  "transaction.paymentProcessorFeeInHostCurrency": "{percentage} taxa de processamento de pagamento",
   "transaction.platformFeeInHostCurrency": "{percentage} taxa do Open Collective",
   "transaction.refund.btn": "reembolso",
   "transaction.refund.yes.btn": "Sim, reembolse!",

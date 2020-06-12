@@ -1451,7 +1451,6 @@
   "transaction.invoice": "請求書",
   "transaction.netAmountInCollectiveCurrency.description": "{collective} の実際の残高",
   "transaction.paymentMethod": "支払方法",
-  "transaction.paymentProcessorFeeInHostCurrency": "支払い処理手数料 {percentage}",
   "transaction.platformFeeInHostCurrency": "Open Collective 手数料 {percentage}",
   "transaction.refund.btn": "返金",
   "transaction.refund.yes.btn": "はい、返金します!",
