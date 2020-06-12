@@ -54,7 +54,7 @@ module.exports = (expressApp, nextApp) => {
   // Support older assets from website
   app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 
-  app.get('/static/*', maxAge(7200));
+  app.get('/static/*', maxAge(86400));
 
   app.get('/favicon.*', maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
@@ -109,14 +109,14 @@ module.exports = (expressApp, nextApp) => {
     });
   }
 
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', (req, res) => {
+  app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', maxAge(86400), (req, res) => {
     const color = req.query.color === 'blue' ? 'blue' : 'white';
     res.sendFile(
       path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
     );
   });
 
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button.js', (req, res) => {
+  app.get('/:collectiveSlug/:verb(contribute|donate)/button.js', maxAge(86400), (req, res) => {
     const content = fs.readFileSync(path.join(__dirname, './templates/button.js'), 'utf8');
     const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
     res.setHeader('content-type', 'application/javascript');
@@ -130,7 +130,7 @@ module.exports = (expressApp, nextApp) => {
     );
   });
 
-  app.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', (req, res) => {
+  app.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', maxAge(86400), (req, res) => {
     const content = fs.readFileSync(path.join(__dirname, './templates/widget.js'), 'utf8');
     const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
     res.setHeader('content-type', 'application/javascript');
