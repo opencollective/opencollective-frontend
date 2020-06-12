@@ -70,8 +70,8 @@ class TransactionDetails extends React.Component {
         defaultMessage: '{percentage} Open Collective fee',
       },
       paymentProcessorFeeInHostCurrency: {
-        id: 'transaction.paymentProcessorFeeInHostCurrency',
-        defaultMessage: '{percentage} payment processor fee',
+        id: 'expense.paymentProcessorFeeInCollectiveCurrency',
+        defaultMessage: 'payment processor fee',
       },
     });
     this.currencyStyle = {
