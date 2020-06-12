@@ -58,6 +58,12 @@ const StyledBackground = styled.div`
     max-height: none;
   }
 
+  @supports not (mask-size: cover) {
+    img {
+      display: none;
+    }
+  }
+
   @supports (mask-size: cover) {
     background: ${props => generateBackground(props.theme)};
     background-repeat: no-repeat;
