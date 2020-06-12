@@ -201,7 +201,7 @@ const ExpenseFormBody = ({
     if (!values.payeeLocation?.address && values.payee?.location) {
       setLocationFromPayee(formik, values.payee);
     }
-  }, [values.payee, values.payeeLocation?.address]);
+  }, [values.payee]);
 
   // Load values from localstorage
   React.useEffect(() => {
