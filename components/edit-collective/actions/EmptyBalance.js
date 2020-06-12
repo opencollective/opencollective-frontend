@@ -31,7 +31,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
       <H2>
         <FormattedMessage
           id="collective.balance.title"
-          defaultMessage={'Empty {collectiveType} balance'}
+          defaultMessage={'Empty {collectiveType, select, Fund {Fund} other {Collective}} balance'}
           values={{ collectiveType }}
         />
       </H2>
@@ -39,7 +39,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
         <FormattedMessage
           id="collective.balance.description"
           defaultMessage={
-            'Transfer remaining balance to the fiscal host. {collectiveType} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
+            'Transfer remaining balance to the fiscal host. {collectiveType, select, Fund {Fund} other {Collective}} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
           }
           values={{ collectiveType }}
         />
