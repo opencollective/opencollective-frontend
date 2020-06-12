@@ -7,10 +7,15 @@ import { FormattedMessage } from 'react-intl';
 
 import { compose } from '../lib/utils';
 
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import CommentForm from './CommentForm';
 import Comments from './Comments';
 import Error from './Error';
+import { Flex } from './Grid';
+import LoadingPlaceholder from './LoadingPlaceholder';
 import LoginBtn from './LoginBtn';
+import MessageBox from './MessageBox';
+import { P } from './Text';
 
 const gqlV2 = gql; // Needed for lint validation of api v2 schema.
 
@@ -27,6 +32,7 @@ class CommentsWithData extends React.Component {
     UpdateId: PropTypes.number,
     limit: PropTypes.number,
     LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
     createComment: PropTypes.func,
     data: PropTypes.object,
     view: PropTypes.object,
@@ -68,14 +74,15 @@ class CommentsWithData extends React.Component {
 
   render() {
     const { data, LoggedInUser, collective, expense, view, fetchMore, deleteComment, editComment } = this.props;
-    const { expense: expenseComments, error } = data;
+    const { expense: expenseComments, error, loading } = data || {};
+
     if (error) {
       return <Error message={error.message} />;
     }
 
     let comments;
     let totalComments;
-    if (expenseComments) {
+    if (expenseComments?.comments) {
       comments = expenseComments.comments.nodes;
       totalComments = expenseComments.comments.totalCount;
     }
@@ -104,6 +111,24 @@ class CommentsWithData extends React.Component {
           id="comment.post.to.collective"
           defaultMessage={'Note: Your comment will be public and we will notify the administrators of this collective'}
         />
+      );
+    }
+
+    if (!expenseComments?.comments) {
+      return loading || this.props.loadingLoggedInUser ? (
+        <LoadingPlaceholder height={76} borderRadius={8} />
+      ) : (
+        <MessageBox type="info" px={4}>
+          <Flex alignItems="center">
+            <PrivateInfoIcon size={42} withoutTooltip />
+            <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
+              <FormattedMessage
+                id="expense.privateCommentsWarning"
+                defaultMessage="The comments for this expense are private, you need to be authenticated as a host/collective admin or as an owner to see them."
+              />
+            </P>
+          </Flex>
+        </MessageBox>
       );
     }
 
@@ -170,6 +195,7 @@ const getCommentsQueryVariables = ({ expense, limit = COMMENTS_PER_PAGE }) => ({
 
 const COMMENTS_PER_PAGE = 10;
 export const commentsQuery = graphql(getCommentsQuery, {
+  skip: props => !props.LoggedInUser,
   options: props => ({
     context: { apiVersion: '2' },
     variables: getCommentsQueryVariables(props),

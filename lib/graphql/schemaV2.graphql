@@ -2334,6 +2334,10 @@ type Expense {
   The state of the expense (pending, approved, paid, rejected...etc)
   """
   status: ExpenseStatus!
+
+  """
+  Returns the list of comments for this expense, or `null` if user is not allowed to see them
+  """
   comments(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2345,7 +2349,7 @@ type Expense {
     """
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
-  ): CommentCollection!
+  ): CommentCollection
 
   """
   The account where the expense was submitted
@@ -2625,6 +2629,11 @@ type ExpensePermissions {
   Whether the current user can mark this expense as unpaid
   """
   canMarkAsUnpaid: Boolean!
+
+  """
+  Whether the current user can comment and see comments for this expense
+  """
+  canComment: Boolean!
 }
 
 """

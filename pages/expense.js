@@ -29,6 +29,7 @@ import { Box, Flex } from '../components/Grid';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
@@ -263,7 +264,7 @@ class ExpensePage extends React.Component {
   });
 
   getThreadItems = memoizeOne((comments, activities) => {
-    return sortBy([...comments, ...activities], 'createdAt');
+    return sortBy([...(comments || []), ...activities], 'createdAt');
   });
 
   onSuccessMsgDismiss = () => {
@@ -471,28 +472,49 @@ class ExpensePage extends React.Component {
                 />
               </Box>
             )}
+            {!expense?.permissions.canComment && (
+              <Box my={4}>
+                {loadingLoggedInUser || isRefetchingDataForUser ? (
+                  <LoadingPlaceholder height={76} borderRadius={8} />
+                ) : (
+                  <MessageBox type="info" px={4}>
+                    <Flex alignItems="center">
+                      <PrivateInfoIcon size={42} withoutTooltip />
+                      <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
+                        <FormattedMessage
+                          id="expense.privateCommentsWarning"
+                          defaultMessage="The comments for this expense are private, you need to be authenticated as a host/collective admin or as an owner to see them."
+                        />
+                      </P>
+                    </Flex>
+                  </MessageBox>
+                )}
+              </Box>
+            )}
             {expense && (
               <Box mb={3} pt={3}>
                 <Thread
                   collective={collective}
-                  items={this.getThreadItems(expense.comments.nodes, expense.activities)}
+                  items={this.getThreadItems(expense.comments?.nodes, expense.activities)}
                   onCommentDeleted={this.onCommentDeleted}
                 />
               </Box>
             )}
-            <Flex mt="40px">
-              <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                <CommentIcon size={24} color="lightgrey" />
-              </Box>
-              <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                <CommentForm
-                  id="new-comment-on-expense"
-                  ExpenseId={expense && expense.id}
-                  disabled={!expense}
-                  onSuccess={this.onCommentAdded}
-                />
-              </Box>
-            </Flex>
+            {expense?.permissions.canComment && (
+              <Flex mt="40px">
+                <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                  <CommentIcon size={24} color="lightgrey" />
+                </Box>
+                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                  <CommentForm
+                    id="new-comment-on-expense"
+                    ExpenseId={expense && expense.id}
+                    disabled={!expense}
+                    onSuccess={this.onCommentAdded}
+                  />
+                </Box>
+              </Flex>
+            )}
           </Box>
           <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
             <Box minWidth={270} width={['100%', null, null, 275]} px={2}>

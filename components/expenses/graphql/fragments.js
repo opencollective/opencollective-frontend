@@ -190,6 +190,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canReject
       canPay
       canMarkAsUnpaid
+      canComment
     }
     activities {
       id

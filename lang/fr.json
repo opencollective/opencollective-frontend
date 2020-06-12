@@ -758,6 +758,7 @@
   "expense.pending": "en attente",
   "expense.platformFeeInCollectiveCurrency": "commission de la plateforme",
   "Expense.PrivacyWarning": "Ce champ est public. N'ajoutez pas d'informations personnelles telles que des noms ou adresses.",
+  "expense.privateCommentsWarning": "The comments for this expense are private, you need to be authenticated as a host/collective admin or as an owner to see them.",
   "expense.privateMessage": "Instructions privées",
   "expense.privateMessage.description": "Les instructions privées sont uniquement visible pour les administrateurs du compte en banque de votre collectif",
   "expense.privateNote": "note privée",
