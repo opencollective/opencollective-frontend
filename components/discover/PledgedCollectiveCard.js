@@ -182,12 +182,6 @@ class PledgedCollectiveCard extends React.Component {
               <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
             </StyledButton>
           </Link>
-
-          <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
-            <StyledButton mt={3} width={1} buttonSize="small" buttonStyle="standard">
-              <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
-            </StyledButton>
-          </Link>
         </CardBody>
         <CardFooter>
           {pledgeStats && (

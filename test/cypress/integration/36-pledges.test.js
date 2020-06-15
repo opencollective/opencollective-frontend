@@ -91,7 +91,7 @@ describe('check FAQ context in each pledge is valid or not', () => {
 
   it('verify how do i claim a pledge ?', () => {
     cy.get('[data-cy="howDoIClaimPledge"]').click();
-    cy.get('[data-cy="howDoIClaimPledge"]').should('contain', 'authenticate with the github profile that owns');
+    cy.get('[data-cy="howDoIClaimPledge"]').should('contain', 'to proove that you are an admin of this project');
   });
 });
 
