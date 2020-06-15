@@ -22,6 +22,7 @@ import Currency from '../components/Currency';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -658,9 +659,8 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.howToClaim"
-                  defaultMessage="You’ll need to authenticate with the github profile that owns / admins that project. Just click on the
-                Claim Collective button in the pledged collective. We will be rolling out other forms of authentication
-                in the future."
+                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project."
+                  values={I18nFormatters}
                 />
               </Details>
             </Container>
