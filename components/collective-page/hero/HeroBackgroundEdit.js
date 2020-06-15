@@ -31,7 +31,7 @@ const KEY_IMG_REMOVE = '__REMOVE__';
  * Wraps the logic to display the hero background. Fallsback on a white background if
  * css `mask` is not supported.
  */
-const HeroBackground = ({ collective, onEditCancel }) => {
+const HeroBackgroundEdit = ({ collective, onEditCancel }) => {
   const [isSubmitting, setSubmitting] = React.useState(false);
   const [editBackground] = useMutation(EditCollectiveBackgroundMutation);
   const [mediaSize, setMediaSize] = React.useState();
@@ -201,7 +201,7 @@ const HeroBackground = ({ collective, onEditCancel }) => {
   );
 };
 
-HeroBackground.propTypes = {
+HeroBackgroundEdit.propTypes = {
   /** The collective to show the image for */
   collective: PropTypes.shape({
     id: PropTypes.number,
@@ -223,10 +223,7 @@ HeroBackground.propTypes = {
 
   /** Called when user click on cancel */
   onEditCancel: PropTypes.func.isRequired,
-
-  /** Wether to show the cropper/uploader */
-  isEditing: PropTypes.bool,
 };
 
 /** @component */
-export default HeroBackground;
+export default HeroBackgroundEdit;

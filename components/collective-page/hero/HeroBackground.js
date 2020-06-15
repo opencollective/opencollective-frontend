@@ -126,12 +126,6 @@ HeroBackground.propTypes = {
       }),
     }),
   }).isRequired,
-
-  /** Called when user click on cancel */
-  onEditCancel: PropTypes.func.isRequired,
-
-  /** Wether to show the cropper/uploader */
-  isEditing: PropTypes.bool,
 };
 
 /** @component */
