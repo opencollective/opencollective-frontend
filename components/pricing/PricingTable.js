@@ -241,7 +241,9 @@ const Cell = ({ content, header, height }) => {
               {content.cta || <FormattedMessage id="pricingTable.action.choosePlan" defaultMessage="Choose plan" />}
             </PlanLink>
             <PlanLink href={content.url} display={['block', null, null, 'none']}>
-              {content.cta || <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />}
+              {content.cta != null
+                ? content.cta.substring(0, content.cta.length - 2)
+                : null || <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />}
             </PlanLink>
           </td>
         );
