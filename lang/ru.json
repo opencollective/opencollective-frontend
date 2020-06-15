@@ -758,6 +758,7 @@
   "expense.pending": "ожидает",
   "expense.platformFeeInCollectiveCurrency": "комиссия платформы",
   "Expense.PrivacyWarning": "This information is public. Please do not add any personal information such as names or addresses in this field.",
+  "expense.privateCommentsWarning": "Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them.",
   "expense.privateMessage": "Личные инструкции",
   "expense.privateMessage.description": "Личные инструкции для представителя для возмещения ваших расходов",
   "expense.privateNote": "личная заметка",
