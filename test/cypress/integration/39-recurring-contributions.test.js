@@ -69,7 +69,7 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it.skip('Can add a new payment method and use it for the recurring contribution', () => {
+  it('Can add a new payment method and use it for the recurring contribution', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
@@ -77,6 +77,7 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
       cy.getByDataCy('recurring-contribution-add-pm-button').click();
       cy.getByDataCy('new-credit-card-form').should('exist');
+      cy.wait(2000);
       cy.fillStripeInput({
         card: { creditCardNumber: 5555555555554444, expirationDate: '07/23', cvcCode: 713, postalCode: 12345 },
       });
