@@ -758,7 +758,7 @@
   "expense.pending": "保留中",
   "expense.platformFeeInCollectiveCurrency": "プラットフォーム手数料",
   "Expense.PrivacyWarning": "This information is public. Please do not add any personal information such as names or addresses in this field.",
-  "expense.privateCommentsWarning": "The comments for this expense are private, you need to be authenticated as a host/collective admin or as an owner to see them.",
+  "expense.privateCommentsWarning": "Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them.",
   "expense.privateMessage": "私的な指示",
   "expense.privateMessage.description": "ホストが請求を払い戻すための私的な指示",
   "expense.privateNote": "プライベートノート",

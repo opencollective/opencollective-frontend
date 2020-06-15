@@ -483,7 +483,7 @@ class ExpensePage extends React.Component {
                       <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
                         <FormattedMessage
                           id="expense.privateCommentsWarning"
-                          defaultMessage="The comments for this expense are private, you need to be authenticated as a host/collective admin or as an owner to see them."
+                          defaultMessage="Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them."
                         />
                       </P>
                     </Flex>
