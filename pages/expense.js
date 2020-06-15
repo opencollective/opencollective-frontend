@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { cloneDeep, get, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -29,6 +29,7 @@ import { Box, Flex } from '../components/Grid';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
@@ -128,13 +129,17 @@ class ExpensePage extends React.Component {
       isSubmitting: false,
       successMessageDismissed: false,
     };
+
+    this.pollingInterval = 60;
+    this.pollingTimeout = null;
+    this.pollingStarted = false;
+    this.pollingPaused = false;
+    this.handlePolling = debounce(this.handlePolling.bind(this), 100);
   }
 
   componentDidMount() {
-    // LoggedInUser is not set during SSR, we refetch for permissions
-    if (this.props.LoggedInUser) {
-      this.refetchDataForUser();
-    }
+    this.handlePolling();
+    document.addEventListener('mousemove', this.handlePolling);
   }
 
   componentDidUpdate(oldProps, oldState) {
@@ -147,6 +152,40 @@ class ExpensePage extends React.Component {
     if (oldState.status !== this.state.status) {
       this.scrollToExpenseTop();
     }
+  }
+
+  componentWillUnmount() {
+    if (this.props.data?.stopPolling) {
+      this.props.data.stopPolling();
+    }
+
+    document.removeEventListener('mousemove', this.handlePolling);
+  }
+
+  handlePolling() {
+    if (!this.pollingStarted) {
+      if (this.pollingPaused) {
+        // The polling was paused, so we immediately refetch
+        if (this.props.data?.refetch) {
+          this.props.data.refetch();
+        }
+        this.pollingPaused = false;
+      }
+      if (this.props.data?.startPolling(this.pollingInterval * 1000)) {
+        this.props.data.stopPolling();
+      }
+      this.pollingStarted = true;
+    }
+
+    clearTimeout(this.pollingTimeout);
+    this.pollingTimeout = setTimeout(() => {
+      // No mouse movement was detected since 60sec, we stop polling
+      if (this.props.data?.stopPolling) {
+        this.props.data.stopPolling();
+      }
+      this.pollingStarted = false;
+      this.pollingPaused = true;
+    }, this.pollingInterval * 1000);
   }
 
   async refetchDataForUser() {
@@ -225,7 +264,7 @@ class ExpensePage extends React.Component {
   });
 
   getThreadItems = memoizeOne((comments, activities) => {
-    return sortBy([...comments, ...activities], 'createdAt');
+    return sortBy([...(comments || []), ...activities], 'createdAt');
   });
 
   onSuccessMsgDismiss = () => {
@@ -251,7 +290,7 @@ class ExpensePage extends React.Component {
       this.onSuccessMsgDismiss();
     }
 
-    return this.setState({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense });
+    return this.setState(() => ({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense }));
   };
 
   render() {
@@ -288,7 +327,7 @@ class ExpensePage extends React.Component {
           <TemporaryNotification onDismiss={this.onSuccessMsgDismiss}>
             <FormattedMessage
               id="expense.createSuccess"
-              defaultMessage="<strong>Expense submited!</strong> You can edit or review updates on this page."
+              defaultMessage="<strong>Expense submitted!</strong> You can edit or review updates on this page."
               values={I18nFormatters}
             />
           </TemporaryNotification>
@@ -336,7 +375,7 @@ class ExpensePage extends React.Component {
                   values={{
                     I18nSupportLink,
                     Link: getI18nLink({
-                      href: 'https://docs.opencollective.com/help/expenses/tax-information',
+                      href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
                       openInNewTab: true,
                     }),
                   }}
@@ -433,28 +472,49 @@ class ExpensePage extends React.Component {
                 />
               </Box>
             )}
+            {!expense?.permissions.canComment && (
+              <Box my={4}>
+                {loadingLoggedInUser || isRefetchingDataForUser ? (
+                  <LoadingPlaceholder height={76} borderRadius={8} />
+                ) : (
+                  <MessageBox type="info" px={4}>
+                    <Flex alignItems="center">
+                      <PrivateInfoIcon size={42} withoutTooltip />
+                      <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
+                        <FormattedMessage
+                          id="expense.privateCommentsWarning"
+                          defaultMessage="Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them."
+                        />
+                      </P>
+                    </Flex>
+                  </MessageBox>
+                )}
+              </Box>
+            )}
             {expense && (
               <Box mb={3} pt={3}>
                 <Thread
                   collective={collective}
-                  items={this.getThreadItems(expense.comments.nodes, expense.activities)}
+                  items={this.getThreadItems(expense.comments?.nodes, expense.activities)}
                   onCommentDeleted={this.onCommentDeleted}
                 />
               </Box>
             )}
-            <Flex mt="40px">
-              <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                <CommentIcon size={24} color="lightgrey" />
-              </Box>
-              <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                <CommentForm
-                  id="new-comment-on-expense"
-                  ExpenseId={expense && expense.id}
-                  disabled={!expense}
-                  onSuccess={this.onCommentAdded}
-                />
-              </Box>
-            </Flex>
+            {expense?.permissions.canComment && (
+              <Flex mt="40px">
+                <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                  <CommentIcon size={24} color="lightgrey" />
+                </Box>
+                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                  <CommentForm
+                    id="new-comment-on-expense"
+                    ExpenseId={expense && expense.id}
+                    disabled={!expense}
+                    onSuccess={this.onCommentAdded}
+                  />
+                </Box>
+              </Flex>
+            )}
           </Box>
           <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
             <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
@@ -472,7 +532,6 @@ class ExpensePage extends React.Component {
 const getData = graphql(expensePageQuery, {
   options: {
     context: API_V2_CONTEXT,
-    pollInterval: 60000, // Will refresh the data every 60s to get new comments
   },
 });
 

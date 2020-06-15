@@ -310,7 +310,7 @@ class Host extends React.Component {
                 defaultMessage="Hold funds for one or more Collectives in your bank account. You will be responsible for paying out approved expenses and handling accounting and taxes."
               />
               &nbsp;
-              <a href="https://docs.opencollective.com/help/hosts/become-host">
+              <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
               .

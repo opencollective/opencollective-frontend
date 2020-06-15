@@ -5,7 +5,7 @@ We use [Cypress](https://www.cypress.io/) for E2E (end-to-end) tests.
 ## Writing E2E tests
 
 See the following guide in our documentation:
-https://docs.opencollective.com/help/developers/testing-with-cypress
+https://docs.opencollective.com/help/contributing/development/testing-with-cypress
 
 ## Running the E2E tests in development environment
 

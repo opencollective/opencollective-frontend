@@ -101,6 +101,10 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
+      location {
+        address
+        country
+      }
       payoutMethods {
         id
         type
@@ -186,6 +190,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canReject
       canPay
       canMarkAsUnpaid
+      canComment
     }
     activities {
       id

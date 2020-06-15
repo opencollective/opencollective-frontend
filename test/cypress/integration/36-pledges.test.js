@@ -58,7 +58,7 @@ describe('Pledges', () => {
     cy.get('[data-cy="submit"]').click();
     cy.url().should('contain', '/pledges/new');
 
-    cy.get('[data-cy="errorMessage"]').should('contain', 'Error:  We could not verify the GitHub organization exists');
+    cy.get('[data-cy="errorMessage"]').should('contain', 'Error: We could not verify the GitHub organization exists');
   });
 
   it('creating a pledge unable to verify the repository', () => {
@@ -68,7 +68,7 @@ describe('Pledges', () => {
     cy.get('[data-cy=publicMessage]').clear().type('publicMessage');
     cy.get('[data-cy="submit"]').click();
     cy.url().should('contain', '/pledges/new');
-    cy.get('[data-cy="errorMessage"]').should('contain', 'Error:  We could not verify the GitHub repository exists');
+    cy.get('[data-cy="errorMessage"]').should('contain', 'Error: We could not verify the GitHub repository exists');
   });
 
   it('creating a pledge unable to verify the repository', () => {
@@ -91,7 +91,7 @@ describe('check FAQ context in each pledge is valid or not', () => {
 
   it('verify how do i claim a pledge ?', () => {
     cy.get('[data-cy="howDoIClaimPledge"]').click();
-    cy.get('[data-cy="howDoIClaimPledge"]').should('contain', 'authenticate with the github profile that owns');
+    cy.get('[data-cy="howDoIClaimPledge"]').should('contain', 'to proove that you are an admin of this project');
   });
 });
 

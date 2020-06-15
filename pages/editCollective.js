@@ -44,8 +44,9 @@ class EditCollectivePage extends React.Component {
   }
 
   async componentDidMount() {
-    const collective = get(this.props, 'data.Collective');
-    this.setState({ Collective: collective || this.state.Collective });
+    this.setState(state => ({
+      Collective: get(this.props, 'data.Collective') || state.Collective,
+    }));
   }
 
   componentDidUpdate(oldProps) {

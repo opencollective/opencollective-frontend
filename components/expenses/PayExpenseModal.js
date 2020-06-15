@@ -7,7 +7,7 @@ import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
-import i18nPayoutMethodType from '../../lib/i18n-payout-method-type';
+import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -36,15 +36,13 @@ const PAYOUT_ACTION_TYPE = defineMessages({
 });
 
 const getPayoutLabel = (intl, type) => {
-  return i18nPayoutMethodType(intl.formatMessage, type, {
-    aliasBankAccountToTransferWise: true,
-  });
+  return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
 const generatePayoutOptions = (intl, payoutMethodType, collective) => {
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   if (payoutMethodType === PayoutMethodType.OTHER) {
-    return [{ label: payoutMethodLabel, value: PayoutMethodType.OTHER }];
+    return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
   } else {
     const defaultTypes = [
       {

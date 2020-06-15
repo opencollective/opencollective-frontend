@@ -30,6 +30,7 @@ import EmptyBalance from './actions/EmptyBalance';
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
 import Conversations from './sections/Conversations';
+import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 // Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
@@ -342,6 +343,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS:
         return <CollectiveGoals collective={collective} currency={collective.currency} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE:
+        return <EditCollectivePage collective={collective} />;
+
       case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
         return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
 
@@ -417,7 +421,10 @@ class EditCollectiveForm extends React.Component {
                 </StyledButton>
               </Link>
 
-              <StyledLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
+              <StyledLink
+                href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards#faq"
+                openInNewTab
+              >
                 <InfoCircle size="1em" />
                 &nbsp;
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />

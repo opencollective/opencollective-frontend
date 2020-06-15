@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { useFormik } from 'formik';
+import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -52,13 +53,19 @@ const EditPayPalAccount = props => {
     initialValues: {
       token: '',
       clientId: '',
+      webhookId: '',
     },
     async onSubmit(values) {
       const {
         data: { createConnectedAccount: createdAccount },
       } = await createConnectedAccount({
         variables: {
-          connectedAccount: { token: values.token, clientId: values.clientId, service: 'paypal' },
+          connectedAccount: {
+            token: trim(values.token),
+            clientId: trim(values.clientId),
+            service: 'paypal',
+            settings: { webhookId: trim(values.webhookId) },
+          },
           account: { slug: props.collective.slug },
         },
       });
@@ -71,6 +78,9 @@ const EditPayPalAccount = props => {
       }
       if (!values.clientId) {
         errors.clientId = 'Required';
+      }
+      if (!values.webhookId) {
+        errors.webhookId = 'Required';
       }
       return errors;
     },
@@ -90,7 +100,7 @@ const EditPayPalAccount = props => {
             defaultMessage="Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>."
             values={{
               a: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-paypal',
+                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts#how-do-i-pay-out-expenses-with-paypal',
                 openInNewTab: true,
               }),
             }}
@@ -117,6 +127,17 @@ const EditPayPalAccount = props => {
         >
           {inputProps => (
             <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.token} />
+          )}
+        </StyledInputField>
+        <StyledInputField
+          mt={2}
+          name="webhookId"
+          label="Webhook ID"
+          error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
+          disabled={isCreating}
+        >
+          {inputProps => (
+            <StyledInput type="text" {...inputProps} onChange={formik.handleChange} value={formik.values.webhookId} />
           )}
         </StyledInputField>
         <StyledButton mt={10} type="submit" buttonSize="tiny" loading={isCreating}>

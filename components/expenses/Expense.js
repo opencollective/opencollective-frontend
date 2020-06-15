@@ -240,11 +240,7 @@ class Expense extends React.Component {
     mode = mode || view;
 
     const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
-    const canMarkExpenseAsUnpaid =
-      LoggedInUser &&
-      LoggedInUser.canPayExpense(expense) &&
-      expense.status === 'PAID' &&
-      expense.payoutMethod === 'other';
+    const canMarkExpenseAsUnpaid = LoggedInUser?.canPayExpense(expense) && expense.status === 'PAID';
 
     const canReject =
       LoggedInUser &&

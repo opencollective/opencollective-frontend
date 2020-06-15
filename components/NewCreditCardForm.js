@@ -68,7 +68,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   render() {
     const { intl, name, profileType, onChange, error, hasSaveCheckBox, hidePostalCode } = this.props;
     return (
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" data-cy="new-credit-card-form">
         <StyledCardElement
           hidePostalCode={hidePostalCode}
           onChange={value => onChange({ name, type: 'StripeCreditCard', value })}

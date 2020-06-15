@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import roles from '../lib/constants/roles';
-import formatMemberRole from '../lib/i18n-member-role';
+import formatMemberRole from '../lib/i18n/member-role';
 
 import { ContributorAvatar } from './Avatar';
 import EditPublicMessagePopup from './EditPublicMessagePopup';
@@ -121,7 +121,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
             {truncate(contributor.name, { length: 16 })}
           </H5>
         </LinkContributor>
-        <ContributorTag>{formatMemberRole(intl.formatMessage, getMainContributorRole(contributor))}</ContributorTag>
+        <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
         {contributor.totalAmountDonated > 0 && (
           <React.Fragment>
             <P fontSize="Tiny" lineHeight="Caption" color="black.500">

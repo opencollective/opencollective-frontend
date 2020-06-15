@@ -25,7 +25,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
     >
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
-          <P mt={3} fontSize="Caption">
+          <P mt={3} fontSize="Caption" lineHeight="Caption">
             {collective.stats.backers.all > 0 && (
               <FormattedMessage
                 id="discoverCard.backers.all"
@@ -44,7 +44,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
 
           {collective.stats.yearlyBudget > 0 && (
             <P mt={1}>
-              <Span fontSize="Caption">
+              <Span fontSize="Caption" lineHeight="Caption">
                 <FormattedMessage id="YearlyBudget" defaultMessage="Yearly budget" />
               </Span>
               <Span display="block" fontSize="LeadParagraph" fontWeight="bold">

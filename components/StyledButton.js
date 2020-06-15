@@ -73,14 +73,17 @@ const StyledButtonContent = styled.button`
   }}
 `;
 
-const StyledButton = ({ loading, ...props }) =>
+const StyledButton = React.forwardRef(({ loading, ...props }, ref) =>
   !loading ? (
-    <StyledButtonContent {...props} />
+    <StyledButtonContent {...props} ref={ref} />
   ) : (
-    <StyledButtonContent {...props} onClick={undefined}>
+    <StyledButtonContent {...props} onClick={undefined} ref={ref}>
       <StyledSpinner size="0.9em" />
     </StyledButtonContent>
-  );
+  ),
+);
+
+StyledButton.displayName = 'StyledButton';
 
 StyledButton.propTypes = {
   /**

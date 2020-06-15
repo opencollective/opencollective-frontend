@@ -8,11 +8,15 @@ import { FormattedMessage } from 'react-intl';
 import MembersWithData from '../components/MembersWithData';
 
 class BannerIframe extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id, style }, res }) {
+  static getInitialProps({ query: { collectiveSlug, id, style }, req, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
       res.removeHeader('X-Frame-Options');
+      if (req && (req.language || req.locale === 'en')) {
+        res.set('Cache-Control', 'public, s-maxage=7200');
+      }
     }
+
     return { collectiveSlug, id, style };
   }
 

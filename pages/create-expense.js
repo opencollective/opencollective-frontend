@@ -104,6 +104,7 @@ class CreateExpensePage extends React.Component {
       expense: null,
       isSubmitting: false,
       formPersister: null,
+      isInitialForm: true,
     };
   }
 
@@ -150,7 +151,7 @@ class CreateExpensePage extends React.Component {
   }
 
   onFormSubmit = expense => {
-    this.setState({ expense, step: STEPS.SUMMARY });
+    this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
   };
 
   onSummarySubmit = async () => {
@@ -260,6 +261,7 @@ class CreateExpensePage extends React.Component {
                           expensesTags={this.getSuggestedTags(collective)}
                           payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                           formPersister={this.state.formPersister}
+                          shouldLoadValuesFromPersister={this.state.isInitialForm}
                           autoFocusTitle
                         />
                       )}

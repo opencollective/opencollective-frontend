@@ -69,6 +69,8 @@ const pages = routes()
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
 
+pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?', 'create-fund');
+
 // New Create Collective Flow
 pages.add(
   'create-collective',

@@ -28,6 +28,7 @@ class ExpensePage extends React.Component {
     ExpenseId: PropTypes.number,
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
     expenseCreated: PropTypes.string, // actually a stringed boolean 'true'
   };
 
@@ -63,7 +64,7 @@ class ExpensePage extends React.Component {
   }
 
   render() {
-    const { slug, data, ExpenseId, LoggedInUser } = this.props;
+    const { slug, data, ExpenseId, LoggedInUser, loadingLoggedInUser } = this.props;
 
     if (!data || data.error || data.loading) {
       return <ErrorPage data={data} />;
@@ -118,6 +119,7 @@ class ExpensePage extends React.Component {
                 host={collective.host}
                 view="details"
                 LoggedInUser={LoggedInUser}
+                loadingLoggedInUser={loadingLoggedInUser}
                 allowPayAction={!this.state.isPayActionLocked}
                 lockPayAction={() => this.setState({ isPayActionLocked: true })}
                 unlockPayAction={() => this.setState({ isPayActionLocked: false })}

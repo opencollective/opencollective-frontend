@@ -19,7 +19,6 @@ class AcceptFinancialContributions extends Component {
     super(props);
 
     this.state = {
-      path: null,
       chosenHost: null,
     };
   }

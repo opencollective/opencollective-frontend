@@ -4,7 +4,7 @@ import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { formatCurrency } from '../lib/currency-utils';
-import formatMemberRole from '../lib/i18n-member-role';
+import formatMemberRole from '../lib/i18n/member-role';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -25,7 +25,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               <FormattedMessage
                 id="Membership.ContributorSince"
                 defaultMessage="{contributorType} since"
-                values={{ contributorType: formatMemberRole(intl.formatMessage, role) }}
+                values={{ contributorType: formatMemberRole(intl, role) }}
               />{' '}
               <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
                 <FormattedDate value={since} month="long" year="numeric" />

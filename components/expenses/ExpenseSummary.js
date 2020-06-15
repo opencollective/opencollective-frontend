@@ -217,9 +217,9 @@ const ExpenseSummary = ({
                 </Span>
               </Flex>
             </LinkCollective>
-            <P whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+            <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
               <LocationAddress location={payeeLocation} isLoading={isLoading || isLoadingLoggedInUser} />
-            </P>
+            </Container>
             {payee.website && (
               <P mt={2} fontSize="11px">
                 <StyledLink href={payee.website} openInNewTab>

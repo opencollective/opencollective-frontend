@@ -625,6 +625,11 @@ class CreateOrderPage extends React.Component {
   getAmountsPresets() {
     const tier = this.props.tier || {};
     if (tier.amountType !== AmountTypes.FIXED) {
+      // Funds MVP, to refactor
+      if (this.props.collective?.settings?.fund === true) {
+        return tier.presets || [100000, 200000, 500000, 1000000];
+      }
+
       return tier.presets || [500, 1000, 2000, 5000];
     } else {
       return null;
@@ -940,8 +945,7 @@ class CreateOrderPage extends React.Component {
                   <Box maxWidth={['100%', '75%']}>
                     <P fontSize="Caption" my={2}>
                       <FormattedMessage
-                        defaultMessage="Open Collective has waived 100% of our fees for COVID-19 Relief Collectives. We rely on the generosity
-                of contributors like you to keep offering this to Collectives."
+                        defaultMessage="Open Collective is free for COVID-19 Relief Collectives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
                       />
                     </P>

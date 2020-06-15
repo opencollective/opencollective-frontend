@@ -1,23 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ExchangeAlt } from '@styled-icons/fa-solid/ExchangeAlt';
-import { MoneyCheck } from '@styled-icons/fa-solid/MoneyCheck';
 import themeGet from '@styled-system/theme-get';
 import { get, uniqBy } from 'lodash';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { formatCurrency } from '../../lib/currency-utils';
-import { getPaymentMethodName, paymentMethodExpiration } from '../../lib/payment_method_label';
+import { getPaymentMethodName } from '../../lib/payment_method_label';
+import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 
-import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import CreditCard from '../icons/CreditCard';
 import CreditCardInactive from '../icons/CreditCardInactive';
-import GiftCard from '../icons/GiftCard';
-import PayPal from '../icons/PayPal';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import NewCreditCardForm from '../NewCreditCardForm';
@@ -36,76 +30,6 @@ const PaymentEntryContainer = styled(Container)`
 `;
 
 const minBalance = 50; // Minimum usable balance for virtual card
-
-const getPaymentMethodIcon = (pm, collective) => {
-  if (pm.type === 'creditcard') {
-    return <CreditCard />;
-  } else if (pm.type === 'virtualcard') {
-    return <GiftCard />;
-  } else if (pm.service === 'paypal') {
-    return <PayPal />;
-  } else if (pm.type === 'prepaid') {
-    return <MoneyCheck width="26px" height="18px" />;
-  } else if (pm.type === 'collective' && collective) {
-    return <Avatar collective={collective} size="3.6rem" />;
-  } else if (pm.type === 'manual') {
-    return <ExchangeAlt size="1.5em" color="#c9ced4" />;
-  }
-};
-
-/** Returns payment method's subtitles */
-const getPaymentMethodMetadata = pm => {
-  if (pm.type === 'creditcard') {
-    const expiryDate = paymentMethodExpiration(pm);
-    return (
-      <FormattedMessage
-        id="ContributePayment.expiresOn"
-        defaultMessage="Expires on {expiryDate}"
-        values={{ expiryDate }}
-      />
-    );
-  } else if (pm.type === 'virtualcard') {
-    if (pm.balance < minBalance) {
-      return (
-        <FormattedMessage
-          id="ContributePayment.unusableBalance"
-          defaultMessage="{balance} left, balance less than {minBalance} cannot be used."
-          values={{
-            balance: formatCurrency(pm.balance, pm.currency),
-            minBalance: formatCurrency(minBalance, pm.currency),
-          }}
-        />
-      );
-    } else if (pm.expiryDate) {
-      return (
-        <FormattedMessage
-          id="ContributePayment.balanceAndExpiry"
-          defaultMessage="{balance} left, expires on {expiryDate}"
-          values={{
-            expiryDate: <FormattedDate value={pm.expiryDate} day="numeric" month="long" year="numeric" />,
-            balance: formatCurrency(pm.balance, pm.currency),
-          }}
-        />
-      );
-    } else {
-      return (
-        <FormattedMessage
-          id="ContributePayment.balanceLeft"
-          defaultMessage="{balance} left"
-          values={{ balance: formatCurrency(pm.balance, pm.currency) }}
-        />
-      );
-    }
-  } else if (['prepaid', 'collective'].includes(pm.type)) {
-    return (
-      <FormattedMessage
-        id="ContributePayment.balanceLeft"
-        defaultMessage="{balance} left"
-        values={{ balance: formatCurrency(pm.balance, pm.currency) }}
-      />
-    );
-  }
-};
 
 /**
  * A radio list to select a payment method.

@@ -53,10 +53,10 @@ const DefaultCollectiveLabel = ({ value: collective }) => (
   <Flex alignItems="center">
     <Avatar collective={collective} radius={28} />
     <Flex flexDirection="column" ml={2}>
-      <Span fontSize="Caption" lineHeight={1.2} color="black.700">
+      <Span fontSize="Caption" fontWeight="500" lineHeight="18px" color="black.700">
         {truncate(collective.name, { length: 40 })}
       </Span>
-      <Span fontSize="Caption" lineHeight={1.2} color="black.500">
+      <Span fontSize="SmallCaption" lineHeight="16px" color="black.500">
         @{collective.slug}
       </Span>
     </Flex>
