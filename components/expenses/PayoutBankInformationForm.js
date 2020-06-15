@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
 import { FastField, Field, useFormikContext } from 'formik';
-import { get } from 'lodash';
+import { get, kebabCase, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { states } from '../../lib/constants/transferwise';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -45,10 +44,10 @@ const FormFieldsContainer = styled(Flex)`
 `;
 
 const requiredFieldsQuery = gqlV2`
-  query Host($slug: String, $currency: String!) {
+  query Host($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
         transferwise {
-          requiredFields(currency: $currency) {
+          requiredFields(currency: $currency, accountDetails: $accountDetails) {
             type
             title
             fields {
@@ -60,6 +59,7 @@ const requiredFieldsQuery = gqlV2`
                 required
                 example
                 validationRegexp
+                refreshRequirementsOnChange
                 valuesAllowed {
                   key
                   name
@@ -72,8 +72,109 @@ const requiredFieldsQuery = gqlV2`
   }
 `;
 
-const RequiredFields = ({ disabled, getFieldName, formik, host, currency }) => {
-  const { loading, error, data } = useQuery(requiredFieldsQuery, {
+const Input = props => {
+  const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
+  const fieldName =
+    input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
+
+  if (input.type === 'text') {
+    const validate = input.validationRegexp
+      ? value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`)
+      : undefined;
+    return (
+      <Box key={input.key} mt={2} flex="1">
+        <FastField name={fieldName} validate={validate}>
+          {({ field, meta }) => (
+            <StyledInputField label={input.name} required error={meta.touched && meta.error}>
+              {() => <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} width="100%" />}
+            </StyledInputField>
+          )}
+        </FastField>
+      </Box>
+    );
+  } else if (input.type === 'radio' || input.type === 'select') {
+    const options = formatTransferWiseSelectOptions(input.valuesAllowed || []);
+    return (
+      <Box mt={2} flex="1">
+        <Field name={fieldName}>
+          {({ field, meta }) => (
+            <StyledInputField label={input.name} required error={meta.touched && meta.error}>
+              {() => (
+                <StyledSelect
+                  name={field.name}
+                  options={options}
+                  disabled={disabled}
+                  onChange={({ value }) => {
+                    formik.setFieldValue(field.name, value);
+                    if (input.refreshRequirementsOnChange) {
+                      refetch({
+                        slug: host.slug,
+                        currency,
+                        accountDetails: set({ ...formik.values }, field.name, value).data,
+                      });
+                    }
+                  }}
+                  isLoading={loading && !options.length}
+                  value={options.find(c => c.value === get(formik.values, field.name))}
+                />
+              )}
+            </StyledInputField>
+          )}
+        </Field>
+      </Box>
+    );
+  } else {
+    return null;
+  }
+};
+
+Input.propTypes = {
+  disabled: PropTypes.bool,
+  loading: PropTypes.bool,
+  host: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+  }).isRequired,
+  currency: PropTypes.string.isRequired,
+  formik: PropTypes.object.isRequired,
+  getFieldName: PropTypes.func.isRequired,
+  refetch: PropTypes.func.isRequired,
+  input: PropTypes.object.isRequired,
+};
+
+const FieldGroup = ({ field, ...props }) => {
+  const hasMultipleInputs = field.group.length > 1;
+  const required = field.group.some(f => f.required);
+  if (!required) {
+    return null;
+  }
+
+  return (
+    <Box flex="1">
+      {hasMultipleInputs && <P fontSize="LeadParagraph">{field.name}</P>}
+      {field.group
+        .filter(f => f.required)
+        .map(input => (
+          <Input key={input.key} input={input} {...props} />
+        ))}
+    </Box>
+  );
+};
+
+FieldGroup.propTypes = {
+  disabled: PropTypes.bool,
+  loading: PropTypes.bool,
+  host: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+  }).isRequired,
+  currency: PropTypes.string.isRequired,
+  formik: PropTypes.object.isRequired,
+  getFieldName: PropTypes.func.isRequired,
+  refetch: PropTypes.func.isRequired,
+  field: PropTypes.object.isRequired,
+};
+
+const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
+  const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: host.slug, currency },
   });
@@ -88,7 +189,7 @@ const RequiredFields = ({ disabled, getFieldName, formik, host, currency }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  if (loading) {
+  if (loading && !data) {
     return <StyledSpinner />;
   }
   if (error) {
@@ -96,92 +197,6 @@ const RequiredFields = ({ disabled, getFieldName, formik, host, currency }) => {
   }
 
   const { fields, title } = data.host.transferwise.requiredFields[0];
-  const renderField = (field, i) => {
-    const hasMultipleInputs = field.group.length > 1;
-    const required = field.group.some(f => f.required);
-    if (!required) {
-      return null;
-    }
-
-    const renderInput = input => {
-      const fieldName =
-        input.key === 'accountHolderName'
-          ? getFieldName(`data.${input.key}`)
-          : getFieldName(`data.details.${input.key}`);
-      let validate;
-      switch (input.type) {
-        case 'text':
-          validate = input.validationRegexp
-            ? value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`)
-            : undefined;
-          return (
-            <Box key={input.key} mt={2} flex="1">
-              <FastField name={fieldName} validate={validate}>
-                {({ field, meta }) => (
-                  <StyledInputField label={input.name} required error={meta.touched && meta.error}>
-                    {() => (
-                      <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} width="100%" />
-                    )}
-                  </StyledInputField>
-                )}
-              </FastField>
-            </Box>
-          );
-        case 'radio':
-        case 'select':
-          validate = value =>
-            input.valuesAllowed.some(v => v.key === value) ? undefined : 'This value is not accepted.';
-          return (
-            <Box key={input.key} mt={2} flex="1">
-              <FastField name={fieldName} validate={validate}>
-                {({ field, meta }) => (
-                  <StyledInputField label={input.name} required error={meta.touched && meta.error}>
-                    {() => {
-                      const options = formatTransferWiseSelectOptions(input.valuesAllowed);
-                      return (
-                        <StyledSelect
-                          name={field.name}
-                          options={options}
-                          disabled={disabled}
-                          onChange={({ value }) => formik.setFieldValue(field.name, value)}
-                          value={options.find(c => c.value === get(formik.values, field.name))}
-                        />
-                      );
-                    }}
-                  </StyledInputField>
-                )}
-              </FastField>
-            </Box>
-          );
-        default:
-          return null;
-      }
-    };
-
-    let groups = field.group;
-    const selectedCountry = get(formik.values, getFieldName(`data.details.address.country`));
-    if (field.group.some(g => g.key === 'address.country') && states[selectedCountry]) {
-      groups = [
-        ...field.group,
-        {
-          example: '',
-          key: 'address.state',
-          name: 'State',
-          required: true,
-          type: 'select',
-          validationRegexp: null,
-          valuesAllowed: states[selectedCountry],
-        },
-      ];
-    }
-
-    return (
-      <Box key={i} flex="1">
-        {hasMultipleInputs && <P fontSize="LeadParagraph">{field.name}</P>}
-        {groups.filter(f => f.required).map(renderInput)}
-      </Box>
-    );
-  };
 
   return (
     <FormFieldsContainer flexDirection="column">
@@ -190,13 +205,39 @@ const RequiredFields = ({ disabled, getFieldName, formik, host, currency }) => {
           {title}
         </P>
       </Box>
-      {Boolean(fields.length) && renderField(accountHolderFieldOptions)}
-      {fields.map(renderField)}
+      {
+        // Displays the account holder field only if the other fields are also loaded
+        Boolean(fields.length) && (
+          <FieldGroup
+            currency={currency}
+            disabled={disabled}
+            field={accountHolderFieldOptions}
+            formik={formik}
+            getFieldName={getFieldName}
+            host={host}
+            key={kebabCase(accountHolderFieldOptions.name)}
+            refetch={refetch}
+          />
+        )
+      }
+      {fields.map(field => (
+        <FieldGroup
+          currency={currency}
+          disabled={disabled}
+          field={field}
+          formik={formik}
+          getFieldName={getFieldName}
+          host={host}
+          key={kebabCase(field.name)}
+          loading={loading}
+          refetch={refetch}
+        />
+      ))}
     </FormFieldsContainer>
   );
 };
 
-RequiredFields.propTypes = {
+DetailsForm.propTypes = {
   disabled: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
@@ -271,12 +312,12 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
         )}
       </FastField>
       {selectedCurrency && (
-        <RequiredFields
-          formik={formik}
-          host={host}
-          getFieldName={getFieldName}
+        <DetailsForm
           currency={selectedCurrency}
           disabled={!isNew}
+          formik={formik}
+          getFieldName={getFieldName}
+          host={host}
         />
       )}
     </React.Fragment>
