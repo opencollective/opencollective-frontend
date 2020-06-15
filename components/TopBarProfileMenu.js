@@ -5,7 +5,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import { get, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
@@ -35,6 +35,14 @@ const CollectiveListItem = styled(ListItem)`
   @media (hover: none) {
     svg {
       opacity: 1;
+    }
+  }
+`;
+
+const HideGlobalScroll = createGlobalStyle`
+  @media(max-width: 40em) {
+    body {
+      overflow: hidden;
     }
   }
 `;
@@ -181,21 +189,21 @@ class TopBarProfileMenu extends React.Component {
     return (
       <Container
         bg="white.full"
-        border="1px solid rgba(18,19,20,0.12)"
-        borderRadius="12px"
+        border={['none', '1px solid rgba(18,19,20,0.12)']}
+        borderRadius={[0, 12]}
         boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
         minWidth="170px"
         maxWidth="500px"
+        width="100%"
         position="absolute"
-        right={16}
-        top={75}
+        right={[0, 16]}
+        top={[69, 75]}
         zIndex={3000}
-        width="90%"
         data-cy="user-menu"
       >
-        <Flex flexWrap="wrap">
-          <Box order={[2, 2, 1]} width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
-            <Hide xs sm>
+        <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
+          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
+            <Hide xs>
               <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
@@ -275,7 +283,7 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
             </Box>
           </Box>
-          <Box order={[1, 1, 2]} width={[1, 1, 1 / 2]} p={3} maxHeight="400px" overflowY="auto">
+          <Box order={[1, 2]} flex="1 1 50%" width={[1, 1, 1 / 2]} p={3} maxHeight="420px" overflowY="auto">
             <Flex alignItems="center">
               <P
                 color="#4E5052"
@@ -369,7 +377,12 @@ class TopBarProfileMenu extends React.Component {
           </P>
         </Hide>
         <ChevronDown color="#46b0ed" size="1.5em" cursor="pointer" />
-        {showProfileMenu && this.renderProfileMenu()}
+        {showProfileMenu && (
+          <React.Fragment>
+            <HideGlobalScroll />
+            {this.renderProfileMenu()}
+          </React.Fragment>
+        )}
       </Flex>
     );
   }
