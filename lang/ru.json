@@ -1451,7 +1451,6 @@
   "transaction.invoice": "счёт",
   "transaction.netAmountInCollectiveCurrency.description": "net amount for {collective}",
   "transaction.paymentMethod": "метод оплаты",
-  "transaction.paymentProcessorFeeInHostCurrency": "{percentage} комиссия обработки платежа",
   "transaction.platformFeeInHostCurrency": "{percentage} комиссия Open Collective",
   "transaction.refund.btn": "возместить",
   "transaction.refund.yes.btn": "Да, возместить!",

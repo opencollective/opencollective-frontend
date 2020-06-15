@@ -1451,7 +1451,6 @@
   "transaction.invoice": "fattura",
   "transaction.netAmountInCollectiveCurrency.description": "net amount for {collective}",
   "transaction.paymentMethod": "payment method",
-  "transaction.paymentProcessorFeeInHostCurrency": "{percentage} payment processor fee",
   "transaction.platformFeeInHostCurrency": "{percentage} Open Collective fee",
   "transaction.refund.btn": "rimborso",
   "transaction.refund.yes.btn": "Si, rimborsa!",

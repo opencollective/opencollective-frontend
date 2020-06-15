@@ -1451,7 +1451,6 @@
   "transaction.invoice": "factura",
   "transaction.netAmountInCollectiveCurrency.description": "monto neto para {collective}",
   "transaction.paymentMethod": "método de pago",
-  "transaction.paymentProcessorFeeInHostCurrency": "payment processor fee",
   "transaction.platformFeeInHostCurrency": "5% Open Collective fee",
   "transaction.refund.btn": "reembolso",
   "transaction.refund.yes.btn": "Sí, ¡reembolsar!",
