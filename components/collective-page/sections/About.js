@@ -18,14 +18,10 @@ import SectionTitle from '../SectionTitle';
 
 // Dynamicly load HTMLEditor to download it only if user can edit the page
 const HTMLEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
-const HTMLEditor = dynamic(() => import('../ReverseCompatibleHTMLEditor'), {
+const HTMLEditor = dynamic(() => import('../../RichTextEditor'), {
   loading: HTMLEditorLoadingPlaceholder,
   ssr: false, // No need for SSR as user needs to be logged in
 });
-
-// Some collectives have a legacy markdown description. We load the markdown renderer only
-// if this is the case.
-const Markdown = dynamic(() => import('react-markdown'));
 
 const messages = defineMessages({
   placeholder: {
@@ -111,14 +107,6 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                     </Span>
                   )}
                 </Flex>
-              );
-            } else if (value[0] !== '<') {
-              // Fallback while we transition from old collective page to the new one.
-              // Should be removed after migration to V2 is done.
-              return (
-                <HTMLContent>
-                  <Markdown source={value} data-cy="longDescription" />
-                </HTMLContent>
               );
             } else {
               return <HTMLContent content={value} data-cy="longDescription" />;
