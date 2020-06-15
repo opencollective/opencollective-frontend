@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
@@ -73,6 +73,11 @@ const RedXCircle = styled(XCircle)`
   color: ${themeGet('colors.red.500')};
 `;
 
+const GrayXCircle = styled(XCircle)`
+  color: ${themeGet('colors.black.500')};
+  cursor: pointer;
+`;
+
 const MenuItem = styled(Flex).attrs({
   px: 3,
 })`
@@ -122,26 +127,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
     context: API_V2_CONTEXT,
   });
 
-  // detect click outside menu to close it - https://medium.com/@pitipatdop/little-neat-trick-to-capture-click-outside-with-react-hook-ba77c37c7e82
-  const popupNode = useRef(null);
-  const handleClick = e => {
-    // we include 'react-select' because the dropdown in UpdateOrderPopUp portals to the
-    // document.body, so if we don't inlude this it closes the menu
-    if (popupNode.current.contains(e.target) || e.target.id.includes('react-select')) {
-      // inside click
-      return;
-    }
-    // outside click
-    setShowPopup(false);
-  };
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClick);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, []);
-
   const { formatMessage } = useIntl();
   const mainMenu = menuState === 'mainMenu' && status === 'ACTIVE';
   const cancelMenu = menuState === 'cancelMenu';
@@ -156,7 +141,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       width={'100%'}
       overflowY={'auto'}
       py={1}
-      ref={popupNode}
       data-cy="recurring-contribution-menu"
     >
       {mainMenu && (
@@ -166,8 +150,9 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
               {formatMessage(messages.options)}
             </P>
             <Flex flexGrow={1} alignItems="center">
-              <StyledHr width="100%" ml={2} />
+              <StyledHr width="100%" mx={2} />
             </Flex>
+            <GrayXCircle size={26} />
           </Flex>
           <MenuItem
             flexGrow={1 / 4}
