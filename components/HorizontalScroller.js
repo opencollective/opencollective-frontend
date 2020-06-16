@@ -75,8 +75,10 @@ class HorizontalScroller extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.ref.current.addEventListener('scroll', this.updateScrollInfo);
-    this.updateScrollInfo();
+    if (this.ref.current) {
+      this.ref.current.addEventListener('scroll', this.updateScrollInfo);
+      this.updateScrollInfo();
+    }
   }
 
   componentDidUpdate(oldProps) {
@@ -86,7 +88,9 @@ class HorizontalScroller extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    this.ref.current.removeEventListener('scroll', this.updateScrollInfo);
+    if (this.ref.current) {
+      this.ref.current.removeEventListener('scroll', this.updateScrollInfo);
+    }
   }
 
   updateScrollInfo = debounceScroll(() => {

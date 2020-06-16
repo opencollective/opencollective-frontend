@@ -278,7 +278,8 @@ class CreateOrderPage extends React.Component {
 
     // sets the total amount & fee options correctly when we change the base amount (if fees on top is available)
     const hasProfileChanged = prevState.stepProfile?.id !== this.state.stepProfile?.id;
-    const hasAmountChanged = prevState.stepDetails?.amount !== this.state.stepDetails?.amount;
+    const hasAmountChanged =
+      this.state.stepDetails?.amount && prevState.stepDetails?.amount !== this.state.stepDetails?.amount;
     if ((hasProfileChanged || hasAmountChanged) && this.canHaveFeesOnTop()) {
       const platformFeeOptions = this.createplatformFeeOptions(this.state.stepDetails.amount);
       this.setState(state => ({
@@ -624,6 +625,11 @@ class CreateOrderPage extends React.Component {
   getAmountsPresets() {
     const tier = this.props.tier || {};
     if (tier.amountType !== AmountTypes.FIXED) {
+      // Funds MVP, to refactor
+      if (this.props.collective?.settings?.fund === true) {
+        return tier.presets || [100000, 200000, 500000, 1000000];
+      }
+
       return tier.presets || [500, 1000, 2000, 5000];
     } else {
       return null;
@@ -939,8 +945,7 @@ class CreateOrderPage extends React.Component {
                   <Box maxWidth={['100%', '75%']}>
                     <P fontSize="Caption" my={2}>
                       <FormattedMessage
-                        defaultMessage="Open Collective has waived 100% of our fees for COVID-19 Relief Collectives. We rely on the generosity
-                of contributors like you to keep offering this to Collectives."
+                        defaultMessage="Open Collective is free for COVID-19 Relief Collectives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
                       />
                     </P>
@@ -976,7 +981,8 @@ class CreateOrderPage extends React.Component {
                           id="platformFee.totalContribution"
                           values={{
                             amount: formatCurrency(
-                              get(this.state, 'stepDetails.amount') + get(this.state, 'stepDetails.platformFee.value'),
+                              get(this.state, 'stepDetails.amount') +
+                                get(this.state, 'stepDetails.platformFee.value') || 0, // Prevent displaying "Total contribution: €NaN"
                               this.getCurrency(),
                             ),
                             frequency: stepDetails.interval ? `per ${stepDetails.interval}` : '',

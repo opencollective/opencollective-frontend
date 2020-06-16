@@ -36,6 +36,7 @@ class HostDashboardActionsBanner extends React.Component {
   static propTypes = {
     host: PropTypes.shape({
       id: PropTypes.number,
+      isActive: PropTypes.boolean,
       paymentMethods: PropTypes.array,
       slug: PropTypes.string.isRequired,
       stats: PropTypes.shape({
@@ -118,7 +119,7 @@ class HostDashboardActionsBanner extends React.Component {
   };
 
   toggleAddFunds = () => {
-    this.setState({ showAddFunds: !this.state.showAddFunds });
+    this.setState(state => ({ showAddFunds: !state.showAddFunds }));
   };
 
   onChange = ({ value: collective }) => {
@@ -159,11 +160,11 @@ class HostDashboardActionsBanner extends React.Component {
                 </Span>
               </H2>
             </div>
-            {host.stats.collectives.hosted > 0 && (
+            {(host.stats.collectives.hosted > 0 || host.isActive) && (
               <Box mb={2}>
                 <CollectivePickerAsync
                   hostCollectiveIds={[host.id]}
-                  types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT]}
+                  types={[CollectiveType.ORGANIZATION, CollectiveType.COLLECTIVE, CollectiveType.EVENT]}
                   onChange={this.onChange}
                   minWidth={300}
                   width="100%"

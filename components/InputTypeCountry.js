@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
 import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
-import { orderBy, truncate } from 'lodash';
+import { isUndefined, orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -42,6 +42,10 @@ class InputTypeCountry extends Component {
   });
 
   getSelectedOption = memoizeOne((locale, country) => {
+    if (!country) {
+      return null;
+    }
+
     const code = country && country.toUpperCase();
     const countries = CountriesI18n[locale] || CountriesI18n.en;
     return {
@@ -58,7 +62,7 @@ class InputTypeCountry extends Component {
         minWidth={150}
         options={this.getOptions(intl.locale, defaultValue)}
         onChange={({ value }) => onChange(value)}
-        value={value ? this.getSelectedOption(intl.locale, value) : undefined}
+        value={!isUndefined(value) ? this.getSelectedOption(intl.locale, value) : undefined}
         defaultValue={defaultValue ? this.getSelectedOption(intl.locale, defaultValue) : undefined}
         placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
         {...props}

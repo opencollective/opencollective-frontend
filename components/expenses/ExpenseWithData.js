@@ -19,6 +19,7 @@ class ExpenseWithData extends React.Component {
     filter: PropTypes.object, // { category, recipient }
     defaultAction: PropTypes.string, // "new" to open the new expense form by default
     LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
     allowPayAction: PropTypes.bool,
     lockPayAction: PropTypes.func,
     unlockPayAction: PropTypes.func,
@@ -75,7 +76,12 @@ class ExpenseWithData extends React.Component {
 
         {view === 'details' && (
           <div className="comments">
-            <CommentsWithData expense={expense} collective={collective} LoggedInUser={LoggedInUser} />
+            <CommentsWithData
+              expense={expense}
+              collective={collective}
+              LoggedInUser={LoggedInUser}
+              loadingLoggedInUser={this.props.loadingLoggedInUser}
+            />
           </div>
         )}
       </div>

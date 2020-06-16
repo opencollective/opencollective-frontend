@@ -17,14 +17,18 @@ import PayExpenseModal from './PayExpenseModal';
 const getDisabledMessage = (expense, collective, payoutMethod) => {
   const host = collective.host;
   if (!host) {
-    return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be payed without a host" />;
+    return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a host" />;
   } else if (collective.balance < expense.amount) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (!payoutMethod) {
     return null;
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
-    const { transferwisePayouts, transferwisePayoutsLimit } = host.plan;
-    if (transferwisePayoutsLimit !== null && transferwisePayouts >= transferwisePayoutsLimit) {
+    // In some cases, host.plan might not be available (Host Organization account)
+    if (
+      host.plan &&
+      host.plan.transferwisePayoutsLimit !== null &&
+      host.plan.transferwisePayouts >= host.plan.transferwisePayoutsLimit
+    ) {
       return (
         <FormattedMessage
           id="expense.pay.transferwise.planlimit"
@@ -88,8 +92,8 @@ const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...p
           onClose={() => showModal(false)}
           error={error}
           onSubmit={async values => {
-            await onSubmit(values);
-            showModal(false);
+            const { action, ...data } = values;
+            await onSubmit(action, data);
           }}
         />
       </React.Fragment>

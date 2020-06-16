@@ -14,11 +14,15 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 import { withUser } from '../../UserProvider';
 
-const getCollectiveType = type => {
-  switch (type) {
+const getCollectiveType = collective => {
+  switch (collective.type) {
     case 'ORGANIZATION':
       return 'Organization';
     case 'COLLECTIVE':
+      // Funds MVP, to refactor
+      if (collective.settings?.fund) {
+        return 'Fund';
+      }
       return 'Collective';
     case 'EVENT':
       return 'Event';
@@ -44,7 +48,7 @@ const DELETE_USER_COLLECTIVE = gql`
 `;
 
 const DeleteCollective = ({ collective, ...props }) => {
-  const collectiveType = getCollectiveType(collective.type);
+  const collectiveType = getCollectiveType(collective);
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
   const [deleteCollective] = useMutation(DELETE_COLLECTIVE, { variables: { id: collective.id } });
@@ -83,9 +87,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         <FormattedMessage
           values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.description"
-          defaultMessage={
-            'This {type} will be deleted, along with all related data like Core Contributor roles and payment methods.'
-          }
+          defaultMessage={'This {type} will be deleted, along with all related data.'}
         />
       </P>
       {error && <P color="#ff5252">{error}</P>}

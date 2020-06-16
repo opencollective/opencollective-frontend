@@ -226,7 +226,7 @@ class CollectiveGoals extends React.Component {
         <Flex justifyContent="center" flexWrap="wrap" mt={5}>
           <Link route="collective" params={{ slug: collective.slug }}>
             <StyledButton mx={2} minWidth={200}>
-              <FormattedMessage id="ViewCollectivePage" defaultMessage="View Collective page" />
+              <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
             </StyledButton>
           </Link>
           <StyledButton

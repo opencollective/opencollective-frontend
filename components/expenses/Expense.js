@@ -101,6 +101,10 @@ class Expense extends React.Component {
       rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
       processing: { id: 'expense.processing', defaultMessage: 'processing' },
       error: { id: 'expense.error', defaultMessage: 'error' },
+      scheduled_for_payment: {
+        id: 'expense.scheduledForPayment',
+        defaultMessage: 'scheduled for payment',
+      },
       expenseTypeMissing: {
         id: 'expense.error.expenseTypeMissing',
         defaultMessage: 'Please pick the type of this expense',
@@ -236,11 +240,7 @@ class Expense extends React.Component {
     mode = mode || view;
 
     const canPay = LoggedInUser && LoggedInUser.canPayExpense(expense) && expense.status === 'APPROVED';
-    const canMarkExpenseAsUnpaid =
-      LoggedInUser &&
-      LoggedInUser.canPayExpense(expense) &&
-      expense.status === 'PAID' &&
-      expense.payoutMethod === 'other';
+    const canMarkExpenseAsUnpaid = LoggedInUser?.canPayExpense(expense) && expense.status === 'PAID';
 
     const canReject =
       LoggedInUser &&

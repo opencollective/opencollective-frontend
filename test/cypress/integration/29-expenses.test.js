@@ -96,7 +96,7 @@ describe('New expense flow', () => {
 
       // Submit!
       cy.getByDataCy('submit-expense-btn').click();
-      cy.contains('[data-cy="temporary-notification"]', 'Expense submited!');
+      cy.contains('[data-cy="temporary-notification"]', 'Expense submitted!');
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
       cy.getByDataCy('dismiss-temporary-notification-btn').click();
       cy.getByDataCy('temporary-notification').should('not.exist');

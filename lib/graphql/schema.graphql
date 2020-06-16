@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed May 20 2020 20:42:11 GMT+0100 (British Summer Time)
+# timestamp: Thu Jun 11 2020 14:05:33 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -357,6 +357,7 @@ input CollectiveInputType {
   firstName: String
   lastName: String
   isIncognito: Boolean
+  isActive: Boolean
 }
 
 """
@@ -716,6 +717,7 @@ type CollectiveStatsType {
     periodInMonths: Int
   ): Int
   yearlyBudget: Int
+  yearlyBudgetManaged: Int
   topExpenses: JSON
   topFundingSources: JSON
   activeRecurringContributions: JSON
@@ -1358,6 +1360,7 @@ enum ExpenseStatus {
   PROCESSING
   ERROR
   PAID
+  SCHEDULED_FOR_PAYMENT
 }
 
 """

@@ -63,7 +63,7 @@ class NewCollectivePage extends React.Component {
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
-    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated']),
     step: PropTypes.string,
     mode: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
@@ -209,12 +209,16 @@ class NewCollectivePage extends React.Component {
   }
 }
 
+export const getCollectivePageQueryVariables = collectiveSlug => {
+  return {
+    slug: collectiveSlug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+  };
+};
+
 const getCollective = graphql(getCollectivePageQuery, {
   options: props => ({
-    variables: {
-      slug: props.slug,
-      nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-    },
+    variables: getCollectivePageQueryVariables(props.slug),
   }),
 });
 

@@ -18,6 +18,9 @@ import StyledHr from '../StyledHr';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
+import UpdateOrderPopUp from './UpdateOrderPopUp';
+import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
+
 const messages = defineMessages({
   cancel: {
     id: 'actions.cancel',
@@ -96,6 +99,7 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
   mutation cancelRecurringContribution($order: OrderReferenceInput!) {
     cancelOrder(order: $order) {
       id
+      status
     }
   }
 `;
@@ -104,54 +108,12 @@ const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
   mutation activateRecurringContribution($order: OrderReferenceInput!) {
     activateOrder(order: $order) {
       id
+      status
     }
   }
 `;
 
-const subsRevampPageQuery = gqlV2/* GraphQL */ `
-  query RecurringContributions($collectiveSlug: String) {
-    account(slug: $collectiveSlug) {
-      id
-      slug
-      name
-      type
-      description
-      settings
-      imageUrl
-      twitterHandle
-      orders {
-        totalCount
-        nodes {
-          id
-          amount {
-            value
-            currency
-          }
-          status
-          frequency
-          tier {
-            name
-          }
-          totalDonations {
-            value
-            currency
-          }
-          toAccount {
-            id
-            slug
-            name
-            description
-            tags
-            imageUrl
-            settings
-          }
-        }
-      }
-    }
-  }
-`;
-
-const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, ...props }) => {
+const RecurringContributionsPopUp = ({ contribution, status, createNotification, setShowPopup, account }) => {
   const [menuState, setMenuState] = useState('mainMenu');
   const [submitCancellation, { loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
@@ -161,9 +123,11 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
   });
 
   // detect click outside menu to close it - https://medium.com/@pitipatdop/little-neat-trick-to-capture-click-outside-with-react-hook-ba77c37c7e82
-  const popupNode = useRef();
+  const popupNode = useRef(null);
   const handleClick = e => {
-    if (popupNode.current.contains(e.target)) {
+    // we include 'react-select' because the dropdown in UpdateOrderPopUp portals to the
+    // document.body, so if we don't inlude this it closes the menu
+    if (popupNode.current.contains(e.target) || e.target.id.includes('react-select')) {
       // inside click
       return;
     }
@@ -186,7 +150,14 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
   const activateMenu = menuState === 'mainMenu' && status === 'CANCELLED';
 
   return (
-    <PopUpMenu minHeight={160} width={'100%'} overflowY={'auto'} ref={popupNode}>
+    <PopUpMenu
+      minHeight={160}
+      maxHeight={360}
+      width={'100%'}
+      overflowY={'auto'}
+      ref={popupNode}
+      data-cy="recurring-contribution-menu"
+    >
       {mainMenu && (
         <MenuSection>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
@@ -205,6 +176,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             onClick={() => {
               setMenuState('paymentMethodMenu');
             }}
+            data-cy="recurring-contribution-menu-payment-option"
           >
             <Flex width={1 / 6}>
               <CreditCard size={20} />
@@ -241,6 +213,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             onClick={() => {
               setMenuState('cancelMenu');
             }}
+            data-cy="recurring-contribution-menu-cancel-option"
           >
             <Flex width={1 / 6}>
               <RedXCircle size={20} />
@@ -255,7 +228,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       )}
 
       {cancelMenu && (
-        <MenuSection>
+        <MenuSection data-cy="recurring-contribution-cancel-menu">
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
               {formatMessage(messages.cancelContribution)}
@@ -278,17 +251,11 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             <StyledButton
               buttonSize="tiny"
               loading={loadingCancellation}
+              data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
                 try {
                   await submitCancellation({
                     variables: { order: { id: contribution.id } },
-                    refetchQueries: [
-                      {
-                        query: subsRevampPageQuery,
-                        variables: { collectiveSlug: props.router.query.collectiveSlug },
-                        context: API_V2_CONTEXT,
-                      },
-                    ],
                   });
                   createNotification('cancel');
                 } catch (error) {
@@ -306,6 +273,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
               onClick={() => {
                 setMenuState('mainMenu');
               }}
+              data-cy="recurring-contribution-cancel-no"
             >
               {formatMessage(messages.noWait)}
             </StyledButton>
@@ -337,17 +305,11 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
             <StyledButton
               buttonSize="tiny"
               loading={loadingActivation}
+              data-cy="recurring-contribution-activate-yes"
               onClick={async () => {
                 try {
                   await submitActivation({
                     variables: { order: { id: contribution.id } },
-                    refetchQueries: [
-                      {
-                        query: subsRevampPageQuery,
-                        variables: { collectiveSlug: props.router.query.collectiveSlug },
-                        context: API_V2_CONTEXT,
-                      },
-                    ],
                   });
                   createNotification('activate');
                 } catch (error) {
@@ -373,54 +335,25 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       )}
 
       {paymentMethodMenu && (
-        <MenuSection>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
-            <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
-              {formatMessage(messages.updatePaymentMethod)}
-            </P>
-            <Flex flexGrow={1} alignItems="center">
-              <StyledHr width="100%" ml={2} />
-            </Flex>
-          </Flex>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center">
-            <StyledButton
-              buttonSize="small"
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
-            >
-              {formatMessage(messages.cancel)}
-            </StyledButton>
-            <StyledButton buttonSize="small" buttonStyle="secondary">
-              {formatMessage(messages.update)}
-            </StyledButton>
-          </Flex>
+        <MenuSection data-cy="recurring-contribution-payment-menu">
+          <UpdatePaymentMethodPopUp
+            setMenuState={setMenuState}
+            contribution={contribution}
+            createNotification={createNotification}
+            setShowPopup={setShowPopup}
+            account={account}
+          />
         </MenuSection>
       )}
 
       {updateTierMenu && (
         <MenuSection>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
-            <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
-              {formatMessage(messages.updateTier)}
-            </P>
-            <Flex flexGrow={1} alignItems="center">
-              <StyledHr width="100%" ml={2} />
-            </Flex>
-          </Flex>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center">
-            <StyledButton
-              buttonSize="small"
-              onClick={() => {
-                setMenuState('mainMenu');
-              }}
-            >
-              {formatMessage(messages.cancel)}
-            </StyledButton>
-            <StyledButton buttonSize="small" buttonStyle="secondary">
-              {formatMessage(messages.update)}
-            </StyledButton>
-          </Flex>
+          <UpdateOrderPopUp
+            setMenuState={setMenuState}
+            contribution={contribution}
+            createNotification={createNotification}
+            setShowPopup={setShowPopup}
+          />
         </MenuSection>
       )}
     </PopUpMenu>
@@ -434,6 +367,7 @@ RecurringContributionsPopUp.propTypes = {
   status: PropTypes.string.isRequired,
   createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
+  account: PropTypes.object.isRequired,
 };
 
 export default withUser(withRouter(RecurringContributionsPopUp));

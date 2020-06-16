@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
-import { first, last } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
-import i18nPayoutMethodType from '../../lib/i18n-payout-method-type';
+import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -29,27 +29,46 @@ const PAYOUT_ACTION_TYPE = defineMessages({
     id: 'Expense.PayAuto',
     defaultMessage: '{payoutMethodLabel} (Automatic)',
   },
+  schedule: {
+    id: 'Expense.ScheduleForPayment',
+    defaultMessage: '{payoutMethodLabel} (Schedule for Payout)',
+  },
 });
 
 const getPayoutLabel = (intl, type) => {
-  return i18nPayoutMethodType(intl.formatMessage, type, {
-    aliasBankAccountToTransferWise: true,
-  });
+  return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
-const generatePayoutOptions = (intl, payoutMethodType) => {
+const generatePayoutOptions = (intl, payoutMethodType, collective) => {
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   if (payoutMethodType === PayoutMethodType.OTHER) {
-    return [{ label: payoutMethodLabel, value: PayoutMethodType.OTHER }];
+    return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
   } else {
-    return [
-      { label: intl.formatMessage(PAYOUT_ACTION_TYPE.auto, { payoutMethodLabel }), value: false },
-      { label: intl.formatMessage(PAYOUT_ACTION_TYPE.manual, { payoutMethodLabel }), value: true },
+    const defaultTypes = [
+      {
+        label: intl.formatMessage(PAYOUT_ACTION_TYPE.auto, { payoutMethodLabel }),
+        value: { forceManual: false, action: 'PAY' },
+      },
+      {
+        label: intl.formatMessage(PAYOUT_ACTION_TYPE.manual, { payoutMethodLabel }),
+        value: { forceManual: true, action: 'PAY' },
+      },
     ];
+    if (
+      hasFeature(collective.host, FEATURES.PAYPAL_PAYOUTS) &&
+      payoutMethodType === PayoutMethodType.PAYPAL &&
+      collective.host?.connectedAccounts?.find(ca => ca?.service === 'paypal')
+    ) {
+      defaultTypes.unshift({
+        label: intl.formatMessage(PAYOUT_ACTION_TYPE.schedule, { payoutMethodLabel }),
+        value: { action: 'SCHEDULE_FOR_PAYMENT' },
+      });
+    }
+    return defaultTypes;
   }
 };
 
-const INITIAL_VALUES = { paymentProcessorFee: null, forceManual: false };
+const DEFAULT_VALUES = { paymentProcessorFee: null };
 
 const validate = values => {
   const errors = {};
@@ -64,11 +83,14 @@ const validate = values => {
  */
 const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
   const intl = useIntl();
-  const formik = useFormik({ initialValues: INITIAL_VALUES, validate, onSubmit });
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
+  const payoutOptions = generatePayoutOptions(intl, payoutMethodType, collective);
+
+  const formik = useFormik({ initialValues: { ...DEFAULT_VALUES, ...payoutOptions[0]?.value }, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
-  const payoutOptions = generatePayoutOptions(intl, payoutMethodType);
-  const selectedOption = !formik.values.forceManual ? first(payoutOptions) : last(payoutOptions);
+  const selectedOption = payoutOptions.find(
+    po => po.value?.action === formik.values.action && po.value.forceManual === formik.values.forceManual,
+  );
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const formattedAmount = isNaN(formik.values.paymentProcessorFee) ? (
     <Span color="black.500" mr={2}>
@@ -89,12 +111,14 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
         <H4 fontSize="20px" fontWeight="bold" mb={3}>
           <FormattedMessage id="Expense.PayoutAndFees" defaultMessage="Payout method and fees" />
         </H4>
-        <P fontSize="13px" lineHeight="19px" mb={3}>
-          <FormattedMessage
-            id="Expense.PayoutAndFeesDetails"
-            defaultMessage="Please add the corresponding fees according to the payout option selected."
-          />
-        </P>
+        {formik.values.forceManual && (
+          <P fontSize="13px" lineHeight="19px" mb={3}>
+            <FormattedMessage
+              id="Expense.PayoutAndFeesDetails"
+              defaultMessage="Please add the corresponding fees according to the payout option selected."
+            />
+          </P>
+        )}
         <StyledInputField
           htmlFor="payExpenseModalPayoutMethod"
           label={<FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />}
@@ -105,7 +129,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
               disabled={payoutOptions.length < 2}
               options={payoutOptions}
               value={selectedOption}
-              onChange={({ value }) => formik.setValues({ forceManual: value, paymentProcessorFee: null })}
+              onChange={({ value }) => formik.setValues({ ...value, paymentProcessorFee: null })}
             />
           )}
         </StyledInputField>

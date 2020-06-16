@@ -104,6 +104,7 @@ class CreateExpensePage extends React.Component {
       expense: null,
       isSubmitting: false,
       formPersister: null,
+      isInitialForm: true,
     };
   }
 
@@ -150,7 +151,7 @@ class CreateExpensePage extends React.Component {
   }
 
   onFormSubmit = expense => {
-    this.setState({ expense, step: STEPS.SUMMARY });
+    this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
   };
 
   onSummarySubmit = async () => {
@@ -162,7 +163,7 @@ class CreateExpensePage extends React.Component {
         expense: prepareExpenseForSubmit(expense),
       });
 
-      // Clear local storage backup if expense submitted successfuly
+      // Clear local storage backup if expense submitted successfully
       if (this.state.formPersister) {
         this.state.formPersister.clearValues();
       }
@@ -219,6 +220,13 @@ class CreateExpensePage extends React.Component {
     const collective = data && data.account;
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
+
+    // Adding that at GraphQL level is buggy
+    // data is coming from CreateExpensePage
+    if (collective && collective.isHost) {
+      collective.host = { ...collective };
+    }
+
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <React.Fragment>
@@ -253,6 +261,7 @@ class CreateExpensePage extends React.Component {
                           expensesTags={this.getSuggestedTags(collective)}
                           payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
                           formPersister={this.state.formPersister}
+                          shouldLoadValuesFromPersister={this.state.isInitialForm}
                           autoFocusTitle
                         />
                       )}
@@ -339,6 +348,21 @@ const getData = graphql(
         expensesTags {
           id
           tag
+        }
+
+        ... on Organization {
+          id
+          isHost
+          isActive
+          balance
+          expensePolicy
+          location {
+            address
+            country
+          }
+          transferwise {
+            availableCurrencies
+          }
         }
 
         ... on Collective {

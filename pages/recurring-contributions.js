@@ -19,7 +19,15 @@ import TemporaryNotification from '../components/TemporaryNotification';
 import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
+const FilterTag = styled(StyledTag)`
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  cursor: pointer;
+  min-width: 180px;
+`;
+
+export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
   query RecurringContributions($collectiveSlug: String) {
     account(slug: $collectiveSlug) {
       id
@@ -34,6 +42,9 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
         totalCount
         nodes {
           id
+          paymentMethod {
+            id
+          }
           amount {
             value
             currency
@@ -41,6 +52,7 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
           status
           frequency
           tier {
+            id
             name
           }
           totalDonations {
@@ -62,14 +74,6 @@ const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const FilterTag = styled(StyledTag)`
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  cursor: pointer;
-  min-width: 180px;
-`;
-
 class recurringContributionsPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug } }) {
     return { collectiveSlug };
@@ -77,7 +81,7 @@ class recurringContributionsPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -92,14 +96,13 @@ class recurringContributionsPage extends React.Component {
 
   createNotification = (type, error) => {
     this.setState({ notification: true });
-    if (type === 'activate') {
-      this.setState({ notificationType: 'activate' });
-    } else if (type === 'cancel') {
-      this.setState({ notificationType: 'cancel' });
-    } else if (type === 'error') {
+    if (type === 'error') {
       this.setState({ notificationType: 'error' });
       this.setState({ notificationText: error });
+    } else {
+      this.setState({ notificationType: type });
     }
+    window.scrollTo(0, 0);
   };
 
   dismissNotification = () => {
@@ -142,14 +145,21 @@ class recurringContributionsPage extends React.Component {
                 {notificationType === 'activate' && (
                   <FormattedMessage
                     id="subscription.createSuccessActivate"
-                    defaultMessage="<strong>Recurring contribution activated!</strong> Woohoo! 🎉"
+                    defaultMessage="Recurring contribution <strong>activated</strong>! Woohoo! 🎉"
                     values={I18nFormatters}
                   />
                 )}
                 {notificationType === 'cancel' && (
                   <FormattedMessage
                     id="subscription.createSuccessCancel"
-                    defaultMessage="<strong>Your recurring contribution has been cancelled.</strong>"
+                    defaultMessage="Your recurring contribution has been <strong>cancelled</strong>."
+                    values={I18nFormatters}
+                  />
+                )}
+                {notificationType === 'update' && (
+                  <FormattedMessage
+                    id="subscription.createSuccessUpdated"
+                    defaultMessage="Your recurring contribution has been <strong>updated</strong>."
                     values={I18nFormatters}
                   />
                 )}
@@ -173,8 +183,9 @@ class recurringContributionsPage extends React.Component {
                   minWidth="180px"
                   mx={2}
                   onClick={() => this.setState({ filter: 'active' })}
+                  data-cy="recurring-contribution-filter-tag-active"
                 >
-                  <FormattedMessage id="Subscriptions.Active" defaultMessage="Active recurring contributions" />
+                  <FormattedMessage id="Subscriptions.Active" defaultMessage="Active" />
                 </FilterTag>
                 <FilterTag
                   type={this.state.filter === 'monthly' ? 'dark' : null}
@@ -182,8 +193,9 @@ class recurringContributionsPage extends React.Component {
                   minWidth="180px"
                   mx={2}
                   onClick={() => this.setState({ filter: 'monthly' })}
+                  data-cy="recurring-contribution-filter-tag-monthly"
                 >
-                  <FormattedMessage id="Subscriptions.Monthly" defaultMessage="Monthly recurring contributions" />
+                  <FormattedMessage id="Frequency.Monthly" defaultMessage="Monthly" />
                 </FilterTag>
                 <FilterTag
                   type={this.state.filter === 'yearly' ? 'dark' : null}
@@ -191,20 +203,23 @@ class recurringContributionsPage extends React.Component {
                   minWidth="180px"
                   mx={2}
                   onClick={() => this.setState({ filter: 'yearly' })}
+                  data-cy="recurring-contribution-filter-tag-yearly"
                 >
-                  <FormattedMessage id="Subscriptions.Yearly" defaultMessage="Yearly recurring contributions" />
+                  <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />
                 </FilterTag>
                 <FilterTag
                   type={this.state.filter === 'cancelled' ? 'dark' : null}
                   variant="rounded"
                   mx={2}
                   onClick={() => this.setState({ filter: 'cancelled' })}
+                  data-cy="recurring-contribution-filter-tag-cancelled"
                 >
-                  <FormattedMessage id="Subscriptions.Cancelled" defaultMessage="Cancelled recurring contributions" />
+                  <FormattedMessage id="Subscriptions.Cancelled" defaultMessage="Cancelled" />
                 </FilterTag>
               </Flex>
               <RecurringContributionsContainer
                 recurringContributions={recurringContributions}
+                account={collective}
                 filter={this.state.filter}
                 createNotification={this.createNotification}
               />

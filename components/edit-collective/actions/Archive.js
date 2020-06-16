@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../../lib/graphql/mutations';
 
@@ -12,11 +11,15 @@ import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 
-const getCollectiveType = type => {
-  switch (type) {
+const getCollectiveType = collective => {
+  switch (collective.type) {
     case 'ORGANIZATION':
       return 'Organization';
     case 'COLLECTIVE':
+      // Funds MVP, to refactor
+      if (collective.settings?.fund) {
+        return 'Fund';
+      }
       return 'Collective';
     case 'EVENT':
       return 'Event';
@@ -25,57 +28,17 @@ const getCollectiveType = type => {
   }
 };
 
-const archiveMessages = defineMessages({
-  [CollectiveType.EVENT]: {
-    id: 'archive.event.confirmation',
-    defaultMessage: 'Are you sure you want to archive this event?',
-  },
-  [CollectiveType.COLLECTIVE]: {
-    id: 'archive.collective.confirmation',
-    defaultMessage: 'Are you sure you want to archive this collective?',
-  },
-  [CollectiveType.ORGANIZATION]: {
-    id: 'archive.organization.confirmation',
-    defaultMessage: 'Are you sure you want to archive this organization?',
-  },
-  _default: {
-    id: 'archive.account.confirmation',
-    defaultMessage: 'Are you sure you want to archive this account?',
-  },
-});
-
-const unarchiveMessages = defineMessages({
-  [CollectiveType.EVENT]: {
-    id: 'unarchive.event.confirmation',
-    defaultMessage: 'Are you sure you want to unarchive this event?',
-  },
-  [CollectiveType.COLLECTIVE]: {
-    id: 'unarchive.collective.confirmation',
-    defaultMessage: 'Are you sure you want to unarchive this collective?',
-  },
-  [CollectiveType.ORGANIZATION]: {
-    id: 'unarchive.organization.confirmation',
-    defaultMessage: 'Are you sure you want to unarchive this organization?',
-  },
-  _default: {
-    id: 'unarchive.account.confirmation',
-    defaultMessage: 'Are you sure you want to unarchive this account?',
-  },
-});
-
 const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
-  const collectiveType = getCollectiveType(collective.type);
-  const defaultAction = isArchived ? 'Archive' : 'Unarchive';
-  const [modal, setModal] = useState({ type: defaultAction, show: false });
-  const intl = useIntl();
+  const collectiveType = getCollectiveType(collective);
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
     isArchived: collective.isArchived,
     error: null,
     confirmationMsg: '',
   });
-
   const { processing, isArchived, error, confirmationMsg } = archiveStatus;
+  const [modal, setModal] = useState({ type: defaultAction, show: false });
+  const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const handleArchiveCollective = async ({ archiveCollective, id }) => {
     setModal({ type: 'Archive', show: false });
     try {
@@ -210,9 +173,20 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         </ModalHeader>
         <ModalBody>
           <P>
-            {modal.type === 'Unarchive'
-              ? intl.formatMessage(unarchiveMessages[collective.type] || unarchiveMessages._default)
-              : intl.formatMessage(archiveMessages[collective.type] || archiveMessages._default)}
+            {modal.type !== 'Unarchive' && (
+              <FormattedMessage
+                id="archive.account.confirmation"
+                defaultMessage={'Are you sure you want to archive this {collectiveType}?'}
+                values={{ collectiveType }}
+              />
+            )}
+            {modal.type === 'Unarchive' && (
+              <FormattedMessage
+                id="unarchive.account.confirmation"
+                defaultMessage={'Are you sure you want to unarchive this {collectiveType}?'}
+                values={{ collectiveType }}
+              />
+            )}
           </P>
         </ModalBody>
         <ModalFooter>

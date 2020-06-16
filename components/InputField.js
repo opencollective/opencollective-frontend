@@ -11,20 +11,19 @@ import InputTypeCountry from './InputTypeCountry';
 import InputTypeCreditCard from './InputTypeCreditCard';
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
+import StyledInputTags from './StyledInputTags';
 import TimezonePicker from './TimezonePicker';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let HTMLEditor, MarkdownEditor, InputTypeTags, DateTime;
+let HTMLEditor, MarkdownEditor, DateTime;
 if (process.env.DYNAMIC_IMPORT) {
   HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
   MarkdownEditor = dynamic(() => import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'));
-  InputTypeTags = dynamic(() => import(/* webpackChunkName: 'InputTypeTags' */ './InputTypeTags'));
   DateTime = dynamic(() => import(/* webpackChunkName: 'DateTime' */ './DateTime'));
 } else {
   HTMLEditor = require('./HTMLEditor').default;
   MarkdownEditor = require('./MarkdownEditor').default;
-  InputTypeTags = require('./InputTypeTags').default;
   DateTime = require('./DateTime').default;
 }
 
@@ -237,15 +236,23 @@ class InputField extends React.Component {
                   {capitalize(field.label)}
                 </Col>
                 <Col sm={10}>
-                  <InputTypeTags {...field} />
+                  <StyledInputTags
+                    {...field}
+                    renderUpdatedTags
+                    onChange={entries => field.onChange(entries.map(e => e.value))}
+                  />
                 </Col>
               </div>
             )}
             {!horizontal && (
               <div>
                 {field.label && <ControlLabel>{`${capitalize(field.label)}`}</ControlLabel>}
-                <InputTypeTags {...field} />
                 {field.description && <HelpBlock>{field.description}</HelpBlock>}
+                <StyledInputTags
+                  {...field}
+                  renderUpdatedTags
+                  onChange={entries => field.onChange(entries.map(e => e.value))}
+                />
               </div>
             )}
           </FormGroup>

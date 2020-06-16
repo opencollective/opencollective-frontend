@@ -14,6 +14,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
 const PROCESS_EXPENSE_MUTATION = gqlV2`
@@ -95,7 +96,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY', false)}
-          onSubmit={paymentParams => triggerAction('PAY', paymentParams)}
+          onSubmit={triggerAction}
           expense={expense}
           collective={collective}
           error={error && getErrorFromGraphqlException(error).message}
@@ -110,13 +111,15 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
         </StyledButton>
       )}
       {permissions.canMarkAsUnpaid && (
-        <StyledButton
-          {...getButtonProps('MARK_AS_UNPAID')}
-          buttonStyle="dangerSecondary"
+        <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
-        >
-          <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
-        </StyledButton>
+          {...getButtonProps('MARK_AS_UNPAID', false)}
+          onConfirm={hasPaymentProcessorFeesRefunded =>
+            triggerAction('MARK_AS_UNPAID', {
+              paymentProcessorFee: hasPaymentProcessorFeesRefunded ? 1 : 0,
+            })
+          }
+        />
       )}
     </React.Fragment>
   );
@@ -136,7 +139,7 @@ ProcessExpenseButtons.propTypes = {
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
-  /** Props passed to all buttons. Usefull to customize sizes, spaces, etc. */
+  /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
 };
 

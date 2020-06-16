@@ -63,9 +63,13 @@ const pages = routes()
     '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
     'expenses-legacy',
   )
+  .add('orders', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders')
+  .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
+
+pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?', 'create-fund');
 
 // New Create Collective Flow
 pages.add(

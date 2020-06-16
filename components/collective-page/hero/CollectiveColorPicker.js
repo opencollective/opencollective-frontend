@@ -107,7 +107,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                   px={2}
                   containerProps={{ ml: 2 }}
                   value={textValue}
-                  maxLength={6}
+                  maxLength={7}
                   disabled={loading}
                   onBlur={() => setShowError(true)}
                   error={

@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { CurrencyPrecision } from '../../lib/constants/currency-precision';
+
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -38,7 +40,11 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
             <LoadingPlaceholder height={16} width={75} />
           ) : (
             <Span color="black.500" fontSize="LeadParagraph">
-              <FormattedMoneyAmount currency={collective.currency} amount={collective.balance} />
+              <FormattedMoneyAmount
+                currency={collective.currency}
+                amount={collective.balance}
+                precision={CurrencyPrecision.DEFAULT}
+              />
             </Span>
           )}
         </Box>

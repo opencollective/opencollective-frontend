@@ -70,7 +70,7 @@ const GenericPlanFeatures = ({ plan }) => {
     'single-host-plan': 1,
     'small-host-plan': 5,
     'medium-host-plan': 10,
-    'large-host-plan': 10,
+    'large-host-plan': 25,
   };
   return (
     <ul>

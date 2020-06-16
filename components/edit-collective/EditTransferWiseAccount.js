@@ -4,8 +4,8 @@ import { useMutation } from '@apollo/react-hooks';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { GraphQLContext } from '../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { getCollectiveToEditQuery } from '../../lib/graphql/queries';
 
 import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -20,6 +20,7 @@ const createConnectedAccountMutation = gqlV2`
       settings
       service
       createdAt
+      updatedAt
     }
   }
 `;
@@ -32,10 +33,13 @@ const deleteConnectedAccountMutation = gqlV2`
   }
 `;
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 const EditTransferWiseAccount = props => {
-  const { refetch } = React.useContext(GraphQLContext);
+  const mutationOptions = {
+    context: API_V2_CONTEXT,
+    refetchQueries: [{ query: getCollectiveToEditQuery, variables: { slug: props.collective.slug } }],
+    awaitRefetchQueries: true,
+  };
+  const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
     mutationOptions,
@@ -49,13 +53,15 @@ const EditTransferWiseAccount = props => {
       token: '',
     },
     async onSubmit(values) {
-      await createConnectedAccount({
+      const {
+        data: { createConnectedAccount: createdAccount },
+      } = await createConnectedAccount({
         variables: {
           connectedAccount: { token: values.token, service: 'transferwise' },
           account: { slug: props.collective.slug },
         },
       });
-      await refetch();
+      setConnectedAccount(createdAccount);
     },
     validate(values) {
       const errors = {};
@@ -68,10 +74,10 @@ const EditTransferWiseAccount = props => {
 
   const handleDelete = async () => {
     await deleteConnectedAccount({ variables: { connectedAccount: { legacyId: props.connectedAccount.id } } });
-    await refetch();
+    setConnectedAccount();
   };
 
-  if (!props.connectedAccount) {
+  if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
         <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
@@ -112,13 +118,12 @@ const EditTransferWiseAccount = props => {
             id="collective.connectedAccounts.transferwise.connected"
             defaultMessage="TransferWise account connected on {updatedAt, date, short}"
             values={{
-              username: props.connectedAccount.username,
-              updatedAt: new Date(props.connectedAccount.updatedAt || props.connectedAccount.createdAt),
+              updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
             }}
           />
         </P>
         <P lineHeight="0">
-          <StyledButton type="submit" buttonSize="small" loading={isDeleting} onClick={handleDelete}>
+          <StyledButton type="submit" buttonSize="tiny" loading={isDeleting} onClick={handleDelete}>
             <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
           </StyledButton>
         </P>

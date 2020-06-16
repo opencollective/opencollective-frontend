@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, groupBy } from 'lodash';
+import { get, groupBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import i18nPayoutMethodType from '../../lib/i18n-payout-method-type';
+import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
@@ -28,6 +28,8 @@ const newPayoutMethodMsg = defineMessages({
     defaultMessage: 'New {pmType}',
   },
 });
+
+const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
 
 /**
  * An overset of `StyledSelect` specialized for payout methods. Accepts all the props
@@ -65,7 +67,6 @@ class PayoutMethodSelect extends React.Component {
   };
 
   getPayoutMethodLabel = payoutMethod => {
-    const { formatMessage } = this.props.intl;
     if (payoutMethod.id) {
       if (payoutMethod.name) {
         return payoutMethod.name;
@@ -83,8 +84,12 @@ class PayoutMethodSelect extends React.Component {
         } else {
           return `${payoutMethod.data.accountHolderName} (${payoutMethod.data.currency})`;
         }
+      } else if (payoutMethod.type === PayoutMethodType.OTHER) {
+        const content = payoutMethod.data?.content?.replace(/\n|\t/g, ' ');
+        const i18nType = i18nPayoutMethodType(this.props.intl, payoutMethod.type);
+        return content ? `${i18nType} - ${truncate(content, { length: MAX_PAYOUT_OPTION_DATA_LENGTH })}` : i18nType;
       } else {
-        return i18nPayoutMethodType(formatMessage, payoutMethod.type);
+        return i18nPayoutMethodType(this.props.intl, payoutMethod.type);
       }
     } else {
       return (
@@ -94,10 +99,16 @@ class PayoutMethodSelect extends React.Component {
           </Span>
           &nbsp;
           {newPayoutMethodMsg[payoutMethod.type]
-            ? formatMessage(newPayoutMethodMsg[payoutMethod.type])
-            : formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })}
+            ? this.props.intl.formatMessage(newPayoutMethodMsg[payoutMethod.type])
+            : this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })}
         </React.Fragment>
       );
+    }
+  };
+
+  getPayoutMethodTitle = pm => {
+    if (pm.type === PayoutMethodType.OTHER && pm.data?.content?.length > MAX_PAYOUT_OPTION_DATA_LENGTH) {
+      return pm.data.content;
     }
   };
 
@@ -115,10 +126,10 @@ class PayoutMethodSelect extends React.Component {
   getOptionFromPayoutMethod = pm => ({
     value: pm,
     label: this.getPayoutMethodLabel(pm),
+    title: this.getPayoutMethodTitle(pm),
   });
 
   getOptions = memoizeOne(payoutMethods => {
-    const { formatMessage } = this.props.intl;
     const groupedPms = groupBy(payoutMethods, 'type');
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
       if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
@@ -131,7 +142,7 @@ class PayoutMethodSelect extends React.Component {
     });
 
     return pmTypes.map(pmType => ({
-      label: i18nPayoutMethodType(formatMessage, pmType),
+      label: i18nPayoutMethodType(this.props.intl, pmType),
       options: [
         // Add existing payout methods for this type
         ...get(groupedPms, pmType, []).map(this.getOptionFromPayoutMethod),

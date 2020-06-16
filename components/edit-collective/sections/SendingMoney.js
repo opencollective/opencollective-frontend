@@ -19,6 +19,10 @@ class SendingMoney extends React.Component {
     if (hasFeature(this.props.collective, FEATURES.TRANSFERWISE) || parseToBoolean(process.env.TRANSFERWISE_ENABLED)) {
       services.push('transferwise');
     }
+    if (hasFeature(this.props.collective, FEATURES.PAYPAL_PAYOUTS)) {
+      services.push('paypal');
+    }
+
     return (
       <Fragment>
         <H3>
@@ -29,15 +33,19 @@ class SendingMoney extends React.Component {
           connectedAccounts={this.props.collective.connectedAccounts}
           services={services}
         />
-        <H4 mt={2}>
-          <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
-        </H4>
-        <P>
-          <FormattedMessage
-            id="collective.sendMoney.description"
-            defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
-          />
-        </P>
+        {!services.includes('paypal') && (
+          <Fragment>
+            <H4 mt={2}>
+              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
+            </H4>
+            <P>
+              <FormattedMessage
+                id="collective.sendMoney.description"
+                defaultMessage={"PayPal is activated by default, you don't have to configure anything."}
+              />
+            </P>
+          </Fragment>
+        )}
       </Fragment>
     );
   }

@@ -56,6 +56,15 @@ export const getCollectivePageQuery = gql`
           all
         }
       }
+      connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {
+        id
+        collective {
+          id
+          name
+          type
+          slug
+        }
+      }
       parentCollective {
         id
         name

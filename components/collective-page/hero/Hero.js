@@ -24,6 +24,7 @@ import { Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
@@ -31,16 +32,25 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import UserCompany from '../../UserCompany';
-// Local imports
 import ContainerSectionContent from '../ContainerSectionContent';
 
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
-import HeroBackground from './HeroBackground';
+import HeroBackground, { BASE_HERO_HEIGHT, StyledHeroBackground } from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 
 // Dynamic imports
 const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
+
+const HeroBackgroundEdit = dynamic(() => import('./HeroBackgroundEdit'), {
+  loading() {
+    return (
+      <StyledHeroBackground>
+        <LoadingPlaceholder height={BASE_HERO_HEIGHT} />
+      </StyledHeroBackground>
+    );
+  },
+});
 
 const Translations = defineMessages({
   website: {
@@ -97,7 +107,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         </MessageBox>
       )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-        <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
+        {isEditing ? (
+          <HeroBackgroundEdit collective={collective} onEditCancel={() => editCover(false)} />
+        ) : (
+          <HeroBackground collective={collective} />
+        )}
+
         {isAdmin && !isEditing && (
           // We don't have any mobile view for this one yet
           <Container
@@ -165,7 +180,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               {isCollective && (
                 <StyledTag textTransform="uppercase" mx={2} my={2} mb={2}>
                   <I18nCollectiveTags
-                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+                    tags={getCollectiveMainTag(
+                      get(collective, 'host.id'),
+                      collective.tags,
+                      collective.type,
+                      collective.settings,
+                    )}
                   />
                 </StyledTag>
               )}
@@ -211,22 +231,41 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                 )}
               </Flex>
               {host && collective.isApproved && !isEvent && (
-                <Container mx={1} color="#969ba3" my={2}>
-                  <FormattedMessage
-                    id="Collective.Hero.Host"
-                    defaultMessage="{FiscalHost}: {hostName}"
-                    values={{
-                      FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
-                      hostName: (
-                        <LinkCollective collective={host}>
-                          <Span data-cy="fiscalHostName" color="black.600">
-                            {host.name}
-                          </Span>
-                        </LinkCollective>
-                      ),
-                    }}
-                  />
-                </Container>
+                <Fragment>
+                  <Container mx={1} color="#969ba3" my={2}>
+                    <FormattedMessage
+                      id="Collective.Hero.Host"
+                      defaultMessage="{FiscalHost}: {hostName}"
+                      values={{
+                        FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} />,
+                        hostName: (
+                          <LinkCollective collective={host}>
+                            <Span data-cy="fiscalHostName" color="black.600">
+                              {host.name}
+                            </Span>
+                          </LinkCollective>
+                        ),
+                      }}
+                    />
+                  </Container>
+                  {collective.connectedTo.length !== 0 && (
+                    <Container mx={1} color="#969ba3" my="12px">
+                      <FormattedMessage
+                        id="Collective.Hero.Parent"
+                        defaultMessage="Part of: {parentName}"
+                        values={{
+                          parentName: (
+                            <LinkCollective collective={collective.connectedTo[0].collective}>
+                              <Span data-cy="parentCollectiveName" color="black.600">
+                                {collective.connectedTo[0].collective.name}
+                              </Span>
+                            </LinkCollective>
+                          ),
+                        }}
+                      />
+                    </Container>
+                  )}
+                </Fragment>
               )}
               {collective.canApply && (
                 <Fragment>
@@ -305,6 +344,16 @@ Hero.propTypes = {
     settings: PropTypes.shape({
       tos: PropTypes.string,
     }).isRequired,
+    connectedTo: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number,
+          name: PropTypes.string.isRequired,
+          slug: PropTypes.string.isRequired,
+        }),
+      }),
+    ),
     parentCollective: PropTypes.shape({
       slug: PropTypes.string,
     }),

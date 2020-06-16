@@ -47,7 +47,7 @@ class ConfirmEmailPage extends React.Component {
   }
 
   /**
-   * The reason for the logic arround the trigger of this function is that `refetchLoggedInUser`
+   * The reason for the logic around the trigger of this function is that `refetchLoggedInUser`
    * will not be effective if user is already loading (Apollo discards duplicate queries).
    */
   async triggerEmailValidation() {

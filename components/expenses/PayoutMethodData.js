@@ -7,6 +7,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 
 import Container from '../Container';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { P } from '../Text';
 
 const renderObject = object =>
@@ -38,11 +39,23 @@ export const payoutMethodHasData = payoutMethod => {
   }
 };
 
+const PRIVATE_DATA_PLACEHOLDER = '********';
+
+const getPmData = (payoutMethod, field, isLoading) => {
+  if (isLoading) {
+    return <LoadingPlaceholder height={15} />;
+  } else {
+    return get(payoutMethod, `data.${field}`, PRIVATE_DATA_PLACEHOLDER);
+  }
+};
+
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodData = ({ payoutMethod, showLabel }) => {
-  if (!payoutMethodHasData(payoutMethod)) {
+const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
+  if (isLoading && !payoutMethod) {
+    return <LoadingPlaceholder height={24} mb={2} />;
+  } else if (!payoutMethod) {
     return null;
   }
 
@@ -58,7 +71,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel }) => {
             </Container>
           )}
           <Container fontSize="11px" color="black.700">
-            {payoutMethod.data.email}
+            {getPmData(payoutMethod, 'email', isLoading)}
           </Container>
         </div>
       );
@@ -73,7 +86,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel }) => {
             </Container>
           )}
           <Container fontSize="11px" color="black.700">
-            {payoutMethod.data.content}
+            {getPmData(payoutMethod, 'content', isLoading)}
           </Container>
         </div>
       );
@@ -87,14 +100,20 @@ const PayoutMethodData = ({ payoutMethod, showLabel }) => {
               <PrivateInfoIcon color="#969BA3" />
             </Container>
           )}
-          <Container fontSize="11px" color="black.700">
-            <FormattedMessage
-              id="BankInfo.Type"
-              defaultMessage="Type: {type}"
-              values={{ type: upperCase(payoutMethod.data.type) }}
-            />
-            {renderObject(payoutMethod.data.details)}
-          </Container>
+          {payoutMethod.data ? (
+            <Container fontSize="11px" color="black.700">
+              <FormattedMessage
+                id="BankInfo.Type"
+                defaultMessage="Type: {type}"
+                values={{ type: upperCase(payoutMethod.data.type) }}
+              />
+              {renderObject(payoutMethod.data.details)}
+            </Container>
+          ) : isLoading ? (
+            <LoadingPlaceholder height="1.5em" />
+          ) : (
+            PRIVATE_DATA_PLACEHOLDER
+          )}
         </div>
       );
     default:
@@ -105,6 +124,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel }) => {
 PayoutMethodData.propTypes = {
   /** If false, only the raw data will be displayed */
   showLabel: PropTypes.bool,
+  isLoading: PropTypes.bool,
   payoutMethod: PropTypes.shape({
     id: PropTypes.string,
     type: PropTypes.oneOf(Object.values(PayoutMethodType)),

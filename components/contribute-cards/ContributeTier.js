@@ -138,7 +138,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
             </Box>
           )}
           {tier.maxQuantity > 0 && (
-            <P fontSize="1.1rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px">
+            <P fontSize="1.1rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px" mb={2}>
               <FormattedMessage
                 id="tier.limited"
                 values={{
@@ -149,7 +149,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
               />
             </P>
           )}
-          <P mb={4}>
+          <P mb={4} lineHeight="20px">
             {description}{' '}
             {(isTruncated || tier.hasLongDescription) && (
               <StyledLink

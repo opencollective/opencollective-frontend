@@ -80,9 +80,6 @@ const DiscoverPageDataQuery = gql`
           }
         }
         isPledged
-        memberOf {
-          id
-        }
         parentCollective {
           id
           slug

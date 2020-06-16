@@ -4,12 +4,13 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { CollectiveType } from '../lib/constants/collectives';
 import { canOrderTicketsFromEvent } from '../lib/events';
+import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
 
 import { AllSectionsNames, Dimensions, Sections } from './collective-page/_constants';
 import Avatar from './Avatar';
@@ -166,65 +167,16 @@ const CollectiveName = styled.h1`
   }
 `;
 
-const i18nSection = defineMessages({
-  [Sections.CONTRIBUTE]: {
-    id: 'Contribute',
-    defaultMessage: 'Contribute',
-  },
-  [Sections.CONVERSATIONS]: {
-    id: 'conversations',
-    defaultMessage: 'Conversations',
-  },
-  [Sections.BUDGET]: {
-    id: 'section.budget.title',
-    defaultMessage: 'Budget',
-  },
-  [Sections.CONTRIBUTORS]: {
-    id: 'section.contributors.title',
-    defaultMessage: 'Contributors',
-  },
-  [Sections.ABOUT]: {
-    id: 'collective.about.title',
-    defaultMessage: 'About',
-  },
-  [Sections.UPDATES]: {
-    id: 'section.updates.title',
-    defaultMessage: 'Updates',
-  },
-  [Sections.CONTRIBUTIONS]: {
-    id: 'Contributions',
-    defaultMessage: 'Contributions',
-  },
-  [Sections.TRANSACTIONS]: {
-    id: 'SectionTransactions.Title',
-    defaultMessage: 'Transactions',
-  },
-  [Sections.GOALS]: {
-    id: 'Goals',
-    defaultMessage: 'Goals',
-  },
-  [Sections.TICKETS]: {
-    id: 'section.tickets.title',
-    defaultMessage: 'Tickets',
-  },
-  [Sections.LOCATION]: {
-    id: 'SectionLocation.Title',
-    defaultMessage: 'Location',
-  },
-  [Sections.PARTICIPANTS]: {
-    id: 'CollectivePage.NavBar.Participants',
-    defaultMessage: 'Participants',
-  },
-});
-
 // Define default sections based on collective type
 const DEFAULT_SECTIONS = {
   [CollectiveType.ORGANIZATION]: [
+    Sections.CONTRIBUTE,
     Sections.CONTRIBUTIONS,
     Sections.CONTRIBUTORS,
     Sections.UPDATES,
     Sections.CONVERSATIONS,
     Sections.TRANSACTIONS,
+    Sections.BUDGET,
     Sections.ABOUT,
   ],
   [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
@@ -247,8 +199,29 @@ const DEFAULT_SECTIONS = {
   ],
 };
 
-const getDefaultSections = collective => {
-  return get(collective, 'settings.collectivePage.sections') || DEFAULT_SECTIONS[get(collective, 'type')] || [];
+/** Returns the default sections for collective */
+export const getDefaultSectionsForCollectiveType = type => {
+  return DEFAULT_SECTIONS[type] || [];
+};
+
+/** Returns the sections from collective's settings, fallbacks on default sections for type */
+export const getSectionsForCollective = collective => {
+  const collectiveSections = get(collective, 'settings.collectivePage.sections');
+  if (!collectiveSections) {
+    return getDefaultSectionsForCollectiveType(get(collective, 'type'));
+  }
+
+  // Convert legacy sections to the new format
+  const sections = [];
+  collectiveSections.forEach(sectionData => {
+    if (typeof sectionData === 'string') {
+      sections.push(sectionData);
+    } else if (sectionData.isEnabled) {
+      sections.push(sectionData.section);
+    }
+  });
+
+  return sections;
 };
 
 /**
@@ -262,17 +235,22 @@ const getDefaultSections = collective => {
  *    - `stats` {object} with following properties: `updates`, (`balance` or `transactions`)
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
-export const getSectionsForCollective = (collective, isAdmin) => {
-  const sections = getDefaultSections(collective);
+export const getFilteredSectionsForCollective = (collective, isAdmin) => {
+  const sections = getSectionsForCollective(collective);
   const toRemove = new Set();
   collective = collective || {};
   const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  const hasContribute = collective.isApproved;
+  const hasContribute = collective.isActive;
   const hasOtherWaysToContribute =
     !isEvent && (collective.events?.length > 0 || collective.connectedCollectives?.length > 0);
   if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
+    toRemove.add(Sections.CONTRIBUTE);
+  }
+
+  // Disallow Organizations to see contribute if not already "active"
+  if (!hasContribute && collective.type === CollectiveType.ORGANIZATION) {
     toRemove.add(Sections.CONTRIBUTE);
   }
 
@@ -298,15 +276,28 @@ export const getSectionsForCollective = (collective, isAdmin) => {
       toRemove.add(Sections.ABOUT);
     }
   }
+
   if (collective.type === CollectiveType.ORGANIZATION) {
     if (!hasFeature(collective, FEATURES.UPDATES)) {
       toRemove.add(Sections.UPDATES);
+    }
+    if (!collective.isActive) {
+      toRemove.add(Sections.BUDGET);
+    } else {
+      toRemove.add(Sections.TRANSACTIONS);
+    }
+  }
+
+  // Funds MVP, to refactor
+  if (collective.settings?.fund) {
+    if (!isAdmin) {
+      toRemove.add(Sections.BUDGET);
     }
   }
 
   if (isEvent) {
     // Should not see tickets section if you can't order them
-    if ((!collective.isApproved && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
+    if ((!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
       toRemove.add(Sections.TICKETS);
     }
 
@@ -331,7 +322,7 @@ const getDefaultCallsToactions = (collective, isAdmin) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   return {
     hasContact: collective.canContact,
-    hasApply: collective.canApply,
+    hasApply: collective.canApply && !isAdmin,
     hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
   };
 };
@@ -428,7 +419,7 @@ const CollectiveNavbar = ({
                     as={LinkComponent}
                     collectivePath={collective.path || `/${collective.slug}`}
                     section={section}
-                    label={i18nSection[section] ? intl.formatMessage(i18nSection[section]) : section}
+                    label={i18nCollectivePageSection(intl, section)}
                   />
                 </MenuLinkContainer>
               ))}
@@ -441,7 +432,7 @@ const CollectiveNavbar = ({
               )}
               {callsToAction.hasContact && (
                 <MenuLinkContainer mobileOnly>
-                  <MenuLink href={`mailto:hello@${collective.slug}.opencollective.com`}>
+                  <MenuLink as={Link} route="collective-contact" params={{ collectiveSlug: collective.slug }}>
                     <FormattedMessage id="Contact" defaultMessage="Contact" />
                   </MenuLink>
                 </MenuLinkContainer>

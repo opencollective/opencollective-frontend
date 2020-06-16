@@ -30,6 +30,7 @@ import EmptyBalance from './actions/EmptyBalance';
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
 import Conversations from './sections/Conversations';
+import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 // Fical Host Sections
 import FiscalHosting from './sections/FiscalHosting';
@@ -103,7 +104,7 @@ class EditCollectiveForm extends React.Component {
       },
       'tags.description': {
         id: 'collective.tags.edit.description',
-        defaultMessage: 'Make your Collective more discoverable (comma separated)',
+        defaultMessage: 'Make your Collective more discoverable',
       },
       'company.label': {
         id: 'collective.company.label',
@@ -168,6 +169,16 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.application.description',
         defaultMessage: 'Enable new Collectives to apply to join your Fiscal Host',
       },
+      /*
+      'isActive.label': {
+        id: 'collective.isActive.label',
+        defaultMessage: 'Direct Contributions',
+      },
+      'isActive.description': {
+        id: 'collective.isActive.description',
+        defaultMessage: 'Allow host to directly receive financial contributions and pay expenses',
+      },
+      */
       'hostFeePercent.label': {
         id: 'HostFee',
         defaultMessage: 'Host fee',
@@ -253,7 +264,7 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = { ...state.collective };
 
-      // GraphQL schema has address embeded within location
+      // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
       if (['address', 'country'].includes(fieldname)) {
         collective.location = collective.location || {};
@@ -332,6 +343,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS:
         return <CollectiveGoals collective={collective} currency={collective.currency} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE:
+        return <EditCollectivePage collective={collective} />;
+
       case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
         return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
 
@@ -407,7 +421,10 @@ class EditCollectiveForm extends React.Component {
                 </StyledButton>
               </Link>
 
-              <StyledLink href="https://docs.opencollective.com/help/backers-and-sponsors/gift-cards#faq" openInNewTab>
+              <StyledLink
+                href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards#faq"
+                openInNewTab
+              >
                 <InfoCircle size="1em" />
                 &nbsp;
                 <FormattedMessage id="Giftcard.learnMore" defaultMessage="Learn more about Gift Cards" />
@@ -679,6 +696,15 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'settings.apply'),
           when: () => collective.isHost,
         },
+        /*
+        {
+          name: 'isActive',
+          className: 'horizontal',
+          type: 'switch',
+          defaultValue: get(this.state.collective, 'isActive'),
+          when: () => collective.isHost,
+        },
+        */
         {
           name: 'hostFeePercent',
           type: 'number',

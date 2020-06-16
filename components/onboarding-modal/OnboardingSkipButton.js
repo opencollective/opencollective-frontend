@@ -9,11 +9,10 @@ import StyledButton from '../../components/StyledButton';
 class OnboardingSkipButton extends React.Component {
   static propTypes = {
     slug: PropTypes.string,
-    onClose: PropTypes.func,
   };
 
   render() {
-    const { slug, onClose } = this.props;
+    const { slug } = this.props;
 
     return (
       <StyledButton
@@ -22,7 +21,6 @@ class OnboardingSkipButton extends React.Component {
         buttonStyle="primary"
         onClick={() => {
           Router.pushRoute('collective-with-onboarding', { slug });
-          () => onClose();
         }}
       >
         <FormattedMessage id="SkipOnboarding" defaultMessage="Skip onboarding" />

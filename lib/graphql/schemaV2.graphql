@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu May 21 2020 14:27:46 GMT+0000 (Coordinated Universal Time)
+# timestamp: Thu Jun 11 2020 14:05:52 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -49,6 +49,16 @@ interface Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
   members(
     limit: Int = 100
     offset: Int = 0
@@ -113,6 +123,16 @@ interface Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(
+    """
+    Filter on given types (creditcard, virtualcard...)
+    """
+    types: [String]
+  ): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -192,6 +212,7 @@ type AccountStats {
   """
   totalAmountReceived: Amount
   yearlyBudget: Amount
+  yearlyBudgetManaged: Amount
 }
 
 """
@@ -254,6 +275,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_TRANSACTION_CREATED
@@ -321,6 +343,16 @@ type Bot implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -380,6 +412,11 @@ type Bot implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -452,6 +489,16 @@ type Collective implements Account {
   isArchived: Boolean
 
   """
+  Returns whether this collective is active
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -513,6 +560,11 @@ type Collective implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -544,11 +596,6 @@ type Collective implements Account {
   isApproved: Boolean
 
   """
-  Returns whether this collective is active
-  """
-  isActive: Boolean
-
-  """
   Number of unique financial contributors of the collective.
   """
   totalFinancialContributors(
@@ -565,6 +612,7 @@ input CollectiveCreateInput {
   description: String!
   tags: [String]
   githubHandle: String
+  settings: JSON
 }
 
 """
@@ -2139,6 +2187,16 @@ type Event implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -2198,6 +2256,11 @@ type Event implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -2271,6 +2334,10 @@ type Expense {
   The state of the expense (pending, approved, paid, rejected...etc)
   """
   status: ExpenseStatus!
+
+  """
+  Returns the list of comments for this expense, or `null` if user is not allowed to see them
+  """
   comments(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2282,7 +2349,7 @@ type Expense {
     """
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
-  ): CommentCollection!
+  ): CommentCollection
 
   """
   The account where the expense was submitted
@@ -2562,6 +2629,11 @@ type ExpensePermissions {
   Whether the current user can mark this expense as unpaid
   """
   canMarkAsUnpaid: Boolean!
+
+  """
+  Whether the current user can comment and see comments for this expense
+  """
+  canComment: Boolean!
 }
 
 """
@@ -2589,6 +2661,11 @@ enum ExpenseProcessAction {
   MARK_AS_UNPAID
 
   """
+  To schedule the expense for payment
+  """
+  SCHEDULE_FOR_PAYMENT
+
+  """
   To trigger the payment
   """
   PAY
@@ -2613,6 +2690,7 @@ enum ExpenseStatus {
   PROCESSING
   ERROR
   PAID
+  SCHEDULED_FOR_PAYMENT
 }
 
 """
@@ -2733,6 +2811,16 @@ type Host implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -2792,6 +2880,11 @@ type Host implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -2923,6 +3016,16 @@ type Individual implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -2982,6 +3085,11 @@ type Individual implements Account {
   The list of payout methods that this collective can use to get paid
   """
   payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3375,6 +3483,46 @@ type Mutation {
     """
     order: OrderReferenceInput!
   ): Order
+
+  """
+  Update an Order's amount, tier, or payment method
+  """
+  updateOrder(
+    """
+    Reference to the Order to update
+    """
+    order: OrderReferenceInput!
+
+    """
+    Reference to a Payment Method to update the order with
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Reference to a Tier to update the order with
+    """
+    tier: TierReferenceInput
+
+    """
+    An Amount to update the order to
+    """
+    amount: Int
+  ): Order
+
+  """
+  Add a new payment method to be used with an Order
+  """
+  addStripeCreditCard(
+    """
+    A Payment Method to add to an Account
+    """
+    paymentMethod: PaymentMethodCreateInput
+
+    """
+    Account to add Payment Method to
+    """
+    account: AccountReferenceInput
+  ): PaymentMethod
 }
 
 """
@@ -3398,6 +3546,7 @@ type Order {
   in calculating this.
   """
   totalDonations: Amount
+  paymentMethod: PaymentMethod
 }
 
 """
@@ -3478,6 +3627,16 @@ type Organization implements Account {
   isArchived: Boolean
 
   """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -3539,6 +3698,11 @@ type Organization implements Account {
   payoutMethods: [PayoutMethod]
 
   """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
@@ -3550,7 +3714,53 @@ type Organization implements Account {
   """
   location: Location
   stats: AccountStats
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
+}
+
+"""
+PaymentMethod model
+"""
+type PaymentMethod {
+  id: String
+  legacyId: Int
+  name: String
+  service: String
+  type: String
+
+  """
+  Returns the balance amount and the currency of this paymentMethod
+  """
+  balance: Amount
+  account: Account
+  data: JSON
+}
+
+input PaymentMethodCreateInput {
+  data: PaymentMethodDataInput
+  name: String
+  token: String
+}
+
+input PaymentMethodDataInput {
+  brand: String!
+  country: String!
+  expMonth: Int!
+  expYear: Int!
+  fullName: String
+  funding: String
+  zip: String
+}
+
+input PaymentMethodReferenceInput {
+  """
+  The id assigned to the payment method
+  """
+  id: String
 }
 
 """
@@ -3810,6 +4020,13 @@ type Tier {
   Get all orders
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
+}
+
+input TierReferenceInput {
+  """
+  The legacy id assigned to the Tier
+  """
+  legacyId: Int
 }
 
 """

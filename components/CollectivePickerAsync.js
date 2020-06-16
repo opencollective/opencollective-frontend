@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import formatCollectiveType from '../lib/i18n-collective-type';
+import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
@@ -28,9 +28,9 @@ const DEFAULT_SEARCH_QUERY = gql`
 `;
 
 /** Throttle search function to limit invocations while typing */
-const throttledSearch = throttle((searchFunc, variables) => {
+const throttledSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
-}, 500);
+}, 750);
 
 const Messages = defineMessages({
   searchForType: {
@@ -55,18 +55,18 @@ const Messages = defineMessages({
  * If a single type is selected, will return a label like: `Search for users`
  * Otherwise it just returns `Search`
  */
-const getPlaceholder = (formatMessage, types) => {
+const getPlaceholder = (intl, types) => {
   const nbTypes = types ? types.length : 0;
   if (nbTypes === 0 || nbTypes > 3) {
-    return formatMessage(Messages.search);
+    return intl.formatMessage(Messages.search);
   } else if (nbTypes === 1) {
-    return formatMessage(Messages.searchForType, { entity: formatCollectiveType(formatMessage, types[0], 100) });
+    return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
   } else {
     // Format by passing a map of entities like { entity1: 'Collectives' }
-    return formatMessage(
+    return intl.formatMessage(
       Messages[`searchForType_${nbTypes}`],
       types.reduce((i18nParams, type, index) => {
-        i18nParams[`entity${index + 1}`] = formatCollectiveType(formatMessage, type, 100);
+        i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100);
         return i18nParams;
       }, {}),
     );
@@ -79,10 +79,10 @@ const getPlaceholder = (formatMessage, types) => {
 const CollectivePickerAsync = ({ types, limit, hostCollectiveIds, preload, filterResults, searchQuery, ...props }) => {
   const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery);
   const [term, setTerm] = React.useState(null);
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
   const collectives = ((term || preload) && data?.search?.collectives) || [];
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
-  const placeholder = getPlaceholder(formatMessage, types);
+  const placeholder = getPlaceholder(intl, types);
 
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {

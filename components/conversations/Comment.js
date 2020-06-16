@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
-import { Edit } from '@styled-icons/feather/Edit';
 import { X } from '@styled-icons/feather/X';
+import { Edit } from '@styled-icons/material/Edit';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
+import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -13,25 +15,60 @@ import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Hide from '../Hide';
 import HTMLContent from '../HTMLContent';
+import RoundHoriztonalDotsIcon from '../icons/RoundHorizontalDotsIcon';
 import InlineEditField from '../InlineEditField';
 import LinkCollective from '../LinkCollective';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
+import StyledHr from '../StyledHr';
 import { P } from '../Text';
 
 import { CommentFieldsFragment } from './graphql';
 
 const CommentBtn = styled(StyledButton)`
-  height: 32px;
-  padding: 4px 16px;
+  padding: 3px 5px;
+  margin: 5px 0;
+  width: 100%;
+  text-align: left;
+  border: none;
+
   span {
-    margin-left: 0.5em;
-    @media (max-width: 52em) {
-      display: none;
-    }
+    margin-left: 12px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: -0.1px;
+  }
+`;
+
+const AdminActionsPopupContainer = styled(Flex)`
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid rgba(49, 50, 51, 0.1);
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
+  width: 184px;
+  padding: 16px;
+  z-index: 1;
+`;
+
+const ActionButton = styled(StyledButton)`
+  padding: 4px 12px;
+  height: 24px;
+  color: #dadada;
+  display: flex;
+  justify-content: center;
+  border-color: ${themeGet('colors.black.200')};
+
+  &:active {
+    background-color: ${themeGet('colors.white.full')};
+    border-color: ${themeGet('colors.white.full')};
+  }
+  &:focus {
+    border-color: ${themeGet('colors.white.full')};
+    color: #dadada;
   }
 `;
 
@@ -54,28 +91,164 @@ const editCommentMutation = gqlV2`
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
+const REACT_POPPER_MODIFIERS = [
+  {
+    name: 'offset',
+    options: {
+      offset: [0, 8],
+    },
+  },
+];
+
 /**
  * Action buttons for the comment owner. Styles change between mobile and desktop.
  */
-const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, onDelete, onEdit }) => {
-  const [isDeleting, setDeleting] = React.useState(null);
-  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
-
+const AdminActionButtons = ({ canEdit, canDelete, openDeleteConfirmation, onEdit, closePopup }) => {
   return (
     <React.Fragment>
       {/** Buttons */}
       {canEdit && (
-        <CommentBtn onClick={onEdit} ml={2} data-cy="edit-comment-button">
-          <Edit size="1em" />
+        <CommentBtn
+          data-cy="edit-comment-button"
+          onClick={() => {
+            closePopup();
+            onEdit();
+          }}
+        >
+          <Edit size="1em" mr={2} />
           <FormattedMessage tagName="span" id="Edit" defaultMessage="Edit" />
         </CommentBtn>
       )}
       {canDelete && (
-        <CommentBtn onClick={() => setDeleting(true)} ml={2} data-cy="delete-comment-button">
-          <X size="1em" />
+        <CommentBtn
+          data-cy="delete-comment-button"
+          onClick={() => {
+            closePopup();
+            openDeleteConfirmation();
+          }}
+          color="red.600"
+        >
+          <X size="1em" mr={2} />
           <FormattedMessage tagName="span" id="actions.delete" defaultMessage="Delete" />
         </CommentBtn>
       )}
+    </React.Fragment>
+  );
+};
+
+AdminActionButtons.propTypes = {
+  comment: PropTypes.object.isRequired,
+  openDeleteConfirmation: PropTypes.func,
+  onEdit: PropTypes.func,
+  closePopup: PropTypes.func,
+  isConversationRoot: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  canDelete: PropTypes.bool,
+};
+
+/**
+ * A custom hook to close the popper
+ */
+const useClosePopper = (popperState, closePopper) => {
+  React.useEffect(() => {
+    function handleOnClick(event) {
+      if (popperState && !popperState.elements.reference.contains(event.target)) {
+        closePopper();
+      }
+    }
+
+    document.addEventListener('click', handleOnClick);
+    return () => {
+      document.removeEventListener('click', handleOnClick);
+    };
+  }, [popperState, closePopper]);
+};
+
+/**
+ * Render a comment.
+ *
+ * /!\ Can only be used with data from API V2.
+ */
+const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight, isConversationRoot, onDelete }) => {
+  const [isEditing, setEditing] = React.useState(false);
+  const [isDeleting, setDeleting] = React.useState(null);
+  const [showAdminActions, setShowAdminActions] = React.useState(false);
+  const [refElement, setRefElement] = React.useState(null);
+  const [popperElement, setPopperElement] = React.useState(null);
+
+  const closePopup = () => {
+    if (showAdminActions) {
+      setShowAdminActions(false);
+    }
+  };
+  const hasActions = !withoutActions && !isEditing && (canEdit || canDelete);
+
+  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
+  const { styles, attributes, state } = usePopper(refElement, popperElement, {
+    placement: 'bottom-start',
+    modifiers: REACT_POPPER_MODIFIERS,
+  });
+  useClosePopper(state, closePopup);
+
+  return (
+    <Container width="100%" data-cy="comment">
+      <Flex mb={3} justifyContent="space-between">
+        <Flex>
+          <Box mr={3}>
+            <LinkCollective collective={comment.fromCollective}>
+              <Avatar collective={comment.fromCollective} radius={40} />
+            </LinkCollective>
+          </Box>
+          <Flex flexDirection="column">
+            <LinkCollective collective={comment.fromCollective}>
+              <P color="black.800" fontWeight="500" truncateOverflow>
+                {comment.fromCollective.name}
+              </P>
+            </LinkCollective>
+            <P fontSize="Caption" color="black.600" truncateOverflow title={comment.createdAt}>
+              <FormattedMessage
+                id="Comment.PostedOn"
+                defaultMessage="Posted on {createdAt, date, long}"
+                values={{ createdAt: new Date(comment.createdAt) }}
+              />
+            </P>
+          </Flex>
+        </Flex>
+        {hasActions && (
+          <ActionButton ref={setRefElement} onClick={() => setShowAdminActions(!showAdminActions)}>
+            <RoundHoriztonalDotsIcon size="16" />
+          </ActionButton>
+        )}
+        {showAdminActions && hasActions && (
+          <AdminActionsPopupContainer ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+            <Flex justifyContent="space-between" alignItems="center">
+              <P
+                fontWeight="600"
+                fontSize="H6"
+                lineHeight="H6"
+                textTransform="uppercase"
+                letterSpacing="0.6px"
+                whiteSpace="nowrap"
+                pr={2}
+              >
+                <FormattedMessage id="comment.actions" defaultMessage="Comment Actions" />
+              </P>
+              <StyledHr flex="1" borderStyle="solid" borderColor="black.300" />
+            </Flex>
+            <Flex flexDirection="column" alignItems="flex-start">
+              <AdminActionButtons
+                comment={comment}
+                isConversationRoot={isConversationRoot}
+                openDeleteConfirmation={() => setDeleting(true)}
+                onEdit={() => setEditing(true)}
+                canEdit={canEdit}
+                canDelete={canDelete}
+                closePopup={closePopup}
+              />
+            </Flex>
+          </AdminActionsPopupContainer>
+        )}
+      </Flex>
       {/** Confirm Modals */}
       {isDeleting && (
         <ConfirmationModal
@@ -116,72 +289,6 @@ const AdminActionButtons = ({ comment, canEdit, canDelete, isConversationRoot, o
           )}
         </ConfirmationModal>
       )}
-    </React.Fragment>
-  );
-};
-
-AdminActionButtons.propTypes = {
-  comment: PropTypes.object.isRequired,
-  onDelete: PropTypes.func,
-  onEdit: PropTypes.func,
-  isConversationRoot: PropTypes.bool,
-  canEdit: PropTypes.bool,
-  canDelete: PropTypes.bool,
-};
-
-/**
- * Render a comment.
- *
- * /!\ Can only be used with data from API V2.
- */
-const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight, isConversationRoot, onDelete }) => {
-  const [isEditing, setEditing] = React.useState(false);
-  const hasActions = !withoutActions && !isEditing && (canEdit || canDelete);
-
-  const actionButtons =
-    withoutActions || isEditing ? null : (
-      <Flex>
-        {hasActions && (
-          <AdminActionButtons
-            comment={comment}
-            isConversationRoot={isConversationRoot}
-            onDelete={onDelete}
-            onEdit={() => setEditing(true)}
-            canEdit={canEdit}
-            canDelete={canDelete}
-          />
-        )}
-      </Flex>
-    );
-
-  return (
-    <Container width="100%" data-cy="comment">
-      <Flex mb={3} justifyContent="space-between">
-        <Flex>
-          <Box mr={3}>
-            <LinkCollective collective={comment.fromCollective}>
-              <Avatar collective={comment.fromCollective} radius={40} />
-            </LinkCollective>
-          </Box>
-          <Flex flexDirection="column">
-            <LinkCollective collective={comment.fromCollective}>
-              <P color="black.800" fontWeight="500" truncateOverflow>
-                {comment.fromCollective.name}
-              </P>
-            </LinkCollective>
-            <P fontSize="Caption" color="black.600" truncateOverflow title={comment.createdAt}>
-              <FormattedMessage
-                id="Comment.PostedOn"
-                defaultMessage="Posted on {createdAt, date, long}"
-                values={{ createdAt: new Date(comment.createdAt) }}
-              />
-            </P>
-          </Flex>
-        </Flex>
-        <Hide xs sm>
-          {actionButtons}
-        </Hide>
-      </Flex>
       <Box position="relative" maxHeight={maxCommentHeight} css={{ overflowY: 'auto' }}>
         <InlineEditField
           mutation={editCommentMutation}
@@ -210,9 +317,6 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
           }
         </InlineEditField>
       </Box>
-      <Hide md lg mt={3}>
-        {actionButtons}
-      </Hide>
     </Container>
   );
 };

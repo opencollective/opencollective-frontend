@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
-// OC Frontend imports
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import CollectiveNavbar, { getSectionsForCollective } from '../CollectiveNavbar';
+import CollectiveNavbar, { getFilteredSectionsForCollective } from '../CollectiveNavbar';
 import Container from '../Container';
 
 import Hero from './hero/Hero';
@@ -22,7 +21,6 @@ import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
 import SectionTransactions from './sections/Transactions';
 import SectionUpdates from './sections/Updates';
-// Collective page imports
 import { Sections } from './_constants';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
@@ -77,8 +75,8 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  getSections = memoizeOne(props => {
-    return getSectionsForCollective(props.collective, props.isAdmin);
+  getSections = memoizeOne((collective, isAdmin) => {
+    return getFilteredSectionsForCollective(collective, isAdmin);
   });
 
   onScroll = throttle(() => {
@@ -99,7 +97,7 @@ class CollectivePage extends Component {
     // Get the currently section that is at the top of the screen.
     const distanceThreshold = 200;
     const breakpoint = window.scrollY + distanceThreshold;
-    const sections = this.getSections(this.props);
+    const sections = this.getSections(this.props.collective, this.props.isAdmin);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
@@ -128,18 +126,23 @@ class CollectivePage extends Component {
     }
   };
 
-  getCallsToAction = memoizeOne((type, isHost, isAdmin, isRoot, canApply, canContact, isArchived) => {
-    const isCollective = type === CollectiveType.COLLECTIVE;
-    const isEvent = type === CollectiveType.EVENT;
-    return {
-      hasContact: !isAdmin && canContact,
-      hasSubmitExpense: (isCollective || isEvent) && !isArchived,
-      hasApply: canApply,
-      hasDashboard: isHost && isAdmin,
-      hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
-      addFunds: isRoot && type === CollectiveType.ORGANIZATION,
-    };
-  });
+  getCallsToAction = memoizeOne(
+    (type, isHost, isAdmin, isRoot, isAuthenticated, canApply, canContact, isArchived, isActive, isFund) => {
+      const isCollective = type === CollectiveType.COLLECTIVE;
+      const isEvent = type === CollectiveType.EVENT;
+      return {
+        hasContact: !isAdmin && canContact && (!isFund || isAuthenticated),
+        hasContribute: isFund && isActive,
+        hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
+        // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
+        hasApply: canApply && !isAdmin,
+        hasDashboard: isHost && isAdmin,
+        hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
+        // Don't display "Add Funds" if it's an Host and you're the Admin
+        addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
+      };
+    },
+  );
 
   onCollectiveClick = () => {
     window.scrollTo(0, 0);
@@ -221,18 +224,23 @@ class CollectivePage extends Component {
   }
 
   render() {
-    const { collective, host, isAdmin, isRoot, onPrimaryColorChange } = this.props;
-    const { type, isHost, canApply, canContact } = collective;
+    const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser } = this.props;
+    const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
-    const sections = this.getSections(this.props);
+    const sections = this.getSections(this.props.collective, this.props.isAdmin);
+    const isFund = settings?.fund === true; // Funds MVP, to refactor
+    const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(
       type,
       isHost,
       isAdmin,
       isRoot,
+      isAuthenticated,
       canApply,
       canContact,
       collective.isArchived,
+      isActive,
+      isFund,
     );
 
     return (

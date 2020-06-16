@@ -12,6 +12,8 @@ const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
 const DUPLICATED_IGNORED_IDS = new Set(['section.team.title', 'contribute.step.details']);
 const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other']);
 
+/* eslint-disable no-console */
+
 // Aggregates the default messages that were extracted from the app's
 // React components via the React Intl Babel plugin. An error will be thrown if
 // there are messages in different components that use the same `id`. The result

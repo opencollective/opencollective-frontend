@@ -212,6 +212,7 @@ const getDataQuery = gql`
       slug
       name
       isHost
+      isActive
       currency
       paymentMethods(includeHostCollectivePaymentMethod: true) {
         id

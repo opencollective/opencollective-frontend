@@ -8,8 +8,8 @@ import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { TransactionTypes } from '../lib/constants/transactions';
-import { i18nExpenseCategory, i18nExpenseType } from '../lib/i18n-expense';
-import { i18nPaymentMethodType } from '../lib/i18n-payment-method-type';
+import { i18nExpenseCategory, i18nExpenseType } from '../lib/i18n/expense';
+import { i18nPaymentMethodType } from '../lib/i18n/payment-method-type';
 import { formatCurrency } from './../lib/currency-utils';
 
 import ExpenseStatusTag from './expenses/ExpenseStatusTag';
@@ -269,12 +269,14 @@ const getItemInfo = (item, isInverted, isFeesOnTop) => {
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' | ';
 
-const formatFee = (value, totalAmount, currency, name) => {
+const formatFee = (value, totalAmount, currency, name, showPercent = true) => {
   if (!value || !totalAmount) {
     return '';
-  } else {
+  } else if (showPercent) {
     const percentage = round((value / totalAmount) * 100, 2);
     return ` ${formatCurrency(value, currency)} (${percentage}% ${name})`;
+  } else {
+    return ` ${formatCurrency(value, currency)} (${name})`;
   }
 };
 
@@ -282,7 +284,13 @@ const getAmountDetailsStr = (amount, currency, transaction, platformFee) => {
   const totalAmount = formatCurrency(Math.abs(amount), currency);
   const pFee = formatFee(platformFee, amount, currency, 'Open Collective fee');
   const hostFee = formatFee(transaction.hostFeeInHostCurrency, amount, currency, 'host fee');
-  const pmFee = formatFee(transaction.paymentProcessorFeeInHostCurrency, amount, currency, 'payment processor fee');
+  const pmFee = formatFee(
+    transaction.paymentProcessorFeeInHostCurrency,
+    amount,
+    currency,
+    'payment processor fee',
+    false,
+  );
   return (
     <React.Fragment>
       <strong>{totalAmount}</strong>

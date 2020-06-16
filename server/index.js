@@ -1,6 +1,5 @@
 require('../env');
 
-const http = require('http');
 const path = require('path');
 
 const next = require('next');
@@ -14,41 +13,39 @@ const logger = require('./logger');
 const loggerMiddleware = require('./logger-middleware');
 const routes = require('./routes');
 const { Sentry } = require('./sentry');
+const hyperwatch = require('./hyperwatch');
 
-const server = express();
+const app = express();
 
-server.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
 const env = process.env.NODE_ENV;
 const dev = env === 'development';
 
-const app = next({ dev, dir: path.dirname(__dirname) });
+const nextApp = next({ dev, dir: path.dirname(__dirname) });
 
 const port = process.env.PORT;
 
-app.prepare().then(() => {
+nextApp.prepare().then(() => {
   // app.buildId is only available after app.prepare(), hence why we setup here
-  server.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.requestHandler());
 
-  server.use(loggerMiddleware.logger);
+  hyperwatch(app);
 
-  server.use(helmet());
+  app.use(helmet());
 
-  server.use(cookieParser());
+  app.use(cookieParser());
 
-  server.use(intl.middleware());
+  app.use(intl.middleware());
 
-  server.use(routes(server, app));
-  server.use(Sentry.Handlers.errorHandler());
-  server.use(loggerMiddleware.errorLogger);
+  app.use(routes(app, nextApp));
+  app.use(Sentry.Handlers.errorHandler());
+  app.use(loggerMiddleware.errorLogger);
 
-  const httpServer = http.createServer(server);
-
-  httpServer.on('error', err => {
-    logger.error(`Can't start server on http://localhost:${port} in ${env} environment. %s`, err);
-  });
-
-  httpServer.listen(port, () => {
-    logger.info(`Ready on http://localhost:${port} in ${env} environment`);
+  app.listen(port, err => {
+    if (err) {
+      throw err;
+    }
+    logger.info(`Ready on http://localhost:${port}`);
   });
 });

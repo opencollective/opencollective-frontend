@@ -9,6 +9,7 @@ import slugify from 'slugify';
 import styled from 'styled-components';
 
 import { defaultImage } from '../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { getCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
@@ -16,16 +17,19 @@ import { Router } from '../server/pages';
 
 import Avatar from '../components/Avatar';
 import Body from '../components/Body';
-import ButtonGroup from '../components/ButtonGroup';
 import Container from '../components/Container';
 import Currency from '../components/Currency';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import StyledButtonSet from '../components/StyledButtonSet';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
+import StyledInputAmount from '../components/StyledInputAmount';
+import StyledInputField from '../components/StyledInputField';
 import StyledInputGroup from '../components/StyledInputGroup';
 import StyledLink from '../components/StyledLink';
 import { H3, H4, H5, P } from '../components/Text';
@@ -95,35 +99,51 @@ const WordCountTextarea = () => {
   );
 };
 
-const AmountField = ({ LoggedInUser }) => {
-  const [amount, setAmount] = useState(20);
-  return (
-    <Flex justifyContent="space-between" alignItems="flex-end" flexWrap="wrap">
-      <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
-        <P {...labelStyles} htmlFor="presetAmount">
-          Amount ({LoggedInUser && LoggedInUser.collective.currency})
-        </P>
-        <ButtonGroup onChange={value => setAmount(() => value)} value={amount} values={[5, 10, 15, 20, 50, 100, 250]} />
-      </Flex>
+const AMOUNT_OPTIONS = [500, 1000, 1500, 2000, 5000, 10000, 25000];
 
-      <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
-        <P {...labelStyles} htmlFor="totalAmount">
-          Custom
-        </P>
-        <TextInput
-          id="totalAmount"
-          name="totalAmount"
-          width={[1, null, 70]}
-          onChange={({ target }) => setAmount(() => target.value)}
-          value={amount}
-        />
+const AmountField = () => {
+  const [amount, setAmount] = useState(2000);
+  return (
+    <Flex flexDirection="column" mb={3} width={[1, 'auto', 'auto']}>
+      <Flex mb={3}>
+        <StyledInputField
+          label={
+            <P {...labelStyles}>
+              <FormattedMessage
+                id="contribution.amount.currency.label"
+                defaultMessage="Amount ({currency})"
+                values={{ currency: 'USD' }}
+              />
+            </P>
+          }
+          htmlFor="amount"
+          css={{ flexGrow: 1 }}
+        >
+          {fieldProps => (
+            <Flex>
+              <StyledButtonSet combo items={AMOUNT_OPTIONS} selected={amount} onChange={value => setAmount(value)}>
+                {({ item }) => <Currency value={item} currency="USD" />}
+              </StyledButtonSet>
+              <StyledInputAmount
+                {...fieldProps}
+                type="number"
+                currency="USD"
+                min={100}
+                value={amount}
+                width={1}
+                onChange={amount => setAmount(amount)}
+                containerProps={{ borderRadius: '0 4px 4px 0', ml: '-1px' }}
+                prependProps={{ pl: 2, pr: 0, bg: 'white.full' }}
+                px="2px"
+                minWidth={75}
+                required
+              />
+            </Flex>
+          )}
+        </StyledInputField>
       </Flex>
     </Flex>
   );
-};
-
-AmountField.propTypes = {
-  LoggedInUser: PropTypes.object,
 };
 
 class CreatePledgePage extends React.Component {
@@ -176,7 +196,7 @@ class CreatePledgePage extends React.Component {
     event.preventDefault();
     const {
       target: {
-        elements: { name, slug, totalAmount, fromCollective, githubHandle, publicMessage, interval },
+        elements: { name, slug, amount, fromCollective, githubHandle, publicMessage, interval },
       },
     } = event;
     const { data } = this.props;
@@ -188,7 +208,7 @@ class CreatePledgePage extends React.Component {
       fromCollective: {
         id: Number(fromCollective.value),
       },
-      totalAmount: Number(totalAmount.value) * 100,
+      totalAmount: Number(amount.value) * 100,
       publicMessage: publicMessage.value,
     };
 
@@ -217,7 +237,8 @@ class CreatePledgePage extends React.Component {
       }
     } catch (error) {
       this.setState({
-        errorMessage: error.toString().replace('GraphQL error:', '').trim(),
+        errorMessage: getErrorFromGraphqlException(error).message,
+        submitting: false,
       });
     } finally {
       this.setState({ submitting: false });
@@ -483,7 +504,7 @@ class CreatePledgePage extends React.Component {
 
               {errorMessage && (
                 <P color="red.500" data-cy="errorMessage" mt={3}>
-                  {errorMessage}
+                  <FormattedMessage id="errorMsg" defaultMessage="Error: {error}" values={{ error: errorMessage }} />
                 </P>
               )}
             </Container>
@@ -638,9 +659,8 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.howToClaim"
-                  defaultMessage="You’ll need to authenticate with the github profile that owns / admins that project. Just click on the
-                Claim Collective button in the pledged collective. We will be rolling out other forms of authentication
-                in the future."
+                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project."
+                  values={I18nFormatters}
                 />
               </Details>
             </Container>

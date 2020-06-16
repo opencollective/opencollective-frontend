@@ -125,7 +125,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
           </Flex>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
             <P fontSize="LeadParagraph" fontWeight="bold">
-              {formatCurrency(host.stats.yearlyBudget.value * 100, host.currency, { precision: 0 })}
+              {formatCurrency(host.stats.yearlyBudgetManaged.value * 100, host.currency, { precision: 0 })}
             </P>
             <P ml={2} fontSize="Caption">
               {host.currency} {formatMessage(messages.managed)}

@@ -52,6 +52,11 @@ const HostFieldsFragment = gqlV2`
     type
     expensePolicy
     website
+    settings
+    connectedAccounts {
+      id
+      service
+    }
     location {
       address
       country
@@ -96,6 +101,10 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
+      location {
+        address
+        country
+      }
       payoutMethods {
         id
         type
@@ -130,6 +139,14 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         tag
       }
 
+      ... on Organization {
+        id
+        isHost
+        balance
+        # Missing
+        # ...HostFieldsFragment
+      }
+
       ... on Collective {
         id
         isApproved
@@ -159,7 +176,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       type
       data
     }
-    comments {
+    comments(limit: 300) {
       nodes {
         ...CommentFields
       }
@@ -173,6 +190,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       canReject
       canPay
       canMarkAsUnpaid
+      canComment
     }
     activities {
       id
