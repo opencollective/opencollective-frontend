@@ -49,6 +49,7 @@ class CollectivePage extends Component {
     connectedCollectives: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
+    isHostAdmin: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
     onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
@@ -76,8 +77,8 @@ class CollectivePage extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  getSections = memoizeOne((collective, isAdmin) => {
-    return getFilteredSectionsForCollective(collective, isAdmin);
+  getSections = memoizeOne((collective, isAdmin, isHostAdmin) => {
+    return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   });
 
   onScroll = throttle(() => {
@@ -98,7 +99,7 @@ class CollectivePage extends Component {
     // Get the currently section that is at the top of the screen.
     const distanceThreshold = 200;
     const breakpoint = window.scrollY + distanceThreshold;
-    const sections = this.getSections(this.props.collective, this.props.isAdmin);
+    const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
     for (let i = sections.length - 1; i >= 0; i--) {
       const sectionName = sections[i];
       const sectionRef = this.sectionsRefs[sectionName];
@@ -232,8 +233,7 @@ class CollectivePage extends Component {
     const { collective, host, isAdmin, isRoot, onPrimaryColorChange, LoggedInUser } = this.props;
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
-    const sections = this.getSections(this.props.collective, this.props.isAdmin);
-
+    const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
     const isFund = settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(

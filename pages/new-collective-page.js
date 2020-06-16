@@ -179,6 +179,7 @@ class NewCollectivePage extends React.Component {
                   conversations={collective.conversations}
                   LoggedInUser={LoggedInUser}
                   isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
+                  isHostAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective.host))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
                   onPrimaryColorChange={onPrimaryColorChange}
                   step={step}
