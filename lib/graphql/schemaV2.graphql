@@ -306,7 +306,6 @@ A financial amount.
 type Amount {
   value: Float
   currency: Currency
-  valueInCents: Float
 }
 
 """
@@ -322,11 +321,6 @@ input AmountInput {
   The currency string
   """
   currency: Currency
-
-  """
-  The value in cents
-  """
-  valueInCents: Int
 }
 
 """

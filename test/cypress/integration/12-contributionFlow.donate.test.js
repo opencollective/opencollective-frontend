@@ -5,11 +5,10 @@ const visitParams = { onBeforeLoad: mockRecaptcha };
 
 describe('Contribution Flow: Donate', () => {
   it('Can donate as new user', () => {
-    // Mock clock so we can check next contribution date in a consistent way
-    cy.clock(Date.parse('2042/05/25'));
-
     const userParams = { firstName: 'Donate', lastName: 'Tester' };
     cy.signup({ user: userParams, redirect: '/apex/donate', visitParams }).then(user => {
+      // Mock clock so we can check next contribution date in a consistent way
+      cy.clock(Date.parse('2042/05/25'));
       // ---- Step 1: Select profile ----
       // Personnal account must be the first entry, and it must be checked
       cy.contains('#contributeAs > label:first', `${user.firstName} ${user.lastName}`);
@@ -77,7 +76,7 @@ describe('Contribution Flow: Donate', () => {
       cy.checkStepsProgress({ enabled: 'contributeAs', disabled: ['details', 'payment'] });
 
       // Previous credit card should be added to the account
-      cy.reload(visitParams).reload(visitParams);
+      cy.reload(visitParams);
       cy.contains('Next step').click();
       cy.contains('Next step').click();
       cy.contains('#PaymentMethod label:first', 'VISA ****');

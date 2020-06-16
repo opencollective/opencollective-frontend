@@ -192,6 +192,7 @@ const DEFAULT_SECTIONS = {
     Sections.CONVERSATIONS,
     Sections.BUDGET,
     Sections.CONTRIBUTORS,
+    Sections.RECURRING_CONTRIBUTIONS,
     Sections.ABOUT,
   ],
   [CollectiveType.EVENT]: [
