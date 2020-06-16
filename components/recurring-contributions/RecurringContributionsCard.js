@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -31,14 +31,6 @@ const getBackground = collective => {
 };
 
 const messages = defineMessages({
-  amountContributed: {
-    id: 'Subscriptions.AmountContributed',
-    defaultMessage: 'Amount contributed',
-  },
-  contributedToDate: {
-    id: 'Subscriptions.ContributedToDate',
-    defaultMessage: 'Contributed to date',
-  },
   manage: {
     id: 'Subscriptions.Edit',
     defaultMessage: 'Edit',
@@ -46,10 +38,6 @@ const messages = defineMessages({
   activate: {
     id: 'Subscriptions.Activate',
     defaultMessage: 'Activate',
-  },
-  ourPurpose: {
-    id: 'SubscriptionsCard.ourPurpose',
-    defaultMessage: 'Our purpose',
   },
 });
 
@@ -62,7 +50,15 @@ const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const RecurringContributionsCard = ({ collective, status, contribution, createNotification, account, ...props }) => {
+const RecurringContributionsCard = ({
+  collective,
+  status,
+  contribution,
+  createNotification,
+  account,
+  LoggedInUser,
+  ...props
+}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isHovering, setHovering] = useState(false);
 
@@ -73,9 +69,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
   const { formatMessage } = useIntl();
   const statusTag = `${status} contribution`;
   const buttonText = status === 'ACTIVE' ? formatMessage(messages.manage) : formatMessage(messages.activate);
-  const userIsLoggedInUser = props.LoggedInUser.collective.slug === props.router.query.slug;
-  // const userIsAdminOfCollectiveOrOrg
-  const userIsAdmin = userIsLoggedInUser; // || userIsAdminOfCollectiveOrOrg
+  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
 
   return (
     <StyledCard onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)} {...props}>
@@ -91,7 +85,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
           {isHovering && !showPopup ? (
             <Fragment>
               <P fontSize="Caption" fontWeight="bold">
-                {formatMessage(messages.ourPurpose)}
+                <FormattedMessage id="SubscriptionsCard.ourPurpose" defaultMessage="Our purpose" />
               </P>
               <P fontSize="Caption" color="black.800">
                 {collective.description}
@@ -109,7 +103,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
         <Container p={2} flexGrow={1} display="flex" flexDirection="column" justifyContent="space-around">
           <Flex flexDirection="column">
             <P fontSize="Paragraph" fontWeight="400">
-              {formatMessage(messages.amountContributed)}
+              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
             </P>
             <P fontSize="Paragraph" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
@@ -121,7 +115,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
           </Flex>
           <Flex flexDirection="column" mb={2}>
             <P fontSize="Paragraph" fontWeight="400">
-              {formatMessage(messages.contributedToDate)}
+              <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />
             </P>
             <P fontSize="Paragraph">
               <FormattedMoneyAmount
@@ -130,7 +124,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
               />
             </P>
           </Flex>
-          {userIsAdmin &&
+          {isAdmin &&
             (status === 'ACTIVE' ? (
               <StyledButton
                 buttonSize="tiny"
@@ -153,6 +147,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
                   } catch (error) {
                     const errorMsg = getErrorFromGraphqlException(error).message;
                     createNotification('error', errorMsg);
+                    return false;
                   }
                 }}
               >

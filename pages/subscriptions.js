@@ -69,11 +69,7 @@ class SubscriptionsPage extends React.Component {
             <div className="content">
               <div className="Subscriptions-header">
                 <div className="Subscriptions-title">
-                  <FormattedMessage
-                    id="Subscriptions.Title"
-                    defaultMessage="{collectiveName}'s recurring financial contributions"
-                    values={{ collectiveName: slug }}
-                  />
+                  <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
                 </div>
               </div>
 

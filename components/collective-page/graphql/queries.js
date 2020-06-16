@@ -39,6 +39,9 @@ export const getCollectivePageQuery = gql`
       imageUrl(height: 256)
       canApply
       canContact
+      ordersFromCollective {
+        isSubscriptionActive
+      }
       stats {
         id
         balance

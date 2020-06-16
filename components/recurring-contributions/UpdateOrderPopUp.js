@@ -38,7 +38,6 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
       id
       amount {
         value
-        valueInCents
         currency
       }
       tier {
@@ -65,11 +64,10 @@ const getTiersQuery = gqlV2/* GraphQL */ `
           interval
           amount {
             value
-            valueInCents
             currency
           }
           minimumAmount {
-            valueInCents
+            value
           }
           amountType
           presets
@@ -133,12 +131,12 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
         key: `tier-${tier.id}`,
         title: tier.name,
         flexible: tier.amountType === 'FLEXIBLE' ? true : false,
-        amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.valueInCents : tier.amount.valueInCents,
+        amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : tier.amount.value * 100,
         id: tier.id,
         currency: tier.amount.currency,
         interval: tier.interval,
         presets: tier.presets,
-        minimumAmount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.valueInCents : 100,
+        minimumAmount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : 100,
       }));
     if (!disableCustomContributions) {
       tierOptions.unshift(customTierOption);
@@ -196,8 +194,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
           keyGetter="key"
           options={mappedTierOptions}
           onChange={setSelectedTier}
-          defaultValue={selectedTier?.key}
-          value={selectedTier}
+          value={selectedTier.key}
         >
           {({ radio, checked, value: { title, subtitle, amount, flexible, currency, interval, minimumAmount } }) => (
             <TierBox minheight={50} py={2} px={3} bg="white.full" data-cy="recurring-contribution-tier-box">
@@ -310,6 +307,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
             } catch (error) {
               const errorMsg = getErrorFromGraphqlException(error).message;
               createNotification('error', errorMsg);
+              return false;
             }
           }}
         >
