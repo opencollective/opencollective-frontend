@@ -189,7 +189,7 @@ describe('Legacy expense flow', () => {
       cy.visit('/testcollective/expenses/legacy');
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
-      cy.get('.Expenses .expense:first .status').contains('pending');
+      cy.get('.Expenses .expense:first .status').contains('Pending');
       cy.get('.Expenses .expense:first .meta').contains('Team');
     });
 
@@ -210,10 +210,10 @@ describe('Legacy expense flow', () => {
       cy.visit('/testcollective/expenses/legacy');
       cy.get('.itemsList .expense', { timeout: 10000 });
       cy.get('.Expenses .expense:first .description').contains(expenseDescription);
-      cy.get('.Expenses .expense:first .status').contains('pending');
+      cy.get('.Expenses .expense:first .status').contains('Pending');
       cy.get('.Expenses .expense:first .privateMessage').contains('Some private note for the host');
       cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
-      cy.get('.Expenses .expense:first .status').contains('approved');
+      cy.get('.Expenses .expense:first .status').contains('Approved');
       cy.get('.Expenses .expense:first .toggleEditExpense').click();
       cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
       cy.get('.Expenses .expense:first .inputField.amount input').type('{selectall}13');
@@ -224,13 +224,13 @@ describe('Legacy expense flow', () => {
       cy.get('.Expenses .expense:first .inputField.description input').focus();
       cy.wait(300);
       cy.getByDataCy('expense-edit-save-btn').click();
-      cy.get('.Expenses .expense:first .status').contains('pending'); // editing an expense should switch status back to pending
+      cy.get('.Expenses .expense:first .status').contains('Pending'); // editing an expense should switch status back to pending
       cy.get('.Expenses .expense:first .description').contains('edited');
       cy.get('.Expenses .expense:first .privateMessage').contains('edited');
       cy.get('.Expenses .expense:first .amount').contains('$13.00');
       cy.get('.Expenses .expense:first .ApproveExpenseBtn button').click();
       cy.wait(300);
-      cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains('approved');
+      cy.get('.Expenses .expense:first .status', { timeout: 5000 }).contains('Approved');
     });
   });
 });

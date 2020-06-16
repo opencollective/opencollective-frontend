@@ -122,7 +122,7 @@ class Expenses extends React.Component {
                 bsStyle={!status ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: null })}
               >
-                <FormattedMessage id="expenses.all" defaultMessage="all" />
+                <FormattedMessage id="expenses.all" defaultMessage="All" />
               </Button>
               <Button
                 className="filterBtn pending"
@@ -130,7 +130,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'PENDING' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'PENDING' })}
               >
-                <FormattedMessage id="expense.pending" defaultMessage="pending" />
+                <FormattedMessage id="expense.pending" defaultMessage="Pending" />
               </Button>
               <Button
                 className="filterBtn pending"
@@ -138,7 +138,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'REJECTED' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'REJECTED' })}
               >
-                <FormattedMessage id="expense.rejected" defaultMessage="rejected" />
+                <FormattedMessage id="expense.rejected" defaultMessage="Rejected" />
               </Button>
               <Button
                 className="filterBtn approved"
@@ -146,7 +146,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'APPROVED' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'APPROVED' })}
               >
-                <FormattedMessage id="expense.approved" defaultMessage="approved" />
+                <FormattedMessage id="expense.approved" defaultMessage="Approved" />
               </Button>
               <Button
                 className="filterBtn ready"
@@ -154,7 +154,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'READY' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'READY' })}
               >
-                <FormattedMessage id="expenses.ready" defaultMessage="ready to pay" />
+                <FormattedMessage id="expenses.ready" defaultMessage="Ready to pay" />
               </Button>
               <Button
                 className="filterBtn processing"
@@ -162,7 +162,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'PROCESSING' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'PROCESSING' })}
               >
-                <FormattedMessage id="expenses.processing" defaultMessage="processing" />
+                <FormattedMessage id="expenses.processing" defaultMessage="Processing" />
               </Button>
               <Button
                 className="filterBtn error"
@@ -170,7 +170,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'ERROR' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'ERROR' })}
               >
-                <FormattedMessage id="expenses.error" defaultMessage="error" />
+                <FormattedMessage id="expenses.error" defaultMessage="Error" />
               </Button>
               <Button
                 className="filterBtn paid"
@@ -178,7 +178,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'PAID' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'PAID' })}
               >
-                <FormattedMessage id="expense.paid" defaultMessage="paid" />
+                <FormattedMessage id="expense.paid" defaultMessage="Paid" />
               </Button>
             </ButtonGroup>
           </div>

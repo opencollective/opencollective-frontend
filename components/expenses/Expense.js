@@ -95,15 +95,15 @@ class Expense extends React.Component {
     this.handleSuccessMessage = this.handleSuccessMessage.bind(this);
 
     this.messages = defineMessages({
-      pending: { id: 'expense.pending', defaultMessage: 'pending' },
-      paid: { id: 'expense.paid', defaultMessage: 'paid' },
-      approved: { id: 'expense.approved', defaultMessage: 'approved' },
-      rejected: { id: 'expense.rejected', defaultMessage: 'rejected' },
-      processing: { id: 'expense.processing', defaultMessage: 'processing' },
-      error: { id: 'expense.error', defaultMessage: 'error' },
+      pending: { id: 'expense.pending', defaultMessage: 'Pending' },
+      paid: { id: 'expense.paid', defaultMessage: 'Paid' },
+      approved: { id: 'expense.approved', defaultMessage: 'Approved' },
+      rejected: { id: 'expense.rejected', defaultMessage: 'Rejected' },
+      processing: { id: 'expense.processing', defaultMessage: 'Processing' },
+      error: { id: 'expense.error', defaultMessage: 'Error' },
       scheduled_for_payment: {
         id: 'expense.scheduledForPayment',
-        defaultMessage: 'scheduled for payment',
+        defaultMessage: 'Scheduled for payment',
       },
       expenseTypeMissing: {
         id: 'expense.error.expenseTypeMissing',

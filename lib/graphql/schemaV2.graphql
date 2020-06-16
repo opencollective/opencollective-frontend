@@ -3110,6 +3110,11 @@ type Individual implements Account {
 }
 
 """
+ISO-8601 date
+"""
+scalar ISODateTime
+
+"""
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
@@ -3956,6 +3961,26 @@ type Query {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where amount is greater than or equal to this value
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where amount is lower than this value
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime
   ): ExpenseCollection
   expense(
     """
