@@ -142,7 +142,7 @@ describe('New collective page', () => {
     it('Shows contributors with role, public message and total amount contributor', () => {
       cy.get('[data-cy=ContributorsGrid_ContributorCard]').then($contributorCard => {
         cy.wrap($contributorCard).should('have.length', 1);
-        cy.wrap($contributorCard).contains('Collective Admin');
+        cy.wrap($contributorCard).contains('Admin');
       });
     });
   });

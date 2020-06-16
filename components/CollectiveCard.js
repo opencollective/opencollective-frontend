@@ -50,7 +50,7 @@ class CollectiveCard extends React.Component {
       },
       'roles.admin.label': {
         id: 'Member.Role.ADMIN',
-        defaultMessage: 'Collective Admin',
+        defaultMessage: 'Admin',
       },
       'roles.member.label': {
         id: 'Member.Role.MEMBER',

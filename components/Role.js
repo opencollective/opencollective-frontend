@@ -35,7 +35,7 @@ class Role extends React.Component {
   constructor(props) {
     super(props);
     this.messages = defineMessages({
-      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Collective Admin' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
       MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       ATTENDEE: { id: 'Member.Role.ATTENDEE', defaultMessage: 'Attendee' },
       FUNDRAISER: {
