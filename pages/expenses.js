@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { has, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { Router } from '../server/pages';
 
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
@@ -22,6 +24,7 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
+import SearchForm from '../components/SearchForm';
 import { H1, H5 } from '../components/Text';
 
 import ExpenseInfoSidebar from './ExpenseInfoSidebar';
@@ -33,11 +36,17 @@ const messages = defineMessages({
   },
 });
 
+const SearchFormContainer = styled(Box)`
+  width: 100%;
+  max-width: 350px;
+  min-width: 10rem;
+`;
+
 const EXPENSES_PER_PAGE = 10;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query }) {
-    const { parentCollectiveSlug, collectiveSlug, offset, limit, type, tag } = query;
+    const { parentCollectiveSlug, collectiveSlug, offset, limit, type, tag, searchTerm } = query;
     return {
       parentCollectiveSlug,
       collectiveSlug,
@@ -45,6 +54,7 @@ class ExpensePage extends React.Component {
       limit: parseInt(limit) || undefined,
       type,
       tag,
+      searchTerm,
     };
   }
 
@@ -53,6 +63,7 @@ class ExpensePage extends React.Component {
     parentCollectiveSlug: PropTypes.string,
     type: PropTypes.string,
     tag: PropTypes.string,
+    searchTerm: PropTypes.string,
     /** from injectIntl */
     intl: PropTypes.object,
     data: PropTypes.shape({
@@ -84,9 +95,21 @@ class ExpensePage extends React.Component {
 
   buildFilterLinkParams(params) {
     return {
-      ...pick(this.props, ['collectiveSlug', 'limit', 'parentCollectiveSlug', 'tag', 'type']),
+      ...pick(this.props, ['collectiveSlug', 'limit', 'parentCollectiveSlug', 'tag', 'type', 'searchTerm']),
       ...params,
     };
+  }
+
+  handleSearch(event) {
+    const searchInput = event.target.elements.q;
+    let params;
+    if (searchInput.value) {
+      params = this.buildFilterLinkParams({ searchTerm: searchInput.value });
+    } else {
+      params = this.buildFilterLinkParams({ searchTerm: null });
+    }
+    Router.pushRoute('expenses', params);
+    event.preventDefault();
   }
 
   getTagProps = tag => {
@@ -118,7 +141,7 @@ class ExpensePage extends React.Component {
       }
     }
 
-    const hasFilters = this.props.tag || this.props.type;
+    const hasFilters = this.props.tag || this.props.type || this.props.searchTerm;
     return (
       <Page collective={data.account} {...this.getPageMetaData(data.account)} withoutGlobalStyles>
         <CollectiveNavbar
@@ -131,9 +154,15 @@ class ExpensePage extends React.Component {
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
             <Flex justifyContent="space-between" flexWrap="wrap">
               <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[0, 3, 5]} mb={5}>
-                <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
-                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
-                </H1>
+                <Flex>
+                  <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+                    <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                  </H1>
+                  <Box mx="auto" />
+                  <SearchFormContainer p={2}>
+                    <SearchForm placeholder="Search..." onSubmit={event => this.handleSearch(event)} />
+                  </SearchFormContainer>
+                </Flex>
                 {!data.loading && !data.expenses?.nodes.length ? (
                   <MessageBox type="info" withIcon>
                     {hasFilters ? (
@@ -142,7 +171,10 @@ class ExpensePage extends React.Component {
                         defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                         values={{
                           ResetLink: text => (
-                            <Link route="expenses" params={this.buildFilterLinkParams({ tag: null, type: null })}>
+                            <Link
+                              route="expenses"
+                              params={this.buildFilterLinkParams({ tag: null, type: null, searchTerm: null })}
+                            >
                               {text}
                             </Link>
                           ),
@@ -214,7 +246,7 @@ class ExpensePage extends React.Component {
 }
 
 const EXPENSES_PAGE_QUERY = gqlV2`
-  query ExpensesPageQuery($collectiveSlug: String!, $limit: Int!, $offset: Int!, $type: ExpenseType, $tags: [String]) {
+  query ExpensesPageQuery($collectiveSlug: String!, $limit: Int!, $offset: Int!, $type: ExpenseType, $tags: [String], $searchTerm: String) {
     account(slug: $collectiveSlug) {
       id
       slug
@@ -257,7 +289,7 @@ const EXPENSES_PAGE_QUERY = gqlV2`
         }
       }
     }
-    expenses(account: { slug: $collectiveSlug }, limit: $limit, offset: $offset, type: $type, tags: $tags) {
+    expenses(account: { slug: $collectiveSlug }, limit: $limit, offset: $offset, type: $type, tags: $tags, searchTerm: $searchTerm) {
       totalCount
       offset
       limit
@@ -297,6 +329,7 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
       limit: props.limit || EXPENSES_PER_PAGE,
       type: has(expenseTypes, props.type) ? props.type : undefined,
       tags: props.tag ? [props.tag] : undefined,
+      searchTerm: props.searchTerm,
     },
   }),
 });

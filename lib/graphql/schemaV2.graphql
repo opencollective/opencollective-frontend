@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Jun 11 2020 14:05:52 GMT+0100 (British Summer Time)
+# timestamp: Tue Jun 16 2020 00:12:27 GMT-0700 (Pacific Daylight Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -3956,6 +3956,11 @@ type Query {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    The term to search
+    """
+    searchTerm: String
   ): ExpenseCollection
   expense(
     """
