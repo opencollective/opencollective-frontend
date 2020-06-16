@@ -15,10 +15,6 @@ const EmojiLabel = styled(Span)`
   font-size: 12px;
   line-height: 14px;
   margin: 4px 8px 4px 0;
-
-  &:disabled {
-    cursor: not-allowed;
-  }
 `;
 
 const CommentReactions = ({ reactions }) => {
@@ -26,7 +22,7 @@ const CommentReactions = ({ reactions }) => {
     .sort()
     .map(emoji => {
       return (
-        <EmojiLabel key={emoji} display="inline-block">
+        <EmojiLabel key={emoji}>
           {emoji}&nbsp;&nbsp;{reactions[emoji]}
         </EmojiLabel>
       );
