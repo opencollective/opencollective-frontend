@@ -68,7 +68,7 @@ class Members extends React.Component {
       roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
       addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
       removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
-      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Collective Admin' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
       MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },

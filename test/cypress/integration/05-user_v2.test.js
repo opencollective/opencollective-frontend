@@ -7,7 +7,7 @@ describe('New users profiles', () => {
       cy.get('[data-cy=section-contributions]').click();
       cy.hash().should('eq', '#section-contributions');
       cy.get('[data-cy=section-contributions-title]').contains('Contributions');
-      cy.get('[data-cy=contribution-date-since]').first().contains('Collective Admin since');
+      cy.get('[data-cy=contribution-date-since]').first().contains('Admin since');
       cy.get('[data-cy=contribution-date-since]').first().contains('August 2016');
       cy.get('[data-cy=amount-contributed]').first().contains('Amount contributed');
       cy.get('[data-cy=amount-contributed]').first().contains('€267');
@@ -20,7 +20,7 @@ describe('New users profiles', () => {
     it('Can filter by contribution type (admin, financial...etc)', () => {
       cy.get('[data-cy=filters]');
       cy.get('[data-cy="filter-button core"]').click();
-      cy.get('[data-cy=collective-contribution]').first().get('[data-cy=caption]').contains('Collective Admin since');
+      cy.get('[data-cy=collective-contribution]').first().get('[data-cy=caption]').contains('Admin since');
       cy.get('[data-cy="filter-button financial"]').click();
       cy.get('[data-cy=collective-contribution]')
         .first()
