@@ -53,12 +53,11 @@ const load = async app => {
   // Configure access Logs in dev and production
 
   const consoleLogOutput = process.env.NODE_ENV === 'development' ? 'console' : 'text';
-  const consoleLogFormatter = new lib.formatter.Formatter(consoleLogOutput);
   pipeline
     .filter(log => !log.getIn(['request', 'url']).match(/^\/_/))
     .filter(log => !log.getIn(['request', 'url']).match(/^\/static/))
     .filter(log => !log.getIn(['request', 'url']).match(/^\/api/))
-    .map(log => console.log(consoleLogFormatter.format(log)));
+    .map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
 
   // Start
 
