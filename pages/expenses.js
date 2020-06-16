@@ -4,6 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import { has, mapValues, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import expenseStatus from '../lib/constants/expense-status';
@@ -29,6 +30,7 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
+import SearchForm from '../components/SearchForm';
 import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
 
@@ -41,11 +43,29 @@ const messages = defineMessages({
   },
 });
 
+const SearchFormContainer = styled(Box)`
+  width: 100%;
+  max-width: 350px;
+  min-width: 10rem;
+`;
+
 const EXPENSES_PER_PAGE = 10;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query }) {
-    const { parentCollectiveSlug, collectiveSlug, offset, limit, type, status, tag, amount, payout, period } = query;
+    const {
+      parentCollectiveSlug,
+      collectiveSlug,
+      offset,
+      limit,
+      type,
+      status,
+      tag,
+      amount,
+      payout,
+      period,
+      searchTerm,
+    } = query;
     return {
       parentCollectiveSlug,
       collectiveSlug,
@@ -58,6 +78,7 @@ class ExpensePage extends React.Component {
         period,
         amount,
         tag,
+        searchTerm,
       },
     };
   }
@@ -68,6 +89,7 @@ class ExpensePage extends React.Component {
     query: PropTypes.shape({
       type: PropTypes.string,
       tag: PropTypes.string,
+      searchTerm: PropTypes.string,
     }),
     /** from injectIntl */
     intl: PropTypes.object,
@@ -106,7 +128,7 @@ class ExpensePage extends React.Component {
   buildFilterLinkParams(params) {
     return {
       ...pick(this.props, ['collectiveSlug', 'parentCollectiveSlug']),
-      ...pick(this.props.query, ['limit', 'tag', 'type', 'status', 'amount', 'payout']),
+      ...pick(this.props.query, ['limit', 'tag', 'type', 'status', 'amount', 'payout', 'searchTerm']),
       ...params,
     };
   }
@@ -114,6 +136,18 @@ class ExpensePage extends React.Component {
   updateFilters = queryParams => {
     return Router.pushRoute('expenses', this.buildFilterLinkParams({ ...queryParams, offset: null }));
   };
+
+  handleSearch(event) {
+    const searchInput = event.target.elements.q;
+    let params;
+    if (searchInput.value) {
+      params = this.buildFilterLinkParams({ searchTerm: searchInput.value });
+    } else {
+      params = this.buildFilterLinkParams({ searchTerm: null });
+    }
+    Router.pushRoute('expenses', params);
+    event.preventDefault();
+  }
 
   getTagProps = tag => {
     if (tag === this.props.query.tag) {
@@ -147,9 +181,15 @@ class ExpensePage extends React.Component {
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
             <Flex justifyContent="space-between" flexWrap="wrap">
               <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
-                <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
-                </H1>
+                <Flex>
+                  <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
+                    <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                  </H1>
+                  <Box mx="auto" />
+                  <SearchFormContainer p={2}>
+                    <SearchForm placeholder="Search..." onSubmit={event => this.handleSearch(event)} />
+                  </SearchFormContainer>
+                </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
                 <Box mb={34}>
                   {data.account ? (
@@ -252,6 +292,7 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
     $dateFrom: ISODateTime
+    $searchTerm: String
   ) {
     account(slug: $collectiveSlug) {
       id
@@ -306,6 +347,7 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
+      searchTerm: $searchTerm
     ) {
       totalCount
       offset
@@ -354,6 +396,7 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,
         dateFrom,
+        searchTerm: props.query.searchTerm,
       },
     };
   },

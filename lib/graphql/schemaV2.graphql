@@ -4032,6 +4032,11 @@ type Query {
     Only return expenses that were created after this date
     """
     dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
   ): ExpenseCollection
   expense(
     """
