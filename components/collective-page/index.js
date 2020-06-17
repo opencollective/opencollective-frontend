@@ -17,6 +17,7 @@ import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
+import SectionProjects from './sections/Projects';
 import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
@@ -224,6 +225,8 @@ class CollectivePage extends Component {
         return (
           <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
         );
+      case Sections.PROJECTS:
+        return <SectionProjects collective={this.props.collective} projects={[]} isAdmin={this.props.isAdmin} />;
       default:
         return null;
     }
