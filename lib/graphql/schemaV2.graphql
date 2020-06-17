@@ -647,6 +647,16 @@ type Comment {
   markdown: String
   fromAccount: Account
   account: Account
+
+  """
+  Returns a map of reactions counts for this comment
+  """
+  reactions: JSONObject
+
+  """
+  Returns the list of reactions added to this comment by logged in user
+  """
+  userReactions: [String]
   fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
   collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
@@ -670,6 +680,13 @@ input CommentCreateInput {
   expense: ExpenseReferenceInput
   ExpenseId: Int
   ConversationId: String
+}
+
+input CommentReferenceInput {
+  """
+  The public id identifying the comment
+  """
+  id: String
 }
 
 input CommentUpdateInput {
@@ -3137,6 +3154,11 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 """
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+"""
 Type for a required legal document
 """
 enum LegalDocumentType {
@@ -3283,6 +3305,18 @@ type Mutation {
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
+  addCommentReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this comment reaction
+    """
+    comment: CommentReferenceInput!
+  ): Comment!
+  removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
 
   """
   Connect external account to Open Collective Account
@@ -4014,7 +4048,7 @@ Statistics for a given tag
 """
 type TagStat {
   """
-  An unique identified for this tag
+  An unique identifier for this tag
   """
   id: String!
 

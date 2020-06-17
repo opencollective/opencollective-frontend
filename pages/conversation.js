@@ -260,6 +260,7 @@ class ConversationPage extends React.Component {
     const collective = data && data.account;
     const conversation = data && data.conversation;
     const body = conversation && conversation.body;
+    const conversationReactions = get(conversation, 'body.reactions', []);
     const comments = get(conversation, 'comments.nodes', []);
     const followers = get(conversation, 'followers');
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
@@ -290,7 +291,7 @@ class ConversationPage extends React.Component {
                   ) : (
                     <Flex flexDirection={['column', null, null, 'row']} justifyContent="space-between">
                       <Box flex="1 1 50%" maxWidth={700} mb={5}>
-                        <Container borderBottom="1px solid" borderColor="black.300" pb={4}>
+                        <Container borderBottom="1px solid" borderColor="black.300" pb={3}>
                           <H2 fontSize="H4" lineHeight="H4" mb={4} wordBreak="break-word">
                             <InlineEditField
                               mutation={editConversationMutation}
@@ -309,9 +310,11 @@ class ConversationPage extends React.Component {
                           </H2>
                           <Comment
                             comment={body}
+                            reactions={conversationReactions}
                             canEdit={canEdit}
                             canDelete={canDelete}
                             onDelete={this.onConversationDeleted}
+                            canReply={Boolean(LoggedInUser)}
                             isConversationRoot
                           />
                         </Container>

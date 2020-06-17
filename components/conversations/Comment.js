@@ -25,6 +25,8 @@ import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
 
+import CommentReactionPicker from './CommentReactionPicker';
+import CommentReactions from './CommentReactions';
 import { CommentFieldsFragment } from './graphql';
 
 const CommentBtn = styled(StyledButton)`
@@ -167,7 +169,17 @@ const useClosePopper = (popperState, closePopper) => {
  *
  * /!\ Can only be used with data from API V2.
  */
-const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight, isConversationRoot, onDelete }) => {
+const Comment = ({
+  comment,
+  canEdit,
+  canDelete,
+  withoutActions,
+  maxCommentHeight,
+  isConversationRoot,
+  onDelete,
+  reactions,
+  canReply,
+}) => {
   const [isEditing, setEditing] = React.useState(false);
   const [isDeleting, setDeleting] = React.useState(null);
   const [showAdminActions, setShowAdminActions] = React.useState(false);
@@ -314,6 +326,10 @@ const Comment = ({ comment, canEdit, canDelete, withoutActions, maxCommentHeight
             )
           }
         </InlineEditField>
+        <Flex mt={3} flexWrap="wrap">
+          <CommentReactions reactions={reactions} />
+          {canReply && <CommentReactionPicker comment={comment} reactions={reactions} />}
+        </Flex>
       </Box>
     </Container>
   );
@@ -325,13 +341,17 @@ Comment.propTypes = {
     html: PropTypes.string,
     createdAt: PropTypes.string,
     fromCollective: PropTypes.shape({
+      id: PropTypes.string,
       name: PropTypes.string,
     }),
   }).isRequired,
+  /** Reactions associated with this comment? */
+  reactions: PropTypes.object,
   /** Can current user edit this comment? */
   canEdit: PropTypes.bool,
   /** Can current user delete this comment? */
   canDelete: PropTypes.bool,
+  canReply: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
   /** Set this to true to disable actions */
