@@ -76,16 +76,25 @@ const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
   const fieldName =
     input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
-  let validate = value => (value ? undefined : 'Is required');
+  let validate = input.required ? value => (value ? undefined : 'Is required') : undefined;
   if (input.type === 'text') {
     if (input.validationRegexp) {
-      validate = value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`);
+      validate = value => {
+        const matches = new RegExp(input.validationRegexp).test(value);
+        if (matches) {
+          undefined;
+        } else if (!value && input.required) {
+          return 'Is required';
+        } else if (!matches && value) {
+          return `Invalid ${input.name}`;
+        }
+      };
     }
     return (
       <Box key={input.key} mt={2} flex="1">
         <Field name={fieldName} validate={validate}>
           {({ field, meta }) => (
-            <StyledInputField label={input.name} required error={meta.touched && meta.error}>
+            <StyledInputField label={input.name} required={input.required} error={meta.touched && meta.error}>
               {() => (
                 <StyledInput
                   {...field}
@@ -106,7 +115,7 @@ const Input = props => {
       <Box mt={2} flex="1">
         <Field name={fieldName}>
           {({ field, meta }) => (
-            <StyledInputField label={input.name} required error={meta.touched && meta.error}>
+            <StyledInputField label={input.name} required={input.required} error={meta.touched && meta.error}>
               {() => (
                 <StyledSelect
                   disabled={disabled}
@@ -152,19 +161,13 @@ Input.propTypes = {
 
 const FieldGroup = ({ field, ...props }) => {
   const hasMultipleInputs = field.group.length > 1;
-  const required = field.group.some(f => f.required);
-  if (!required) {
-    return null;
-  }
 
   return (
     <Box flex="1">
       {hasMultipleInputs && <P fontSize="LeadParagraph">{field.name}</P>}
-      {field.group
-        .filter(f => f.required)
-        .map(input => (
-          <Input key={input.key} input={input} {...props} />
-        ))}
+      {field.group.map(input => (
+        <Input key={input.key} input={input} {...props} />
+      ))}
     </Box>
   );
 };
