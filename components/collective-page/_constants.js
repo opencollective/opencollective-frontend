@@ -20,6 +20,7 @@ export const Sections = {
   GOALS: 'goals',
   TICKETS: 'tickets',
   CONTRIBUTIONS: 'contributions',
+  RECURRING_CONTRIBUTIONS: 'recurring-contributions',
   CONTRIBUTE: 'contribute',
   UPDATES: 'updates',
   PARTICIPANTS: 'participants',

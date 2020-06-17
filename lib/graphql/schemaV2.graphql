@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Jun 11 2020 14:05:52 GMT+0100 (British Summer Time)
+# timestamp: Mon Jun 15 2020 19:54:29 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -306,6 +306,27 @@ A financial amount.
 type Amount {
   value: Float
   currency: Currency
+  valueInCents: Float
+}
+
+"""
+Input type for an amount with the value and currency
+"""
+input AmountInput {
+  """
+  The value in plain
+  """
+  value: Float
+
+  """
+  The currency string
+  """
+  currency: Currency
+
+  """
+  The value in cents
+  """
+  valueInCents: Int
 }
 
 """
@@ -604,6 +625,7 @@ type Collective implements Account {
     """
     accountType: AccountType
   ): Int
+  tiers: TierCollection!
 }
 
 input CollectiveCreateInput {
@@ -3506,7 +3528,7 @@ type Mutation {
     """
     An Amount to update the order to
     """
-    amount: Int
+    amount: AmountInput
   ): Order
 
   """
@@ -4020,13 +4042,38 @@ type Tier {
   Get all orders
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
+  amount: Amount
+  interval: TierInterval
+  presets: [Int]
+  amountType: TierAmountType!
+  minimumAmount: Amount
+}
+
+enum TierAmountType {
+  FIXED
+  FLEXIBLE
+}
+
+"""
+A collection of "Tiers"
+"""
+type TierCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Tier]
+}
+
+enum TierInterval {
+  month
+  year
 }
 
 input TierReferenceInput {
   """
-  The legacy id assigned to the Tier
+  The id assigned to the Tier
   """
-  legacyId: Int
+  id: String
 }
 
 """
