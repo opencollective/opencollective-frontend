@@ -39,8 +39,8 @@ export const hasProcessButtons = permissions => {
 
   return (
     permissions.canApprove ||
+    permissions.canUnapprove ||
     permissions.canReject ||
-    permissions.canPay ||
     permissions.canPay ||
     permissions.canMarkAsUnpaid
   );
