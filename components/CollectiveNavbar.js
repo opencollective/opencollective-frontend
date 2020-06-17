@@ -240,7 +240,7 @@ export const getSectionsForCollective = collective => {
  *    - `stats` {object} with following properties: `updates`, (`balance` or `transactions`)
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
-export const getFilteredSectionsForCollective = (collective, isAdmin) => {
+export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmin) => {
   const sections = getSectionsForCollective(collective);
   const toRemove = new Set();
   collective = collective || {};
@@ -269,7 +269,7 @@ export const getFilteredSectionsForCollective = (collective, isAdmin) => {
   }
 
   // Some sections are hidden for non-admins (usually when there's no data)
-  if (!isAdmin) {
+  if (!isAdmin && !isHostAdmin) {
     const { updates, transactions, balance } = collective.stats || {};
     if (!updates) {
       toRemove.add(Sections.UPDATES);
@@ -295,7 +295,7 @@ export const getFilteredSectionsForCollective = (collective, isAdmin) => {
 
   // Funds MVP, to refactor
   if (collective.settings?.fund) {
-    if (!isAdmin) {
+    if (!isAdmin && !isHostAdmin) {
       toRemove.add(Sections.BUDGET);
     }
   }
