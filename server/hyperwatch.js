@@ -2,20 +2,14 @@ const hyperwatch = require('@hyperwatch/hyperwatch');
 const expressBasicAuth = require('express-basic-auth');
 const expressWs = require('express-ws');
 
+const { parseToBooleanDefaultFalse } = require('./utils');
+
 const {
   HYPERWATCH_ENABLED: enabled,
   HYPERWATCH_PATH: path,
   HYPERWATCH_USERNAME: username,
   HYPERWATCH_SECRET: secret,
 } = process.env;
-
-const parseToBooleanDefaultFalse = value => {
-  if (value === null || value === undefined || value === '') {
-    return false;
-  }
-  const string = value.toString().trim().toLowerCase();
-  return ['on', 'enabled', '1', 'true', 'yes'].includes(string);
-};
 
 const load = async app => {
   if (parseToBooleanDefaultFalse(enabled) !== true) {
