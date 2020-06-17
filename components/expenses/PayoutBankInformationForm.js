@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
-import { FastField, Field, useFormikContext } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -76,20 +76,28 @@ const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
   const fieldName =
     input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
-
+  let validate = value => (value ? undefined : 'Is required');
   if (input.type === 'text') {
-    const validate = input.validationRegexp
-      ? value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`)
-      : undefined;
+    if (input.validationRegexp) {
+      validate = value => (new RegExp(input.validationRegexp).test(value) ? undefined : `Invalid ${input.name}`);
+    }
     return (
       <Box key={input.key} mt={2} flex="1">
-        <FastField name={fieldName} validate={validate}>
+        <Field name={fieldName} validate={validate}>
           {({ field, meta }) => (
             <StyledInputField label={input.name} required error={meta.touched && meta.error}>
-              {() => <Field as={StyledInput} placeholder={input.example} {...field} disabled={disabled} width="100%" />}
+              {() => (
+                <StyledInput
+                  {...field}
+                  placeholder={input.example}
+                  error={meta.touched && meta.error}
+                  disabled={disabled}
+                  width="100%"
+                />
+              )}
             </StyledInputField>
           )}
-        </FastField>
+        </Field>
       </Box>
     );
   } else if (input.type === 'radio' || input.type === 'select') {
@@ -101,9 +109,12 @@ const Input = props => {
             <StyledInputField label={input.name} required error={meta.touched && meta.error}>
               {() => (
                 <StyledSelect
+                  disabled={disabled}
+                  error={meta.touched && meta.error}
+                  isLoading={loading && !options.length}
                   name={field.name}
                   options={options}
-                  disabled={disabled}
+                  value={options.find(c => c.value === get(formik.values, field.name))}
                   onChange={({ value }) => {
                     formik.setFieldValue(field.name, value);
                     if (input.refreshRequirementsOnChange) {
@@ -114,8 +125,6 @@ const Input = props => {
                       });
                     }
                   }}
-                  isLoading={loading && !options.length}
-                  value={options.find(c => c.value === get(formik.values, field.name))}
                 />
               )}
             </StyledInputField>
@@ -286,7 +295,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
 
   return (
     <React.Fragment>
-      <FastField name={currencyFieldName}>
+      <Field name={currencyFieldName}>
         {({ field, meta }) => (
           <StyledInputField
             name={field.name}
@@ -310,7 +319,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
             )}
           </StyledInputField>
         )}
-      </FastField>
+      </Field>
       {selectedCurrency && (
         <DetailsForm
           currency={selectedCurrency}
