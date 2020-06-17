@@ -105,7 +105,7 @@ const I18nContributionType = defineMessages({
   },
   [ContributionTypes.CHILD_COLLECTIVE]: {
     id: 'ContributionType.ChildCollective',
-    defaultMessage: 'Member collective',
+    defaultMessage: 'Connected Collective',
   },
 });
 
@@ -119,7 +119,7 @@ const getContributeCTA = type => {
     case ContributionTypes.EVENT_PASSED:
       return <FormattedMessage id="ContributeCard.BtnEventPassed" defaultMessage="View event" />;
     case ContributionTypes.CHILD_COLLECTIVE:
-      return <FormattedMessage id="ContributeCard.SeeCollective" defaultMessage="View collective" />;
+      return <FormattedMessage id="ContributeCard.SeeCollective" defaultMessage="View Collective" />;
     default:
       return <FormattedMessage id="Contribute" defaultMessage="Contribute" />;
   }
