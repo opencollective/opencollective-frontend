@@ -62,7 +62,15 @@ const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const RecurringContributionsCard = ({ collective, status, contribution, createNotification, account, ...props }) => {
+const RecurringContributionsCard = ({
+  collective,
+  status,
+  contribution,
+  createNotification,
+  account,
+  LoggedInUser,
+  ...props
+}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isHovering, setHovering] = useState(false);
 
@@ -73,9 +81,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
   const { formatMessage } = useIntl();
   const statusTag = `${status} contribution`;
   const buttonText = status === 'ACTIVE' ? formatMessage(messages.manage) : formatMessage(messages.activate);
-  const userIsLoggedInUser = props.LoggedInUser.collective.slug === props.router.query.slug;
-  // const userIsAdminOfCollectiveOrOrg
-  const userIsAdmin = userIsLoggedInUser; // || userIsAdminOfCollectiveOrOrg
+  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
 
   return (
     <StyledCard onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)} {...props}>
@@ -130,7 +136,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
               />
             </P>
           </Flex>
-          {userIsAdmin &&
+          {isAdmin &&
             (status === 'ACTIVE' ? (
               <StyledButton
                 buttonSize="tiny"
