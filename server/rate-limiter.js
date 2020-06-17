@@ -33,9 +33,10 @@ const load = async app => {
     total: total,
     expire: expire * 1000,
     whitelist,
-    onRateLimited: function (req, res) {
-      logger.info(`Rate limit exceeded for ${req.ip}`);
+    onRateLimited: function (req, res, next) {
+      logger.info(`Rate limit exceeded for '${req.ip}' '${req.headers['user-agent']}'`);
       if (simulate) {
+        next();
         return;
       }
       const message = `Rate limit exceeded. Try again in a few seconds. Please contact support@opencollective.com if you think this is an error.`;
