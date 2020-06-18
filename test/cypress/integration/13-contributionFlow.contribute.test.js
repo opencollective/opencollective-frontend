@@ -50,12 +50,12 @@ describe('Contribution Flow: Order', () => {
   });
 
   it('Can order as new user', () => {
-    // Mock clock so we can check next contribution date in a consistent way
-    cy.clock(Date.parse('2042/05/03'));
-
     const userParams = { firstName: 'Order', lastName: 'Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
     cy.signup({ user: userParams, redirect: '/apex/contribute/sponsors-470/checkout', visitParams }).then(user => {
+      // Mock clock so we can check next contribution date in a consistent way
+      cy.clock(Date.parse('2042/05/03'));
+
       // ---- Step 1: Select profile ----
       // Personnal account must be the first entry, and it must be checked
       cy.contains('#contributeAs > label:first', `${user.firstName} ${user.lastName}`);
@@ -98,7 +98,6 @@ describe('Contribution Flow: Order', () => {
   });
 
   it('Can order with an existing orgnanization', () => {
-    cy.clock(Date.parse('2042/05/03'));
     let collectiveSlug = null;
     const visitParams = { onBeforeLoad: mockRecaptcha };
 
@@ -112,6 +111,7 @@ describe('Contribution Flow: Order', () => {
         cy.visit('/apex/contribute/sponsors-470/checkout', visitParams);
         // Check the newly created organization
         cy.get(`[type="radio"][name=contributeAs][value=${collective.id}]`).check();
+        cy.clock(Date.parse('2042/05/03'));
         cy.tick(1000);
         cy.get(`input[type=radio][name=contributeAs][value=${collective.id}]`).should('be.checked');
 
