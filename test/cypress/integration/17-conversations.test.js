@@ -30,7 +30,7 @@ describe('Conversations', () => {
       cy.getByDataCy('styled-input-tags-input').type('amazing stuff{enter}{enter}');
 
       // Save then redirects to the conversation page
-      cy.getByDataCy('submit-new-conversation-btn').click();
+      cy.getByDataCy('submit-new-conversation-btn').click({ timeout: 10000 });
       cy.getByDataCy('conversation-page').click();
 
       // Conversation page
