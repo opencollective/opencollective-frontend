@@ -9,7 +9,6 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Dimensions } from '../components/collective-page/_constants';
-import SectionTitle from '../components/collective-page/SectionTitle';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
