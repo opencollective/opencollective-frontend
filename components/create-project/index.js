@@ -31,17 +31,20 @@ class CreateProject extends Component {
     this.createProject = this.createProject.bind(this);
   }
 
-  async createProject(collective) {
+  async createProject(project) {
     // set state to loading
     this.setState({ creating: true });
 
     // try mutation
     try {
-      const res = await this.props.createProject({ variables: { collective } });
+      const res = await this.props.createProject({
+        variables: { project, parent: { slug: this.props.parent.slug } },
+      });
       const createdProject = res.data.createProject;
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        slug: createdProject.slug,
+      Router.pushRoute('project', {
+        parentSlug: this.props.parent.slug,
+        projectSlug: createdProject.slug,
         status: 'projectCreated',
       }).then(() => window.scrollTo(0, 0));
     } catch (err) {
@@ -83,16 +86,14 @@ class CreateProject extends Component {
 
 const createProjectMutation = gqlV2`
   mutation CreateProject(
-    $collective: CollectiveCreateInput!
-    $host: AccountReferenceInput,
+    $project: ProjectCreateInput!
+    $parent: AccountReferenceInput,
   ) {
-    createProject(collective: $collective) {
+    createProject(project: $project, parent: $parent) {
+      id
       name
       slug
-      tags
       description
-      githubHandle
-      legacyId
     }
   }
 `;

@@ -14,23 +14,6 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 import { withUser } from '../../UserProvider';
 
-const getCollectiveType = collective => {
-  switch (collective.type) {
-    case 'ORGANIZATION':
-      return 'Organization';
-    case 'COLLECTIVE':
-      // Funds MVP, to refactor
-      if (collective.settings?.fund) {
-        return 'Fund';
-      }
-      return 'Collective';
-    case 'EVENT':
-      return 'Event';
-    default:
-      return 'Account';
-  }
-};
-
 const DELETE_COLLECTIVE = gql`
   mutation deleteCollective($id: Int!) {
     deleteCollective(id: $id) {
@@ -48,7 +31,7 @@ const DELETE_USER_COLLECTIVE = gql`
 `;
 
 const DeleteCollective = ({ collective, ...props }) => {
-  const collectiveType = getCollectiveType(collective);
+  const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
   const [deleteCollective] = useMutation(DELETE_COLLECTIVE, { variables: { id: collective.id } });
@@ -78,16 +61,20 @@ const DeleteCollective = ({ collective, ...props }) => {
     <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
       <H2>
         <FormattedMessage
-          values={{ type: collectiveType }}
           id="collective.delete.title"
-          defaultMessage={'Delete this {type}'}
+          defaultMessage={
+            'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
+          }
+          values={{ type: collectiveType }}
         />
       </H2>
       <P>
         <FormattedMessage
-          values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.description"
-          defaultMessage={'This {type} will be deleted, along with all related data.'}
+          defaultMessage={
+            '{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.'
+          }
+          values={{ type: collectiveType }}
         />
       </P>
       {error && <P color="#ff5252">{error}</P>}
@@ -97,54 +84,65 @@ const DeleteCollective = ({ collective, ...props }) => {
         disabled={collective.isHost || !collective.isDeletable}
       >
         <FormattedMessage
-          values={{ type: collectiveType.toLowerCase() }}
           id="collective.delete.title"
-          defaultMessage={'Delete this {type}'}
+          defaultMessage={
+            'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
+          }
+          values={{ type: collectiveType }}
         />
       </StyledButton>
       {collective.isHost && (
         <P color="rgb(224, 183, 0)">
           <FormattedMessage
             id="collective.delete.isHost"
-            defaultMessage={"You can't delete your collective while being a Host, please deactivate as Host first."}
-          />{' '}
-        </P>
-      )}
-      {!collective.isDeletable && collective.type !== CollectiveType.EVENT && (
-        <P color="rgb(224, 183, 0)">
-          <FormattedMessage
+            defaultMessage={
+              "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
+            }
             values={{ type: collectiveType }}
-            id="collective.delete.isNotDeletable-message"
-            defaultMessage={
-              '{type}s with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.'
-            }
           />{' '}
         </P>
       )}
-      {!collective.isDeletable && collective.type === CollectiveType.EVENT && (
-        <P color="rgb(224, 183, 0)">
-          <FormattedMessage
-            id="collective.event.delete.isNotDeletable-message"
-            defaultMessage={
-              'Events with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
-            }
-          />
-        </P>
-      )}
+      {!collective.isDeletable &&
+        collective.type !== CollectiveType.EVENT &&
+        collective.type !== CollectiveType.PROJECT && (
+          <P color="rgb(224, 183, 0)">
+            <FormattedMessage
+              id="collective.delete.isNotDeletable-message"
+              defaultMessage={
+                '{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, orders, events or paid expenses cannot be deleted. Please archive it instead.'
+              }
+              values={{ type: collectiveType }}
+            />{' '}
+          </P>
+        )}
+      {!collective.isDeletable &&
+        (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) && (
+          <P color="rgb(224, 183, 0)">
+            <FormattedMessage
+              id="collective.event.delete.isNotDeletable-message"
+              defaultMessage={
+                '{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.'
+              }
+              values={{ type: collectiveType }}
+            />
+          </P>
+        )}
       <Modal show={showModal} width="570px" onClose={closeModal}>
         <ModalHeader onClose={closeModal}>
           <FormattedMessage
             id="collective.delete.modal.header"
-            values={{ name: collective.name }}
             defaultMessage={'Delete {name}'}
+            values={{ name: collective.name }}
           />
         </ModalHeader>
         <ModalBody>
           <P>
             <FormattedMessage
               id="collective.delete.modal.body"
-              values={{ type: collectiveType.toLowerCase() }}
-              defaultMessage={'Are you sure you want to delete this {type}?'}
+              defaultMessage={
+                'Are you sure you want to delete this {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
+              }
+              values={{ type: collectiveType }}
             />
           </P>
         </ModalBody>

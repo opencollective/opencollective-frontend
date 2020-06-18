@@ -35,7 +35,6 @@ const placeholders = {
 const messages = defineMessages({
   nameLabel: { id: 'createProject.form.nameLabel', defaultMessage: "What's the name of your Project?" },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
-  suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createProject.form.descriptionLabel',
     defaultMessage: "What's the purpose of your Project?",
@@ -198,9 +197,6 @@ class CreateProjectForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny">{intl.formatMessage(messages.suggestedLabel)}</P>
-                    )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
