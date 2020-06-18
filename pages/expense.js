@@ -358,7 +358,7 @@ class ExpensePage extends React.Component {
               )}
             </Flex>
           </Container>
-          <Box flex="1 1 650px" minWidth={300} maxWidth={750} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
+          <Box flex="1 1 650px" minWidth={300} maxWidth={792} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
             <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
               <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
             </H1>
