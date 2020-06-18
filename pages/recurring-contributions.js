@@ -197,15 +197,7 @@ class recurringContributionsPage extends React.Component {
             )}
             <CollectiveNavbar collective={collective} onlyInfos={true} />
             <MainContainer py={[3, 4]} px={[2, 3]}>
-              <SectionTitle textAlign="left" mb={1}>
-                <FormattedMessage
-                  id="Subscriptions.Title"
-                  defaultMessage="{collectiveName}'s recurring financial contributions"
-                  values={{
-                    collectiveName: collective.name,
-                  }}
-                />
-              </SectionTitle>
+              <P>This is a test</P>
               <Box mt={4} mx="auto">
                 <StyledFilters
                   filters={filters}
