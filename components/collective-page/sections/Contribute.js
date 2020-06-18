@@ -11,7 +11,6 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { parseToBoolean } from '../../../lib/utils';
 
 import { getCollectivePageQueryVariables } from '../../../pages/new-collective-page';
 import Container from '../../Container';
@@ -44,9 +43,6 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
     return <LoadingPlaceholder height={400} />;
   },
 });
-
-// link to new fiscal host application flow if flag is on
-const newHostFlow = parseToBoolean(process.env.NEW_HOST_APPLICATION_FLOW);
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
@@ -310,10 +306,7 @@ class SectionContribute extends React.PureComponent {
               </P>
             </Flex>
             <Box my={5}>
-              <Link
-                route={newHostFlow ? 'accept-financial-contributions' : 'editCollective'}
-                params={newHostFlow ? { slug: collective.slug } : { slug: collective.slug, section: 'host' }}
-              >
+              <Link route={'accept-financial-contributions'} params={{ slug: collective.slug }}>
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>
