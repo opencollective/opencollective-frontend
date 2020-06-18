@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Enviar resposta",
   "CommentForm.SignIn": "Por favor, autentique-se para comentar:",
   "comments.count": "{n, plural, one {# comentário} other {# comentários}}",
-  "completePledge.MissingOrder": "Esta promessa não existe ou já foi completada.",
-  "completePledge.Title": "Complete sua promessa",
   "confirm": "Confirmar",
   "confirmCollective.deletion.title": "Seu {collectiveType} foi excluído.",
   "confirmCollective.other.deletion.description": "Nós deletamos o seu {collectiveType}, despesas, colaboradores, níveis e todas as entidades relacionadas a este {collectiveType}.",

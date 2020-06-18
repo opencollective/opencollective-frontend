@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Odeslat odpověď",
   "CommentForm.SignIn": "Pro komentování se přihlaste:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
-  "completePledge.MissingOrder": "This pledge doesn't exist or has already been completed.",
-  "completePledge.Title": "Dokončete svůj závazek",
   "confirm": "Potvrdit",
   "confirmCollective.deletion.title": "Váš {collectiveType} byl smazán.",
   "confirmCollective.other.deletion.description": "Smazali jsme Váš {collectiveType}, výdaje, přispěvatele, úrovně a všechny věci související s tímto {collectiveType}.",

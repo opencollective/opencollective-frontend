@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Antwort posten",
   "CommentForm.SignIn": "Bitte logge dich zum Kommentieren ein:",
   "comments.count": "{n, plural, one {# Kommentar} other {# Kommentare}}",
-  "completePledge.MissingOrder": "This pledge doesn't exist or has already been completed.",
-  "completePledge.Title": "Vervollständige dein Versprechen",
   "confirm": "Bestätigen",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",
   "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",

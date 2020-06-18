@@ -1620,7 +1620,6 @@ type Mutation {
   deleteEventCollective(id: Int!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   deleteUserCollective(id: Int!): CollectiveInterface
-  claimCollective(id: Int!): CollectiveInterface
 
   """
   Approve a collective

@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "发表回复",
   "CommentForm.SignIn": "请登录后发表评论:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
-  "completePledge.MissingOrder": "This pledge doesn't exist or has already been completed.",
-  "completePledge.Title": "Complete your pledge",
   "confirm": "确认",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",
   "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",

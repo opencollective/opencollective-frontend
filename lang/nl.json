@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Plaats een reactie",
   "CommentForm.SignIn": "Please sign in to comment:",
   "comments.count": "{n, plural, one {# reactie} other {# reacties}}",
-  "completePledge.MissingOrder": "Deze belofte bestaat niet of is al voltooid.",
-  "completePledge.Title": "Voltooi je belofte",
   "confirm": "Bevestigen",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",
   "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",
