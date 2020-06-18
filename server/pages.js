@@ -25,6 +25,7 @@ const pages = routes()
   .add('hosts', '/hosts')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
+  .add('create-project', '/:parentCollectiveSlug/projects/(new|create)')
   .add('createOrganization', '/organizations/new')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
@@ -69,7 +70,7 @@ const pages = routes()
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
 
-pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?', 'create-fund');
+pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
 
 // New Create Collective Flow
 pages.add(
