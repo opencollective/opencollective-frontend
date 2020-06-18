@@ -6,4 +6,4 @@ We have team members answering from the USA, France, Belgium, Germany and New Ze
 
 To contact support, write by email to:
 
-<span style="font-size: 2em">[support@opencollective.com](mailto:support@opencollective.com)</span>
+<span style="font-size: 2em; word-break: break-all;">[support@opencollective.com](mailto:support@opencollective.com)</span>
