@@ -76,7 +76,7 @@ describe('Contribution Flow: Donate', () => {
       cy.checkStepsProgress({ enabled: 'contributeAs', disabled: ['details', 'payment'] });
 
       // Previous credit card should be added to the account
-      cy.reload(visitParams);
+      cy.reload();
       cy.contains('Next step').click();
       cy.contains('Next step').click();
       cy.contains('#PaymentMethod label:first', 'VISA ****');
