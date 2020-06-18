@@ -13,8 +13,8 @@ env:
   IMAGES_URL: http://localhost:3001
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
-  CYPRESS_RECORD: true
-  CYPRESS_VIDEO: true
+  CYPRESS_RECORD: false
+  CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
