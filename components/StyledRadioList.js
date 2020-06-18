@@ -47,14 +47,6 @@ export const getItems = (options, keyGetter) => {
   );
 };
 
-const getValueFromProps = props => {
-  if (!isUndefined(props.value)) {
-    return props.value;
-  } else {
-    return props.defaultValue;
-  }
-};
-
 /**
  * Component for controlling a list of radio inputs
  */
@@ -70,12 +62,11 @@ const StyledRadioList = ({
   labelProps,
   ...props
 }) => {
-  const [localStateSelected, setSelected] = useState(getValueFromProps(props));
+  const [localStateSelected, setSelected] = useState(props.defaultValue);
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
   const defaultValueStr = props.defaultValue !== undefined && props.defaultValue.toString();
-  const valueFromProps = getValueFromProps(props);
-  const selected = isUndefined(valueFromProps) ? localStateSelected : valueFromProps;
+  const selected = !isUndefined(props.value) ? props.value : localStateSelected;
   return (
     <Container id={id} as="fieldset" border="none" m={0} p={0} {...containerProps}>
       {items.map(({ value, key }, index) => (
