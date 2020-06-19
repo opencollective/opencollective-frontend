@@ -26,6 +26,7 @@ import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import { CollectivePledgesQuery } from '../components/PledgedCollectivePage';
 import StyledButtonSet from '../components/StyledButtonSet';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputAmount from '../components/StyledInputAmount';
@@ -230,7 +231,7 @@ class CreatePledgePage extends React.Component {
     try {
       const {
         data: { createOrder: result },
-      } = await this.props.createPledge(order, this.props.slug);
+      } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
         const params = { slug: result.collective.slug };
         Router.pushRoute('collective', params);
@@ -727,10 +728,15 @@ export const addCreatePledgeMutation = graphql(
   `,
   {
     props: ({ mutate }) => ({
-      createPledge: async (order, collectiveSlug) => {
+      createPledge: async (order, collective) => {
         return await mutate({
           variables: { order },
-          refetchQueries: !collectiveSlug ? [] : [{ query: getCollectiveQuery, variables: { slug: collectiveSlug } }],
+          refetchQueries: !collective
+            ? []
+            : [
+                { query: getCollectiveQuery, variables: { slug: collective.slug } },
+                { query: CollectivePledgesQuery, variables: { id: collective.id } },
+              ],
         });
       },
     }),
