@@ -6,7 +6,6 @@ import { get, kebabCase, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { states } from '../../lib/constants/transferwise';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -131,7 +130,7 @@ const Input = props => {
                       refetch({
                         slug: host.slug,
                         currency,
-                        accountDetails: set({ ...formik.values }, field.name, value).data,
+                        accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
                       });
                     }
                   }}
@@ -161,27 +160,9 @@ Input.propTypes = {
 };
 
 const FieldGroup = ({ field, ...props }) => {
-  const selectedCountry = get(props.formik.values, props.getFieldName(`data.details.address.country`));
-  const group = field.group;
-  if (
-    group.some(g => g.key === 'address.country') &&
-    states[selectedCountry] &&
-    // There is some inconsistency between the sandbox and the production TransferWise environment
-    !group.some(g => g.key === 'address.state')
-  ) {
-    group.push({
-      example: '',
-      key: 'address.state',
-      name: 'State',
-      required: true,
-      type: 'select',
-      validationRegexp: null,
-      valuesAllowed: states[selectedCountry],
-    });
-  }
   return (
     <Box flex="1">
-      {group.map(input => (
+      {field.group.map(input => (
         <Input key={input.key} input={input} {...props} />
       ))}
     </Box>
