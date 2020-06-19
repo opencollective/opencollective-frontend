@@ -204,7 +204,7 @@ const DEFAULT_SECTIONS = {
     Sections.LOCATION,
     Sections.BUDGET,
   ],
-  [CollectiveType.PROJECT]: [Sections.ABOUT, Sections.BUDGET],
+  [CollectiveType.PROJECT]: [Sections.ABOUT, Sections.CONTRIBUTE, Sections.BUDGET],
 };
 
 /** Returns the default sections for collective */

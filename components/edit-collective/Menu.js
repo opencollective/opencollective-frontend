@@ -155,10 +155,11 @@ const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.typ
 const isFund = c => c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
+const isProject = c => c.type === CollectiveType.PROJECT;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c) || isProject(c),
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
@@ -171,7 +172,13 @@ const sectionsDisplayConditions = {
     isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.ORGANIZATION),
+    isOneOfTypes(
+      c,
+      CollectiveType.COLLECTIVE,
+      CollectiveType.EVENT,
+      CollectiveType.ORGANIZATION,
+      CollectiveType.PROJECT,
+    ),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
     isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION, CollectiveType.USER) && !isFund(c),

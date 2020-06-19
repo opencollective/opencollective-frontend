@@ -19,7 +19,7 @@ import Form from './Form';
 const defaultSettings = {
   fund: true,
   features: { conversations: false },
-  collectivePage: { sections: ['budget', 'about'] },
+  collectivePage: { sections: ['budget', 'projects', 'about'] },
 };
 
 class CreateFund extends Component {
@@ -82,7 +82,7 @@ class CreateFund extends Component {
 
   render() {
     const { LoggedInUser, router } = this.props;
-    const { error } = this.state;
+    const { creating, error } = this.state;
     const { category } = router.query;
 
     if (!LoggedInUser) {
@@ -112,15 +112,7 @@ class CreateFund extends Component {
       return <CategoryPicker />;
     }
 
-    return (
-      <Form
-        host={this.getHost()}
-        onSubmit={this.createFund}
-        onChange={this.handleChange}
-        loading={this.state.creating}
-        error={error}
-      />
-    );
+    return <Form host={this.getHost()} onSubmit={this.createFund} loading={creating} error={error} />;
   }
 }
 

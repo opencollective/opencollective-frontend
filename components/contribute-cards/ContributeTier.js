@@ -72,7 +72,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
     routeParams = {
       collectiveSlug: collective.parentCollective.slug,
       verb: 'events',
-      eventSlug: collective.slug,
+      slug: collective.slug,
       tierId: tier.id,
     };
   } else {

@@ -43,8 +43,8 @@ class CreateProject extends Component {
       const createdProject = res.data.createProject;
       await this.props.refetchLoggedInUser();
       Router.pushRoute('project', {
-        parentSlug: this.props.parent.slug,
-        projectSlug: createdProject.slug,
+        parentCollectiveSlug: this.props.parent.slug,
+        slug: createdProject.slug,
         status: 'projectCreated',
       }).then(() => window.scrollTo(0, 0));
     } catch (err) {

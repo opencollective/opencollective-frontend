@@ -38,6 +38,11 @@ const messages = defineMessages({
     id: 'createFund.createdApproved.description',
     defaultMessage: "It's already approved by the host ({host}), you can already contribute money and submit expenses.",
   },
+  // Project Created
+  projectCreated: {
+    id: 'project.created',
+    defaultMessage: 'Your Project has been created with success.',
+  },
   // Organization Created
   organizationCreated: {
     id: 'organization.created',
@@ -111,6 +116,10 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
     return {
       title: intl.formatMessage(messages.fundCreated),
       description: host ? intl.formatMessage(messages.fundCreatedDescription, { host: host.name }) : '',
+    };
+  } else if (status === 'projectCreated') {
+    return {
+      title: intl.formatMessage(messages.projectCreated),
     };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {

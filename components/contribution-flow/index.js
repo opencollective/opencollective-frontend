@@ -153,6 +153,7 @@ class CreateOrderPage extends React.Component {
       currency: PropTypes.string.isRequired,
       hostFeePercent: PropTypes.number.isRequired,
       location: PropTypes.shape({ country: PropTypes.string }),
+      settings: PropTypes.object,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string,
         settings: PropTypes.object,
@@ -594,7 +595,14 @@ class CreateOrderPage extends React.Component {
 
     return LoggedInUser.memberOf
       .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
-      .map(({ collective }) => collective);
+      .map(({ collective }) => collective)
+      .map(collective => {
+        // Funds MVP, to refactor
+        if (collective.settings?.fund) {
+          collective.type = 'FUND';
+        }
+        return collective;
+      });
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */

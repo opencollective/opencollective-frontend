@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -17,11 +16,6 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
-
-const BackButton = styled(StyledButton)`
-  color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
-`;
 
 const ContainerWithImage = styled(Container)`
   @media screen and (min-width: 40em) {
@@ -114,12 +108,6 @@ class CreateFundForm extends React.Component {
     return (
       <Flex flexDirection="column" m={[3, 0]}>
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
-            <BackButton asLink onClick={() => window && window.history.back()}>
-              ←&nbsp;
-              <FormattedMessage id="Back" defaultMessage="Back" />
-            </BackButton>
-          </Box>
           <Box mb={[2, 3]}>
             <H1
               fontSize={['H5', 'H3']}

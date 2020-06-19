@@ -81,7 +81,7 @@ pages.add(
 
 // Events and Projects using new collective page
 pages.add('event', '/:parentCollectiveSlug/events/:slug', 'new-collective-page');
-pages.add('project', '/:parentSlug/projects/:slug', 'new-collective-page');
+pages.add('project', '/:parentCollectiveSlug/projects/:slug', 'new-collective-page');
 
 // Tier page
 // ---------------

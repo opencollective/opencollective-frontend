@@ -2,37 +2,14 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
 import { MapPin } from '@styled-icons/feather/MapPin';
-import themeGet from '@styled-system/theme-get';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
-import styled from 'styled-components';
 
 import Link from '../../Link';
 import StyledTooltip from '../../StyledTooltip';
 
-const StyledEventNote = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 5px 0;
-  font-size: 16px;
-  svg {
-    flex: 0 0 auto;
-    margin-right: 6px;
-  }
-  a {
-    color: #333;
-    &:focus {
-      color: ${themeGet('colors.primary.700')};
-      text-decoration: none;
-    }
-
-    &:hover {
-      color: ${themeGet('colors.primary.400')};
-      text-decoration: none;
-    }
-  }
-`;
+import HeroNote from './HeroNote';
 
 const FormattedDateProps = (value, timeZone) => ({
   value,
@@ -114,7 +91,7 @@ class HeroEventDetails extends React.Component {
     return (
       <Fragment>
         {startsAt && (
-          <StyledEventNote>
+          <HeroNote>
             <Clock size={16} />
             {this.isNotLocalTimeZone() ? (
               <Fragment>
@@ -152,29 +129,31 @@ class HeroEventDetails extends React.Component {
                 isSameDay={this.isSameDay(startsAt, endsAt, timezone)}
               />
             )}
-          </StyledEventNote>
+          </HeroNote>
         )}
 
         {location.name && (
-          <StyledEventNote>
+          <HeroNote>
             <MapPin size={16} />
             <Link route={locationRoute}>
               <span>{location.name}</span>
             </Link>
-          </StyledEventNote>
+          </HeroNote>
         )}
 
-        <StyledEventNote>
-          <span>
-            <FormattedMessage
-              id="Event.CreatedBy"
-              defaultMessage="Created by: {CollectiveLink}"
-              values={{
-                CollectiveLink: <Link route={`/${parentCollective.slug}`}>{parentCollective.name}</Link>,
-              }}
-            />
-          </span>
-        </StyledEventNote>
+        {parentCollective && (
+          <HeroNote>
+            <span>
+              <FormattedMessage
+                id="Event.CreatedBy"
+                defaultMessage="Created by: {CollectiveLink}"
+                values={{
+                  CollectiveLink: <Link route={`/${parentCollective.slug}`}>{parentCollective.name}</Link>,
+                }}
+              />
+            </span>
+          </HeroNote>
+        )}
       </Fragment>
     );
   }

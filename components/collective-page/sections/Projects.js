@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import ContributeProject from '../../contribute-cards/ContributeProject';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
@@ -71,7 +72,13 @@ class SectionProjects extends React.PureComponent {
 
                 <ContributeCardsContainer ref={ref}>
                   {projects.map(project => (
-                    <ContributeCardContainer key={project.id}></ContributeCardContainer>
+                    <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                      <ContributeProject
+                        collective={collective}
+                        project={project}
+                        disableCTA={!project.isActive || !project.isActive}
+                      />
+                    </Box>
                   ))}
                   {isAdmin && (
                     <ContributeCardContainer minHeight={150}>

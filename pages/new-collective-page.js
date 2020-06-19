@@ -169,6 +169,7 @@ class NewCollectivePage extends React.Component {
                   financialContributors={collective.financialContributors}
                   tiers={collective.tiers}
                   events={collective.events}
+                  projects={collective.projects}
                   connectedCollectives={collective.connectedCollectives}
                   transactions={collective.transactions}
                   expenses={collective.expenses}

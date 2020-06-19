@@ -133,14 +133,15 @@ class CollectivePage extends Component {
     (type, isHost, isAdmin, isRoot, isAuthenticated, canApply, canContact, isArchived, isActive, isFund) => {
       const isCollective = type === CollectiveType.COLLECTIVE;
       const isEvent = type === CollectiveType.EVENT;
+      const isProject = type === CollectiveType.PROJECT;
       return {
         hasContact: !isAdmin && canContact && (!isFund || isAuthenticated),
-        hasContribute: isFund && isActive,
-        hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
+        hasContribute: (isFund || isProject) && isActive,
+        hasSubmitExpense: (isCollective || isEvent || isProject || (isHost && isActive)) && !isArchived,
         // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
         hasApply: canApply && !isAdmin,
         hasDashboard: isHost && isAdmin,
-        hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
+        hasManageSubscriptions: isAdmin && !isCollective && !isEvent && !isProject,
         // Don't display "Add Funds" if it's an Host and you're the Admin
         addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
       };
@@ -226,7 +227,13 @@ class CollectivePage extends Component {
           <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
         );
       case Sections.PROJECTS:
-        return <SectionProjects collective={this.props.collective} projects={[]} isAdmin={this.props.isAdmin} />;
+        return (
+          <SectionProjects
+            collective={this.props.collective}
+            projects={this.props.projects}
+            isAdmin={this.props.isAdmin}
+          />
+        );
       default:
         return null;
     }

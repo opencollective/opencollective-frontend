@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';

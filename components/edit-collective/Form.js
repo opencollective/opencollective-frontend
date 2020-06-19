@@ -871,7 +871,7 @@ class EditCollectiveForm extends React.Component {
                     route={isEvent ? 'event' : 'collective'}
                     params={
                       isEvent
-                        ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                        ? { parentCollectiveSlug: collective.parentCollective.slug, slug: collective.slug }
                         : { slug: collective.slug }
                     }
                   >
