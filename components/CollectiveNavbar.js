@@ -359,7 +359,7 @@ const CollectiveNavbar = ({
   intl,
 }) => {
   const [isExpended, setExpended] = React.useState(false);
-  sections = sections || getSectionsForCollective(collective, isAdmin);
+  sections = sections || getFilteredSectionsForCollective(collective, isAdmin);
   callsToAction = { ...getDefaultCallsToactions(collective, isAdmin), ...callsToAction };
 
   return (
