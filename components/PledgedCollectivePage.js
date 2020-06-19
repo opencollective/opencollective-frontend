@@ -21,7 +21,7 @@ import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
-const CollectivePledgesQuery = gql`
+export const CollectivePledgesQuery = gql`
   query CollectivePledges($id: Int!) {
     Collective(id: $id) {
       id
