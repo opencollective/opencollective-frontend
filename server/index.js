@@ -14,6 +14,7 @@ const loggerMiddleware = require('./logger-middleware');
 const routes = require('./routes');
 const { Sentry } = require('./sentry');
 const hyperwatch = require('./hyperwatch');
+const rateLimiter = require('./rate-limiter');
 
 const app = express();
 
@@ -31,6 +32,8 @@ nextApp.prepare().then(() => {
   app.use(Sentry.Handlers.requestHandler());
 
   hyperwatch(app);
+
+  rateLimiter(app);
 
   app.use(helmet());
 

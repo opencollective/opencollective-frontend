@@ -200,6 +200,6 @@ pages.add(
 );
 
 // testing new recurring contributions page
-pages.add('recurring-contributions', '/:collectiveSlug/recurring-contributions');
+pages.add('recurring-contributions', '/:slug/recurring-contributions');
 
 module.exports = pages;

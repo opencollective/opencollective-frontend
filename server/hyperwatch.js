@@ -2,20 +2,14 @@ const hyperwatch = require('@hyperwatch/hyperwatch');
 const expressBasicAuth = require('express-basic-auth');
 const expressWs = require('express-ws');
 
+const { parseToBooleanDefaultFalse } = require('./utils');
+
 const {
   HYPERWATCH_ENABLED: enabled,
   HYPERWATCH_PATH: path,
   HYPERWATCH_USERNAME: username,
   HYPERWATCH_SECRET: secret,
 } = process.env;
-
-const parseToBooleanDefaultFalse = value => {
-  if (value === null || value === undefined || value === '') {
-    return false;
-  }
-  const string = value.toString().trim().toLowerCase();
-  return ['on', 'enabled', '1', 'true', 'yes'].includes(string);
-};
 
 const load = async app => {
   if (parseToBooleanDefaultFalse(enabled) !== true) {
@@ -53,12 +47,11 @@ const load = async app => {
   // Configure access Logs in dev and production
 
   const consoleLogOutput = process.env.NODE_ENV === 'development' ? 'console' : 'text';
-  const consoleLogFormatter = new lib.formatter.Formatter(consoleLogOutput);
   pipeline
     .filter(log => !log.getIn(['request', 'url']).match(/^\/_/))
     .filter(log => !log.getIn(['request', 'url']).match(/^\/static/))
     .filter(log => !log.getIn(['request', 'url']).match(/^\/api/))
-    .map(log => console.log(consoleLogFormatter.format(log)));
+    .map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
 
   // Start
 

@@ -2,25 +2,24 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
-import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import AuthenticatedPage from '../components/AuthenticatedPage';
-import { Dimensions } from '../components/collective-page/_constants';
-import SectionTitle from '../components/collective-page/SectionTitle';
-import CollectiveNavbar from '../components/CollectiveNavbar';
-import Container from '../components/Container';
-import ErrorPage from '../components/ErrorPage';
-import { Box } from '../components/Grid';
-import I18nFormatters from '../components/I18nFormatters';
-import Loading from '../components/Loading';
-import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
-import StyledFilters from '../components/StyledFilters';
-import TemporaryNotification from '../components/TemporaryNotification';
-import { P } from '../components/Text';
-import { withUser } from '../components/UserProvider';
+import { Dimensions } from '../_constants';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import I18nFormatters from '../../I18nFormatters';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
+import RecurringContributionsContainer from '../../recurring-contributions/RecurringContributionsContainer';
+import StyledFilters from '../../StyledFilters';
+import TemporaryNotification from '../../TemporaryNotification';
+import { P } from '../../Text';
+import { withUser } from '../../UserProvider';
+import ContainerSectionContent from '../ContainerSectionContent';
+import SectionTitle from '../SectionTitle';
+
+import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 
 export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
   query RecurringContributions($slug: String) {
@@ -42,7 +41,6 @@ export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
           }
           amount {
             value
-            valueInCents
             currency
           }
           status
@@ -70,11 +68,6 @@ export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const MainContainer = styled(Container)`
-  max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
-  margin: 0 auto;
-`;
-
 const FILTERS = {
   ACTIVE: 'ACTIVE',
   MONTHLY: 'MONTHLY',
@@ -100,7 +93,7 @@ const I18nFilters = defineMessages({
   },
 });
 
-class recurringContributionsPage extends React.Component {
+class SectionRecurringContributions extends React.Component {
   static getInitialProps({ query: { slug } }) {
     return { slug };
   }
@@ -142,28 +135,43 @@ class recurringContributionsPage extends React.Component {
   };
 
   render() {
-    const { slug, data, LoggedInUser, intl } = this.props;
+    const { data, LoggedInUser, intl } = this.props;
     const { notification, notificationType, notificationText } = this.state;
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
-    if (!data.loading) {
-      if (!data || data.error) {
-        return <ErrorPage data={data} />;
-      } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
-      }
+    if (data.loading || !LoggedInUser) {
+      return <LoadingPlaceholder height={600} borderRadius={0} />;
+    } else if (!data.account) {
+      return (
+        <Container display="flex" border="1px dashed #d1d1d1" justifyContent="center" py={[6, 7]} background="#f8f8f8">
+          <MessageBox type="error" withIcon>
+            <FormattedMessage
+              id="NCP.SectionFetchError"
+              defaultMessage="We encountered an error while retrieving the data for this section."
+            />
+          </MessageBox>
+        </Container>
+      );
     }
 
     const collective = data && data.account;
     const recurringContributions = collective && collective.orders;
+    const hasRecurringContributions = recurringContributions.nodes.length;
 
     return (
-      <AuthenticatedPage>
-        {data.loading || !LoggedInUser ? (
-          <Container py={[5, 6]}>
-            <Loading />
-          </Container>
+      <Box pt={5} pb={3}>
+        {!hasRecurringContributions ? (
+          <Flex flexDirection="column" alignItems="center">
+            <img src={EmptyCollectivesSectionImageSVG} alt="" />
+            <P color="black.600" fontSize="LeadParagraph" mt={5}>
+              <FormattedMessage
+                id="CollectivePage.SectionRecurringContributions.Empty"
+                defaultMessage="{collectiveName} doesn't seem to to have any recurring contributions yet! 😔"
+                values={{ collectiveName: collective.name }}
+              />
+            </P>
+          </Flex>
         ) : (
           <Fragment>
             {notification && (
@@ -195,37 +203,36 @@ class recurringContributionsPage extends React.Component {
                 {notificationType === 'error' && <P>{notificationText}</P>}
               </TemporaryNotification>
             )}
-            <CollectiveNavbar collective={collective} onlyInfos={true} />
-            <MainContainer py={[3, 4]} px={[2, 3]}>
+            <ContainerSectionContent>
               <SectionTitle textAlign="left" mb={1}>
                 <FormattedMessage
-                  id="Subscriptions.Title"
-                  defaultMessage="{collectiveName}'s recurring financial contributions"
-                  values={{
-                    collectiveName: collective.name,
-                  }}
+                  id="CollectivePage.SectionRecurringContributions.Title"
+                  defaultMessage="Recurring Contributions"
                 />
               </SectionTitle>
-              <Box mt={4} mx="auto">
-                <StyledFilters
-                  filters={filters}
-                  getLabel={key => intl.formatMessage(I18nFilters[key])}
-                  selected={this.state.filter}
-                  justifyContent="left"
-                  minButtonWidth={175}
-                  onChange={filter => this.setState({ filter: filter })}
-                />
-              </Box>
+            </ContainerSectionContent>
+            <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+              <StyledFilters
+                filters={filters}
+                getLabel={key => intl.formatMessage(I18nFilters[key])}
+                selected={this.state.filter}
+                justifyContent="left"
+                minButtonWidth={175}
+                px={Dimensions.PADDING_X}
+                onChange={filter => this.setState({ filter: filter })}
+              />
+            </Box>
+            <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} mt={4} mx="auto">
               <RecurringContributionsContainer
                 recurringContributions={recurringContributions}
                 account={collective}
                 filter={this.state.filter}
                 createNotification={this.createNotification}
               />
-            </MainContainer>
+            </Container>
           </Fragment>
         )}
-      </AuthenticatedPage>
+      </Box>
     );
   }
 }
@@ -236,4 +243,4 @@ const getData = graphql(recurringContributionsPageQuery, {
   },
 });
 
-export default injectIntl(withUser(getData(recurringContributionsPage)));
+export default injectIntl(withUser(getData(SectionRecurringContributions)));

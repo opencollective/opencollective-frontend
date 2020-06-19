@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { CollectiveType } from '../lib/constants/collectives';
-import { canOrderTicketsFromEvent } from '../lib/events';
+import { canOrderTicketsFromEvent, isPastEvent } from '../lib/events';
 import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
 
 import { AllSectionsNames, Dimensions, Sections } from './collective-page/_constants';
@@ -179,7 +179,12 @@ const DEFAULT_SECTIONS = {
     Sections.BUDGET,
     Sections.ABOUT,
   ],
-  [CollectiveType.USER]: [Sections.CONTRIBUTIONS, Sections.TRANSACTIONS, Sections.ABOUT],
+  [CollectiveType.USER]: [
+    Sections.CONTRIBUTIONS,
+    Sections.TRANSACTIONS,
+    Sections.RECURRING_CONTRIBUTIONS,
+    Sections.ABOUT,
+  ],
   [CollectiveType.COLLECTIVE]: [
     Sections.GOALS,
     Sections.CONTRIBUTE,
@@ -235,14 +240,16 @@ export const getSectionsForCollective = collective => {
  *    - `stats` {object} with following properties: `updates`, (`balance` or `transactions`)
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
-export const getFilteredSectionsForCollective = (collective, isAdmin) => {
+export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmin) => {
   const sections = getSectionsForCollective(collective);
   const toRemove = new Set();
   collective = collective || {};
   const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  const hasContribute = collective.isActive;
+  const hasCustomContribution = !collective.settings?.disableCustomContributions;
+  const hasTiers = Boolean(collective.tiers?.length || hasCustomContribution);
+  const hasContribute = collective.isActive && hasTiers && !isPastEvent(collective);
   const hasOtherWaysToContribute =
     !isEvent && (collective.events?.length > 0 || collective.connectedCollectives?.length > 0);
   if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
@@ -264,7 +271,7 @@ export const getFilteredSectionsForCollective = (collective, isAdmin) => {
   }
 
   // Some sections are hidden for non-admins (usually when there's no data)
-  if (!isAdmin) {
+  if (!isAdmin && !isHostAdmin) {
     const { updates, transactions, balance } = collective.stats || {};
     if (!updates) {
       toRemove.add(Sections.UPDATES);
@@ -290,9 +297,14 @@ export const getFilteredSectionsForCollective = (collective, isAdmin) => {
 
   // Funds MVP, to refactor
   if (collective.settings?.fund) {
-    if (!isAdmin) {
+    if (!isAdmin && !isHostAdmin) {
       toRemove.add(Sections.BUDGET);
     }
+  }
+
+  // Recurring contributions
+  if (!collective.settings?.recurringContributions) {
+    toRemove.add(Sections.RECURRING_CONTRIBUTIONS);
   }
 
   if (isEvent) {

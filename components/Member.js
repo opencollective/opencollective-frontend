@@ -26,7 +26,7 @@ class Member extends React.Component {
 
     this.messages = defineMessages({
       'membership.since': { id: 'membership.since', defaultMessage: 'since {date}' },
-      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Collective Admin' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
       MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       BACKER: { id: 'Member.Role.BACKER', defaultMessage: 'Financial Contributor' },
       'membership.totalDonations': {

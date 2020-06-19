@@ -103,7 +103,19 @@ export const searchableCustomComponents = { ...customComponents, DropdownIndicat
  * See https://react-select.com for more documentation.
  */
 export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs(
-  ({ theme, intl, placeholder, disabled, isDisabled, useSearchIcon, hideDropdownIndicator, hideMenu, error }) => ({
+  ({
+    theme,
+    intl,
+    placeholder,
+    disabled,
+    isDisabled,
+    useSearchIcon,
+    hideDropdownIndicator,
+    hideMenu,
+    error,
+    controlStyles,
+    isSearchable,
+  }) => ({
     isDisabled: disabled || isDisabled,
     placeholder: placeholder || intl.formatMessage(Messages.placeholder),
     loadingMessage: () => intl.formatMessage(Messages.loading),
@@ -111,7 +123,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     components: useSearchIcon ? searchableCustomComponents : customComponents,
     styles: {
       control: (baseStyles, state) => {
-        const customStyles = { borderColor: theme.colors.black[300], cursor: 'text' };
+        const customStyles = { borderColor: theme.colors.black[300] };
 
         if (error) {
           customStyles.borderColor = theme.colors.red[500];
@@ -125,7 +137,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           customStyles.boxShadow = `inset 0px 2px 2px ${theme.colors.primary[50]}`;
         }
 
-        return { ...baseStyles, ...customStyles };
+        if (isSearchable !== false) {
+          customStyles.cursor = 'text';
+        } else {
+          customStyles.cursor = 'pointer';
+        }
+
+        return { ...baseStyles, ...customStyles, ...controlStyles };
       },
       option: (baseStyles, state) => {
         const customStyles = { cursor: 'pointer' };
@@ -206,6 +224,7 @@ StyledSelect.propTypes = {
   intl: PropTypes.object,
   /** Default option */
   defaultValue: PropTypes.object,
+  controlStyles: PropTypes.object,
   // Styled-system
   ...propTypes.typography,
   ...propTypes.layout,
@@ -214,6 +233,7 @@ StyledSelect.propTypes = {
 
 StyledSelect.defaultProps = {
   fontSize: 'Paragraph',
+  controlStyles: {},
 };
 
 /** @component */

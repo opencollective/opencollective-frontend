@@ -10,8 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { parseToBoolean } from '../../../lib/utils';
 
 import { getCollectivePageQueryVariables } from '../../../pages/new-collective-page';
 import Container from '../../Container';
@@ -44,9 +44,6 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
     return <LoadingPlaceholder height={400} />;
   },
 });
-
-// link to new fiscal host application flow if flag is on
-const newHostFlow = parseToBoolean(process.env.NEW_HOST_APPLICATION_FLOW);
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
@@ -228,7 +225,7 @@ class SectionContribute extends React.PureComponent {
   getFinancialContributions = memoizeOne(sortedTiers => {
     const { collective, contributors, contributorsStats } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
-    const isActive = collective.isActive;
+    const canContribute = collective.isActive && !isPastEvent(collective);
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
     const waysToContribute = [];
 
@@ -243,7 +240,7 @@ class SectionContribute extends React.PureComponent {
               contributors: this.getFinancialContributorsWithoutTier(contributors),
               stats: contributorsStats,
               hideContributors: hasNoContributor,
-              disableCTA: !isActive,
+              disableCTA: !canContribute,
             },
           });
         }
@@ -255,7 +252,7 @@ class SectionContribute extends React.PureComponent {
             collective,
             tier,
             hideContributors: hasNoContributor,
-            disableCTA: !isActive,
+            disableCTA: !canContribute,
           },
         });
       }
@@ -279,7 +276,6 @@ class SectionContribute extends React.PureComponent {
     const hasHost = collective.host;
     const isHost = collective.isHost;
     const waysToContribute = this.getFinancialContributions(sortedTiers);
-    const canMoveTiers = isAdmin && waysToContribute.length > 1;
 
     /*
     cases
@@ -310,10 +306,7 @@ class SectionContribute extends React.PureComponent {
               </P>
             </Flex>
             <Box my={5}>
-              <Link
-                route={newHostFlow ? 'accept-financial-contributions' : 'editCollective'}
-                params={newHostFlow ? { slug: collective.slug } : { slug: collective.slug, section: 'host' }}
-              >
+              <Link route={'accept-financial-contributions'} params={{ slug: collective.slug }}>
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>
@@ -354,7 +347,7 @@ class SectionContribute extends React.PureComponent {
                             </P>
                           </ContainerOverlay>
                         )}
-                        {!(canMoveTiers && showTiersAdmin) && (
+                        {!(isAdmin && showTiersAdmin) && (
                           <ContributeCardsContainer ref={ref} disableScrollSnapping={!!draggingContributionsOrder}>
                             {waysToContribute.map(({ key, Component, componentProps }) => (
                               <ContributeCardContainer key={key}>
@@ -363,7 +356,7 @@ class SectionContribute extends React.PureComponent {
                             ))}
                           </ContributeCardsContainer>
                         )}
-                        {canMoveTiers && (
+                        {isAdmin && (
                           <Container display={showTiersAdmin ? 'block' : 'none'}>
                             <AdminContributeCardsContainer
                               collective={collective}

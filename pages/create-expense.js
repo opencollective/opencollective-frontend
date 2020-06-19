@@ -239,7 +239,7 @@ class CreateExpensePage extends React.Component {
             )}
             <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
               <Flex justifyContent="space-between" flexWrap="wrap">
-                <Box flex="1 1 500px" minWidth={300} maxWidth={750} mr={[0, 3, 5]} mb={5}>
+                <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
                   <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
                     {step === STEPS.FORM ? (
                       <FormattedMessage id="create-expense.title" defaultMessage="Submit expense" />
