@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import Container from './Container';
 import { Flex } from './Grid';
 import Link from './Link';
 import StyledButton from './StyledButton';
-import { TextInput } from './StyledInput';
+import StyledInput from './StyledInput';
 
 const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
   const { pathname, query } = router;
@@ -20,7 +21,7 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
     }
 
     const { value } = target;
-    if (!value) {
+    if (!value || !parseInt(value) || parseInt(value) === currentPage) {
       return;
     }
 
@@ -44,13 +45,13 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
           </StyledButton>
         </Link>
       )}
-      <Flex alignItems="center" mx={2}>
+      <Container display="inline-block" mx={2}>
         <FormattedMessage
           id="Pagination.Count"
           defaultMessage="Page {current} of {total}"
           values={{
             current: (
-              <TextInput
+              <StyledInput
                 key={offset}
                 defaultValue={currentPage}
                 onBlur={changePage}
@@ -61,12 +62,15 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
                 py={1}
                 width={30}
                 disabled={isDisabled}
+                type="text"
+                pattern="[0-9]+"
+                data-cy="pagination-current"
               />
             ),
-            total: totalPages || 1,
+            total: <span data-cy="pagination-total">{totalPages || 1}</span>,
           }}
         />
-      </Flex>
+      </Container>
       {currentPage < totalPages && (
         <Link
           route={route || router.route.slice(1)}

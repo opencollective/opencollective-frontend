@@ -171,6 +171,7 @@ class ExpensePage extends React.Component {
                         values={{
                           ResetLink: text => (
                             <Link
+                              data-cy="reset-expenses-filters"
                               route="expenses"
                               params={this.buildFilterLinkParams(mapValues(this.props.query, () => null))}
                             >

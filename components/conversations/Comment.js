@@ -113,7 +113,7 @@ const Comment = ({
           }
         </InlineEditField>
         {(reactions || hasReactionsPicker) && (
-          <Flex mt={3} flexWrap="wrap">
+          <Flex mt={3} flexWrap="wrap" data-cy="comment-reactions">
             {reactions && <CommentReactions reactions={reactions} />}
             {hasReactionsPicker && <CommentReactionPicker comment={comment} reactions={reactions} />}
           </Flex>

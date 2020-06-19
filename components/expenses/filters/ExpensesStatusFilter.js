@@ -13,6 +13,7 @@ const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
 
   return (
     <ExpensesFilter
+      data-cy="expenses-filter-status"
       isSearchable={false}
       options={[getOption('ALL'), ...Object.values(expenseStatus).map(getOption)]}
       onChange={({ value }) => onChange(value)}

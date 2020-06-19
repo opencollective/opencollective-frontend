@@ -59,6 +59,7 @@ const AdminActionButtons = ({ canEdit, canDelete, openDeleteConfirmation, onEdit
       {/** Buttons */}
       {canEdit && (
         <CommentBtn
+          data-cy="edit-comment-btn"
           onClick={() => {
             closePopup();
             onEdit();
@@ -70,6 +71,7 @@ const AdminActionButtons = ({ canEdit, canDelete, openDeleteConfirmation, onEdit
       )}
       {canDelete && (
         <CommentBtn
+          data-cy="delete-comment-btn"
           onClick={() => {
             closePopup();
             openDeleteConfirmation();
@@ -133,7 +135,12 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
   return (
     <React.Fragment>
       <div>
-        <StyledButton ref={setRefElement} buttonSize="tiny" onClick={() => setShowAdminActions(!showAdminActions)}>
+        <StyledButton
+          ref={setRefElement}
+          buttonSize="tiny"
+          data-cy="commnent-actions-trigger"
+          onClick={() => setShowAdminActions(!showAdminActions)}
+        >
           <RoundHoriztonalDotsIcon size="16" />
         </StyledButton>
       </div>

@@ -66,6 +66,7 @@ const ExpensesDateFilter = ({ onChange, value, ...props }) => {
 
   return (
     <ExpensesFilter
+      data-cy="expenses-filter-period"
       isSearchable={false}
       value={selected ? getOption(...selected) : allPeriodsOption}
       onChange={({ value }) => onChange(value)}

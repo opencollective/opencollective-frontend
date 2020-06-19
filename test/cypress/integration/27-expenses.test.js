@@ -2,7 +2,6 @@ import 'cypress-file-upload';
 
 const random = Math.round(Math.random() * 100000);
 const expenseDescription = `New expense ${random}`;
-import { randomSlug } from '../support/faker';
 
 const uploadReceipt = (dropzoneElement = '.InputTypeDropzone input') => {
   cy.fixture('./images/receipt.jpg').then(picture => {
@@ -155,112 +154,53 @@ describe('New expense flow', () => {
   });
 
   describe('Actions on expense', () => {
-    let collectiveSlug;
+    let collective;
+    let user;
+    let expenseUrl;
 
     before(() => {
-      cy.login({ redirect: '/brusselstogetherasbl' });
-      cy.get('[data-cy="host-apply-btn"]:visible').click();
-      collectiveSlug = randomSlug();
-      cy.get(`input[name="name"]`).type('new-collective');
-      cy.get(`input[name="slug"]`).type(collectiveSlug);
-      cy.get(`input[name="description"]`).type('short description for new collective');
-      cy.get('[data-cy="custom-checkbox"]').click();
-      cy.wait(300);
-      cy.get('button[type="submit"]').click();
-      cy.wait(1000);
-      cy.visit(`/new-collective${collectiveSlug}/expenses/new/v2`);
-      cy.wait(200);
-      cy.getByDataCy('radio-expense-type-RECEIPT').click();
-      cy.get('input[name="description"]').type('Brussels January team retreat');
+      cy.signup().then(response => (user = response));
+    });
 
-      // Upload 2 files to the multi-files dropzone
-      cy.fixture('images/receipt.jpg').then(fileContent => {
-        const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
-        const files = [getFile(1), getFile(2)];
-        cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
-      });
+    before(() => {
+      cy.createHostedCollective({ userEmail: user.email }).then(c => (collective = c));
+    });
 
-      // Fill info for first attachment
-      cy.get('input[name="items[0].description"]').type('Fancy restaurant');
-      cy.get('input[name="items[0].amount"]').type('{selectall}13');
-
-      // Select Payout Method
-      cy.getByDataCy('payout-method-select').click();
-      cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
-      cy.get('[data-cy="payout-other-info"]').type('A simple thanks would work');
-      cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-      cy.get('input[name="items[1].amount"]').type('{selectall}2.50');
-      cy.getByDataCy('expense-summary-btn').click();
-
-      // Submit!
-      cy.getByDataCy('submit-expense-btn').click();
-      cy.getByDataCy('dismiss-temporary-notification-btn').click();
-
-      // Donate some money
-      cy.visit(`/new-collective${collectiveSlug}/donate`);
-      cy.contains('#contributeAs > label', 'A new organization').click();
-
-      // Name must be shown on step
-      cy.get('#contributeAs input[name=name]').type('Evil Corp');
-
-      // Fill form
-      cy.get('#contributeAs input[name=website]').type('https://www.youtube.com/watch?v=oHg5SJYRHA0');
-      cy.get('#contributeAs input[name=githubHandle]').type('test');
-      cy.get('#contributeAs input[name=twitterHandle]').type('test');
-
-      // Submit form
-      cy.contains('button:not([disabled])', 'Next step').click();
-      cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
-
-      cy.contains('button:not([disabled])', 'Next step').click();
-      cy.wait(5000);
-      cy.fillStripeInput();
-      cy.contains('button', 'Make contribution').click();
-      cy.wait(5000);
+    beforeEach(() => {
+      cy.createExpense({
+        userEmail: user.email,
+        user: { paypalEmail: 'paypal@test.com', id: user.id },
+        collective: { id: collective.id },
+      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
     });
 
     it('Approve, unapprove, reject and pay actions on expense', () => {
-      cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
-      cy.wait(100);
-      cy.get('[data-cy="single-expense"]:nth-child(1) [data-cy="expense-link"]').click({ force: true });
-      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
-      cy.get('[data-cy="expense-status-msg"]').contains('pending');
+      cy.visit(expenseUrl);
+      cy.get('[data-cy="expense-status-msg"]').contains('Pending');
       cy.getByDataCy('approve-button').click();
-      cy.get('[data-cy="expense-status-msg"]').contains('approved');
+      cy.get('[data-cy="expense-status-msg"]').contains('Approved');
       cy.getByDataCy('unapprove-button').click();
-      cy.get('[data-cy="expense-status-msg"]').contains('pending');
+      cy.get('[data-cy="expense-status-msg"]').contains('Pending');
       cy.getByDataCy('approve-button').click();
-      cy.getByDataCy('pay-button').click();
-      cy.getByDataCy('mark-as-paid-button').click();
-      cy.get('[data-cy="expense-status-msg"]').contains('paid');
-      cy.get('[data-cy="collective-balance"] > span').contains('€1,216');
-      cy.wait(200);
-      cy.getByDataCy('mark-as-unpaid-button').click();
-      cy.get('[data-cy="expense-status-msg"]').contains('approved');
+      cy.get('[data-cy="expense-status-msg"]').contains('Approved');
       cy.getByDataCy('unapprove-button').click();
-      cy.get('[data-cy="expense-status-msg"]').contains('pending');
+      cy.get('[data-cy="expense-status-msg"]').contains('Pending');
       cy.getByDataCy('reject-button').click();
-      cy.get('[data-cy="expense-status-msg"]').contains('rejected');
-      cy.get('[data-cy="collective-balance"] > span').contains('€1,231');
+      cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
     });
 
-    it('Delete actions on expense', () => {
-      cy.login({ email: 'testuser+admin@opencollective.com' });
-      cy.wait(300);
-      cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
-      cy.wait(300);
-      cy.get('[data-cy="single-expense"]:nth-child(1) [data-cy="expense-link"]').click({ force: true });
-      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
-      cy.get('[data-cy="expense-status-msg"]').contains('rejected');
-      cy.get('[data-cy="collective-balance"] > span').contains('€1,231');
+    it('Delete expense', () => {
+      cy.login({ email: user.email, redirect: expenseUrl });
+      cy.getByDataCy('reject-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
 
       // Now delete the expense
       cy.getByDataCy('delete-expense-button').click();
       cy.getByDataCy('confirmation-modal-continue').click();
-      cy.wait(200);
-      cy.visit(`/new-collective${collectiveSlug}/expenses/v2`);
-      cy.wait(100);
-      cy.get('[data-cy="zero-expense-message"]').contains('No expenses');
+      cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
+      cy.request({ url: expenseUrl, failOnStatusCode: false }).then(resp => {
+        expect(resp.status).to.eq(404);
+      });
     });
   });
 });

@@ -1,73 +1,62 @@
 describe('New Expense Flow comments', () => {
-  describe('Add, Edit and Delete comment', () => {
-    let collectiveSlug;
+  let collective;
+  let user;
+  let expenseUrl;
 
-    before(() => {
-      cy.createHostedCollective().then(collective => {
-        collectiveSlug = collective.slug;
-        cy.login();
-        cy.visit(`/${collectiveSlug}/expenses/new/v2`);
-        cy.wait(200);
-        cy.getByDataCy('radio-expense-type-RECEIPT').click();
-        cy.get('input[name="description"]').type('Brussels January team retreat');
+  before(() => {
+    cy.signup().then(response => (user = response));
+  });
 
-        // Upload 2 files to the multi-files dropzone
-        cy.fixture('images/receipt.jpg').then(fileContent => {
-          const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
-          const files = [getFile(1), getFile(2)];
-          cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
-        });
+  before(() => {
+    cy.createHostedCollective({ userEmail: user.email }).then(c => (collective = c));
+  });
 
-        // Fill info for first attachment
-        cy.get('input[name="items[0].description"]').type('Fancy restaurant');
-        cy.get('input[name="items[0].amount"]').type('{selectall}13');
+  beforeEach(() => {
+    cy.createExpense({
+      userEmail: user.email,
+      user: { paypalEmail: 'paypal@test.com', id: user.id },
+      collective: { id: collective.id },
+    }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
+  });
 
-        // Select Payout Method
-        cy.getByDataCy('payout-method-select').click();
-        cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
-        cy.get('[data-cy="payout-other-info"]').type('A simple thanks would work');
-        cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-        cy.get('input[name="items[1].amount"]').type('{selectall}2.50');
-        cy.getByDataCy('expense-summary-btn').click();
+  it('Add, Edit and delete comment', () => {
+    cy.visit(expenseUrl);
 
-        // Submit!
-        cy.getByDataCy('submit-expense-btn').click();
-        cy.getByDataCy('dismiss-temporary-notification-btn').click();
-      });
-    });
-    beforeEach(() => {
-      cy.login();
-    });
-    it('Add, Edit and delete actions', () => {
-      cy.visit(`/${collectiveSlug}/expenses/v2`);
-      cy.wait(100);
-      cy.get('[data-cy="single-expense"]:nth-child(1) [data-cy="expense-link"]').click({ force: true });
-      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
+    // Adding a comment
+    cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
+    cy.get('@editor').type('I am typing a comment');
+    cy.getByDataCy('submit-comment-btn').click();
+    cy.get('[data-cy="comment-body"]:nth-child(1) > div').contains('I am typing a comment');
+    cy.reload();
+    cy.get('[data-cy="comment-body"]:nth-child(1) > div').contains('I am typing a comment');
 
-      // Adding a comment
+    // Editing the same comment
+    cy.get('[data-cy="comment"]:nth-child(1)').within(() => {
+      cy.getByDataCy('commnent-actions-trigger').click();
+      cy.getByDataCy('edit-comment-btn').click();
       cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
-      cy.get('@editor').type('I am typing a comment');
-      cy.getByDataCy('submit-comment-btn').click();
-      cy.get('[data-cy="comment-body"]:nth-child(1) > div').contains('I am typing a comment');
-      cy.reload();
-      cy.get('[data-cy="comment-body"]:nth-child(1) > div').contains('I am typing a comment');
-      // Editing the same comment
-
-      cy.get('[data-cy="comment"]:nth-child(1)').within(() => {
-        cy.get('[data-cy="edit-comment-button"] > span').contains('Edit').click();
-        cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
-        cy.get('@editor').type('Modifying my first comment');
-        cy.getByDataCy('InlineEditField-Btn-Save').click();
-      });
-
-      // Now deleting my comment
-      cy.get('[data-cy="delete-comment-button"] > span').contains('Delete').click();
-      cy.getByDataCy('confirmation-modal-continue').click();
-
-      // No comments left and hence no thread
-      cy.getByDataCy('comment').should('not.exist');
-      cy.getByDataCy('comment-body').should('not.exist');
+      cy.get('@editor').type('Modifying my first comment');
+      cy.getByDataCy('InlineEditField-Btn-Save').click();
     });
+
+    // Now deleting my comment
+    cy.getByDataCy('commnent-actions-trigger').click();
+    cy.getByDataCy('delete-comment-btn').click();
+    cy.getByDataCy('confirmation-modal-continue').click();
+
+    // No comments left and hence no thread
+    cy.getByDataCy('comment').should('not.exist');
+    cy.getByDataCy('comment-body').should('not.exist');
+  });
+
+  it('Add reactions', () => {
+    cy.login({ redirect: expenseUrl, email: user.email });
+    cy.get('[data-cy="RichTextEditor"] trix-editor').as('editor');
+    cy.get('@editor').type('Add emojis here ⬇️⬇️⬇️');
+    cy.getByDataCy('submit-comment-btn').click();
+    cy.getByDataCy('comment-reaction-picker-trigger').click();
+    cy.contains('[data-cy="comment-reaction-picker-popper"] button', '👍️').click({ force: true });
+    cy.getByDataCy('comment-reactions').contains('👍️ 1');
   });
 });
 
