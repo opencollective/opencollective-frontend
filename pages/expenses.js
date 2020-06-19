@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { has, mapValues, pick } from 'lodash';
+import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -40,6 +40,10 @@ const messages = defineMessages({
   title: {
     id: 'ExpensesPage.title',
     defaultMessage: '{collectiveName} · Expenses',
+  },
+  searchPlaceholder: {
+    id: 'search.placeholder',
+    defaultMessage: 'Search...',
   },
 });
 
@@ -128,7 +132,7 @@ class ExpensePage extends React.Component {
   buildFilterLinkParams(params) {
     return {
       ...pick(this.props, ['collectiveSlug', 'parentCollectiveSlug']),
-      ...pick(this.props.query, ['limit', 'tag', 'type', 'status', 'amount', 'payout', 'searchTerm']),
+      ...omit(this.props.query, ['offset']),
       ...params,
     };
   }
@@ -139,12 +143,7 @@ class ExpensePage extends React.Component {
 
   handleSearch(event) {
     const searchInput = event.target.elements.q;
-    let params;
-    if (searchInput.value) {
-      params = this.buildFilterLinkParams({ searchTerm: searchInput.value });
-    } else {
-      params = this.buildFilterLinkParams({ searchTerm: null });
-    }
+    const params = this.buildFilterLinkParams({ searchTerm: searchInput.value || null });
     Router.pushRoute('expenses', params);
     event.preventDefault();
   }
@@ -156,7 +155,7 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, query } = this.props;
+    const { collectiveSlug, data, query, intl } = this.props;
     const hasFilters = this.hasFilter(query);
 
     if (!data.loading) {
@@ -187,7 +186,11 @@ class ExpensePage extends React.Component {
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
-                    <SearchForm placeholder="Search..." onSubmit={event => this.handleSearch(event)} />
+                    <SearchForm
+                      placeholder={intl.formatMessage(messages.searchPlaceholder)}
+                      onSubmit={event => this.handleSearch(event)}
+                      defaultValue={query.searchTerm}
+                    />
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />

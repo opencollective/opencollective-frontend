@@ -1293,6 +1293,7 @@
   "search.ifYouDontSee": "If you don't see the collective you're looking for:",
   "search.noResult": "No collectives found matching your query: \"{query}\"",
   "search.OpenCollective": "Search Open Collective",
+  "search.placeholder": "Search...",
   "SearchFor": "Search for {entity}",
   "SearchFor2": "Search for {entity1} or {entity2}",
   "SearchFor3": "Search for {entity1}, {entity2} or {entity3}",
