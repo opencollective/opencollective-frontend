@@ -308,7 +308,7 @@ export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmi
 
   // don't display for TYPE=COLLECTIVE if no active contributions
   if (collective.type === CollectiveType.COLLECTIVE) {
-    if (!collective.ordersFromCollective.filter(collective => collective.isSubscriptionActive === true).length) {
+    if (!collective.ordersFromCollective?.some(collective => collective.isSubscriptionActive)) {
       toRemove.add(Sections.RECURRING_CONTRIBUTIONS);
     }
   }
