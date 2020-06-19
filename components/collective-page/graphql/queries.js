@@ -39,7 +39,7 @@ export const getCollectivePageQuery = gql`
       imageUrl(height: 256)
       canApply
       canContact
-      ordersFromCollective {
+      ordersFromCollective(subscriptionsOnly: true) {
         isSubscriptionActive
       }
       stats {
