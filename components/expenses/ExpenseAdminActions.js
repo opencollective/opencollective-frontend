@@ -125,6 +125,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
         <React.Fragment>
           <ButtonWithLabel
             buttonStyle="danger"
+            data-cy="delete-expense-button"
             disabled={isDisabled}
             onClick={() => showDeleteConfirm(true)}
             icon={<IconTrash size={18} />}

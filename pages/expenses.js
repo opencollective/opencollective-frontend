@@ -163,7 +163,7 @@ class ExpensePage extends React.Component {
                   )}
                 </Box>
                 {!data.loading && !data.expenses?.nodes.length ? (
-                  <MessageBox type="info" withIcon>
+                  <MessageBox type="info" withIcon data-cy="zero-expense-message">
                     {hasFilters ? (
                       <FormattedMessage
                         id="ExpensesList.Empty"
@@ -219,12 +219,14 @@ class ExpensePage extends React.Component {
                     expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
                     limit={30}
                     getTagProps={this.getTagProps}
+                    data-cy="expense-tags-title"
                   >
                     {({ key, tag, renderedTag, props }) => (
                       <Link
                         key={key}
                         route="expenses"
                         params={this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag })}
+                        data-cy="expense-tags-link"
                       >
                         {renderedTag}
                       </Link>
