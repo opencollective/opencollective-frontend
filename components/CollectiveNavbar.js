@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { CollectiveType } from '../lib/constants/collectives';
-import { canOrderTicketsFromEvent } from '../lib/events';
+import { canOrderTicketsFromEvent, isPastEvent } from '../lib/events';
 import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
 
 import { AllSectionsNames, Dimensions, Sections } from './collective-page/_constants';
@@ -247,7 +247,9 @@ export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmi
   const isEvent = collective.type === CollectiveType.EVENT;
 
   // Can't contribute anymore if the collective is archived or has no host
-  const hasContribute = collective.isActive;
+  const hasCustomContribution = !collective.settings?.disableCustomContributions;
+  const hasTiers = Boolean(collective.tiers?.length || hasCustomContribution);
+  const hasContribute = collective.isActive && hasTiers && !isPastEvent(collective);
   const hasOtherWaysToContribute =
     !isEvent && (collective.events?.length > 0 || collective.connectedCollectives?.length > 0);
   if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
