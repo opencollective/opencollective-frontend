@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
@@ -60,7 +60,6 @@ const RecurringContributionsCard = ({
   ...props
 }) => {
   const [showPopup, setShowPopup] = useState(false);
-  const [isHovering, setHovering] = useState(false);
 
   const [submitActivation, { loadingActivation }] = useMutation(activateRecurringContributionMutation, {
     context: API_V2_CONTEXT,
@@ -72,7 +71,7 @@ const RecurringContributionsCard = ({
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
 
   return (
-    <StyledCard onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)} {...props}>
+    <StyledCard {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
           <LinkCollective collective={collective}>
@@ -82,20 +81,9 @@ const RecurringContributionsCard = ({
       </Container>
       <Flex flexDirection="column" justifyContent="space-around" height={260}>
         <Container p={2}>
-          {isHovering && !showPopup ? (
-            <Fragment>
-              <P fontSize="Caption" fontWeight="bold">
-                <FormattedMessage id="SubscriptionsCard.ourPurpose" defaultMessage="Our purpose" />
-              </P>
-              <P fontSize="Caption" color="black.800">
-                {collective.description}
-              </P>
-            </Fragment>
-          ) : (
-            <P fontSize="LeadParagraph" fontWeight="bold" color="black.800">
-              {collective.name}
-            </P>
-          )}
+          <P fontSize="LeadParagraph" fontWeight="bold" color="black.800">
+            {collective.name}
+          </P>
           <StyledTag display="inline-block" textTransform="uppercase" my={2}>
             <I18nCollectiveTags tags={statusTag} />
           </StyledTag>
@@ -175,7 +163,6 @@ RecurringContributionsCard.propTypes = {
   status: PropTypes.string.isRequired,
   router: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
-  hover: PropTypes.bool,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
 };

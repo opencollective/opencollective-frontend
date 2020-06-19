@@ -47,14 +47,6 @@ export const getItems = (options, keyGetter) => {
   );
 };
 
-const getValueFromProps = props => {
-  if (!isUndefined(props.value)) {
-    return props.value;
-  } else {
-    return props.defaultValue;
-  }
-};
-
 /**
  * Component for controlling a list of radio inputs
  */
