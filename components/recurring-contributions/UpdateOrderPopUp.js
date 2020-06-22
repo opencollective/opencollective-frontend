@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import themeGet from '@styled-system/theme-get';
 import { first, get, startCase } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -321,10 +320,9 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
 UpdateOrderPopUp.propTypes = {
   data: PropTypes.object,
   setMenuState: PropTypes.func,
-  router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
 };
 
-export default withRouter(UpdateOrderPopUp);
+export default UpdateOrderPopUp;

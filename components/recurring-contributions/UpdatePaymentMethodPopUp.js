@@ -158,6 +158,7 @@ const UpdatePaymentMethodPopUp = ({
       setLoadingSelectedPaymentMethod(false);
     } else if (paymentOptions && addedPaymentMethod) {
       setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
+      setLoadingSelectedPaymentMethod(false);
     }
   }, [paymentOptions, addedPaymentMethod]);
 
@@ -284,6 +285,7 @@ const UpdatePaymentMethodPopUp = ({
                   });
                   setAddedPaymentMethod(res.data.addStripeCreditCard);
                   setShowAddPaymentMethod(false);
+                  setLoadingSelectedPaymentMethod(true);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
                   createNotification('error', errorMsg);

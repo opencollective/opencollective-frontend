@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -161,10 +160,9 @@ RecurringContributionsCard.propTypes = {
   collective: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   status: PropTypes.string.isRequired,
-  router: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
 
-export default withUser(withRouter(RecurringContributionsCard));
+export default withUser(RecurringContributionsCard);

@@ -79,7 +79,7 @@ const CollectiveCallsToAction = ({
         </Link>
       )}
       {hasManageSubscriptions && (
-        <Link route="subscriptions" params={{ collectiveSlug: collective.slug }}>
+        <Link route="recurring-contributions" params={{ slug: collective.slug }}>
           <StyledButton buttonSize="small" mx={2} my={1} minWidth={buttonsMinWidth}>
             <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
           </StyledButton>
