@@ -445,7 +445,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
-            {collective.type === CollectiveType.COLLECTIVE && (
+            {(collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.FUND) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
             <Archive collective={collective} />

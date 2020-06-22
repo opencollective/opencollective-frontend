@@ -16,12 +16,6 @@ import { withUser } from '../UserProvider';
 import CategoryPicker from './CategoryPicker';
 import Form from './Form';
 
-const defaultSettings = {
-  fund: true,
-  features: { conversations: false },
-  collectivePage: { sections: ['budget', 'projects', 'about'] },
-};
-
 class CreateFund extends Component {
   static propTypes = {
     host: PropTypes.object,
@@ -52,26 +46,22 @@ class CreateFund extends Component {
     }
   }
 
-  async createFund(collective) {
+  async createFund(fund) {
     const host = this.getHost();
 
     // set state to loading
     this.setState({ creating: true });
 
-    // Settings
-    collective.settings = defaultSettings;
-
-    delete collective.tos;
-    delete collective.hostTos;
+    delete fund.tos;
+    delete fund.hostTos;
     delete host.termsUrl;
 
     // try mutation
     try {
-      const res = await this.props.createFund({ variables: { collective, host } });
-      const newCollective = res.data.createCollective;
+      const res = await this.props.createFund({ variables: { fund, host } });
       await this.props.refetchLoggedInUser();
       Router.pushRoute('collective', {
-        slug: newCollective.slug,
+        slug: res.data.createFund.slug,
         status: 'fundCreated',
       }).then(() => window.scrollTo(0, 0));
     } catch (err) {
@@ -118,16 +108,15 @@ class CreateFund extends Component {
 
 const createFundMutation = gqlV2`
   mutation CreateFund(
-    $collective: CollectiveCreateInput!
+    $fund: FundCreateInput!
     $host: AccountReferenceInput,
   ) {
-    createCollective(collective: $collective, host: $host) {
+    createFund(fund: $fund, host: $host) {
+      id
       name
       slug
       tags
       description
-      githubHandle
-      legacyId
     }
   }
 `;

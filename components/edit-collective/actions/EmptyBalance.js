@@ -40,7 +40,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
         <FormattedMessage
           id="collective.balance.description"
           defaultMessage={
-            'Transfer remaining balance to the fiscal host. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {Account}} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
+            'Transfer remaining balance to the fiscal host. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
           }
           values={{ type: collectiveType }}
         />

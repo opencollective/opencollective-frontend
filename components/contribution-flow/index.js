@@ -594,7 +594,13 @@ class CreateOrderPage extends React.Component {
     }
 
     return LoggedInUser.memberOf
-      .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
+      .filter(
+        m =>
+          m.role === 'ADMIN' &&
+          m.collective.id !== collective.id &&
+          m.collective.type !== 'EVENT' &&
+          m.collective.type !== 'PROJECT',
+      )
       .map(({ collective }) => collective)
       .map(collective => {
         // Funds MVP, to refactor

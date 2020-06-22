@@ -245,7 +245,7 @@ class CollectivePage extends Component {
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
-    const isFund = settings?.fund === true; // Funds MVP, to refactor
+    const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(
       type,

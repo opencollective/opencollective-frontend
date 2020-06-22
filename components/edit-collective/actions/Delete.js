@@ -140,7 +140,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             <FormattedMessage
               id="collective.delete.modal.body"
               defaultMessage={
-                'Are you sure you want to delete this {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
+                'Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
               }
               values={{ type: collectiveType }}
             />

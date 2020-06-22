@@ -86,6 +86,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
+  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -176,7 +177,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
           {!isEvent && (
             <Flex alignItems="center" flexWrap="wrap">
-              {(isCollective || isProject) && (
+              {(isCollective || isFund || isProject) && (
                 <StyledTag textTransform="uppercase" mx={2} my={2} mb={2}>
                   <I18nCollectiveTags
                     tags={getCollectiveMainTag(
@@ -233,7 +234,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                 <Container mx={1} color="#969ba3" my="12px">
                   <FormattedMessage
                     id="Collective.Hero.ParentCollective"
-                    defaultMessage="Parent: {parentName}"
+                    defaultMessage="Part of: {parentName}"
                     values={{
                       parentName: (
                         <LinkCollective collective={collective.parentCollective}>

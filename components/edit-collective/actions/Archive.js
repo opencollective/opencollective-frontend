@@ -64,7 +64,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
         <FormattedMessage
           id="collective.archive.title"
           defaultMessage={
-            'Archive {type, select, EVENT {this event} PROJECT {this project} FUND {this fund} COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}}'
+            'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
           }
           values={{ type: collectiveType }}
         />
@@ -74,7 +74,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           <FormattedMessage
             id="collective.archive.description"
             defaultMessage={
-              'Archiving {type, select, EVENT {this event} PROJECT {this project} FUND {this fund} COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
+              'Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
             }
             values={{ type: collectiveType }}
           />
@@ -97,7 +97,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
           <FormattedMessage
             id="collective.archive.title"
             defaultMessage={
-              'Archive {type, select, EVENT {this event} PROJECT {this project} FUND {this fund} COLLECTIVE {this collective} ORGANIZATION {this organization} other {this account}}'
+              'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
             }
             values={{ type: collectiveType }}
           />
