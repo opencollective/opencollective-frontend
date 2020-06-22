@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { Flex } from './Grid';
@@ -8,11 +8,15 @@ import Link from './Link';
 import StyledButton from './StyledButton';
 import { TextInput } from './StyledInput';
 
-const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
-  const { pathname, query } = router;
+const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabled }) => {
+  const router = useRouter();
   const totalPages = Math.ceil(total / limit);
   const currentPage = offset / limit + 1;
   isDisabled = isDisabled || totalPages <= 1;
+
+  if (!router) {
+    return null;
+  }
 
   const changePage = async ({ target, key }) => {
     if (key && key !== 'Enter') {
@@ -24,6 +28,7 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
       return;
     }
 
+    const { pathname, query } = router;
     await router.push({ pathname, query: { ...query, offset: (value - 1) * limit } });
 
     if (scrollToTopOnChange) {
@@ -37,7 +42,7 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
         <Link
           route={route || router.route.slice(1)}
           scroll={scrollToTopOnChange}
-          params={{ ...query, offset: offset - limit }}
+          params={{ ...router.query, offset: offset - limit }}
         >
           <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
@@ -71,7 +76,7 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
         <Link
           route={route || router.route.slice(1)}
           scroll={scrollToTopOnChange}
-          params={{ ...query, offset: offset + limit }}
+          params={{ ...router.query, offset: offset + limit }}
         >
           <StyledButton buttonSize="small" disabled={isDisabled}>
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
@@ -83,7 +88,6 @@ const Pagination = ({ router, route, limit, offset, total, scrollToTopOnChange, 
 };
 
 Pagination.propTypes = {
-  router: PropTypes.object,
   limit: PropTypes.number,
   offset: PropTypes.number,
   total: PropTypes.number,
@@ -97,4 +101,4 @@ Pagination.defaultProps = {
   scrollToTopOnChange: false,
 };
 
-export default withRouter(Pagination);
+export default Pagination;

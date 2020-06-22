@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
 import { get, times } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { useRouter } from 'next/router';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { Link } from '../server/pages';
@@ -140,8 +139,10 @@ const I18nSortLabels = defineMessages({
   },
 });
 
-const DiscoverPage = ({ router, intl }) => {
-  const { query } = router;
+const DiscoverPage = () => {
+  const intl = useIntl();
+  const router = useRouter();
+  const query = router?.query || {};
 
   const params = {
     offset: Number(query.offset) || 0,
@@ -326,11 +327,4 @@ const DiscoverPage = ({ router, intl }) => {
   );
 };
 
-DiscoverPage.propTypes = {
-  /** @ignore from withRouter */
-  router: PropTypes.object,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-};
-
-export default withRouter(injectIntl(DiscoverPage));
+export default DiscoverPage;
