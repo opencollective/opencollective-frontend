@@ -4,7 +4,7 @@ import CustomStyledIcon from './CustomStyledIcon';
 
 const RoundHorizontalDotsIcon = props => {
   return (
-    <CustomStyledIcon width={16} height={16} viewBox="0 0 16 16" fill="none" {...props}>
+    <CustomStyledIcon width={16} height={16} viewBox="0 0 16 16" fill="none" strokeWidth="0.25" {...props}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"
