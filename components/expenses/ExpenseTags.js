@@ -18,7 +18,7 @@ const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children }) => {
             const extraTagProps = getTagProps?.(tag) || {};
             const key = `${tag}-${idx}`;
             const renderedTag = (
-              <StyledTag key={key} variant="rounded-right" mb="4px" mr="4px" {...extraTagProps}>
+              <StyledTag key={key} variant="rounded-right" mb="4px" mr="4px" data-cy="expense-tag" {...extraTagProps}>
                 {tag}
               </StyledTag>
             );

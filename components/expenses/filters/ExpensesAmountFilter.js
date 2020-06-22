@@ -47,6 +47,7 @@ const ExpensesAmountFilter = ({ currency, onChange, value, ...props }) => {
 
   return (
     <ExpensesFilter
+      data-cy="expenses-filter-amount"
       isSearchable={false}
       value={value ? getOption(...parseAmountRange(value)) : allExpensesOption}
       onChange={({ value }) => onChange(value)}

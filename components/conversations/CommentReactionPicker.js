@@ -137,6 +137,7 @@ const CommentReactionPicker = ({ comment }) => {
               onClick={() => setOpen(true)}
               ref={ref}
               margin="4px 8px 4px 0"
+              data-cy="comment-reaction-picker-trigger"
             >
               <AddReactionIcon />
             </StyledButton>
@@ -151,6 +152,7 @@ const CommentReactionPicker = ({ comment }) => {
                 data-placement={placement}
                 ref={ref}
                 style={style}
+                data-cy="comment-reaction-picker-popper"
               >
                 <Flex>
                   {emojiFirstRow.map(emoji => (

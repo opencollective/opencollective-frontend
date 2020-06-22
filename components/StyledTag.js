@@ -124,7 +124,7 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
       <Span mr={2} letterSpacing="inherit">
         {children}
       </Span>
-      <CloseButton {...closeButtonProps}>
+      <CloseButton data-cy="remove-btn" {...closeButtonProps}>
         <Times size="10px" />
       </CloseButton>
     </StyledTagBase>

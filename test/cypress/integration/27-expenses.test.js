@@ -152,6 +152,57 @@ describe('New expense flow', () => {
       cy.getByDataCy('attachment-url-field').should('contain', 'Receipt required');
     });
   });
+
+  describe('Actions on expense', () => {
+    let collective;
+    let user;
+    let expenseUrl;
+
+    before(() => {
+      cy.signup().then(response => (user = response));
+    });
+
+    before(() => {
+      cy.createHostedCollective({ userEmail: user.email }).then(c => (collective = c));
+    });
+
+    beforeEach(() => {
+      cy.createExpense({
+        userEmail: user.email,
+        user: { paypalEmail: 'paypal@test.com', id: user.id },
+        collective: { id: collective.id },
+      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.id}`));
+    });
+
+    it('Approve, unapprove, reject and pay actions on expense', () => {
+      cy.visit(expenseUrl);
+      cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('approve-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Approved');
+      cy.getByDataCy('unapprove-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('approve-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Approved');
+      cy.getByDataCy('unapprove-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('reject-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
+    });
+
+    it('Delete expense', () => {
+      cy.login({ email: user.email, redirect: expenseUrl });
+      cy.getByDataCy('reject-button').click();
+      cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
+
+      // Now delete the expense
+      cy.getByDataCy('delete-expense-button').click();
+      cy.getByDataCy('confirmation-modal-continue').click();
+      cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
+      cy.request({ url: expenseUrl, failOnStatusCode: false }).then(resp => {
+        expect(resp.status).to.eq(404);
+      });
+    });
+  });
 });
 
 describe('Legacy expense flow', () => {

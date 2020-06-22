@@ -377,6 +377,7 @@ const ExpenseFormBody = ({
                               >
                                 {({ id, error }) => (
                                   <InputTypeCountry
+                                    data-cy="payee-country"
                                     inputId={id}
                                     onChange={value => formik.setFieldValue(field.name, value)}
                                     value={field.value}
