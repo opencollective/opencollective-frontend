@@ -619,7 +619,7 @@ class CreateOrderPage extends React.Component {
     const tier = this.props.tier || {};
     if (tier.amountType !== AmountTypes.FIXED) {
       // Funds MVP, to refactor
-      if (this.props.collective?.settings?.fund === true) {
+      if (this.props.collective.type === CollectiveType.FUND || this.props.collective?.settings?.fund === true) {
         return tier.presets || [100000, 200000, 500000, 1000000];
       }
 

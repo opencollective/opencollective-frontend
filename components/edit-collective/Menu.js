@@ -152,7 +152,7 @@ const MenuItem = styled(Link)`
 const isType = (c, collectiveType) => c.type === collectiveType;
 const isOneOfTypes = (c, ...collectiveTypes) => collectiveTypes.includes(c.type);
 const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.type, feature);
-const isFund = c => c.settings?.fund === true; // Funds MVP, to refactor
+const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
 const isProject = c => c.type === CollectiveType.PROJECT;

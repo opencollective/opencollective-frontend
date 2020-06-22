@@ -196,6 +196,13 @@ const DEFAULT_SECTIONS = {
     Sections.RECURRING_CONTRIBUTIONS,
     Sections.ABOUT,
   ],
+  [CollectiveType.FUND]: [
+    Sections.CONTRIBUTE,
+    Sections.UPDATES,
+    Sections.BUDGET,
+    Sections.CONTRIBUTORS,
+    Sections.ABOUT,
+  ],
   [CollectiveType.EVENT]: [
     Sections.ABOUT,
     Sections.TICKETS,
@@ -299,7 +306,7 @@ export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmi
   }
 
   // Funds MVP, to refactor
-  if (collective.settings?.fund) {
+  if (collective.type === CollectiveType.FUND || collective.settings?.fund) {
     if (!isAdmin && !isHostAdmin) {
       toRemove.add(Sections.BUDGET);
     }
