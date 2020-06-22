@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { find } from 'lodash';
+import { find, isUndefined } from 'lodash';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -62,30 +62,18 @@ const StyledRadioList = ({
   labelProps,
   ...props
 }) => {
-  const [selected, setSelected] = useState(props.defaultValue);
+  const [localStateSelected, setSelected] = useState(props.defaultValue);
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
   const defaultValueStr = props.defaultValue !== undefined && props.defaultValue.toString();
+  const checkedItem = !isUndefined(props.value) ? props.value : localStateSelected;
+
   return (
-    <Container
-      id={id}
-      as="fieldset"
-      border="none"
-      m={0}
-      p={0}
-      {...containerProps}
-      onChange={event => {
-        event.stopPropagation();
-        const target = event.target;
-        const selectedItem = find(items, item => item.key === target.value);
-        onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
-        setSelected(target.value);
-      }}
-    >
+    <Container id={id} as="fieldset" border="none" m={0} p={0} {...containerProps}>
       {items.map(({ value, key }, index) => (
         <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0} {...labelProps}>
           {children({
-            checked: selected && key === selected,
+            checked: key === checkedItem,
             index,
             key,
             value,
@@ -95,9 +83,17 @@ const StyledRadioList = ({
                 name={name}
                 id={id && key + id}
                 value={key}
-                defaultChecked={props.defaultValue !== undefined && defaultValueStr === key}
+                defaultChecked={isUndefined(props.defaultValue) ? undefined : defaultValueStr === key}
+                checked={isUndefined(props.value) ? undefined : props.value === key}
                 disabled={disabled || (value && value.disabled)} // disable a specific option or entire options
                 data-cy="radio-select"
+                onChange={event => {
+                  event.stopPropagation();
+                  const target = event.target;
+                  const selectedItem = find(items, item => item.key === target.value);
+                  onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
+                  setSelected(target.value);
+                }}
               />
             ),
           })}
@@ -125,6 +121,8 @@ StyledRadioList.propTypes = {
   name: PropTypes.string.isRequired,
   /** event handler for when a selection is made */
   onChange: PropTypes.func,
+  /** for controlled components */
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
   /** list or map of options to display */
   options: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),

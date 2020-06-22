@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -7,7 +7,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { Dimensions } from '../_constants';
 import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import I18nFormatters from '../../I18nFormatters';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
@@ -18,8 +18,6 @@ import { P } from '../../Text';
 import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
-
-import EmptyCollectivesSectionImageSVG from '../images/EmptyCollectivesSectionImage.svg';
 
 export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
   query RecurringContributions($slug: String) {
@@ -157,81 +155,65 @@ class SectionRecurringContributions extends React.Component {
 
     const collective = data && data.account;
     const recurringContributions = collective && collective.orders;
-    const hasRecurringContributions = recurringContributions.nodes.length;
 
     return (
       <Box pt={5} pb={3}>
-        {!hasRecurringContributions ? (
-          <Flex flexDirection="column" alignItems="center">
-            <img src={EmptyCollectivesSectionImageSVG} alt="" />
-            <P color="black.600" fontSize="LeadParagraph" mt={5}>
+        {notification && (
+          <TemporaryNotification
+            onDismiss={this.dismissNotification}
+            type={notificationType === 'error' ? 'error' : 'default'}
+          >
+            {notificationType === 'activate' && (
               <FormattedMessage
-                id="CollectivePage.SectionRecurringContributions.Empty"
-                defaultMessage="{collectiveName} doesn't seem to to have any recurring contributions yet! 😔"
-                values={{ collectiveName: collective.name }}
+                id="subscription.createSuccessActivate"
+                defaultMessage="Recurring contribution <strong>activated</strong>! Woohoo! 🎉"
+                values={I18nFormatters}
               />
-            </P>
-          </Flex>
-        ) : (
-          <Fragment>
-            {notification && (
-              <TemporaryNotification
-                onDismiss={this.dismissNotification}
-                type={notificationType === 'error' ? 'error' : 'default'}
-              >
-                {notificationType === 'activate' && (
-                  <FormattedMessage
-                    id="subscription.createSuccessActivate"
-                    defaultMessage="Recurring contribution <strong>activated</strong>! Woohoo! 🎉"
-                    values={I18nFormatters}
-                  />
-                )}
-                {notificationType === 'cancel' && (
-                  <FormattedMessage
-                    id="subscription.createSuccessCancel"
-                    defaultMessage="Your recurring contribution has been <strong>cancelled</strong>."
-                    values={I18nFormatters}
-                  />
-                )}
-                {notificationType === 'update' && (
-                  <FormattedMessage
-                    id="subscription.createSuccessUpdated"
-                    defaultMessage="Your recurring contribution has been <strong>updated</strong>."
-                    values={I18nFormatters}
-                  />
-                )}
-                {notificationType === 'error' && <P>{notificationText}</P>}
-              </TemporaryNotification>
             )}
-            <ContainerSectionContent>
-              <SectionTitle textAlign="left" mb={1}>
-                <FormattedMessage
-                  id="CollectivePage.SectionRecurringContributions.Title"
-                  defaultMessage="Recurring Contributions"
-                />
-              </SectionTitle>
-            </ContainerSectionContent>
-            <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
-              <StyledFilters
-                filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key])}
-                selected={this.state.filter}
-                justifyContent="left"
-                minButtonWidth={175}
-                px={Dimensions.PADDING_X}
-                onChange={filter => this.setState({ filter: filter })}
+            {notificationType === 'cancel' && (
+              <FormattedMessage
+                id="subscription.createSuccessCancel"
+                defaultMessage="Your recurring contribution has been <strong>cancelled</strong>."
+                values={I18nFormatters}
               />
-            </Box>
-            <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} mt={4} mx="auto">
-              <RecurringContributionsContainer
-                recurringContributions={recurringContributions}
-                account={collective}
-                filter={this.state.filter}
-                createNotification={this.createNotification}
+            )}
+            {notificationType === 'update' && (
+              <FormattedMessage
+                id="subscription.createSuccessUpdated"
+                defaultMessage="Your recurring contribution has been <strong>updated</strong>."
+                values={I18nFormatters}
               />
-            </Container>
-          </Fragment>
+            )}
+            {notificationType === 'error' && <P>{notificationText}</P>}
+          </TemporaryNotification>
         )}
+        <ContainerSectionContent>
+          <SectionTitle textAlign="left" mb={1}>
+            <FormattedMessage
+              id="CollectivePage.SectionRecurringContributions.Title"
+              defaultMessage="Recurring Contributions"
+            />
+          </SectionTitle>
+        </ContainerSectionContent>
+        <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
+          <StyledFilters
+            filters={filters}
+            getLabel={key => intl.formatMessage(I18nFilters[key])}
+            selected={this.state.filter}
+            justifyContent="left"
+            minButtonWidth={175}
+            px={Dimensions.PADDING_X}
+            onChange={filter => this.setState({ filter: filter })}
+          />
+        </Box>
+        <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} mt={4} mx="auto">
+          <RecurringContributionsContainer
+            recurringContributions={recurringContributions}
+            account={collective}
+            filter={this.state.filter}
+            createNotification={this.createNotification}
+          />
+        </Container>
       </Box>
     );
   }

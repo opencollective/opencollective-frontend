@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Jun 17 2020 16:06:41 GMT-0300 (Brasilia Standard Time)
+# timestamp: Fri Jun 19 2020 10:05:57 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -4014,12 +4014,12 @@ type Query {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
-    Only return expenses where amount is greater than or equal to this value
+    Only return expenses where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
 
     """
-    Only return expenses where amount is lower than this value
+    Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
 

@@ -177,6 +177,7 @@ const DEFAULT_SECTIONS = {
     Sections.CONVERSATIONS,
     Sections.TRANSACTIONS,
     Sections.BUDGET,
+    Sections.RECURRING_CONTRIBUTIONS,
     Sections.ABOUT,
   ],
   [CollectiveType.USER]: [
@@ -192,6 +193,7 @@ const DEFAULT_SECTIONS = {
     Sections.CONVERSATIONS,
     Sections.BUDGET,
     Sections.CONTRIBUTORS,
+    Sections.RECURRING_CONTRIBUTIONS,
     Sections.ABOUT,
   ],
   [CollectiveType.EVENT]: [
@@ -305,6 +307,13 @@ export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmi
   // Recurring contributions
   if (!collective.settings?.recurringContributions) {
     toRemove.add(Sections.RECURRING_CONTRIBUTIONS);
+  }
+
+  // don't display for TYPE=COLLECTIVE if no active contributions
+  if (collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.ORGANIZATION) {
+    if (!collective.ordersFromCollective?.some(collective => collective.isSubscriptionActive)) {
+      toRemove.add(Sections.RECURRING_CONTRIBUTIONS);
+    }
   }
 
   if (isEvent) {
