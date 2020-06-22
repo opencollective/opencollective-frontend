@@ -143,7 +143,7 @@ class EditPaymentMethod extends React.Component {
                 </StyledButton>
               )}
               {hasSubscriptions && (
-                <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }} passHref>
+                <Link route="recurring-contributions" params={{ slug: this.props.collectiveSlug }} passHref>
                   <StyledLink buttonStyle="standard" buttonSize="medium" mx={1} disabled={isSaving}>
                     {intl.formatMessage(this.messages['paymentMethod.editSubscriptions'])}
                   </StyledLink>

@@ -226,8 +226,8 @@ class TopBarProfileMenu extends React.Component {
               {incognitoProfileMembership && (
                 <ListItem py={1}>
                   <Link
-                    route="subscriptions"
-                    params={{ collectiveSlug: incognitoProfileMembership.collective.slug }}
+                    route="recurring-contributions"
+                    params={{ slug: incognitoProfileMembership.collective.slug }}
                     passHref
                   >
                     <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
@@ -240,7 +240,7 @@ class TopBarProfileMenu extends React.Component {
                 </ListItem>
               )}
               <ListItem py={1}>
-                <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                <Link route="recurring-contributions" params={{ slug: LoggedInUser.username }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                   </StyledLink>

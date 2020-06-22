@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import themeGet from '@styled-system/theme-get';
-import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -68,26 +67,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
     context: API_V2_CONTEXT,
   });
 
-  // detect click outside menu to close it - https://medium.com/@pitipatdop/little-neat-trick-to-capture-click-outside-with-react-hook-ba77c37c7e82
-  const popupNode = useRef(null);
-  const handleClick = e => {
-    // we include 'react-select' because the dropdown in UpdateOrderPopUp portals to the
-    // document.body, so if we don't inlude this it closes the menu
-    if (popupNode.current.contains(e.target) || e.target.id.includes('react-select')) {
-      // inside click
-      return;
-    }
-    // outside click
-    setShowPopup(false);
-  };
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClick);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, []);
-
   const mainMenu = menuState === 'mainMenu' && status === 'ACTIVE';
   const cancelMenu = menuState === 'cancelMenu';
   const updateTierMenu = menuState === 'updateTierMenu';
@@ -99,7 +78,6 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
       maxHeight={360}
       width={'100%'}
       overflowY={'auto'}
-      ref={popupNode}
       py={1}
       data-cy="recurring-contribution-menu"
     >
@@ -272,11 +250,10 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
 RecurringContributionsPopUp.propTypes = {
   contribution: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
-  router: PropTypes.object.isRequired,
   status: PropTypes.string.isRequired,
   createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
 
-export default withUser(withRouter(RecurringContributionsPopUp));
+export default withUser(RecurringContributionsPopUp);
