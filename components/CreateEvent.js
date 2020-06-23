@@ -6,18 +6,21 @@ import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { Router } from '../server/pages';
 
 import Body from './Body';
 import CollectiveNavbar from './CollectiveNavbar';
 import EditEventForm from './EditEventForm';
 import Footer from './Footer';
 import Header from './Header';
+import { withUser } from './UserProvider';
 
 class CreateEvent extends React.Component {
   static propTypes = {
     parentCollective: PropTypes.object,
     createCollective: PropTypes.func,
-    LoggedInUser: PropTypes.object,
+    LoggedInUser: PropTypes.object, // from withUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
   };
 
   constructor(props) {
@@ -52,12 +55,16 @@ class CreateEvent extends React.Component {
     try {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;
-      const eventUrl = `${window.location.protocol}//${window.location.host}/${parentCollective.slug}/events/${event.slug}`;
       this.setState({
         status: 'idle',
-        result: { success: `Event created successfully: ${eventUrl}` },
+        result: { success: `Event created successfully.` },
       });
-      window.location.replace(eventUrl);
+      await this.props.refetchLoggedInUser();
+      Router.pushRoute('event', {
+        parentCollectiveSlug: parentCollective.slug,
+        slug: event.slug,
+        status: 'eventCreated',
+      }).then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({
@@ -153,4 +160,4 @@ class CreateEvent extends React.Component {
   }
 }
 
-export default addCreateCollectiveMutation(CreateEvent);
+export default withUser(addCreateCollectiveMutation(CreateEvent));
