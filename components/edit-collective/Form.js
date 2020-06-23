@@ -673,7 +673,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 128,
           type: 'tags',
           placeholder: 'meetup, javascript',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
         },
       ],
       expenses: [

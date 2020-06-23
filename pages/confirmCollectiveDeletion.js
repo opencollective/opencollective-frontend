@@ -46,6 +46,10 @@ class ConfirmCollectiveDeletion extends Component {
         return 'collective';
       case 'EVENT':
         return 'event';
+      case 'PROJECT':
+        return 'project';
+      case 'FUND':
+        return 'fund';
       default:
         return 'account';
     }

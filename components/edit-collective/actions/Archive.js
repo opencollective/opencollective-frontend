@@ -54,7 +54,7 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
     }
   };
 
-  const hasBalance = collective.stats.balance > 0 && collective.type === 'COLLECTIVE';
+  const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
 
   const closeModal = () => setModal({ ...modal, show: false });
 

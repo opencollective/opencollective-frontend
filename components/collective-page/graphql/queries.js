@@ -159,14 +159,12 @@ export const getCollectivePageQuery = gql`
         description
         image
         isActive
-        startsAt
-        endsAt
         backgroundImageUrl(height: 208)
-        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
           id
+          name
           image
           collectiveSlug
-          name
           type
         }
         stats {

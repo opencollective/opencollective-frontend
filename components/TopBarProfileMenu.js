@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
@@ -186,6 +186,12 @@ class TopBarProfileMenu extends React.Component {
         return a.collective.slug.localeCompare(b.collective.slug);
       });
 
+    const funds = memberships
+      .filter(m => m.collective.type === 'FUND')
+      .sort((a, b) => {
+        return a.collective.slug.localeCompare(b.collective.slug);
+      });
+
     return (
       <Container
         bg="white.full"
@@ -315,6 +321,33 @@ class TopBarProfileMenu extends React.Component {
                   </em>
                 </P>
               </Box>
+            )}
+            {funds.length > 0 && (
+              <Fragment>
+                <Flex alignItems="center" mt={3}>
+                  <P
+                    color="#4E5052"
+                    fontFamily="montserratlight, arial"
+                    fontSize="1rem"
+                    fontWeight="600"
+                    letterSpacing="1px"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    <FormattedMessage id="funds" defaultMessage="my funds" />
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                  <StyledRoundButton ml={2} size={24} color="#C4C7CC">
+                    <Link route="/fund/create" passHref>
+                      <Plus size={12} color="#76777A" />
+                    </Link>
+                  </StyledRoundButton>
+                </Flex>
+                <Box as="ul" p={0} my={2}>
+                  {funds.map(this.renderMembershipLine)}
+                </Box>
+              </Fragment>
             )}
             <Flex alignItems="center" mt={3}>
               <P
