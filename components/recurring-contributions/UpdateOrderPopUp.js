@@ -103,7 +103,10 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
     if (contribution.tier === null) {
       return tiers.find(option => option.key === 'custom-tier');
     } else {
-      return tiers.find(option => option.id === contribution.tier.id);
+      // for some collectives if a tier has been deleted it won't have moved the contribution
+      // to the custom 'null' tier so we have to check for that
+      const matchedTier = tiers.find(option => option.id === contribution.tier.id);
+      return !matchedTier ? tiers.find(option => option.key === 'custom-tier') : matchedTier;
     }
   };
 
@@ -193,7 +196,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
           keyGetter="key"
           options={mappedTierOptions}
           onChange={setSelectedTier}
-          value={selectedTier.key}
+          value={selectedTier?.key}
         >
           {({ radio, checked, value: { title, subtitle, amount, flexible, currency, interval, minimumAmount } }) => (
             <TierBox minheight={50} py={2} px={3} bg="white.full" data-cy="recurring-contribution-tier-box">

@@ -19,6 +19,8 @@ const pages = routes()
   .add('confirmEmail', '/confirm/email/:token')
   .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')
   .add('create-account', '/:form(create-account)', 'signin')
+  .add('subscriptions_redirect', '/subscriptions', 'recurring-contributions-redirect')
+  .add('recurring-contributions-redirect', '/recurring-contributions')
   .add('search', '/search')
   .add('hosts', '/hosts')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
@@ -193,7 +195,8 @@ pages.add(
   '/:slug/accept-financial-contributions/:path(myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
 );
 
-// testing new recurring contributions page
+// New recurring contributions page
 pages.add('recurring-contributions', '/:slug/recurring-contributions');
+pages.add('subscriptions', '/:slug/subscriptions', 'recurring-contributions');
 
 module.exports = pages;
