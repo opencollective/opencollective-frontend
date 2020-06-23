@@ -80,9 +80,6 @@ describe('Expenses component', () => {
       expect(component.find('[data-cy="pay-expense-btn"]')).not.toBeFalsy();
       expect(component.find('[data-cy="mark-expense-as-paid-btn"]')).not.toBeFalsy();
 
-      // make sure none are disabled
-      expect(component.find('[data-cy="expense-actions"] button[disabled]').lenght).toEqual(undefined);
-
       // click on the first one
       component.find('[data-cy="expense-actions"] button').first().simulate('click');
 
