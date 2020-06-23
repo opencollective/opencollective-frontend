@@ -1358,6 +1358,7 @@
   "Subscriptions.Cancelled": "Cancelled",
   "Subscriptions.ContributedToDate": "Contributed to date",
   "Subscriptions.Edit": "Edit",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active} CANCELLED {Cancelled}} contribution",
   "Subscriptions.Title": "Recurring contributions",
   "table.head.large": "Grande",
   "table.head.medium": "Medio",
