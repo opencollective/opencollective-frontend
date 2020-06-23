@@ -156,11 +156,7 @@ pages.add(
 // Pledges
 // -------
 
-pages
-  .add('createPledge', '/pledges/new')
-  .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
-  .add('completePledge', '/pledges/:orderId/:step(contributeAs|details|payment|summary)?')
-  .add('claimCollective', '/:collectiveSlug/claim');
+pages.add('createPledge', '/pledges/new').add('createCollectivePledge', '/:slug/pledges/new', 'createPledge');
 
 // Application management
 // ----------------------

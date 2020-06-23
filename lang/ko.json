@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "답글 작성",
   "CommentForm.SignIn": "댓글을 작성하려면 로그인하세요:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
-  "completePledge.MissingOrder": "존재하지 않는 서약이거나 이미 완료 되었습니다.",
-  "completePledge.Title": "서약 완성하기",
   "confirm": "확인",
   "confirmCollective.deletion.title": "Your {collectiveType} has been deleted.",
   "confirmCollective.other.deletion.description": "We've deleted your {collectiveType}, expenses, contributors, tiers, and all entities related to this {collectiveType}.",

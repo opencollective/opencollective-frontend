@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Poster en réponse",
   "CommentForm.SignIn": "Pour commenter, connectez-vous :",
   "comments.count": "{n, plural, one {# commentaire} other {# commentaires}}",
-  "completePledge.MissingOrder": "Cette promesse de don n'existe pas ou a déjà été remplie.",
-  "completePledge.Title": "Compléter votre promesse de don",
   "confirm": "Confirmer",
   "confirmCollective.deletion.title": "Votre {collectiveType} a été supprimé.",
   "confirmCollective.other.deletion.description": "Nous avons supprimé votre {collectiveType}, dépenses, contributeurs, tiers et toutes les entités liées à ce {collectiveType}.",

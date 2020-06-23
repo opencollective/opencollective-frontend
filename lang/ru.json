@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Опубликовать ответ",
   "CommentForm.SignIn": "Пожалуйста, войдите, чтобы оставить комментарий:",
   "comments.count": "{n, plural, one {# комментарий} few {# комментария} many {# комментариев} other {# комментариев}}",
-  "completePledge.MissingOrder": "Обязательство не существует или уже было завершено.",
-  "completePledge.Title": "Выполнить свое обязательство",
   "confirm": "Подтвердить",
   "confirmCollective.deletion.title": "Ваш {collectiveType} был удален.",
   "confirmCollective.other.deletion.description": "Мы удалили ваш {collectiveType}, расходы, участников, уровни и все, что связанно с {collectiveType}.",

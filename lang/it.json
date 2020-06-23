@@ -301,8 +301,6 @@
   "CommentForm.PostReply": "Rispondi",
   "CommentForm.SignIn": "Per favore accedi per commentare:",
   "comments.count": "{n, plural, one {# commento} other {# commenti}}",
-  "completePledge.MissingOrder": "Questo impegno non esiste o è già stato completato.",
-  "completePledge.Title": "Completa il tuo impegno",
   "confirm": "Conferma",
   "confirmCollective.deletion.title": "Il tuo {collectiveType} è stato cancellato.",
   "confirmCollective.other.deletion.description": "Abbiamo eliminato il tuo {collectiveType}, le spese, i collaboratori, i livelli e tutte le entità relative a questo {collectiveType}.",
