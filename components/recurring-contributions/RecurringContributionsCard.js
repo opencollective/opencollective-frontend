@@ -38,6 +38,10 @@ const messages = defineMessages({
     id: 'Subscriptions.Activate',
     defaultMessage: 'Activate',
   },
+  tag: {
+    id: 'Subscriptions.Status',
+    defaultMessage: '{status, select, ACTIVE {Active} CANCELLED {Cancelled}} contribution',
+  },
 });
 
 const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
@@ -65,7 +69,7 @@ const RecurringContributionsCard = ({
   });
 
   const { formatMessage } = useIntl();
-  const statusTag = `${status} contribution`;
+  const statusTag = formatMessage(messages.tag, { status });
   const buttonText = status === 'ACTIVE' ? formatMessage(messages.manage) : formatMessage(messages.activate);
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
 
