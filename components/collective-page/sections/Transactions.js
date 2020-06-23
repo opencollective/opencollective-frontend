@@ -11,7 +11,7 @@ import BudgetItemsList, {
   BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+} from '../../budget/BudgetItemsList';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -92,7 +92,6 @@ class SectionTransactions extends React.Component {
             amount: PropTypes.number.isRequired,
             description: PropTypes.string.isRequired,
             createdAt: PropTypes.string.isRequired,
-            category: PropTypes.string.isRequired,
             transaction: PropTypes.shape({
               id: PropTypes.number,
             }),

@@ -12,7 +12,7 @@ import BudgetItemsList, {
   BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+} from '../../budget/BudgetItemsList';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';

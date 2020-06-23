@@ -4,7 +4,7 @@ import {
   BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+} from '../../budget/BudgetItemsList';
 
 import * as fragments from './fragments';
 

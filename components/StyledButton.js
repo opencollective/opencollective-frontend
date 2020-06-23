@@ -51,7 +51,7 @@ const StyledButtonContent = styled.button`
   /** Special prop to render borderless */
   ${props => {
     if (props.asLink || props.isBorderless) {
-      const baseActiveStyles = props.theme.buttons[props.buttonStyle]['&:active'];
+      const baseActiveStyles = props.theme.buttons[props.buttonStyle]?.['&:active'] || {};
 
       return css`
         background: transparent;

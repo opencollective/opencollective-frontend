@@ -183,7 +183,7 @@ describe('New Collective page with euro currency', () => {
   describe('Budget section', () => {
     it('Shows latest transactions with amount and type (credit/debit)', () => {
       scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy="contributions transactions"] [data-cy=transaction-amount]')
+      cy.get('[data-cy="budget-item"] [data-cy=transaction-amount]')
         .first()
         .within($firstTransactionAmount => {
           cy.get('[data-cy=transaction-sign]').should('have.text', '-');
