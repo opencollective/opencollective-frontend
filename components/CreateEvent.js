@@ -60,11 +60,12 @@ class CreateEvent extends React.Component {
         result: { success: `Event created successfully.` },
       });
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('event', {
+      await Router.pushRoute('event', {
         parentCollectiveSlug: parentCollective.slug,
         slug: event.slug,
         status: 'eventCreated',
-      }).then(() => window.scrollTo(0, 0));
+      });
+      window.scrollTo(0, 0);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({

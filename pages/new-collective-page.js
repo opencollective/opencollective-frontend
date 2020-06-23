@@ -61,7 +61,13 @@ class NewCollectivePage extends React.Component {
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
-    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated']),
+    status: PropTypes.oneOf([
+      'collectiveCreated',
+      'collectiveArchived',
+      'fundCreated',
+      'projectCreated',
+      'eventCreated',
+    ]),
     step: PropTypes.string,
     mode: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
