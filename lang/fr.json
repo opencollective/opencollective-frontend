@@ -1256,6 +1256,7 @@
   "profile.incognito.description": "Garder cette contribution privée (voir la FAQ pour + d'infos)",
   "profilemenu.memberships.tooltip.balance": "Solde {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} dépenses en attente",
+  "Receipts.None": "None",
   "RecurringContributions.customAmount": "Montant personnalisé",
   "RecurringContributions.minAmount": "Montant minimum : {minAmount}",
   "RecurringContributions.none": "No recurring contributions to see here! 👀",

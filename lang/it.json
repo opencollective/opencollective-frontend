@@ -1256,6 +1256,7 @@
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
   "profilemenu.memberships.tooltip.balance": "Bilancio {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} pending expenses",
+  "Receipts.None": "None",
   "RecurringContributions.customAmount": "Custom amount",
   "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "RecurringContributions.none": "No recurring contributions to see here! 👀",

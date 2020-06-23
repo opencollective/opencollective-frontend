@@ -1256,6 +1256,7 @@
   "profile.incognito.description": "Zachovejte můj příspěvek soukromý (viz FAQ pro více informací)",
   "profilemenu.memberships.tooltip.balance": "Balance {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} pending expenses",
+  "Receipts.None": "None",
   "RecurringContributions.customAmount": "Custom amount",
   "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "RecurringContributions.none": "No recurring contributions to see here! 👀",
