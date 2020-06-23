@@ -108,9 +108,9 @@ class ExportForm extends React.Component {
     }
 
     // Helper to prepare date values to be part of the file name
-    const format = d => moment(d).format('YYYYMMDDHHMMSS');
-    let fileName = `${this.props.collective.slug}--`;
-    fileName += `${format(this.state.dateFrom)}-`;
+    const format = d => moment(d).format('YYYY-MM-DD');
+    let fileName = `${this.props.collective.slug}-from-`;
+    fileName += `${format(this.state.dateFrom)}-to-`;
     fileName += `${format(this.state.dateTo)}.csv`;
     return exportFile('text/plain;charset=utf-8', fileName, csv);
   }
