@@ -665,6 +665,7 @@
   "errorMsg": "Erreur : {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Ce moyen de paiement ne peut pas être supprimé car des contribution financières récurrentes lui sont liées.",
   "event.create.btn": "Créer un événement",
+  "event.created": "Your Event has been created with success.",
   "Event.CreatedBy": "Créé par : {CollectiveLink}",
   "Event.CreateNew": "Créer un événement",
   "event.endsAt.label": "date et heure de fin",

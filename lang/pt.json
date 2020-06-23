@@ -665,6 +665,7 @@
   "errorMsg": "Erro: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Este método de pagamento não pode ser removido porque tem contribuições financeiras recorrentes atreladas.",
   "event.create.btn": "Criar evento",
+  "event.created": "Your Event has been created with success.",
   "Event.CreatedBy": "Criado por: {CollectiveLink}",
   "Event.CreateNew": "Criar novo evento",
   "event.endsAt.label": "data e hora de término",

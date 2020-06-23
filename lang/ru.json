@@ -665,6 +665,7 @@
   "errorMsg": "Ошибка: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active recurring financial contributions.",
   "event.create.btn": "Создать событие",
+  "event.created": "Your Event has been created with success.",
   "Event.CreatedBy": "Created by: {CollectiveLink}",
   "Event.CreateNew": "Create new event",
   "event.endsAt.label": "дата и время окончания",
