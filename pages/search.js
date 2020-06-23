@@ -156,7 +156,7 @@ class SearchPage extends React.Component {
 
           {showCollectives && collectives.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-              <P pt={3} borderTop="1px solid #E6E6E6">
+              <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
                 <em>
                   <FormattedMessage
                     id="search.ifYouDontSee"
