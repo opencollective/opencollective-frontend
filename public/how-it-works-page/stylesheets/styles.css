@@ -394,6 +394,7 @@
 
 .mkt-page-how-it-works section.cta-bottom svg.bubbles {
     margin-top: 35px;
+    width: 100%;
 }
 
 .mkt-page-how-it-works section.cta-bottom svg.bubbles path {
