@@ -1356,6 +1356,7 @@
   "Subscriptions.Cancelled": "Cancelled",
   "Subscriptions.ContributedToDate": "Contributed to date",
   "Subscriptions.Edit": "Edit",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active} CANCELLED {Cancelled}} contribution",
   "Subscriptions.Title": "{collectiveName}'s recurring financial contributions",
   "table.head.large": "큰",
   "table.head.medium": "중간",
