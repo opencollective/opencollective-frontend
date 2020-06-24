@@ -35,6 +35,7 @@ describe('event.create.test.js', () => {
     cy.get('#location .address').contains('1050');
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier] [data-cy=amount]').contains(15);
+    cy.disableSmoothScroll();
     cy.get('#top').scrollIntoView();
     cy.getByDataCy('edit-collective-btn').click();
     // edit event info
@@ -62,7 +63,7 @@ describe('event.create.test.js', () => {
     // delete event tiers
     cy.getByDataCy('edit-collective-btn').click();
     cy.getByDataCy('menu-item-advanced').click();
-    cy.contains('button', 'Delete this event').click();
+    cy.contains('button', 'Delete this Event').click();
     cy.get('[data-cy=delete]').click();
     cy.wait(1000);
     cy.location().should(location => {
