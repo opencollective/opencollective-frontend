@@ -33,7 +33,7 @@ const LinkCollective = ({ target, title, collective, children, ...props }) => {
   ) : (
     <Link
       route="event"
-      params={{ eventSlug: slug, parentCollectiveSlug: getEventParentCollectiveSlug(parentCollective) }}
+      params={{ slug, parentCollectiveSlug: getEventParentCollectiveSlug(parentCollective) }}
       title={title || name}
       target={target}
       {...props}

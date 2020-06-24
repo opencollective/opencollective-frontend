@@ -50,14 +50,12 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
-  static getInitialProps({ req, res, query: { slug, eventSlug, status, step, mode } }) {
+  static getInitialProps({ req, res, query: { slug, status, step, mode } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
-    /** If there is a eventSlug parameter, use that one as slug,
-     * remove this and fix routes when feature flag NEW_EVENTS is gone */
-    return { slug: eventSlug ? eventSlug : slug, status, step, mode };
+    return { slug, status, step, mode };
   }
 
   static propTypes = {

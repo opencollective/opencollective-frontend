@@ -23,7 +23,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const isPassed = isPastEvent(event);
   const canOrderTickets = canOrderTicketsFromEvent(event);
   const showYearOnStartDate = endsAt ? undefined : 'numeric'; // only if there's no end date
-  const eventRouteParams = { parentCollectiveSlug: collective.slug, eventSlug: event.slug };
+  const eventRouteParams = { parentCollectiveSlug: collective.slug, slug: event.slug };
   return (
     <Contribute
       route="event"
@@ -62,7 +62,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
       {description}
       {isTruncated && (
-        <Link route="event" params={{ parentCollectiveSlug: collective.slug, eventSlug: event.slug }}>
+        <Link route="event" params={{ parentCollectiveSlug: collective.slug, slug: event.slug }}>
           <Span textTransform="capitalize" whiteSpace="nowrap">
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </Span>
