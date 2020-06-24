@@ -41,6 +41,18 @@ const CollectiveCallsToAction = ({
     <_ApplyToHostBtn host={collective} disabled={!hostWithinLimit} showConditions={false} minWidth={buttonsMinWidth} />
   );
 
+  let contributeRoute = 'orderCollectiveNew';
+  let contributeRouteParams = { collectiveSlug: collective.slug, verb: 'contribute' };
+  if (collective.settings?.disableCustomContributions) {
+    if (collective.tiers.length > 0) {
+      const tier = collective.tiers[0];
+      contributeRoute = 'orderCollectiveTierNew';
+      contributeRouteParams = { ...contributeRouteParams, tierSlug: tier.slug, tierId: tier.id };
+    } else {
+      hasContribute = false;
+    }
+  }
+
   return (
     <Container display="flex" justifyContent="center" alignItems="center" whiteSpace="nowrap" {...props}>
       {hasContact && (
@@ -51,7 +63,7 @@ const CollectiveCallsToAction = ({
         </Link>
       )}
       {hasContribute && (
-        <Link route="orderCollectiveNew" params={{ collectiveSlug: collective.slug, verb: 'donate' }}>
+        <Link route={contributeRoute} params={contributeRouteParams}>
           <StyledButton
             buttonSize="small"
             mx={2}
@@ -141,6 +153,8 @@ CollectiveCallsToAction.propTypes = {
     slug: PropTypes.string.isRequired,
     plan: PropTypes.object,
     host: PropTypes.object,
+    settings: PropTypes.object,
+    tiers: PropTypes.arrayOf(PropTypes.object),
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */
