@@ -149,7 +149,7 @@ class Overlay extends React.Component {
     }
     const invoices = data.allInvoices;
     const years = uniq(invoices.map(i => i.year));
-    const months = []; //uniq(invoices.filter(i => Number(i.year) === Number(this.state.year)).map(i => i.month));
+    const months = uniq(invoices.filter(i => Number(i.year) === Number(this.state.year)).map(i => i.month));
     const none = <FormattedMessage id="Receipts.None" defaultMessage="None" />;
     const renderMonths = months.length > 0 ? months.map(this.renderMonth) : none;
     const renderyears = years.length > 0 ? years.map(this.renderYear) : none;
