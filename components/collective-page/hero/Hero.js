@@ -5,7 +5,6 @@ import { Camera } from '@styled-icons/feather/Camera';
 import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Settings } from '@styled-icons/feather/Settings';
-// Icons
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
@@ -13,7 +12,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../../lib/collective.lib';
-// General project imports
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url_helpers';
 
@@ -24,6 +22,7 @@ import { Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
@@ -31,16 +30,25 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import UserCompany from '../../UserCompany';
-// Local imports
 import ContainerSectionContent from '../ContainerSectionContent';
 
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
-import HeroBackground from './HeroBackground';
+import HeroBackground, { BASE_HERO_HEIGHT, StyledHeroBackground } from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 
 // Dynamic imports
 const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
+
+const HeroBackgroundEdit = dynamic(() => import('./HeroBackgroundEdit'), {
+  loading() {
+    return (
+      <StyledHeroBackground>
+        <LoadingPlaceholder height={BASE_HERO_HEIGHT} />
+      </StyledHeroBackground>
+    );
+  },
+});
 
 const Translations = defineMessages({
   website: {
@@ -77,6 +85,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
+  const isProject = collective.type === CollectiveType.PROJECT;
+  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -97,7 +107,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
         </MessageBox>
       )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-        <HeroBackground collective={collective} isEditing={isEditingCover} onEditCancel={() => editCover(false)} />
+        {isEditing ? (
+          <HeroBackgroundEdit collective={collective} onEditCancel={() => editCover(false)} />
+        ) : (
+          <HeroBackground collective={collective} />
+        )}
+
         {isAdmin && !isEditing && (
           // We don't have any mobile view for this one yet
           <Container
@@ -162,7 +177,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           )}
           {!isEvent && (
             <Flex alignItems="center" flexWrap="wrap">
-              {isCollective && (
+              {(isCollective || isFund || isProject) && (
                 <StyledTag textTransform="uppercase" mx={2} my={2} mb={2}>
                   <I18nCollectiveTags
                     tags={getCollectiveMainTag(
@@ -215,7 +230,24 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   </StyledLink>
                 )}
               </Flex>
-              {host && collective.isApproved && !isEvent && (
+              {collective.parentCollective && (
+                <Container mx={1} color="#969ba3" my="12px">
+                  <FormattedMessage
+                    id="Collective.Hero.ParentCollective"
+                    defaultMessage="Part of: {parentName}"
+                    values={{
+                      parentName: (
+                        <LinkCollective collective={collective.parentCollective}>
+                          <Span data-cy="parentCollectiveName" color="black.600">
+                            {collective.parentCollective.name}
+                          </Span>
+                        </LinkCollective>
+                      ),
+                    }}
+                  />
+                </Container>
+              )}
+              {host && collective.isApproved && (
                 <Fragment>
                   <Container mx={1} color="#969ba3" my={2}>
                     <FormattedMessage
@@ -291,6 +323,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
           {!isCollective && !isEvent && !collective.isHost && (
             <HeroTotalCollectiveContributionsWithData collective={collective} />
           )}
+
           {/** Calls to actions - only displayed on mobile because NavBar has its own instance on tablet+ */}
           <CollectiveCallsToAction
             display={['flex', null, 'none']}
@@ -340,6 +373,7 @@ Hero.propTypes = {
       }),
     ),
     parentCollective: PropTypes.shape({
+      name: PropTypes.string,
       slug: PropTypes.string,
     }),
   }).isRequired,

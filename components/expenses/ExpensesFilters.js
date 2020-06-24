@@ -1,0 +1,84 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import { Flex } from '../Grid';
+
+import ExpensesAmountFilter from './filters/ExpensesAmountFilter';
+import ExpensesDateFilter from './filters/ExpensesDateFilter';
+import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
+import ExpensesStatusFilter from './filters/ExpensesStatusFilter';
+import ExpensesTypeFilter from './filters/ExpensesTypeFilter';
+
+const FilterContainer = styled.div`
+  margin-bottom: 8px;
+  flex: 1 1 120px;
+  &:not(:last-child) {
+    margin-right: 18px;
+  }
+`;
+
+const FilterLabel = styled.label`
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #9d9fa3;
+`;
+
+const ExpensesFilters = ({ collective, filters, onChange }) => {
+  const getFilterProps = name => ({
+    inputId: `expenses-filter-${name}`,
+    value: filters?.[name],
+    onChange: value => {
+      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+    },
+  });
+
+  return (
+    <Flex flexWrap="wrap">
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-filter-type">
+          <FormattedMessage id="expense.type" defaultMessage="Type" />
+        </FilterLabel>
+        <ExpensesTypeFilter {...getFilterProps('type')} />
+      </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-filter-payout">
+          <FormattedMessage id="Payout" defaultMessage="Payout" />
+        </FilterLabel>
+        <ExpensesPayoutTypeFilter {...getFilterProps('payout')} />
+      </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-filter-period">
+          <FormattedMessage id="Period" defaultMessage="Period" />
+        </FilterLabel>
+        <ExpensesDateFilter {...getFilterProps('period')} />
+      </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-filter-amount">
+          <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
+        </FilterLabel>
+        <ExpensesAmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+      </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-filter-status">
+          <FormattedMessage id="expense.status" defaultMessage="Status" />
+        </FilterLabel>
+        <ExpensesStatusFilter {...getFilterProps('status')} />
+      </FilterContainer>
+    </Flex>
+  );
+};
+
+ExpensesFilters.propTypes = {
+  onChange: PropTypes.func,
+  filters: PropTypes.object,
+  collective: PropTypes.shape({
+    currency: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
+export default React.memo(ExpensesFilters);

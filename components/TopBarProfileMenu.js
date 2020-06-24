@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import { get, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
@@ -35,6 +35,14 @@ const CollectiveListItem = styled(ListItem)`
   @media (hover: none) {
     svg {
       opacity: 1;
+    }
+  }
+`;
+
+const HideGlobalScroll = createGlobalStyle`
+  @media(max-width: 40em) {
+    body {
+      overflow: hidden;
     }
   }
 `;
@@ -178,24 +186,30 @@ class TopBarProfileMenu extends React.Component {
         return a.collective.slug.localeCompare(b.collective.slug);
       });
 
+    const funds = memberships
+      .filter(m => m.collective.type === 'FUND')
+      .sort((a, b) => {
+        return a.collective.slug.localeCompare(b.collective.slug);
+      });
+
     return (
       <Container
         bg="white.full"
-        border="1px solid rgba(18,19,20,0.12)"
-        borderRadius="12px"
+        border={['none', '1px solid rgba(18,19,20,0.12)']}
+        borderRadius={[0, 12]}
         boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
         minWidth="170px"
         maxWidth="500px"
+        width="100%"
         position="absolute"
-        right={16}
-        top={75}
+        right={[0, 16]}
+        top={[69, 75]}
         zIndex={3000}
-        width="90%"
         data-cy="user-menu"
       >
-        <Flex flexWrap="wrap">
-          <Box order={[2, 2, 1]} width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
-            <Hide xs sm>
+        <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
+          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
+            <Hide xs>
               <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
               <P mt={2} color="#313233" fontWeight="500">
                 {LoggedInUser.collective.name}
@@ -218,8 +232,8 @@ class TopBarProfileMenu extends React.Component {
               {incognitoProfileMembership && (
                 <ListItem py={1}>
                   <Link
-                    route="subscriptions"
-                    params={{ collectiveSlug: incognitoProfileMembership.collective.slug }}
+                    route="recurring-contributions"
+                    params={{ slug: incognitoProfileMembership.collective.slug }}
                     passHref
                   >
                     <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
@@ -232,7 +246,7 @@ class TopBarProfileMenu extends React.Component {
                 </ListItem>
               )}
               <ListItem py={1}>
-                <Link route="subscriptions" params={{ collectiveSlug: LoggedInUser.username }} passHref>
+                <Link route="recurring-contributions" params={{ slug: LoggedInUser.username }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
                     <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
                   </StyledLink>
@@ -275,7 +289,7 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
             </Box>
           </Box>
-          <Box order={[1, 1, 2]} width={[1, 1, 1 / 2]} p={3} maxHeight="400px" overflowY="auto">
+          <Box order={[1, 2]} flex="1 1 50%" width={[1, 1, 1 / 2]} p={3} maxHeight="420px" overflowY="auto">
             <Flex alignItems="center">
               <P
                 color="#4E5052"
@@ -307,6 +321,33 @@ class TopBarProfileMenu extends React.Component {
                   </em>
                 </P>
               </Box>
+            )}
+            {funds.length > 0 && (
+              <Fragment>
+                <Flex alignItems="center" mt={3}>
+                  <P
+                    color="#4E5052"
+                    fontFamily="montserratlight, arial"
+                    fontSize="1rem"
+                    fontWeight="600"
+                    letterSpacing="1px"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    <FormattedMessage id="funds" defaultMessage="my funds" />
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                  <StyledRoundButton ml={2} size={24} color="#C4C7CC">
+                    <Link route="/fund/create" passHref>
+                      <Plus size={12} color="#76777A" />
+                    </Link>
+                  </StyledRoundButton>
+                </Flex>
+                <Box as="ul" p={0} my={2}>
+                  {funds.map(this.renderMembershipLine)}
+                </Box>
+              </Fragment>
             )}
             <Flex alignItems="center" mt={3}>
               <P
@@ -369,7 +410,12 @@ class TopBarProfileMenu extends React.Component {
           </P>
         </Hide>
         <ChevronDown color="#46b0ed" size="1.5em" cursor="pointer" />
-        {showProfileMenu && this.renderProfileMenu()}
+        {showProfileMenu && (
+          <React.Fragment>
+            <HideGlobalScroll />
+            {this.renderProfileMenu()}
+          </React.Fragment>
+        )}
       </Flex>
     );
   }

@@ -10,7 +10,7 @@ import Header from '../components/Header';
 import Link from '../components/Link';
 import { withUser } from '../components/UserProvider';
 
-class SubscriptionsRedirectPage extends React.Component {
+class RecurringContributionsRedirectPage extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
@@ -29,16 +29,9 @@ class SubscriptionsRedirectPage extends React.Component {
 
     if (!loadingLoggedInUser) {
       if (!LoggedInUser) {
-        Router.push('/signin', '/signin?next=/subscriptions');
+        Router.push('/signin', '/signin?next=/recurring-contributions');
       } else {
-        setTimeout(
-          () =>
-            Router.push(
-              `/subscriptions?collectiveSlug=${LoggedInUser.collective.slug}`,
-              `/${LoggedInUser.collective.slug}/subscriptions`,
-            ),
-          4000,
-        );
+        setTimeout(() => Router.push(`/${LoggedInUser.collective.slug}/recurring-contributions`), 100);
       }
     }
   }
@@ -106,15 +99,15 @@ class SubscriptionsRedirectPage extends React.Component {
                     <div>
                       This page has moved. Your recurring financial contributions are now at
                       <Link
-                        route={'subscriptions'}
+                        route={'recurring-contributions'}
                         params={{
-                          collectiveSlug: LoggedInUser.collective.slug,
+                          slug: LoggedInUser.collective.slug,
                         }}
                       >
                         <span className="link">
                           {' '}
                           /{LoggedInUser.collective.slug}
-                          /subscriptions
+                          /recurring-contributions
                         </span>
                       </Link>
                       . Redirecting...
@@ -131,4 +124,4 @@ class SubscriptionsRedirectPage extends React.Component {
   }
 }
 
-export default withUser(SubscriptionsRedirectPage);
+export default withUser(RecurringContributionsRedirectPage);

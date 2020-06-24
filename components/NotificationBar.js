@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import AcceptRejectButtons from './host-dashboard/AcceptRejectButtons';
+import { Flex } from './Grid';
+
 const logo = '/static/images/opencollective-icon.svg';
 
 class NotificationBar extends React.Component {
@@ -11,10 +14,20 @@ class NotificationBar extends React.Component {
     description: PropTypes.string,
     error: PropTypes.string,
     actions: PropTypes.arrayOf(PropTypes.node),
+    /** Collective */
+    collective: PropTypes.shape({
+      id: PropTypes.number,
+      slug: PropTypes.string,
+    }),
+    LoggedInUser: PropTypes.shape({
+      roles: PropTypes.arrayOf(PropTypes.node),
+      isHostAdmin: PropTypes.bool.isRequired,
+    }),
   };
 
   render() {
-    const { status, error, title, description, actions } = this.props;
+    const { status, error, title, description, actions, collective, LoggedInUser } = this.props;
+    const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(collective);
 
     return (
       <div className={classNames(status, 'NotificationBar')}>
@@ -87,9 +100,6 @@ class NotificationBar extends React.Component {
               align-items: center;
               flex-direction: column;
             }
-            .collectivePending {
-              background: #ff8c00;
-            }
             .NotificationLine h1 {
               font-size: 1.8rem;
               margin: 1rem;
@@ -117,6 +127,12 @@ class NotificationBar extends React.Component {
           <div className={`NotificationLine ${status}`}>
             <h1>{title}</h1>
             <p className="description">{description}</p>
+
+            {status === 'collectivePending' && isHostAdmin && (
+              <Flex flexWrap="wrap" alignItems="center" justifyContent="center">
+                <AcceptRejectButtons collective={collective} />
+              </Flex>
+            )}
             {actions && (
               <div className="actions">
                 {actions.map(action => (

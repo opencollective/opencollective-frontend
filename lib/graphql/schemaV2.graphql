@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Thu Jun 11 2020 14:05:52 GMT+0100 (British Summer Time)
+# timestamp: Wed Jun 24 2020 11:38:58 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -222,8 +222,10 @@ enum AccountType {
   BOT
   COLLECTIVE
   EVENT
-  ORGANIZATION
+  FUND
   INDIVIDUAL
+  ORGANIZATION
+  PROJECT
 }
 
 """
@@ -306,6 +308,27 @@ A financial amount.
 type Amount {
   value: Float
   currency: Currency
+  valueInCents: Float
+}
+
+"""
+Input type for an amount with the value and currency
+"""
+input AmountInput {
+  """
+  The value in plain
+  """
+  value: Float
+
+  """
+  The currency string
+  """
+  currency: Currency
+
+  """
+  The value in cents
+  """
+  valueInCents: Int
 }
 
 """
@@ -604,6 +627,7 @@ type Collective implements Account {
     """
     accountType: AccountType
   ): Int
+  tiers: TierCollection!
 }
 
 input CollectiveCreateInput {
@@ -625,6 +649,16 @@ type Comment {
   markdown: String
   fromAccount: Account
   account: Account
+
+  """
+  Returns a map of reactions counts for this comment
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this comment by logged in user
+  """
+  userReactions: [String]
   fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
   collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
@@ -648,6 +682,13 @@ input CommentCreateInput {
   expense: ExpenseReferenceInput
   ExpenseId: Int
   ConversationId: String
+}
+
+input CommentReferenceInput {
+  """
+  The public id identifying the comment
+  """
+  id: String
 }
 
 input CommentUpdateInput {
@@ -2334,6 +2375,10 @@ type Expense {
   The state of the expense (pending, approved, paid, rejected...etc)
   """
   status: ExpenseStatus!
+
+  """
+  Returns the list of comments for this expense, or `null` if user is not allowed to see them
+  """
   comments(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2345,7 +2390,7 @@ type Expense {
     """
     offset: Int = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
-  ): CommentCollection!
+  ): CommentCollection
 
   """
   The account where the expense was submitted
@@ -2625,6 +2670,11 @@ type ExpensePermissions {
   Whether the current user can mark this expense as unpaid
   """
   canMarkAsUnpaid: Boolean!
+
+  """
+  Whether the current user can comment and see comments for this expense
+  """
+  canComment: Boolean!
 }
 
 """
@@ -2765,6 +2815,136 @@ input ExpenseUpdateInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+}
+
+"""
+This represents an Project account
+"""
+type Fund implements Account {
+  id: String
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  longDescription: String
+  tags: [String]
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  expensePolicy: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  stats: AccountStats
+}
+
+input FundCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  settings: JSON
 }
 
 """
@@ -3101,6 +3281,11 @@ type Individual implements Account {
 }
 
 """
+ISO-8601 date
+"""
+scalar ISODateTime
+
+"""
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
@@ -3249,9 +3434,59 @@ enum MemberRole {
 This is the root mutation
 """
 type Mutation {
+  createCollective(
+    """
+    Information about the collective to create (name, slug, description, tags, ...)
+    """
+    collective: CollectiveCreateInput!
+
+    """
+    Reference to the host to apply on creation.
+    """
+    host: AccountReferenceInput
+
+    """
+    Wether to trigger the automated approval for Open Source collectives with GitHub.
+    """
+    automateApprovalWithGithub: Boolean = false
+  ): Collective
+  createFund(
+    """
+    Information about the collective to create (name, slug, description, tags, ...)
+    """
+    fund: FundCreateInput!
+
+    """
+    Reference to the host to apply on creation.
+    """
+    host: AccountReferenceInput
+  ): Fund
+  createProject(
+    """
+    Information about the Project to create (name, slug, description, tags, settings)
+    """
+    project: ProjectCreateInput!
+
+    """
+    Reference to the parent Account creating the Project.
+    """
+    parent: AccountReferenceInput
+  ): Project
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
+  addCommentReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this comment reaction
+    """
+    comment: CommentReferenceInput!
+  ): Comment!
+  removeCommentReaction(comment: CommentReferenceInput!, emoji: String!): Comment!
 
   """
   Connect external account to Open Collective Account
@@ -3333,22 +3568,6 @@ type Mutation {
     """
     isActive: Boolean = true
   ): Boolean
-  createCollective(
-    """
-    Information about the collective to create (name, slug, description, tags, ...)
-    """
-    collective: CollectiveCreateInput!
-
-    """
-    Reference to the host to apply on creation.
-    """
-    host: AccountReferenceInput
-
-    """
-    Wether to trigger the automated approval for Open Source collectives with GitHub.
-    """
-    automateApprovalWithGithub: Boolean = false
-  ): Collective
 
   """
   Submit an expense to a collective
@@ -3497,7 +3716,7 @@ type Mutation {
     """
     An Amount to update the order to
     """
-    amount: Int
+    amount: AmountInput
   ): Order
 
   """
@@ -3814,6 +4033,141 @@ input ProcessExpensePaymentParams {
 }
 
 """
+This represents an Project account
+"""
+type Project implements Account {
+  id: String
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+  name: String
+  description: String
+  longDescription: String
+  tags: [String]
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  expensePolicy: String
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
+  memberOf(
+    limit: Int
+    offset: Int
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+  ): MemberOfCollection
+  transactions(
+    type: TransactionType
+    limit: Int = 100
+    offset: Int = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): TransactionCollection
+  orders(
+    limit: Int = 100
+    offset: Int = 0
+    filter: AccountOrdersFilter
+    status: [OrderStatus]
+    tierSlug: String
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): OrderCollection
+  settings: JSON
+  conversations(
+    limit: Int
+    offset: Int
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(types: [String]): [PaymentMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  stats: AccountStats
+
+  """
+  The collective hosting this Project
+  """
+  parent: Collective
+}
+
+input ProjectCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  settings: JSON
+}
+
+"""
 This is the root query
 """
 type Query {
@@ -3947,6 +4301,26 @@ type Query {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime
   ): ExpenseCollection
   expense(
     """
@@ -3983,7 +4357,7 @@ Statistics for a given tag
 """
 type TagStat {
   """
-  An unique identified for this tag
+  An unique identifier for this tag
   """
   id: String!
 
@@ -4011,13 +4385,38 @@ type Tier {
   Get all orders
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
+  amount: Amount
+  interval: TierInterval
+  presets: [Int]
+  amountType: TierAmountType!
+  minimumAmount: Amount
+}
+
+enum TierAmountType {
+  FIXED
+  FLEXIBLE
+}
+
+"""
+A collection of "Tiers"
+"""
+type TierCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Tier]
+}
+
+enum TierInterval {
+  month
+  year
 }
 
 input TierReferenceInput {
   """
-  The legacy id assigned to the Tier
+  The id assigned to the Tier
   """
-  legacyId: Int
+  id: String
 }
 
 """
@@ -4066,6 +4465,11 @@ type TransferWise {
     The 3 letter code identifying the currency you want to receive (ie: USD, EUR, BRL, GBP)
     """
     currency: String!
+
+    """
+    The account JSON object being validated
+    """
+    accountDetails: JSON
   ): [TransferWiseRequiredField]
   availableCurrencies: [String]
 }
@@ -4080,6 +4484,7 @@ type TransferWiseFieldGroup {
   name: String
   type: String
   required: Boolean
+  refreshRequirementsOnChange: Boolean
   displayFormat: String
   example: String
   minLength: Int

@@ -100,6 +100,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               error={formatFormErrorMessage(intl, meta.error)}
               label={formatMessage(msg.content)}
               disabled={!isNew}
+              data-cy="payout-other-info"
               required
             >
               {inputProps => <StyledTextarea minHeight={100} {...inputProps} {...field} />}

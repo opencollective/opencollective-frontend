@@ -22,9 +22,11 @@ import Currency from '../components/Currency';
 import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import I18nFormatters from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import { CollectivePledgesQuery } from '../components/PledgedCollectivePage';
 import StyledButtonSet from '../components/StyledButtonSet';
 import StyledInput, { SubmitInput, TextInput } from '../components/StyledInput';
 import StyledInputAmount from '../components/StyledInputAmount';
@@ -229,7 +231,7 @@ class CreatePledgePage extends React.Component {
     try {
       const {
         data: { createOrder: result },
-      } = await this.props.createPledge(order, this.props.slug);
+      } = await this.props.createPledge(order, this.props.data?.Collective);
       if (result.collective.slug) {
         const params = { slug: result.collective.slug };
         Router.pushRoute('collective', params);
@@ -658,9 +660,8 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.howToClaim"
-                  defaultMessage="You’ll need to authenticate with the github profile that owns / admins that project. Just click on the
-                Claim Collective button in the pledged collective. We will be rolling out other forms of authentication
-                in the future."
+                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to proove that you are an admin of this project."
+                  values={I18nFormatters}
                 />
               </Details>
             </Container>
@@ -727,10 +728,15 @@ export const addCreatePledgeMutation = graphql(
   `,
   {
     props: ({ mutate }) => ({
-      createPledge: async (order, collectiveSlug) => {
+      createPledge: async (order, collective) => {
         return await mutate({
           variables: { order },
-          refetchQueries: !collectiveSlug ? [] : [{ query: getCollectiveQuery, variables: { slug: collectiveSlug } }],
+          refetchQueries: !collective
+            ? []
+            : [
+                { query: getCollectiveQuery, variables: { slug: collective.slug } },
+                { query: CollectivePledgesQuery, variables: { id: collective.id } },
+              ],
         });
       },
     }),

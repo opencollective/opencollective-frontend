@@ -4,8 +4,6 @@ import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { getHostPendingApplicationsQuery } from '../../lib/graphql/queries';
-
 import Container from '../Container';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -16,6 +14,15 @@ const rejectCollectiveQuery = gql`
   mutation rejectCollective($id: Int!, $rejectionReason: String) {
     rejectCollective(id: $id, rejectionReason: $rejectionReason) {
       id
+      isActive
+      isApproved
+      host {
+        id
+        name
+        slug
+        type
+        settings
+      }
     }
   }
 `;
@@ -27,7 +34,7 @@ const messages = defineMessages({
   },
 });
 
-const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSlug }) => {
+const ApplicationRejectionReasonModal = ({ show, onClose, collectiveId }) => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectCollective, { loading, error }] = useMutation(rejectCollectiveQuery);
   const intl = useIntl();
@@ -67,9 +74,6 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
             onClick={async () => {
               await rejectCollective({
                 variables: { id: collectiveId, rejectionReason },
-                refetchQueries: [{ query: getHostPendingApplicationsQuery, variables: { hostCollectiveSlug } }],
-                awaitRefetchQueries: true,
-                ignoreResults: true,
               });
               onClose();
             }}
@@ -82,11 +86,10 @@ const AppRejectionReasonModal = ({ show, onClose, collectiveId, hostCollectiveSl
   );
 };
 
-AppRejectionReasonModal.propTypes = {
+ApplicationRejectionReasonModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   collectiveId: PropTypes.number.isRequired,
-  hostCollectiveSlug: PropTypes.string.isRequired,
 };
 
-export default AppRejectionReasonModal;
+export default ApplicationRejectionReasonModal;

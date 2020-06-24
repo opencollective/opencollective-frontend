@@ -50,7 +50,7 @@ class CollectiveCard extends React.Component {
       },
       'roles.admin.label': {
         id: 'Member.Role.ADMIN',
-        defaultMessage: 'Collective Admin',
+        defaultMessage: 'Admin',
       },
       'roles.member.label': {
         id: 'Member.Role.MEMBER',
@@ -123,7 +123,7 @@ class CollectiveCard extends React.Component {
       route = 'event';
       params = {
         parentCollectiveSlug: collective.parentCollective && collective.parentCollective.slug,
-        eventSlug: collective.slug,
+        slug: collective.slug,
       };
     } else {
       route = 'collective';

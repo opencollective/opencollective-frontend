@@ -139,7 +139,7 @@ class Overlay extends React.Component {
 
     if (data.loading) {
       return (
-        <Popover id="downloadInvoicesPopover" title="Download invoices" {...forwardedProps}>
+        <Popover id="downloadInvoicesPopover" title="Download Receipts" {...forwardedProps}>
           <div>
             <FormattedMessage id="loading" defaultMessage="loading" />
             ...
@@ -150,9 +150,12 @@ class Overlay extends React.Component {
     const invoices = data.allInvoices;
     const years = uniq(invoices.map(i => i.year));
     const months = uniq(invoices.filter(i => Number(i.year) === Number(this.state.year)).map(i => i.month));
+    const none = <FormattedMessage id="Receipts.None" defaultMessage="None" />;
+    const renderMonths = months.length > 0 ? months.map(this.renderMonth) : none;
+    const renderyears = years.length > 0 ? years.map(this.renderYear) : none;
 
     return (
-      <Popover id="downloadInvoicesPopover" title="Download invoices" {...forwardedProps}>
+      <Popover id="downloadInvoicesPopover" title="Download Receipts" {...forwardedProps}>
         <ul className="nav nav-tabs">
           <li
             role="presentation"
@@ -178,7 +181,7 @@ class Overlay extends React.Component {
             defaultValue={this.state.year}
           />
         )}
-        <div>{this.state.isDisplayYearly ? years.map(this.renderYear) : months.map(this.renderMonth)}</div>
+        <div>{this.state.isDisplayYearly ? renderyears : renderMonths}</div>
       </Popover>
     );
   }

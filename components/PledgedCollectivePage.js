@@ -10,6 +10,7 @@ import { Link } from '../server/pages';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
+import I18nFormatters from './I18nFormatters';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import Page from './Page';
@@ -20,7 +21,7 @@ import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
-const CollectivePledgesQuery = gql`
+export const CollectivePledgesQuery = gql`
   query CollectivePledges($id: Int!) {
     Collective(id: $id) {
       id
@@ -195,7 +196,7 @@ const PledgedCollectivePage = ({ collective }) => {
           py={4}
           width={1}
         >
-          <Box width={[1, null, 0.65]}>
+          <Box>
             <H5 textAlign="left" fontWeight="normal" mb={1}>
               <FormattedMessage
                 id="pledge.ownerQuestion"
@@ -203,22 +204,14 @@ const PledgedCollectivePage = ({ collective }) => {
                 values={{ collective: <strong>{collective.name}</strong> }}
               />
             </H5>
-            <P fontSize="Caption" color="black.500">
+            <P fontSize="Caption" color="black.500" mt={3}>
               <FormattedMessage
-                id="pledge.ownerDetails"
-                defaultMessage="You can claim this collective! You will be able to start raising funds and manage your expenses
-                  transparently. We will contact the organizations and individuals who made commitment for them to
-                  fulfill their pledge."
+                id="pledge.contactToClaim"
+                defaultMessage="To claim this Collective, contact <SupportLink></SupportLink>."
+                values={I18nFormatters}
               />
             </P>
           </Box>
-          <Flex width={[1, null, 0.35]} justifyContent="center" mt={[4, null, 0]}>
-            <Link route="claimCollective" params={{ collectiveSlug: collective.slug }} passHref>
-              <StyledLink textAlign="center" width={1} buttonSize="medium" buttonStyle="standard">
-                <FormattedMessage id="pledge.claim" defaultMessage="Claim this collective" />
-              </StyledLink>
-            </Link>
-          </Flex>
         </Container>
       </Box>
     </Page>

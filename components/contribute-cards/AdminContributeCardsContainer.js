@@ -25,14 +25,17 @@ const AdminContributeCardsContainer = ({ collective, cards, onContributionCardMo
       <ContributeCardsContainer>
         {cards.map(({ key, Component, componentProps }, index) => (
           <ContributeCardContainer key={key}>
-            <DraggableContributeCardWrapper
-              key={key}
-              Component={Component}
-              componentProps={componentProps}
-              index={index}
-              onMove={onContributionCardMove}
-              onDrop={onContributionCardDrop}
-            />
+            {cards.length === 1 ? (
+              <Component {...componentProps} />
+            ) : (
+              <DraggableContributeCardWrapper
+                Component={Component}
+                componentProps={componentProps}
+                index={index}
+                onMove={onContributionCardMove}
+                onDrop={onContributionCardDrop}
+              />
+            )}
           </ContributeCardContainer>
         ))}
         <ContributeCardContainer>

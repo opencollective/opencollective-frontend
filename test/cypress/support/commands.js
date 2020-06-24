@@ -162,6 +162,10 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, ...pa
           mutation createExpense($expense: ExpenseInputType!) {
             createExpense(expense: $expense) {
               id
+              collective {
+                id
+                slug
+              }
             }
           }
         `,

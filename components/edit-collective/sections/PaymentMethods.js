@@ -173,7 +173,7 @@ class EditPaymentMethods extends React.Component {
             id="errors.PM.Remove.HasActiveSubscriptions"
             defaultMessage="This payment method cannot be removed because it has active recurring financial contributions."
           />{' '}
-          <Link route="subscriptions" params={{ collectiveSlug: this.props.collectiveSlug }}>
+          <Link route="recurring-contributions" params={{ slug: this.props.collectiveSlug }}>
             <Span textTransform="capitalize">
               <FormattedMessage
                 id="paymentMethod.editSubscriptions"

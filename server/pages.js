@@ -19,18 +19,19 @@ const pages = routes()
   .add('confirmEmail', '/confirm/email/:token')
   .add('unsubscribeEmail', '/email/unsubscribe/:email/:slug/:type/:token')
   .add('create-account', '/:form(create-account)', 'signin')
-  .add('subscriptions_redirect', '/subscriptions', 'subscriptions-redirect')
+  .add('subscriptions_redirect', '/subscriptions', 'recurring-contributions-redirect')
+  .add('recurring-contributions-redirect', '/recurring-contributions')
   .add('search', '/search')
   .add('hosts', '/hosts')
   .add('button', '/:collectiveSlug/:verb(contribute|donate)/button')
   .add('createEvent', '/:parentCollectiveSlug/events/(new|create)')
+  .add('create-project', '/:parentCollectiveSlug/projects/(new|create)')
   .add('createOrganization', '/organizations/new')
   .add('collectives-iframe', '/:collectiveSlug/(collectives|widget).html')
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
   .add('editCollective', '/:slug/edit/:section?')
   .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/contact')
-  .add('subscriptions', '/:collectiveSlug/subscriptions')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
@@ -69,7 +70,7 @@ const pages = routes()
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
 
-pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?', 'create-fund');
+pages.add('create-fund', '/fund/:verb(apply|create)/:step(form)?');
 
 // New Create Collective Flow
 pages.add(
@@ -78,8 +79,9 @@ pages.add(
   'new-create-collective',
 );
 
-// Events using new collective page
-pages.add('event', '/:parentCollectiveSlug/events/:eventSlug', 'new-collective-page');
+// Events and Projects using new collective page
+pages.add('event', '/:parentCollectiveSlug/events/:slug', 'new-collective-page');
+pages.add('project', '/:parentCollectiveSlug/projects/:slug', 'new-collective-page');
 
 // Tier page
 // ---------------
@@ -158,11 +160,7 @@ pages.add(
 // Pledges
 // -------
 
-pages
-  .add('createPledge', '/pledges/new')
-  .add('createCollectivePledge', '/:slug/pledges/new', 'createPledge')
-  .add('completePledge', '/pledges/:orderId/:step(contributeAs|details|payment|summary)?')
-  .add('claimCollective', '/:collectiveSlug/claim');
+pages.add('createPledge', '/pledges/new').add('createCollectivePledge', '/:slug/pledges/new', 'createPledge');
 
 // Application management
 // ----------------------
@@ -199,7 +197,8 @@ pages.add(
   '/:slug/accept-financial-contributions/:path(myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
 );
 
-// testing new recurring contributions page
-pages.add('recurring-contributions', '/:collectiveSlug/recurring-contributions');
+// New recurring contributions page
+pages.add('recurring-contributions', '/:slug/recurring-contributions');
+pages.add('subscriptions', '/:slug/subscriptions', 'recurring-contributions');
 
 module.exports = pages;

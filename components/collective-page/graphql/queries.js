@@ -39,6 +39,9 @@ export const getCollectivePageQuery = gql`
       imageUrl(height: 256)
       canApply
       canContact
+      ordersFromCollective(subscriptionsOnly: true) {
+        isSubscriptionActive
+      }
       stats {
         id
         balance
@@ -137,6 +140,31 @@ export const getCollectivePageQuery = gql`
           image
           collectiveSlug
           name
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
+      }
+      projects {
+        id
+        slug
+        name
+        description
+        image
+        isActive
+        backgroundImageUrl(height: 208)
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+          id
+          name
+          image
+          collectiveSlug
           type
         }
         stats {

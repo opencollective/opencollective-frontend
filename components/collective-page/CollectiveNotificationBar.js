@@ -38,6 +38,16 @@ const messages = defineMessages({
     id: 'createFund.createdApproved.description',
     defaultMessage: "It's already approved by the host ({host}), you can already contribute money and submit expenses.",
   },
+  // Event Created
+  eventCreated: {
+    id: 'event.created',
+    defaultMessage: 'Your Event has been created with success.',
+  },
+  // Project Created
+  projectCreated: {
+    id: 'project.created',
+    defaultMessage: 'Your Project has been created with success.',
+  },
   // Organization Created
   organizationCreated: {
     id: 'organization.created',
@@ -112,6 +122,14 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       title: intl.formatMessage(messages.fundCreated),
       description: host ? intl.formatMessage(messages.fundCreatedDescription, { host: host.name }) : '',
     };
+  } else if (status === 'eventCreated') {
+    return {
+      title: intl.formatMessage(messages.eventCreated),
+    };
+  } else if (status === 'projectCreated') {
+    return {
+      title: intl.formatMessage(messages.projectCreated),
+    };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
@@ -158,10 +176,12 @@ const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUse
 
   return !notification ? null : (
     <NotificationBar
-      status={notification.status}
+      status={status || notification.status}
+      collective={collective}
       title={notification.title}
       description={notification.description}
       actions={notification.actions}
+      LoggedInUser={LoggedInUser}
     />
   );
 };
@@ -178,7 +198,7 @@ CollectiveNotificationBar.propTypes = {
     name: PropTypes.string,
   }),
   /** A special status to show the notification bar (collective created, archived...etc) */
-  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated']),
+  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated', 'projectCreated', 'eventCreated']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   /** from withUser */

@@ -5,7 +5,7 @@ describe('Archive Collective', () => {
       cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
         const collectiveSlug = collective.slug;
         cy.visit(`/${collectiveSlug}/edit/advanced`);
-        cy.contains('button', 'Archive this organization').click();
+        cy.contains('button', 'Archive this Organization').click();
         cy.get('[data-cy=action]').click();
         cy.wait(500);
         cy.contains('This organization has been archived');
@@ -19,7 +19,7 @@ describe('Archive Collective', () => {
       cy.createCollective({ type: 'COLLECTIVE' }).then(collective => {
         const collectiveSlug = collective.slug;
         cy.visit(`/${collectiveSlug}/edit/advanced`);
-        cy.contains('button', 'Archive this collective').click();
+        cy.contains('button', 'Archive this Collective').click();
         cy.get('[data-cy=action]').click();
         cy.wait(500);
         cy.contains('This collective has been archived');

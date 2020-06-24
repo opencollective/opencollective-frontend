@@ -72,6 +72,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
         <StyledCardElement
           hidePostalCode={hidePostalCode}
           onChange={value => onChange({ name, type: 'StripeCreditCard', value })}
+          onReady={input => input.focus()}
         />
         {error && (
           <Span display="block" color="red.500" pt={2} fontSize="Tiny">

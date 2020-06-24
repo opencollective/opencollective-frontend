@@ -6,7 +6,7 @@ import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
 import { first, get, pick, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -29,14 +29,6 @@ const PaymentMethodBox = styled(Flex)`
 `;
 
 const messages = defineMessages({
-  cancel: {
-    id: 'actions.cancel',
-    defaultMessage: 'Cancel',
-  },
-  update: {
-    id: 'subscription.updateAmount.update.btn',
-    defaultMessage: 'Update',
-  },
   updatePaymentMethod: {
     id: 'subscription.menu.editPaymentMethod',
     defaultMessage: 'Update payment method',
@@ -45,15 +37,11 @@ const messages = defineMessages({
     id: 'subscription.menu.addPaymentMethod',
     defaultMessage: 'Add new payment method',
   },
-  save: {
-    id: 'save',
-    defaultMessage: 'Save',
-  },
 });
 
 const getPaymentMethodsQuery = gqlV2`
-  query UpdatePaymentMethodPopUpQuery($collectiveSlug: String) {
-    account(slug: $collectiveSlug) {
+  query UpdatePaymentMethodPopUpQuery($slug: String) {
+    account(slug: $slug) {
       id
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
         id
@@ -107,8 +95,7 @@ const UpdatePaymentMethodPopUp = ({
   // state management
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-  const [defaultPaymentMethod, setDefaultPaymentMethod] = useState(null);
-  const [loadingDefaultPaymentMethod, setLoadingDefaultPaymentMethod] = useState(true);
+  const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
   const [stripeIsReady, setStripeIsReady] = useState(false);
   const [stripe, setStripe] = useState(null);
   const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
@@ -117,7 +104,7 @@ const UpdatePaymentMethodPopUp = ({
   // GraphQL mutations and queries
   const { data } = useQuery(getPaymentMethodsQuery, {
     variables: {
-      collectiveSlug: router.query.collectiveSlug,
+      slug: router.query.slug,
     },
     context: API_V2_CONTEXT,
   });
@@ -157,22 +144,27 @@ const UpdatePaymentMethodPopUp = ({
     }));
     const uniquePMs = uniqBy(paymentMethodsOptions, 'id');
     // put the PM that matches this recurring contribution on top of the list
-    const sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod.id);
+    let sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod.id);
+    // if we've just added a PM, put it at the top of the list
+    if (addedPaymentMethod !== null) {
+      sortedPMs = sortedPMs.sort(a => a.id !== addedPaymentMethod.id);
+    }
     return sortedPMs;
   }, [paymentMethods]);
 
   useEffect(() => {
-    if (paymentOptions && defaultPaymentMethod === null) {
-      setDefaultPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
-      setLoadingDefaultPaymentMethod(false);
+    if (paymentOptions && selectedPaymentMethod === null) {
+      setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
+      setLoadingSelectedPaymentMethod(false);
     } else if (paymentOptions && addedPaymentMethod) {
-      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.legacyId));
+      setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
+      setLoadingSelectedPaymentMethod(false);
     }
-  }, [paymentOptions]);
+  }, [paymentOptions, addedPaymentMethod]);
 
   return (
     <Fragment>
-      <Flex width={1} alignItems="center" justifyContent="center" minHeight={45}>
+      <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
         <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
           {showAddPaymentMethod
             ? intl.formatMessage(messages.addPaymentMethod)
@@ -188,19 +180,21 @@ const UpdatePaymentMethodPopUp = ({
             size={20}
             onClick={() => setShowAddPaymentMethod(true)}
             data-cy="recurring-contribution-add-pm-button"
+            style={{ cursor: 'pointer' }}
           />
         )}
       </Flex>
       {showAddPaymentMethod ? (
-        <NewCreditCardForm
-          name="newCreditCardInfo"
-          profileType={'USER'}
-          // error={errors.newCreditCardInfo}
-          onChange={setNewPaymentMethodInfo}
-          onReady={({ stripe }) => setStripe(stripe)}
-          hasSaveCheckBox={false}
-        />
-      ) : loadingDefaultPaymentMethod ? (
+        <Box px={1} pt={2} pb={3}>
+          <NewCreditCardForm
+            name="newCreditCardInfo"
+            profileType={'USER'}
+            onChange={setNewPaymentMethodInfo}
+            onReady={({ stripe }) => setStripe(stripe)}
+            hasSaveCheckBox={false}
+          />
+        </Box>
+      ) : loadingSelectedPaymentMethod ? (
         <LoadingPlaceholder height={100} />
       ) : (
         <StyledRadioList
@@ -209,11 +203,10 @@ const UpdatePaymentMethodPopUp = ({
           keyGetter="key"
           options={paymentOptions}
           onChange={setSelectedPaymentMethod}
-          defaultValue={defaultPaymentMethod?.key}
-          value={selectedPaymentMethod}
+          value={selectedPaymentMethod?.key}
         >
           {({ radio, value: { title, subtitle, icon } }) => (
-            <PaymentMethodBox minheight={50} p={2} bg="white.full" data-cy="recurring-contribution-pm-box">
+            <PaymentMethodBox minheight={50} py={2} bg="white.full" data-cy="recurring-contribution-pm-box" px={3}>
               <Flex alignItems="center">
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
@@ -222,7 +215,7 @@ const UpdatePaymentMethodPopUp = ({
                   {icon}
                 </Flex>
                 <Flex flexDirection="column">
-                  <P fontWeight={subtitle ? 600 : 400} color="black.900">
+                  <P fontSize="12px" fontWeight={subtitle ? 600 : 400} color="black.900">
                     {title}
                   </P>
                   {subtitle && (
@@ -241,20 +234,22 @@ const UpdatePaymentMethodPopUp = ({
           <StyledHr width="100%" />
         </Flex>
       </Flex>
-      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={45}>
+      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={50}>
         {showAddPaymentMethod ? (
           <Fragment>
             <StyledButton
               buttonSize="tiny"
+              minWidth={75}
               onClick={() => {
                 setShowAddPaymentMethod(false);
                 setNewPaymentMethodInfo(null);
               }}
             >
-              {intl.formatMessage(messages.cancel)}
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
               ml={2}
+              minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
               disabled={newPaymentMethodInfo ? !newPaymentMethodInfo?.value.complete : true}
@@ -283,38 +278,41 @@ const UpdatePaymentMethodPopUp = ({
                     refetchQueries: [
                       {
                         query: getPaymentMethodsQuery,
-                        variables: { collectiveSlug: router.query.collectiveSlug },
+                        variables: { slug: router.query.slug },
                         context: API_V2_CONTEXT,
                       },
                     ],
                   });
                   setAddedPaymentMethod(res.data.addStripeCreditCard);
                   setShowAddPaymentMethod(false);
+                  setLoadingSelectedPaymentMethod(true);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
                   createNotification('error', errorMsg);
+                  return false;
                 }
               }}
             >
-              {intl.formatMessage(messages.save)}
+              <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           </Fragment>
         ) : (
           <Fragment>
             <StyledButton
               buttonSize="tiny"
+              minWidth={75}
               onClick={() => {
                 setMenuState('mainMenu');
               }}
             >
-              {intl.formatMessage(messages.cancel)}
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
               ml={2}
+              minWidth={75}
               buttonSize="tiny"
               buttonStyle="secondary"
               loading={loadingUpdatePaymentMethod}
-              disabled={!selectedPaymentMethod}
               data-cy="recurring-contribution-update-pm-button"
               onClick={async () => {
                 try {
@@ -322,7 +320,7 @@ const UpdatePaymentMethodPopUp = ({
                     variables: {
                       order: { id: contribution.id },
                       paymentMethod: {
-                        id: selectedPaymentMethod.value.paymentMethod.id,
+                        id: selectedPaymentMethod.value ? selectedPaymentMethod.value.id : selectedPaymentMethod.id,
                       },
                     },
                   });
@@ -331,10 +329,11 @@ const UpdatePaymentMethodPopUp = ({
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
                   createNotification('error', errorMsg);
+                  return false;
                 }
               }}
             >
-              {intl.formatMessage(messages.update)}
+              <FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" />
             </StyledButton>
           </Fragment>
         )}

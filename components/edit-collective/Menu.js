@@ -152,26 +152,34 @@ const MenuItem = styled(Link)`
 const isType = (c, collectiveType) => c.type === collectiveType;
 const isOneOfTypes = (c, ...collectiveTypes) => collectiveTypes.includes(c.type);
 const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.type, feature);
-const isFund = c => c.settings?.fund === true; // Funds MVP, to refactor
+const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
+const isProject = c => c.type === CollectiveType.PROJECT;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c) || isFund(c) || isProject(c),
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
   [EDIT_COLLECTIVE_SECTIONS.CONVERSATIONS]: c => isFeatureAllowed(c, FEATURES.CONVERSATIONS) && !isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.EXPENSES]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c) && !isFund(c),
-  [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c),
-  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c => isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION),
-  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION) && !isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.HOST]: c => isCollective(c) || isFund(c),
+  [EDIT_COLLECTIVE_SECTIONS.MEMBERS]: c =>
+    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.FUND, CollectiveType.ORGANIZATION),
+  [EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS]: c => isOneOfTypes(c, CollectiveType.ORGANIZATION, CollectiveType.USER),
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: c => isType(c, CollectiveType.EVENT),
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.ORGANIZATION),
+    isOneOfTypes(
+      c,
+      CollectiveType.COLLECTIVE,
+      CollectiveType.FUND,
+      CollectiveType.EVENT,
+      CollectiveType.ORGANIZATION,
+      CollectiveType.PROJECT,
+    ),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
     isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION, CollectiveType.USER) && !isFund(c),

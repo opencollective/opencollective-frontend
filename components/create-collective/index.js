@@ -184,6 +184,7 @@ const createCollective = gqlV2`
     $automateApprovalWithGithub: Boolean
   ) {
     createCollective(collective: $collective, host: $host, automateApprovalWithGithub: $automateApprovalWithGithub) {
+      id
       name
       slug
       tags

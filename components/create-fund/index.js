@@ -16,12 +16,6 @@ import { withUser } from '../UserProvider';
 import CategoryPicker from './CategoryPicker';
 import Form from './Form';
 
-const defaultSettings = {
-  fund: true,
-  features: { conversations: false },
-  collectivePage: { sections: ['budget', 'about'] },
-};
-
 class CreateFund extends Component {
   static propTypes = {
     host: PropTypes.object,
@@ -52,26 +46,22 @@ class CreateFund extends Component {
     }
   }
 
-  async createFund(collective) {
+  async createFund(fund) {
     const host = this.getHost();
 
     // set state to loading
     this.setState({ creating: true });
 
-    // Settings
-    collective.settings = defaultSettings;
-
-    delete collective.tos;
-    delete collective.hostTos;
+    delete fund.tos;
+    delete fund.hostTos;
     delete host.termsUrl;
 
     // try mutation
     try {
-      const res = await this.props.createFund({ variables: { collective, host } });
-      const newCollective = res.data.createCollective;
+      const res = await this.props.createFund({ variables: { fund, host } });
       await this.props.refetchLoggedInUser();
       Router.pushRoute('collective', {
-        slug: newCollective.slug,
+        slug: res.data.createFund.slug,
         status: 'fundCreated',
       }).then(() => window.scrollTo(0, 0));
     } catch (err) {
@@ -82,7 +72,7 @@ class CreateFund extends Component {
 
   render() {
     const { LoggedInUser, router } = this.props;
-    const { error } = this.state;
+    const { creating, error } = this.state;
     const { category } = router.query;
 
     if (!LoggedInUser) {
@@ -112,30 +102,21 @@ class CreateFund extends Component {
       return <CategoryPicker />;
     }
 
-    return (
-      <Form
-        host={this.getHost()}
-        onSubmit={this.createFund}
-        onChange={this.handleChange}
-        loading={this.state.creating}
-        error={error}
-      />
-    );
+    return <Form host={this.getHost()} onSubmit={this.createFund} loading={creating} error={error} />;
   }
 }
 
 const createFundMutation = gqlV2`
   mutation CreateFund(
-    $collective: CollectiveCreateInput!
+    $fund: FundCreateInput!
     $host: AccountReferenceInput,
   ) {
-    createCollective(collective: $collective, host: $host) {
+    createFund(fund: $fund, host: $host) {
+      id
       name
       slug
       tags
       description
-      githubHandle
-      legacyId
     }
   }
 `;

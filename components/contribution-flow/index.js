@@ -153,6 +153,7 @@ class CreateOrderPage extends React.Component {
       currency: PropTypes.string.isRequired,
       hostFeePercent: PropTypes.number.isRequired,
       location: PropTypes.shape({ country: PropTypes.string }),
+      settings: PropTypes.object,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string,
         settings: PropTypes.object,
@@ -181,12 +182,6 @@ class CreateOrderPage extends React.Component {
       presets: PropTypes.arrayOf(PropTypes.number),
       customFields: PropTypes.arrayOf(PropTypes.object),
     }),
-    /** If completing a pledge, this should contain an order object */
-    pledge: PropTypes.shape({
-      id: PropTypes.number,
-      interval: PropTypes.string,
-      totalAmount: PropTypes.number,
-    }),
     verb: PropTypes.string.isRequired,
     step: PropTypes.string,
     redirect: PropTypes.string,
@@ -203,7 +198,6 @@ class CreateOrderPage extends React.Component {
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     createOrder: PropTypes.func.isRequired, // from mutation
     confirmOrder: PropTypes.func.isRequired, // from mutation
-    completePledge: PropTypes.func.isRequired, // from mutation
     createCollective: PropTypes.func.isRequired, // from mutation
     loadStripe: PropTypes.func.isRequired, // from withStripe
     intl: PropTypes.object.isRequired, // from injectIntl
@@ -314,7 +308,7 @@ class CreateOrderPage extends React.Component {
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
-    const { collective, tier, pledge } = this.props;
+    const { collective, tier } = this.props;
 
     const params = {
       verb: this.props.verb || 'donate',
@@ -339,10 +333,6 @@ class CreateOrderPage extends React.Component {
         route = 'orderCollectiveTierNew';
         params.verb = 'contribute'; // Enforce "contribute" verb for ordering tiers
       }
-    } else if (pledge && pledge.id && stepName !== 'success') {
-      route = 'completePledge';
-      params.orderId = pledge.id;
-      delete params.verb;
     } else if (params.verb === 'contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       params.verb = 'pay';
@@ -469,11 +459,10 @@ class CreateOrderPage extends React.Component {
       }
     }
 
-    const { collective, tier, description, pledge, completePledge, createOrder } = this.props;
+    const { collective, tier, description, createOrder } = this.props;
     const order = {
       paymentMethod,
       recaptchaToken,
-      id: pledge ? pledge.id : null,
       totalAmount: this.getTotalAmountWithTaxes(),
       platformFee: get(stepDetails, 'platformFee.value'),
       taxAmount: get(stepSummary, 'amount', 0),
@@ -490,10 +479,7 @@ class CreateOrderPage extends React.Component {
     };
 
     try {
-      const orderCreated = pledge
-        ? (await completePledge(order)).data.updateOrder
-        : (await createOrder(order)).data.createOrder;
-
+      const orderCreated = (await createOrder(order)).data.createOrder;
       if (orderCreated.stripeError) {
         this.handleStripeError(orderCreated);
       } else {
@@ -608,8 +594,21 @@ class CreateOrderPage extends React.Component {
     }
 
     return LoggedInUser.memberOf
-      .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
-      .map(({ collective }) => collective);
+      .filter(
+        m =>
+          m.role === 'ADMIN' &&
+          m.collective.id !== collective.id &&
+          m.collective.type !== 'EVENT' &&
+          m.collective.type !== 'PROJECT',
+      )
+      .map(({ collective }) => collective)
+      .map(collective => {
+        // Funds MVP, to refactor
+        if (collective.settings?.fund) {
+          collective.type = 'FUND';
+        }
+        return collective;
+      });
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */
@@ -626,7 +625,7 @@ class CreateOrderPage extends React.Component {
     const tier = this.props.tier || {};
     if (tier.amountType !== AmountTypes.FIXED) {
       // Funds MVP, to refactor
-      if (this.props.collective?.settings?.fund === true) {
+      if (this.props.collective.type === CollectiveType.FUND || this.props.collective?.settings?.fund === true) {
         return tier.presets || [100000, 200000, 500000, 1000000];
       }
 
@@ -651,7 +650,7 @@ class CreateOrderPage extends React.Component {
   }
 
   getDefaultAmount() {
-    const { tier, pledge } = this.props;
+    const { tier } = this.props;
     const stateAmount = get(this.state.stepDetails, 'totalAmount');
 
     if (!isNil(stateAmount)) {
@@ -660,8 +659,6 @@ class CreateOrderPage extends React.Component {
       return this.props.fixedAmount;
     } else if (tier && !isNil(tier.amount)) {
       return tier.amount;
-    } else if (pledge && pledge.totalAmount) {
-      return pledge.totalAmount;
     } else if (this.getOrderMinAmount() === 0) {
       // Free tiers are free per default, even when user can make a donation
       return 0;
@@ -674,10 +671,10 @@ class CreateOrderPage extends React.Component {
   /** Get default total amount, or undefined if we don't have any info on this */
   getDefaultStepDetails(tier) {
     const { stepDetails } = this.state;
-    const { fixedInterval, pledge } = this.props;
+    const { fixedInterval } = this.props;
     const amount = this.getDefaultAmount();
     const quantity = get(stepDetails, 'quantity') || this.props.defaultQuantity || 1;
-    const interval = get(stepDetails, 'interval') || get(tier, 'interval') || fixedInterval || get(pledge, 'interval');
+    const interval = get(stepDetails, 'interval') || get(tier, 'interval') || fixedInterval;
     const totalAmount = amount * quantity;
 
     return { amount, quantity, interval, totalAmount };
@@ -1323,27 +1320,6 @@ export const addConfirmOrderMutation = graphql(
   },
 );
 
-const addCompletePledgeMutation = graphql(
-  gql`
-    mutation completePledge($order: OrderInputType!) {
-      updateOrder(order: $order) {
-        ...SubmitOrderFragment
-      }
-    }
-    ${SubmitOrderFragment}
-  `,
-  {
-    props: ({ mutate }) => ({
-      completePledge: order => mutate({ variables: { order } }),
-    }),
-  },
-);
-
-const addGraphQL = compose(
-  addCreateCollectiveMutation,
-  addCreateOrderMutation,
-  addConfirmOrderMutation,
-  addCompletePledgeMutation,
-);
+const addGraphQL = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);
 
 export default injectIntl(addGraphQL(withUser(withStripeLoader(CreateOrderPage))));

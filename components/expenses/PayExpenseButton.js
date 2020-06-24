@@ -66,7 +66,13 @@ const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...p
   const isDisabled = Boolean(disabled || disabledMessage);
 
   const button = (
-    <StyledButton buttonStyle="successSecondary" {...props} disabled={isDisabled} onClick={() => showModal(true)}>
+    <StyledButton
+      buttonStyle="successSecondary"
+      data-cy="pay-button"
+      {...props}
+      disabled={isDisabled}
+      onClick={() => showModal(true)}
+    >
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} size={12} />
       <Span ml="6px">
         <FormattedMessage id="actions.pay" defaultMessage="Pay" />

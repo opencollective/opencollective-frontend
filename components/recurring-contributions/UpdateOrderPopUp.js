@@ -2,9 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { first, get, startCase } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -34,16 +32,24 @@ const messages = defineMessages({
 });
 
 const updateOrderMutation = gqlV2/* GraphQL */ `
-  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: Int, $tier: TierReferenceInput) {
+  mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: AmountInput, $tier: TierReferenceInput) {
     updateOrder(order: $order, amount: $amount, tier: $tier) {
       id
+      amount {
+        value
+        currency
+      }
+      tier {
+        id
+        name
+      }
     }
   }
 `;
 
-const getTiersQuery = gql`
-  query UpdateOrderPopUpQuery($collectiveSlug: String!) {
-    Collective(slug: $collectiveSlug) {
+const getTiersQuery = gqlV2/* GraphQL */ `
+  query UpdateOrderPopUpQuery($slug: String!) {
+    collective(slug: $slug) {
       id
       slug
       name
@@ -51,18 +57,20 @@ const getTiersQuery = gql`
       currency
       settings
       tiers {
-        id
-        name
-        slug
-        interval
-        currency
-        amount
-        minimumAmount
-        button
-        amountType
-        endsAt
-        type
-        presets
+        nodes {
+          id
+          name
+          interval
+          amount {
+            value
+            currency
+          }
+          minimumAmount {
+            value
+          }
+          amountType
+          presets
+        }
       }
     }
   }
@@ -84,21 +92,26 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
   });
   const { data } = useQuery(getTiersQuery, {
     variables: {
-      collectiveSlug: contribution.toAccount.slug,
+      slug: contribution.toAccount.slug,
     },
+    context: API_V2_CONTEXT,
   });
 
   // Tier data wrangling
 
   const getDefaultTier = tiers => {
     if (contribution.tier === null) {
-      return first(tiers);
+      return tiers.find(option => option.key === 'custom-tier');
     } else {
-      return tiers.find(option => option.title.toLowerCase() === contribution.tier.name.toLowerCase());
+      // for some collectives if a tier has been deleted it won't have moved the contribution
+      // to the custom 'null' tier so we have to check for that
+      const matchedTier = tiers.find(option => option.id === contribution.tier.id);
+      return !matchedTier ? tiers.find(option => option.key === 'custom-tier') : matchedTier;
     }
   };
 
-  const tiers = get(data, 'Collective.tiers', null);
+  const tiers = get(data, 'collective.tiers.nodes', null);
+  const disableCustomContributions = get(data, 'collective.settings.disableCustomContributions', false);
   const mappedTierOptions = React.useMemo(() => {
     if (!tiers) {
       return null;
@@ -120,14 +133,16 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
         key: `tier-${tier.id}`,
         title: tier.name,
         flexible: tier.amountType === 'FLEXIBLE' ? true : false,
-        amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount : tier.amount,
+        amount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : tier.amount.value * 100,
         id: tier.id,
-        currency: tier.currency,
+        currency: tier.amount.currency,
         interval: tier.interval,
         presets: tier.presets,
-        minimumAmount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount : 100,
+        minimumAmount: tier.amountType === 'FLEXIBLE' ? tier.minimumAmount.value * 100 : 100,
       }));
-    tierOptions.unshift(customTierOption);
+    if (!disableCustomContributions) {
+      tierOptions.unshift(customTierOption);
+    }
     return tierOptions;
   }, [tiers]);
 
@@ -164,7 +179,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
 
   return (
     <Fragment>
-      <Flex width={1} alignItems="center" justifyContent="center" minHeight={45}>
+      <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
         <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
           <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
         </P>
@@ -181,11 +196,10 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
           keyGetter="key"
           options={mappedTierOptions}
           onChange={setSelectedTier}
-          defaultValue={selectedTier?.key}
-          value={selectedTier}
+          value={selectedTier?.key}
         >
           {({ radio, checked, value: { title, subtitle, amount, flexible, currency, interval, minimumAmount } }) => (
-            <TierBox minheight={50} p={2} bg="white.full">
+            <TierBox minheight={50} py={2} px={3} bg="white.full" data-cy="recurring-contribution-tier-box">
               <Flex alignItems="center">
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
@@ -197,12 +211,14 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                   {checked && flexible ? (
                     <Fragment>
                       <StyledSelect
+                        data-cy="tier-amount-select"
                         menuPortalTarget={document.body}
                         onChange={setSelectedAmountOption}
                         value={selectedAmountOption}
                         options={amountOptions}
                         my={2}
                         minWidth={150}
+                        isSearchable={false}
                       />
                       {selectedAmountOption?.label === 'Other' && (
                         <Flex flexDirection="column">
@@ -255,9 +271,10 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
           <StyledHr width="100%" />
         </Flex>
       </Flex>
-      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={45}>
+      <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" minHeight={50}>
         <StyledButton
           buttonSize="tiny"
+          minWidth={75}
           onClick={() => {
             setMenuState('mainMenu');
           }}
@@ -266,17 +283,24 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
         </StyledButton>
         <StyledButton
           ml={2}
+          minWidth={75}
           buttonSize="tiny"
           buttonStyle="secondary"
           loading={loadingUpdateOrder}
+          data-cy="recurring-contribution-update-order-button"
           onClick={async () => {
             try {
               await submitUpdateOrder({
                 variables: {
                   order: { id: contribution.id },
-                  amount: selectedAmountOption.label === 'Other' ? inputAmountValue : selectedAmountOption.value,
+                  amount: {
+                    value:
+                      selectedAmountOption.label === 'Other'
+                        ? inputAmountValue / 100
+                        : selectedAmountOption.value / 100,
+                  },
                   tier: {
-                    legacyId: selectedTier.value ? selectedTier.value.id : selectedTier.id,
+                    id: selectedTier.value ? selectedTier.value.id : selectedTier.id,
                   },
                 },
               });
@@ -285,6 +309,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
             } catch (error) {
               const errorMsg = getErrorFromGraphqlException(error).message;
               createNotification('error', errorMsg);
+              return false;
             }
           }}
         >
@@ -298,10 +323,9 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
 UpdateOrderPopUp.propTypes = {
   data: PropTypes.object,
   setMenuState: PropTypes.func,
-  router: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   createNotification: PropTypes.func,
   setShowPopup: PropTypes.func,
 };
 
-export default withRouter(UpdateOrderPopUp);
+export default UpdateOrderPopUp;

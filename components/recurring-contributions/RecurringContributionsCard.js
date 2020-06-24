@@ -1,8 +1,11 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -27,14 +30,6 @@ const getBackground = collective => {
 };
 
 const messages = defineMessages({
-  amountContributed: {
-    id: 'Subscriptions.AmountContributed',
-    defaultMessage: 'Amount contributed',
-  },
-  contributedToDate: {
-    id: 'Subscriptions.ContributedToDate',
-    defaultMessage: 'Contributed to date',
-  },
   manage: {
     id: 'Subscriptions.Edit',
     defaultMessage: 'Edit',
@@ -43,25 +38,43 @@ const messages = defineMessages({
     id: 'Subscriptions.Activate',
     defaultMessage: 'Activate',
   },
-  ourPurpose: {
-    id: 'SubscriptionsCard.ourPurpose',
-    defaultMessage: 'Our purpose',
+  tag: {
+    id: 'Subscriptions.Status',
+    defaultMessage: '{status, select, ACTIVE {Active} CANCELLED {Cancelled}} contribution',
   },
 });
 
-const RecurringContributionsCard = ({ collective, status, contribution, createNotification, account, ...props }) => {
+const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
+  mutation activateRecurringContribution($order: OrderReferenceInput!) {
+    activateOrder(order: $order) {
+      id
+      status
+    }
+  }
+`;
+
+const RecurringContributionsCard = ({
+  collective,
+  status,
+  contribution,
+  createNotification,
+  account,
+  LoggedInUser,
+  ...props
+}) => {
   const [showPopup, setShowPopup] = useState(false);
-  const [isHovering, setHovering] = useState(false);
+
+  const [submitActivation, { loadingActivation }] = useMutation(activateRecurringContributionMutation, {
+    context: API_V2_CONTEXT,
+  });
 
   const { formatMessage } = useIntl();
-  const statusTag = `${status} contribution`;
+  const statusTag = formatMessage(messages.tag, { status });
   const buttonText = status === 'ACTIVE' ? formatMessage(messages.manage) : formatMessage(messages.activate);
-  const userIsLoggedInUser = props.LoggedInUser.collective.slug === props.router.query.collectiveSlug;
-  // const userIsAdminOfCollectiveOrOrg
-  const userIsAdmin = userIsLoggedInUser; // || userIsAdminOfCollectiveOrOrg
+  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
 
   return (
-    <StyledCard onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)} {...props}>
+    <StyledCard {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
         <Container border="2px solid white" borderRadius="25%" backgroundColor="white.full" width={68}>
           <LinkCollective collective={collective}>
@@ -71,20 +84,9 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
       </Container>
       <Flex flexDirection="column" justifyContent="space-around" height={260}>
         <Container p={2}>
-          {isHovering && !showPopup ? (
-            <Fragment>
-              <P fontSize="Caption" fontWeight="bold">
-                {formatMessage(messages.ourPurpose)}
-              </P>
-              <P fontSize="Caption" color="black.800">
-                {collective.description}
-              </P>
-            </Fragment>
-          ) : (
-            <P fontSize="LeadParagraph" fontWeight="bold" color="black.800">
-              {collective.name}
-            </P>
-          )}
+          <P fontSize="LeadParagraph" fontWeight="bold" color="black.800">
+            {collective.name}
+          </P>
           <StyledTag display="inline-block" textTransform="uppercase" my={2}>
             <I18nCollectiveTags tags={statusTag} />
           </StyledTag>
@@ -92,9 +94,9 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
         <Container p={2} flexGrow={1} display="flex" flexDirection="column" justifyContent="space-around">
           <Flex flexDirection="column">
             <P fontSize="Paragraph" fontWeight="400">
-              {formatMessage(messages.amountContributed)}
+              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
             </P>
-            <P fontSize="Paragraph" fontWeight="bold">
+            <P fontSize="Paragraph" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
                 amount={contribution.amount.value * 100}
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}
@@ -104,7 +106,7 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
           </Flex>
           <Flex flexDirection="column" mb={2}>
             <P fontSize="Paragraph" fontWeight="400">
-              {formatMessage(messages.contributedToDate)}
+              <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />
             </P>
             <P fontSize="Paragraph">
               <FormattedMoneyAmount
@@ -113,15 +115,36 @@ const RecurringContributionsCard = ({ collective, status, contribution, createNo
               />
             </P>
           </Flex>
-          {userIsAdmin && (
-            <StyledButton
-              buttonSize="tiny"
-              onClick={() => setShowPopup(true)}
-              data-cy="recurring-contribution-edit-activate-button"
-            >
-              {buttonText}
-            </StyledButton>
-          )}
+          {isAdmin &&
+            (status === 'ACTIVE' ? (
+              <StyledButton
+                buttonSize="tiny"
+                onClick={() => setShowPopup(true)}
+                data-cy="recurring-contribution-edit-activate-button"
+              >
+                {buttonText}
+              </StyledButton>
+            ) : (
+              <StyledButton
+                buttonSize="tiny"
+                loading={loadingActivation}
+                data-cy="recurring-contribution-activate-yes"
+                onClick={async () => {
+                  try {
+                    await submitActivation({
+                      variables: { order: { id: contribution.id } },
+                    });
+                    createNotification('activate');
+                  } catch (error) {
+                    const errorMsg = getErrorFromGraphqlException(error).message;
+                    createNotification('error', errorMsg);
+                    return false;
+                  }
+                }}
+              >
+                {buttonText}
+              </StyledButton>
+            ))}
         </Container>
       </Flex>
       {showPopup && (
@@ -141,11 +164,9 @@ RecurringContributionsCard.propTypes = {
   collective: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
   status: PropTypes.string.isRequired,
-  router: PropTypes.object.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
-  hover: PropTypes.bool,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
 
-export default withUser(withRouter(RecurringContributionsCard));
+export default withUser(RecurringContributionsCard);

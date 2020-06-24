@@ -37,7 +37,7 @@ const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders }) => {
   return (
     <StyledCard>
       {expenses.map((expense, idx) => (
-        <ExpenseContainer key={expense?.id || idx} isFirst={!idx}>
+        <ExpenseContainer key={expense?.id || idx} isFirst={!idx} data-cy="single-expense">
           <Box mr={3}>
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
@@ -53,7 +53,7 @@ const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders }) => {
                 <LoadingPlaceholder height={70} width="70%" />
               ) : (
                 <Box maxWidth="70%">
-                  <LinkExpense collective={collective} expense={expense} isV2>
+                  <LinkExpense collective={collective} expense={expense} isV2 data-cy="expense-link">
                     <AutosizeText
                       value={expense.description}
                       maxLength={255}
@@ -68,6 +68,7 @@ const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders }) => {
                           textDecoration="none"
                           color="black.900"
                           fontSize={`${fontSize}px`}
+                          data-cy="expense-title"
                         >
                           {value}
                         </H3>

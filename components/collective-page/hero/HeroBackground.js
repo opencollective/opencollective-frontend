@@ -1,38 +1,12 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { Mutation } from '@apollo/react-components';
-import { Upload } from '@styled-icons/feather/Upload';
-import { get, has, set } from 'lodash';
-import dynamic from 'next/dynamic';
-import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
-
-import { upload } from '../../../lib/api';
-
-import Container from '../../Container';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
-import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
-import { Span } from '../../Text';
-// Local imports
-import { EditCollectiveBackgroundMutation } from '../graphql/mutations';
+import { get, has } from 'lodash';
+import styled, { css } from 'styled-components';
 
 import HeroBackgroundMask from '../images/HeroBackgroundMask.svg';
 
-const BASE_WIDTH = 1368;
-const BASE_HEIGHT = 325;
-
-// Dynamically import cropper component
-const EditBackgroundLoadingPlaceholder = () => <LoadingPlaceholder height={BASE_HEIGHT} />;
-const Cropper = dynamic(() => import(/* webpackChunkName: 'react-easy-crop' */ 'react-easy-crop'), {
-  loading: EditBackgroundLoadingPlaceholder,
-  ssr: false,
-});
-
-// Dynamically import dropzone component
-const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), {
-  ssr: false,
-});
+export const BASE_HERO_WIDTH = 1368;
+export const BASE_HERO_HEIGHT = 325;
 
 const generateBackground = theme => {
   const color = theme.colors.primary[300];
@@ -40,23 +14,42 @@ const generateBackground = theme => {
   return `${gradient}, ${color}`;
 };
 
-const StyledBackground = styled.div`
+const BackgroundImage = styled.img.attrs({ alt: '' })``;
+
+export const StyledHeroBackground = styled.div`
   position: absolute;
   right: 0;
   top: 0;
   height: 100%;
   width: 100%;
-  max-width: ${BASE_WIDTH}px; // Should match SVG's viewbox
+  max-width: ${BASE_HERO_WIDTH}px; // Should match SVG's viewbox
   z-index: ${props => (props.isEditing ? 0 : -1)};
+  overflow: hidden;
 
   img {
     margin: 0;
   }
 
-  .reactEasyCrop_Image {
-    max-width: none;
+  .reactEasyCrop_Image,
+  ${BackgroundImage} {
     max-height: none;
+    max-width: none;
   }
+
+  ${props =>
+    props.isAlignedRight &&
+    css`
+      .reactEasyCrop_Image,
+      ${BackgroundImage} {
+        top: 0;
+        right: 0;
+        min-height: 0;
+        min-width: 0;
+        left: unset;
+        bottom: unset;
+        position: absolute;
+      }
+    `}
 
   @supports (mask-size: cover) {
     background: ${props => generateBackground(props.theme)};
@@ -74,214 +67,43 @@ const StyledBackground = styled.div`
   }
 `;
 
-const ImageContainer = styled.div`
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
-  overflow: hidden;
-`;
+export const DEFAULT_BACKGROUND_CROP = { x: 0, y: 0 };
 
-const BackgroundImage = styled.img.attrs({ alt: '' })`
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  min-height: 0;
-  min-width: 0;
-  max-height: none;
-  max-width: none;
-  position: absolute;
-  margin: auto;
-`;
+export const getCrop = collective => {
+  return get(collective.settings, 'collectivePage.background.crop') || DEFAULT_BACKGROUND_CROP;
+};
 
-const KEY_IMG_REMOVE = '__REMOVE__';
-const DEFAULT_CROP = { x: 0, y: 0 };
+export const getZoom = collective => {
+  return get(collective.settings, 'collectivePage.background.zoom') || 1;
+};
 
-const getCrop = collective => get(collective.settings, 'collectivePage.background.crop') || DEFAULT_CROP;
-const getZoom = collective => get(collective.settings, 'collectivePage.background.zoom') || 1;
+export const getAlignedRight = collective => {
+  return get(collective.settings, 'collectivePage.background.isAlignedRight');
+};
 
 /**
  * Wraps the logic to display the hero background. Fallsback on a white background if
  * css `mask` is not supported.
  */
-const HeroBackground = ({ collective, isEditing, onEditCancel }) => {
-  const [crop, onCropChange] = React.useState(getCrop(collective));
-  const [zoom, onZoomChange] = React.useState(getZoom(collective));
-  const [uploadedImage, setUploadedImage] = React.useState();
-  const [submitting, setSubmitting] = React.useState(false);
+const HeroBackground = ({ collective }) => {
+  const crop = getCrop(collective);
+  const zoom = getZoom(collective);
+  const isAlignedRight = getAlignedRight(collective);
   const hasBackgroundSettings = has(collective.settings, 'collectivePage.background');
 
-  return !isEditing ? (
-    <StyledBackground>
+  return (
+    <StyledHeroBackground isAlignedRight={isAlignedRight}>
       {collective.backgroundImageUrl && (
-        <ImageContainer>
-          <BackgroundImage
-            src={collective.backgroundImageUrl}
-            style={
-              hasBackgroundSettings
-                ? { transform: `translate(${crop.x}px, ${crop.y}px) scale(${zoom})` }
-                : { minWidth: '100%' }
-            }
-          />
-        </ImageContainer>
+        <BackgroundImage
+          src={collective.backgroundImageUrl}
+          style={
+            hasBackgroundSettings
+              ? { transform: `translate(${crop.x}px, ${crop.y}px) scale(${zoom})` }
+              : { minWidth: '100%' }
+          }
+        />
       )}
-    </StyledBackground>
-  ) : (
-    <Mutation mutation={EditCollectiveBackgroundMutation}>
-      {editBackground => (
-        <StyledBackground
-          data-cy="collective-background-image-styledBackground"
-          backgroundImage={collective.backgroundImageUrl}
-          isEditing
-        >
-          <Cropper
-            image={uploadedImage ? uploadedImage.preview : collective.backgroundImageUrl}
-            cropSize={{ width: BASE_WIDTH, height: BASE_HEIGHT }}
-            crop={crop}
-            zoom={zoom}
-            minZoom={0.25}
-            maxZoom={5}
-            zoomSpeed={0.5}
-            restrictPosition={false}
-            onCropChange={onCropChange}
-            onZoomChange={onZoomChange}
-            style={{
-              imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
-              containerStyle: { height: BASE_HEIGHT },
-            }}
-          />
-          <Container display={['none', 'flex']} position="absolute" right={25} top={25} zIndex={222}>
-            <Dropzone
-              onDrop={acceptedFiles => {
-                onZoomChange(1);
-                onCropChange(DEFAULT_CROP);
-                setUploadedImage(
-                  ...acceptedFiles.map(file =>
-                    Object.assign(file, {
-                      preview: URL.createObjectURL(file),
-                    }),
-                  ),
-                );
-              }}
-              multiple={false}
-              accept="image/jpeg, image/png"
-              style={{}}
-              disabled={submitting}
-            >
-              {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
-                <div {...getRootProps()}>
-                  <input data-cy="heroBackgroundDropzone" {...getInputProps()} />
-                  <StyledButton minWidth={150} disabled={submitting} buttonSize="small">
-                    {!isDragActive && (
-                      <React.Fragment>
-                        <Span mr={2}>
-                          <Upload size="1em" />
-                        </Span>
-                        <FormattedMessage id="Upload" defaultMessage="Upload" />
-                      </React.Fragment>
-                    )}
-                    {isDragActive &&
-                      (isDragAccept ? (
-                        <FormattedMessage id="uploadImage.isDragActive" defaultMessage="Drop it like it's hot 🔥" />
-                      ) : (
-                        <FormattedMessage
-                          id="uploadImage.isDragReject"
-                          defaultMessage="🚫 This file type is not accepted"
-                        />
-                      ))}
-                  </StyledButton>
-                </div>
-              )}
-            </Dropzone>
-            {uploadedImage !== KEY_IMG_REMOVE && collective.backgroundImage && (
-              <StyledButton
-                minWidth={150}
-                ml={3}
-                disabled={submitting}
-                onClick={() => (uploadedImage ? setUploadedImage(null) : setUploadedImage(KEY_IMG_REMOVE))}
-                buttonSize="small"
-              >
-                <FormattedMessage id="Remove" defaultMessage="Remove" />
-              </StyledButton>
-            )}
-            <StyledButton
-              textTransform="capitalize"
-              minWidth={150}
-              disabled={submitting}
-              ml={3}
-              buttonSize="small"
-              onClick={() => {
-                const base = get(collective.settings, 'collectivePage.background');
-                onCropChange((base && base.crop) || DEFAULT_CROP);
-                onZoomChange((base && base.zoom) || 1);
-                setUploadedImage(null);
-                onEditCancel();
-              }}
-            >
-              <FormattedMessage id="form.cancel" defaultMessage="cancel" />
-            </StyledButton>
-            <StyledButton
-              data-cy="heroBackgroundDropzoneSave"
-              textTransform="capitalize"
-              buttonStyle="primary"
-              buttonSize="small"
-              ml={3}
-              minWidth={150}
-              loading={submitting}
-              onClick={async () => {
-                setSubmitting(true); // Need this because `upload` is not a graphql function
-
-                try {
-                  // We intentionally use the raw image URL rather than image service here
-                  // because the `backgroundImage` column is not supposed to store the
-                  // images service address
-                  let imgURL = collective.backgroundImage;
-
-                  // Upload image if changed or remove it
-                  if (uploadedImage === KEY_IMG_REMOVE) {
-                    imgURL = null;
-                  } else if (uploadedImage) {
-                    imgURL = await upload(uploadedImage);
-                  }
-
-                  // Update settings
-                  const result = await editBackground({
-                    variables: {
-                      id: collective.id,
-                      backgroundImage: imgURL,
-                      settings: set({ ...collective.settings }, 'collectivePage.background', { crop, zoom }),
-                    },
-                  });
-
-                  // Reset
-                  const base = get(result, 'data.editCollective.settings.collectivePage.background');
-                  onCropChange((base && base.crop) || DEFAULT_CROP);
-                  onZoomChange((base && base.zoom) || 1);
-                  setUploadedImage(null);
-
-                  // Close the form
-                  onEditCancel();
-                } finally {
-                  setSubmitting(false);
-                }
-              }}
-            >
-              <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
-          </Container>
-          <Container zIndex={222} position="absolute" right={25} top={75}>
-            <MessageBox type="info" withIcon opacity={0.9} px={2} py={1}>
-              <FormattedMessage
-                id="HeroBackground.Instructions"
-                defaultMessage="Use your mouse wheel or pinch to change the zoom, drag and drop to adjust position."
-              />
-            </MessageBox>
-          </Container>
-        </StyledBackground>
-      )}
-    </Mutation>
+    </StyledHeroBackground>
   );
 };
 
@@ -304,12 +126,6 @@ HeroBackground.propTypes = {
       }),
     }),
   }).isRequired,
-
-  /** Called when user click on cancel */
-  onEditCancel: PropTypes.func.isRequired,
-
-  /** Wether to show the cropper/uploader */
-  isEditing: PropTypes.bool,
 };
 
 /** @component */
