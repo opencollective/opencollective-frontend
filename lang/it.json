@@ -764,7 +764,6 @@
   "Expense.PrivacyWarning": "This information is public. Please do not add any personal information such as names or addresses in this field.",
   "expense.privateCommentsWarning": "Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them.",
   "expense.privateMessage": "Istruzioni private",
-  "expense.privateMessage.description": "Istruzioni private per l'host per rimborsare le tue spese",
   "expense.privateNote": "nota privata",
   "Expense.PrivateNote": "Nota privata",
   "expense.processing": "Processing",

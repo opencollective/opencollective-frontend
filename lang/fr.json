@@ -764,7 +764,6 @@
   "Expense.PrivacyWarning": "Ce champ est public. N'ajoutez pas d'informations personnelles telles que des noms ou adresses.",
   "expense.privateCommentsWarning": "Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them.",
   "expense.privateMessage": "Instructions privées",
-  "expense.privateMessage.description": "Les instructions privées sont uniquement visible pour les administrateurs du compte en banque de votre collectif",
   "expense.privateNote": "note privée",
   "Expense.PrivateNote": "Note privée",
   "expense.processing": "Processing",

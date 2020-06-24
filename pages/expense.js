@@ -26,6 +26,7 @@ import {
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
+import HTMLContent from '../components/HTMLContent';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
@@ -409,9 +410,7 @@ class ExpensePage extends React.Component {
                           <FormattedMessage id="expense.notes" defaultMessage="Notes" />
                         </H5>
                         <PrivateNoteLabel mb={2} />
-                        <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre-wrap">
-                          {expense.privateMessage}
-                        </P>
+                        <HTMLContent color="black.700" mt={1} fontSize="LeadCaption" content={expense.privateMessage} />
                       </Container>
                     )}
                   </React.Fragment>

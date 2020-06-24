@@ -10,18 +10,19 @@ import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { imagePreview } from '../../lib/image-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { capitalize } from '../../lib/utils';
 
 import InputField from '../../components/InputField';
 
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import { Box, Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+import ExpenseNotesForm from './ExpenseNotesForm';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 import TransactionDetails from './TransactionDetails';
@@ -369,14 +370,16 @@ class ExpenseDetails extends React.Component {
               <label>
                 <FormattedMessage id="expense.privateNote" defaultMessage="private note" />
               </label>
-              {(!editMode || !isAuthor) && capitalize(expense.privateMessage)}
-              {editMode && (isAuthor || canEditExpense) && (
-                <InputField
-                  type="textarea"
-                  name="privateMessage"
-                  onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
-                  defaultValue={expense.privateMessage}
-                />
+              {!editMode ? (
+                <HTMLContent content={expense.privateMessage} fontSize="12px" />
+              ) : (
+                <Box mb={2}>
+                  <ExpenseNotesForm
+                    hideLabel
+                    onChange={e => this.handleChange('privateMessage', e.target.value)}
+                    defaultValue={expense.privateMessage}
+                  />
+                </Box>
               )}
             </div>
           )}
