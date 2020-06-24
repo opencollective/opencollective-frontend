@@ -7,6 +7,8 @@ import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { capitalize } from '../../../lib/utils';
 
@@ -20,6 +22,10 @@ import StyledHr from '../../StyledHr';
 import { H3, H4, P, Span } from '../../Text';
 
 import { updateSettingsMutation } from './../mutations';
+
+const { FUND, PROJECT, EVENT } = CollectiveType;
+const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
+const { FIXED, FLEXIBLE } = AmountTypes;
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -42,7 +48,7 @@ class Tiers extends React.Component {
     this.removeTier = this.removeTier.bind(this);
     this.editTier = this.editTier.bind(this);
     this.onChange = props.onChange.bind(this);
-    this.defaultType = this.props.defaultType || (this.props.collective.type === 'EVENT' ? 'TICKET' : 'TIER');
+    this.defaultType = this.props.defaultType || TIER;
 
     this.messages = defineMessages({
       TIER: { id: 'tier.type.tier', defaultMessage: 'generic tier' },
@@ -180,8 +186,10 @@ class Tiers extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(props.types || ['TIER', 'TICKET', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']),
+        options: getOptions(props.types || [TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION]),
         label: intl.formatMessage(this.messages['type.label']),
+        when: (tier, collective) =>
+          ![FUND, PROJECT].includes(collective.type) && !(collective.type === EVENT && props.defaultType === TICKET),
       },
       {
         name: 'name',
@@ -195,7 +203,7 @@ class Tiers extends React.Component {
       {
         name: 'amountType',
         type: 'select',
-        options: getOptions(['FIXED', 'FLEXIBLE']),
+        options: getOptions([FIXED, FLEXIBLE]),
         label: intl.formatMessage(this.messages['amountType.label']),
       },
       {
@@ -203,7 +211,7 @@ class Tiers extends React.Component {
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages['amount.label']),
-        when: tier => tier.amountType === 'FIXED',
+        when: tier => tier.amountType === FIXED,
       },
       {
         name: 'presets',
@@ -211,40 +219,42 @@ class Tiers extends React.Component {
         type: 'component',
         component: InputFieldPresets,
         label: intl.formatMessage(this.messages['presets.label']),
-        when: tier => tier.amountType === 'FLEXIBLE',
+        when: tier => tier.amountType === FLEXIBLE,
       },
       {
         name: 'amount',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages['defaultAmount.label']),
-        when: tier => tier.amountType === 'FLEXIBLE',
+        when: tier => tier.amountType === FLEXIBLE,
       },
       {
         name: 'minimumAmount',
         pre: getCurrencySymbol(props.currency),
         type: 'currency',
         label: intl.formatMessage(this.messages['minimumAmount.label']),
-        when: tier => tier.amountType === 'FLEXIBLE',
+        when: tier => tier.amountType === FLEXIBLE,
       },
       {
         name: 'interval',
         type: 'select',
         options: getOptions(['onetime', 'month', 'year']),
         label: intl.formatMessage(this.messages['interval.label']),
-        when: tier => !tier || ['DONATION', 'MEMBERSHIP', 'TIER', 'SERVICE'].includes(tier.type),
+        when: tier => !tier || [DONATION, MEMBERSHIP, TIER, SERVICE].includes(tier.type),
       },
       {
         name: 'maxQuantity',
         type: 'number',
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
-        when: tier => ['TICKET', 'PRODUCT', 'TIER'].includes(tier.type),
+        when: (tier, collective) =>
+          [TICKET, PRODUCT].includes(tier.type) || (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
       },
       {
         name: 'button',
         type: 'text',
         label: intl.formatMessage(this.messages['button.label']),
+        when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
       },
       {
         name: 'goal',
@@ -252,12 +262,14 @@ class Tiers extends React.Component {
         type: 'currency',
         label: intl.formatMessage(this.messages['goal.label']),
         description: intl.formatMessage(this.messages['goal.description']),
+        when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
       },
       {
         name: '__hasLongDescription',
         type: 'switch',
         label: 'Force standalone page',
         description: intl.formatMessage(this.messages.forceLongDescription),
+        when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
       },
     ];
   }
@@ -325,11 +337,11 @@ class Tiers extends React.Component {
     const vatOriginCountry = hasVat && getVatOriginCountry(tier.type, hostCountry, collectiveCountry);
     const vatPercentage = hasVat ? getStandardVatRate(tier.type, vatOriginCountry) : 0;
     if (!tier.amountType) {
-      tier.amountType = tier.presets ? 'FLEXIBLE' : 'FIXED';
+      tier.amountType = tier.presets ? FLEXIBLE : FIXED;
     }
 
     // Set the default value of preset
-    if (tier.amountType === 'FLEXIBLE' && !tier.presets) {
+    if (tier.amountType === FLEXIBLE && !tier.presets) {
       tier.presets = [1000];
     }
 
@@ -340,7 +352,6 @@ class Tiers extends React.Component {
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
-      amountType: tier.amountType,
     };
 
     return (
@@ -353,7 +364,7 @@ class Tiers extends React.Component {
         <Form horizontal>
           {this.fields.map(
             field =>
-              (!field.when || field.when(defaultValues)) && (
+              (!field.when || field.when(defaultValues, collective)) && (
                 <Box key={field.name}>
                   <InputField
                     className="horizontal"
@@ -396,9 +407,9 @@ class Tiers extends React.Component {
   }
 
   render() {
-    const { intl, collective, defaultType = 'TICKET' } = this.props;
+    const { intl, collective, defaultType = TICKET } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
-    const displayCustomContributionsSettings = collective.id && defaultType !== 'TICKET';
+    const displayCustomContributionsSettings = collective.id && defaultType !== TICKET;
 
     return (
       <div className="EditTiers">
