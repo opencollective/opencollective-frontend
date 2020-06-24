@@ -108,6 +108,9 @@ class StaticPage extends React.Component {
               margin: -7px 0;
               line-height: 1.5rem;
             }
+            .staticPage .content iframe {
+              max-width: 100%;
+            }
           `}
         </style>
         <Header title={title} LoggedInUser={LoggedInUser} />
