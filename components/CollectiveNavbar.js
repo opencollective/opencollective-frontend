@@ -199,6 +199,7 @@ const DEFAULT_SECTIONS = {
   [CollectiveType.FUND]: [
     Sections.CONTRIBUTE,
     Sections.UPDATES,
+    Sections.PROJECTS,
     Sections.BUDGET,
     Sections.CONTRIBUTORS,
     Sections.ABOUT,
