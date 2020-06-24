@@ -153,6 +153,7 @@ class CreateOrderPage extends React.Component {
       currency: PropTypes.string.isRequired,
       hostFeePercent: PropTypes.number.isRequired,
       location: PropTypes.shape({ country: PropTypes.string }),
+      settings: PropTypes.object,
       parentCollective: PropTypes.shape({
         slug: PropTypes.string,
         settings: PropTypes.object,
@@ -593,8 +594,21 @@ class CreateOrderPage extends React.Component {
     }
 
     return LoggedInUser.memberOf
-      .filter(m => m.role === 'ADMIN' && m.collective.id !== collective.id && m.collective.type !== 'EVENT')
-      .map(({ collective }) => collective);
+      .filter(
+        m =>
+          m.role === 'ADMIN' &&
+          m.collective.id !== collective.id &&
+          m.collective.type !== 'EVENT' &&
+          m.collective.type !== 'PROJECT',
+      )
+      .map(({ collective }) => collective)
+      .map(collective => {
+        // Funds MVP, to refactor
+        if (collective.settings?.fund) {
+          collective.type = 'FUND';
+        }
+        return collective;
+      });
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */
@@ -611,7 +625,7 @@ class CreateOrderPage extends React.Component {
     const tier = this.props.tier || {};
     if (tier.amountType !== AmountTypes.FIXED) {
       // Funds MVP, to refactor
-      if (this.props.collective?.settings?.fund === true) {
+      if (this.props.collective.type === CollectiveType.FUND || this.props.collective?.settings?.fund === true) {
         return tier.presets || [100000, 200000, 500000, 1000000];
       }
 

@@ -36,7 +36,7 @@ const messages = defineMessages({
 const SectionAbout = ({ collective, canEdit, intl }) => {
   const isEmptyDescription = isEmptyValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
-  const isFund = collective.settings?.fund === true; // Funds MVP, to refactor
+  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
   canEdit = collective.isArchived ? false : canEdit;
 
   return (

@@ -17,8 +17,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
     return null;
   }
 
-  // Funds MVP, to refactor
-  const collectiveType = collective.settings?.fund ? 'Fund' : 'Collective';
+  const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
 
   const confirmTransfer = () => {
     setModal({ ...modal, show: true, isApproved: false });
@@ -31,17 +30,19 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
       <H2>
         <FormattedMessage
           id="collective.balance.title"
-          defaultMessage={'Empty {collectiveType, select, Fund {Fund} other {Collective}} balance'}
-          values={{ collectiveType }}
+          defaultMessage={
+            'Empty {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance'
+          }
+          values={{ type: collectiveType }}
         />
       </H2>
       <P>
         <FormattedMessage
           id="collective.balance.description"
           defaultMessage={
-            'Transfer remaining balance to the fiscal host. {collectiveType, select, Fund {Fund} other {Collective}} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
+            'Transfer remaining balance to the fiscal host. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive it or change hosts. Alternatively, you can submit an expense or donate to another Collective.'
           }
-          values={{ collectiveType }}
+          values={{ type: collectiveType }}
         />
       </P>
       {!collective.host.hostCollective && (

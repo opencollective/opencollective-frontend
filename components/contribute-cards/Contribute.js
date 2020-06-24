@@ -107,6 +107,10 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.ChildCollective',
     defaultMessage: 'Connected Collective',
   },
+  [ContributionTypes.PROJECT]: {
+    id: 'ContributionType.Project',
+    defaultMessage: 'Project',
+  },
 });
 
 const getContributeCTA = type => {

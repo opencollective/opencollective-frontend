@@ -445,7 +445,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
-            {collective.type === CollectiveType.COLLECTIVE && (
+            {(collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.FUND) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
             <Archive collective={collective} />
@@ -673,7 +673,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 128,
           type: 'tags',
           placeholder: 'meetup, javascript',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
         },
       ],
       expenses: [
@@ -871,7 +871,7 @@ class EditCollectiveForm extends React.Component {
                     route={isEvent ? 'event' : 'collective'}
                     params={
                       isEvent
-                        ? { parentCollectiveSlug: collective.parentCollective.slug, eventSlug: collective.slug }
+                        ? { parentCollectiveSlug: collective.parentCollective.slug, slug: collective.slug }
                         : { slug: collective.slug }
                     }
                   >

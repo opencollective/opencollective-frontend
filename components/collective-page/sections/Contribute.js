@@ -269,9 +269,12 @@ class SectionContribute extends React.PureComponent {
     const orderKeys = draggingContributionsOrder || this.getCollectiveContributionCardsOrder();
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
+    const isProject = collective.type === CollectiveType.PROJECT;
+    const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
     const hasCustomContribution = !collective.settings?.disableCustomContributions;
     const hasContribute = isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution));
-    const hasOtherWaysToContribute = !isEvent && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
+    const hasOtherWaysToContribute =
+      !isEvent && !isProject && !isFund && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
     const isHost = collective.isHost;

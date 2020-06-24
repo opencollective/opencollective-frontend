@@ -152,6 +152,31 @@ export const getCollectivePageQuery = gql`
           }
         }
       }
+      projects {
+        id
+        slug
+        name
+        description
+        image
+        isActive
+        backgroundImageUrl(height: 208)
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+          id
+          name
+          image
+          collectiveSlug
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
+      }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
         collective: member {
