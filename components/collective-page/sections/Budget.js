@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import { get, isEmpty, orderBy } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 
 import BudgetItemsList, {
@@ -50,6 +51,8 @@ const SectionBudget = ({ collective, stats }) => {
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
+  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
+  const isProject = collective.type === CollectiveType.PROJECT;
   return (
     <ContainerSectionContent pt={[4, 5]} pb={3}>
       <SectionTitle>
@@ -145,33 +148,35 @@ const SectionBudget = ({ collective, stats }) => {
               {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
             </P>
           </Box>
-          <Container data-cy="budgetSection-estimated-budget" flex="1" background="#F5F7FA" py={16} px={4}>
-            <DefinedTerm
-              term={Terms.ESTIMATED_BUDGET}
-              fontSize="Tiny"
-              textTransform="uppercase"
-              color="black.700"
-              extraTooltipContent={
-                <Box mt={2}>
-                  <FormattedMessage
-                    id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
-                    defaultMessage="Monthly recurring: {amount}"
-                    values={{ amount: formatCurrency(monthlyRecurring, collective.currency) }}
-                  />
-                  <br />
-                  <FormattedMessage
-                    id="CollectivePage.SectionBudget.TotalAmountReceived"
-                    defaultMessage="Total received in the last 12 months: {amount}"
-                    values={{ amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency) }}
-                  />
-                </Box>
-              }
-            />
-            <P fontSize="H5" mt={2}>
-              <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
-              <Span color="black.400">{collective.currency}</Span>
-            </P>
-          </Container>
+          {!isFund && !isProject && (
+            <Container data-cy="budgetSection-estimated-budget" flex="1" background="#F5F7FA" py={16} px={4}>
+              <DefinedTerm
+                term={Terms.ESTIMATED_BUDGET}
+                fontSize="Tiny"
+                textTransform="uppercase"
+                color="black.700"
+                extraTooltipContent={
+                  <Box mt={2}>
+                    <FormattedMessage
+                      id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
+                      defaultMessage="Monthly recurring: {amount}"
+                      values={{ amount: formatCurrency(monthlyRecurring, collective.currency) }}
+                    />
+                    <br />
+                    <FormattedMessage
+                      id="CollectivePage.SectionBudget.TotalAmountReceived"
+                      defaultMessage="Total received in the last 12 months: {amount}"
+                      values={{ amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency) }}
+                    />
+                  </Box>
+                }
+              />
+              <P fontSize="H5" mt={2}>
+                <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
+                <Span color="black.400">{collective.currency}</Span>
+              </P>
+            </Container>
+          )}
         </StyledCard>
       </Flex>
     </ContainerSectionContent>
@@ -183,9 +188,11 @@ SectionBudget.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     isArchived: PropTypes.bool,
     platformFeePercent: PropTypes.number,
+    settings: PropTypes.objec,
   }),
 
   /** Stats */
