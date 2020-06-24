@@ -158,10 +158,12 @@ const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUse
 
   return !notification ? null : (
     <NotificationBar
-      status={notification.status}
+      status={status || notification.status}
+      collective={collective}
       title={notification.title}
       description={notification.description}
       actions={notification.actions}
+      LoggedInUser={LoggedInUser}
     />
   );
 };
