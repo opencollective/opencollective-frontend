@@ -1256,6 +1256,7 @@
   "profile.incognito.description": "Keep my contribution private (see FAQ for more info)",
   "profilemenu.memberships.tooltip.balance": "残高 {balance}",
   "profilemenu.memberships.tooltip.pendingExpenses": "{n} 件の請求が保留中",
+  "Receipts.None": "None",
   "RecurringContributions.customAmount": "Custom amount",
   "RecurringContributions.minAmount": "Min. amount: {minAmount}",
   "RecurringContributions.none": "No recurring contributions to see here! 👀",
