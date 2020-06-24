@@ -7,6 +7,7 @@ import { Router } from '../server/pages';
 
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
+import StyledInput from './StyledInput';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
@@ -39,11 +40,17 @@ const handleSubmit = event => {
   event.preventDefault();
 };
 
-const SearchForm = ({ fontSize, onSubmit = handleSubmit, placeholder = 'Search Open Collective', width = 1 }) => (
+const SearchForm = ({
+  fontSize,
+  onSubmit = handleSubmit,
+  placeholder = 'Search Open Collective',
+  width = 1,
+  defaultValue,
+}) => (
   <form action="/search" method="GET" onSubmit={onSubmit}>
     <SearchInputContainer alignItems="center" justifyContent="space-between" p={1}>
       <SearchInput
-        as="input"
+        as={StyledInput}
         type="search"
         name="q"
         placeholder={placeholder}
@@ -52,6 +59,7 @@ const SearchForm = ({ fontSize, onSubmit = handleSubmit, placeholder = 'Search O
         width={width}
         fontSize={fontSize}
         aria-label="Open collective search input"
+        defaultValue={defaultValue}
       />
       <SearchButton as="button" mr={1} p={1}>
         <SearchIcon size={16} fill="#aaaaaa" />
@@ -62,6 +70,7 @@ const SearchForm = ({ fontSize, onSubmit = handleSubmit, placeholder = 'Search O
 
 SearchForm.propTypes = {
   fontSize: PropTypes.string,
+  defaultValue: PropTypes.string,
   onSubmit: PropTypes.func,
   placeholder: PropTypes.string,
   backgroundColor: PropTypes.string,

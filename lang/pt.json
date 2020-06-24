@@ -1300,6 +1300,7 @@
   "search.ifYouDontSee": "Se você não encontrar o Coletivo que procura:",
   "search.noResult": "Nenhum Coletivo encontrado com esta busca: \"{query}\"",
   "search.OpenCollective": "Procurar no Open Collective",
+  "search.placeholder": "Search...",
   "SearchFor": "Procurar por {entity}",
   "SearchFor2": "Procurar por {entity1} ou {entity2}",
   "SearchFor3": "Procurar por {entity1}, {entity2} ou {entity3}",
