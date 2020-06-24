@@ -30,6 +30,7 @@ export const Sections = {
   CONVERSATIONS: 'conversations',
   TRANSACTIONS: 'transactions',
   ABOUT: 'about',
+  PROJECTS: 'projects',
 };
 
 /** A list of all section names */

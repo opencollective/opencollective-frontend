@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
 import styled from 'styled-components';
 
+import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
@@ -14,7 +15,6 @@ import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
-import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
 
 const ContainerWithImage = styled(Container)`
@@ -27,21 +27,20 @@ const ContainerWithImage = styled(Container)`
 `;
 
 const placeholders = {
-  name: 'Agora Fund',
+  name: 'Agora Project',
   slug: 'agora',
 };
 
 const messages = defineMessages({
-  nameLabel: { id: 'createFund.form.nameLabel', defaultMessage: "What's the name of your fund?" },
+  nameLabel: { id: 'createProject.form.nameLabel', defaultMessage: "What's the name of your Project?" },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'What URL would you like?' },
-  suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
-    id: 'createFund.form.descriptionLabel',
-    defaultMessage: 'What does your fund do?',
+    id: 'createProject.form.descriptionLabel',
+    defaultMessage: "What's the purpose of your Project?",
   },
   descriptionHint: {
-    id: 'createFund.form.descriptionHint',
-    defaultMessage: 'Write a short description of your Fund (150 characters max)',
+    id: 'createProject.form.descriptionHint',
+    defaultMessage: 'Write a short description of your Project (150 characters max)',
   },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
@@ -61,10 +60,10 @@ const messages = defineMessages({
   },
 });
 
-class CreateFundForm extends React.Component {
+class CreateProjectForm extends React.Component {
   static propTypes = {
     error: PropTypes.string,
-    host: PropTypes.object,
+    parent: PropTypes.object,
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
@@ -74,7 +73,7 @@ class CreateFundForm extends React.Component {
   };
 
   render() {
-    const { intl, error, host, loading } = this.props;
+    const { intl, error, loading, parent } = this.props;
 
     const initialValues = {
       name: '',
@@ -107,6 +106,9 @@ class CreateFundForm extends React.Component {
 
     return (
       <Flex flexDirection="column" m={[3, 0]}>
+        <Container mb={4}>
+          <CollectiveNavbar collective={parent} onlyInfos={true} />
+        </Container>
         <Flex flexDirection="column" my={[2, 4]}>
           <Box mb={[2, 3]}>
             <H1
@@ -116,23 +118,8 @@ class CreateFundForm extends React.Component {
               textAlign="center"
               color="black.900"
             >
-              <FormattedMessage id="createFund.create" defaultMessage="Create a Fund" />
+              <FormattedMessage id="createProject.create" defaultMessage="Create a Project" />
             </H1>
-          </Box>
-          <Box textAlign="center" minHeight={['24px']}>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
-              <FormattedMessage
-                id="createFund.subtitle.introduce"
-                defaultMessage="Apply for Fiscal Sponsorship below. We will review your application shortly. {faqLink}"
-                values={{
-                  faqLink: (
-                    <StyledLink href="https://docs.opencollective.foundation/" openInNewTab>
-                      <FormattedMessage id="createFund.subtitle.faq" defaultMessage="FAQs here." />
-                    </StyledLink>
-                  ),
-                }}
-              />
-            </P>
           </Box>
         </Flex>
         {error && (
@@ -204,14 +191,11 @@ class CreateFundForm extends React.Component {
                           }}
                           as={StyledInputGroup}
                           {...inputProps}
-                          prepend="opencollective.com/"
+                          prepend={`opencollective.com/${parent.slug}/`}
                           placeholder={placeholders.slug}
                         />
                       )}
                     </StyledInputField>
-                    {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny">{intl.formatMessage(messages.suggestedLabel)}</P>
-                    )}
                     <StyledInputField
                       name="description"
                       htmlFor="description"
@@ -233,40 +217,7 @@ class CreateFundForm extends React.Component {
                     </StyledInputField>
                     <P fontSize="SmallCaption">{intl.formatMessage(messages.descriptionHint)}</P>
 
-                    <Flex flexDirection="column" mx={1} my={4}>
-                      <P fontSize="13px" mb={2}>
-                        -{' '}
-                        <FormattedMessage
-                          id="createFund.tos.label"
-                          defaultMessage="Read the {toslink} of Open Collective."
-                          values={{
-                            toslink: (
-                              <StyledLink href="/tos" openInNewTab>
-                                <FormattedMessage id="tos" defaultMessage="terms of service" />
-                              </StyledLink>
-                            ),
-                          }}
-                        />
-                      </P>
-                      {host && host.termsUrl && (
-                        <P fontSize="13px">
-                          -{' '}
-                          <FormattedMessage
-                            id="createFund.hosttos.label"
-                            defaultMessage="Read the {hosttoslink} of the Open Collective Foundation."
-                            values={{
-                              hosttoslink: (
-                                <StyledLink href={host.termsUrl} openInNewTab>
-                                  <FormattedMessage id="fiscaltos" defaultMessage="terms of fiscal sponsorship" />
-                                </StyledLink>
-                              ),
-                            }}
-                          />
-                        </P>
-                      )}
-                    </Flex>
-
-                    <Flex justifyContent={['center', 'left']} mb={4}>
+                    <Flex justifyContent={['center', 'left']} mt={5} mb={4}>
                       <StyledButton
                         fontSize="13px"
                         minWidth="148px"
@@ -277,7 +228,7 @@ class CreateFundForm extends React.Component {
                         onSubmit={handleSubmit}
                         data-cy="ccf-form-submit"
                       >
-                        <FormattedMessage id="createFund.button" defaultMessage="Create Fund" />
+                        <FormattedMessage id="createProject.button" defaultMessage="Create Project" />
                       </StyledButton>
                     </Flex>
                   </Form>
@@ -299,4 +250,4 @@ class CreateFundForm extends React.Component {
   }
 }
 
-export default injectIntl(withRouter(CreateFundForm));
+export default injectIntl(withRouter(CreateProjectForm));

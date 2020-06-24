@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import EditTiers from './edit-collective/sections/Tiers';
+import Tickets from './edit-collective/sections/Tickets';
 import Button from './Button';
 import InputField from './InputField';
 import TimezonePicker from './TimezonePicker';
@@ -240,13 +240,14 @@ class EditEventForm extends React.Component {
               ),
             )}
           </div>
-          <EditTiers
+          <Tickets
             title="Tickets"
-            types={['TIER', 'TICKET', 'DONATION']}
+            types={['TICKET']}
             tiers={this.state.tiers}
             collective={{ ...event, type: 'EVENT' }}
             currency={event.parentCollective.currency}
             onChange={tiers => this.setState({ tiers })}
+            defaultType="TICKET"
           />
         </div>
         <div className="actions">

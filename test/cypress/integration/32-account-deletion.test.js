@@ -7,7 +7,7 @@ describe('Account Deletion', () => {
       cy.createCollective({ type: 'COLLECTIVE' }).then(collective => {
         const collectiveSlug = collective.slug;
         cy.visit(`/${collectiveSlug}/edit/advanced`);
-        cy.contains('button', 'Delete this collective', { timeout: 15000 }).click();
+        cy.contains('button', 'Delete this Collective', { timeout: 15000 }).click();
         cy.get('[data-cy=delete]').click();
         cy.wait(1000);
         cy.location().should(location => {

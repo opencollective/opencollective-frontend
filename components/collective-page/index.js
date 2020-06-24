@@ -17,6 +17,7 @@ import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
+import SectionProjects from './sections/Projects';
 import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTickets from './sections/Tickets';
@@ -46,6 +47,7 @@ class CollectivePage extends Component {
     expenses: PropTypes.arrayOf(PropTypes.object),
     updates: PropTypes.arrayOf(PropTypes.object),
     events: PropTypes.arrayOf(PropTypes.object),
+    projects: PropTypes.arrayOf(PropTypes.object),
     connectedCollectives: PropTypes.arrayOf(PropTypes.object),
     LoggedInUser: PropTypes.object,
     isAdmin: PropTypes.bool.isRequired,
@@ -132,14 +134,15 @@ class CollectivePage extends Component {
     (type, isHost, isAdmin, isRoot, isAuthenticated, canApply, canContact, isArchived, isActive, isFund) => {
       const isCollective = type === CollectiveType.COLLECTIVE;
       const isEvent = type === CollectiveType.EVENT;
+      const isProject = type === CollectiveType.PROJECT;
       return {
         hasContact: !isAdmin && canContact && (!isFund || isAuthenticated),
-        hasContribute: isFund && isActive,
-        hasSubmitExpense: (isCollective || isEvent || (isHost && isActive)) && !isArchived,
+        hasContribute: (isFund || isProject) && isActive,
+        hasSubmitExpense: (isCollective || isFund || isEvent || isProject || (isHost && isActive)) && !isArchived,
         // Don't display Apply if you're the admin (you can go to "Edit Collective" for that)
         hasApply: canApply && !isAdmin,
         hasDashboard: isHost && isAdmin,
-        hasManageSubscriptions: isAdmin && !isCollective && !isEvent,
+        hasManageSubscriptions: isAdmin && !isCollective && !isFund && !isEvent && !isProject,
         // Don't display "Add Funds" if it's an Host and you're the Admin
         addFunds: isRoot && type === CollectiveType.ORGANIZATION && !(isAdmin && isHost),
       };
@@ -224,6 +227,14 @@ class CollectivePage extends Component {
         return (
           <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
         );
+      case Sections.PROJECTS:
+        return (
+          <SectionProjects
+            collective={this.props.collective}
+            projects={this.props.projects}
+            isAdmin={this.props.isAdmin}
+          />
+        );
       default:
         return null;
     }
@@ -234,7 +245,7 @@ class CollectivePage extends Component {
     const { type, isHost, canApply, canContact, isActive, settings } = collective;
     const { isFixed, selectedSection } = this.state;
     const sections = this.getSections(this.props.collective, this.props.isAdmin, this.props.isHostAdmin);
-    const isFund = settings?.fund === true; // Funds MVP, to refactor
+    const isFund = collective.type === CollectiveType.FUND || settings?.fund === true; // Funds MVP, to refactor
     const isAuthenticated = LoggedInUser ? true : false;
     const callsToAction = this.getCallsToAction(
       type,

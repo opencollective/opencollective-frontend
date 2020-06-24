@@ -17,7 +17,6 @@ class CreateEventPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveData
     data: PropTypes.object.isRequired, // from withData
-    LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
   };
 
@@ -26,13 +25,13 @@ class CreateEventPage extends React.Component {
   }
 
   render() {
-    const { data, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data, loadingLoggedInUser } = this.props;
 
     if (loadingLoggedInUser || !data.Collective) {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
-    return <CreateEvent parentCollective={data.Collective} LoggedInUser={LoggedInUser} />;
+    return <CreateEvent parentCollective={data.Collective} />;
   }
 }
 

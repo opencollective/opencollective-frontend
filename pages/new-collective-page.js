@@ -50,20 +50,24 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class NewCollectivePage extends React.Component {
-  static getInitialProps({ req, res, query: { slug, eventSlug, status, step, mode } }) {
+  static getInitialProps({ req, res, query: { slug, status, step, mode } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
 
-    /** If there is a eventSlug parameter, use that one as slug,
-     * remove this and fix routes when feature flag NEW_EVENTS is gone */
-    return { slug: eventSlug ? eventSlug : slug, status, step, mode };
+    return { slug, status, step, mode };
   }
 
   static propTypes = {
     slug: PropTypes.string.isRequired, // from getInitialProps
     /** A special status to show the notification bar (collective created, archived...etc) */
-    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated']),
+    status: PropTypes.oneOf([
+      'collectiveCreated',
+      'collectiveArchived',
+      'fundCreated',
+      'projectCreated',
+      'eventCreated',
+    ]),
     step: PropTypes.string,
     mode: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
@@ -171,6 +175,7 @@ class NewCollectivePage extends React.Component {
                   financialContributors={collective.financialContributors}
                   tiers={collective.tiers}
                   events={collective.events}
+                  projects={collective.projects}
                   connectedCollectives={collective.connectedCollectives}
                   transactions={collective.transactions}
                   expenses={collective.expenses}

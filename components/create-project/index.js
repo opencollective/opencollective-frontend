@@ -13,56 +13,39 @@ import SignInOrJoinFree from '../SignInOrJoinFree';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
-import CategoryPicker from './CategoryPicker';
 import Form from './Form';
 
-class CreateFund extends Component {
+class CreateProject extends Component {
   static propTypes = {
-    host: PropTypes.object,
+    parent: PropTypes.object,
     LoggedInUser: PropTypes.object, // from withUser
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    router: PropTypes.object.isRequired, // from withRouter
-    createFund: PropTypes.func.isRequired, // addCreateFundMutation
+    createProject: PropTypes.func.isRequired, // addCreateProjectMutation
   };
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      error: null,
-      creating: false,
-    };
+    this.state = { error: null, creating: false };
 
-    this.createFund = this.createFund.bind(this);
+    this.createProject = this.createProject.bind(this);
   }
 
-  getHost() {
-    if (this.props.router.query.category === 'foundation') {
-      return {
-        slug: 'foundation',
-        termsUrl:
-          'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
-      };
-    }
-  }
-
-  async createFund(fund) {
-    const host = this.getHost();
-
+  async createProject(project) {
     // set state to loading
     this.setState({ creating: true });
 
-    delete fund.tos;
-    delete fund.hostTos;
-    delete host.termsUrl;
-
     // try mutation
     try {
-      const res = await this.props.createFund({ variables: { fund, host } });
+      const res = await this.props.createProject({
+        variables: { project, parent: { slug: this.props.parent.slug } },
+      });
+      const createdProject = res.data.createProject;
       await this.props.refetchLoggedInUser();
-      Router.pushRoute('collective', {
-        slug: res.data.createFund.slug,
-        status: 'fundCreated',
+      Router.pushRoute('project', {
+        parentCollectiveSlug: this.props.parent.slug,
+        slug: createdProject.slug,
+        status: 'projectCreated',
       }).then(() => window.scrollTo(0, 0));
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -71,9 +54,8 @@ class CreateFund extends Component {
   }
 
   render() {
-    const { LoggedInUser, router } = this.props;
+    const { LoggedInUser, parent } = this.props;
     const { creating, error } = this.state;
-    const { category } = router.query;
 
     if (!LoggedInUser) {
       return (
@@ -98,32 +80,27 @@ class CreateFund extends Component {
       );
     }
 
-    if (!category) {
-      return <CategoryPicker />;
-    }
-
-    return <Form host={this.getHost()} onSubmit={this.createFund} loading={creating} error={error} />;
+    return <Form parent={parent} onSubmit={this.createProject} loading={creating} error={error} />;
   }
 }
 
-const createFundMutation = gqlV2`
-  mutation CreateFund(
-    $fund: FundCreateInput!
-    $host: AccountReferenceInput,
+const createProjectMutation = gqlV2`
+  mutation CreateProject(
+    $project: ProjectCreateInput!
+    $parent: AccountReferenceInput,
   ) {
-    createFund(fund: $fund, host: $host) {
+    createProject(project: $project, parent: $parent) {
       id
       name
       slug
-      tags
       description
     }
   }
 `;
 
-const addCreateFundMutation = graphql(createFundMutation, {
-  name: 'createFund',
+const addCreateProjectMutation = graphql(createProjectMutation, {
+  name: 'createProject',
   options: { context: API_V2_CONTEXT },
 });
 
-export default withRouter(withUser(addCreateFundMutation(CreateFund)));
+export default withRouter(withUser(addCreateProjectMutation(CreateProject)));
