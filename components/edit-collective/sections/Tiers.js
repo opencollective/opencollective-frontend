@@ -23,7 +23,7 @@ import { H3, H4, P, Span } from '../../Text';
 
 import { updateSettingsMutation } from './../mutations';
 
-const { FUND, PROJECT } = CollectiveType;
+const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
@@ -188,7 +188,8 @@ class Tiers extends React.Component {
         type: 'select',
         options: getOptions(props.types || [TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION]),
         label: intl.formatMessage(this.messages['type.label']),
-        when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
+        when: (tier, collective) =>
+          ![FUND, PROJECT].includes(collective.type) && !(collective.type === EVENT && props.defaultType === TICKET),
       },
       {
         name: 'name',

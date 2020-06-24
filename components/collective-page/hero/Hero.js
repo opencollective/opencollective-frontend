@@ -373,7 +373,7 @@ Hero.propTypes = {
       }),
     ),
     parentCollective: PropTypes.shape({
-      name: PropTypes.string.isRequired,
+      name: PropTypes.string,
       slug: PropTypes.string,
     }),
   }).isRequired,
