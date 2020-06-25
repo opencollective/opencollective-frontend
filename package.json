@@ -112,7 +112,7 @@
     "universal-url": "^2.0.0",
     "uuid": "8.1.0",
     "validator": "13.1.1",
-    "winston": "3.3.2"
+    "winston": "3.3.3"
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
