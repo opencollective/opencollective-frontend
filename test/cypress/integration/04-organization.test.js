@@ -1,7 +1,7 @@
 describe('New organization profile', () => {
   /**
-   * Contributions section is already tested in `05-user_v2.test.js`
-   * About section is already tested in `04-collective_v2.test.js`
+   * Contributions section is already tested in `05-user.test.js`
+   * About section is already tested in `04-collective.test.js`
    */
   beforeEach(() => {
     cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
@@ -20,7 +20,7 @@ describe('New organization profile', () => {
   });
 
   describe('Transactions section', () => {
-    // The rest of the transactions section tests are in `05-user_v2.test.js`
+    // The rest of the transactions section tests are in `05-user.test.js`
     it("Has no filters (because organizations don't have expenses)", () => {
       cy.getByDataCy('filters').should('not.exist');
       cy.getByDataCy('section-transactions').click();

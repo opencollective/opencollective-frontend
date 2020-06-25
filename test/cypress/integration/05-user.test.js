@@ -1,6 +1,6 @@
 describe('New users profiles', () => {
   before(() => {
-    cy.visit('/xdamman/v2');
+    cy.visit('/xdamman');
   });
   describe('Contributions section', () => {
     it('Shows contributions with date since and amount contributed', () => {

@@ -79,9 +79,9 @@ pages.add(
   'new-create-collective',
 );
 
-// Events and Projects using new collective page
-pages.add('event', '/:parentCollectiveSlug/events/:slug', 'new-collective-page');
-pages.add('project', '/:parentCollectiveSlug/projects/:slug', 'new-collective-page');
+// Events and Projects using collective page
+pages.add('event', '/:parentCollectiveSlug/events/:slug', 'collective-page');
+pages.add('project', '/:parentCollectiveSlug/projects/:slug', 'collective-page');
 
 // Tier page
 // ---------------
@@ -179,15 +179,12 @@ pages.add(
 // Collective
 // ----------
 
-// New collective page - we keep the v2 alias because we shared some of these URLs by email
-pages.add('new-collective-page', '/:slug/v2');
-
 // Collective page
-pages.add('collective', '/:slug', 'new-collective-page');
+pages.add('collective', '/:slug', 'collective-page');
 pages.add(
   'collective-with-onboarding',
   '/:slug/:mode(onboarding)?/:step(administrators|contact|success)?',
-  'new-collective-page',
+  'collective-page',
 );
 
 // New accept financial contributions flow
