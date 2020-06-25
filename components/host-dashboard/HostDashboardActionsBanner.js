@@ -164,7 +164,13 @@ class HostDashboardActionsBanner extends React.Component {
               <Box mb={2}>
                 <CollectivePickerAsync
                   hostCollectiveIds={[host.id]}
-                  types={[CollectiveType.ORGANIZATION, CollectiveType.COLLECTIVE, CollectiveType.EVENT]}
+                  types={[
+                    CollectiveType.ORGANIZATION,
+                    CollectiveType.COLLECTIVE,
+                    CollectiveType.EVENT,
+                    CollectiveType.FUND,
+                    CollectiveType.PROJECT,
+                  ]}
                   onChange={this.onChange}
                   minWidth={300}
                   width="100%"
