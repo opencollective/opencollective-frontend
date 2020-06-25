@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Mon Jul 13 2020 12:29:27 GMT+0100 (British Summer Time)
+# timestamp: Tue Jul 14 2020 16:19:32 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -3389,6 +3389,7 @@ type Individual implements Account {
   lastName: String
   email: String
   isFollowingConversation(id: String!): Boolean!
+  hasTwoFactorAuth: Boolean
 }
 
 """
@@ -3754,6 +3755,21 @@ type Mutation {
     """
     value: JSON!
   ): Account!
+
+  """
+  Add 2FA to the Account if it does not have it
+  """
+  addTwoFactorAuthTokenToIndividual(
+    """
+    Account that will have 2FA added to it
+    """
+    account: AccountReferenceInput!
+
+    """
+    The generated secret to save to the Account
+    """
+    token: String!
+  ): Individual!
 
   """
   Apply to an host with a collective

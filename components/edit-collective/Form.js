@@ -41,6 +41,7 @@ import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
 import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
+import SetupTwoFactorAuth from './sections/SetupTwoFactorAuth';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import Updates from './sections/Updates';
@@ -472,6 +473,10 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
+
+      // 2FA
+      case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
+        return <SetupTwoFactorAuth slug={collective.slug} collectiveName={collective.name} />;
 
       default:
         return null;
