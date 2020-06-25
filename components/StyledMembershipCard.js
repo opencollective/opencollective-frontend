@@ -21,7 +21,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
           {role && (
-            <P fontSize="Caption" mb={3} data-cy="contribution-date-since">
+            <P fontSize="Caption" lineHeight="Caption" mb={3} data-cy="contribution-date-since">
               <FormattedMessage
                 id="Membership.ContributorSince"
                 defaultMessage="{contributorType} since"
@@ -34,7 +34,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
           )}
           {role === roles.BACKER ? (
             <P mt={3} data-cy="amount-contributed">
-              <Span fontSize="Caption">
+              <Span fontSize="Caption" lineHeight="Caption">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
               </Span>
               <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
@@ -46,7 +46,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </Span>
             </P>
           ) : (
-            <P mt={3} fontSize="Caption">
+            <P mt={3} fontSize="Caption" lineHeight="Caption">
               {collective.stats.backers.all > 0 && (
                 <FormattedMessage
                   id="StyledMembershipCard.backers.all"
