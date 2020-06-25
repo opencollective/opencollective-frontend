@@ -1300,6 +1300,7 @@
   "search.ifYouDontSee": "Si no ve el colectivo que está buscando:",
   "search.noResult": "No se han encontrado colectivos que coincidan con su consulta: \"{query}\"",
   "search.OpenCollective": "Buscar en Open Collective",
+  "search.placeholder": "Search...",
   "SearchFor": "Buscar por {entity}",
   "SearchFor2": "Buscar por {entity1} o {entity2}",
   "SearchFor3": "Buscar por {entity1}, {entity2} o {entity3}",
