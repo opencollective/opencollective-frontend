@@ -14,6 +14,7 @@ import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import HTMLContent from '../../HTMLContent';
 import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
@@ -43,7 +44,7 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
   border: 1px solid #b8deff;
   box-sizing: border-box;
   border-radius: 6px;
-  margin-top: 10px;
+  margin: 10px 0;
   padding: 10px;
   font-size: 12px;
   color: #71757a;
@@ -159,11 +160,13 @@ class SectionUpdates extends React.PureComponent {
               >
                 <Flex>
                   <Box mr={3}>
-                    <Avatar collective={update.fromCollective} radius={40} />
+                    <LinkCollective collective={update.fromCollective}>
+                      <Avatar collective={update.fromCollective} radius={40} />
+                    </LinkCollective>
                   </Box>
                   <Flex flexDirection="column" justifyContent="space-between">
                     <Link route="update" params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}>
-                      <P color="black.900" fontWeight="600">
+                      <P color="black.900" fontWeight="600" mb={2}>
                         {update.title}
                       </P>
                     </Link>
@@ -206,7 +209,7 @@ class SectionUpdates extends React.PureComponent {
                               month: 'long',
                               year: 'numeric',
                             }),
-                            author: update.fromCollective.name,
+                            author: <LinkCollective collective={update.fromCollective} />,
                           }}
                         />
                       ) : (
@@ -215,7 +218,7 @@ class SectionUpdates extends React.PureComponent {
                           defaultMessage={'Created on {date} (draft) by {author}'}
                           values={{
                             date: formatDate(update.createdAt),
-                            author: update.fromCollective.name,
+                            author: <LinkCollective collective={update.fromCollective} />,
                           }}
                         />
                       )}
