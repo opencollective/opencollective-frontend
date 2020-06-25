@@ -20,6 +20,7 @@ import Link from './Link';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import Role from './Role';
+import StyledHr from './StyledHr';
 import { H3 } from './Text';
 import UpdateTextWithData from './UpdateTextWithData';
 
@@ -34,10 +35,6 @@ const UpdateWrapper = styled(Flex)`
   @media (max-width: 600px) {
     max-width: 100%;
   }
-`;
-
-const AvatarContainer = styled(Container)`
-  margin-right: 20px;
 `;
 
 const ActionButton = styled.button`
@@ -204,14 +201,14 @@ class StyledUpdate extends Component {
     if (mode === 'summary') {
       return (
         <Link route={`/${collective.slug}/updates/${update.slug}`}>
-          <H3 data-cy="updateTitle" color="#090A0A">
+          <H3 data-cy="updateTitle" color="#090A0A" lineHeight="22px">
             {update.title}
           </H3>
         </Link>
       );
     } else {
       return (
-        <H3 data-cy="updateTitle" color="#090A0A">
+        <H3 data-cy="updateTitle" color="#090A0A" lineHeight="22px">
           {update.title}
         </H3>
       );
@@ -224,9 +221,15 @@ class StyledUpdate extends Component {
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
-          <Container mb={2} fontSize="14px" color="#4B4E52" dangerouslySetInnerHTML={{ __html: update.summary }} />
+          <Container
+            mb={2}
+            pl={[0, 60]}
+            fontSize="14px"
+            color="#4B4E52"
+            css={{ wordBreak: 'break-word' }}
+            dangerouslySetInnerHTML={{ __html: update.summary }}
+          />
         )}
-        {this.renderUpdateMeta(update)}
         {!update.userCanSeeUpdate && (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
             <FormattedMessage
@@ -242,28 +245,24 @@ class StyledUpdate extends Component {
 
   renderFullContent() {
     const { update, collective, LoggedInUser } = this.props;
-    const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
     const canPublishUpdate = LoggedInUser && LoggedInUser.canEditCollective(collective) && !update.publishedAt;
-    const editable = !this.props.compact && this.props.editable && canEditUpdate;
 
     return (
-      <React.Fragment>
-        {this.renderUpdateMeta(update, editable)}
-        <Container>
-          {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
-          {!update.html && <UpdateTextWithData id={update.id} />}
-          {!update.userCanSeeUpdate && (
-            <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
-              <FormattedMessage
-                id="update.private.cannot_view_message"
-                defaultMessage="Become a backer of {collective} to see this update"
-                values={{ collective: collective.name }}
-              />
-            </PrivateUpdateMesgBox>
-          )}
-          {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
-        </Container>
-      </React.Fragment>
+      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]}>
+        <StyledHr mt={3} mb={4} borderColor="black.100" />
+        {update.html && <div dangerouslySetInnerHTML={{ __html: update.html }} />}
+        {!update.html && <UpdateTextWithData id={update.id} />}
+        {!update.userCanSeeUpdate && (
+          <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
+            <FormattedMessage
+              id="update.private.cannot_view_message"
+              defaultMessage="Become a backer of {collective} to see this update"
+              values={{ collective: collective.name }}
+            />
+          </PrivateUpdateMesgBox>
+        )}
+        {canPublishUpdate && <PublishUpdateBtnWithData id={update.id} />}
+      </Container>
     );
   }
 
@@ -278,20 +277,27 @@ class StyledUpdate extends Component {
   }
 
   render() {
-    const { update, intl, collective, ...props } = this.props;
+    const { update, intl, collective, compact, LoggedInUser, ...props } = this.props;
     const { mode } = this.state;
+    const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
+    const editable = !compact && props.editable && canEditUpdate;
 
     return (
       <React.Fragment>
         <UpdateWrapper {...props}>
-          <AvatarContainer>
-            <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
-              <Avatar collective={update.fromCollective} radius={40} />
-            </a>
-          </AvatarContainer>
           {mode !== 'edit' && (
-            <Container display="flex" flexDirection="column">
-              <Box>{this.renderUpdateTitle()}</Box>
+            <Container width="100%">
+              <Flex mb={2}>
+                <Container mr={20}>
+                  <a href={`/${update.fromCollective.slug}`} title={update.fromCollective.name}>
+                    <Avatar collective={update.fromCollective} radius={40} />
+                  </a>
+                </Container>
+                <Box>
+                  {this.renderUpdateTitle()}
+                  {this.renderUpdateMeta(update, editable)}
+                </Box>
+              </Flex>
               {mode === 'summary' && this.renderSummary(update)}
               {mode === 'details' && this.renderFullContent()}
             </Container>
