@@ -71,11 +71,14 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
   const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
 
   React.useEffect(() => {
-    if (canEditEvent) {
-      console.log('refetching');
-      refetch();
-      setIsRefetched(true);
-    }
+    const refreshData = async () => {
+      if (canEditEvent) {
+        await refetch();
+        setIsRefetched(true);
+      }
+    };
+
+    refreshData();
   }, [LoggedInUser]);
 
   return (
