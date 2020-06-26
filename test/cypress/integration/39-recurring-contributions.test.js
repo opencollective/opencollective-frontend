@@ -112,7 +112,7 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.wait('@updateorder', { responseTimeout: 15000 }).its('status').should('eq', 200);
       cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
-      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$2 USD / month');
+      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$2.00 USD / month');
     });
   });
 });

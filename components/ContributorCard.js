@@ -128,7 +128,7 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
               <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
             </P>
             <P fontSize="Caption" fontWeight="bold">
-              <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} />
+              <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} precision={0} />
             </P>
           </React.Fragment>
         )}
