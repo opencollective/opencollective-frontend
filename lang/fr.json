@@ -1179,7 +1179,7 @@
   "paymentMethods.labelUnavailable": "(informations sur le moyen de paiement non disponibles)",
   "paymentMethods.labelVirtualCard": "{name} {expiration} ({balance} restants)",
   "paymentMethods.manual.add": "Ajouter les détails de votre compte en banque",
-  "paymentMethods.manual.add.info": "Pour recevoir des contributions directement sur votre compte bancaire au nom des Collectifs que vous hébergez",
+  "paymentMethods.manual.add.info": "To accept contributions to your Collectives by bank transfer, add the account details here",
   "paymentMethods.manual.add.seePricing": "voir les tarifs.",
   "paymentMethods.manual.add.trial": "Gratuit jusqu'à 1000$ reçus, ",
   "paymentMethods.manual.bankInfo.title": "Ajouter les informations de votre compte bancaire",

@@ -1179,7 +1179,7 @@
   "paymentMethods.labelUnavailable": "(payment method info not available)",
   "paymentMethods.labelVirtualCard": "{name} {expiration} ({balance} left)",
   "paymentMethods.manual.add": "Add your bank account details",
-  "paymentMethods.manual.add.info": "To receive donations  directly on your bank account on behalf of the collectives that you are hosting",
+  "paymentMethods.manual.add.info": "To accept contributions to your Collectives by bank transfer, add the account details here",
   "paymentMethods.manual.add.seePricing": "see pricing",
   "paymentMethods.manual.add.trial": "Free for the first $1,000 received, ",
   "paymentMethods.manual.bankInfo.title": "Add your bank account information",
