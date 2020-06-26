@@ -460,11 +460,14 @@ class CreateOrderPage extends React.Component {
     }
 
     const { collective, tier, description, createOrder } = this.props;
+    const isFeesOnTop =
+      this.props.feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
     const order = {
       paymentMethod,
       recaptchaToken,
       totalAmount: this.getTotalAmountWithTaxes(),
       platformFee: get(stepDetails, 'platformFee.value'),
+      isFeesOnTop,
       taxAmount: get(stepSummary, 'amount', 0),
       countryISO: get(stepSummary, 'countryISO'),
       taxIDNumber: get(stepSummary, 'number'),
