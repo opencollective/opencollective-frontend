@@ -79,7 +79,11 @@ class MarkExpenseAsPaidBtn extends React.Component {
     let disabledMessage = '';
 
     if (expense.payoutMethod === 'paypal') {
-      if (!isValidEmail(get(expense, 'user.paypalEmail')) && !isValidEmail(get(expense, 'user.email'))) {
+      if (
+        !get(expense.PayoutMethod, 'data.email') && // New payout methods validate emails on input
+        !isValidEmail(get(expense, 'user.paypalEmail')) &&
+        !isValidEmail(get(expense, 'user.email'))
+      ) {
         disabled = true;
         disabledMessage = intl.formatMessage(this.messages.paypalMissing);
       }
