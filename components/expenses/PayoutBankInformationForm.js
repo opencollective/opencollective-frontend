@@ -77,7 +77,9 @@ const Input = props => {
   const fieldName =
     input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   let validate = input.required ? value => (value ? undefined : 'Is required') : undefined;
-  if (input.type === 'text') {
+  if (!input.required) {
+    return null;
+  } else if (input.type === 'text') {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
