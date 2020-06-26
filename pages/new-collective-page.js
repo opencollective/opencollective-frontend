@@ -98,6 +98,7 @@ class NewCollectivePage extends React.Component {
         expenses: PropTypes.arrayOf(PropTypes.object),
         updates: PropTypes.arrayOf(PropTypes.object),
       }),
+      refetch: PropTypes.func,
     }).isRequired, // from withData
   };
 
@@ -189,6 +190,7 @@ class NewCollectivePage extends React.Component {
                   onPrimaryColorChange={onPrimaryColorChange}
                   step={step}
                   mode={mode}
+                  refetch={data.refetch}
                 />
               )}
             </CollectiveThemeProvider>
