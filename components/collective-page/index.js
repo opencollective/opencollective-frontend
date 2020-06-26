@@ -61,6 +61,7 @@ class CollectivePage extends Component {
       backers: PropTypes.object,
     }),
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -220,7 +221,13 @@ class CollectivePage extends Component {
           />
         );
       case Sections.PARTICIPANTS:
-        return <SectionParticipants collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
+        return (
+          <SectionParticipants
+            refetch={this.props.refetch}
+            collective={this.props.collective}
+            LoggedInUser={this.props.LoggedInUser}
+          />
+        );
       case Sections.LOCATION:
         return <SectionLocation collective={this.props.collective} />;
       case Sections.RECURRING_CONTRIBUTIONS:

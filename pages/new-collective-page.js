@@ -98,6 +98,7 @@ class NewCollectivePage extends React.Component {
         expenses: PropTypes.arrayOf(PropTypes.object),
         updates: PropTypes.arrayOf(PropTypes.object),
       }),
+      refetch: PropTypes.func,
     }).isRequired, // from withData
   };
 
@@ -134,7 +135,7 @@ class NewCollectivePage extends React.Component {
   };
 
   render() {
-    const { slug, data, LoggedInUser, status, step, mode } = this.props;
+    const { slug, data, LoggedInUser, status, step, mode, refetch } = this.props;
     const { showOnboardingModal } = this.state;
 
     if (!data.loading) {
@@ -189,6 +190,7 @@ class NewCollectivePage extends React.Component {
                   onPrimaryColorChange={onPrimaryColorChange}
                   step={step}
                   mode={mode}
+                  refetch={data.refetch}
                 />
               )}
             </CollectiveThemeProvider>

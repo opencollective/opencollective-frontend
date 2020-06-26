@@ -34,7 +34,9 @@ const StyledAdminActions = styled.div`
   }
 `;
 
-const Participants = ({ collective: event, LoggedInUser }) => {
+const Participants = ({ collective: event, LoggedInUser, refetch }) => {
+  const [isRefetched, setIsRefetched] = React.useState(false);
+
   // const ticketOrders = event.orders
   //   .filter(order => (order.tier && order.tier.type === TierTypes.TICKET))
   //   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -68,6 +70,14 @@ const Participants = ({ collective: event, LoggedInUser }) => {
 
   const canEditEvent = LoggedInUser && LoggedInUser.canEditEvent(event);
 
+  React.useEffect(() => {
+    if (canEditEvent) {
+      console.log('refetching');
+      refetch();
+      setIsRefetched(true);
+    }
+  }, [LoggedInUser]);
+
   return (
     <Box pt={[4, 5]}>
       {sponsors.length > 0 && (
@@ -87,7 +97,7 @@ const Participants = ({ collective: event, LoggedInUser }) => {
               defaultMessage="{n} {n, plural, one {person going} other {people going}}"
             />
           </SectionTitle>
-          {canEditEvent && (
+          {canEditEvent && isRefetched && (
             <StyledAdminActions>
               <ul>
                 <li>
@@ -115,6 +125,7 @@ Participants.propTypes = {
     orders: PropTypes.array,
   }).isRequired,
   LoggedInUser: PropTypes.object,
+  refetch: PropTypes.func,
 };
 
 export default Participants;
