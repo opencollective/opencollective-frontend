@@ -75,7 +75,7 @@ const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...p
     >
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} size={12} />
       <Span ml="6px">
-        <FormattedMessage id="actions.pay" defaultMessage="Pay" />
+        <FormattedMessage id="actions.goToPay" defaultMessage="Go to Pay" />
       </Span>
     </StyledButton>
   );

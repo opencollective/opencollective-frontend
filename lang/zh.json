@@ -40,7 +40,7 @@
   "actions.done": "完成",
   "actions.download": "下载",
   "actions.follow": "关注",
-  "actions.pay": "Pay",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "拒绝",
   "actions.submitApplication": "提交您的申请",
   "actions.unfollow": "取消关注",

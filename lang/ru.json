@@ -40,7 +40,7 @@
   "actions.done": "Готово",
   "actions.download": "Загрузить",
   "actions.follow": "Подписаться",
-  "actions.pay": "Оплатить",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "Отклонить",
   "actions.submitApplication": "Отправить заявку",
   "actions.unfollow": "Отписаться",
