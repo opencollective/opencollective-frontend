@@ -21,9 +21,11 @@ import ErrorPage from '../components/ErrorPage';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
+import ExpensesSearchBar from '../components/expenses/ExpensesSearchBar';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
+import { expensesListFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -31,7 +33,6 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
-import SearchForm from '../components/SearchForm';
 import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -40,10 +41,6 @@ const messages = defineMessages({
   title: {
     id: 'ExpensesPage.title',
     defaultMessage: '{collectiveName} · Expenses',
-  },
-  searchPlaceholder: {
-    id: 'search.placeholder',
-    defaultMessage: 'Search...',
   },
 });
 
@@ -152,12 +149,10 @@ class ExpensePage extends React.Component {
     return Router.pushRoute('expenses', this.buildFilterLinkParams({ ...queryParams, offset: null }));
   };
 
-  handleSearch(event) {
-    const searchInput = event.target.elements.q;
-    const params = this.buildFilterLinkParams({ searchTerm: searchInput.value || null });
+  handleSearch = searchTerm => {
+    const params = this.buildFilterLinkParams({ searchTerm, offset: null });
     Router.pushRoute('expenses', params);
-    event.preventDefault();
-  }
+  };
 
   getTagProps = tag => {
     if (tag === this.props.query.tag) {
@@ -166,7 +161,7 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, query, intl } = this.props;
+    const { collectiveSlug, data, query } = this.props;
     const hasFilters = this.hasFilter(query);
 
     if (!data.loading) {
@@ -197,11 +192,7 @@ class ExpensePage extends React.Component {
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
-                    <SearchForm
-                      placeholder={intl.formatMessage(messages.searchPlaceholder)}
-                      onSubmit={event => this.handleSearch(event)}
-                      defaultValue={query.searchTerm}
-                    />
+                    <ExpensesSearchBar defaultValue={query.searchTerm} onSubmit={this.handleSearch} />
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
@@ -374,45 +365,11 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       searchTerm: $searchTerm
     ) {
-      totalCount
-      offset
-      limit
-      nodes {
-        id
-        legacyId
-        description
-        status
-        createdAt
-        tags
-        amount
-        currency
-        type
-        permissions {
-          canDelete
-          canApprove
-          canUnapprove
-          canReject
-          canPay
-          canMarkAsUnpaid
-        }
-        payoutMethod {
-          id
-          type
-        }
-        payee {
-          id
-          type
-          slug
-          imageUrl(height: 80)
-        }
-        createdByAccount {
-          id
-          type
-          slug
-        }
-      }
+      ...ExpensesListFragment
     }
   }
+
+  ${expensesListFragment}
 `;
 
 const getData = graphql(EXPENSES_PAGE_QUERY, {

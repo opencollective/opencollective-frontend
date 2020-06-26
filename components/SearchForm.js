@@ -46,6 +46,8 @@ const SearchForm = ({
   placeholder = 'Search Open Collective',
   width = 1,
   defaultValue,
+  value,
+  onChange,
 }) => (
   <form action="/search" method="GET" onSubmit={onSubmit}>
     <SearchInputContainer alignItems="center" justifyContent="space-between" p={1}>
@@ -60,6 +62,8 @@ const SearchForm = ({
         fontSize={fontSize}
         aria-label="Open collective search input"
         defaultValue={defaultValue}
+        value={value}
+        onChange={onChange && (e => onChange(e.target.value))}
       />
       <SearchButton as="button" mr={1} p={1}>
         <SearchIcon size={16} fill="#aaaaaa" />
@@ -71,10 +75,12 @@ const SearchForm = ({
 SearchForm.propTypes = {
   fontSize: PropTypes.string,
   defaultValue: PropTypes.string,
+  value: PropTypes.string,
   onSubmit: PropTypes.func,
   placeholder: PropTypes.string,
   backgroundColor: PropTypes.string,
   width: PropTypes.number,
+  onChange: PropTypes.func,
 };
 
 export default SearchForm;

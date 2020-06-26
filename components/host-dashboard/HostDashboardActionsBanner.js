@@ -146,7 +146,7 @@ class HostDashboardActionsBanner extends React.Component {
     const customOptions = selectedCollective ? [{ label: allCollectivesLabel, value: null }] : undefined;
     return (
       <Container background="#f2f4f5" px={2} py={4}>
-        <Flex flexWrap="wrap" justifyContent="space-between" maxWidth={1600} m="16px auto">
+        <Flex flexWrap="wrap" justifyContent="space-between" maxWidth={1280} m="16px auto">
           <div>
             <div className="title">
               <H2 mb={3}>
@@ -202,9 +202,9 @@ class HostDashboardActionsBanner extends React.Component {
               </React.Fragment>
             )}
           </div>
-          <div style={{ maxWidth: 450 }}>
+          <Container display="flex" alignItems="center" maxWidth={450}>
             {this.canEdit() && <ConnectPaypal collective={host} onClickRefillBalance={saveFilterPreferences} />}
-          </div>
+          </Container>
         </Flex>
         <div>
           {selectedCollective && this.state.showAddFunds && (

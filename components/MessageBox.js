@@ -20,7 +20,7 @@ const Message = styled.div`
   padding: ${themeGet('space.3')}px;
 
   a {
-    text-decoration: underline;
+    text-decoration: underline !important;
   }
 
   ${borders}

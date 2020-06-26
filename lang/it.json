@@ -1009,6 +1009,7 @@
   "host.types.label": "Select host type",
   "host.types.organization.label": "una organizzazione",
   "host.types.user.label": "an individual (me)",
+  "HostDashboardExpenses.Beta": "We are working on a new version of the expenses page for the host dashboard. It's still in progress, but we'd love to hear your thoughts on this! You can provide feedback on the <IssueLink>dedicated Github issue</IssueLink>.",
   "HostedCollectives": "Hosted Collectives",
   "HostedEvents": "Hosted Events",
   "HostFee": "Host fee",
