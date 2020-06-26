@@ -83,9 +83,7 @@ const Input = props => {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
-        if (matches) {
-          undefined;
-        } else if (!value && input.required) {
+        if (!value && input.required) {
           return 'Is required';
         } else if (!matches && value) {
           return `Invalid ${input.name}`;
@@ -104,6 +102,7 @@ const Input = props => {
                   error={meta.touched && meta.error}
                   disabled={disabled}
                   width="100%"
+                  value={get(formik.values, field.name)}
                 />
               )}
             </StyledInputField>
@@ -311,7 +310,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
                 inputId={id}
                 name={field.name}
                 onChange={({ value }) => {
-                  formik.setFieldValue('data', {});
+                  formik.setFieldValue(getFieldName('data'), {});
                   formik.setFieldValue(field.name, value);
                 }}
                 options={currencies}
