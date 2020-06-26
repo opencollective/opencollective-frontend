@@ -135,7 +135,7 @@ class NewCollectivePage extends React.Component {
   };
 
   render() {
-    const { slug, data, LoggedInUser, status, step, mode, refetch } = this.props;
+    const { slug, data, LoggedInUser, status, step, mode } = this.props;
     const { showOnboardingModal } = this.state;
 
     if (!data.loading) {
