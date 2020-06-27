@@ -1529,6 +1529,7 @@
   "ViewCollectivePage": "Voir le profil",
   "viewDetails": "Voir les détails",
   "viewYourProfile": "Voir votre profil",
+  "VirtualCard.Limitinfo": "Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact {email}.",
   "virtualCards.balance": "Solde : {balance}",
   "virtualCards.batch": "Groupe",
   "virtualCards.batches.all": "Tous les groupes",
