@@ -17,7 +17,7 @@
   "acceptContributions.organization.myOrgs": "Meine Organisationen",
   "acceptContributions.organization.subtitle": "Unsere Organisation",
   "acceptContributions.picker.header": "Finanzbeiträge akzeptieren",
-  "acceptContributions.picker.host": "A fiscal host",
+  "acceptContributions.picker.host": "Ein Steuer-Träger",
   "acceptContributions.picker.hostInfo": "Outsource fundholding to an entity who offers this service ({moreInfo})",
   "acceptContributions.picker.myself": "Ich selbst",
   "acceptContributions.picker.myselfInfo": "Mein persönliches Bankkonto verwenden",
