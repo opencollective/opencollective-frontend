@@ -333,6 +333,7 @@
   "Contact.Message": "Messaggio",
   "Contact.Subject": "Oggetto",
   "ContactCollective": "Contatta {collective}",
+  "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Contribuisci",
   "contribute.changeFrequency.confirmMsg": "Se stai cambiando la frequenza, non contribuirai a questo specifico livello \"{tierName}\"",
   "contribute.changeTaxNumber": "Modifica numero {taxName}",

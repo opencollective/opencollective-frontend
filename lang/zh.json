@@ -333,6 +333,7 @@
   "Contact.Message": "Message",
   "Contact.Subject": "主题",
   "ContactCollective": "联系 {collective}",
+  "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "贡献",
   "contribute.changeFrequency.confirmMsg": "If you're changing the frequency, you will not contribute to this specific tier \"{tierName}\"",
   "contribute.changeTaxNumber": "改变 {taxName} 数目",

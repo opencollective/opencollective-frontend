@@ -119,7 +119,7 @@ const StepDetails = ({
   interval = interval || 'oneTime';
   return (
     <Flex width={1} flexDirection={hasOptions ? 'column' : 'row'} flexWrap="wrap">
-      <Flex mb={3}>
+      <Flex mb={1}>
         {hasOptions && (
           <StyledInputField
             label={
@@ -202,7 +202,7 @@ const StepDetails = ({
           </StyledInputField>
         )}
       </Flex>
-      <Flex fontSize="Caption" color="black.500" flexDirection="column" alignItems="flex-end" mb={2}>
+      <Flex fontSize="Caption" color="black.500" flexDirection="column" alignItems="flex-end" mb={3}>
         <FormattedMessage
           id="contribuion.minimumAmount"
           values={{ minAmount: formatCurrency(minAmount, currency), currency: currency }}

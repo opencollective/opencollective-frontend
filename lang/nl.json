@@ -333,6 +333,7 @@
   "Contact.Message": "Bericht",
   "Contact.Subject": "Onderwerp",
   "ContactCollective": "Contacteer {collective}",
+  "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Contribute",
   "contribute.changeFrequency.confirmMsg": "Als u de frequentie wijzigt, draagt ​​u niet bij aan deze specifieke rang \"{tierName}\"",
   "contribute.changeTaxNumber": "Verander {taxName} nummer",
