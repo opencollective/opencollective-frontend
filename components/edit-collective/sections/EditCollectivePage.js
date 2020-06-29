@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
@@ -57,7 +58,17 @@ const SectionEntryContainer = styled.div`
     `}
 `;
 
-const CollectiveSectionEntry = ({ intl, isEnabled, restrictedTo, section, index, onMove, onDrop, onSectionToggle }) => {
+const CollectiveSectionEntry = ({
+  intl,
+  isEnabled,
+  restrictedTo,
+  section,
+  index,
+  onMove,
+  onDrop,
+  onSectionToggle,
+  isCollective,
+}) => {
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
@@ -73,7 +84,7 @@ const CollectiveSectionEntry = ({ intl, isEnabled, restrictedTo, section, index,
 
   drag(drop(ref));
 
-  const options = [
+  let options = [
     {
       label: <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisible" defaultMessage="Always visible" />,
       value: 'ALWAYS',
@@ -87,6 +98,12 @@ const CollectiveSectionEntry = ({ intl, isEnabled, restrictedTo, section, index,
       value: 'DISABLED',
     },
   ];
+
+  // Remove the "Only for admins" option if it's a collective
+  // That can be re-considered later
+  if (isCollective) {
+    options = options.filter(({ value }) => value !== 'ADMIN');
+  }
 
   let defaultValue;
   if (!isEnabled) {
@@ -105,7 +122,7 @@ const CollectiveSectionEntry = ({ intl, isEnabled, restrictedTo, section, index,
       <P fontWeight="bold">{i18nCollectivePageSection(intl, section)}</P>
 
       <StyledSelect
-        fontSize="10px"
+        fontSize="11px"
         name={`show-section-${section}`}
         defaultValue={defaultValue}
         options={options}
@@ -116,7 +133,7 @@ const CollectiveSectionEntry = ({ intl, isEnabled, restrictedTo, section, index,
           onSectionToggle(section, isEnabled, restrictedTo);
         }}
         menuPortalTarget={document.body}
-        formatOptionLabel={option => <Span fontSize="10px">{option.label}</Span>}
+        formatOptionLabel={option => <Span fontSize="11px">{option.label}</Span>}
       />
     </SectionEntryContainer>
   );
@@ -131,6 +148,7 @@ CollectiveSectionEntry.propTypes = {
   onMove: PropTypes.func,
   onDrop: PropTypes.func,
   onSectionToggle: PropTypes.func,
+  isCollective: PropTypes.bool,
 };
 
 export const isCollectiveSectionEnabled = (collective, section) => {
@@ -204,6 +222,9 @@ const EditCollectivePage = ({ collective }) => {
   }, [data?.account]);
 
   const displayedSections = tmpSections || sections;
+
+  const isCollective = collective.type === CollectiveType.COLLECTIVE;
+
   return (
     <DndProviderHTML5Backend>
       <H3>
@@ -231,6 +252,7 @@ const EditCollectivePage = ({ collective }) => {
                       section={section}
                       index={index}
                       isEnabled={isEnabled}
+                      isCollective={isCollective}
                       restrictedTo={restrictedTo}
                       onMove={(dragIndex, hoverIndex) => {
                         const newSections = getNewSections(sections, dragIndex, hoverIndex);
@@ -245,7 +267,7 @@ const EditCollectivePage = ({ collective }) => {
                       }}
                       onSectionToggle={(selectedSection, isEnabled, restrictedTo) => {
                         const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
-                        let newSections = cloneDeep(sections);
+                        const newSections = cloneDeep(sections);
                         set(newSections, `${sectionIdx}.isEnabled`, isEnabled);
                         set(newSections, `${sectionIdx}.restrictedTo`, restrictedTo);
                         setSections(newSections);
@@ -303,6 +325,7 @@ const EditCollectivePage = ({ collective }) => {
 EditCollectivePage.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
   }),
 };
 
