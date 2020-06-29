@@ -105,7 +105,7 @@ class Host extends React.Component {
             </Box>
             <Box>
               {!collective.isActive && (
-                <div>
+                <Fragment>
                   <p>
                     <FormattedMessage
                       id="editCollective.host.pending"
@@ -133,38 +133,47 @@ class Host extends React.Component {
                       />
                     </Button>
                   </p>
-                </div>
+                </Fragment>
               )}
               {collective.isActive && (
-                <div>
+                <Fragment>
                   <p>
                     <FormattedMessage
                       id="editCollective.host.label"
-                      defaultMessage="Your fiscal host is {host}. It is currently hosting {collectives, plural, one {one collective} other {{collectives} collectives}}"
-                      values={{
-                        collectives: get(collective, 'host.stats.collectives.hosted'),
-                        host: get(collective, 'host.name'),
-                      }}
+                      defaultMessage="Your Fiscal Host is {host}."
+                      values={{ host: get(collective, 'host.name') }}
                     />
                   </p>
                   {collective.stats.balance > 0 && (
                     <p>
                       <FormattedMessage
                         id="editCollective.host.balance"
-                        defaultMessage="Your host currently holds {balance} on behalf of your Collective."
+                        defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund}}."
                         values={{
                           balance: formatCurrency(collective.stats.balance, collective.currency),
+                          type: collective.type,
                         }}
                       />
-                      <br />
+                    </p>
+                  )}
+                  {collective.stats.balance > 0 && (
+                    <p>
                       <FormattedMessage
                         id="editCollective.host.change.balanceNotEmpty"
-                        defaultMessage="If you would like to change fiscal host, you first need to empty your Collective balance. You can do this by submitting expenses, or by transferring funds to another Collective (select your Collective balance as the payment method when making a financial contribution) or to your host (via Advanced)."
+                        defaultMessage="If you would like to change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance}}. You can do this by submitting expenses, making financial contributions (select  {type, select, COLLECTIVE {your Collective} FUND {your Fund}} as 'Contribute As') or by donating to your Fiscal Host using the {emptyBalanceLink} feature."
+                        values={{
+                          type: collective.type,
+                          emptyBalanceLink: (
+                            <Link route="editCollective" params={{ slug: collective.slug, section: 'advanced' }}>
+                              <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
+                            </Link>
+                          ),
+                        }}
                       />
                     </p>
                   )}
                   {collective.stats.balance === 0 && (
-                    <div>
+                    <Fragment>
                       <p>
                         <Button
                           bsStyle="primary"
@@ -178,12 +187,13 @@ class Host extends React.Component {
                       <Fineprint>
                         <FormattedMessage
                           id="editCollective.host.change.removeFirst"
-                          defaultMessage="Once removed, your Collective won't be able to accept financial contributions anymore. You will be able to apply to another host."
+                          defaultMessage="Once removed, {type, select, COLLECTIVE {your Collective} FUND {your Fund}} won't be able to accept financial contributions anymore. You will be able to apply to another Fiscal Host."
+                          values={{ type: collective.type }}
                         />
                       </Fineprint>
-                    </div>
+                    </Fragment>
                   )}
-                </div>
+                </Fragment>
               )}
             </Box>
           </Flex>
@@ -278,12 +288,12 @@ class Host extends React.Component {
             <Box mb={4}>
               <h2>
                 <label htmlFor="host-radio-noHost">
-                  <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No fiscal host" />
+                  <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No Fiscal Host" />
                 </label>
               </h2>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
-                defaultMessage="Without a fiscal host, you can't collect money. You can still use other features, like editing your Collective page, submitting expenses, and posting updates."
+                defaultMessage="Without a Fiscal Host, you can't collect money. You can still use other features, like editing your profile page, submitting expenses, and posting updates."
               />
             </Box>
           </Flex>
@@ -302,7 +312,7 @@ class Host extends React.Component {
             <Box mb={4}>
               <h2>
                 <label htmlFor="host-radio-ownHost">
-                  <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Use own fiscal host" />
+                  <FormattedMessage id="collective.edit.host.useOwn.title" defaultMessage="Use own Fiscal Host" />
                 </label>
               </h2>
               <FormattedMessage
@@ -340,13 +350,13 @@ class Host extends React.Component {
                 <label htmlFor="host-radio-findHost">
                   <FormattedMessage
                     id="collective.edit.host.findHost.title"
-                    defaultMessage="Apply to an existing fiscal host"
+                    defaultMessage="Apply to an existing Fiscal Host"
                   />
                 </label>
               </h2>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
-                defaultMessage="With this option, you don't need to hold funds yourself, or set up a legal entity and bank account for your project. The fiscal host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the host's page before confirming)."
+                defaultMessage="With this option, you don't need to hold funds yourself, or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (you can review these details on the Host's page before confirming)."
               />
               {selectedOption === 'findHost' && (
                 <div>
@@ -358,14 +368,14 @@ class Host extends React.Component {
                       />
                     </h3>
                     <Link route="/hosts">
-                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all fiscal hosts" />
+                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
                     </Link>
                   </div>
                   {collective.tags && collective.tags.length > 0 && (
                     <div className="suggestedHostsDescription subtitle">
                       <FormattedMessage
                         id="collective.edit.host.suggestedHosts.description"
-                        defaultMessage="Based on the tags of your Collective ({tags})"
+                        defaultMessage="Based on the tags ({tags})"
                         values={{
                           tags: collective.tags.join(', '),
                         }}
