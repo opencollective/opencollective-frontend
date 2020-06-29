@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getPrecisionFromAmount } from '../../lib/currency-utils';
+import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
 import { getNextChargeDate } from '../../lib/date-utils';
 import { Router } from '../../server/pages';
 
@@ -201,6 +201,13 @@ const StepDetails = ({
             )}
           </StyledInputField>
         )}
+      </Flex>
+      <Flex fontSize="Caption" color="black.500" flexDirection="column" alignItems="flex-end" mb={2}>
+        <FormattedMessage
+          id="contribuion.minimumAmount"
+          values={{ minAmount: formatCurrency(minAmount, currency), currency: currency }}
+          defaultMessage={'Minimum amount: {minAmount} {currency}'}
+        />
       </Flex>
       {showInterval && (
         <StyledInputField
