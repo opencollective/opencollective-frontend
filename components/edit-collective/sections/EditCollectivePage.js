@@ -23,8 +23,8 @@ import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
-import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
+import StyledSelect from '../../StyledSelect';
 import { H3, P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 
@@ -57,7 +57,7 @@ const SectionEntryContainer = styled.div`
     `}
 `;
 
-const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDrop, onSectionToggle }) => {
+const CollectiveSectionEntry = ({ intl, isEnabled, restrictedTo, section, index, onMove, onDrop, onSectionToggle }) => {
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
@@ -73,22 +73,51 @@ const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDro
 
   drag(drop(ref));
 
+  const options = [
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisible" defaultMessage="Always visible" />,
+      value: 'ALWAYS',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.OnlyAdmins" defaultMessage="Only for admins" />,
+      value: 'ADMIN',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.Disabled" defaultMessage="Disabled" />,
+      value: 'DISABLED',
+    },
+  ];
+
+  let defaultValue;
+  if (!isEnabled) {
+    defaultValue = options.find(({ value }) => value == 'DISABLED');
+  } else if (restrictedTo && restrictedTo.includes('ADMIN')) {
+    defaultValue = options.find(({ value }) => value == 'ADMIN');
+  } else {
+    defaultValue = options.find(({ value }) => value == 'ALWAYS');
+  }
+
   return (
     <SectionEntryContainer ref={preview} isDragging={isDragging}>
       <Container mr={3} cursor="move" ref={ref}>
         <DragIndicator size={14} />
       </Container>
       <P fontWeight="bold">{i18nCollectivePageSection(intl, section)}</P>
-      <div>
-        <StyledCheckbox
-          name={`show-section-${section}`}
-          label={<FormattedMessage id="EditCollectivePage.ShowSection" defaultMessage="Show section" />}
-          checked={isEnabled}
-          onChange={({ checked }) => {
-            onSectionToggle(section, checked);
-          }}
-        />
-      </div>
+
+      <StyledSelect
+        fontSize="10px"
+        name={`show-section-${section}`}
+        defaultValue={defaultValue}
+        options={options}
+        minWidth={150}
+        onChange={({ value }) => {
+          const isEnabled = value !== 'DISABLED';
+          const restrictedTo = value === 'ADMIN' ? ['ADMIN'] : [];
+          onSectionToggle(section, isEnabled, restrictedTo);
+        }}
+        menuPortalTarget={document.body}
+        formatOptionLabel={option => <Span fontSize="10px">{option.label}</Span>}
+      />
     </SectionEntryContainer>
   );
 };
@@ -96,6 +125,7 @@ const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDro
 CollectiveSectionEntry.propTypes = {
   intl: PropTypes.object,
   isEnabled: PropTypes.bool,
+  restrictedTo: PropTypes.array,
   section: PropTypes.oneOf(Object.values(Sections)),
   index: PropTypes.number,
   onMove: PropTypes.func,
@@ -194,13 +224,14 @@ const EditCollectivePage = ({ collective }) => {
           ) : (
             <div>
               <StyledCard mb={4}>
-                {displayedSections.map(({ section, isEnabled }, index) => (
+                {displayedSections.map(({ section, isEnabled, restrictedTo }, index) => (
                   <React.Fragment key={section}>
                     <CollectiveSectionEntry
                       intl={intl}
                       section={section}
                       index={index}
                       isEnabled={isEnabled}
+                      restrictedTo={restrictedTo}
                       onMove={(dragIndex, hoverIndex) => {
                         const newSections = getNewSections(sections, dragIndex, hoverIndex);
                         if (!isEqual(tmpSections, newSections)) {
@@ -212,9 +243,11 @@ const EditCollectivePage = ({ collective }) => {
                         setSections(getNewSections(sections, dragIndex, hoverIndex));
                         setDirty(true);
                       }}
-                      onSectionToggle={(selectedSection, isEnabled) => {
+                      onSectionToggle={(selectedSection, isEnabled, restrictedTo) => {
                         const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
-                        const newSections = set(cloneDeep(sections), `${sectionIdx}.isEnabled`, isEnabled);
+                        let newSections = cloneDeep(sections);
+                        set(newSections, `${sectionIdx}.isEnabled`, isEnabled);
+                        set(newSections, `${sectionIdx}.restrictedTo`, restrictedTo);
                         setSections(newSections);
                         setDirty(true);
                       }}
