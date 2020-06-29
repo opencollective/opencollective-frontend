@@ -18,6 +18,7 @@ import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
@@ -33,8 +34,6 @@ import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
 import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
-
-import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 
 const messages = defineMessages({
   title: {

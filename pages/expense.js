@@ -18,6 +18,7 @@ import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
@@ -36,8 +37,6 @@ import StyledButton from '../components/StyledButton';
 import TemporaryNotification from '../components/TemporaryNotification';
 import { H1, H5, P, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-
-import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 
 const messages = defineMessages({
   title: {
