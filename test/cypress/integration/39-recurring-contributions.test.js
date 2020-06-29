@@ -33,42 +33,6 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Can cancel an active contribution', () => {
-    cy.login().then(() => {
-      cy.visit(`/testuseradmin/recurring-contributions`);
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
-      cy.getByDataCy('recurring-contribution-cancel-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-cancel-menu').contains('Are you sure?');
-      cy.getByDataCy('recurring-contribution-cancel-no').contains('No, wait');
-      cy.getByDataCy('recurring-contribution-cancel-yes')
-        .click()
-        .then(() => {
-          cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been cancelled');
-          cy.getByDataCy('filter-button cancelled').click();
-          cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
-        });
-    });
-  });
-
-  it('Can reactivate a cancelled contribution', () => {
-    cy.login().then(() => {
-      cy.visit(`/testuseradmin/recurring-contributions`);
-      cy.getByDataCy('filter-button cancelled').click();
-      cy.getByDataCy('recurring-contribution-activate-yes').first().contains('Activate');
-      cy.getByDataCy('recurring-contribution-activate-yes')
-        .first()
-        .click()
-        .then(() => {
-          cy.getByDataCy('temporary-notification').contains('Recurring contribution activated!');
-          cy.getByDataCy('filter-button active').click();
-          cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
-        });
-    });
-  });
-
   it('Can add a new payment method and use it for the recurring contribution', () => {
     cy.login().then(() => {
       cy.visit(`/testuseradmin/recurring-contributions`);
@@ -113,6 +77,26 @@ describe('Recurring contributions', () => {
       cy.wait('@updateorder', { responseTimeout: 15000 }).its('status').should('eq', 200);
       cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been updated.');
       cy.getByDataCy('recurring-contribution-amount-contributed').contains('$2 USD / month');
+    });
+  });
+
+  it('Can cancel an active contribution', () => {
+    cy.login().then(() => {
+      cy.visit(`/testuseradmin/recurring-contributions`);
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
+      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+      cy.getByDataCy('recurring-contribution-menu').should('exist');
+      cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
+      cy.getByDataCy('recurring-contribution-cancel-menu').should('exist');
+      cy.getByDataCy('recurring-contribution-cancel-menu').contains('Are you sure?');
+      cy.getByDataCy('recurring-contribution-cancel-no').contains('No, wait');
+      cy.getByDataCy('recurring-contribution-cancel-yes')
+        .click()
+        .then(() => {
+          cy.getByDataCy('temporary-notification').contains('Your recurring contribution has been cancelled');
+          cy.getByDataCy('filter-button cancelled').click();
+          cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
+        });
     });
   });
 });

@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-
-import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -34,24 +30,11 @@ const messages = defineMessages({
     id: 'Subscriptions.Edit',
     defaultMessage: 'Edit',
   },
-  activate: {
-    id: 'Subscriptions.Activate',
-    defaultMessage: 'Activate',
-  },
   tag: {
     id: 'Subscriptions.Status',
     defaultMessage: '{status, select, ACTIVE {Active} CANCELLED {Cancelled}} contribution',
   },
 });
-
-const activateRecurringContributionMutation = gqlV2/* GraphQL */ `
-  mutation activateRecurringContribution($order: OrderReferenceInput!) {
-    activateOrder(order: $order) {
-      id
-      status
-    }
-  }
-`;
 
 const RecurringContributionsCard = ({
   collective,
@@ -64,14 +47,11 @@ const RecurringContributionsCard = ({
 }) => {
   const [showPopup, setShowPopup] = useState(false);
 
-  const [submitActivation, { loadingActivation }] = useMutation(activateRecurringContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
-
   const { formatMessage } = useIntl();
   const statusTag = formatMessage(messages.tag, { status });
-  const buttonText = status === 'ACTIVE' ? formatMessage(messages.manage) : formatMessage(messages.activate);
+  const buttonText = formatMessage(messages.manage);
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
+  const isActive = status === 'ACTIVE';
 
   return (
     <StyledCard {...props}>
@@ -115,36 +95,15 @@ const RecurringContributionsCard = ({
               />
             </P>
           </Flex>
-          {isAdmin &&
-            (status === 'ACTIVE' ? (
-              <StyledButton
-                buttonSize="tiny"
-                onClick={() => setShowPopup(true)}
-                data-cy="recurring-contribution-edit-activate-button"
-              >
-                {buttonText}
-              </StyledButton>
-            ) : (
-              <StyledButton
-                buttonSize="tiny"
-                loading={loadingActivation}
-                data-cy="recurring-contribution-activate-yes"
-                onClick={async () => {
-                  try {
-                    await submitActivation({
-                      variables: { order: { id: contribution.id } },
-                    });
-                    createNotification('activate');
-                  } catch (error) {
-                    const errorMsg = getErrorFromGraphqlException(error).message;
-                    createNotification('error', errorMsg);
-                    return false;
-                  }
-                }}
-              >
-                {buttonText}
-              </StyledButton>
-            ))}
+          {isAdmin && isActive && (
+            <StyledButton
+              buttonSize="tiny"
+              onClick={() => setShowPopup(true)}
+              data-cy="recurring-contribution-edit-activate-button"
+            >
+              {buttonText}
+            </StyledButton>
+          )}
         </Container>
       </Flex>
       {showPopup && (
