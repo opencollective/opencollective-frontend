@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { fadeIn } from './StyledKeyframes';
+import { fadeIn } from '../StyledKeyframes';
 
 /** A single item */
 const DebitCreditItem = styled.div`
@@ -50,9 +50,9 @@ const DebitCreditGradient = styled.div`
 `;
 
 /** Displays a debit entry in the list */
-export const DebitItem = ({ children }) => {
+export const DebitItem = ({ children, ...props }) => {
   return (
-    <DebitCreditItem>
+    <DebitCreditItem {...props}>
       <DebitCreditGradient isCredit={false} />
       {children}
     </DebitCreditItem>
@@ -62,9 +62,9 @@ export const DebitItem = ({ children }) => {
 DebitItem.propTypes = { children: PropTypes.node };
 
 /** Displays a credit entry in the list */
-export const CreditItem = ({ children }) => {
+export const CreditItem = ({ children, ...props }) => {
   return (
-    <DebitCreditItem>
+    <DebitCreditItem {...props}>
       <DebitCreditGradient isCredit />
       {children}
     </DebitCreditItem>

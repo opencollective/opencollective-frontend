@@ -37,26 +37,24 @@ describe('New users profiles', () => {
       cy.hash().should('eq', '#section-transactions');
       cy.get('[data-cy=section-transactions-title]').contains('Transactions');
       cy.get('button[data-cy="filter-button expenses"]').click();
-      cy.get('[data-cy="expenses transactions"]');
       cy.get('[data-cy="transaction-sign"]').first().contains('+');
       cy.get('button[data-cy="filter-button contributions"]').click();
-      cy.get('[data-cy="contributions transactions"]');
       cy.get('[data-cy="transaction-sign"]').first().contains('-');
     });
 
     it('Show transactions with all info and links', () => {
-      cy.get('[data-cy~="transactions"]:first a[href="/brusselstogether"]').should('exist');
-      cy.get('[data-cy~="transactions"]')
+      cy.get('[data-cy="budget-item"]:first a[href="/brusselstogether"]').should('exist');
+      cy.get('[data-cy="budget-item"]')
         .first()
         .get('[data-cy=transaction-description]')
         .contains('monthly recurring subscription');
-      cy.get('[data-cy~="transactions"]')
+      cy.get('[data-cy="budget-item"]')
         .first()
         .get('[data-cy=transaction-details] > span[data-cy=transaction-date]')
         .contains('11/30/2017');
-      cy.get('[data-cy~="transactions"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
-      cy.get('[data-cy~="transactions"]').first().get('[data-cy=transaction-amount] > span').eq(1).contains('€10.00');
-      cy.get('[data-cy~="transactions"]').first().get('[data-cy=transaction-amount] > span').eq(2).contains('EUR');
+      cy.get('[data-cy="budget-item"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
+      cy.get('[data-cy="budget-item"]').first().get('[data-cy=transaction-amount] > span').eq(1).contains('€10.00');
+      cy.get('[data-cy="budget-item"]').first().get('[data-cy=transaction-amount] > span').eq(2).contains('EUR');
     });
   });
 });
