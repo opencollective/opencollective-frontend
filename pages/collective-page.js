@@ -7,7 +7,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
 
-import CollectivePage from '../components/collective-page';
+import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
@@ -49,7 +49,7 @@ const GlobalStyles = createGlobalStyle`
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
-class NewCollectivePage extends React.Component {
+class CollectivePage extends React.Component {
   static getInitialProps({ req, res, query: { slug, status, step, mode } }) {
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
@@ -169,7 +169,7 @@ class NewCollectivePage extends React.Component {
             />
             <CollectiveThemeProvider collective={collective}>
               {({ onPrimaryColorChange }) => (
-                <CollectivePage
+                <CollectivePageContent
                   collective={collective}
                   host={collective.host}
                   coreContributors={collective.coreContributors}
@@ -230,4 +230,4 @@ const getCollective = graphql(getCollectivePageQuery, {
   }),
 });
 
-export default withUser(getCollective(NewCollectivePage));
+export default withUser(getCollective(CollectivePage));

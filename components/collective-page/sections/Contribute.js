@@ -13,7 +13,7 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { getCollectivePageQueryVariables } from '../../../pages/new-collective-page';
+import { getCollectivePageQueryVariables } from '../../../pages/collective-page';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';

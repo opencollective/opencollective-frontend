@@ -4,7 +4,7 @@ import mockRecaptcha from '../mocks/recaptcha';
 import { disableSmoothScroll } from '../support/helpers';
 
 const scrollToSection = section => {
-  // Wait for new collective page to load before disabling smooth scroll
+  // Wait for collective page to load before disabling smooth scroll
   cy.get('[data-cy=collective-page-main]');
   disableSmoothScroll();
   cy.get(`#section-${section}`).scrollIntoView();
@@ -18,7 +18,7 @@ const uploadImage = ({ dropzone, fileName }) => {
   cy.wait(900);
 };
 
-describe('New collective page', () => {
+describe('Collective page', () => {
   let collectiveSlug = null;
   before(() => {
     cy.createHostedCollective({
@@ -27,11 +27,11 @@ describe('New collective page', () => {
       website: 'opencollective.com/testCollective',
     })
       .then(({ slug }) => (collectiveSlug = slug))
-      .then(() => cy.visit(`/${collectiveSlug}/v2`));
+      .then(() => cy.visit(`/${collectiveSlug}`));
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/v2` });
+    cy.login({ redirect: `/${collectiveSlug}` });
     cy.wait(900);
   });
 
@@ -118,7 +118,7 @@ describe('New collective page', () => {
         cy.get('[data-cy=edit-update-submit-btn]').click();
       });
       cy.get('[data-cy=PublishUpdateBtn] button').click();
-      cy.visit(`/${collectiveSlug}/v2`);
+      cy.visit(`/${collectiveSlug}`);
       scrollToSection(Sections.UPDATES);
       cy.get('[data-cy=view-all-updates-btn]').should('be.visible');
     });
@@ -165,9 +165,9 @@ describe('New collective page', () => {
   });
 });
 
-describe('New Collective page with euro currency', () => {
+describe('Collective page with euro currency', () => {
   before(() => {
-    cy.visit('/brusselstogether/v2');
+    cy.visit('/brusselstogether');
   });
 
   it('contributors amount in euro', () => {
@@ -216,7 +216,7 @@ describe('Edit public message after contribution', () => {
         cy.get('[data-cy=EditPublicMessagePopup]');
 
         // SECTION: Go to the collective page and change the public message
-        cy.visit(`/${slug}/v2`);
+        cy.visit(`/${slug}`);
         /** Cypress can't find the public message text unless we do this.
          * Probably related to this issue: https://github.com/cypress-io/cypress/issues/695
          */
