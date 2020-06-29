@@ -204,21 +204,23 @@ class EditUpdateForm extends React.Component {
             minHeight={75}
             flexWrap="wrap"
           >
-            <div>
-              <StyledCheckbox
-                defaultChecked={update.isPrivate}
-                name="private"
-                size="16px"
-                label="Private update"
-                onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
-              />
-              <Container ml="25px" fontSize="12px" color="#71757A" mt={1}>
-                <FormattedMessage
-                  id="update.private.description"
-                  defaultMessage="Only contributors will be able to see the content of this update"
+            {!collective.isHost && (
+              <div>
+                <StyledCheckbox
+                  defaultChecked={update.isPrivate}
+                  name="private"
+                  size="16px"
+                  label="Private update"
+                  onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
                 />
-              </Container>
-            </div>
+                <Container ml="25px" fontSize="12px" color="#71757A" mt={1}>
+                  <FormattedMessage
+                    id="update.private.description"
+                    defaultMessage="Only contributors will be able to see the content of this update"
+                  />
+                </Container>
+              </div>
+            )}
             {update.isPrivate && (
               <Box ml={2}>
                 <Container

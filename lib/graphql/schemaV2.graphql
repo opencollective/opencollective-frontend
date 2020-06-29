@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Jul 01 2020 11:46:11 GMT+0200 (Central European Summer Time)
+# timestamp: Sun Jul 05 2020 11:27:56 GMT+0530 (India Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -256,6 +256,11 @@ type Activity {
   The person who triggered the action, if any
   """
   individual: Individual
+
+  """
+  Data attached to this activity (if any)
+  """
+  data: JSON!
 }
 
 enum ActivityType {
@@ -2430,7 +2435,7 @@ type Expense {
   items: [ExpenseItem]
 
   """
-  Additional information about the payment. Only visible to user and admins.
+  Additional information about the payment as HTML. Only visible to user and admins.
   """
   privateMessage: String
 
@@ -2506,7 +2511,7 @@ input ExpenseCreateInput {
   type: ExpenseType!
 
   """
-  A private note that will be attached to your invoice
+  A private note that will be attached to your invoice, as HTML
   """
   privateMessage: String
 
@@ -2781,7 +2786,7 @@ input ExpenseUpdateInput {
   type: ExpenseType
 
   """
-  A private note that will be attached to your invoice
+  A private note that will be attached to your invoice, as HTML
   """
   privateMessage: String
 
@@ -3709,6 +3714,11 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): PayoutMethod
+
+  """
+  Remove the given payout method
+  """
+  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
   Cancel an order
