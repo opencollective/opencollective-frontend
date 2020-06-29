@@ -20,6 +20,7 @@ import CollectivePickerAsync from './CollectivePickerAsync';
 import Container from './Container';
 import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
 import { Box, Flex } from './Grid';
+import { I18nSupportLink } from './I18nFormatters';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
@@ -389,6 +390,16 @@ class CreateVirtualCardsForm extends Component {
             disabled={submitting}
           />
         </InlineField>
+        <P>
+          <FormattedMessage
+            id="VirtualCard.Limitinfo"
+            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+            values={{
+              SupportLink: I18nSupportLink,
+              limit: 100,
+            }}
+          />
+        </P>
       </Box>
     );
   }
@@ -401,10 +412,10 @@ class CreateVirtualCardsForm extends Component {
         <P>
           <FormattedMessage
             id="VirtualCard.Limitinfo"
-            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact {email}."
+            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
             values={{
-              email: <a href={`mailto:support@opencollective.com`}>{'support@opencollective.com'}</a>,
-              limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
+              SupportLink: I18nSupportLink,
+              limit: virtualCardsMaxDailyCount,
             }}
           />
         </P>

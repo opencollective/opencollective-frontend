@@ -1529,7 +1529,7 @@
   "ViewCollectivePage": "View Profile page",
   "viewDetails": "View Details",
   "viewYourProfile": "View your profile",
-  "VirtualCard.Limitinfo": "Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact {email}.",
+  "VirtualCard.Limitinfo": "Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>.",
   "virtualCards.balance": "Balance: {balance}",
   "virtualCards.batch": "Batch name",
   "virtualCards.batches.all": "All batches",
