@@ -945,7 +945,7 @@ class CreateOrderPage extends React.Component {
                   <Box maxWidth={['100%', '75%']}>
                     <P fontSize="Caption" my={2}>
                       <FormattedMessage
-                        defaultMessage="Open Collective is free for COVID-19 Relief Collectives. We rely on the generosity of contributors like you to keep this possible!"
+                        defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
                       />
                     </P>
@@ -1030,7 +1030,7 @@ class CreateOrderPage extends React.Component {
                   <Box p={1} mt={2}>
                     <P fontSize="LeadCaption" color="colors.black.300">
                       <FormattedMessage
-                        defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contributione will be tax-deductible to the extent allowed by the law."
+                        defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
                         id="platformFee.taxDeductible"
                       />
                     </P>
