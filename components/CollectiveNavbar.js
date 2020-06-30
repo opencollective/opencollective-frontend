@@ -221,7 +221,7 @@ export const getDefaultSectionsForCollectiveType = type => {
 };
 
 /** Returns the sections from collective's settings, fallbacks on default sections for type */
-export const getSectionsForCollective = collective => {
+export const getSectionsForCollective = (collective, isAdmin, isHostAdmin) => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
   if (!collectiveSections) {
     return getDefaultSectionsForCollectiveType(get(collective, 'type'));
@@ -233,7 +233,13 @@ export const getSectionsForCollective = collective => {
     if (typeof sectionData === 'string') {
       sections.push(sectionData);
     } else if (sectionData.isEnabled) {
-      sections.push(sectionData.section);
+      if (sectionData.restrictedTo && sectionData.restrictedTo.includes('ADMIN')) {
+        if (isAdmin || isHostAdmin) {
+          sections.push(sectionData.section);
+        }
+      } else {
+        sections.push(sectionData.section);
+      }
     }
   });
 
@@ -252,7 +258,8 @@ export const getSectionsForCollective = collective => {
  * @param {boolean} `isAdmin` wether the user is an admin of the collective
  */
 export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmin) => {
-  const sections = getSectionsForCollective(collective);
+  const sections = getSectionsForCollective(collective, isAdmin, isHostAdmin);
+
   const toRemove = new Set();
   collective = collective || {};
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -303,13 +310,6 @@ export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmi
       toRemove.add(Sections.BUDGET);
     } else {
       toRemove.add(Sections.TRANSACTIONS);
-    }
-  }
-
-  // Funds MVP, to refactor
-  if (collective.type === CollectiveType.FUND || collective.settings?.fund) {
-    if (!isAdmin && !isHostAdmin) {
-      toRemove.add(Sections.BUDGET);
     }
   }
 

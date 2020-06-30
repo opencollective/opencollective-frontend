@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
@@ -23,8 +24,8 @@ import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
-import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
+import StyledSelect from '../../StyledSelect';
 import { H3, P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 
@@ -57,7 +58,17 @@ const SectionEntryContainer = styled.div`
     `}
 `;
 
-const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDrop, onSectionToggle }) => {
+const CollectiveSectionEntry = ({
+  intl,
+  isEnabled,
+  restrictedTo,
+  section,
+  index,
+  onMove,
+  onDrop,
+  onSectionToggle,
+  isCollective,
+}) => {
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
@@ -73,22 +84,57 @@ const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDro
 
   drag(drop(ref));
 
+  let options = [
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisible" defaultMessage="Always visible" />,
+      value: 'ALWAYS',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.OnlyAdmins" defaultMessage="Only for admins" />,
+      value: 'ADMIN',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.Disabled" defaultMessage="Disabled" />,
+      value: 'DISABLED',
+    },
+  ];
+
+  // Remove the "Only for admins" option if it's a collective
+  // That can be re-considered later
+  if (isCollective) {
+    options = options.filter(({ value }) => value !== 'ADMIN');
+  }
+
+  let defaultValue;
+  if (!isEnabled) {
+    defaultValue = options.find(({ value }) => value == 'DISABLED');
+  } else if (restrictedTo && restrictedTo.includes('ADMIN')) {
+    defaultValue = options.find(({ value }) => value == 'ADMIN');
+  } else {
+    defaultValue = options.find(({ value }) => value == 'ALWAYS');
+  }
+
   return (
     <SectionEntryContainer ref={preview} isDragging={isDragging}>
       <Container mr={3} cursor="move" ref={ref}>
         <DragIndicator size={14} />
       </Container>
       <P fontWeight="bold">{i18nCollectivePageSection(intl, section)}</P>
-      <div>
-        <StyledCheckbox
-          name={`show-section-${section}`}
-          label={<FormattedMessage id="EditCollectivePage.ShowSection" defaultMessage="Show section" />}
-          checked={isEnabled}
-          onChange={({ checked }) => {
-            onSectionToggle(section, checked);
-          }}
-        />
-      </div>
+
+      <StyledSelect
+        fontSize="11px"
+        name={`show-section-${section}`}
+        defaultValue={defaultValue}
+        options={options}
+        minWidth={150}
+        onChange={({ value }) => {
+          const isEnabled = value !== 'DISABLED';
+          const restrictedTo = value === 'ADMIN' ? ['ADMIN'] : [];
+          onSectionToggle(section, isEnabled, restrictedTo);
+        }}
+        menuPortalTarget={document.body}
+        formatOptionLabel={option => <Span fontSize="11px">{option.label}</Span>}
+      />
     </SectionEntryContainer>
   );
 };
@@ -96,11 +142,13 @@ const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDro
 CollectiveSectionEntry.propTypes = {
   intl: PropTypes.object,
   isEnabled: PropTypes.bool,
+  restrictedTo: PropTypes.array,
   section: PropTypes.oneOf(Object.values(Sections)),
   index: PropTypes.number,
   onMove: PropTypes.func,
   onDrop: PropTypes.func,
   onSectionToggle: PropTypes.func,
+  isCollective: PropTypes.bool,
 };
 
 export const isCollectiveSectionEnabled = (collective, section) => {
@@ -174,6 +222,9 @@ const EditCollectivePage = ({ collective }) => {
   }, [data?.account]);
 
   const displayedSections = tmpSections || sections;
+
+  const isCollective = collective.type === CollectiveType.COLLECTIVE;
+
   return (
     <DndProviderHTML5Backend>
       <H3>
@@ -194,13 +245,15 @@ const EditCollectivePage = ({ collective }) => {
           ) : (
             <div>
               <StyledCard mb={4}>
-                {displayedSections.map(({ section, isEnabled }, index) => (
+                {displayedSections.map(({ section, isEnabled, restrictedTo }, index) => (
                   <React.Fragment key={section}>
                     <CollectiveSectionEntry
                       intl={intl}
                       section={section}
                       index={index}
                       isEnabled={isEnabled}
+                      isCollective={isCollective}
+                      restrictedTo={restrictedTo}
                       onMove={(dragIndex, hoverIndex) => {
                         const newSections = getNewSections(sections, dragIndex, hoverIndex);
                         if (!isEqual(tmpSections, newSections)) {
@@ -212,9 +265,11 @@ const EditCollectivePage = ({ collective }) => {
                         setSections(getNewSections(sections, dragIndex, hoverIndex));
                         setDirty(true);
                       }}
-                      onSectionToggle={(selectedSection, isEnabled) => {
+                      onSectionToggle={(selectedSection, isEnabled, restrictedTo) => {
                         const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
-                        const newSections = set(cloneDeep(sections), `${sectionIdx}.isEnabled`, isEnabled);
+                        const newSections = cloneDeep(sections);
+                        set(newSections, `${sectionIdx}.isEnabled`, isEnabled);
+                        set(newSections, `${sectionIdx}.restrictedTo`, restrictedTo);
                         setSections(newSections);
                         setDirty(true);
                       }}
@@ -270,6 +325,7 @@ const EditCollectivePage = ({ collective }) => {
 EditCollectivePage.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
   }),
 };
 
