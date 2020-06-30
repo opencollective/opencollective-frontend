@@ -289,6 +289,7 @@ class TierPage extends Component {
                             abbreviateAmount={tier.goal > 1000000}
                             abbreviateInterval
                             amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                            precision={0}
                           />
                         ),
                       }}
@@ -315,6 +316,7 @@ class TierPage extends Component {
                             interval={tier.interval}
                             amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
                             abbreviateAmount={amountRaised > 1000000}
+                            precision={0}
                             abbreviateInterval
                           />
                         ),

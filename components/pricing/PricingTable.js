@@ -202,6 +202,7 @@ const Cell = ({ content, header, height }) => {
                 currency="USD"
                 amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontSize: 20 }}
                 showCurrencyCode={false}
+                precision={0}
               />
             </Box>
             <Box as="span" display={['inline', null, 'none']}>
@@ -212,6 +213,7 @@ const Cell = ({ content, header, height }) => {
                 amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontSize: 20 }}
                 showCurrencyCode={false}
                 abbreviateInterval
+                precision={0}
               />
             </Box>
           </td>

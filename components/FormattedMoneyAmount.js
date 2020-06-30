@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { CurrencyPrecision } from '../lib/constants/currency-precision';
+
 import Currency from './Currency';
 import { Span } from './Text';
 
@@ -86,7 +88,7 @@ FormattedMoneyAmount.propTypes = {
 FormattedMoneyAmount.defaultProps = {
   abbreviate: false,
   abbreviateInterval: false,
-  precision: 0,
+  precision: CurrencyPrecision.DEFAULT,
   amountStyles: DEFAULT_AMOUNT_STYLES,
   showCurrencyCode: true,
 };
