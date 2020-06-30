@@ -31,10 +31,6 @@ const IncognitoUserCollective = dynamic(
   { loading: Loading },
 );
 
-const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
-  ssr: false,
-});
-
 /** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
   html {
@@ -206,12 +202,6 @@ class CollectivePage extends React.Component {
             )}
           </React.Fragment>
         )}
-        <CovidBanner
-          variant={
-            collective?.tags?.some(tag => tag == 'covid' || tag == 'covid-19') ? 'SPONSORED_COLLECTIVE' : undefined
-          }
-          showLink
-        />
       </Page>
     );
   }
