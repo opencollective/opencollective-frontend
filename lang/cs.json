@@ -40,7 +40,7 @@
   "actions.done": "Hotovo",
   "actions.download": "Stáhnout",
   "actions.follow": "Sledovat",
-  "actions.pay": "Pay",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "Zamítnout",
   "actions.submitApplication": "Odeslat žádost",
   "actions.unfollow": "Přestat sledovat",

@@ -40,7 +40,7 @@
   "actions.done": "Done",
   "actions.download": "Download",
   "actions.follow": "Follow",
-  "actions.pay": "Pay",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "Reject",
   "actions.submitApplication": "Submit application",
   "actions.unfollow": "Unfollow",

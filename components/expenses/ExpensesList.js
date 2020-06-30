@@ -24,7 +24,13 @@ const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders, isInver
     <StyledCard>
       {expenses.map((expense, idx) => (
         <ExpenseContainer key={expense?.id || idx} isFirst={!idx} data-cy="single-expense">
-          <ExpenseBudgetItem isLoading={isLoading} isInverted={isInverted} collective={collective} expense={expense} />
+          <ExpenseBudgetItem
+            isLoading={isLoading}
+            isInverted={isInverted}
+            collective={collective}
+            expense={expense}
+            showProcessActions
+          />
         </ExpenseContainer>
       ))}
     </StyledCard>

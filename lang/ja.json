@@ -40,7 +40,7 @@
   "actions.done": "完了",
   "actions.download": "ダウンロード",
   "actions.follow": "フォロー",
-  "actions.pay": "支払う",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "リジェクト",
   "actions.submitApplication": "申請内容を送信",
   "actions.unfollow": "フォロー解除",

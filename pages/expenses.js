@@ -34,6 +34,7 @@ import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
 import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
   title: {
@@ -89,6 +90,7 @@ class ExpensePage extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string,
     parentCollectiveSlug: PropTypes.string,
+    LoggedInUser: PropTypes.object,
     query: PropTypes.shape({
       type: PropTypes.string,
       tag: PropTypes.string,
@@ -99,6 +101,7 @@ class ExpensePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
+      refetch: PropTypes.func,
       variables: PropTypes.shape({
         offset: PropTypes.number.isRequired,
         limit: PropTypes.number.isRequired,
@@ -115,6 +118,15 @@ class ExpensePage extends React.Component {
       }),
     }),
   };
+
+  componentDidUpdate(oldProps) {
+    const { LoggedInUser, data } = this.props;
+    if (!oldProps.LoggedInUser && LoggedInUser) {
+      if (LoggedInUser.canEditCollective(data.account) || LoggedInUser.isHostAdmin(data.account)) {
+        data.refetch();
+      }
+    }
+  }
 
   getPageMetaData(collective) {
     if (collective) {
@@ -329,6 +341,10 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
           name
           slug
           type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
         }
       }
       ... on Collective {
@@ -338,6 +354,10 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
           name
           slug
           type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
         }
       }
     }
@@ -367,6 +387,18 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
         amount
         currency
         type
+        permissions {
+          canDelete
+          canApprove
+          canUnapprove
+          canReject
+          canPay
+          canMarkAsUnpaid
+        }
+        payoutMethod {
+          id
+          type
+        }
         payee {
           id
           type
@@ -407,4 +439,4 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
   },
 });
 
-export default injectIntl(getData(ExpensePage));
+export default injectIntl(getData(withUser(ExpensePage)));

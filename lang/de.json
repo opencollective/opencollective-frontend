@@ -40,7 +40,7 @@
   "actions.done": "Erledigt",
   "actions.download": "Herunterladen",
   "actions.follow": "Folgen",
-  "actions.pay": "Bezahlen",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "Ablehnen",
   "actions.submitApplication": "Bewerbung einreichen",
   "actions.unfollow": "Nicht mehr folgen",

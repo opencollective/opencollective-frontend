@@ -40,7 +40,7 @@
   "actions.done": "완료",
   "actions.download": "다운로드",
   "actions.follow": "팔로우",
-  "actions.pay": "지불",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "거절",
   "actions.submitApplication": "신청 제출",
   "actions.unfollow": "팔로우 취소",

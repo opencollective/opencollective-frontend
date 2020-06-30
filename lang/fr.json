@@ -40,7 +40,7 @@
   "actions.done": "Fait",
   "actions.download": "Télécharger",
   "actions.follow": "S’abonner",
-  "actions.pay": "Payer",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "Rejeter",
   "actions.submitApplication": "Envoyer la candidature",
   "actions.unfollow": "Se désabonner",

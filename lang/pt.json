@@ -40,7 +40,7 @@
   "actions.done": "Concluído",
   "actions.download": "Baixar",
   "actions.follow": "Seguir",
-  "actions.pay": "Pay",
+  "actions.goToPay": "Go to Pay",
   "actions.reject": "Rejeitar",
   "actions.submitApplication": "Enviar solicitação",
   "actions.unfollow": "Deixar de seguir",

@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedDate, FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
+import ProcessExpenseButtons, { DEFAULT_PROCESS_EXPENSE_BTN_PROPS } from '../expenses/ProcessExpenseButtons';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
@@ -14,7 +16,21 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
-const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, expense }) => {
+const ButtonsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8px;
+
+  &:not(:hover) {
+    opacity: 0.3;
+  }
+
+  & > *:last-child {
+    margin-right: 0;
+  }
+`;
+
+const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, expense, showProcessActions }) => {
   const featuredProfile = isInverted ? collective : expense?.payee;
   return (
     <Box p="16px 27px">
@@ -87,9 +103,21 @@ const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, 
           )}
         </Flex>
       </Flex>
-      <Box mt={2}>
-        <ExpenseTags expense={expense} />
-      </Box>
+      <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box mt={2}>
+          <ExpenseTags expense={expense} />
+        </Box>
+        {showProcessActions && expense?.permissions && (
+          <ButtonsContainer>
+            <ProcessExpenseButtons
+              collective={collective}
+              expense={expense}
+              permissions={expense.permissions}
+              buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
+            />
+          </ButtonsContainer>
+        )}
+      </Flex>
     </Box>
   );
 };
@@ -99,6 +127,7 @@ ExpenseBudgetItem.propTypes = {
   /** Set this to true to invert who's displayed (payee or collective) */
   isInverted: PropTypes.bool,
   showAmountSign: PropTypes.bool,
+  showProcessActions: PropTypes.bool,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     parentCollective: PropTypes.shape({
@@ -115,6 +144,7 @@ ExpenseBudgetItem.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
+    permissions: PropTypes.object,
     payee: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       type: PropTypes.string.isRequired,
