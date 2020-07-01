@@ -21,19 +21,23 @@ const ButtonsContainer = styled.div`
   flex-wrap: wrap;
   margin-top: 8px;
 
-  &:not(:hover) {
-    opacity: 0.3;
-  }
-
   & > *:last-child {
     margin-right: 0;
+  }
+`;
+
+const ExpenseContainer = styled.div`
+  padding: 16px 27px;
+
+  &:not(:hover):not(:focus-within) ${ButtonsContainer} {
+    opacity: 0.24;
   }
 `;
 
 const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, expense, showProcessActions }) => {
   const featuredProfile = isInverted ? collective : expense?.payee;
   return (
-    <Box p="16px 27px">
+    <ExpenseContainer>
       <Flex justifyContent="space-between" flexWrap="wrap">
         <Flex flex="1" minWidth="max(60%, 300px)" maxWidth={[null, '70%']}>
           <Box mr={3}>
@@ -118,7 +122,7 @@ const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, 
           </ButtonsContainer>
         )}
       </Flex>
-    </Box>
+    </ExpenseContainer>
   );
 };
 
