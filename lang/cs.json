@@ -1185,6 +1185,7 @@
   "PayoutMethod.New.Other": "Nová vlastní metoda výplaty",
   "PayoutMethod.New.PayPal": "New PayPal account",
   "PayoutMethod.Other.content": "Informace",
+  "PayoutMethod.RemoveWarning": "Do you want to remove this payout method?",
   "PayoutMethod.Type.All": "All methods",
   "PayoutMethod.Type.BankAccount": "Bankovní převod",
   "PayoutMethod.Type.Other": "Ostatní",

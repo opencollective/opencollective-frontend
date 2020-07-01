@@ -2430,7 +2430,7 @@ type Expense {
   items: [ExpenseItem]
 
   """
-  Additional information about the payment. Only visible to user and admins.
+  Additional information about the payment as HTML. Only visible to user and admins.
   """
   privateMessage: String
 
@@ -2506,7 +2506,7 @@ input ExpenseCreateInput {
   type: ExpenseType!
 
   """
-  A private note that will be attached to your invoice
+  A private note that will be attached to your invoice, as HTML
   """
   privateMessage: String
 
@@ -2781,7 +2781,7 @@ input ExpenseUpdateInput {
   type: ExpenseType
 
   """
-  A private note that will be attached to your invoice
+  A private note that will be attached to your invoice, as HTML
   """
   privateMessage: String
 
@@ -3709,6 +3709,11 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): PayoutMethod
+
+  """
+  Remove the given payout method
+  """
+  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
   Cancel an order
