@@ -10,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
+import { getCollectiveTypeForUrl } from '../../lib/collective.lib';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
@@ -143,8 +144,8 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
                   continueHandler={() =>
                     deleteExpense({ variables: { id: expense.id } }).then(() =>
                       Router.replaceRoute('expenses', {
-                        parentCollectiveSlug: collective.parentCollective?.slug,
-                        collectiveType: collective.parentCollective && 'events',
+                        parentCollectiveSlug: collective.parent?.slug,
+                        collectiveType: collective.parent ? getCollectiveTypeForUrl(collective) : undefined,
                         collectiveSlug: collective.slug,
                       }),
                     )
@@ -172,7 +173,8 @@ ExpenseAdminActions.propTypes = {
   }),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    parentCollective: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
   }),

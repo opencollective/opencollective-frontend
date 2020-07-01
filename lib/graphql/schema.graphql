@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Jun 24 2020 11:38:37 GMT+0200 (Central European Summer Time)
+# timestamp: Wed Jul 01 2020 11:45:49 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -2274,7 +2274,6 @@ type Order implements Transaction {
   updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
-  privateMessage: String
   publicMessage: String
   order: OrderType
   subscription: Subscription
@@ -2325,6 +2324,7 @@ input OrderInputType {
   hostFeePercent: Int
   platformFeePercent: Int
   platformFee: Int
+  isFeesOnTop: Boolean
   currency: String
   interval: String
   description: String

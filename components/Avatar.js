@@ -65,7 +65,7 @@ Avatar.propTypes = {
   /** Collective image url */
   src: PropTypes.string,
   /** Collective type */
-  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+  type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   /** Avatar size */
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Duration to transition size. Disabled if 0, null or undefined */
@@ -89,7 +89,7 @@ ContributorAvatar.propTypes = {
     name: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
-    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
+    type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
   }).isRequired,
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };

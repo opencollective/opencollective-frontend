@@ -155,6 +155,14 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           ...HostFieldsFragment
         }
       }
+      ... on Fund {
+        id
+        isApproved
+        balance
+        host {
+          ...HostFieldsFragment
+        }
+      }
       ... on Event {
         id
         isApproved
@@ -162,7 +170,22 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         host {
           ...HostFieldsFragment
         }
-        parentCollective {
+        parent {
+          id
+          slug
+          name
+          type
+          imageUrl
+        }
+      }
+       ... on Project {
+        id
+        isApproved
+        balance
+        host {
+          ...HostFieldsFragment
+        }
+        parent {
           id
           slug
           name

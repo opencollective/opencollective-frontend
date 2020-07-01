@@ -328,9 +328,36 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
         isHost
         isActive
       }
+
+      ... on Collective {
+        balance
+        host {
+          id
+          name
+          slug
+          type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
+      ... on Fund {
+        balance
+        host {
+          id
+          name
+          slug
+          type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
       ... on Event {
         balance
-        parentCollective {
+        parent {
           id
           name
           slug
@@ -347,8 +374,14 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
           }
         }
       }
-      ... on Collective {
+      ... on Project {
         balance
+        parent {
+          id
+          name
+          slug
+          type
+        }
         host {
           id
           name

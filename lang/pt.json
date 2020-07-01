@@ -246,7 +246,7 @@
   "Collective.URL": "Link do Coletivo",
   "collective.user.orderProcessing.manual": "Sua doação está pendente. Siga as instruções no e-mail de confirmação para pagar manualmente o administrador do coletivo.",
   "collective.website.description": "Insira o link do seu site ou página do Facebook",
-  "CollectiveBalance": "Balanço do Coletivo",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Usar cor personalizada",
   "CollectiveColorPicker.Error": "Por favor utilize um valor hexadecimal (ex: #3E8DCE)",
   "CollectiveColorPicker.Preset": "Cores padrão",

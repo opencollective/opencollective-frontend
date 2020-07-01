@@ -45,7 +45,7 @@ ExpensesList.propTypes = {
   nbPlaceholders: PropTypes.number,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    parentCollective: PropTypes.shape({
+    parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
   }),

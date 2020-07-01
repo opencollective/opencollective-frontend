@@ -246,7 +246,7 @@
   "Collective.URL": "Collective URL",
   "collective.user.orderProcessing.manual": "Je donatie is in afwachting. Gelieve de instructies in de bevestigingsemail te volgen om de beheerder van het collectief manueel te betalen.",
   "collective.website.description": "Geef de URL in van je website of Facebook pagina",
-  "CollectiveBalance": "Collective balance",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Gebruik aangepaste kleur",
   "CollectiveColorPicker.Error": "Gebruik een hexadecimale waarde (bijv. # 3E8DCE)",
   "CollectiveColorPicker.Preset": "Vooraf ingestelde kleuren",

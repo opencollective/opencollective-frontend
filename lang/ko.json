@@ -246,7 +246,7 @@
   "Collective.URL": "Collective URL",
   "collective.user.orderProcessing.manual": "후원이 진행중입니다. Collective의 호스트에게 수동으로 지불하려면 확인 메일의 지시를 따르십시오.",
   "collective.website.description": "귀하의 웹사이트 또는 페이스북 페이지 URL을 입력하십시오.",
-  "CollectiveBalance": "Collective 잔액",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "사용자 지정 색 사용",
   "CollectiveColorPicker.Error": "16진수의 값을 입력해 주십시오. (예시: #3E8DCE)",
   "CollectiveColorPicker.Preset": "기본 색상",

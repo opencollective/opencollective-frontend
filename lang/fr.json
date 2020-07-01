@@ -246,7 +246,7 @@
   "Collective.URL": "URL du Collectif",
   "collective.user.orderProcessing.manual": "Votre don est en attente de confirmation. Merci de suivre les instructions qui se trouvent dans l'email de confirmation que nous venons de vous envoyer pour payer l'hôte du collectif.",
   "collective.website.description": "Entrez l'adresse URL de votre site Web ou de votre page Facebook",
-  "CollectiveBalance": "Solde du Collectif",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Utiliser une couleur personnalisée",
   "CollectiveColorPicker.Error": "Vous devez utiliser une valeur hexadécimale (ex: #3E8DCE)",
   "CollectiveColorPicker.Preset": "Couleurs prédéfinies",

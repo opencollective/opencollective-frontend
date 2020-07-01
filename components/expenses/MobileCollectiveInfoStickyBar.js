@@ -34,7 +34,13 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
       <Flex justifyContent="space-between" alignItems="center">
         <Box minWidth={135} flex="1 1 45%">
           <P fontSize="Caption" fontWeight="bold" color="black.900" mb={1}>
-            <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
+            <FormattedMessage
+              id="CollectiveBalance"
+              defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
+              values={{
+                type: collective?.type, // collective can be null when it's loading
+              }}
+            />
           </P>
           {isLoading ? (
             <LoadingPlaceholder height={16} width={75} />
@@ -74,8 +80,9 @@ MobileCollectiveInfoStickyBar.propTypes = {
   isLoading: PropTypes.bool,
   /** Must be provided if `isLoading` is false */
   collective: PropTypes.shape({
-    currency: PropTypes.string.isRequried,
-    balance: PropTypes.number.isRequried,
+    currency: PropTypes.string.isRequired,
+    balance: PropTypes.number.isRequired,
+    type: PropTypes.string,
   }),
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,

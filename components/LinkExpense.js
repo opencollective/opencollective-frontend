@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+
 import Link from './Link';
 
 const LinkExpense = ({ collective, expense, ...props }) => {
@@ -8,8 +10,8 @@ const LinkExpense = ({ collective, expense, ...props }) => {
     <Link
       route="expense-v2"
       params={{
-        parentCollectiveSlug: collective.parentCollective?.slug,
-        collectiveType: collective.parentCollective ? 'events' : undefined,
+        parentCollectiveSlug: collective.parent?.slug,
+        collectiveType: collective.parent ? getCollectiveTypeForUrl(collective) : undefined,
         collectiveSlug: collective.slug,
         ExpenseId: expense.legacyId || expense.id,
       }}
@@ -21,7 +23,8 @@ const LinkExpense = ({ collective, expense, ...props }) => {
 LinkExpense.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    parentCollective: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
   }).isRequired,

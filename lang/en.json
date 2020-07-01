@@ -246,7 +246,7 @@
   "Collective.URL": "Collective URL",
   "collective.user.orderProcessing.manual": "Your donation is pending. Please follow the instructions in the confirmation email to manually pay the host of the collective.",
   "collective.website.description": "Enter the URL of your website or Facebook Page",
-  "CollectiveBalance": "Collective balance",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Use custom color",
   "CollectiveColorPicker.Error": "Please use an hexadecimal value (eg. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Preset colors",

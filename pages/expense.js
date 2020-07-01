@@ -5,6 +5,7 @@ import { cloneDeep, debounce, get, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
@@ -268,14 +269,14 @@ class ExpensePage extends React.Component {
 
   onSuccessMsgDismiss = () => {
     // Replaces the route by the version without `createSuccess=true`
-    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId } = this.props;
+    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
     this.setState({ successMessageDismissed: true });
     return Router.replaceRoute(
       `expense-v2`,
       {
         parentCollectiveSlug,
         collectiveSlug,
-        collectiveType: parentCollectiveSlug && 'events',
+        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : undefined,
         ExpenseId: legacyExpenseId,
       },
       {
