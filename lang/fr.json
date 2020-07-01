@@ -326,6 +326,7 @@
   "Contact.Message": "Message",
   "Contact.Subject": "Sujet",
   "ContactCollective": "Contacter {collective}",
+  "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Contribuer",
   "contribute.changeFrequency.confirmMsg": "Si vous changez la fréquence, vous ne serez pas en mesure de contribuer à l’échelon \"{tierName}\"",
   "contribute.changeTaxNumber": "Changer le numéro de {taxName}",

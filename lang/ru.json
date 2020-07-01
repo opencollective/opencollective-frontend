@@ -326,6 +326,7 @@
   "Contact.Message": "Сообщение",
   "Contact.Subject": "Тема",
   "ContactCollective": "Связаться с {collective}",
+  "contribuion.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "Contribute": "Участие",
   "contribute.changeFrequency.confirmMsg": "Если вы меняете частоту, вы не будете участвовать в этом определенном уровне \"{tierName}\"",
   "contribute.changeTaxNumber": "Изменить номер {taxName}",
