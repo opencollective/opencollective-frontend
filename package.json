@@ -164,7 +164,7 @@
   "devDependencies": {
     "@babel/cli": "7.7.7",
     "@babel/core": "7.7.2",
-    "@babel/node": "7.7.0",
+    "@babel/node": "7.10.4",
     "@cypress/code-coverage": "^3.8.1",
     "babel-eslint": "^10.1.0",
     "babel-plugin-istanbul": "^6.0.0",
