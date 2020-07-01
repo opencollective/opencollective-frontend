@@ -18,6 +18,17 @@ const load = async app => {
 
   const { input, lib, modules, pipeline } = hyperwatch;
 
+  // Init
+
+  hyperwatch.init({
+    modules: {
+      // Expose the status page
+      status: { active: true },
+      // Expose logs (HTTP and Websocket)
+      logs: { active: true },
+    },
+  });
+
   // Mount Hyperwatch API and Websocket
 
   if (secret) {
@@ -44,18 +55,23 @@ const load = async app => {
 
   pipeline.registerInput(expressInput);
 
-  // Configure access Logs in dev and production
+  // Filter 'main' node
 
-  const consoleLogOutput = process.env.NODE_ENV === 'development' ? 'console' : 'text';
   pipeline
+    .getNode('main')
     .filter(log => !log.getIn(['request', 'url']).match(/^\/_/))
     .filter(log => !log.getIn(['request', 'url']).match(/^\/static/))
     .filter(log => !log.getIn(['request', 'url']).match(/^\/api/))
-    .map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
+    .registerNode('main');
+
+  // Configure access Logs in dev and production
+
+  const consoleLogOutput = process.env.NODE_ENV === 'development' ? 'console' : 'text';
+  pipeline.getNode('main').map(log => console.log(lib.logger.defaultFormatter.format(log, consoleLogOutput)));
 
   // Start
 
-  modules.load();
+  modules.beforeStart();
 
   pipeline.start();
 };
