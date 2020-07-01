@@ -15,7 +15,7 @@ import { Span } from '../Text';
 import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, payoutMethod) => {
-  const host = collective.host;
+  const host = collective.isHost ? collective : collective.host;
   if (!host) {
     return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a host" />;
   } else if (collective.balance < expense.amount) {

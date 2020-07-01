@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
+import { FileInvoice } from '@styled-icons/fa-solid/FileInvoice';
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
 import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -13,6 +14,7 @@ import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
 import { Dashboard, PendingApplications } from '../components/host-dashboard';
+import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExpenses';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
@@ -26,6 +28,11 @@ const MenuLink = styled(props => <Link {...omit(props, ['isActive'])} />)`
   display: flex;
   align-items: center;
   border-bottom: 4px solid rgb(0, 0, 0, 0);
+
+  @media (max-width: 600px) {
+    width: 100%;
+    justify-content: center;
+  }
 
   &:focus {
     color: #090a0a;
@@ -59,7 +66,7 @@ class HostDashboardPage extends React.Component {
     data: PropTypes.object, // from withData
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    view: PropTypes.oneOf(['expenses', 'donations', 'pending-applications']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'expenses-beta', 'donations', 'pending-applications']).isRequired,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -112,10 +119,13 @@ class HostDashboardPage extends React.Component {
       );
     }
 
-    if (view === 'pending-applications') {
-      return <PendingApplications hostCollectiveSlug={host.slug} />;
-    } else {
-      return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
+    switch (view) {
+      case 'pending-applications':
+        return <PendingApplications hostCollectiveSlug={host.slug} />;
+      case 'expenses-beta':
+        return <HostDashboardExpenses hostSlug={host.slug} />;
+      default:
+        return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
     }
   }
 
@@ -126,9 +136,9 @@ class HostDashboardPage extends React.Component {
     const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
 
     return (
-      <Page collective={host} title={host.name || 'Host Dashboard'} LoggedInUser={LoggedInUser}>
+      <Page collective={host} title={host.name || 'Host Dashboard'} withoutGlobalStyles={view === 'expenses-beta'}>
         {data.Collective && (
-          <Container mb={4}>
+          <Container>
             <CollectiveNavbar collective={host} isAdmin={canEdit} showEdit onlyInfos={true} />
           </Container>
         )}
@@ -145,7 +155,7 @@ class HostDashboardPage extends React.Component {
               alignItems="center"
               background="white"
               borderBottom="#E6E8EB"
-              boxShadow="0px 6px 10px 1px #E6E8EB"
+              boxShadow="0px 7px 10px 3px #E6E8EB"
               minHeight={60}
               flexWrap="wrap"
               data-cy="host-dashboard-menu-bar"
@@ -157,6 +167,14 @@ class HostDashboardPage extends React.Component {
               >
                 <ReceiptIcon size="1em" />
                 <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+              </MenuLink>
+              <MenuLink
+                route="host.dashboard"
+                params={{ hostCollectiveSlug: slug, view: 'expenses-beta' }}
+                isActive={view === 'expenses-beta'}
+              >
+                <FileInvoice size="1em" />
+                <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" /> (Beta)
               </MenuLink>
               <MenuLink
                 route="host.dashboard"

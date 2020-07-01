@@ -209,3 +209,45 @@ export const expensePageExpenseFieldsFragment = gqlV2`
   ${CommentFieldsFragment}
   ${HostFieldsFragment}
 `;
+
+export const expensesListFragment = gqlV2/* GraphQL */ `
+  fragment ExpensesListFragment on ExpenseCollection {
+    totalCount
+    offset
+    limit
+    nodes {
+      id
+      legacyId
+      description
+      status
+      createdAt
+      tags
+      amount
+      currency
+      type
+      permissions {
+        canDelete
+        canApprove
+        canUnapprove
+        canReject
+        canPay
+        canMarkAsUnpaid
+      }
+      payoutMethod {
+        id
+        type
+      }
+      payee {
+        id
+        type
+        slug
+        imageUrl(height: 80)
+      }
+      createdByAccount {
+        id
+        type
+        slug
+      }
+    }
+  }
+`;

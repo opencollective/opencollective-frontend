@@ -4283,6 +4283,11 @@ type Query {
     account: AccountReferenceInput
 
     """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: ExpenseStatus
