@@ -14,7 +14,7 @@ import ExpensesList from '../expenses/ExpensesList';
 import ExpensesSearchBar from '../expenses/ExpensesSearchBar';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../expenses/filters/ExpensesDateFilter';
-import { expensesListFragment } from '../expenses/graphql/fragments';
+import { expensesListFieldsFragment } from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -44,6 +44,11 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
       name
       currency
       isHost
+      type
+      plan {
+        transferwisePayouts
+        transferwisePayoutsLimit
+      }
     }
     expenses(
       host: { slug: $hostSlug }
@@ -58,11 +63,27 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       searchTerm: $searchTerm
     ) {
-      ...ExpensesListFragment
+      totalCount
+      offset
+      limit
+      nodes {
+        ...ExpensesListFieldsFragment
+        account {
+          id
+          name
+          slug
+          ... on Collective {
+            balance
+          }
+          ... on Event {
+            balance
+          }
+        }
+      }
     }
   }
 
-  ${expensesListFragment}
+  ${expensesListFieldsFragment}
 `;
 
 const EXPENSES_PER_PAGE = 15;
@@ -180,7 +201,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <ExpensesList
             isLoading={loading}
             nbPlaceholders={variables.limit}
-            collective={data?.host}
+            host={data?.host}
             expenses={data?.expenses?.nodes}
           />
           <Flex mt={5} justifyContent="center">

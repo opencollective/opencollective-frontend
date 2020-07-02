@@ -25,7 +25,7 @@ import ExpensesSearchBar from '../components/expenses/ExpensesSearchBar';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
-import { expensesListFragment } from '../components/expenses/graphql/fragments';
+import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -234,6 +234,7 @@ class ExpensePage extends React.Component {
                     <ExpensesList
                       isLoading={data.loading}
                       collective={data.account}
+                      host={data.account?.isHost ? data.account : data.account?.host}
                       expenses={data.expenses?.nodes}
                       nbPlaceholders={data.variables.limit}
                     />
@@ -365,11 +366,16 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       searchTerm: $searchTerm
     ) {
-      ...ExpensesListFragment
+      totalCount
+      offset
+      limit
+      nodes {
+        ...ExpensesListFieldsFragment
+      }
     }
   }
 
-  ${expensesListFragment}
+  ${expensesListFieldsFragment}
 `;
 
 const getData = graphql(EXPENSES_PAGE_QUERY, {

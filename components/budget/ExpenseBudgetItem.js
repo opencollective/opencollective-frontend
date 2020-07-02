@@ -34,7 +34,15 @@ const ExpenseContainer = styled.div`
   }
 `;
 
-const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, expense, showProcessActions }) => {
+const ExpenseBudgetItem = ({
+  isLoading,
+  host,
+  isInverted,
+  showAmountSign,
+  collective,
+  expense,
+  showProcessActions,
+}) => {
   const featuredProfile = isInverted ? collective : expense?.payee;
   return (
     <ExpenseContainer>
@@ -53,7 +61,7 @@ const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, 
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <LinkExpense collective={collective} expense={expense} data-cy="expense-link">
+              <LinkExpense collective={expense.account || collective} expense={expense} data-cy="expense-link">
                 <AutosizeText
                   value={expense.description}
                   maxLength={255}
@@ -114,7 +122,8 @@ const ExpenseBudgetItem = ({ isLoading, isInverted, showAmountSign, collective, 
         {showProcessActions && expense?.permissions && (
           <ButtonsContainer>
             <ProcessExpenseButtons
-              collective={collective}
+              host={host}
+              collective={expense.account || collective}
               expense={expense}
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
@@ -138,6 +147,7 @@ ExpenseBudgetItem.propTypes = {
       slug: PropTypes.string.isRequired,
     }),
   }),
+  host: PropTypes.object,
   expense: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     legacyId: PropTypes.number,
@@ -158,6 +168,10 @@ ExpenseBudgetItem.propTypes = {
     createdByAccount: PropTypes.shape({
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
+    }),
+    /** If available, this `account` will be used to link expense in place of the `collective` */
+    account: PropTypes.shape({
+      slug: PropTypes.string,
     }),
   }),
 };

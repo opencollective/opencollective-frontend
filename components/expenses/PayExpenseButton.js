@@ -14,8 +14,7 @@ import { Span } from '../Text';
 
 import PayExpenseModal from './PayExpenseModal';
 
-const getDisabledMessage = (expense, collective, payoutMethod) => {
-  const host = collective.isHost ? collective : collective.host;
+const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   if (!host) {
     return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a host" />;
   } else if (collective.balance < expense.amount) {
@@ -60,9 +59,9 @@ PayoutMethodTypeIcon.propTypes = {
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...props }) => {
+const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
   const [hasModal, showModal] = React.useState(false);
-  const disabledMessage = getDisabledMessage(expense, collective, expense.payoutMethod);
+  const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
   const isDisabled = Boolean(disabled || disabledMessage);
 
   const button = (

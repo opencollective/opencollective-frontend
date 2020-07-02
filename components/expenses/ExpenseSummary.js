@@ -285,7 +285,7 @@ const ExpenseSummary = ({
       {showProcessButtons && (
         <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
           <Flex flexWrap="wrap" justifyContent="flex-end">
-            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} />
+            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} host={host} />
           </Flex>
         </Container>
       )}

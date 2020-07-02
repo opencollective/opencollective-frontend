@@ -13,7 +13,7 @@ const ExpenseContainer = styled.div`
     `}
 `;
 
-const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders, isInverted }) => {
+const ExpensesList = ({ collective, host, expenses, isLoading, nbPlaceholders, isInverted }) => {
   expenses = !isLoading ? expenses : [...new Array(nbPlaceholders)];
 
   if (!expenses?.length) {
@@ -29,6 +29,7 @@ const ExpensesList = ({ collective, expenses, isLoading, nbPlaceholders, isInver
             isInverted={isInverted}
             collective={collective}
             expense={expense}
+            host={host}
             showProcessActions
           />
         </ExpenseContainer>
@@ -43,6 +44,7 @@ ExpensesList.propTypes = {
   isInverted: PropTypes.bool,
   /** When `isLoading` is true, this sets the number of "loadin" items displayed */
   nbPlaceholders: PropTypes.number,
+  host: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     parentCollective: PropTypes.shape({
