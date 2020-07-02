@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
+import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import CollectiveNavbar, { getFilteredSectionsForCollective } from '../CollectiveNavbar';
+import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 
 import Hero from './hero/Hero';

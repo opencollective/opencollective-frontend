@@ -630,6 +630,7 @@
   "EditCollective.VAT.Own": "Utiliser mon propre numéro de TVA",
   "EditCollective.VATNumber": "Numéro de TVA",
   "EditCollective.VATNumber.Description": "Votre numéro de TVA intra-communautaire",
+  "EditCollectivePage.EmptySection": "This section does not appear to have any associated data and will not appear publicly until it does.",
   "EditCollectivePage.Sections": "Sections de page",
   "EditCollectivePage.SectionsDescription": "Sur cette page, vous pouvez utiliser le glisser-déposer pour réorganiser les sections de la page de profil.",
   "EditCollectivePage.ShowSection.AlwaysVisible": "Always visible",

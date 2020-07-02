@@ -155,11 +155,9 @@ const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.typ
 const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
-const isProject = c => c.type === CollectiveType.PROJECT;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c) || isFund(c) || isProject(c),
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),

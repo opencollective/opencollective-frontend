@@ -630,6 +630,7 @@
   "EditCollective.VAT.Own": "Použít mé vlastní DIČ",
   "EditCollective.VATNumber": "DIČ",
   "EditCollective.VATNumber.Description": "Your European Value Added Tax (VAT) number",
+  "EditCollectivePage.EmptySection": "This section does not appear to have any associated data and will not appear publicly until it does.",
   "EditCollectivePage.Sections": "Page sections",
   "EditCollectivePage.SectionsDescription": "In this section you can use drag and drop to reorder the Profile Page sections.",
   "EditCollectivePage.ShowSection.AlwaysVisible": "Always visible",

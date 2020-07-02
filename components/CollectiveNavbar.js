@@ -3,16 +3,14 @@ import { PropTypes } from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
 import themeGet from '@styled-system/theme-get';
-import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getFilteredSectionsForCollective } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
-import { canOrderTicketsFromEvent, isPastEvent } from '../lib/events';
 import i18nCollectivePageSection from '../lib/i18n-collective-page-section';
 
-import { AllSectionsNames, Dimensions, Sections } from './collective-page/_constants';
+import { AllSectionsNames, Dimensions } from './collective-page/_constants';
 import Avatar from './Avatar';
 import CollectiveCallsToAction from './CollectiveCallsToAction';
 import Container from './Container';
@@ -166,178 +164,6 @@ const CollectiveName = styled.h1`
     text-align: center;
   }
 `;
-
-// Define default sections based on collective type
-const DEFAULT_SECTIONS = {
-  [CollectiveType.ORGANIZATION]: [
-    Sections.CONTRIBUTE,
-    Sections.CONTRIBUTIONS,
-    Sections.CONTRIBUTORS,
-    Sections.UPDATES,
-    Sections.CONVERSATIONS,
-    Sections.TRANSACTIONS,
-    Sections.BUDGET,
-    Sections.RECURRING_CONTRIBUTIONS,
-    Sections.ABOUT,
-  ],
-  [CollectiveType.USER]: [
-    Sections.CONTRIBUTIONS,
-    Sections.TRANSACTIONS,
-    Sections.RECURRING_CONTRIBUTIONS,
-    Sections.ABOUT,
-  ],
-  [CollectiveType.COLLECTIVE]: [
-    Sections.GOALS,
-    Sections.CONTRIBUTE,
-    Sections.UPDATES,
-    Sections.CONVERSATIONS,
-    Sections.BUDGET,
-    Sections.CONTRIBUTORS,
-    Sections.RECURRING_CONTRIBUTIONS,
-    Sections.ABOUT,
-  ],
-  [CollectiveType.FUND]: [
-    Sections.CONTRIBUTE,
-    Sections.UPDATES,
-    Sections.PROJECTS,
-    Sections.BUDGET,
-    Sections.CONTRIBUTORS,
-    Sections.ABOUT,
-  ],
-  [CollectiveType.EVENT]: [
-    Sections.ABOUT,
-    Sections.TICKETS,
-    Sections.CONTRIBUTE,
-    Sections.PARTICIPANTS,
-    Sections.LOCATION,
-    Sections.BUDGET,
-  ],
-  [CollectiveType.PROJECT]: [Sections.ABOUT, Sections.CONTRIBUTE, Sections.BUDGET],
-};
-
-/** Returns the default sections for collective */
-export const getDefaultSectionsForCollectiveType = type => {
-  return DEFAULT_SECTIONS[type] || [];
-};
-
-/** Returns the sections from collective's settings, fallbacks on default sections for type */
-export const getSectionsForCollective = (collective, isAdmin, isHostAdmin) => {
-  const collectiveSections = get(collective, 'settings.collectivePage.sections');
-  if (!collectiveSections) {
-    return getDefaultSectionsForCollectiveType(get(collective, 'type'));
-  }
-
-  // Convert legacy sections to the new format
-  const sections = [];
-  collectiveSections.forEach(sectionData => {
-    if (typeof sectionData === 'string') {
-      sections.push(sectionData);
-    } else if (sectionData.isEnabled) {
-      if (sectionData.restrictedTo && sectionData.restrictedTo.includes('ADMIN')) {
-        if (isAdmin || isHostAdmin) {
-          sections.push(sectionData.section);
-        }
-      } else {
-        sections.push(sectionData.section);
-      }
-    }
-  });
-
-  return sections;
-};
-
-/**
- * Get the sections for a collective.
- *
- * @param {object} `collective` the collective with following properties set:
- *    - `type`
- *    - `settings`
- *    - `isArchived`
- *    - `host`
- *    - `stats` {object} with following properties: `updates`, (`balance` or `transactions`)
- * @param {boolean} `isAdmin` wether the user is an admin of the collective
- */
-export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmin) => {
-  const sections = getSectionsForCollective(collective, isAdmin, isHostAdmin);
-
-  const toRemove = new Set();
-  collective = collective || {};
-  const isEvent = collective.type === CollectiveType.EVENT;
-
-  // Can't contribute anymore if the collective is archived or has no host
-  const hasCustomContribution = !collective.settings?.disableCustomContributions;
-  const hasTiers = Boolean(collective.tiers?.length || hasCustomContribution);
-  const hasContribute = collective.isActive && hasTiers && !isPastEvent(collective);
-  const hasOtherWaysToContribute =
-    !isEvent && (collective.events?.length > 0 || collective.connectedCollectives?.length > 0);
-  if (!hasContribute && !hasOtherWaysToContribute && !isAdmin) {
-    toRemove.add(Sections.CONTRIBUTE);
-  }
-
-  // Disallow Organizations to see contribute if not already "active"
-  if (!hasContribute && collective.type === CollectiveType.ORGANIZATION) {
-    toRemove.add(Sections.CONTRIBUTE);
-  }
-
-  // Check opt-in features
-  if (!hasFeature(collective, FEATURES.COLLECTIVE_GOALS)) {
-    toRemove.add(Sections.GOALS);
-  }
-
-  if (!hasFeature(collective, FEATURES.CONVERSATIONS)) {
-    toRemove.add(Sections.CONVERSATIONS);
-  }
-
-  // Some sections are hidden for non-admins (usually when there's no data)
-  if (!isAdmin && !isHostAdmin) {
-    const { updates, transactions, balance } = collective.stats || {};
-    if (!updates) {
-      toRemove.add(Sections.UPDATES);
-    }
-    if (!collective.balance && !balance && !(transactions && transactions.all)) {
-      toRemove.add(Sections.BUDGET);
-    }
-    if (!collective.hasLongDescription && !collective.longDescription) {
-      toRemove.add(Sections.ABOUT);
-    }
-  }
-
-  if (collective.type === CollectiveType.ORGANIZATION) {
-    if (!hasFeature(collective, FEATURES.UPDATES)) {
-      toRemove.add(Sections.UPDATES);
-    }
-    if (!collective.isActive) {
-      toRemove.add(Sections.BUDGET);
-    } else {
-      toRemove.add(Sections.TRANSACTIONS);
-    }
-  }
-
-  // Recurring contributions
-  // don't display for TYPE=COLLECTIVE || ORGANIZATION if no active contributions
-  if (collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.ORGANIZATION) {
-    if (!collective.ordersFromCollective?.some(collective => collective.isSubscriptionActive)) {
-      toRemove.add(Sections.RECURRING_CONTRIBUTIONS);
-    }
-  }
-
-  if (isEvent) {
-    // Should not see tickets section if you can't order them
-    if ((!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin)) {
-      toRemove.add(Sections.TICKETS);
-    }
-
-    if (!collective.orders || collective.orders.length === 0) {
-      toRemove.add(Sections.PARTICIPANTS);
-    }
-
-    if (!(collective.location && collective.location.name)) {
-      toRemove.add(Sections.LOCATION);
-    }
-  }
-
-  return sections.filter(section => !toRemove.has(section));
-};
 
 const getDefaultCallsToactions = (collective, isAdmin) => {
   if (!collective) {
