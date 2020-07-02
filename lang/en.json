@@ -758,7 +758,6 @@
   "Expense.PrivacyWarning": "This information is public. Please do not add any personal information such as names or addresses in this field.",
   "expense.privateCommentsWarning": "Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them.",
   "expense.privateMessage": "Private instructions",
-  "expense.privateMessage.description": "Private instructions for the host to reimburse your expense",
   "expense.privateNote": "private note",
   "Expense.PrivateNote": "Private note",
   "expense.processing": "Processing",

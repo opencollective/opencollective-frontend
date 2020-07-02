@@ -234,7 +234,7 @@ describe('Legacy expense flow', () => {
       cy.get('.inputField.paypalEmail input').type('{selectall}{del}');
       cy.get('.error').should('have.text', 'Please provide your PayPal email address (or change the payout method)');
       cy.get('.inputField.paypalEmail input').type('paypal@test.com');
-      cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
+      cy.get('[data-cy="ExpenseNotesEditor"] trix-editor').type('Some private note for the host');
       cy.get('button[type=submit]').click();
       cy.get('[data-cy="expenseCreated"]').contains('success');
       cy.visit('/testcollective/expenses/legacy');
@@ -255,7 +255,7 @@ describe('Legacy expense flow', () => {
       cy.get('.LoginTopBarProfileButton').contains('testuseradmin', {
         timeout: 15000,
       });
-      cy.get('.inputField.privateMessage textarea').type('Some private note for the host');
+      cy.get('[data-cy="ExpenseNotesEditor"] trix-editor').type('Some private note for the host');
       cy.get('button[type=submit]').click();
       cy.get('[data-cy="expenseCreated"]').contains('success');
       cy.visit('/testcollective/expenses/legacy');
@@ -269,9 +269,7 @@ describe('Legacy expense flow', () => {
       cy.get('.Expenses .expense:first .inputField.description input').type(' edited');
       cy.get('.Expenses .expense:first .inputField.amount input').type('{selectall}13');
       cy.get('.Expenses .expense:first .inputField.category select').select('Team');
-      cy.get('.Expenses .expense:first .inputField.privateMessage textarea').type(
-        '{selectall}Another private note (edited)',
-      );
+      cy.get('[data-cy="ExpenseNotesEditor"] trix-editor').type('{selectall}Another private note (edited)');
       cy.get('.Expenses .expense:first .inputField.description input').focus();
       cy.wait(300);
       cy.getByDataCy('expense-edit-save-btn').click();

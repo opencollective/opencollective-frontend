@@ -108,4 +108,4 @@ Thread.propTypes = {
   theme: PropTypes.object,
 };
 
-export default withUser(withTheme(Thread));
+export default React.memo(withUser(withTheme(Thread)));

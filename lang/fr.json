@@ -758,7 +758,6 @@
   "Expense.PrivacyWarning": "Ce champ est public. N'ajoutez pas d'informations personnelles telles que des noms ou adresses.",
   "expense.privateCommentsWarning": "Les commentaires pour cette dépense sont privés. Vous devez être connecté·e en tant qu'administrateur ou en tant qu'émetteur de cette dépense pour les voir.",
   "expense.privateMessage": "Instructions privées",
-  "expense.privateMessage.description": "Les instructions privées sont uniquement visible pour les administrateurs du compte en banque de votre collectif",
   "expense.privateNote": "note privée",
   "Expense.PrivateNote": "Note privée",
   "expense.processing": "En cours de traitement",

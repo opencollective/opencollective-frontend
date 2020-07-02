@@ -758,7 +758,6 @@
   "Expense.PrivacyWarning": "This information is public. Please do not add any personal information such as names or addresses in this field.",
   "expense.privateCommentsWarning": "Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them.",
   "expense.privateMessage": "私的な指示",
-  "expense.privateMessage.description": "ホストが請求を払い戻すための私的な指示",
   "expense.privateNote": "プライベートノート",
   "Expense.PrivateNote": "自分用メモ",
   "expense.processing": "Processing",
