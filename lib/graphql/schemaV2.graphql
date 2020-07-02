@@ -3966,6 +3966,11 @@ type Organization implements Account {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
+
+  """
+  If the organization if a host account, this will return the matchig Host object
+  """
+  host: Host
 }
 
 """

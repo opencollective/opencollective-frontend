@@ -138,13 +138,17 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         id
         tag
       }
-
+      location {
+        address
+        country
+      }
       ... on Organization {
         id
         isHost
         balance
-        # Missing
-        # ...HostFieldsFragment
+        host {
+          ...HostFieldsFragment
+        }
       }
 
       ... on Collective {
