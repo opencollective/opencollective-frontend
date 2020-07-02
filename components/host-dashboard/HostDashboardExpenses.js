@@ -72,6 +72,8 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
           id
           name
           slug
+          currency
+          type
           ... on Collective {
             balance
           }
