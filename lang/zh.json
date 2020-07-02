@@ -246,7 +246,7 @@
   "Collective.URL": "集合链接",
   "collective.user.orderProcessing.manual": "你的捐款还在等待中。请按照确认电子邮件中的说明手动支付集体的主机。",
   "collective.website.description": "输入您的网站或 Facebook 主页的 URL",
-  "CollectiveBalance": "集合余额",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "使用自定义颜色",
   "CollectiveColorPicker.Error": "请使用十六进制颜色 (例如 #3E8DCE)",
   "CollectiveColorPicker.Preset": "预设颜色",

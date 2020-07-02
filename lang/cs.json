@@ -246,7 +246,7 @@
   "Collective.URL": "URL kolektivu",
   "collective.user.orderProcessing.manual": "Your donation is pending. Please follow the instructions in the confirmation email to manually pay the host of the collective.",
   "collective.website.description": "Zadejte adresu URL vašeho webu nebo Facebook stránky",
-  "CollectiveBalance": "Kolektivní zůstatek",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Použít vlastní barvu",
   "CollectiveColorPicker.Error": "Použijte hexadecimální hodnotu (např. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Přednastavené barvy",

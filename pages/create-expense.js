@@ -7,6 +7,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -169,11 +170,11 @@ class CreateExpensePage extends React.Component {
 
       // Redirect to the expense page
       const legacyExpenseId = result.data.createExpense.legacyId;
-      const { collectiveSlug, parentCollectiveSlug } = this.props;
+      const { collectiveSlug, parentCollectiveSlug, data } = this.props;
       Router.pushRoute(`expense-v2`, {
         parentCollectiveSlug,
         collectiveSlug,
-        collectiveType: parentCollectiveSlug && 'events',
+        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
         ExpenseId: legacyExpenseId,
         createSuccess: true,
       });
@@ -384,7 +385,46 @@ const getData = graphql(
             }
           }
         }
+        ... on Fund {
+          id
+          isApproved
+          balance
+          host {
+            id
+            name
+            slug
+            type
+            expensePolicy
+            settings
+            location {
+              address
+              country
+            }
+            transferwise {
+              availableCurrencies
+            }
+          }
+        }
         ... on Event {
+          id
+          isApproved
+          balance
+          host {
+            id
+            name
+            slug
+            type
+            expensePolicy
+            location {
+              address
+              country
+            }
+            transferwise {
+              availableCurrencies
+            }
+          }
+        }
+        ... on Project {
           id
           isApproved
           balance

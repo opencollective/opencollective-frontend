@@ -134,7 +134,7 @@ ExpenseBudgetItem.propTypes = {
   showProcessActions: PropTypes.bool,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    parentCollective: PropTypes.shape({
+    parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
   }),

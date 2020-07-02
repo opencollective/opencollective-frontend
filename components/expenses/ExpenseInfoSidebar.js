@@ -23,7 +23,13 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
     <Box width="100%">
       <Box display={['none', 'block']}>
         <H5 mb={3}>
-          <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
+          <FormattedMessage
+            id="CollectiveBalance"
+            defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
+            values={{
+              type: collective?.type, // collective can be null when it's loading
+            }}
+          />
         </H5>
         <Container
           borderLeft="1px solid"
@@ -76,6 +82,7 @@ ExpenseInfoSidebar.propTypes = {
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     balance: PropTypes.number.isRequired,
+    type: PropTypes.string,
   }),
   host: PropTypes.shape({
     name: PropTypes.string.isRequired,

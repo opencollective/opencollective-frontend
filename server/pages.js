@@ -31,41 +31,41 @@ const pages = routes()
   .add('banner-iframe', '/:collectiveSlug/banner.html')
   .add('editEvent', '/:parentCollectiveSlug/events/:eventSlug/edit/:section?')
   .add('editCollective', '/:slug/edit/:section?')
-  .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/contact')
+  .add('collective-contact', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact')
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
     '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-beta|pending-applications|donations)?',
     'host.dashboard',
   )
-  .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/transactions')
+  .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')
   .add('createUpdate', '/:collectiveSlug/updates/new')
   .add('updates', '/:collectiveSlug/updates')
   .add('update', '/:collectiveSlug/updates/:updateSlug')
-  .add('createExpense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new/legacy')
-  .add('create-expense', '/:parentCollectiveSlug?/:type(events)?/:collectiveSlug/expenses/new/:version(v2)?')
+  .add('createExpense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new/legacy')
+  .add('create-expense', '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new/:version(v2)?')
   .add(
     'expense-v2',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
     'expense',
   )
   .add(
     'expense',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
+    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/legacy',
     'expense-legacy',
   )
   .add(
     'expenses',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:version(v2)?',
+    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
     'expenses',
   )
   .add(
     'expenses-legacy',
-    '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
+    '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:filter(categories|recipients)?/:value?',
     'expenses-legacy',
   )
-  .add('orders', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders')
-  .add('order', '/:parentCollectiveSlug?/:collectiveType(events)?/:collectiveSlug/orders/:OrderId([0-9]+)')
+  .add('orders', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders')
+  .add('order', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)')
   .add('confirmOrder', '/orders/:id([0-9]+)/confirm')
   .add('discover', '/discover')
   .add('member-invitations', '/member-invitations');
@@ -146,14 +146,14 @@ pages.add(
 // Events
 pages.add(
   'orderEventTier',
-  '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/:step(contributeAs|details|payment|summary)?',
+  '/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(contributeAs|details|payment|summary)?',
   'createOrder',
 );
 
 // Events
 pages.add(
   'orderEventTierSuccess',
-  '/:collectiveSlug/:verb(events)/:eventSlug/order/:tierId/:step(success)',
+  '/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(success)',
   'orderSuccess',
 );
 

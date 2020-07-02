@@ -246,7 +246,7 @@
   "Collective.URL": "URL del Colectivo",
   "collective.user.orderProcessing.manual": "Tu donación está pendiente. Por favor siga las instrucciones escritas en el correo de confirmación para realizar el pago manual al host de este colectivo.",
   "collective.website.description": "Escribe la dirección web de tu página web o página de Facebook",
-  "CollectiveBalance": "Balance del Colectivo",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Utilizar un color personalizado",
   "CollectiveColorPicker.Error": "Por favor, utilice un valor hexadecimal (ej. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Colores predeterminados",

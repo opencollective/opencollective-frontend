@@ -246,7 +246,7 @@
   "Collective.URL": "Kollektiv URL",
   "collective.user.orderProcessing.manual": "Deine Spende ist in Bearbeitung. Bitte folge den Anweisungen in der Bestätigungsmail um den Besitzer des Collective manuell zu bezahlen.",
   "collective.website.description": "Gib die URL deiner Webseite oder Facebook Seite ein",
-  "CollectiveBalance": "Collective balance",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Benutzerdefinierte Farbe verwenden",
   "CollectiveColorPicker.Error": "Bitte verwenden Sie einen Hexadezimalwert (z. B. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Aktuelle Farben",

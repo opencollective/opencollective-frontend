@@ -246,7 +246,7 @@
   "Collective.URL": "URL коллектива",
   "collective.user.orderProcessing.manual": "Ваше пожертвование находится в ожидании. Пожалуйста, следуйте инструкциям в письме, чтобы чтобы перевести деньги хозяину коллектива.",
   "collective.website.description": "Задайте адрес вашего сайта или страницы Facebook",
-  "CollectiveBalance": "Баланс общества",
+  "CollectiveBalance": "{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}",
   "CollectiveColorPicker.Custom": "Использовать собственный цвет",
   "CollectiveColorPicker.Error": "Пожалуйста, используйте шестнадцатеричное значение (напр. #3E8DCE)",
   "CollectiveColorPicker.Preset": "Предустановленные цвета",

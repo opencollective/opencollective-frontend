@@ -4,6 +4,8 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
 
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+
 import _ApplyToHostBtn from './ApplyToHostBtn';
 import Container from './Container';
 import { Box } from './Grid';
@@ -82,7 +84,14 @@ const CollectiveCallsToAction = ({
         </Link>
       )}
       {hasSubmitExpense && (
-        <Link route="create-expense" params={{ collectiveSlug: collective.slug }}>
+        <Link
+          route="create-expense"
+          params={{
+            parentCollectiveSlug: collective.parentCollective?.slug,
+            type: collective.parentCollective ? getCollectiveTypeForUrl(collective) : undefined,
+            collectiveSlug: collective.slug,
+          }}
+        >
           <StyledButton
             buttonSize="small"
             mx={2}
@@ -160,6 +169,9 @@ CollectiveCallsToAction.propTypes = {
     host: PropTypes.object,
     settings: PropTypes.object,
     tiers: PropTypes.arrayOf(PropTypes.object),
+    parentCollective: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */
