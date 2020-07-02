@@ -157,8 +157,7 @@ class CreateOrderPage extends React.Component {
 
   renderPageContent() {
     const { data, intl } = this.props;
-    const feesOnTopAvailable =
-      get(data, 'Collective.platformFeePercent') === 0 && get(data, 'Collective.host.settings.feesOnTop');
+    const feesOnTopAvailable = get(data, 'Collective.platformFeePercent') === 0;
     const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
 
     // Adding that at GraphQL level is buggy
