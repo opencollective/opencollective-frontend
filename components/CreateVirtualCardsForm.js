@@ -347,6 +347,16 @@ class CreateVirtualCardsForm extends Component {
     const { submitting, errors, multiEmailsInitialState } = this.state;
     return (
       <Box>
+        <P>
+          <FormattedMessage
+            id="VirtualCard.Limitinfo"
+            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+            values={{
+              SupportLink: I18nSupportLink,
+              limit: 100,
+            }}
+          />
+        </P>
         <Flex flexDirection="column" mb="2em">
           <label style={{ width: '100%' }}>
             <Flex flexDirection="column">
@@ -390,16 +400,6 @@ class CreateVirtualCardsForm extends Component {
             disabled={submitting}
           />
         </InlineField>
-        <P>
-          <FormattedMessage
-            id="VirtualCard.Limitinfo"
-            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
-            values={{
-              SupportLink: I18nSupportLink,
-              limit: 100,
-            }}
-          />
-        </P>
       </Box>
     );
   }
