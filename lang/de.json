@@ -61,7 +61,7 @@
   "addfunds.totalAmount": "Finanzierungsbetrag",
   "AddFundsForm.PutAside": "Bitte legen Sie {hostFeePercent}% ({hostFeeAmount}) für Ihre Hostgebühren und {platformFeePercent}% ({platformFeeAmount}) für Plattformgebühren beiseite.",
   "administrators": "Administratoren",
-  "AllExpenses": "All expenses",
+  "AllExpenses": "Alle Ausgaben",
   "alternativeVerificationCriteria": "alternative Verifizierungskriterien",
   "Amount": "{amount} {currencyCode}",
   "amount.free": "kostenlos",
