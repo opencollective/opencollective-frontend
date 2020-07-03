@@ -106,9 +106,11 @@ class InputField extends React.Component {
     closeOnSelect: PropTypes.bool,
     charCount: PropTypes.number,
     maxLength: PropTypes.number,
+    step: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
     timeFormat: PropTypes.string,
     min: PropTypes.number,
+    max: PropTypes.number,
     focus: PropTypes.bool,
     help: PropTypes.string,
   };
@@ -153,9 +155,9 @@ class InputField extends React.Component {
   }
 
   handleChange(value) {
-    const { type } = this.props;
+    const { type, step } = this.props;
     if (type === 'number') {
-      const parsed = parseInt(value);
+      const parsed = step && parseFloat(step) !== 1 ? parseFloat(value) : parseInt(value);
       value = isNaN(parsed) ? null : parsed;
     } else if (type === 'currency') {
       value = this.roundCurrencyValue(value);
@@ -609,6 +611,9 @@ class InputField extends React.Component {
             value={field.value}
             defaultValue={field.defaultValue || ''}
             validationState={this.state.validationState}
+            step={field.step}
+            min={field.min}
+            max={field.max}
           />
         );
         break;
