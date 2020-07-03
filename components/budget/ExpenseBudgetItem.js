@@ -29,8 +29,10 @@ const ButtonsContainer = styled.div`
 const ExpenseContainer = styled.div`
   padding: 16px 27px;
 
-  &:not(:hover):not(:focus-within) ${ButtonsContainer} {
-    opacity: 0.24;
+  @media (hover: hover) {
+    &:not(:hover):not(:focus-within) ${ButtonsContainer} {
+      opacity: 0.24;
+    }
   }
 `;
 
