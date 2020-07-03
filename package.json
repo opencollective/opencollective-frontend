@@ -247,6 +247,18 @@
     "env": {
       "compiler": "bit.envs/compilers/react@1.0.14"
     },
+    "overrides": {
+      "*": {
+        "dependencies": {
+          "react": "-",
+          "react-dom": "-"
+        },
+        "peerDependencies": {
+          "react": "+",
+          "react-dom": "+"
+        }
+      }
+    },
     "componentsDefaultDirectory": "components/{name}",
     "packageManager": "npm"
   }
