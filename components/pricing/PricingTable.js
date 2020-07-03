@@ -74,16 +74,15 @@ const StyledTable = styled(Box)`
     border-bottom-right-radius: 8px;
   }
 
-  @media screen and (max-width: 62em)
-  {
+  @media screen and (max-width: 62em) {
     tfoot tr:last-child td:last-child {
-    border-bottom-right-radius: 8px;
-    padding-left: 1%;
-    padding-right: 1%;
-  }
-  tfoot tr:last-child td:last-child a {
-   width:fit-content;
-  }
+      border-bottom-right-radius: 8px;
+      padding-left: 1%;
+      padding-right: 1%;
+    }
+    tfoot tr:last-child td:last-child a {
+      width: fit-content;
+    }
   }
 
   thead tr:first-child th:first-child {
