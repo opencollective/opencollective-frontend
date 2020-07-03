@@ -118,6 +118,9 @@ class AddFundsForm extends React.Component {
         name: 'hostFeePercent',
         when: () => !this.isAddFundsToOrg,
         defaultValue: props.collective.hostFeePercent,
+        step: 0.01,
+        min: 0,
+        max: 100,
         type: 'number',
         post: '%',
       },
@@ -125,6 +128,9 @@ class AddFundsForm extends React.Component {
         name: 'platformFeePercent',
         type: 'number',
         post: '%',
+        step: 0.01,
+        min: 0,
+        max: 100,
         when: () => this.props.LoggedInUser && this.props.LoggedInUser.isRoot() && !this.isAddFundsToOrg,
       },
     ];
@@ -208,22 +214,21 @@ class AddFundsForm extends React.Component {
 
   render() {
     const { loading } = this.props;
-
     const hostFeePercent = this.state.form.hostFeePercent || 0;
     const platformFeePercent = this.getPlatformFee();
 
     const hostFeeAmount = formatCurrency(
-      (hostFeePercent / 100) * this.state.form.totalAmount,
+      Math.round((hostFeePercent / 100) * this.state.form.totalAmount),
       this.props.collective.currency,
       { precision: 2 },
     );
     const platformFeeAmount = formatCurrency(
-      (platformFeePercent / 100) * this.state.form.totalAmount,
+      Math.round((platformFeePercent / 100) * this.state.form.totalAmount),
       this.props.collective.currency,
       { precision: 2 },
     );
     const netAmount = formatCurrency(
-      this.state.form.totalAmount * (1 - (hostFeePercent + platformFeePercent) / 100),
+      Math.round(this.state.form.totalAmount * (1 - (hostFeePercent + platformFeePercent) / 100)),
       this.props.collective.currency,
       { precision: 2 },
     );
