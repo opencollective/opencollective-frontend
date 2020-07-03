@@ -84,6 +84,17 @@ const StyledTable = styled(Box)`
     }
   }
 
+    @media only screen and (max-width:62em) {
+    tfoot tr:last-child td:last-child {
+      border-bottom-right-radius: 8px;
+      padding-left:1%;
+      padding-right:1%;
+    }
+    tfoot tr:last-child td:last-child  a {
+    width:fit-content;
+    }
+  }
+
   thead tr:first-child th:first-child {
     border-top-left-radius: 8px;
   }
