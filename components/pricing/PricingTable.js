@@ -240,7 +240,7 @@ const Cell = ({ content, header, height }) => {
             </PlanLink>
             <PlanLink href={content.url} display={['block', null, null, 'none']}>
               {content.cta != null
-                ? content.cta.substring(0, content.cta.length - 2)
+                ? content.cta.substring(0, content.cta.indexOf(' '))
                 : null || <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />}
             </PlanLink>
           </td>
