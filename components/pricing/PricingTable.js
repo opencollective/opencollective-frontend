@@ -74,12 +74,16 @@ const StyledTable = styled(Box)`
     border-bottom-right-radius: 8px;
   }
 
-  @media only screen and (max-width:62em) {
+    @media only screen and (max-width:62em) {
     tfoot tr:last-child td:last-child {
       border-bottom-right-radius: 8px;
       padding-left:1%;
       padding-right:1%;
     }
+    tfoot tr:last-child td:last-child  a {
+    width:fit-content;
+    }
+  }
 
   thead tr:first-child th:first-child {
     border-top-left-radius: 8px;
@@ -246,7 +250,7 @@ const Cell = ({ content, header, height }) => {
               {content.cta || <FormattedMessage id="pricingTable.action.choosePlan" defaultMessage="Choose plan" />}
             </PlanLink>
             <PlanLink href={content.url} display={['block', null, null, 'none']}>
-              {content.cta|| <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />}
+              {content.cta || <FormattedMessage id="pricingTable.action.choose" defaultMessage="Choose" />}
             </PlanLink>
           </td>
         );
