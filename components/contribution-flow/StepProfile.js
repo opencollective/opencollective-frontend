@@ -11,7 +11,6 @@ import { escapeInput, reportValidityHTML5 } from '../../lib/utils';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Logo from '../Logo';
 import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
@@ -213,8 +212,8 @@ const StepProfile = ({
             <Box as="span" mr={3}>
               {radio}
             </Box>
-            {value.type === 'USER' && <Avatar collective={value} size="3.6rem" />}{' '}
-            {value.type !== 'USER' && value.slug && <Logo collective={value} height="3.6rem" />}
+            {value.type === 'USER' && <Avatar collective={value} size="3.6rem" />}
+            {value.type !== 'USER' && value.slug && <Avatar collective={value} radius="3.6rem" />}
             <Flex flexDirection="column" ml={2}>
               <P color="inherit" fontWeight={value.type ? 600 : 500}>
                 {value.isIncognito && <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
