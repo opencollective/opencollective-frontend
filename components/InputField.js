@@ -8,7 +8,6 @@ import { capitalize } from '../lib/utils';
 
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
-import InputTypeCreditCard from './InputTypeCreditCard';
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import StyledInputTags from './StyledInputTags';
@@ -179,29 +178,6 @@ class InputField extends React.Component {
     let value = this.state.value;
     const horizontal = field.className && field.className.match(/horizontal/);
     switch (this.props.type) {
-      case 'creditcard':
-        this.input = (
-          <FormGroup controlId={field.name}>
-            {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
-                  <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style} />
-                </Col>
-              </div>
-            )}
-            {!horizontal && (
-              <div>
-                <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                <InputTypeCreditCard onChange={this.handleChange} style={this.props.style} />
-              </div>
-            )}
-          </FormGroup>
-        );
-        break;
-
       case 'textarea': {
         value = value || this.props.defaultValue || '';
         let after;
