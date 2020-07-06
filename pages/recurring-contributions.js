@@ -31,7 +31,7 @@ export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
       type
       settings
       imageUrl
-      orders {
+      orders(filter: OUTGOING, status: [ACTIVE, CANCELLED]) {
         totalCount
         nodes {
           id
