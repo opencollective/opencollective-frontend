@@ -345,6 +345,7 @@ class CreateVirtualCardsForm extends Component {
 
   renderEmailFields() {
     const { submitting, errors, multiEmailsInitialState } = this.state;
+    const { collectiveSettings } = this.props;
     return (
       <Box>
         <P>
@@ -353,7 +354,7 @@ class CreateVirtualCardsForm extends Component {
             defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
             values={{
               SupportLink: I18nSupportLink,
-              limit: 100,
+              limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
             }}
           />
         </P>
