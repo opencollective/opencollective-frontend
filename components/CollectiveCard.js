@@ -9,10 +9,10 @@ import { defaultBackgroundImage } from '../lib/constants/collectives';
 import { imagePreview } from '../lib/image-utils';
 import { firstSentence } from '../lib/utils';
 
+import Avatar from './Avatar';
 import Container from './Container';
 import Currency from './Currency';
 import Link from './Link';
-import Logo from './Logo';
 
 const CardWrapper = styled(Container)`
   display: flex;
@@ -284,7 +284,7 @@ class CollectiveCard extends React.Component {
           <div className="head">
             <div className="background" style={coverStyle} />
             <div className="logo">
-              <Logo collective={collective} height={65} />
+              <Avatar collective={collective} radius={65} />
             </div>
           </div>
           <div className="body">
