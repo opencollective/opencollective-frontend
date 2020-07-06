@@ -18,7 +18,8 @@
     [
       "react-intl",
       {
-        "messagesDir": "./dist/messages/"
+        "messagesDir": "./dist/messages/",
+        "removeDefaultMessage": true
       }
     ]
   ],
