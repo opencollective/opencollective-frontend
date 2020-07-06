@@ -90,11 +90,11 @@ const msg = defineMessages({
   },
 });
 
-const getDefaultExpense = (collective, payoutProfiles) => ({
+const getDefaultExpense = collective => ({
   description: '',
   items: [],
   attachedFiles: [],
-  payee: first(payoutProfiles),
+  payee: null,
   payoutMethod: undefined,
   privateMessage: '',
   invoiceInfo: '',
@@ -170,6 +170,19 @@ const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.address', payee.location.address || '');
 };
 
+const getPayoutMethodsFromPayee = payee => {
+  const pms = get(payee, 'payoutMethods', EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
+  return pms.length > 0 ? pms : EMPTY_ARRAY;
+};
+
+const refreshPayoutProfile = (formik, payoutProfiles) => {
+  const payee = formik.values.payee
+    ? payoutProfiles.find(profile => profile.id === formik.values.payee.id)
+    : first(payoutProfiles);
+
+  formik.setFieldValue('payee', payee);
+};
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -187,6 +200,8 @@ const ExpenseFormBody = ({
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
   const isReceipt = values.type === expenseTypes.RECEIPT;
+  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
+  const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
   // When user logs in we set its account as the default payout profile if not yet defined
@@ -456,8 +471,9 @@ const ExpenseFormBody = ({
                                 inputId={id}
                                 error={error}
                                 onChange={setPayoutMethod}
+                                onRemove={onPayoutMethodRemove}
                                 payoutMethod={values.payoutMethod}
-                                payoutMethods={get(values.payee, 'payoutMethods', EMPTY_ARRAY)}
+                                payoutMethods={allPayoutMethods}
                                 disabled={!values.payee}
                                 collective={collective}
                               />
@@ -569,7 +585,7 @@ const ExpenseForm = ({
 
   return (
     <Formik
-      initialValues={{ ...getDefaultExpense(collective, payoutProfiles), ...expense }}
+      initialValues={{ ...getDefaultExpense(collective), ...expense }}
       validate={hasValidate && validate}
       onSubmit={async (values, formik) => {
         // We initially let the browser do the validation. Then once users try to submit the

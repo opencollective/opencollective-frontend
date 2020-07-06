@@ -18,6 +18,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
       type
       name
       data
+      isSaved
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
       nodes {
@@ -37,6 +38,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
             type
             name
             data
+            isSaved
           }
         }
       }
@@ -110,6 +112,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         type
         name
         data
+        isSaved
       }
     }
     payeeLocation {
@@ -202,6 +205,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       id
       type
       data
+      isSaved
     }
     comments(limit: 300) {
       nodes {

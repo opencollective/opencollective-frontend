@@ -1181,6 +1181,7 @@
   "PayoutMethod.New.Other": "Moyen de remboursement personnalisé",
   "PayoutMethod.New.PayPal": "Nouveau compte PayPal",
   "PayoutMethod.Other.content": "Infos",
+  "PayoutMethod.RemoveWarning": "Do you want to remove this payout method?",
   "PayoutMethod.Type.All": "Toutes les méthodes",
   "PayoutMethod.Type.BankAccount": "Virement bancaire",
   "PayoutMethod.Type.Other": "Autre",
