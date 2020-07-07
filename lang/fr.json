@@ -1355,7 +1355,7 @@
   "Subscriptions.Cancelled": "Annulée",
   "Subscriptions.ContributedToDate": "Contribution à ce jour",
   "Subscriptions.Edit": "Editer",
-  "Subscriptions.Status": "Contribution {status, select, ACTIVE {Active} CANCELLED {Annulée}}",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} other {}}",
   "Subscriptions.Title": "Contributions récurrentes",
   "table.head.large": "Large",
   "table.head.medium": "Moyen",
