@@ -171,8 +171,9 @@ const setLocationFromPayee = (formik, payee) => {
 };
 
 const getPayoutMethodsFromPayee = payee => {
-  const pms = get(payee, 'payoutMethods', EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
-  return pms.length > 0 ? pms : EMPTY_ARRAY;
+  const basePms = get(payee, 'payoutMethods') || EMPTY_ARRAY;
+  const filteredPms = basePms.filter(({ isSaved }) => isSaved);
+  return filteredPms.length > 0 ? filteredPms : EMPTY_ARRAY;
 };
 
 const refreshPayoutProfile = (formik, payoutProfiles) => {
