@@ -60,7 +60,7 @@ class TopBarProfileMenu extends React.Component {
     this.state = { showProfileMenu: false, loading: true };
     this.messages = defineMessages({
       'tooltip.balance': {
-        id: 'profilemenu.memberships.tooltip.balance',
+        id: 'BalanceAmount',
         defaultMessage: 'Balance {balance}',
       },
       'tooltip.pendingExpenses': {

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -8,6 +9,8 @@ import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
+import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
+import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, { DEFAULT_PROCESS_EXPENSE_BTN_PROPS } from '../expenses/ProcessExpenseButtons';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -17,10 +20,22 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
+const DetailColumnHeader = styled.div`
+  font-style: normal;
+  font-weight: bold;
+  font-size: 9px;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #c4c7cc;
+  margin-bottom: 2px;
+`;
+
 const ButtonsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
+  transition: opacity 0.05s;
 
   & > *:last-child {
     margin-right: 0;
@@ -45,8 +60,11 @@ const ExpenseBudgetItem = ({
   collective,
   expense,
   showProcessActions,
+  view,
 }) => {
   const featuredProfile = isInverted ? collective : expense?.payee;
+  const isAdminView = view === 'admin';
+
   return (
     <ExpenseContainer>
       <Flex justifyContent="space-between" flexWrap="wrap">
@@ -87,13 +105,35 @@ const ExpenseBudgetItem = ({
                 </AutosizeText>
               </LinkExpense>
               <P mt="5px" fontSize="12px" color="black.600">
-                <FormattedMessage
-                  id="Expense.By"
-                  defaultMessage="by {name}"
-                  values={{ name: <LinkCollective collective={expense.createdByAccount} /> }}
-                />
+                {isAdminView ? (
+                  <LinkCollective collective={collective} />
+                ) : (
+                  <FormattedMessage
+                    id="Expense.By"
+                    defaultMessage="by {name}"
+                    values={{ name: <LinkCollective collective={expense.createdByAccount} /> }}
+                  />
+                )}
                 {' • '}
                 <FormattedDate value={expense.createdAt} />
+                {isAdminView && (
+                  <React.Fragment>
+                    {' • '}
+                    <FormattedMessage
+                      id="BalanceAmount"
+                      defaultMessage="Balance {balance}"
+                      values={{
+                        balance: (
+                          <FormattedMoneyAmount
+                            amount={collective.balance}
+                            currency={collective.currency}
+                            amountStyles={{ color: 'black.700' }}
+                          />
+                        ),
+                      }}
+                    />
+                  </React.Fragment>
+                )}
               </P>
             </Box>
           )}
@@ -114,20 +154,61 @@ const ExpenseBudgetItem = ({
           {isLoading ? (
             <LoadingPlaceholder height={20} width={140} />
           ) : (
-            <ExpenseStatusTag
-              status={expense.status}
-              fontSize="9px"
-              lineHeight="14px"
-              p="3px 8px"
-              showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-              showTaxFormMsg={expense.payee.isAdmin}
-            />
+            <Flex>
+              {isAdminView && (
+                <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
+              )}
+              <ExpenseStatusTag
+                status={expense.status}
+                fontSize="9px"
+                lineHeight="14px"
+                p="3px 8px"
+                showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+                showTaxFormMsg={expense.payee.isAdmin}
+              />
+            </Flex>
           )}
         </Flex>
       </Flex>
       <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
         <Box mt={2}>
-          <ExpenseTags expense={expense} />
+          {isAdminView ? (
+            <Flex>
+              <Box mr={[0, 3, 4]}>
+                <DetailColumnHeader>
+                  <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+                </DetailColumnHeader>
+                <PayoutMethodTypeWithIcon
+                  isLoading={isLoading}
+                  type={expense?.payoutMethod?.type}
+                  iconSize="10px"
+                  fontSize="11px"
+                  fontWeight="normal"
+                  color="black.700"
+                />
+              </Box>
+              <Box mr={[0, 3, 4]}>
+                <DetailColumnHeader>
+                  <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+                </DetailColumnHeader>
+                {isLoading ? (
+                  <LoadingPlaceholder height={15} width={90} />
+                ) : (
+                  <P color="black.700" fontSize="11px">
+                    <MaximizeIcon size={10} color="#969BA3" />
+                    &nbsp;&nbsp;
+                    <FormattedMessage
+                      id="ExepenseReceipts.count"
+                      defaultMessage="{count, plural, one {# receipt} other {# receipts}}"
+                      values={{ count: expense.items.length }}
+                    />
+                  </P>
+                )}
+              </Box>
+            </Flex>
+          ) : (
+            <ExpenseTags expense={expense} />
+          )}
         </Box>
         {showProcessActions && expense?.permissions && (
           <ButtonsContainer>
@@ -151,8 +232,11 @@ ExpenseBudgetItem.propTypes = {
   isInverted: PropTypes.bool,
   showAmountSign: PropTypes.bool,
   showProcessActions: PropTypes.bool,
+  view: PropTypes.oneOf(['public', 'admin']),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    balance: PropTypes.number,
+    currency: PropTypes.number,
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
@@ -169,6 +253,7 @@ ExpenseBudgetItem.propTypes = {
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
+    items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     payee: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -176,6 +261,9 @@ ExpenseBudgetItem.propTypes = {
       slug: PropTypes.string.isRequired,
       imageUrl: PropTypes.string.isRequired,
       isAdmin: PropTypes.bool,
+    }),
+    payoutMethod: PropTypes.shape({
+      type: PropTypes.string,
     }),
     createdByAccount: PropTypes.shape({
       type: PropTypes.string.isRequired,
@@ -186,6 +274,10 @@ ExpenseBudgetItem.propTypes = {
       slug: PropTypes.string,
     }),
   }),
+};
+
+ExpenseBudgetItem.defaultProps = {
+  view: 'public',
 };
 
 export default ExpenseBudgetItem;
