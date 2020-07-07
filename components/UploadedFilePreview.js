@@ -31,12 +31,16 @@ const MainContainer = styled(Container)`
   justify-content: center;
   align-items: center;
   font-size: 12px;
+  max-width: 100%;
 
   img {
-    height: 100%;
+    width: 100%;
     max-height: 100%;
     max-width: 100%;
     border-radius: 8px;
+    @media (max-width: 40em) {
+      object-fit: cover;
+    }
   }
 `;
 
@@ -72,6 +76,7 @@ UploadedFilePreview.propTypes = {
   isLoading: PropTypes.bool,
   alt: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+  maxHeihgt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** If true, a link to the original file will be added if possible */
   hasLink: PropTypes.bool,
 };
