@@ -35,6 +35,7 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
   mutation updateOrderTierOrAmount($order: OrderReferenceInput!, $amount: AmountInput, $tier: TierReferenceInput) {
     updateOrder(order: $order, amount: $amount, tier: $tier) {
       id
+      status
       amount {
         value
         currency

@@ -135,12 +135,7 @@ StyledTag.propTypes = {
   closeButtonProps: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   /** If defined, a close button will be displayed on the tag */
   onClose: PropTypes.func,
-  iconWidth: PropTypes.string,
-  iconHeight: PropTypes.string,
   backgroundColor: PropTypes.string,
-  iconColor: PropTypes.string,
-  iconDisplay: PropTypes.string,
-  iconAlign: PropTypes.string,
   variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left', 'rounded']),
   children: PropTypes.node,
   type: PropTypes.oneOf(Object.keys(TAG_TYPE_VARIANTS)),
@@ -148,10 +143,6 @@ StyledTag.propTypes = {
 
 StyledTag.defaultProps = {
   variant: 'squared',
-  iconHeight: '2.5em',
-  iconWidth: '2.5em',
-  iconBackgroundColor: 'rgba(33, 33, 33, 1)',
-  iconColor: 'white',
 };
 
 export default StyledTag;

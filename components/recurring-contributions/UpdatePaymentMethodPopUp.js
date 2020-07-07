@@ -65,6 +65,7 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
   mutation updatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
     updateOrder(order: $order, paymentMethod: $paymentMethod) {
       id
+      status
       paymentMethod {
         id
       }

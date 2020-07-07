@@ -25,7 +25,7 @@ const getBackground = collective => {
 /**
  * A card to show a collective that supports including a custom body.
  */
-const StyledCollectiveCard = ({ collective, children, ...props }) => {
+const StyledCollectiveCard = ({ collective, tag, children, ...props }) => {
   return (
     <StyledCard {...props}>
       <Container style={{ background: getBackground(collective) }} backgroundSize="cover" height={100} px={3} pt={26}>
@@ -42,11 +42,15 @@ const StyledCollectiveCard = ({ collective, children, ...props }) => {
               {collective.name}
             </P>
           </LinkCollective>
-          <StyledTag display="inline-block" textTransform="uppercase" my={2}>
-            <I18nCollectiveTags
-              tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-            />
-          </StyledTag>
+          {tag === undefined ? (
+            <StyledTag display="inline-block" textTransform="uppercase" my={2}>
+              <I18nCollectiveTags
+                tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+              />
+            </StyledTag>
+          ) : (
+            tag
+          )}
         </Container>
         {children}
       </Flex>
@@ -57,6 +61,8 @@ const StyledCollectiveCard = ({ collective, children, ...props }) => {
 StyledCollectiveCard.propTypes = {
   /** Displayed below the top header of the card */
   children: PropTypes.node,
+  /** To replace the default tag. Set to `null` to hide tag */
+  tag: PropTypes.node,
   /** The collective to display */
   collective: PropTypes.shape({
     name: PropTypes.string.isRequired,

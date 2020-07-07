@@ -95,9 +95,14 @@ interface Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -256,6 +261,11 @@ type Activity {
   The person who triggered the action, if any
   """
   individual: Individual
+
+  """
+  Data attached to this activity (if any)
+  """
+  data: JSON!
 }
 
 enum ActivityType {
@@ -407,9 +417,14 @@ type Bot implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -553,9 +568,14 @@ type Collective implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -2269,9 +2289,14 @@ type Event implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -2898,9 +2923,14 @@ type Fund implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -3059,9 +3089,14 @@ type Host implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -3264,9 +3299,14 @@ type Individual implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -3919,9 +3959,14 @@ type Organization implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -4154,9 +4199,14 @@ type Project implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int

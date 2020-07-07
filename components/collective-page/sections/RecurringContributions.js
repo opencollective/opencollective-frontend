@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { Dimensions } from '../_constants';
 import Container from '../../Container';
@@ -11,6 +11,7 @@ import { Box } from '../../Grid';
 import I18nFormatters from '../../I18nFormatters';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
+import { recurringContributionsQuery } from '../../recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../../recurring-contributions/RecurringContributionsContainer';
 import StyledFilters from '../../StyledFilters';
 import TemporaryNotification from '../../TemporaryNotification';
@@ -19,59 +20,13 @@ import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
-  query RecurringContributions($slug: String) {
-    account(slug: $slug) {
-      id
-      slug
-      name
-      type
-      description
-      settings
-      imageUrl
-      twitterHandle
-      orders {
-        totalCount
-        nodes {
-          id
-          paymentMethod {
-            id
-          }
-          amount {
-            value
-            currency
-          }
-          status
-          frequency
-          tier {
-            id
-            name
-          }
-          totalDonations {
-            value
-            currency
-          }
-          toAccount {
-            id
-            slug
-            name
-            description
-            tags
-            imageUrl
-            settings
-          }
-        }
-      }
-    }
-  }
-`;
-
 const FILTERS = {
   ACTIVE: 'ACTIVE',
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY',
   CANCELLED: 'CANCELLED',
 };
+
 const I18nFilters = defineMessages({
   [FILTERS.ACTIVE]: {
     id: 'Subscriptions.Active',
@@ -219,7 +174,7 @@ class SectionRecurringContributions extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsPageQuery, {
+const getData = graphql(recurringContributionsQuery, {
   options: {
     context: API_V2_CONTEXT,
   },
