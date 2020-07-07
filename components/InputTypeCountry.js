@@ -1,22 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { countries as countriesEN } from 'i18n-iso-countries/langs/en.json';
-import { countries as countriesFR } from 'i18n-iso-countries/langs/fr.json';
+import countries from 'i18n-iso-countries';
+import countriesEN from 'i18n-iso-countries/langs/en.json';
+import countriesFR from 'i18n-iso-countries/langs/fr.json';
 import { isUndefined, orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import StyledSelect from './StyledSelect';
 
-const CountriesI18n = {
-  fr: countriesFR,
-  en: countriesEN,
-};
+countries.registerLocale(countriesEN);
+countries.registerLocale(countriesFR);
 
 class InputTypeCountry extends Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     name: PropTypes.string,
+    /** To force a specific locale */
+    locale: PropTypes.string,
     defaultValue: PropTypes.string,
     /** Use this to control the component state */
     value: PropTypes.string,
@@ -30,12 +31,15 @@ class InputTypeCountry extends Component {
 
   static defaultProps = { name: 'country' };
 
-  getOptions = memoizeOne(locale => {
-    const countries = CountriesI18n[locale] || CountriesI18n.en;
+  getCountryLabel(code, locale) {
+    const name = countries.getName(code, locale) || countries.getName(code, 'en');
+    return `${truncate(name, { length: 30 })} - ${code}`;
+  }
 
-    const options = Object.keys(countries).map(code => ({
+  getOptions = memoizeOne(locale => {
+    const options = Object.keys(countries.getAlpha2Codes()).map(code => ({
       value: code,
-      label: `${truncate(countries[code] || countriesEN[code], { length: 30 })} - ${code}`,
+      label: this.getCountryLabel(code, locale),
     }));
 
     return orderBy(options, 'label');
@@ -47,23 +51,22 @@ class InputTypeCountry extends Component {
     }
 
     const code = country && country.toUpperCase();
-    const countries = CountriesI18n[locale] || CountriesI18n.en;
     return {
       value: code,
-      label: `${truncate(countries[code] || countriesEN[code], { length: 30 })} - ${code}`,
+      label: this.getCountryLabel(code, locale),
     };
   });
 
   render() {
-    const { defaultValue, value, intl, onChange, ...props } = this.props;
+    const { defaultValue, value, intl, onChange, locale, ...props } = this.props;
     return (
       <StyledSelect
         name={name}
         minWidth={150}
-        options={this.getOptions(intl.locale, defaultValue)}
+        options={this.getOptions(locale || intl.locale, defaultValue)}
         onChange={({ value }) => onChange(value)}
-        value={!isUndefined(value) ? this.getSelectedOption(intl.locale, value) : undefined}
-        defaultValue={defaultValue ? this.getSelectedOption(intl.locale, defaultValue) : undefined}
+        value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
+        defaultValue={defaultValue ? this.getSelectedOption(locale || intl.locale, defaultValue) : undefined}
         placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
         {...props}
       />
