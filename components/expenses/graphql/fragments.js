@@ -286,8 +286,14 @@ export const expensesListAdminFieldsFragment = gqlV2/* GraphQL */ `
     id
     items {
       id
+      description
+      incurredAt
       url
       amount
+    }
+    attachedFiles {
+      id
+      url
     }
   }
 `;

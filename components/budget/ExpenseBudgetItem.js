@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
-import { includes } from 'lodash';
+import { includes, size } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import expenseTypes from '../../lib/constants/expenseTypes';
+
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
+import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
@@ -17,6 +20,7 @@ import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import LinkExpense from '../LinkExpense';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import StyledButton from '../StyledButton';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -52,6 +56,16 @@ const ExpenseContainer = styled.div`
   }
 `;
 
+const getNbAttachedFiles = expense => {
+  if (!expense) {
+    return 0;
+  } else if (expense.type === expenseTypes.INVOICE) {
+    return 1 + size(expense.attachedFiles);
+  } else {
+    return size(expense.attachedFiles) + size(expense.items.filter(({ url }) => Boolean(url)));
+  }
+};
+
 const ExpenseBudgetItem = ({
   isLoading,
   host,
@@ -62,8 +76,10 @@ const ExpenseBudgetItem = ({
   showProcessActions,
   view,
 }) => {
+  const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const featuredProfile = isInverted ? collective : expense?.payee;
   const isAdminView = view === 'admin';
+  const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
 
   return (
     <ExpenseContainer>
@@ -174,7 +190,7 @@ const ExpenseBudgetItem = ({
         <Box mt={2}>
           {isAdminView ? (
             <Flex>
-              <Box mr={[0, 3, 4]}>
+              <Box mr={[3, 4]}>
                 <DetailColumnHeader>
                   <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
                 </DetailColumnHeader>
@@ -187,24 +203,35 @@ const ExpenseBudgetItem = ({
                   color="black.700"
                 />
               </Box>
-              <Box mr={[0, 3, 4]}>
-                <DetailColumnHeader>
-                  <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
-                </DetailColumnHeader>
-                {isLoading ? (
-                  <LoadingPlaceholder height={15} width={90} />
-                ) : (
-                  <P color="black.700" fontSize="11px">
-                    <MaximizeIcon size={10} color="#969BA3" />
-                    &nbsp;&nbsp;
-                    <FormattedMessage
-                      id="ExepenseReceipts.count"
-                      defaultMessage="{count, plural, one {# receipt} other {# receipts}}"
-                      values={{ count: expense.items.length }}
-                    />
-                  </P>
-                )}
-              </Box>
+              {nbAttachedFiles > 0 && (
+                <Box mr={[3, 4]}>
+                  <DetailColumnHeader>
+                    <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <StyledButton
+                      color="black.700"
+                      fontSize="11px"
+                      cursor="pointer"
+                      buttonSize="tiny"
+                      onClick={() => showFilesPreview(true)}
+                      px={2}
+                      ml={-2}
+                      isBorderless
+                    >
+                      <MaximizeIcon size={10} />
+                      &nbsp;&nbsp;
+                      <FormattedMessage
+                        id="ExepenseReceipts.count"
+                        defaultMessage="{count, plural, one {# receipt} other {# receipts}}"
+                        values={{ count: nbAttachedFiles }}
+                      />
+                    </StyledButton>
+                  )}
+                </Box>
+              )}
             </Flex>
           ) : (
             <ExpenseTags expense={expense} />
@@ -222,6 +249,14 @@ const ExpenseBudgetItem = ({
           </ButtonsContainer>
         )}
       </Flex>
+      {hasFilesPreview && (
+        <ExpenseFilesPreviewModal
+          show
+          collective={collective}
+          expense={expense}
+          onClose={() => showFilesPreview(false)}
+        />
+      )}
     </ExpenseContainer>
   );
 };
@@ -255,6 +290,7 @@ ExpenseBudgetItem.propTypes = {
     permissions: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
+    attachedFiles: PropTypes.arrayOf(PropTypes.object),
     payee: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       type: PropTypes.string.isRequired,

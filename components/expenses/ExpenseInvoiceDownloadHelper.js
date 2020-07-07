@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { saveAs } from 'file-saver';
 
 import { fetchFromPDFService } from '../../lib/api';
+import expenseTypes from '../../lib/constants/expenseTypes';
 import { getErrorFromPdfService } from '../../lib/errors';
 import { expenseInvoiceUrl } from '../../lib/url_helpers';
 
@@ -15,40 +16,79 @@ const getPrettyDate = expense => {
   return `-${utc.split('T')[0]}`;
 };
 
+export const getExpenseInvoiceFilename = (collective, expense) => {
+  const prettyDate = getPrettyDate(expense);
+  return `Expense-${expense.legacyId}-${collective?.slug}-invoice${prettyDate}.pdf`;
+};
+
+export const generateInvoiceBlob = async expense => {
+  const invoiceUrl = expenseInvoiceUrl(expense.id);
+  return fetchFromPDFService(invoiceUrl);
+};
+
+export const downloadExpenseInvoice = async (
+  collective,
+  expense,
+  { setLoading, isLoading, onError, disablePreview },
+) => {
+  if (isLoading) {
+    return false;
+  }
+
+  const filename = getExpenseInvoiceFilename(collective, expense);
+  setLoading(true);
+  try {
+    const file = await generateInvoiceBlob(expense);
+    if (disablePreview) {
+      return saveAs(file, filename);
+    } else {
+      try {
+        const blobURL = URL.createObjectURL(file);
+        window.open(blobURL);
+      } catch (e) {
+        return saveAs(file, filename);
+      }
+    }
+  } catch (e) {
+    const error = getErrorFromPdfService(e);
+    onError(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+export const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disablePreview }) => {
+  const [isLoading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+
+  if (expense.type !== expenseTypes.INVOICE) {
+    return { error: null, isLoading: false, filename: '', downloadInvoice: null };
+  }
+
+  return {
+    error,
+    isLoading,
+    filename: getExpenseInvoiceFilename(collective, expense),
+    downloadInvoice: () => {
+      return downloadExpenseInvoice(collective, expense, {
+        setLoading,
+        isLoading,
+        disablePreview,
+        onError: error => {
+          onError(error);
+          setError(error);
+        },
+      });
+    },
+  };
+};
+
 /**
  * An helper to build components that download expense's invoice. Does not check the permissions.
  */
-const ExpenseInvoiceDownloadHelper = ({ children, expense, collective, onError }) => {
-  const [isLoading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
-  const prettyDate = getPrettyDate(expense);
-  const filename = `Expense-${expense.legacyId}-${collective?.slug}-invoice${prettyDate}.pdf`;
-
-  return children({
-    error,
-    isLoading,
-    filename,
-    downloadInvoice: async () => {
-      if (isLoading) {
-        return false;
-      }
-
-      const invoiceUrl = expenseInvoiceUrl(expense.id);
-      setLoading(true);
-      try {
-        const file = await fetchFromPDFService(invoiceUrl);
-        return saveAs(file, filename);
-      } catch (e) {
-        const error = getErrorFromPdfService(e);
-        setError(error);
-        if (onError) {
-          onError(error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    },
-  });
+const ExpenseInvoiceDownloadHelper = ({ children, expense, collective, onError, disablePreview }) => {
+  const state = useExpenseInvoiceDownloadHelper({ expense, collective, onError, disablePreview });
+  return children(state);
 };
 
 ExpenseInvoiceDownloadHelper.propTypes = {
