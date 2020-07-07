@@ -42,7 +42,6 @@ const PopUpMenu = styled(Flex)`
   z-index: 1000;
   background: white;
   border-radius: 8px;
-  border: 1px solid ${themeGet('colors.black.300')};
   box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.5);
 `;
 
@@ -67,7 +66,7 @@ const RecurringContributionsPopUp = ({ contribution, status, createNotification,
     context: API_V2_CONTEXT,
   });
 
-  const mainMenu = menuState === 'mainMenu' && status === 'ACTIVE';
+  const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
   const cancelMenu = menuState === 'cancelMenu';
   const updateTierMenu = menuState === 'updateTierMenu';
   const paymentMethodMenu = menuState === 'paymentMethodMenu';

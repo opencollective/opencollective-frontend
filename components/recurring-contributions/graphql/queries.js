@@ -9,7 +9,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       type
       settings
       imageUrl
-      orders(filter: OUTGOING, status: [ACTIVE, CANCELLED]) {
+      orders(filter: OUTGOING, onlySubscriptions: true) {
         totalCount
         nodes {
           id
