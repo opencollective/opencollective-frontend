@@ -114,12 +114,12 @@ describe('Contribution Flow: Order', () => {
         cy.clock(Date.parse('2042/05/03'));
         cy.tick(1000);
         cy.get(`input[type=radio][name=contributeAs][value=${collective.id}]`).should('be.checked');
-
         cy.contains('Next step').click();
 
         cy.checkStepsProgress({ enabled: ['contributeAs', 'details'], disabled: 'payment' });
         cy.get('#interval input').should('exist');
         cy.contains('Next charge: Jun 1, 2042');
+        cy.get('#amount > :nth-child(1)').click();
         cy.contains('Next step').click();
         cy.checkStepsProgress({ enabled: ['contributeAs', 'details', 'payment'] });
 
