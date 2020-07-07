@@ -1181,6 +1181,7 @@
   "PayoutMethod.New.Other": "Nuevo método de pago personalizado",
   "PayoutMethod.New.PayPal": "Nueva cuenta de PayPal",
   "PayoutMethod.Other.content": "Info",
+  "PayoutMethod.RemoveWarning": "Do you want to remove this payout method?",
   "PayoutMethod.Type.All": "All methods",
   "PayoutMethod.Type.BankAccount": "Transferencia bancaria",
   "PayoutMethod.Type.Other": "Otro",
