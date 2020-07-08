@@ -154,7 +154,7 @@ const UpdatePaymentMethodPopUp = ({
   }, [paymentMethods]);
 
   useEffect(() => {
-    if (paymentOptions && selectedPaymentMethod === null) {
+    if (paymentOptions && selectedPaymentMethod === null && contribution.paymentMethod) {
       setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
       setLoadingSelectedPaymentMethod(false);
     } else if (paymentOptions && addedPaymentMethod) {
