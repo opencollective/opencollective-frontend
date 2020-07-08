@@ -1158,6 +1158,7 @@
   "ParticipantsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {is} other {are}} participating",
   "PayExpense.ProcessorFeesInput": "Payment processor fees (if apply)",
   "PayExpenseModal.ManualPayoutWarning": "Important: By clicking below you are acknowledging that you have already paid this expense via the {payoutMethod} dashboard directly.",
+  "PayExpenseModal.RefillBalanceError": "Refill balance from dashboard",
   "paymentMethod.activeSubscriptions": "{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}",
   "paymentMethod.add": "Новая кредитная карта",
   "paymentMethod.editSubscriptions": "Edit recurring financial contributions",
