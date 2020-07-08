@@ -4,7 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import * as LibTaxes from '@opencollective/taxes';
 import { themeGet } from '@styled-system/theme-get';
 import gql from 'graphql-tag';
-import { debounce, findIndex, get, isNil, pick } from 'lodash';
+import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { URLSearchParams } from 'universal-url';
@@ -816,7 +816,20 @@ class CreateOrderPage extends React.Component {
   }
 
   // Debounce state update functions that may be called successively
-  updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepDetails: null, stepPayment: null }), 300);
+  updateProfile = debounce(
+    stepProfile =>
+      this.setState(state => {
+        const stepDetails = omit(state.stepDetails, ['platformFee']);
+        stepDetails.totalAmount = stepDetails.amount;
+        return {
+          stepProfile,
+          stepDetails,
+          stepPayment: null,
+        };
+      }),
+    300,
+  );
+
   updateDetails = stepDetails => this.setState({ stepDetails });
 
   handleCustomFieldsChange = (name, value) => {
