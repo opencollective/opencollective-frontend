@@ -816,7 +816,7 @@ class CreateOrderPage extends React.Component {
   }
 
   // Debounce state update functions that may be called successively
-  updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
+  updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepDetails: null, stepPayment: null }), 300);
   updateDetails = stepDetails => this.setState({ stepDetails });
 
   handleCustomFieldsChange = (name, value) => {

@@ -103,6 +103,7 @@ describe('Contribution Flow: Donate', () => {
 
       // Submit form
       cy.contains('button:not([disabled])', 'Next step').click();
+      cy.get('#amount > :nth-child(3)').click();
       cy.contains('button:not([disabled])', 'Next step').click();
       cy.wait(2000);
       cy.fillStripeInput();
