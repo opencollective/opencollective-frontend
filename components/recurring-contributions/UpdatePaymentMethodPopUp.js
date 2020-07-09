@@ -145,7 +145,7 @@ const UpdatePaymentMethodPopUp = ({
     }));
     const uniquePMs = uniqBy(paymentMethodsOptions, 'id');
     // put the PM that matches this recurring contribution on top of the list
-    let sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod.id);
+    let sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod?.id);
     // if we've just added a PM, put it at the top of the list
     if (addedPaymentMethod !== null) {
       sortedPMs = sortedPMs.sort(a => a.id !== addedPaymentMethod.id);
