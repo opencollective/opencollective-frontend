@@ -195,62 +195,64 @@ class EditUpdateForm extends React.Component {
             </Container>
           </div>
 
-          <Container
-            mt={3}
-            mb={2}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            minHeight={75}
-            flexWrap="wrap"
-          >
-            {!collective.isHost && (
-              <div>
-                <StyledCheckbox
-                  defaultChecked={update.isPrivate}
-                  name="private"
-                  size="16px"
-                  label="Private update"
-                  onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
-                />
-                <Container ml="25px" fontSize="12px" color="#71757A" mt={1}>
-                  <FormattedMessage
-                    id="update.private.description"
-                    defaultMessage="Only contributors will be able to see the content of this update"
+          {(!collective.isHost || update.isPrivate) && (
+            <Container
+              mt={3}
+              mb={2}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              minHeight={75}
+              flexWrap="wrap"
+            >
+              {!collective.isHost && (
+                <div>
+                  <StyledCheckbox
+                    defaultChecked={update.isPrivate}
+                    name="private"
+                    size="16px"
+                    label="Private update"
+                    onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
                   />
-                </Container>
-              </div>
-            )}
-            {update.isPrivate && (
-              <Box ml={2}>
-                <Container
-                  as="label"
-                  htmlFor="makePublicOn"
-                  fontWeight="normal"
-                  fontSize="Paragraph"
-                  color="black.900"
-                  mb={2}
-                >
-                  <FormattedMessage
-                    id="update.makePublicOn.label"
-                    defaultMessage="Automatically make public on this date"
-                  />
-                </Container>
-                <StyledInputField htmlFor="makePublicOn">
-                  {inputProps => (
-                    <StyledInput
-                      {...inputProps}
-                      type="date"
-                      defaultValue={update.makePublicOn ? toIsoDateStr(new Date(update.makePublicOn)) : ''}
-                      onChange={e => this.tryUpdateDate('makePublicOn', e.target.value)}
-                      width="100%"
-                      maxWidth="40em"
+                  <Container ml="25px" fontSize="12px" color="#71757A" mt={1}>
+                    <FormattedMessage
+                      id="update.private.description"
+                      defaultMessage="Only contributors will be able to see the content of this update"
                     />
-                  )}
-                </StyledInputField>
-              </Box>
-            )}
-          </Container>
+                  </Container>
+                </div>
+              )}
+              {update.isPrivate && (
+                <Box ml={2}>
+                  <Container
+                    as="label"
+                    htmlFor="makePublicOn"
+                    fontWeight="normal"
+                    fontSize="Paragraph"
+                    color="black.900"
+                    mb={2}
+                  >
+                    <FormattedMessage
+                      id="update.makePublicOn.label"
+                      defaultMessage="Automatically make public on this date"
+                    />
+                  </Container>
+                  <StyledInputField htmlFor="makePublicOn">
+                    {inputProps => (
+                      <StyledInput
+                        {...inputProps}
+                        type="date"
+                        defaultValue={update.makePublicOn ? toIsoDateStr(new Date(update.makePublicOn)) : ''}
+                        onChange={e => this.tryUpdateDate('makePublicOn', e.target.value)}
+                        width="100%"
+                        maxWidth="40em"
+                      />
+                    )}
+                  </StyledInputField>
+                </Box>
+              )}
+            </Container>
+          )}
 
           <ActionButtonWrapper className="row actions" mx={2} my={4}>
             <StyledButton

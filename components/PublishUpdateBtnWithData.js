@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { compose } from '../lib/utils';
 
 import Container from './Container';
-import SmallButton from './SmallButton';
+import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
 import { H5, Span } from './Text';
 
@@ -39,6 +39,7 @@ class PublishUpdateBtn extends React.Component {
 
   render() {
     const update = this.props.data.Update;
+    const isLoading = this.props.data.loading;
     const isHost = get(update, 'collective.isHost');
     const backers = get(update, 'collective.stats.backers.all');
     const hostedCollectives = get(update, 'collective.stats.collectives.hosted');
@@ -70,8 +71,8 @@ class PublishUpdateBtn extends React.Component {
       case 'FINANCIAL_CONTRIBUTORS':
         notice = (
           <FormattedMessage
-            id="update.publish.notify.financialContributors."
-            defaultMessage="Your update will be sent to {n} backers"
+            id="update.publish.notify.financialContributors"
+            defaultMessage="Your update will be sent to {n} financial contributors"
             values={{ n: backers }}
           />
         );
@@ -81,10 +82,8 @@ class PublishUpdateBtn extends React.Component {
         notice = (
           <FormattedMessage
             id="update.publish.notify.hostedCollectiveAdmins"
-            defaultMessage="Your update will be sent to {m} hosted collective's admins"
-            values={{
-              m: hostedCollectives,
-            }}
+            defaultMessage="Your update will be sent to the admins of {m} hosted collectives"
+            values={{ m: hostedCollectives }}
           />
         );
         break;
@@ -93,11 +92,8 @@ class PublishUpdateBtn extends React.Component {
         notice = (
           <FormattedMessage
             id="update.publish.notify.Everyone"
-            defaultMessage="Your update will be sent to {n} backers and {m} hosted collective's admins"
-            values={{
-              n: backers,
-              m: hostedCollectives,
-            }}
+            defaultMessage="Your update will be sent to the admins of {m} hosted collectives and to {n} financial contributors"
+            values={{ m: hostedCollectives, n: backers }}
           />
         );
         break;
@@ -110,15 +106,17 @@ class PublishUpdateBtn extends React.Component {
             .PublishUpdateBtn {
               display: flex;
               align-items: center;
+              border-top: 1px solid #e8e9eb;
+              margin-top: 32px;
             }
             .notice {
               color: #525866;
               font-size: 12px;
-              margin-left: 1rem;
+              margin-top: 8px;
             }
           `}
         </style>
-        <Container mt="4" mb="5" display="flex" flexDirection="column" alignItems="left">
+        <Container mt="4" mb="5" display="flex" flexDirection="column" alignItems="left" width="100%" maxWidth={400}>
           {isHost && (
             <Span>
               <H5>
@@ -128,26 +126,22 @@ class PublishUpdateBtn extends React.Component {
                 options={options}
                 defaultValue={options[0]}
                 onChange={selected => this.handleNotificationChange(selected)}
+                isSearchable={false}
+                maxWidth={300}
               />
             </Span>
           )}
+          {!isLoading && <div className="notice">{notice}</div>}
           <Container mt="3" display="flex" alignItems="center">
-            <SmallButton className="publish" onClick={this.onClick}>
-              <FormattedMessage id="update.publish.btn" defaultMessage="publish" />
-            </SmallButton>
-            <div className="notice">
-              {isHost ? (
-                notice
-              ) : (
-                <FormattedMessage
-                  id="update.publish.backers"
-                  defaultMessage={'Your update will be sent to {n} backers'}
-                  values={{
-                    n: backers,
-                  }}
-                />
-              )}
-            </div>
+            <StyledButton
+              buttonStyle="primary"
+              onClick={this.onClick}
+              loading={isLoading}
+              minWidth={100}
+              data-cy="btn-publish"
+            >
+              <FormattedMessage id="update.publish.btn" defaultMessage="Publish" />
+            </StyledButton>
           </Container>
         </Container>
       </div>
