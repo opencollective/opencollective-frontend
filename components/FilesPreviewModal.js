@@ -98,7 +98,7 @@ export default class FilesPreviewModal extends React.Component {
           <FormattedMessage id="FilesPreviewModal.AttachmentPreview" defaultMessage="Attachment preview" />
         </ModalHeader>
         <ModalBody mb={0}>
-          <Flex justifyContent="center">
+          <Flex justifyContent="center" width="100%">
             {hasMultipleFiles && (
               <StyledButton
                 buttonSize="tiny"
@@ -111,9 +111,9 @@ export default class FilesPreviewModal extends React.Component {
                 <ArrowLeft size={18} />
               </StyledButton>
             )}
-            <Box mx={2} width="100%">
+            <Flex mx={2} width="100%" justifyContent="center">
               {selectedItem && this.renderItemPreview(selectedItem)}
-            </Box>
+            </Flex>
             {hasMultipleFiles && (
               <StyledButton
                 buttonSize="tiny"
