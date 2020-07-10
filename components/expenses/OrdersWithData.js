@@ -83,6 +83,7 @@ const getOrdersQuery = gql`
         slug
         currency
         name
+        isHost
         host {
           id
           slug
