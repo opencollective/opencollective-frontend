@@ -1381,6 +1381,8 @@
   "tax.vat": "Impuesto sobre el valor añadido (IVA)",
   "tax.vat.description": "Utilice este tipo de categoría para ajustarse a la legislación vigente sobre el IVA en Europa.",
   "tax.vatShort": "VAT",
+  "TaxForm": "Tax form",
+  "TaxForm.DisabledPayment": "The payee must submit their tax form info before the expense can be paid.",
   "tier.amountType.fixed": "cantidad fija",
   "tier.amountType.flexible": "cantidad flexible",
   "tier.amountType.label": "Tipo de cantidad",

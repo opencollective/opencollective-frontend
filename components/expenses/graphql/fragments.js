@@ -103,6 +103,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
+      isAdmin
       location {
         address
         country
@@ -252,6 +253,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     amount
     currency
     type
+    requiredLegalDocuments
     permissions {
       canDelete
       canApprove
@@ -269,6 +271,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       type
       slug
       imageUrl(height: 80)
+      isAdmin
     }
     createdByAccount {
       id

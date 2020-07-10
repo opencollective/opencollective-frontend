@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -91,6 +92,8 @@ const ExpenseSummary = ({
             letterSpacing="0.8px"
             fontWeight="600"
             fontSize="Tiny"
+            showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+            showTaxFormMsg={expense.payee.isAdmin}
           />
         )}
       </Flex>
@@ -320,6 +323,7 @@ ExpenseSummary.propTypes = {
     status: PropTypes.oneOf(Object.values(expenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
+    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     items: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
@@ -334,6 +338,7 @@ ExpenseSummary.propTypes = {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      isAdmin: PropTypes.bool,
     }).isRequired,
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,

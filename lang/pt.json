@@ -1381,6 +1381,8 @@
   "tax.vat": "Imposto sobre o Valor Acrescentado (VAT)",
   "tax.vat.description": "Use este tipo de nível de modo a obedecer a legislação de VAT na Europa.",
   "tax.vatShort": "VAT",
+  "TaxForm": "Tax form",
+  "TaxForm.DisabledPayment": "The payee must submit their tax form info before the expense can be paid.",
   "tier.amountType.fixed": "quantia fixa",
   "tier.amountType.flexible": "quantia flexível",
   "tier.amountType.label": "Tipo de quantia",

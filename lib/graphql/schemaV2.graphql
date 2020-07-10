@@ -59,6 +59,11 @@ interface Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
   members(
     limit: Int = 100
     offset: Int = 0
@@ -386,6 +391,11 @@ type Bot implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -535,6 +545,11 @@ type Collective implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -2258,6 +2273,11 @@ type Event implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -2892,6 +2912,11 @@ type Fund implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -3056,6 +3081,11 @@ type Host implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -3266,6 +3296,11 @@ type Individual implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -3928,6 +3963,11 @@ type Organization implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -4166,6 +4206,11 @@ type Project implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
