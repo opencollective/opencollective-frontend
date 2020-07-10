@@ -65,7 +65,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
 
   if (!showTaxFormMsg) {
     return (
-      <Flex>
+      <Flex alignItems="center">
         {tag}
         {taxFormTag}
       </Flex>
@@ -73,7 +73,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
   }
 
   return (
-    <Flex>
+    <Flex alignItems="center">
       {tag}
       <StyledTooltip
         content={() => (
