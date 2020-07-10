@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { cloneDeep, debounce, get, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -313,7 +313,7 @@ class ExpensePage extends React.Component {
     const collective = expense?.account;
     const host = collective?.host;
     const hasAttachedFiles = expense?.attachedFiles?.length > 0;
-    const showTaxFormMsg = expense?.requiredLegalDocuments.includes('US_TAX_FORM') && expense?.permissions.canEdit;
+    const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
 
     // Adding that at GraphQL level is buggy

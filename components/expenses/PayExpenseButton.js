@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
+import { includes } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -19,6 +20,13 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
     return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a host" />;
   } else if (collective.balance < expense.amount) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
+  } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
+    return (
+      <FormattedMessage
+        id="TaxForm.DisabledPayment"
+        defaultMessage="The payee must submit their tax form info before the expense can be paid."
+      />
+    );
   } else if (!payoutMethod) {
     return null;
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {

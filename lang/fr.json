@@ -1381,6 +1381,8 @@
   "tax.vat": "Taxe sur la valeur ajoutée (TVA)",
   "tax.vat.description": "Utilisez ce type pour vous conformez à la réglementation pour la TVA en Europe.",
   "tax.vatShort": "TVA",
+  "TaxForm": "Tax form",
+  "TaxForm.DisabledPayment": "The payee must submit their tax form info before the expense can be paid.",
   "tier.amountType.fixed": "montant fixe",
   "tier.amountType.flexible": "montant flexible",
   "tier.amountType.label": "Type de montant",

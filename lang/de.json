@@ -1381,6 +1381,8 @@
   "tax.vat": "Value-added tax (VAT)",
   "tax.vat.description": "Use this tier type to conform with legislation on VAT in Europe.",
   "tax.vatShort": "VAT",
+  "TaxForm": "Tax form",
+  "TaxForm.DisabledPayment": "The payee must submit their tax form info before the expense can be paid.",
   "tier.amountType.fixed": "fixed amount",
   "tier.amountType.flexible": "flexible amount",
   "tier.amountType.label": "Amount type",

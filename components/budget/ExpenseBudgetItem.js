@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -113,7 +114,14 @@ const ExpenseBudgetItem = ({
           {isLoading ? (
             <LoadingPlaceholder height={20} width={140} />
           ) : (
-            <ExpenseStatusTag status={expense.status} fontSize="9px" lineHeight="14px" p="3px 8px" />
+            <ExpenseStatusTag
+              status={expense.status}
+              fontSize="9px"
+              lineHeight="14px"
+              p="3px 8px"
+              showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+              showTaxFormMsg={expense.payee.isAdmin}
+            />
           )}
         </Flex>
       </Flex>
@@ -161,11 +169,13 @@ ExpenseBudgetItem.propTypes = {
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
+    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     payee: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       imageUrl: PropTypes.string.isRequired,
+      isAdmin: PropTypes.bool,
     }),
     createdByAccount: PropTypes.shape({
       type: PropTypes.string.isRequired,
