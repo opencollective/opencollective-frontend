@@ -100,7 +100,7 @@ const EditPayPalAccount = props => {
             defaultMessage="Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>."
             values={{
               a: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts#how-do-i-pay-out-expenses-with-paypal',
+                href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-paypal',
                 openInNewTab: true,
               }),
             }}
@@ -121,7 +121,7 @@ const EditPayPalAccount = props => {
         <StyledInputField
           mt={2}
           name="token"
-          label="Token"
+          label="Secret"
           error={(formik.touched.token && formik.errors.token) || createError?.message.replace('GraphQL error: ', '')}
           disabled={isCreating}
         >
