@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Jul 01 2020 11:45:49 GMT+0200 (Central European Summer Time)
+# timestamp: Sun Jul 05 2020 11:26:58 GMT+0530 (India Standard Time)
 
 """
 Application model
@@ -1966,7 +1966,7 @@ type Mutation {
   addFundsToCollective(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
-  publishUpdate(id: Int!): UpdateType
+  publishUpdate(id: Int!, notificationAudience: UpdateAudienceTypeEnum!): UpdateType
   unpublishUpdate(id: Int!): UpdateType
   deleteUpdate(id: Int!): UpdateType
   createComment(comment: CommentInputType!): CommentType
@@ -3728,6 +3728,26 @@ input UpdateAttributesInputType {
 }
 
 """
+Defines targets for an update
+"""
+enum UpdateAudienceTypeEnum {
+  """
+  Will be sent to collective admins and financial contributors
+  """
+  ALL
+
+  """
+  Will be sent to collective admins
+  """
+  COLLECTIVE_ADMINS
+
+  """
+  Will be sent to financial contributors
+  """
+  FINANCIAL_CONTRIBUTORS
+}
+
+"""
 Input type for UpdateType
 """
 input UpdateInputType {
@@ -3754,6 +3774,7 @@ type UpdateType {
   slug: String
   image: String
   isPrivate: Boolean
+  notificationAudience: UpdateAudienceTypeEnum
   makePublicOn: IsoDateString
 
   """

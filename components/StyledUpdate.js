@@ -268,6 +268,7 @@ class StyledUpdate extends Component {
 
   renderEditUpdateForm() {
     const { collective, update } = this.props;
+
     return (
       <Container display="flex" flexDirection="column" flex="1 1" maxWidth="55em" flexWrap="wrap">
         {this.renderUpdateMeta(update, true)}

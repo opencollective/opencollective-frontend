@@ -15,7 +15,7 @@ describe('create an update', () => {
     cy.get('[data-cy=meta]').contains('draft');
     cy.get('[data-cy="privateIcon"]').should('not.exist');
     cy.get('.UpdatePage .PublishUpdateBtn').contains('Your update will be sent to');
-    cy.get('.UpdatePage button.publish').click();
+    cy.getByDataCy('btn-publish').click();
     cy.get('[data-cy=meta]').contains('draft').should('not.exist');
 
     cy.get('[data-cy=toggleEditUpdate').click();

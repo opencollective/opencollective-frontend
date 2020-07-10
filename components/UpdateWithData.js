@@ -60,6 +60,7 @@ const getUpdateQuery = gql`
         name
         slug
         settings
+        isHost
         stats {
           id
           backers {
