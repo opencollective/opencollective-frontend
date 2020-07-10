@@ -13,7 +13,7 @@ const ExpenseContainer = styled.div`
     `}
 `;
 
-const ExpensesList = ({ collective, host, expenses, isLoading, nbPlaceholders, isInverted }) => {
+const ExpensesList = ({ collective, host, expenses, isLoading, nbPlaceholders, isInverted, view }) => {
   expenses = !isLoading ? expenses : [...new Array(nbPlaceholders)];
 
   if (!expenses?.length) {
@@ -27,10 +27,11 @@ const ExpensesList = ({ collective, host, expenses, isLoading, nbPlaceholders, i
           <ExpenseBudgetItem
             isLoading={isLoading}
             isInverted={isInverted}
-            collective={collective}
+            collective={collective || expense?.account}
             expense={expense}
             host={host}
             showProcessActions
+            view={view}
           />
         </ExpenseContainer>
       ))}
@@ -45,6 +46,7 @@ ExpensesList.propTypes = {
   /** When `isLoading` is true, this sets the number of "loadin" items displayed */
   nbPlaceholders: PropTypes.number,
   host: PropTypes.object,
+  view: PropTypes.oneOf(['public', 'admin']),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     parent: PropTypes.shape({
@@ -61,6 +63,7 @@ ExpensesList.propTypes = {
 
 ExpensesList.defaultProps = {
   nbPlaceholders: 10,
+  view: 'public',
 };
 
 export default ExpensesList;

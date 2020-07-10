@@ -14,7 +14,7 @@ import ExpensesList from '../expenses/ExpensesList';
 import ExpensesSearchBar from '../expenses/ExpensesSearchBar';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../expenses/filters/ExpensesDateFilter';
-import { expensesListFieldsFragment } from '../expenses/graphql/fragments';
+import { expensesListAdminFieldsFragment, expensesListFieldsFragment } from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -68,6 +68,7 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
       limit
       nodes {
         ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
         account {
           id
           name
@@ -86,6 +87,7 @@ const dashboardExpensesQuery = gqlV2/* GraphQL */ `
   }
 
   ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
 `;
 
 const EXPENSES_PER_PAGE = 15;
@@ -205,6 +207,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             nbPlaceholders={variables.limit}
             host={data?.host}
             expenses={data?.expenses?.nodes}
+            view="admin"
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

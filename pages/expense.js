@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
@@ -312,7 +313,9 @@ class ExpensePage extends React.Component {
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
-    const hasAttachedFiles = expense?.attachedFiles?.length > 0;
+    const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
+    const isInvoice = expense?.type === expenseTypes.INVOICE;
+    const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
 
@@ -401,7 +404,12 @@ class ExpensePage extends React.Component {
                         <H5 fontSize="LeadParagraph" mb={3}>
                           <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
                         </H5>
-                        <ExpenseAttachedFiles files={expense.attachedFiles} />
+                        <ExpenseAttachedFiles
+                          files={expense.attachedFiles}
+                          collective={collective}
+                          expense={expense}
+                          showInvoice={canSeeInvoiceInfo}
+                        />
                       </Container>
                     )}
                     {expense?.privateMessage && (

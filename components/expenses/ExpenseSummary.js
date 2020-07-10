@@ -144,18 +144,19 @@ const ExpenseSummary = ({
         <div data-cy="expense-summary-items">
           {expense.items.map(attachment => (
             <React.Fragment key={attachment.id}>
-              <Flex justifyContent="space-between" alignItems="center" my={24}>
-                <Flex>
-                  {(isReceipt || attachment.url) && (
-                    <Box mr={3}>
-                      <UploadedFilePreview
-                        url={attachment.url}
-                        isLoading={isLoading || isLoadingLoggedInUser}
-                        isPrivate={!attachment.url && !isLoading}
-                        size={48}
-                      />
-                    </Box>
-                  )}
+              <Flex my={24} flexWrap="wrap">
+                {(isReceipt || attachment.url) && (
+                  <Box mr={3} mb={3} width={['100%', 'auto']}>
+                    <UploadedFilePreview
+                      url={attachment.url}
+                      isLoading={isLoading || isLoadingLoggedInUser}
+                      isPrivate={!attachment.url && !isLoading}
+                      size={[640, 48]}
+                      maxHeight={48}
+                    />
+                  </Box>
+                )}
+                <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
                   <Flex flexDirection="column" justifyContent="center">
                     <Span color="black.900" fontWeight="500">
                       {attachment.description || (
@@ -175,16 +176,15 @@ const ExpenseSummary = ({
                       <FormattedDate value={attachment.incurredAt} />
                     </Span>
                   </Flex>
+                  <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
+                    <FormattedMoneyAmount
+                      amount={attachment.amount}
+                      currency={expense.currency}
+                      amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                      precision={2}
+                    />
+                  </P>
                 </Flex>
-
-                <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
-                  <FormattedMoneyAmount
-                    amount={attachment.amount}
-                    currency={expense.currency}
-                    amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
-                    precision={2}
-                  />
-                </P>
               </Flex>
               <StyledHr borderStyle="dotted" />
             </React.Fragment>

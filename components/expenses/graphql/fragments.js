@@ -280,3 +280,20 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     }
   }
 `;
+
+export const expensesListAdminFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensesListAdminFieldsFragment on Expense {
+    id
+    items {
+      id
+      description
+      incurredAt
+      url
+      amount
+    }
+    attachedFiles {
+      id
+      url
+    }
+  }
+`;
