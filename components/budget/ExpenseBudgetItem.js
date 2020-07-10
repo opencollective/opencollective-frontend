@@ -194,14 +194,16 @@ const ExpenseBudgetItem = ({
                 <DetailColumnHeader>
                   <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
                 </DetailColumnHeader>
-                <PayoutMethodTypeWithIcon
-                  isLoading={isLoading}
-                  type={expense?.payoutMethod?.type}
-                  iconSize="10px"
-                  fontSize="11px"
-                  fontWeight="normal"
-                  color="black.700"
-                />
+                <Box mt="6px">
+                  <PayoutMethodTypeWithIcon
+                    isLoading={isLoading}
+                    type={expense?.payoutMethod?.type}
+                    iconSize="10px"
+                    fontSize="11px"
+                    fontWeight="normal"
+                    color="black.700"
+                  />
+                </Box>
               </Box>
               {nbAttachedFiles > 0 && (
                 <Box mr={[3, 4]}>
