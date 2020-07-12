@@ -1462,7 +1462,6 @@
   "transactions.downloadcsvbutton": "Download CSV",
   "transactions.downloadinvoicesbutton": "Download Receipts",
   "transactions.empty": "Žádné transakce",
-  "transactions.emptysearch": "V tomto časovém rozmezí nejsou žádné transakce.",
   "transactions.viewAll": "View All Transactions",
   "transferwise.error.balance.payment-option-unavailable": "Unable to fund transfer, please check your balance and try again.",
   "transferwise.error.currencyNotSupported": "Tato měna není podporována",

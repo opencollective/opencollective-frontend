@@ -1462,7 +1462,6 @@
   "transactions.downloadcsvbutton": "Télécharger CSV",
   "transactions.downloadinvoicesbutton": "Télécharger les factures",
   "transactions.empty": "Pas de transactions",
-  "transactions.emptysearch": "Il n'y a pas de transactions pour cette période.",
   "transactions.viewAll": "Voir toutes les transactions",
   "transferwise.error.balance.payment-option-unavailable": "Impossible de financer le transfert, veuillez vérifier votre solde et réessayer.",
   "transferwise.error.currencyNotSupported": "Cette devise n'est pas prise en charge",

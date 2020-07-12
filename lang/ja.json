@@ -1462,7 +1462,6 @@
   "transactions.downloadcsvbutton": "CSV をダウンロード",
   "transactions.downloadinvoicesbutton": "領収書をダウンロード",
   "transactions.empty": "取引がありません",
-  "transactions.emptysearch": "この期間に取引はありません。",
   "transactions.viewAll": "全ての取引を表示する",
   "transferwise.error.balance.payment-option-unavailable": "Unable to fund transfer, please check your balance and try again.",
   "transferwise.error.currencyNotSupported": "This currency is not supported",

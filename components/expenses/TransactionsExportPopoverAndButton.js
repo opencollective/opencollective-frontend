@@ -158,10 +158,16 @@ class ExportForm extends React.Component {
         </Button>
         {this.state.searchReturnedEmpty && (
           <div className="empty-search-error">
+            {/*
+            Work around for react-intl 5.0.0
+            See: https://github.com/opencollective/opencollective-frontend/pull/4592
+            And: https://github.com/formatjs/formatjs/commit/42fa3c1c084b6da969790ee0b77b2f7fd6353488
             <FormattedMessage
               id="transactions.emptysearch"
               defaultMessage="There are no transactions in this date range."
             />
+            */}
+            There are no transactions in this date range.
           </div>
         )}
       </Popover>
