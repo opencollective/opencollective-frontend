@@ -82,7 +82,7 @@
     "polished": "3.6.5",
     "prop-types": "15.7.2",
     "react": "16.13.1",
-    "react-bootstrap": "0.33.1",
+    "react-bootstrap": "1.2.1",
     "react-datetime": "2.16.3",
     "react-dnd": "11.1.1",
     "react-dnd-html5-backend": "11.1.1",
