@@ -21,7 +21,7 @@ const localeDataCache = new Map();
 const getLocaleDataScript = locale => {
   const lang = locale.split('-')[0];
   if (!localeDataCache.has(lang)) {
-    const localeDataFile = require.resolve(`@formatjs/intl-relativetimeformat/dist/locale-data/${lang}`);
+    const localeDataFile = require.resolve(`@formatjs/intl-relativetimeformat/locale-data/${lang}`);
     const localeDataScript = fs.readFileSync(localeDataFile, 'utf8');
     localeDataCache.set(lang, localeDataScript);
   }
