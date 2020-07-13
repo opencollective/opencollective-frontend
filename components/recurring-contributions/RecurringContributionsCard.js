@@ -42,6 +42,8 @@ const RecurringContributionsCard = ({
   const isError = status === ORDER_STATUS.ERROR;
   const isActive = status === ORDER_STATUS.ACTIVE || isError;
 
+  console.log(contribution.platformFee);
+
   return (
     <StyledCollectiveCard
       {...props}
@@ -69,6 +71,20 @@ const RecurringContributionsCard = ({
               currency={contribution.amount.currency}
             />
           </P>
+          {contribution.platformFee && (
+            <Box>
+              <P fontSize="Caption" lineHeight="Paragraph" fontWeight="400">
+                <FormattedMessage id="Subscriptions.PlatformFeeAmount" defaultMessage="Platform fee" />
+              </P>
+              <P fontSize="Caption" lineHeight="Paragraph" fontWeight="bold">
+                <FormattedMoneyAmount
+                  amount={contribution.platformFee.value * 100}
+                  interval={contribution.frequency.toLowerCase().slice(0, -2)}
+                  currency={contribution.amount.currency}
+                />
+              </P>
+            </Box>
+          )}
         </Box>
         <Box mb={3}>
           <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
