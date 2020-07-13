@@ -65,7 +65,6 @@ class Transaction extends React.Component {
       interval: PropTypes.oneOf(['month', 'year']),
     }),
     type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
-    isFeesOnTop: PropTypes.bool, // whether or not this transaction refers to a refund
     isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
     /** Choose between date (eg. 2018/12/09) or interval (eg. two months ago) */
     dateDisplayType: PropTypes.oneOf(['date', 'interval']),
@@ -128,8 +127,6 @@ class Transaction extends React.Component {
       paymentProcessorFeeInHostCurrency,
       dateDisplayType,
       expense,
-      isFeesOnTop,
-      platformFeeInHostCurrency,
     } = this.props;
 
     if (!fromCollective) {
@@ -137,10 +134,7 @@ class Transaction extends React.Component {
       return <div />;
     }
 
-    let amountToDisplay = isFeesOnTop ? amount + platformFeeInHostCurrency : amount;
-    if (['ORGANIZATION', 'USER'].includes(collective.type)) {
-      amountToDisplay = netAmountInCollectiveCurrency;
-    }
+    const amountToDisplay = ['ORGANIZATION', 'USER'].includes(collective.type) ? netAmountInCollectiveCurrency : amount;
 
     return (
       <Flex my={4}>

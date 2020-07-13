@@ -23,21 +23,9 @@ import TransactionSign from '../TransactionSign';
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const OrderBudgetItem = ({
-  collective,
-  fromCollective,
-  isInverted,
-  isExpanded,
-  setExpanded,
-  transaction,
-  order,
-  isFeesOnTop,
-}) => {
+const OrderBudgetItem = ({ collective, fromCollective, isInverted, isExpanded, setExpanded, transaction, order }) => {
   const isCredit = transaction.type === TransactionTypes.CREDIT;
-  let amount = transaction[isCredit ? 'amount' : 'netAmountInCollectiveCurrency'];
-  if (isFeesOnTop) {
-    amount = transaction.amount + transaction.platformFeeInHostCurrency;
-  }
+  const amount = transaction[isCredit ? 'amount' : 'netAmountInCollectiveCurrency'];
   if (isInverted) {
     [fromCollective, collective] = [collective, fromCollective];
   }
@@ -158,7 +146,6 @@ const OrderBudgetItem = ({
 
 OrderBudgetItem.propTypes = {
   isInverted: PropTypes.bool.isRequired,
-  isFeesOnTop: PropTypes.bool.isRequired,
   isExpanded: PropTypes.bool.isRequired,
   setExpanded: PropTypes.func.isRequired,
   fromCollective: PropTypes.shape({

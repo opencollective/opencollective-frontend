@@ -177,7 +177,7 @@ const DetailsContainer = styled.div`
 /**
  * A single item
  */
-const BudgetItem = ({ item, isInverted, isCompact, isFeesOnTop, canDownloadInvoice }) => {
+const BudgetItem = ({ item, isInverted, isCompact, canDownloadInvoice }) => {
   const [isExpanded, setExpanded] = React.useState(false);
 
   if (item.__typename === 'ExpenseType') {
@@ -204,7 +204,6 @@ const BudgetItem = ({ item, isInverted, isCompact, isFeesOnTop, canDownloadInvoi
             collective={item.collective}
             transaction={item}
             isInverted={isInverted}
-            isFeesOnTop={isFeesOnTop}
             isExpanded={isExpanded}
             setExpanded={setExpanded}
             order={item.order}
@@ -214,7 +213,6 @@ const BudgetItem = ({ item, isInverted, isCompact, isFeesOnTop, canDownloadInvoi
           <DetailsContainer isCompact={isCompact}>
             <OrderBudgetItemDetails
               collective={item.collective || item.fromCollective}
-              isFeesOnTop={isFeesOnTop}
               canDownloadInvoice={canDownloadInvoice}
               isInverted={isInverted}
               transaction={item}
@@ -239,9 +237,6 @@ BudgetItem.propTypes = {
   /** Use this if the place where the component is rendered isn't that big to compact it */
   isCompact: PropTypes.bool,
 
-  /** Use this if you want to change how Platform Fees are displayed */
-  isFeesOnTop: PropTypes.bool,
-
   /** If true, a button to download invoice will be displayed when possible */
   canDownloadInvoice: PropTypes.bool,
 };
@@ -251,7 +246,7 @@ BudgetItem.propTypes = {
  * types. You must provide items fetched from GraphQL, as the component will use the
  * `__typename` to know how to display item.
  */
-const BudgetItemsList = ({ items, isInverted, isCompact, canDownloadInvoice, isFeesOnTop }) => {
+const BudgetItemsList = ({ items, isInverted, isCompact, canDownloadInvoice }) => {
   return !items || items.length === 0 ? null : (
     <DebitCreditList>
       {items.map(item => (
@@ -260,7 +255,6 @@ const BudgetItemsList = ({ items, isInverted, isCompact, canDownloadInvoice, isF
           item={item}
           isInverted={isInverted}
           isCompact={isCompact}
-          isFeesOnTop={isFeesOnTop}
           canDownloadInvoice={canDownloadInvoice}
         />
       ))}
