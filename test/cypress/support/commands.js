@@ -1,5 +1,6 @@
 import 'cypress-file-upload';
 
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getLoggedInUserQuery } from '../../../lib/graphql/queries';
 
 import { CreditCards } from '../../stripe-helpers';
@@ -328,6 +329,63 @@ Cypress.Commands.add('disableSmoothScroll', () => {
   disableSmoothScroll();
 });
 
+/**
+ * Add 2FA to a test account
+ */
+Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail, userSlug, secret } = {}) => {
+  let authToken;
+  return signinRequestAndReturnToken({ email: userEmail, slug: userSlug }, null).then(token => {
+    authToken = token;
+    return graphqlV2Query(authToken, {
+      operationName: 'AccountHasTwoFactorAuth',
+      query: `
+        query AccountHasTwoFactorAuth($slug: String) {
+          individual(slug: $slug) {
+            id
+            slug
+            name
+            type
+            id
+            slug
+            name
+            type
+            ... on Individual {
+              hasTwoFactorAuth
+            }
+          }
+        }
+          `,
+      variables: { slug: userSlug },
+      options: { context: API_V2_CONTEXT },
+    })
+      .then(({ body }) => {
+        const account = {
+          id: body.data.individual.id,
+        };
+        const token = secret;
+
+        return graphqlV2Query(authToken, {
+          operationName: 'AddTwoFactorAuthToAccount',
+          query: `
+            mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
+              addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+                id
+                ... on Individual {
+                  hasTwoFactorAuth
+                }
+              }
+            }
+        `,
+          variables: { account, token },
+          options: { context: API_V2_CONTEXT },
+        });
+      })
+      .then(({ body }) => {
+        return body.data;
+      });
+  });
+});
+
 // ---- Private ----
 
 /**
@@ -360,6 +418,19 @@ function signinRequestAndReturnToken(user, redirect) {
 function graphqlQuery(token, body) {
   return cy.request({
     url: '/api/graphql',
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+function graphqlV2Query(token, body) {
+  return cy.request({
+    url: '/api/graphql/v2',
     method: 'POST',
     headers: {
       Accept: 'application/json',

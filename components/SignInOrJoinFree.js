@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
+import { Field, Form, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { pick } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { checkUserExistence, signin } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
@@ -15,7 +16,18 @@ import { Box, Flex } from './Grid';
 import Link from './Link';
 import MessageBox from './MessageBox';
 import SignIn from './SignIn';
-import { P } from './Text';
+import StyledButton from './StyledButton';
+import StyledCard from './StyledCard';
+import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
+import { H5, P } from './Text';
+
+const messages = defineMessages({
+  inputLabel: {
+    id: 'TwoFactorAuth.Setup.Form.InputLabel',
+    defaultMessage: 'Please enter your 6-digit code without any dashes.',
+  },
+});
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
@@ -44,6 +56,9 @@ class SignInOrJoinFree extends React.Component {
     withShadow: PropTypes.bool,
     /** Label for signIn, defaults to "Sign in using your email address:" */
     signInLabel: PropTypes.node,
+    intl: PropTypes.object,
+    enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
+    submitTwoFactorAuthenticatorCode: PropTypes.func,
   };
 
   state = {
@@ -131,10 +146,80 @@ class SignInOrJoinFree extends React.Component {
     }
   };
 
+  renderTwoFactorAuthBox = () => {
+    return (
+      <StyledCard maxWidth={480} width={1} boxShadow={'0px 9px 14px 1px #dedede'}>
+        <Box py={4} px={[3, 4]}>
+          <H5 as="label" fontWeight="bold" htmlFor="twoFactorAuthenticatorCode" mb={3} textAlign="left" display="block">
+            <FormattedMessage id="TwoFactorAuth.SignIn" defaultMessage="Please verify your login using the 2FA code:" />
+          </H5>
+          <Formik
+            initialValues={{
+              twoFactorAuthenticatorCode: '',
+            }}
+            onSubmit={(values, actions) => {
+              this.props.submitTwoFactorAuthenticatorCode(values, actions);
+            }}
+          >
+            {formik => {
+              const { values, handleSubmit, errors, touched, isSubmitting } = formik;
+
+              return (
+                <Form>
+                  <StyledInputField
+                    name="twoFactorAuthenticatorCode"
+                    htmlFor="twoFactorAuthenticatorCode"
+                    error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
+                    label={this.props.intl.formatMessage(messages.inputLabel)}
+                    value={values.twoFactorAuthenticatorCode}
+                    required
+                    mt={2}
+                    mb={3}
+                  >
+                    {inputProps => (
+                      <Field
+                        as={StyledInput}
+                        {...inputProps}
+                        minWidth={300}
+                        minHeight={75}
+                        fontSize={'H5'}
+                        placeholder="123456"
+                        pattern="[0-9]{6}"
+                        autoFocus
+                        data-cy="signin-two-factor-auth-input"
+                      />
+                    )}
+                  </StyledInputField>
+
+                  <Flex justifyContent={['center', 'left']} mb={4}>
+                    <StyledButton
+                      fontSize="13px"
+                      minWidth="148px"
+                      minHeight="36px"
+                      buttonStyle="primary"
+                      type="submit"
+                      onSubmit={handleSubmit}
+                      disabled={values.twoFactorAuthenticatorCode.length < 6}
+                      loading={isSubmitting}
+                      data-cy="signin-two-factor-auth-button"
+                    >
+                      <FormattedMessage id="TwoFactorAuth.Setup.Form.VerifyButton" defaultMessage="Verify" />
+                    </StyledButton>
+                  </Flex>
+                </Form>
+              );
+            }}
+          </Formik>
+        </Box>
+      </StyledCard>
+    );
+  };
+
   render() {
     const { submitting, error, unknownEmailError, email } = this.state;
     const displayedForm = this.props.form || this.state.form;
     const routes = this.props.routes || {};
+    const { enforceTwoFactorAuthForLoggedInUser } = this.props;
 
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
@@ -143,45 +228,51 @@ class SignInOrJoinFree extends React.Component {
             {error.replace('GraphQL error: ', 'Error: ')}
           </MessageBox>
         )}
-        {displayedForm !== 'create-account' ? (
-          <SignIn
-            email={email}
-            onEmailChange={email => this.setState({ email })}
-            onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
-            onSubmit={this.signIn}
-            loading={submitting}
-            unknownEmail={unknownEmailError}
-            withShadow={this.props.withShadow}
-            label={this.props.signInLabel}
-          />
+        {enforceTwoFactorAuthForLoggedInUser ? (
+          this.renderTwoFactorAuthBox()
         ) : (
-          <Flex flexDirection="column" width={1} alignItems="center">
-            <Flex justifyContent="center" width={1}>
-              <Box width={[0, null, null, 1 / 5]} />
-              <CreateProfile
+          <Fragment>
+            {displayedForm !== 'create-account' ? (
+              <SignIn
                 email={email}
                 onEmailChange={email => this.setState({ email })}
-                onPersonalSubmit={this.createProfile}
-                onOrgSubmit={this.createProfile}
-                onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
-                submitting={submitting}
-                mx={[2, 4]}
-                createPersonalProfileLabel={this.props.createPersonalProfileLabel}
-                createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
+                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                onSubmit={this.signIn}
+                loading={submitting}
+                unknownEmail={unknownEmailError}
+                withShadow={this.props.withShadow}
+                label={this.props.signInLabel}
               />
-              <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
-            </Flex>
-            <P mt={4} color="black.500" fontSize="Caption" mb={3} data-cy="join-conditions">
-              <FormattedMessage
-                id="SignIn.legal"
-                defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
-                values={{
-                  'tos-link': msg => <Link route="/tos">{msg}</Link>,
-                  'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
-                }}
-              />
-            </P>
-          </Flex>
+            ) : (
+              <Flex flexDirection="column" width={1} alignItems="center">
+                <Flex justifyContent="center" width={1}>
+                  <Box width={[0, null, null, 1 / 5]} />
+                  <CreateProfile
+                    email={email}
+                    onEmailChange={email => this.setState({ email })}
+                    onPersonalSubmit={this.createProfile}
+                    onOrgSubmit={this.createProfile}
+                    onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
+                    submitting={submitting}
+                    mx={[2, 4]}
+                    createPersonalProfileLabel={this.props.createPersonalProfileLabel}
+                    createOrganizationProfileLabel={this.props.createOrganizationProfileLabel}
+                  />
+                  <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
+                </Flex>
+                <P mt={4} color="black.500" fontSize="Caption" mb={3} data-cy="join-conditions">
+                  <FormattedMessage
+                    id="SignIn.legal"
+                    defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
+                    values={{
+                      'tos-link': msg => <Link route="/tos">{msg}</Link>,
+                      'privacy-policy-link': msg => <Link route="/privacypolicy">{msg}</Link>,
+                    }}
+                  />
+                </P>
+              </Flex>
+            )}
+          </Fragment>
         )}
       </Flex>
     );
@@ -211,4 +302,4 @@ const createUserQuery = gql`
 
 const addCreateUserMutation = graphql(createUserQuery, { name: 'createUser' });
 
-export default addCreateUserMutation(SignInOrJoinFree);
+export default injectIntl(addCreateUserMutation(SignInOrJoinFree));

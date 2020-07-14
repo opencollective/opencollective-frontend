@@ -1,3 +1,6 @@
+import { Secret, TOTP } from 'otpauth';
+import speakeasy from 'speakeasy';
+
 import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
 import generateToken from '../support/token';
 
@@ -170,5 +173,46 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${email}.`);
+  });
+});
+
+describe('signin with 2FA', () => {
+  let user = null;
+  let secret;
+  let TOTPCode;
+
+  before(() => {
+    cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => (user = u));
+  });
+
+  before(() => {
+    secret = speakeasy.generateSecret({ length: 64 });
+    cy.enableTwoFactorAuth({
+      userEmail: user.email,
+      userSlug: user.collective.slug,
+      secret: secret.base32,
+    });
+  });
+
+  it('can signin with 2fa enabled', () => {
+    // now login with 2FA enabled
+    cy.log('secret', secret);
+    cy.login({ email: user.email, redirect: '/apex' });
+    cy.getByDataCy('signin-message-box').contains('Two-factor authentication is enabled on this account');
+    cy.getByDataCy('signin-two-factor-auth-input').type('123456');
+    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.getByDataCy('signin-message-box').contains(
+      'Sign In failed: Two-factor authentication code failed. Please try again',
+    );
+    TOTPCode = new TOTP({
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: Secret.fromB32(secret.base32),
+    }).generate();
+    cy.getByDataCy('signin-two-factor-auth-input').clear().type(TOTPCode);
+    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.assertLoggedIn();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
 });
