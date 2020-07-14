@@ -76,7 +76,6 @@ class Transactions extends React.Component {
     const isRoot = LoggedInUser && LoggedInUser.isRoot();
     const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(collective);
     const isCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
-    const isFeesOnTop = collective.platformFeePercent === 0 && collective.host?.settings?.feesOnTop;
 
     return (
       <div className="Transactions">
@@ -187,7 +186,6 @@ class Transactions extends React.Component {
               <Transaction
                 collective={collective}
                 {...transaction}
-                isFeesOnTop={isFeesOnTop}
                 isRefund={Boolean(transaction.refundTransaction)}
                 canRefund={this.canRefund(isRoot, isHostAdmin, isCollectiveAdmin)}
                 canDownloadInvoice={this.canDownloadInvoice(transaction, isRoot, isCollectiveAdmin)}

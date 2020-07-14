@@ -47,7 +47,6 @@ class TransactionDetails extends React.Component {
     }),
     type: PropTypes.oneOf(['CREDIT', 'DEBIT']),
     isRefund: PropTypes.bool, // whether or not this transaction refers to a refund
-    isFeesOnTop: PropTypes.bool, // whether or not this transaction refers to a refund
     intl: PropTypes.object.isRequired,
     mode: PropTypes.string, // open or closed
     fromCollective: PropTypes.object,
@@ -111,15 +110,11 @@ class TransactionDetails extends React.Component {
       currency,
       hostCurrency,
       hostCurrencyFxRate,
-      isFeesOnTop,
-      platformFeeInHostCurrency,
     } = this.props;
 
     let initialAmount = amount;
     if (['ORGANIZATION', 'USER'].includes(collective.type)) {
       initialAmount = -netAmountInCollectiveCurrency;
-    } else if (isFeesOnTop) {
-      initialAmount = amount + platformFeeInHostCurrency;
     }
     let totalAmount = initialAmount;
     const amountDetails = [
@@ -129,11 +124,8 @@ class TransactionDetails extends React.Component {
       }),
     ];
     if (hostCurrencyFxRate && hostCurrencyFxRate !== 1) {
-      let amountInHostCurrency = amount * hostCurrencyFxRate;
+      const amountInHostCurrency = amount * hostCurrencyFxRate;
       totalAmount = amount;
-      if (isFeesOnTop) {
-        amountInHostCurrency = amountInHostCurrency + platformFeeInHostCurrency;
-      }
       amountDetails.push(
         ` (${intl.formatNumber(amountInHostCurrency / 100, {
           currency: hostCurrency,
@@ -158,11 +150,7 @@ class TransactionDetails extends React.Component {
       });
     };
 
-    if (isFeesOnTop) {
-      addFees(['taxAmount', 'hostFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
-    } else {
-      addFees(['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
-    }
+    addFees(['taxAmount', 'hostFeeInHostCurrency', 'platformFeeInHostCurrency', 'paymentProcessorFeeInHostCurrency']);
 
     let amountDetailsStr = amountDetails.length > 1 ? amountDetails.join(' ') : '';
 

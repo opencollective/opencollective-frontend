@@ -34,7 +34,6 @@ export const getCollectivePageQuery = gql`
       isHost
       isIncognito
       hostFeePercent
-      platformFeePercent
       image
       imageUrl(height: 256)
       canApply

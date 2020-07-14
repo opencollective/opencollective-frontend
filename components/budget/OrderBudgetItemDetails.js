@@ -58,17 +58,14 @@ const getAmountDetailsStr = (amount, currency, transaction, platformFee) => {
   );
 };
 
-const OrderBudgetItemDetails = ({ collective, isInverted, isFeesOnTop, transaction, canDownloadInvoice }) => {
+const OrderBudgetItemDetails = ({ collective, isInverted, transaction, canDownloadInvoice }) => {
   const intl = useIntl();
   const isCredit = transaction.type === TransactionTypes.CREDIT;
   const hasRefund = Boolean(transaction && transaction.refundTransaction);
   const hasAccessToInvoice = canDownloadInvoice && transaction && transaction.uuid;
   const hasInvoiceBtn = hasAccessToInvoice && !hasRefund && (!isCredit || !isInverted);
-  const platformFee = isFeesOnTop ? undefined : transaction.platformFeeInHostCurrency;
-  let amount = transaction[isCredit ? 'amount' : 'netAmountInCollectiveCurrency'];
-  if (isFeesOnTop) {
-    amount = transaction.amount + transaction.platformFeeInHostCurrency;
-  }
+  const platformFee = transaction.platformFeeInHostCurrency;
+  const amount = transaction[isCredit ? 'amount' : 'netAmountInCollectiveCurrency'];
 
   return (
     <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center">
@@ -117,7 +114,6 @@ OrderBudgetItemDetails.propTypes = {
   /** If true, debit and credit will be inverted. Useful to adapt based on who's viewing */
   isInverted: PropTypes.bool,
   isCredit: PropTypes.bool,
-  isFeesOnTop: PropTypes.bool,
   /** If true, a button to download invoice will be displayed when possible */
   canDownloadInvoice: PropTypes.bool,
   transaction: PropTypes.shape({
