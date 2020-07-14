@@ -1358,6 +1358,7 @@
   "Subscriptions.Cancelled": "Annulée",
   "Subscriptions.ContributedToDate": "Contribution à ce jour",
   "Subscriptions.Edit": "Editer",
+  "Subscriptions.FeesOnTopTooltip": "Contribution to collective plus contribution to the platform",
   "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} other {}}",
   "Subscriptions.Title": "Contributions récurrentes",
   "table.head.large": "Large",
