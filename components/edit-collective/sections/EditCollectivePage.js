@@ -109,6 +109,9 @@ const CollectiveSectionEntry = ({
   if (collectiveType !== CollectiveType.FUND && collectiveType !== CollectiveType.PROJECT) {
     options = options.filter(({ value }) => value !== 'ADMIN');
   }
+  if (section === 'budget' && ![CollectiveType.FUND, CollectiveType.PROJECT].includes(collectiveType)) {
+    options = options.filter(({ value }) => value !== 'DISABLED');
+  }
 
   let defaultValue;
   if (!isEnabled) {
