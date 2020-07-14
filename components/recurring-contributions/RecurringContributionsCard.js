@@ -6,10 +6,11 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledTag from '../StyledTag';
+import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -53,23 +54,73 @@ const RecurringContributionsCard = ({
       }
     >
       <Container p={3}>
-        <Box mb={3}>
-          <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
-            <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
-          </P>
-          <P
-            fontSize="Paragraph"
-            lineHeight="Paragraph"
-            fontWeight="bold"
-            data-cy="recurring-contribution-amount-contributed"
-          >
-            <FormattedMoneyAmount
-              amount={contribution.amount.value * 100}
-              interval={contribution.frequency.toLowerCase().slice(0, -2)}
-              currency={contribution.amount.currency}
-            />
-          </P>
-        </Box>
+        {contribution.platformFee ? (
+          <Box mb={3}>
+            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
+              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
+            </P>
+            <Flex>
+              <P
+                fontSize="Paragraph"
+                lineHeight="Paragraph"
+                fontWeight="bold"
+                data-cy="recurring-contribution-amount-contributed"
+              >
+                <FormattedMoneyAmount
+                  amount={(contribution.amount.value + contribution.platformFee.value) * 100}
+                  interval={contribution.frequency.toLowerCase().slice(0, -2)}
+                  currency={contribution.amount.currency}
+                />
+              </P>
+              <StyledTooltip
+                content={() => (
+                  <FormattedMessage
+                    id="Subscriptions.FeesOnTopTooltip"
+                    defaultMessage="Contribution to collective plus contribution to the platform"
+                  />
+                )}
+              >
+                <P fontSize="Caption" lineHeight="Paragraph" color="black.700" ml={1}>
+                  (
+                  <FormattedMoneyAmount
+                    amount={contribution.amount.value * 100}
+                    currency={contribution.amount.currency}
+                    showCurrencyCode={false}
+                    precision={0}
+                    amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
+                  />{' '}
+                  +{' '}
+                  <FormattedMoneyAmount
+                    amount={contribution.platformFee.value * 100}
+                    currency={contribution.amount.currency}
+                    showCurrencyCode={false}
+                    precision={0}
+                    amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
+                  />
+                  )
+                </P>
+              </StyledTooltip>
+            </Flex>
+          </Box>
+        ) : (
+          <Box mb={3}>
+            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
+              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
+            </P>
+            <P
+              fontSize="Paragraph"
+              lineHeight="Paragraph"
+              fontWeight="bold"
+              data-cy="recurring-contribution-amount-contributed"
+            >
+              <FormattedMoneyAmount
+                amount={contribution.amount.value * 100}
+                interval={contribution.frequency.toLowerCase().slice(0, -2)}
+                currency={contribution.amount.currency}
+              />
+            </P>
+          </Box>
+        )}
         <Box mb={3}>
           <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
             <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />

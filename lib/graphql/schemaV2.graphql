@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Sun Jul 05 2020 11:27:56 GMT+0530 (India Standard Time)
+# timestamp: Mon Jul 13 2020 12:29:27 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -3873,6 +3873,11 @@ type Order {
   """
   totalDonations: Amount
   paymentMethod: PaymentMethod
+
+  """
+  If an Order has fees on top, we should return the amount
+  """
+  platformFee: Amount
 }
 
 """

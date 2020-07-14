@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Sun Jul 05 2020 11:26:58 GMT+0530 (India Standard Time)
+# timestamp: Mon Jul 13 2020 12:29:09 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -102,7 +102,7 @@ type Collective implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -399,7 +399,7 @@ interface CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -1012,7 +1012,7 @@ type Event implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -1444,7 +1444,7 @@ type Fund implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -2507,7 +2507,7 @@ type Organization implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -2919,7 +2919,7 @@ type Project implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -3835,7 +3835,7 @@ type User implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
