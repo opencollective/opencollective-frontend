@@ -89,7 +89,7 @@
   "bankaccount.instructions.account": "bank account details added above",
   "bankaccount.instructions.amount": "total amount of the order",
   "bankaccount.instructions.collective": "slug of the collective receiving the order",
-  "bankaccount.instructions.preview": "Preview:",
+  "bankaccount.instructions.preview": "预览：",
   "bankaccount.instructions.reference": "unique id to track when the order is received",
   "bankaccount.instructions.variables": "You can use the following variables in the instructions:",
   "BankInfo.Type": "类型： {type}",
