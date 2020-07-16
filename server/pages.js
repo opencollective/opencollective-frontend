@@ -198,4 +198,12 @@ pages.add(
 pages.add('recurring-contributions', '/:slug/recurring-contributions');
 pages.add('subscriptions', '/:slug/subscriptions', 'recurring-contributions');
 
+// new contribution flow
+pages.add('new-donate', '/:slug/:verb(new-donate)/:step(details|profile|payment|success)', 'new-contribution-flow');
+pages.add(
+  'new-contribute',
+  '/:slug/:verb(new-contribute)/:tier/:step(details|profile|payment|success)',
+  'new-contribution-flow',
+);
+
 module.exports = pages;
