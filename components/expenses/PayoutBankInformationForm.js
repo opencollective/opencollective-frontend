@@ -4,7 +4,6 @@ import { useQuery } from '@apollo/react-hooks';
 import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -39,10 +38,6 @@ const accountHolderFieldOptions = {
   ],
 };
 
-const FormFieldsContainer = styled(Flex)`
-  text-transform: capitalize;
-`;
-
 const requiredFieldsQuery = gqlV2`
   query Host($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
@@ -76,13 +71,13 @@ const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
   const fieldName =
     input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
-  let validate = input.required ? value => (value ? undefined : 'Is required') : undefined;
+  let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
   if (input.type === 'text') {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
         if (!value && input.required) {
-          return 'Is required';
+          return `${input.name} is required`;
         } else if (!matches && value) {
           return `Invalid ${input.name}`;
         }
@@ -92,12 +87,16 @@ const Input = props => {
       <Box key={input.key} mt={2} flex="1">
         <Field name={fieldName} validate={validate}>
           {({ field, meta }) => (
-            <StyledInputField label={input.name} required={input.required} error={meta.touched && meta.error}>
+            <StyledInputField
+              label={input.name}
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+            >
               {() => (
                 <StyledInput
                   {...field}
                   placeholder={input.example}
-                  error={meta.touched && meta.error}
+                  error={(meta.touched || disabled) && meta.error}
                   disabled={disabled}
                   width="100%"
                   value={get(formik.values, field.name) || ''}
@@ -112,13 +111,17 @@ const Input = props => {
     const options = formatTransferWiseSelectOptions(input.valuesAllowed || []);
     return (
       <Box mt={2} flex="1">
-        <Field name={fieldName}>
+        <Field name={fieldName} validate={validate}>
           {({ field, meta }) => (
-            <StyledInputField label={input.name} required={input.required} error={meta.touched && meta.error}>
+            <StyledInputField
+              label={input.name}
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+            >
               {() => (
                 <StyledSelect
                   disabled={disabled}
-                  error={meta.touched && meta.error}
+                  error={(meta.touched || disabled) && meta.error}
                   isLoading={loading && !options.length}
                   name={field.name}
                   options={options}
@@ -207,7 +210,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const { fields, title } = data.host.transferwise.requiredFields[0];
 
   return (
-    <FormFieldsContainer flexDirection="column">
+    <Flex flexDirection="column">
       <Box mt={2} flex="1">
         <P fontSize="LeadParagraph" fontWeight="bold">
           {title}
@@ -241,7 +244,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           refetch={refetch}
         />
       ))}
-    </FormFieldsContainer>
+    </Flex>
   );
 };
 
