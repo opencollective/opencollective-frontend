@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
+import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
-import { get, kebabCase, set } from 'lodash';
+import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -13,6 +14,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
 import StyledSpinner from '../StyledSpinner';
+import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
@@ -207,18 +209,26 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     return <P>{error.message}</P>;
   }
 
-  const { fields, title } = data.host.transferwise.requiredFields[0];
+  const [requiredFields] = data.host.transferwise.requiredFields;
+  const [addressFields, otherFields] = partition(requiredFields.fields, f =>
+    f.group.every(g => g.key.includes('address.')),
+  );
 
   return (
     <Flex flexDirection="column">
       <Box mt={2} flex="1">
         <P fontSize="LeadParagraph" fontWeight="bold">
-          {title}
+          {requiredFields.title}
+        </P>
+      </Box>
+      <Box mt={3} flex="1">
+        <P fontSize="Paragraph" fontWeight="bold">
+          Account Information
         </P>
       </Box>
       {
         // Displays the account holder field only if the other fields are also loaded
-        Boolean(fields.length) && (
+        Boolean(requiredFields.fields.length) && (
           <FieldGroup
             currency={currency}
             disabled={disabled}
@@ -231,7 +241,28 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           />
         )
       }
-      {fields.map(field => (
+      {otherFields.map(field => (
+        <FieldGroup
+          currency={currency}
+          disabled={disabled}
+          field={field}
+          formik={formik}
+          getFieldName={getFieldName}
+          host={host}
+          key={kebabCase(field.name)}
+          loading={loading}
+          refetch={refetch}
+        />
+      ))}
+      <Box mt={3} flex="1">
+        <P fontSize="Paragraph" fontWeight="bold">
+          Recipient&apos;s Address&nbsp;
+          <StyledTooltip content="For legal reasons, we need to ask for the recipient's address (not the bank's address).">
+            <Info size={16} />
+          </StyledTooltip>
+        </P>
+      </Box>
+      {addressFields.map(field => (
         <FieldGroup
           currency={currency}
           disabled={disabled}
