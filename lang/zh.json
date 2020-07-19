@@ -189,7 +189,7 @@
   "collective.editHost.continue.btn": "{action}",
   "collective.editHost.header": "Withdraw application from {name}",
   "collective.editHost.remove": "移除{name}",
-  "collective.editHost.removeHost": "Are you sure you want to remove {name}?",
+  "collective.editHost.removeHost": "您确定要删除 {name} 群组吗？",
   "collective.editHost.withdrawApp": "Are you sure you want to withdraw application from {name}?",
   "collective.emptyBalance.body": "Are you sure you want to {action} to {collective}?",
   "collective.emptyBalance.header": "{action} Balance",
