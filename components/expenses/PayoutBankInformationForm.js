@@ -257,7 +257,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       <Box mt={3} flex="1">
         <P fontSize="Paragraph" fontWeight="bold">
           Recipient&apos;s Address&nbsp;
-          <StyledTooltip content="For legal reasons, we need to ask for the recipient's address (not the bank's address).">
+          <StyledTooltip content="Address of the owner of the bank account (not the address of the bank)">
             <Info size={16} />
           </StyledTooltip>
         </P>
