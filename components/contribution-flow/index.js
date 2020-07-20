@@ -460,8 +460,7 @@ class CreateOrderPage extends React.Component {
     }
 
     const { collective, tier, description, createOrder } = this.props;
-    const isFeesOnTop =
-      this.props.feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+    const isFeesOnTop = this.canHaveFeesOnTop();
     const order = {
       paymentMethod,
       recaptchaToken,
@@ -684,7 +683,12 @@ class CreateOrderPage extends React.Component {
   }
 
   canHaveFeesOnTop(props = this.props, state = this.state) {
-    return props.feesOnTopAvailable && state.stepProfile?.type !== 'COLLECTIVE' && props.tier?.type !== 'TICKET';
+    return (
+      props.feesOnTopAvailable &&
+      props.tier?.type !== 'TICKET' &&
+      (state.stepProfile?.type !== 'COLLECTIVE' ||
+        (state.stepProfile?.host?.id && state.stepProfile?.host?.id === props.host?.id))
+    );
   }
 
   /** Get total amount based on stepDetails with taxes from step summary applied */
@@ -875,7 +879,7 @@ class CreateOrderPage extends React.Component {
   };
 
   renderStep(step) {
-    const { collective, tier, host, feesOnTopAvailable, taxDeductible } = this.props;
+    const { collective, tier, host, taxDeductible } = this.props;
     const { stepProfile, stepDetails, stepPayment, customData, platformFeeOptions } = this.state;
     const personalProfile = this.getPersonalProfile();
     const otherProfiles = this.getOtherProfiles();
@@ -883,8 +887,7 @@ class CreateOrderPage extends React.Component {
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
     const isIncognito = get(stepProfile, 'isIncognito');
-    const showFeesOnTop =
-      feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+    const showFeesOnTop = this.canHaveFeesOnTop();
 
     if (step.name === 'contributeAs') {
       return (
