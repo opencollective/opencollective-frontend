@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Jul 14 2020 16:19:32 GMT+0100 (British Summer Time)
+# timestamp: Mon Jul 20 2020 11:47:07 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -2188,6 +2188,11 @@ enum Currency {
   Czech Koruna
   """
   CZK
+
+  """
+  Brazilian Real
+  """
+  BRL
 }
 
 scalar DateString
