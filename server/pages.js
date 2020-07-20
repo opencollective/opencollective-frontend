@@ -199,10 +199,14 @@ pages.add('recurring-contributions', '/:slug/recurring-contributions');
 pages.add('subscriptions', '/:slug/subscriptions', 'recurring-contributions');
 
 // new contribution flow
-pages.add('new-donate', '/:slug/:verb(new-donate)/:step(details|profile|payment|success)', 'new-contribution-flow');
+pages.add(
+  'new-donate',
+  '/:collectiveSlug/:verb(new-donate)/:step(details|profile|payment|success)?',
+  'new-contribution-flow',
+);
 pages.add(
   'new-contribute',
-  '/:slug/:verb(new-contribute)/:tier/:step(details|profile|payment|success)',
+  '/:collectiveSlug/:verb(new-contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(details|profile|payment|success)?',
   'new-contribution-flow',
 );
 

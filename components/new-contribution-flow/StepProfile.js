@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'next/router';
-import { injectIntl } from 'react-intl';
 
 import { Box } from '../../components/Grid';
 import { P } from '../../components/Text';
@@ -11,15 +9,19 @@ class NewContributionFlowStepPayment extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    intl: PropTypes.object,
-    router: PropTypes.object,
     loadingLoggedInUser: PropTypes.object,
+    stepDetails: PropTypes.shape({
+      amount: PropTypes.number,
+      interval: PropTypes.string,
+    }),
   };
 
-  renderForm = (LoggedInUser, router) => {
-    const guestLowContribution = !LoggedInUser && router.query.amount < 500000;
-    const guestHighContribution = !LoggedInUser && router.query.amount > 500000;
-    const guestRecurrentContribution = !LoggedInUser && router.query.frequency;
+  renderForm = () => {
+    const { LoggedInUser } = this.props;
+    const { amount, interval } = this.props.stepDetails;
+    const guestLowContribution = !LoggedInUser && amount < 500000;
+    const guestHighContribution = !LoggedInUser && amount > 500000;
+    const guestRecurrentContribution = !LoggedInUser && interval;
     const loggedInContribution = LoggedInUser;
 
     if (guestLowContribution) {
@@ -34,10 +36,8 @@ class NewContributionFlowStepPayment extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, router } = this.props;
-
-    return <Box width={1}>{this.renderForm(LoggedInUser, router)}</Box>;
+    return <Box width={1}>{this.renderForm()}</Box>;
   }
 }
 
-export default injectIntl(withUser(withRouter(NewContributionFlowStepPayment)));
+export default withUser(NewContributionFlowStepPayment);

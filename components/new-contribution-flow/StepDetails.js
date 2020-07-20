@@ -1,61 +1,50 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
-import { first } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
-import Container from '../../components/Container';
+import INTERVALS from '../../lib/constants/intervals';
+import { getCurrencySymbol } from '../../lib/currency-utils';
+import { i18nInterval } from '../../lib/i18n/interval';
+
 import Currency from '../../components/Currency';
-import FormattedMoneyAmount from '../../components/FormattedMoneyAmount';
-import { Box, Flex } from '../../components/Grid';
-import Link from '../../components/Link';
+import { Box } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputField from '../../components/StyledInputField';
-import { H4, P } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
 
 class NewContributionFlowStepDetails extends React.Component {
   static propTypes = {
-    collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
     router: PropTypes.object,
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      amount: null,
-    };
-  }
-
-  getTier = tiers => {
-    if (this.props.router.query.tier) {
-      return tiers.nodes.find(option => option.name === this.props.router.query.tier);
-    }
-  };
-
-  getTierType = tier => {
-    return tier.amountType;
+    onChange: PropTypes.func,
+    data: PropTypes.shape({
+      amount: PropTypes.number,
+      interval: PropTypes.string,
+    }),
+    collective: PropTypes.shape({
+      currency: PropTypes.string,
+    }),
+    tier: PropTypes.shape({
+      amountType: PropTypes.string,
+    }),
   };
 
   getTierPresets = tier => {
-    if (tier.presets) {
+    if (tier?.presets) {
       return tier.presets;
     } else {
       return [5000, 10000, 15000, 50000];
     }
   };
 
-  render() {
-    const { collective, LoggedInUser, router } = this.props;
-    const { amount, frequency } = this.state;
+  onChange = (field, value) => {
+    this.props.onChange({
+      stepDetails: { ...this.props.data, [field]: value },
+    });
+  };
 
-    const tier = this.getTier(collective.tiers);
-    const tierType = this.getTierType(tier);
-    const tierPresets = this.getTierPresets(tier);
+  render() {
+    const { collective, tier, data, intl } = this.props;
 
     return (
       <Box width={1}>
@@ -63,37 +52,34 @@ class NewContributionFlowStepDetails extends React.Component {
           label={
             <FormattedMessage
               id="contribution.amount.currency.label"
-              values={{
-                currency: collective.currency,
-              }}
               defaultMessage="Amount ({currency})"
+              values={{ currency: `${getCurrencySymbol(collective.currency)}${collective.currency}` }}
             />
           }
-          htmlFor="frequency"
+          htmlFor="amount"
           css={{ flexGrow: 1 }}
           labelFontSize={20}
           py={2}
+          mb={24}
         >
           {fieldProps => (
             <StyledButtonSet
               {...fieldProps}
               justifyContent="center"
               mt={[4, 0]}
-              items={tierPresets}
-              selected={amount}
+              items={this.getTierPresets(tier)}
               buttonProps={{ p: 2 }}
-              onChange={amount => {
-                this.setState({ amount });
-              }}
+              selected={data?.amount}
+              onChange={amount => this.onChange('amount', amount)}
             >
               {({ item }) => <Currency value={item} currency={collective.currency} precision={2} />}
             </StyledButtonSet>
           )}
         </StyledInputField>
-        {tierType === 'FLEXIBLE' && (
+        {(!tier || tier.amountType === 'FLEXIBLE') && (
           <StyledInputField
             label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
-            htmlFor="frequency"
+            htmlFor="interval"
             css={{ flexGrow: 1 }}
             labelFontSize={20}
             py={2}
@@ -103,14 +89,12 @@ class NewContributionFlowStepDetails extends React.Component {
                 {...fieldProps}
                 justifyContent="center"
                 mt={[4, 0]}
-                items={['One time', 'Monthly', 'Yearly']}
-                selected={frequency}
+                items={[null, INTERVALS.month, INTERVALS.year]}
+                selected={data?.interval}
                 buttonProps={{ p: 2 }}
-                onChange={frequency => {
-                  this.setState({ frequency });
-                }}
+                onChange={interval => this.onChange('interval', interval)}
               >
-                {({ item }) => <P>{item}</P>}
+                {({ item }) => i18nInterval(intl, item || INTERVALS.oneTime)}
               </StyledButtonSet>
             )}
           </StyledInputField>
@@ -120,4 +104,4 @@ class NewContributionFlowStepDetails extends React.Component {
   }
 }
 
-export default injectIntl(withUser(withRouter(NewContributionFlowStepDetails)));
+export default injectIntl(NewContributionFlowStepDetails);

@@ -1,34 +1,38 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { first } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import Avatar, { ContributorAvatar } from '../../components/Avatar';
 import Container from '../../components/Container';
 import FormattedMoneyAmount from '../../components/FormattedMoneyAmount';
 import { Box, Flex } from '../../components/Grid';
-import Link from '../../components/Link';
 import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
-const MAX_CONTRIBUTORS_TO_DISPLAY = 10;
-
 class NewContributionFlowHeader extends React.Component {
   static propTypes = {
-    collective: PropTypes.object,
+    collective: PropTypes.shape({
+      currency: PropTypes.string,
+      name: PropTypes.string,
+      contributors: PropTypes.shape({
+        totalCount: PropTypes.number,
+        nodes: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+            name: PropTypes.string,
+          }),
+        ),
+      }),
+    }).isRequired,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
   };
 
   render() {
-    const { collective, LoggedInUser } = this.props;
-
-    const contributors = collective && collective.members.nodes;
-    const loggedInUserIsContributor =
-      LoggedInUser &&
-      first(contributors?.filter(contributor => contributor.account.slug === LoggedInUser.collective.slug));
-    const loggedInUserTotalDonations =
-      loggedInUserIsContributor && first(loggedInUserIsContributor.account.orders.nodes).totalDonations.value;
+    const { collective } = this.props;
+    const contributors = collective.contributors.nodes;
+    const loggedInUserIsContributor = false; // TODO
+    const loggedInUserTotalDonations = 0; // TODO
 
     return (
       <Flex flexDirection="column" alignItems="center" maxWidth={500}>
@@ -60,38 +64,24 @@ class NewContributionFlowHeader extends React.Component {
           </P>
         ) : (
           <Fragment>
-            {contributors && contributors.length > 0 && (
+            {contributors?.length > 0 && (
               <Fragment>
-                <P fontSize="LeadParagraph" fontWeight={400} color="black.500" py={2}>
+                <P fontSize="LeadParagraph" lineHeight="24px" fontWeight={400} color="black.500" py={2}>
                   <FormattedMessage
                     id="NewContributionFlow.Join"
                     defaultMessage="Join {numberOfContributors} other fellow contributors"
-                    values={{ numberOfContributors: contributors.length }}
+                    values={{ numberOfContributors: collective.contributors.totalCount }}
                   />
                 </P>
-                <Flex py={2}>
-                  {contributors.slice(0, MAX_CONTRIBUTORS_TO_DISPLAY).map(contributor => (
-                    <Box key={contributor.account.id} mx={1}>
-                      {contributor.account.slug ? (
-                        <Link
-                          route="collective"
-                          params={{ slug: contributor.account.slug }}
-                          title={contributor.account.name}
-                        >
-                          <ContributorAvatar contributor={contributor.account} radius={24} />
-                        </Link>
-                      ) : (
-                        <ContributorAvatar
-                          contributor={contributor.account}
-                          radius={24}
-                          title={contributor.account.name}
-                        />
-                      )}
+                <Flex py={2} alignItems="center">
+                  {contributors.map(contributor => (
+                    <Box key={contributor.id} mx={1}>
+                      <ContributorAvatar contributor={contributor} radius={24} />
                     </Box>
                   ))}
-                  {contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY && (
+                  {collective.contributors.totalCount > contributors.length && (
                     <Container fontSize="Caption" color="black.600">
-                      + {contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY}
+                      + {collective.contributors.totalCount - contributors.length}
                     </Container>
                   )}
                 </Flex>

@@ -1,15 +1,18 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { get } from 'lodash';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Router } from '../../server/pages';
+import { formatCurrency } from '../../lib/currency-utils';
 
 import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
 import { Span } from '../Text';
 
+import { STEPS } from './constants';
+
+// Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
   text-transform: uppercase;
   text-align: center;
@@ -21,72 +24,111 @@ StepLabel.defaultProps = {
   mt: 1,
 };
 
-const STEP_ONE = 'Contribution';
-const STEP_TWO = 'Contribute as';
-const STEP_THREE = 'Payment info';
+const STEP_LABELS = defineMessages({
+  contributeAs: {
+    id: 'contribute.step.contributeAs',
+    defaultMessage: 'Contribute as',
+  },
+  details: {
+    id: 'contribute.step.details',
+    defaultMessage: 'Details',
+  },
+  payment: {
+    id: 'contribute.step.payment',
+    defaultMessage: 'Payment info',
+  },
+  summary: {
+    id: 'contribute.step.summary',
+    defaultMessage: 'Summary',
+  },
+});
 
-const steps = [
-  { name: STEP_ONE, routerStep: 'details' },
-  { name: STEP_TWO, routerStep: 'profile' },
-  { name: STEP_THREE, routerStep: 'payment' },
-];
+const ContributionFlowStepsProgress = ({
+  stepProfile,
+  stepDetails,
+  stepPayment,
+  submitted,
+  loading,
+  steps,
+  currentStep,
+  lastVisitedStep,
+  goToStep,
+  currency,
+  isFreeTier,
+  showFeesOnTop,
+}) => {
+  const { formatMessage } = useIntl();
+  return (
+    <StepsProgress
+      steps={steps}
+      focus={currentStep}
+      allCompleted={submitted}
+      onStepSelect={!loading && !submitted ? goToStep : undefined}
+      loadingStep={loading ? currentStep : undefined}
+      disabledStepNames={steps.slice(lastVisitedStep.index + 1, steps.length).map(s => s.name)}
+    >
+      {({ step }) => {
+        let details = null;
+        if (step.name === STEPS.PROFILE) {
+          details = get(stepProfile, 'name', null);
+        } else if (step.name === STEPS.DETAILS) {
+          if (stepDetails && stepDetails.amount) {
+            const formattedAmount = showFeesOnTop
+              ? formatCurrency(stepDetails.amount + stepDetails.platformFee?.value, currency)
+              : formatCurrency(stepDetails.amount, currency);
 
-class NewContributionFlowStepsProgress extends React.Component {
-  static propTypes = {
-    router: PropTypes.object,
-  };
+            const formattedTotalAmount =
+              stepDetails.quantity > 1 ? `${formattedAmount} x ${stepDetails.quantity}` : formattedAmount;
 
-  getFocus = step => {
-    switch (step) {
-      case 'details':
-        return steps[0];
-      case 'profile':
-        return steps[1];
-      case 'payment':
-        return steps[2];
-      default:
-        return steps[0];
-    }
-  };
-
-  render() {
-    const { router } = this.props;
-
-    return (
-      <Fragment>
-        <StepsProgress
-          steps={steps}
-          focus={this.getFocus(router.query.step)}
-          onStepSelect={step => {
-            Router.pushRoute('new-contribute', {
-              slug: router.query.slug,
-              verb: router.query.verb,
-              tier: router.query.tier,
-              step: step.routerStep,
-            });
-          }}
-        >
-          {({ step }) => {
-            let label = null;
-            if (step.name === STEP_ONE) {
-              label = <FormattedMessage id="NewContributionFlow.step.contribution" defaultMessage={STEP_ONE} />;
-            }
-            if (step.name === STEP_TWO) {
-              label = <FormattedMessage id="contribute.step.contributeAs" defaultMessage={STEP_TWO} />;
-            }
-            if (step.name === STEP_THREE) {
-              label = <FormattedMessage id="contribute.step.payment" defaultMessage={STEP_THREE} />;
-            }
-            return (
-              <Flex flexDirection="column" alignItems="center">
-                <StepLabel>{label}</StepLabel>
-              </Flex>
+            details = !stepDetails.interval ? (
+              formattedTotalAmount
+            ) : (
+              <Span>
+                {formattedTotalAmount}{' '}
+                <FormattedMessage
+                  id="tier.interval"
+                  defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                  values={{ interval: stepDetails.interval }}
+                />
+              </Span>
             );
-          }}
-        </StepsProgress>
-      </Fragment>
-    );
-  }
-}
+          } else if (stepDetails && stepDetails.amount === 0 && isFreeTier) {
+            details = <FormattedMessage id="Amount.Free" defaultMessage="Free" />;
+          }
+        } else if (step.name === STEPS.PAYMENT) {
+          if (isFreeTier && get(stepDetails, 'totalAmount') === 0) {
+            details = <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
+          } else {
+            details = get(stepPayment, 'title', null);
+          }
+        }
 
-export default withRouter(NewContributionFlowStepsProgress);
+        return (
+          <Flex flexDirection="column" alignItems="center">
+            <StepLabel>{STEP_LABELS[step.name] ? formatMessage(STEP_LABELS[step.name]) : step.name}</StepLabel>
+            <Span fontSize="Caption" textAlign="center">
+              {step.isVisited && details}
+            </Span>
+          </Flex>
+        );
+      }}
+    </StepsProgress>
+  );
+};
+
+ContributionFlowStepsProgress.propTypes = {
+  steps: PropTypes.arrayOf(PropTypes.object).isRequired,
+  currentStep: PropTypes.object.isRequired,
+  goToStep: PropTypes.func.isRequired,
+  stepProfile: PropTypes.object,
+  stepDetails: PropTypes.object,
+  stepPayment: PropTypes.object,
+  submitted: PropTypes.bool,
+  loading: PropTypes.bool,
+  lastVisitedStep: PropTypes.object,
+  currency: PropTypes.string,
+  isFreeTier: PropTypes.bool,
+  showFeesOnTop: PropTypes.bool,
+};
+
+export default ContributionFlowStepsProgress;

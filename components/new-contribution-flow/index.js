@@ -1,36 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CheckShield } from '@styled-icons/boxicons-regular/CheckShield';
-import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { get, pick } from 'lodash';
+import memoizeOne from 'memoize-one';
+import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
 import NewContributeFAQ from '../../components/faqs/NewContributeFAQ';
 import { Box, Flex } from '../../components/Grid';
-import StyledLink from '../../components/StyledLink';
-import { P } from '../../components/Text';
+
+import Steps from '../Steps';
+import { withUser } from '../UserProvider';
 
 import NewContributionFlowButtons from './ContributionFlowButtons';
-import NewContributionFlowHeader from './ContributionFlowHeader';
-import NewContributionFlowMainContainer from './ContributionFlowMainContainer';
-import NewContributionFlowStepsProgress from './ContributionFlowStepsProgress';
-
-const PROTECTED_TRANSACTIONS_KNOW_MORE_LINK = 'https://www.opencollective.com';
-
-const ProtectTransactionInfoBox = styled(Box)`
-  border-radius: 15px;
-  background-color: ${themeGet('colors.primary.50')};
-  border: 2px solid ${themeGet('colors.primary.600')};
-`;
-
-const BlueCheckShield = styled(CheckShield)`
-  color: ${themeGet('colors.blue.500')};
-`;
+import ContributionFlowHeader from './ContributionFlowHeader';
+import ContributionFlowMainContainer from './ContributionFlowMainContainer';
+import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
+import SafeTransactionMessage from './SafeTransactionMessage';
+import { getTierMinAmount, isFixedContribution, taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
-  min-height: 95px;
-  max-width: 600px;
+  min-height: 100px;
+  max-width: 450px;
 
   @media screen and (max-width: 640px) {
     width: 100%;
@@ -38,69 +31,230 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
-class NewContributionFlowContainer extends React.Component {
+const stepsLabels = defineMessages({
+  contributeAs: {
+    id: 'contribute.step.contributeAs',
+    defaultMessage: 'Contribute as',
+  },
+  details: {
+    id: 'contribute.step.details',
+    defaultMessage: 'Details',
+  },
+  payment: {
+    id: 'contribute.step.payment',
+    defaultMessage: 'Payment info',
+  },
+  summary: {
+    id: 'contribute.step.summary',
+    defaultMessage: 'Summary',
+  },
+});
+
+class ContributionFlow extends React.Component {
   static propTypes = {
-    collective: PropTypes.object,
+    collective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
+    }).isRequired,
+    host: PropTypes.object.isRequired,
+    tier: PropTypes.object,
     intl: PropTypes.object,
   };
 
-  render() {
-    const { collective } = this.props;
+  constructor(props) {
+    super(props);
+    this.mainContainerRef = React.createRef();
+    this.state = {
+      stepDetails: null,
+      stepPayment: null,
+      stepSummary: null,
+    };
+  }
 
+  /** Steps component callback  */
+  onStepChange = async step => this.pushStepRoute(step.name);
+
+  /** Navigate to another step, ensuring all route params are preserved */
+  pushStepRoute = async (stepName, routeParams = {}) => {
+    const { collective, tier } = this.props;
+
+    const params = {
+      verb: this.props.verb || 'new-donate',
+      collectiveSlug: collective.slug,
+      step: stepName === 'details' ? undefined : stepName,
+      totalAmount: this.props.fixedAmount ? this.props.fixedAmount.toString() : undefined,
+      interval: this.props.fixedInterval || undefined,
+      ...pick(this.props, ['interval', 'description', 'redirect']),
+      ...routeParams,
+    };
+
+    let route = 'new-donate';
+    if (tier) {
+      params.tierId = tier.id;
+      params.tierSlug = tier.slug;
+      if (tier.type === 'TICKET' && collective.parentCollective) {
+        route = 'orderEventTier';
+        params.collectiveSlug = collective.parentCollective.slug;
+        params.eventSlug = collective.slug;
+        params.verb = 'events';
+      } else {
+        route = 'new-contribute';
+        params.verb = 'new-contribute'; // Enforce "contribute" verb for ordering tiers
+      }
+    } else if (params.verb === 'contribute') {
+      // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
+      params.verb = 'new-donate';
+    }
+
+    // Reset errors if any
+    if (this.state.error) {
+      this.setState({ error: null });
+    }
+
+    // Navigate to the new route
+    await Router.pushRoute(stepName === 'success' ? `${route}Success` : route, params);
+
+    if (this.mainContainerRef.current) {
+      this.mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  };
+
+  // Memoized helpers
+  isFixedContribution = memoizeOne(isFixedContribution);
+  getTierMinAmount = memoizeOne(getTierMinAmount);
+  taxesMayApply = memoizeOne(taxesMayApply);
+
+  /** Returns the steps list */
+  getSteps() {
+    const { skipStepDetails, fixedInterval, fixedAmount, intl, collective, host, tier } = this.props;
+    const { stepDetails, stepPayment, stepSummary } = this.state;
+    const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
+    const minAmount = this.getTierMinAmount(tier);
+    const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
+    const steps = [];
+
+    // If amount and interval are forced by a tier or by params, skip StepDetails (except for events)
+    if (!skipStepDetails && (!isFixedContribution || tier?.type === 'TICKET' || this.canHaveFeesOnTop())) {
+      steps.push({
+        name: 'details',
+        label: intl.formatMessage(stepsLabels.details),
+        isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount),
+      });
+    }
+
+    steps.push({
+      name: 'profile',
+      label: intl.formatMessage(stepsLabels.contributeAs),
+      isCompleted: Boolean(this.state.stepProfile),
+    });
+
+    // Hide step payment if using a free tier with fixed price
+    if (!(minAmount === 0 && isFixedContribution)) {
+      steps.push({
+        name: 'payment',
+        label: intl.formatMessage(stepsLabels.payment),
+        isCompleted: Boolean(noPaymentRequired || stepPayment),
+      });
+    }
+
+    // Show the summary step only if the order has tax
+    if (this.taxesMayApply(collective, host, tier)) {
+      steps.push({
+        name: 'summary',
+        label: intl.formatMessage(stepsLabels.summary),
+        isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
+      });
+    }
+
+    return steps;
+  }
+
+  render() {
+    const { collective, tier, showFeesOnTop, LoggedInUser } = this.props;
     return (
-      <Container
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        py={[3, 4]}
-        px={[2, 3]}
+      <Steps
+        steps={this.getSteps()}
+        currentStepName={this.props.step}
+        onStepChange={this.onStepChange}
+        onInvalidStep={this.onInvalidStep}
+        onComplete={this.submitOrder}
       >
-        <NewContributionFlowHeader collective={collective} />
-        <StepsProgressBox mb={[3, null, 4]} width={[1.0, 0.8]}>
-          <NewContributionFlowStepsProgress />
-        </StepsProgressBox>
-        {/* main container */}
-        <Flex justifyContent="center" width={1}>
-          <Box width={1 / 3} minWidth="335px" />
-          <NewContributionFlowMainContainer collective={collective} width={1 / 3} />
-          <Flex flexDirection="column" width={1 / 3}>
-            <ProtectTransactionInfoBox width={1 / 5} minWidth="335px" ml={4} p={3}>
-              <Flex alignItems="center">
-                <Box>
-                  <BlueCheckShield size={30} />
+        {({
+          steps,
+          currentStep,
+          lastVisitedStep,
+          goNext,
+          goBack,
+          goToStep,
+          prevStep,
+          nextStep,
+          isValidating,
+          isValidStep,
+        }) => (
+          <Container
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            py={[3, 4, 5]}
+            mb={4}
+            ref={this.mainContainerRef}
+          >
+            <Box px={[2, 3]} mb={4}>
+              <ContributionFlowHeader collective={collective} />
+            </Box>
+            <StepsProgressBox mb={[3, null, 4]} width={[1.0, 0.8]}>
+              <ContributionFlowStepsProgress
+                steps={steps}
+                currentStep={currentStep}
+                lastVisitedStep={lastVisitedStep}
+                goToStep={goToStep}
+                stepProfile={this.state.stepProfile}
+                stepDetails={this.state.stepDetails}
+                stepPayment={this.state.stepPayment}
+                submitted={this.state.submitted}
+                loading={this.state.loading || this.state.submitting}
+                currency={collective.currency}
+                isFreeTier={this.getTierMinAmount(tier) === 0}
+                showFeesOnTop={showFeesOnTop}
+              />
+            </StepsProgressBox>
+            {/* main container */}
+            <Flex justifyContent="center" width={1} maxWidth={1340} flexWrap={['wrap', 'nowrap']} px={[2, 3]}>
+              <Box display={['none', null, null, 'block']} width={[0.5, null, null, null, 1 / 3]} />
+              <Box as="form" flex="1 1 50%">
+                <ContributionFlowMainContainer
+                  collective={collective}
+                  tier={tier}
+                  mainState={this.state}
+                  onChange={data => this.setState(data)}
+                  step={currentStep}
+                />
+                <Box mt={[4, 5]}>
+                  <NewContributionFlowButtons
+                    goNext={goNext}
+                    goBack={goBack}
+                    step={currentStep}
+                    prevStep={prevStep}
+                    nextStep={nextStep}
+                    isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.frequency}
+                  />
                 </Box>
-                <Flex flexDirection="column" mx={2}>
-                  <P fontWeight="bold" lineHeight="Paragraph">
-                    <FormattedMessage
-                      id="NewContributionFlow.ProtectTransactionTitle"
-                      defaultMessage="We protect your transaction:"
-                    />
-                  </P>
-                  <P lineHeight="Paragraph">
-                    <FormattedMessage
-                      id="NewContributionFlow.ProtectTransactionDetails"
-                      defaultMessage="In Open Collective, your transaction is safe. {knowMoreLink}"
-                      values={{
-                        knowMoreLink: (
-                          <StyledLink href={PROTECTED_TRANSACTIONS_KNOW_MORE_LINK} openInNewTab>
-                            <FormattedMessage id="KnowMore" defaultMessage="Know more." />
-                          </StyledLink>
-                        ),
-                      }}
-                    />
-                  </P>
-                </Flex>
-              </Flex>
-            </ProtectTransactionInfoBox>
-            <NewContributeFAQ mt={4} ml={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
-          </Flex>
-        </Flex>
-        {/* main container */}
-        <NewContributionFlowButtons collectiveSlug={collective.slug} />
-      </Container>
+              </Box>
+              <Box minWidth="300px" width={1 / 3} ml={[0, 4]} mt={[4, 0]}>
+                <Box maxWidth={['100%', 300]}>
+                  <SafeTransactionMessage />
+                  <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                </Box>
+              </Box>
+            </Flex>
+          </Container>
+        )}
+      </Steps>
     );
   }
 }
 
-export default injectIntl(NewContributionFlowContainer);
+export default injectIntl(withUser(ContributionFlow));

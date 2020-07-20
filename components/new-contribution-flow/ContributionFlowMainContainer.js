@@ -1,31 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
-import { withRouter } from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
-import Container from '../../components/Container';
 import { Flex } from '../../components/Grid';
 import StyledHr from '../../components/StyledHr';
 import { H4 } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
+import StyledCard from '../StyledCard';
+
 import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 
-const MainContributionContainer = styled(Container)`
-  border-radius: 15px;
-  border: 2px solid ${themeGet('colors.black.300')};
-`;
-
 class NewContributionFlowMainContainer extends React.Component {
   static propTypes = {
-    collective: PropTypes.object,
-    router: PropTypes.object,
     intl: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    collective: PropTypes.object,
+    tier: PropTypes.object,
+    onChange: PropTypes.func,
+    step: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+    mainState: PropTypes.shape({
+      stepDetails: PropTypes.object,
+    }),
   };
 
   constructor(props) {
@@ -43,53 +43,54 @@ class NewContributionFlowMainContainer extends React.Component {
   }
 
   renderHeader = (step, LoggedInUser) => {
-    switch (step) {
-      case 'payment':
-        return this.props.intl.formatMessage(this.headerMessages[step]);
-      case 'details':
-        return this.props.intl.formatMessage(this.headerMessages[step]);
-      case 'profile':
-        if (LoggedInUser) {
-          return this.props.intl.formatMessage(this.headerMessages[step]);
-        } else {
-          return this.props.router.query.frequency
-            ? this.props.intl.formatMessage(this.headerMessages[`${step}.guest.recurrent`])
-            : this.props.intl.formatMessage(this.headerMessages[`${step}.guest`]);
-        }
+    if (step === 'profile' && !LoggedInUser) {
+      return this.props.mainState.stepDetails?.frequency
+        ? this.props.intl.formatMessage(this.headerMessages[`profile.guest.recurrent`])
+        : this.props.intl.formatMessage(this.headerMessages[`profile.guest`]);
+    } else if (this.headerMessages[step]) {
+      return this.props.intl.formatMessage(this.headerMessages[step]);
+    } else {
+      return step;
     }
   };
 
   renderStep = step => {
     switch (step) {
       case 'details':
-        return <StepDetails collective={this.props.collective} />;
+        return (
+          <StepDetails
+            collective={this.props.collective}
+            tier={this.props.tier}
+            onChange={this.props.onChange}
+            data={this.props.mainState.stepDetails}
+          />
+        );
       case 'profile':
-        return <StepProfile collective={this.props.collective} />;
+        return <StepProfile collective={this.props.collective} stepDetails={this.props.mainState.stepDetails} />;
       case 'payment':
         return <StepPayment collective={this.props.collective} />;
     }
   };
 
   render() {
-    const { router, LoggedInUser } = this.props;
-    const step = router.query.step;
+    const { LoggedInUser, step } = this.props;
 
     return (
-      <MainContributionContainer px={3} py={2} minWidth={600}>
+      <StyledCard p={32}>
         <Flex flexDirection="column" alignItems="center">
-          <Flex width="100%">
+          <Flex width="100%" mb={3}>
             <H4 fontWeight={500} py={2}>
-              {this.renderHeader(step, LoggedInUser)}
+              {this.renderHeader(step.name, LoggedInUser)}
             </H4>
             <Flex flexGrow={1} alignItems="center" justifyContent="center">
-              <StyledHr width="100%" ml={3} />
+              <StyledHr width="100%" ml={3} borderColor="black.300" />
             </Flex>
           </Flex>
-          {this.renderStep(step)}
+          {this.renderStep(step.name)}
         </Flex>
-      </MainContributionContainer>
+      </StyledCard>
     );
   }
 }
 
-export default injectIntl(withUser(withRouter(NewContributionFlowMainContainer)));
+export default injectIntl(withUser(NewContributionFlowMainContainer));

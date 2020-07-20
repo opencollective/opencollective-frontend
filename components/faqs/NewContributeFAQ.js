@@ -10,54 +10,43 @@ import FAQ, { Content, Entry, Title } from './FAQ';
  * FAQ associated to the new contribution flow.
  */
 const ContributeAsFAQ = props => (
-  <FAQ {...props}>
+  <FAQ withBorderLeft withNewButtons {...props}>
     <Entry>
       <Title>
         <FormattedMessage id="NewContributionFlow.FAQ.Secure.Title" defaultMessage="Is my contribution secure?" />
       </Title>
       <Content>
+        Quam nemo umquam voluptatem appellavit, appellat; Sin te auctoritas commovebat, nobisne omnibus et Platoni ipsi
+        nescio quem illum anteponebas?
+      </Content>
+    </Entry>
+    <Entry>
+      <Title>
         <FormattedMessage
-          id="CreateExpenseFAQ.isItPublicDetails"
-          defaultMessage="No. Only the expense amount and description are public. Attachments, payment info, emails and addresses are only visible to you and the admins."
+          id="createProfile.faq.persoVSOrg.title"
+          defaultMessage="What's the difference between a personal and an organization profile?"
+        />
+      </Title>
+      <Content>
+        <FormattedMessage
+          id="createProfile.faq.persoVsOrg.content"
+          defaultMessage="Create an organization profile if you want to make a financial contribution in the name of your company or organization. An organization profile allows you to enable other members of your organization to make financial contributions within certain limits that you can define. Organizations can also issue gift cards."
         />
       </Content>
     </Entry>
     <Entry>
       <Title>
         <FormattedMessage
-          id="NewContributionFlow.FAQ.ContributeAsOrg.Title"
-          defaultMessage="What do I do if I want to contribute as an organization?"
+          id="ContributeDetails.faq.isIncognito.title"
+          defaultMessage="What is an incognito contribution?"
         />
       </Title>
       <Content>
         <FormattedMessage
-          id="CreateExpenseFAQ.isItPublicDetails"
-          defaultMessage="No. Only the expense amount and description are public. Attachments, payment info, emails and addresses are only visible to you and the admins."
-        />
-      </Content>
-    </Entry>
-    <Entry>
-      <Title>
-        <FormattedMessage id="CreateExpenseFAQ.isItPublic" defaultMessage="Is my private data made public?" />
-      </Title>
-      <Content>
-        <FormattedMessage
-          id="CreateExpenseFAQ.isItPublicDetails"
-          defaultMessage="No. Only the expense amount and description are public. Attachments, payment info, emails and addresses are only visible to you and the admins."
-        />
-      </Content>
-    </Entry>
-    <Entry>
-      <Title>
-        <FormattedMessage
-          id="NewContributionFlow.FAQ.ReceiveContribution.Title"
-          defaultMessage="When will the Collective receive my contribution?"
-        />
-      </Title>
-      <Content>
-        <FormattedMessage
-          id="CreateExpenseFAQ.isItPublicDetails"
-          defaultMessage="No. Only the expense amount and description are public. Attachments, payment info, emails and addresses are only visible to you and the admins."
+          id="ContributeDetails.faq.isIncognito.content"
+          defaultMessage={
+            'If you chose to contribute as "incognito", your financial contribution will show up publicly as an incognito donation and it won\'t link to your public profile. However, in the effort of being transparent and compliant with KYC regulations (Know Your Customer), the fiscal host and the administrators of the collective can export a list of all the financial contributors with their personal information.'
+          }
         />
       </Content>
     </Entry>
