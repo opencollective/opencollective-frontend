@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@apollo/react-components": "3.1.5",
-    "@apollo/react-hoc": "3.1.5",
+    "@apollo/react-hoc": "4.0.0",
     "@apollo/react-hooks": "3.1.5",
     "@apollo/react-ssr": "3.1.5",
     "@apollo/react-testing": "3.1.4",
