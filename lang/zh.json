@@ -26,7 +26,7 @@
   "acceptContributions.picker.subtitle": "Who will hold money on behalf of the Collective?",
   "acceptContributions.stripe.info": "Automatically accept contributions with credit cards from all over the world. {fees}.",
   "acceptContributions.stripeConnected": "Stripe 已连接",
-  "acceptContributions.success.hostSettings": "Fiscal Host Settings",
+  "acceptContributions.success.hostSettings": "财政设定",
   "acceptContributions.success.hostSettingsInfo": "You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}.",
   "acceptContributions.success.nowAcceptingContributions": "Congratulations! {collective} is now accepting financial contributions.",
   "acceptContributions.success.toConsider": "A few more things you should consider:",
