@@ -80,6 +80,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
       width="100%"
       minWidth={130}
       buttonStyle={isFollowing ? 'standard' : 'secondary'}
+      buttonSize="small"
       disabled={!LoggedInUser || loadingLoggedInUser || loading || submitting}
       onClick={() => {
         return followConversation({

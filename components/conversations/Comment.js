@@ -60,11 +60,11 @@ const Comment = ({
           </Box>
           <Flex flexDirection="column">
             <LinkCollective collective={comment.fromCollective}>
-              <P color="black.800" fontWeight="500" truncateOverflow>
+              <P color="black.800" fontSize="14px" lineHeight="20px" fontWeight="500" truncateOverflow>
                 {comment.fromCollective.name}
               </P>
             </LinkCollective>
-            <P fontSize="Caption" color="black.600" truncateOverflow title={comment.createdAt}>
+            <P fontSize="Caption" lineHeight="18px" color="black.600" truncateOverflow title={comment.createdAt}>
               <FormattedMessage
                 id="Comment.PostedOn"
                 defaultMessage="Posted on {createdAt, date, long}"
