@@ -13,6 +13,7 @@ import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { filterSectionsByData, getDefaultSectionsForCollective } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
@@ -23,6 +24,7 @@ import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
@@ -244,7 +246,7 @@ const EditCollectivePage = ({ collective }) => {
     context: API_V2_CONTEXT,
   });
 
-  const [submitSetting, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {
+  const [submitSetting, { loading: isSubmitting, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -318,6 +320,11 @@ const EditCollectivePage = ({ collective }) => {
                   </React.Fragment>
                 ))}
               </StyledCard>
+              {error && (
+                <MessageBox type="error" fontSize="14px" withIcon my={2}>
+                  {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
+                </MessageBox>
+              )}
               <Flex flexWrap="wrap" alignItems="center" justifyContent={['center', 'flex-start']}>
                 <StyledButton
                   buttonStyle="primary"
