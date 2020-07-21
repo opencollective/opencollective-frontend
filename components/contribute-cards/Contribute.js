@@ -117,11 +117,11 @@ const getContributeCTA = type => {
   switch (type) {
     case ContributionTypes.FINANCIAL_GOAL:
       return <FormattedMessage id="ContributeCard.BtnGoal" defaultMessage="Contribute to this goal" />;
-    case ContributionTypes.EVENT_PARTICIPATE:
     case ContributionTypes.TICKET:
       return <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="Get tickets" />;
+    case ContributionTypes.EVENT_PARTICIPATE:
     case ContributionTypes.EVENT_PASSED:
-      return <FormattedMessage id="ContributeCard.BtnEventPassed" defaultMessage="View event" />;
+      return <FormattedMessage id="ContributeCard.BtnViewEvent" defaultMessage="View Event" />;
     case ContributionTypes.CHILD_COLLECTIVE:
       return <FormattedMessage id="ContributeCard.SeeCollective" defaultMessage="View Collective" />;
     default:
