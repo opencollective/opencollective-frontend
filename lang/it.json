@@ -642,6 +642,8 @@
   "EditCollectivePageFAQ.DataDetails": "Yes, your data is preserved when you hide a section and you'll be able to re-enable it whenever you want",
   "EditCollectivePageFAQ.EditHidden": "Can I edit a hidden section?",
   "EditCollectivePageFAQ.EditHiddenDetails": "If you untick \"Show section\", the section will be hidden for everyone - including you - and you will not be able to edit it",
+  "EditCollectivePageFAQ.HideBudget": "Why can't I hide my budget section?",
+  "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective is all about transparency, and hiding collective's budgets could go against this value.",
   "EditCollectivePageFAQ.Publish": "When will the changes be published?",
   "EditCollectivePageFAQ.PublishDetails": "Your changes will be published as soon as you click on \"Save\"",
   "EditGoals.Instructions": "È possibile definire obiettivi personalizzati per condividere una panoramica del piano finanziario con la comunità e monitorare i tuoi progressi. Saranno inviati nelle email ricevute dai tuoi collaboratori. Puoi scegliere di visualizzarli nella tua pagina del Collettivo selezionando la casella qui sotto.",
