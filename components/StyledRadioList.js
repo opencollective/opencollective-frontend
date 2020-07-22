@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { find, isUndefined } from 'lodash';
+import styled from 'styled-components';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -23,6 +24,12 @@ export const getKeyExtractor = (options, keyGetter) => {
     return (_item, key) => key.toString();
   }
 };
+
+const RadioInput = styled.input`
+  &[type='radio'] {
+    margin: 0;
+  }
+`;
 
 /**
  * Convert a list of items to an object like {key, value} to be used in selects
@@ -78,7 +85,7 @@ const StyledRadioList = ({
             key,
             value,
             radio: (
-              <input
+              <RadioInput
                 type="radio"
                 name={name}
                 id={id && key + id}

@@ -5,15 +5,14 @@ import { useIntl } from 'react-intl';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
 
-import { ExpensesFilter } from './ExpensesFilter';
+import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: i18nExpenseType(intl, value), value });
 
   return (
-    <ExpensesFilter
-      isSearchable={false}
+    <StyledSelectFilter
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
       options={[

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
 import { FileInvoice } from '@styled-icons/fa-solid/FileInvoice';
+import { Grid as HostedCollectivesIcon } from '@styled-icons/feather/Grid';
 import { Receipt as ReceiptIcon } from '@styled-icons/material/Receipt';
 import { omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -14,7 +15,9 @@ import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
 import { Dashboard, PendingApplications } from '../components/host-dashboard';
+import { HOST_SECTIONS } from '../components/host-dashboard/constants';
 import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExpenses';
+import HostDashboardHostedCollectives from '../components/host-dashboard/HostDashboardHostedCollectives';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
@@ -66,7 +69,8 @@ class HostDashboardPage extends React.Component {
     data: PropTypes.object, // from withData
     loadingLoggedInUser: PropTypes.bool.isRequired, // from withUser
     LoggedInUser: PropTypes.object, // from withUser
-    view: PropTypes.oneOf(['expenses', 'expenses-beta', 'donations', 'pending-applications']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'expenses-beta', 'hosted-collectives', 'donations', 'pending-applications'])
+      .isRequired,
   };
 
   // See https://github.com/opencollective/opencollective/issues/1872
@@ -124,6 +128,8 @@ class HostDashboardPage extends React.Component {
         return <PendingApplications hostCollectiveSlug={host.slug} />;
       case 'expenses-beta':
         return <HostDashboardExpenses hostSlug={host.slug} />;
+      case HOST_SECTIONS.HOSTED_COLLECTIVES:
+        return <HostDashboardHostedCollectives hostSlug={host.slug} />;
       default:
         return <Dashboard view={view} hostCollectiveSlug={host.slug} LoggedInUser={LoggedInUser} />;
     }
@@ -191,6 +197,14 @@ class HostDashboardPage extends React.Component {
               >
                 <CheckDouble size="1.2em" />
                 <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
+              </MenuLink>
+              <MenuLink
+                route="host.dashboard"
+                params={{ hostCollectiveSlug: slug, view: HOST_SECTIONS.HOSTED_COLLECTIVES }}
+                isActive={view === HOST_SECTIONS.HOSTED_COLLECTIVES}
+              >
+                <HostedCollectivesIcon size="1.2em" />
+                <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
               </MenuLink>
             </Container>
             <div>{this.renderView(host)}</div>

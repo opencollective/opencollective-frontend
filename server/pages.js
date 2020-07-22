@@ -35,7 +35,7 @@ const pages = routes()
   .add('host.expenses', '/:hostCollectiveSlug/collectives/expenses', 'host.dashboard')
   .add(
     'host.dashboard',
-    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-beta|pending-applications|donations)?',
+    '/:hostCollectiveSlug/dashboard/:view(expenses|expenses-beta|pending-applications|hosted-collectives|donations)?',
     'host.dashboard',
   )
   .add('transactions', '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions')

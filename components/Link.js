@@ -14,6 +14,7 @@ class Link extends React.Component {
     className: PropTypes.string,
     title: PropTypes.string,
     onClick: PropTypes.func,
+    openInNewTab: PropTypes.bool,
     children: PropTypes.node.isRequired,
     'data-cy': PropTypes.string,
   };
@@ -28,7 +29,7 @@ class Link extends React.Component {
   }
 
   render() {
-    const { route, params, children, className, title, onClick, ...otherProps } = this.props;
+    const { route, params, children, className, title, onClick, openInNewTab, ...otherProps } = this.props;
     if (this.isHash) {
       const afterAnimate = () => {
         if (window.history) {
@@ -57,7 +58,13 @@ class Link extends React.Component {
     } else {
       return (
         <router.Link {...pick(this.props, ['route', 'params', 'href', 'scroll', 'passHref'])}>
-          <a className={className} title={title} onClick={onClick} data-cy={this.props['data-cy']}>
+          <a
+            className={className}
+            title={title}
+            onClick={onClick}
+            data-cy={this.props['data-cy']}
+            {...(!openInNewTab ? null : { target: '_blank', rel: 'noopener noreferrer' })}
+          >
             {children}
           </a>
         </router.Link>

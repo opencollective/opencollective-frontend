@@ -17,7 +17,7 @@ import { P, Span } from './Text';
 const StyledMembershipCard = ({ membership, intl, ...props }) => {
   const { collective, since, stats, role } = membership;
   return (
-    <StyledCollectiveCard collective={collective} width={250} height={360} position="relative" {...props}>
+    <StyledCollectiveCard collective={collective} width={250} {...props}>
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
           {role && (

@@ -414,6 +414,21 @@ type Bot implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -570,6 +585,21 @@ type Collective implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -644,6 +674,16 @@ type Collective implements Account {
   host: Host
 
   """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -661,7 +701,7 @@ type Collective implements Account {
     Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: AccountType
-  ): Int
+  ): Int!
   tiers: TierCollection!
 }
 
@@ -2301,6 +2341,21 @@ type Event implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -2375,9 +2430,29 @@ type Event implements Account {
   host: Host
 
   """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
 
   """
   The Collective hosting this Event
@@ -2940,6 +3015,21 @@ type Fund implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -3014,6 +3104,16 @@ type Fund implements Account {
   host: Host
 
   """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -3031,7 +3131,7 @@ type Fund implements Account {
     Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: AccountType
-  ): Int
+  ): Int!
   tiers: TierCollection!
 }
 
@@ -3111,6 +3211,21 @@ type Host implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -3188,6 +3303,26 @@ type HostCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Host]
+}
+
+"""
+All supported expense types
+"""
+enum HostFeeStructure {
+  """
+  Use global host fees
+  """
+  DEFAULT
+
+  """
+  Custom fee for this Collective only
+  """
+  CUSTOM_FEE
+
+  """
+  Set a monthly retainer for this Collective
+  """
+  MONTHLY_RETAINER
 }
 
 """
@@ -3326,6 +3461,21 @@ type Individual implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -3762,6 +3912,21 @@ type Mutation {
   ): Account!
 
   """
+  An endpoint for hosts to edit the fees structure of their hosted accounts
+  """
+  editAccountFeeStructure(
+    """
+    Account where the settings will be updated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The host fee percent to apply to this account
+    """
+    hostFeePercent: Float!
+  ): Account!
+
+  """
   Add 2FA to the Account if it does not have it
   """
   addTwoFactorAuthTokenToIndividual(
@@ -4012,6 +4177,21 @@ type Organization implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -4257,6 +4437,21 @@ type Project implements Account {
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberOfCollection
   transactions(
     type: TransactionType
@@ -4331,9 +4526,29 @@ type Project implements Account {
   host: Host
 
   """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
 
   """
   The Fund hosting this Project

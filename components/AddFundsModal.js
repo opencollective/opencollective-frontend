@@ -4,6 +4,9 @@ import { Mutation } from '@apollo/react-components';
 import gql from 'graphql-tag';
 import { pick } from 'lodash';
 import { Col, Modal, Row } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
+
+import { CollectiveType } from '../lib/constants/collectives';
 
 import AddFundsForm from './AddFundsForm';
 import Button from './Button';
@@ -22,10 +25,31 @@ const addFundsToOrgMutation = gql`
   }
 `;
 
-const AddFundsModal = ({ LoggedInUser, show, setShow, collective }) => {
+const addFundsToCollectiveMutation = gql`
+  mutation addFundsToCollective($order: OrderInputType!) {
+    addFundsToCollective(order: $order) {
+      id
+      fromCollective {
+        id
+        slug
+        name
+      }
+      collective {
+        id
+        stats {
+          id
+          balance
+        }
+      }
+    }
+  }
+`;
+
+const AddFundsModal = ({ LoggedInUser, show, setShow, collective, host }) => {
   const [loading, setLoading] = React.useState(false);
   const [fundsAdded, setFundsAdded] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const isAddFundsToOrg = collective.type === CollectiveType.ORGANIZATION;
   const close = () => {
     setShow(false);
     setError(null);
@@ -43,7 +67,9 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective }) => {
           <Col sm={12}>
             {fundsAdded && (
               <div>
-                <h1>Funds added to organization successfully</h1>
+                <h1>
+                  <FormattedMessage id="AddFunds.Success" defaultMessage="Funds added successfully" />
+                </h1>
                 <center>
                   <Button className="blue" onClick={close}>
                     Ok
@@ -52,11 +78,12 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective }) => {
               </div>
             )}
             {!fundsAdded && (
-              <Mutation mutation={addFundsToOrgMutation}>
-                {addFundsToOrg => (
+              <Mutation mutation={isAddFundsToOrg ? addFundsToOrgMutation : addFundsToCollectiveMutation}>
+                {addFunds => (
                   <AddFundsForm
                     LoggedInUser={LoggedInUser}
                     collective={collective}
+                    host={host}
                     loading={loading}
                     onCancel={close}
                     onSubmit={async form => {
@@ -73,13 +100,25 @@ const AddFundsModal = ({ LoggedInUser, show, setShow, collective }) => {
 
                       setLoading(true);
                       try {
-                        await addFundsToOrg({
-                          variables: {
-                            ...pick(form, ['totalAmount', 'description']),
-                            CollectiveId: collective.id,
-                            HostCollectiveId: Number(form.FromCollectiveId),
-                          },
-                        });
+                        if (isAddFundsToOrg) {
+                          await addFunds({
+                            variables: {
+                              ...pick(form, ['totalAmount', 'description']),
+                              CollectiveId: collective.legacyId || collective.id,
+                              HostCollectiveId: Number(form.FromCollectiveId),
+                            },
+                          });
+                        } else {
+                          await addFunds({
+                            variables: {
+                              order: {
+                                ...pick(form, ['totalAmount', 'description', 'hostFeePercent', 'platformFeePercent']),
+                                collective: { id: collective.legacyId || collective.id },
+                                fromCollective: { id: Number(form.FromCollectiveId) },
+                              },
+                            },
+                          });
+                        }
 
                         setFundsAdded(true);
                         setLoading(false);
@@ -108,6 +147,7 @@ AddFundsModal.propTypes = {
   show: PropTypes.bool,
   setShow: PropTypes.func,
   collective: PropTypes.object,
+  host: PropTypes.object,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
 };
