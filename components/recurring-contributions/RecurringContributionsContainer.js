@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 
 import Container from '../Container';
-import { Flex } from '../Grid';
+import { Flex, Grid } from '../Grid';
 import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
 
@@ -16,21 +16,6 @@ import EmptyCollectivesSectionImageSVG from '../collective-page/images/EmptyColl
 
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
-  margin-bottom: 40px;
-  margin-right: 4px;
-
-  @media screen and (min-width: 40em) {
-    margin-right: 5%;
-  }
-
-  @media screen and (min-width: 64em) {
-    margin-right: 2%;
-  }
-
-  @media screen and (min-width: 1250px) {
-    margin-right: 57px;
-    margin-bottom: 50px;
-  }
 `;
 
 const filterContributions = (contributions, filterName) => {
@@ -54,11 +39,14 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
   return (
     <Container mt={4}>
       {displayedRecurringContributions.length ? (
-        <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']} my={2}>
+        <Grid
+          gridGap={24}
+          gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr', 'repeat(4, 1fr)', 'repeat(5, 1fr)']}
+          my={2}
+        >
           {displayedRecurringContributions.map(contribution => (
             <CollectiveCardContainer key={contribution.id}>
               <RecurringContributionsCard
-                width={250}
                 collective={contribution.toAccount}
                 status={contribution.status}
                 contribution={contribution}
@@ -69,7 +57,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
               />
             </CollectiveCardContainer>
           ))}
-        </Flex>
+        </Grid>
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
           <img src={EmptyCollectivesSectionImageSVG} alt="" />

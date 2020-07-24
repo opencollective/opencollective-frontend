@@ -11,7 +11,7 @@ import roles from '../../../lib/constants/roles';
 
 import { Dimensions } from '../_constants';
 import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
+import { Box, Flex, Grid } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -79,24 +79,11 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
+const GRID_TEMPLATE_COLUMNS = ['1fr', '1fr 1fr', '1fr 1fr 1fr', 'repeat(4, 1fr)', 'repeat(5, 1fr)'];
+
 /** A container for membership cards to ensure we have a smooth transition */
 const MembershipCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
-  margin-bottom: 40px;
-  margin-right: 4px;
-
-  @media screen and (min-width: 40em) {
-    margin-right: 5%;
-  }
-
-  @media screen and (min-width: 64em) {
-    margin-right: 2%;
-  }
-
-  @media screen and (min-width: 1250px) {
-    margin-right: 57px;
-    margin-bottom: 50px;
-  }
 `;
 
 class SectionContributions extends React.PureComponent {
@@ -154,7 +141,7 @@ class SectionContributions extends React.PureComponent {
     selectedFilter: FILTERS.ALL,
   };
 
-  static NB_MEMBERSHIPS_PER_PAGE = 16;
+  static NB_MEMBERSHIPS_PER_PAGE = 20;
 
   /** There's no point to show all filters if not required */
   getFilters = memoizeOne(memberships => {
@@ -295,17 +282,17 @@ class SectionContributions extends React.PureComponent {
                 <Container
                   data-cy="Contributions"
                   maxWidth={Dimensions.MAX_SECTION_WIDTH}
-                  pl={Dimensions.PADDING_X}
+                  px={Dimensions.PADDING_X}
                   mt={4}
                   mx="auto"
                 >
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                  <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
                     {sortedMemberships.slice(0, nbMemberships).map(membership => (
                       <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                         <StyledMembershipCard membership={membership} />
                       </MembershipCardContainer>
                     ))}
-                  </Flex>
+                  </Grid>
                 </Container>
                 {nbMemberships < sortedMemberships.length && (
                   <Flex mt={3} justifyContent="center">
@@ -342,13 +329,13 @@ class SectionContributions extends React.PureComponent {
                   </SectionTitle>
                 </ContainerSectionContent>
                 <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} m="0 auto">
-                  <Flex flexWrap="wrap" justifyContent={['space-evenly', 'left']}>
+                  <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
                     {connectedCollectives.map(({ id, collective }) => (
                       <MembershipCardContainer key={id}>
                         <StyledMembershipCard membership={{ collective }} />
                       </MembershipCardContainer>
                     ))}
-                  </Flex>
+                  </Grid>
                 </Container>
               </Box>
             )}

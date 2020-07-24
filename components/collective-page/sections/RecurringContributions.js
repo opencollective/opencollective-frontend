@@ -161,7 +161,7 @@ class SectionRecurringContributions extends React.Component {
             onChange={filter => this.setState({ filter: filter })}
           />
         </Box>
-        <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} pl={Dimensions.PADDING_X} mt={4} mx="auto">
+        <Container maxWidth={Dimensions.MAX_SECTION_WIDTH} px={Dimensions.PADDING_X} mt={4} mx="auto">
           <RecurringContributionsContainer
             recurringContributions={recurringContributions}
             account={collective}

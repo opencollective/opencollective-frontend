@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, truncate } from 'lodash';
 import { injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -105,9 +105,11 @@ const MaskSVG = props => (
 );
 
 const StyledBackgroundMask = styled(MaskSVG)`
-  width: 100%;
-  height: 100%;
+  /** Dimensions are a bit more than 100% to resolve a strange background overlap issue */
+  width: 101%;
+  height: 102%;
   top: 0;
+  left: -1px;
   position: absolute;
 `;
 
@@ -144,7 +146,7 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, ...props 
           <Container p={3}>
             <LinkCollective collective={collective}>
               <P fontSize="LeadParagraph" fontWeight="bold" color="black.800">
-                {collective.name}
+                {truncate(collective.name, { length: 50 })}
               </P>
             </LinkCollective>
             {tag === undefined ? (
