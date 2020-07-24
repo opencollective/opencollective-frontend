@@ -1007,7 +1007,7 @@ class CreateOrderPage extends React.Component {
                       </P>
                     </Flex>
                   </Flex>
-                  {stepDetails.platformFee.label === 'Other' && (
+                  {stepDetails.platformFee?.label === 'Other' && (
                     <Box>
                       <StyledInputField
                         label="Other amount"
@@ -1241,9 +1241,8 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { loadingLoggedInUser, LoggedInUser, feesOnTopAvailable, tier } = this.props;
-    const showFeesOnTop =
-      feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+    const { loadingLoggedInUser, LoggedInUser } = this.props;
+    const showFeesOnTop = this.canHaveFeesOnTop();
 
     return (
       <Steps
