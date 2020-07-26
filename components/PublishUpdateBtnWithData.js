@@ -30,7 +30,7 @@ class PublishUpdateBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     const { notificationAudience } = this.state;
-    await this.props.publishUpdate(id, notificationAudience);
+    await this.props.publishUpdate({ variables: { id, notificationAudience } });
   }
 
   handleNotificationChange(selected) {
@@ -183,11 +183,7 @@ const updateQuery = gql`
 const addUpdateData = graphql(updateQuery);
 
 const addPublishUpdateMutation = graphql(publishUpdateMutation, {
-  props: ({ mutate }) => ({
-    publishUpdate: async (id, notificationAudience) => {
-      return await mutate({ variables: { id, notificationAudience } });
-    },
-  }),
+  name: 'publishUpdate',
 });
 
 const addGraphql = compose(addPublishUpdateMutation, addUpdateData);

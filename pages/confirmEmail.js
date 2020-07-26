@@ -53,7 +53,7 @@ class ConfirmEmailPage extends React.Component {
   async triggerEmailValidation() {
     try {
       this.setState({ validationTriggered: true });
-      await this.props.confirmUserEmail(this.props.token);
+      await this.props.confirmUserEmail({ variables: { token: this.props.token } });
       setTimeout(this.props.refetchLoggedInUser, 3000);
       this.setState({ status: 'success' });
     } catch (e) {
@@ -127,11 +127,7 @@ const confirmUserEmailMutation = gql`
 `;
 
 export const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
-  props: ({ mutate }) => ({
-    confirmUserEmail: token => {
-      return mutate({ variables: { token } });
-    },
-  }),
+  name: 'confirmUserEmail',
 });
 
 export default withUser(addConfirmUserEmailMutation(ConfirmEmailPage));

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
 import { cloneDeep, get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
@@ -16,8 +16,6 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import LoginBtn from './LoginBtn';
 import MessageBox from './MessageBox';
 import { P } from './Text';
-
-const gqlV2 = gql; // Needed for lint validation of api v2 schema.
 
 class CommentsWithData extends React.Component {
   static propTypes = {
@@ -256,9 +254,7 @@ const createCommentMutation = gqlV2/* GraphQL */ `
 `;
 
 const addCreateCommentMutation = graphql(createCommentMutation, {
-  options: {
-    context: { apiVersion: '2' },
-  },
+  options: { context: API_V2_CONTEXT },
   props: ({ ownProps, mutate }) => ({
     createComment: async comment => {
       return await mutate({
@@ -291,9 +287,7 @@ const deleteCommentMutation = gqlV2/* GraphQL */ `
 `;
 
 const addDeleteCommentMutation = graphql(deleteCommentMutation, {
-  options: {
-    context: { apiVersion: '2' },
-  },
+  options: { context: API_V2_CONTEXT },
   props: ({ ownProps, mutate }) => ({
     deleteComment: async id => {
       return await mutate({
@@ -348,14 +342,8 @@ const editCommentMutation = gqlV2/* GraphQL */ `
 `;
 
 const addEditCommentMutation = graphql(editCommentMutation, {
-  options: {
-    context: { apiVersion: '2' },
-  },
-  props: ({ mutate }) => ({
-    editComment: async comment => {
-      return await mutate({ variables: { comment } });
-    },
-  }),
+  name: 'editComment',
+  options: { context: API_V2_CONTEXT },
 });
 
 const addGraphql = compose(

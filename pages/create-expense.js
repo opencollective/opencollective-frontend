@@ -159,8 +159,10 @@ class CreateExpensePage extends React.Component {
       this.setState({ isSubmitting: true, error: null });
       const { expense } = this.state;
       const result = await this.props.createExpense({
-        account: { id: this.props.data.account.id },
-        expense: prepareExpenseForSubmit(expense),
+        variables: {
+          account: { id: this.props.data.account.id },
+          expense: prepareExpenseForSubmit(expense),
+        },
       });
 
       // Clear local storage backup if expense submitted successfully
@@ -471,12 +473,8 @@ const createExpenseMutation = gqlV2/* GraphQL */ `
 `;
 
 const addCreateExpenseMutation = graphql(createExpenseMutation, {
+  name: 'createExpense',
   options: { context: API_V2_CONTEXT },
-  props: ({ mutate }) => ({
-    createExpense: async variables => {
-      return mutate({ variables });
-    },
-  }),
 });
 
 export default withUser(addCreateExpensePageData(withRouter(addCreateExpenseMutation(injectIntl(CreateExpensePage)))));

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
@@ -30,22 +30,6 @@ const deactivateCollectiveAsHostMutation = gql`
   }
 `;
 
-const addActivateCollectiveAsHostMutation = graphql(activateCollectiveAsHostMutation, {
-  props: ({ mutate }) => ({
-    activateCollectiveAsHost: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
-});
-
-const addDeactivateCollectiveAsHostMutation = graphql(deactivateCollectiveAsHostMutation, {
-  props: ({ mutate }) => ({
-    deactivateCollectiveAsHost: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
-});
-
 const getCollectiveType = type => {
   switch (type) {
     case 'ORGANIZATION':
@@ -57,10 +41,10 @@ const getCollectiveType = type => {
   }
 };
 
-const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollectiveAsHost }) => {
+const FiscalHosting = ({ collective }) => {
   const collectiveType = getCollectiveType(collective.type);
   const { refetch } = useContext(GraphQLContext);
-  const [activationStatus, setaActivationStatus] = useState({
+  const [activationStatus, setActivationStatus] = useState({
     processing: false,
     isHostAccount: collective.isHost,
     error: null,
@@ -71,13 +55,16 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
   const defaultAction = isHostAccount ? 'Activate' : 'Deactivate';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
 
+  const [activateCollectiveAsHost] = useMutation(activateCollectiveAsHostMutation);
+  const [deactivateCollectiveAsHost] = useMutation(deactivateCollectiveAsHostMutation);
+
   const handleActivateAsHost = async ({ activateCollectiveAsHost, id }) => {
     setModal({ type: 'Activate', show: false });
     try {
-      setaActivationStatus({ ...activationStatus, processing: true });
-      await activateCollectiveAsHost(id);
+      setActivationStatus({ ...activationStatus, processing: true });
+      await activateCollectiveAsHost({ variables: { id } });
       await refetch();
-      setaActivationStatus({
+      setActivationStatus({
         ...activationStatus,
         processing: false,
         isHostAccount: true,
@@ -85,17 +72,17 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      setaActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
+      setActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
     }
   };
 
   const handleDeactivateAsHost = async ({ deactivateCollectiveAsHost, id }) => {
     setModal({ type: 'Deactivate', show: false });
     try {
-      setaActivationStatus({ ...activationStatus, processing: true });
-      await deactivateCollectiveAsHost(id);
+      setActivationStatus({ ...activationStatus, processing: true });
+      await deactivateCollectiveAsHost({ variables: { id } });
       await refetch();
-      setaActivationStatus({
+      setActivationStatus({
         ...activationStatus,
         processing: false,
         isHostAccount: false,
@@ -103,7 +90,7 @@ const FiscalHosting = ({ collective, activateCollectiveAsHost, deactivateCollect
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      setaActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
+      setActivationStatus({ ...activationStatus, processing: false, error: errorMsg });
     }
   };
 
@@ -250,4 +237,4 @@ FiscalHosting.propTypes = {
   deactivateCollectiveAsHost: PropTypes.func,
 };
 
-export default addDeactivateCollectiveAsHostMutation(addActivateCollectiveAsHostMutation(FiscalHosting));
+export default FiscalHosting;

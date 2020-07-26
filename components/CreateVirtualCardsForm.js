@@ -263,7 +263,8 @@ class CreateVirtualCardsForm extends Component {
       }
 
       this.setState({ submitting: true });
-      const params = {
+      const variables = {
+        CollectiveId: this.props.collectiveId,
         amount: values.amount,
         PaymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
@@ -272,14 +273,14 @@ class CreateVirtualCardsForm extends Component {
       };
 
       if (deliverType === 'email') {
-        params.emails = values.emails;
-        params.customMessage = values.customMessage;
+        variables.emails = values.emails;
+        variables.customMessage = values.customMessage;
       } else if (deliverType === 'manual') {
-        params.numberOfVirtualCards = values.numberOfVirtualCards;
+        variables.numberOfVirtualCards = values.numberOfVirtualCards;
       }
 
       this.props
-        .createVirtualCards(params)
+        .createVirtualCards({ variables })
         .then(({ data }) => {
           this.setState({ createdVirtualCards: data.createVirtualCards, submitting: false });
           window.scrollTo(0, 0);
@@ -758,15 +759,7 @@ const createVirtualCardsMutation = gql`
 `;
 
 const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutation, {
-  props: ({ mutate, ownProps }) => ({
-    createVirtualCards: variables =>
-      mutate({
-        variables: {
-          ...variables,
-          CollectiveId: ownProps.collectiveId,
-        },
-      }),
-  }),
+  name: 'createVirtualCards',
 });
 
 const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateVirtualCardsMutation);

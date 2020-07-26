@@ -118,7 +118,7 @@ class EditTwitterAccount extends React.Component {
 
   async onClick() {
     const connectedAccount = pick(this.state.connectedAccount, ['id', 'settings']);
-    await this.props.editConnectedAccount(connectedAccount);
+    await this.props.editConnectedAccount({ variables: { connectedAccount } });
     this.setState({ isModified: false });
   }
 
@@ -217,11 +217,7 @@ const editConnectedAccountMutation = gql`
 `;
 
 const addEditConnectedAccountMutation = graphql(editConnectedAccountMutation, {
-  props: ({ mutate }) => ({
-    editConnectedAccount: async connectedAccount => {
-      return await mutate({ variables: { connectedAccount } });
-    },
-  }),
+  name: 'editConnectedAccount',
 });
 
 export default injectIntl(addEditConnectedAccountMutation(EditTwitterAccount));

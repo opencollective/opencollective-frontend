@@ -112,7 +112,7 @@ class StyledUpdate extends Component {
     }
 
     try {
-      await this.props.deleteUpdate(this.props.update.id);
+      await this.props.deleteUpdate({ variables: { id: this.props.update.id } });
       Router.pushRoute('collective', { slug: this.props.collective.slug });
     } catch (err) {
       // TODO: this should be reported to the user
@@ -122,7 +122,7 @@ class StyledUpdate extends Component {
 
   save = async update => {
     update.id = get(this.props, 'update.id');
-    await this.props.editUpdate(update);
+    await this.props.editUpdate({ variables: { update } });
     this.setState({ modified: false, mode: 'details' });
   };
 
@@ -340,22 +340,12 @@ const deleteUpdateMutation = gql`
   }
 `;
 
-/* TODO(GraphQL): refactor unnecessary mutate */
 const addEditUpdateMutation = graphql(editUpdateMutation, {
-  props: ({ mutate }) => ({
-    editUpdate: async update => {
-      return await mutate({ variables: { update } });
-    },
-  }),
+  name: 'editUpdate',
 });
 
-/* TODO(GraphQL): refactor unnecessary mutate */
 const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
-  props: ({ mutate }) => ({
-    deleteUpdate: async updateID => {
-      return await mutate({ variables: { id: updateID } });
-    },
-  }),
+  name: 'deleteUpdate',
 });
 
 const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);

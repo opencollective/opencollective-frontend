@@ -481,7 +481,8 @@ class CreateOrderPage extends React.Component {
     };
 
     try {
-      const orderCreated = (await createOrder(order)).data.createOrder;
+      const res = await createOrder({ variables: { order } });
+      const orderCreated = res.data.createOrder;
       if (orderCreated.stripeError) {
         this.handleStripeError(orderCreated);
       } else {
@@ -505,7 +506,7 @@ class CreateOrderPage extends React.Component {
     this.setState({ submitting: true, error: null });
 
     try {
-      const res = await this.props.confirmOrder(order);
+      const res = await this.props.confirmOrder({ variables: { order } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -1316,9 +1317,7 @@ const createOrderMutation = gql`
 `;
 
 const addCreateOrderMutation = graphql(createOrderMutation, {
-  props: ({ mutate }) => ({
-    createOrder: order => mutate({ variables: { order } }),
-  }),
+  name: 'createOrder',
 });
 
 const confirmOrderMutation = gql`
@@ -1331,9 +1330,7 @@ const confirmOrderMutation = gql`
 `;
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {
-  props: ({ mutate }) => ({
-    confirmOrder: order => mutate({ variables: { order } }),
-  }),
+  name: 'confirmOrder',
 });
 
 const addGraphql = compose(addCreateCollectiveMutation, addCreateOrderMutation, addConfirmOrderMutation);

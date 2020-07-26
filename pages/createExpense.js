@@ -50,7 +50,7 @@ class CreateExpensePage extends React.Component {
       expense.PayoutMethod = this.getPayoutMethod(expense);
       delete expense.paypalEmail;
       delete expense.payoutMethod;
-      const res = await this.props.createExpense(expense);
+      const res = await this.props.createExpense({ variables: { expense } });
       const expenseCreated = res.data.createExpense;
       Router.pushRoute(`/${this.props.slug}/expenses/${expenseCreated.id}/legacy?createSuccess=true`);
     } catch (e) {
@@ -99,7 +99,7 @@ class CreateExpensePage extends React.Component {
 }
 
 const createExpenseMutation = gql`
-  mutation createExpense($expense: ExpenseInputType!) {
+  mutation CreateExpense($expense: ExpenseInputType!) {
     createExpense(expense: $expense) {
       id
       description
@@ -212,11 +212,7 @@ const createExpensePageQuery = gql`
 `;
 
 const addCreateExpenseMutation = graphql(createExpenseMutation, {
-  props: ({ mutate }) => ({
-    createExpense: async expense => {
-      return await mutate({ variables: { expense } });
-    },
-  }),
+  name: 'createExpense',
 });
 
 const addCreateExpensePageData = graphql(createExpensePageQuery);

@@ -46,7 +46,7 @@ class Members extends React.Component {
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
-    mutate: PropTypes.func.isRequired,
+    editCoreContributors: PropTypes.func.isRequired,
     /** @ignore from Apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -184,7 +184,7 @@ class Members extends React.Component {
 
     try {
       this.setState({ isSubmitting: true, error: null });
-      await this.props.mutate({
+      await this.props.editCoreContributors({
         variables: {
           collectiveId: this.props.collective.id,
           members: this.state.members.map(member => ({
@@ -433,7 +433,9 @@ const editCoreContributorsMutation = gql`
   ${memberFieldsFragment}
 `;
 
-const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation);
+const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
+  name: 'editCoreContributors',
+});
 
 const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
 

@@ -171,7 +171,7 @@ class Expense extends React.Component {
 
   handleUnapproveExpense = async id => {
     try {
-      await this.props.unapproveExpense(id);
+      await this.props.unapproveExpense({ variables: { id } });
       this.setState({ showUnapproveModal: false });
       await this.props.refetch();
     } catch (err) {
@@ -181,7 +181,7 @@ class Expense extends React.Component {
 
   handleDeleteExpense = async id => {
     try {
-      await this.props.deleteExpense(id);
+      await this.props.deleteExpense({ variables: { id } });
       this.setState({ showDeleteExpenseModal: false, error: null });
       await this.props.refetch();
     } catch (err) {
@@ -196,7 +196,7 @@ class Expense extends React.Component {
         id: this.props.expense.id,
         ...this.state.expense,
       };
-      await this.props.editExpense(expense);
+      await this.props.editExpense({ variables: { expense } });
       this.setState({ modified: false, mode: 'details', isSubmitting: false });
     } catch (e) {
       this.setState({ isSubmitting: false });
@@ -622,11 +622,7 @@ const deleteExpenseMutation = gql`
 `;
 
 const addDeleteExpenseMutation = graphql(deleteExpenseMutation, {
-  props: ({ mutate }) => ({
-    deleteExpense: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+  name: 'deleteExpense',
 });
 
 const unapproveExpenseMutation = gql`
@@ -639,11 +635,7 @@ const unapproveExpenseMutation = gql`
 `;
 
 const addUnapproveExpenseMutation = graphql(unapproveExpenseMutation, {
-  props: ({ mutate }) => ({
-    unapproveExpense: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+  name: 'unapproveExpense',
 });
 
 const editExpenseMutation = gql`
@@ -674,11 +666,7 @@ const editExpenseMutation = gql`
 `;
 
 const addEditExpenseMutation = graphql(editExpenseMutation, {
-  props: ({ mutate }) => ({
-    editExpense: async expense => {
-      return await mutate({ variables: { expense } });
-    },
-  }),
+  name: 'editExpense',
 });
 
 const addGraphql = compose(addUnapproveExpenseMutation, addEditExpenseMutation, addDeleteExpenseMutation);

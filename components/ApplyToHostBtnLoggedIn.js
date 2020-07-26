@@ -53,11 +53,14 @@ class ApplyToHostBtnLoggedIn extends React.Component {
 
   handleContinueBtn = async () => {
     const { host } = this.props;
-    const CollectiveInputType = {
-      id: this.inactiveCollective.id,
-      HostCollectiveId: host.id,
-    };
-    await this.props.editCollective(CollectiveInputType);
+    await this.props.editCollective({
+      variables: {
+        collective: {
+          id: this.inactiveCollective.id,
+          HostCollectiveId: host.id,
+        },
+      },
+    });
     this.setState({ showModal: false });
   };
 
@@ -237,11 +240,7 @@ const addInactiveCollectivesData = graphql(inactiveCollectivesQuery, {
 });
 
 const addApplyToHostMutation = graphql(applyToHostMutation, {
-  props: ({ mutate }) => ({
-    editCollective: async CollectiveInputType => {
-      return await mutate({ variables: { collective: CollectiveInputType } });
-    },
-  }),
+  name: 'editCollective',
 });
 
 const addGraphql = compose(addInactiveCollectivesData, addApplyToHostMutation);

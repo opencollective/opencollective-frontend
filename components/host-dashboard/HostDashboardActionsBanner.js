@@ -250,6 +250,8 @@ const addFundsToCollectiveMutation = gql`
   }
 `;
 
-const addMutation = graphql(addFundsToCollectiveMutation, { name: 'addFundsToCollective' });
+const addMutation = graphql(addFundsToCollectiveMutation, {
+  name: 'addFundsToCollective',
+});
 
 export default addMutation(injectIntl(HostDashboardActionsBanner));
