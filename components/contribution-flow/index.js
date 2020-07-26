@@ -1289,8 +1289,8 @@ class CreateOrderPage extends React.Component {
   }
 }
 
-const submitOrderFragment = gql`
-  fragment SubmitOrderFragment on OrderType {
+const submitOrderFieldsFragment = gql`
+  fragment SubmitOrderFields on OrderType {
     id
     idV2
     status
@@ -1309,10 +1309,10 @@ const submitOrderFragment = gql`
 const createOrderMutation = gql`
   mutation CreateOrder($order: OrderInputType!) {
     createOrder(order: $order) {
-      ...SubmitOrderFragment
+      ...SubmitOrderFields
     }
   }
-  ${submitOrderFragment}
+  ${submitOrderFieldsFragment}
 `;
 
 const addCreateOrderMutation = graphql(createOrderMutation, {
@@ -1324,10 +1324,10 @@ const addCreateOrderMutation = graphql(createOrderMutation, {
 const confirmOrderMutation = gql`
   mutation ConfirmOrder($order: ConfirmOrderInputType!) {
     confirmOrder(order: $order) {
-      ...SubmitOrderFragment
+      ...SubmitOrderFields
     }
   }
-  ${submitOrderFragment}
+  ${submitOrderFieldsFragment}
 `;
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {

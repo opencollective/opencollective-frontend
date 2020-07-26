@@ -223,65 +223,68 @@ class CreateOrderPage extends React.Component {
   }
 }
 
-const collectiveFields = `
-  id
-  slug
-  name
-  description
-  longDescription
-  twitterHandle
-  type
-  website
-  imageUrl
-  backgroundImage
-  currency
-  hostFeePercent
-  platformFeePercent
-  tags
-  settings
-  isActive
-  isHost
-  location {
-    country
-  }
-  host {
+const collectiveFieldsFragment = gql`
+  fragment CollectiveFields on CollectiveInterface {
     id
-    name
-    settings
-    connectedAccounts {
-      id
-      service
-    }
-    location {
-      country
-    }
-    plan {
-      bankTransfers
-      bankTransfersLimit
-    }
-  }
-  parentCollective {
     slug
+    name
+    description
+    longDescription
+    twitterHandle
+    type
+    website
+    imageUrl
+    backgroundImage
+    currency
+    hostFeePercent
+    platformFeePercent
+    tags
     settings
+    isActive
+    isHost
     location {
       country
+    }
+    host {
+      id
+      name
+      settings
+      connectedAccounts {
+        id
+        service
+      }
+      location {
+        country
+      }
+      plan {
+        bankTransfers
+        bankTransfersLimit
+      }
+    }
+    parentCollective {
+      slug
+      settings
+      location {
+        country
+      }
     }
   }
 `;
 
-/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const createOrderPageQuery = gql`
   query CreateOrderPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug) {
-      ${collectiveFields}
+      ...CollectiveFields
     }
   }
+
+  ${collectiveFieldsFragment}
 `;
 
 const createOrderPageWithTierQuery = gql`
   query CreateOrderPageWithTier($collectiveSlug: String!, $tierId: Int!) {
     Collective(slug: $collectiveSlug) {
-      ${collectiveFields}
+      ...CollectiveFields
     }
     Tier(id: $tierId) {
       id
@@ -303,6 +306,8 @@ const createOrderPageWithTierQuery = gql`
       }
     }
   }
+
+  ${collectiveFieldsFragment}
 `;
 
 const addCreateOrderPageData = graphql(createOrderPageQuery, { skip: props => props.tierId });

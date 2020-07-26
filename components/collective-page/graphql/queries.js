@@ -83,10 +83,10 @@ export const collectivePageQuery = gql`
         settings
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
-        ...ContributorsFieldsFragment
+        ...ContributorsFields
       }
       financialContributors: contributors(roles: [BACKER], limit: 150) {
-        ...ContributorsFieldsFragment
+        ...ContributorsFields
       }
       tiers {
         id
@@ -211,7 +211,7 @@ export const collectivePageQuery = gql`
         ...BudgetItemExpenseTypeFragment
       }
       updates(limit: 3, onlyPublishedUpdates: true) {
-        ...UpdatesFieldsFragment
+        ...UpdatesFields
       }
       plan {
         hostDashboard

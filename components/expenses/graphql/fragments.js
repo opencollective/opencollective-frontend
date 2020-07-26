@@ -3,7 +3,7 @@ import { gqlV2 } from '../../../lib/graphql/helpers';
 import { commentFieldsFragment } from '../../conversations/graphql';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
-  fragment LoggedInAccountExpensePayoutFieldsFragment on Individual {
+  fragment LoggedInAccountExpensePayoutFields on Individual {
     id
     slug
     imageUrl
@@ -47,7 +47,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
 `;
 
 const hostFieldsFragment = gqlV2/* GraphQL */ `
-  fragment HostFieldsFragment on Host {
+  fragment HostFields on Host {
     id
     name
     slug
@@ -74,7 +74,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
 `;
 
 export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
-  fragment ExpensePageExpenseFieldsFragment on Expense {
+  fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
     description
@@ -151,7 +151,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isHost
         balance
         host {
-          ...HostFieldsFragment
+          ...HostFields
         }
       }
 
@@ -160,7 +160,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         balance
         host {
-          ...HostFieldsFragment
+          ...HostFields
         }
       }
       ... on Fund {
@@ -168,7 +168,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         balance
         host {
-          ...HostFieldsFragment
+          ...HostFields
         }
       }
       ... on Event {
@@ -176,7 +176,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         balance
         host {
-          ...HostFieldsFragment
+          ...HostFields
         }
         parent {
           id
@@ -191,7 +191,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         balance
         host {
-          ...HostFieldsFragment
+          ...HostFields
         }
         parent {
           id
