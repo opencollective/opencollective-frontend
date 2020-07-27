@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Jul 14 2020 16:19:16 GMT+0100 (British Summer Time)
+# timestamp: Mon Jul 27 2020 12:31:41 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -3497,9 +3497,7 @@ type Tier {
   interval: String
   presets: [Int]
   maxQuantity: Int
-  maxQuantityPerUser: Int
   goal: Int
-  password: String
   customFields: [JSON]
   startsAt: DateString
   endsAt: DateString
@@ -3562,13 +3560,11 @@ input TierInputType {
   maxQuantity: Int
   minimumAmount: Int
   amountType: String
-  maxQuantityPerUser: Int
 
   """
   amount that you are trying to raise with this tier
   """
   goal: Int
-  password: String
   customFields: [CustomFieldsInputType]
 
   """

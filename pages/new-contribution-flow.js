@@ -1,3 +1,4 @@
+/* eslint-disable graphql/template-strings */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
@@ -243,29 +244,6 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     ... on Project {
       host {
         ...HostFields
-      }
-    }
-    members(limit: 12) {
-      nodes {
-        id
-        role
-        account {
-          id
-          name
-          slug
-          type
-          imageUrl
-          orders(filter: OUTGOING, onlySubscriptions: true) {
-            totalCount
-            nodes {
-              id
-              totalDonations {
-                value
-                currency
-              }
-            }
-          }
-        }
       }
     }
   }

@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Mon Jul 20 2020 11:47:07 GMT-0300 (Brasilia Standard Time)
+# timestamp: Mon Jul 27 2020 12:32:00 GMT+0100 (British Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -34,7 +34,6 @@ interface Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -369,7 +368,6 @@ type Bot implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -526,7 +524,6 @@ type Collective implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -666,22 +663,6 @@ type Collective implements Account {
     accountType: AccountType
   ): Int
   tiers: TierCollection!
-
-  """
-  All the persons and entities that contribute to this organization
-  """
-  contributors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    roles: [MemberRole]
-  ): ContributorCollection!
 }
 
 input CollectiveCreateInput {
@@ -837,108 +818,6 @@ enum ConnectedAccountService {
   twitter
   meetup
   transferwise
-}
-
-"""
-A person or an entity that contributes financially or by any other mean to the mission
-of the collective. While "Member" is dedicated to permissions, this type is meant
-to surface all the public contributors.
-"""
-type Contributor {
-  """
-  A unique identifier for this member
-  """
-  id: String!
-
-  """
-  Name of the contributor
-  """
-  name: String!
-
-  """
-  All the roles for a given contributor
-  """
-  roles: [ContributorRole]
-
-  """
-  True if the contributor is a collective admin
-  """
-  isAdmin: Boolean!
-
-  """
-  True if the contributor is a core contributor
-  """
-  isCore: Boolean!
-
-  """
-  True if the contributor is a financial contributor
-  """
-  isBacker: Boolean!
-
-  """
-  Member join date
-  """
-  since: ISODateTime!
-
-  """
-  How much money the user has contributed for this (in cents, using collective currency)
-  """
-  totalAmountDonated: Int!
-
-  """
-  Wether the contributor is an individual, an organization...
-  """
-  type: String!
-
-  """
-  Defines if the contributors wants to be incognito (name not displayed)
-  """
-  isIncognito: Boolean!
-
-  """
-  Description of how the member contribute. Will usually be a tier name, or "design" or "code".
-  """
-  description: String
-
-  """
-  If the contributor has a page on Open Collective, this is the slug to link to it
-  """
-  collectiveSlug: String
-
-  """
-  Contributor avatar or logo
-  """
-  image(height: Int, format: ImageFormat): String
-
-  """
-  A public message from contributors to describe their contributions
-  """
-  publicMessage: String
-}
-
-"""
-A collection of "Contributor"
-"""
-type ContributorCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Contributor]
-}
-
-"""
-Possible roles for a contributor. Extends `Member.Role`.
-"""
-enum ContributorRole {
-  HOST
-  ADMIN
-  MEMBER
-  CONTRIBUTOR
-  BACKER
-  FUNDRAISER
-  ATTENDEE
-  FOLLOWER
-  CONNECTED_COLLECTIVE
 }
 
 """
@@ -2376,7 +2255,6 @@ type Event implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -3016,7 +2894,6 @@ type Fund implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -3156,22 +3033,6 @@ type Fund implements Account {
     accountType: AccountType
   ): Int
   tiers: TierCollection!
-
-  """
-  All the persons and entities that contribute to this organization
-  """
-  contributors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int = 0
-    roles: [MemberRole]
-  ): ContributorCollection!
 }
 
 input FundCreateInput {
@@ -3204,7 +3065,6 @@ type Host implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -3420,7 +3280,6 @@ type Individual implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -4107,7 +3966,6 @@ type Organization implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -4353,7 +4211,6 @@ type Project implements Account {
   currency: String
   expensePolicy: String
   imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
   The time of creation
@@ -4684,12 +4541,6 @@ type Query {
     """
     tags: [String]
   ): HostCollection
-  tier(
-    """
-    Identifiers to retrieve the expense.
-    """
-    tier: TierReferenceInput
-  ): Tier
   loggedInAccount: Account
 }
 
