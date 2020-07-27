@@ -873,7 +873,7 @@ class CreateOrderPage extends React.Component {
     }));
     platformFeeArray.push(
       { label: this.props.intl.formatMessage(messages.platformFeeNoContribution), value: 0 },
-      { label: this.props.intl.formatMessage(messages.platformFeeOther), value: 100 },
+      { label: this.props.intl.formatMessage(messages.platformFeeOther), value: 100, isCustomAmount: true },
     );
     return platformFeeArray;
   };
@@ -1007,10 +1007,10 @@ class CreateOrderPage extends React.Component {
                       </P>
                     </Flex>
                   </Flex>
-                  {stepDetails.platformFee?.label === 'Other' && (
+                  {stepDetails.platformFee?.isCustomAmount && (
                     <Box>
                       <StyledInputField
-                        label="Other amount"
+                        label={this.props.intl.formatMessage(messages.platformFeeOther)}
                         htmlFor="feesOnTopOtherAmount"
                         name="feesOnTopOtherAmount"
                         required
