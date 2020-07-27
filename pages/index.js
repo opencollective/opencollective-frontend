@@ -27,8 +27,8 @@ const HomePage = () => {
       <MakeCommunitySection />
       <WhatCanYouDoSection />
       <FeaturesSection />
-      <OCUsersSection />
       <FiscalHostSection />
+      <OCUsersSection />
       <WeAreOpenSection />
       <LearnMoreSection />
       <JoinUsSection />
