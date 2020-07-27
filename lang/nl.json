@@ -226,8 +226,6 @@
   "collective.pending.description": "Dit collectief wacht op goedkeuring van de beheerder ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organisatie} other {organisaties}} steunen {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
-  "collective.sendInvoiceByEmail.description": "Voeg een PDF toe van ontvangstbewijzen met je maandelijkse rapportage e-mail",
-  "collective.sendInvoiceByEmail.label": "Facturen",
   "collective.sendMoney.description": "PayPal is activated by default, you don't have to configure anything.",
   "collective.slug.label": "url",
   "collective.stats.balance.title": "Beschikbaar saldo",

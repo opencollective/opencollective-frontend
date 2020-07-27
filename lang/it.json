@@ -226,8 +226,6 @@
   "collective.pending.description": "Questa collettivo è in attesa di approvazione da parte dell'ospite ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organizzazione sta} other {organizzazioni stanno}} sostenendo {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {persona sta} other {persone stanno}} sostenendo {collective}",
-  "collective.sendInvoiceByEmail.description": "Includi un PDF di ricevute con la tua email di rapporto mensile",
-  "collective.sendInvoiceByEmail.label": "Fatture",
   "collective.sendMoney.description": "PayPal è attivato per impostazione predefinita, non devi configurare nulla.",
   "collective.slug.label": "url",
   "collective.stats.balance.title": "Bilancio disponibile",

@@ -59,13 +59,11 @@ class EditCollective extends React.Component {
     collective.settings = {
       ...this.props.collective.settings,
       editor: collective.markdown ? 'markdown' : 'html',
-      sendInvoiceByEmail: collective.sendInvoiceByEmail,
       apply: collective.application,
       tos: collective.tos,
     };
 
     delete collective.markdown;
-    delete collective.sendInvoiceByEmail;
     delete collective.tos;
     delete collective.application;
 

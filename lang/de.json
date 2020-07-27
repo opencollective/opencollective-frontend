@@ -226,8 +226,6 @@
   "collective.pending.description": "Dieses Collective wartet auf die Genehmigung des Hosts ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {Organisation unterstützt} other {Organisationen unterstützen}} {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {Person unterstützt} other {Personen unterstützen}} {collective}",
-  "collective.sendInvoiceByEmail.description": "Fügen Sie Ihrer monatlichen Berichts-E-Mail eine PDF mit Bescheinigungen bei",
-  "collective.sendInvoiceByEmail.label": "Rechnungen",
   "collective.sendMoney.description": "PayPal ist standardmäßig aktiviert, Sie müssen nichts konfigurieren.",
   "collective.slug.label": "url",
   "collective.stats.balance.title": "Verfügbarer Betrag",

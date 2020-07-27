@@ -226,8 +226,6 @@
   "collective.pending.description": "Ce collectif est en attente d'approbation de l'hôte ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organisation soutient} other {organisations soutiennent}} {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {personne soutient} other {personnes soutiennent}} {collective}",
-  "collective.sendInvoiceByEmail.description": "Inclure un PDF contenant les reçus dans l'email de rapport mensuel",
-  "collective.sendInvoiceByEmail.label": "Factures",
   "collective.sendMoney.description": "PayPal est activé par défaut, vous n'avez rien à configurer.",
   "collective.slug.label": "URL",
   "collective.stats.balance.title": "Solde disponible",

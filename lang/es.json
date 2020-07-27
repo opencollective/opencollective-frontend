@@ -226,8 +226,6 @@
   "collective.pending.description": "Este colectivo está pendiente de aprobación del patrocinador fiscal ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organización está} other {organizaciones están}} apoyando a {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
-  "collective.sendInvoiceByEmail.description": "Incluir un PDF de recibos con su correo electrónico mensual",
-  "collective.sendInvoiceByEmail.label": "Facturas",
   "collective.sendMoney.description": "PayPal está activado automáticamente, no tienes que configurar nada.",
   "collective.slug.label": "url",
   "collective.stats.balance.title": "Balance disponible:",
