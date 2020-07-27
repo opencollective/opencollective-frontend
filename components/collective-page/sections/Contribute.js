@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { get } from '@styled-system/css';
-import { cloneDeep, orderBy, set } from 'lodash';
+import { cloneDeep, orderBy, partition, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
@@ -261,6 +261,10 @@ class SectionContribute extends React.PureComponent {
     return waysToContribute;
   });
 
+  triageEvents = memoizeOne(events => {
+    return partition(events, isPastEvent);
+  });
+
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
@@ -279,6 +283,7 @@ class SectionContribute extends React.PureComponent {
     const hasHost = collective.host;
     const isHost = collective.isHost;
     const waysToContribute = this.getFinancialContributions(sortedTiers);
+    const [pastEvents, upcomingEvents] = this.triageEvents(events);
 
     /*
     cases
@@ -398,12 +403,22 @@ class SectionContribute extends React.PureComponent {
                     </ContainerSectionContent>
 
                     <ContributeCardsContainer ref={ref}>
+                      {upcomingEvents.map(event => (
+                        <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                          <ContributeEvent
+                            collective={collective}
+                            event={event}
+                            hideContributors={hasNoContributorForEvents}
+                            disableCTA={!collective.isActive || !event.isActive}
+                          />
+                        </Box>
+                      ))}
                       {connectedCollectives.map(({ id, collective }) => (
                         <Box key={id} px={CONTRIBUTE_CARD_PADDING_X}>
                           <ContributeCollective collective={collective} />
                         </Box>
                       ))}
-                      {events.map(event => (
+                      {pastEvents.map(event => (
                         <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
                           <ContributeEvent
                             collective={collective}
