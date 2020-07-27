@@ -52,11 +52,11 @@ const CarouselSlot = styled(Container)`
 
 const Indicatior = styled(Box)`
   cursor: pointer;
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
   border: none;
   box-shadow: inset 0px 2px 2px rgba(20, 20, 20, 0.08);
-  border-radius: 5px;
+  border-radius: 8px;
   background: ${props => (props.active ? '#DC5F7D' : '#E8E9EB')};
 `;
 
@@ -170,26 +170,21 @@ class StyledCarousel extends React.Component {
           </Swipeable>
         </Box>
 
-        <Container
-          width={1}
-          display="flex"
-          alignItems="center"
-          justifyContent={showArrowController ? 'space-between' : 'center'}
-        >
-          <Flex mx={4} my={3} display={props.display}>
+        <Container width={1} display="flex" alignItems="center" justifyContent={'center'}>
+          {showArrowController && (
+            <Box mx={1} color="black.600" onClick={() => this.handleSwipe()}>
+              <ArrowLeftCircle size="40" />
+            </Box>
+          )}
+          <Flex mx={3} my={3} display={props.display}>
             {Array.from({ length: children.length }, (_, i) => (
               <Indicatior key={i} active={i === activeIndex} mx={1} onClick={() => this.handleOnClickIndicator(i)} />
             ))}
           </Flex>
           {showArrowController && (
-            <Container display="flex" mr={3}>
-              <Box mx={1} color="black.700" onClick={() => this.handleSwipe()}>
-                <ArrowLeftCircle size="24" />
-              </Box>
-              <Box mx={1} color="black.700" onClick={() => this.handleSwipe(true)}>
-                <ArrowRightCircle size="24" />
-              </Box>
-            </Container>
+            <Box mx={1} color="black.600" onClick={() => this.handleSwipe(true)}>
+              <ArrowRightCircle size="40" />
+            </Box>
           )}
         </Container>
       </Container>

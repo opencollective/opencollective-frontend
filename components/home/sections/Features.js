@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
+import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 import themeGet from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -22,9 +23,10 @@ const SelectFeatureButton = styled.button`
   background: #fff;
   padding: 0;
 
-  @media screen and (min-width: 64em) {
+  @media screen and (min-width: 40em) {
     color: ${themeGet('colors.black.700')};
-    width: 286px;
+    width: 220px;
+    padding: 3px;
 
     ${props =>
       props.active &&
@@ -40,6 +42,10 @@ const SelectFeatureButton = styled.button`
     &:hover {
       color: #1869f5;
     }
+  }
+
+  @media screen and (min-width: 64em) {
+    width: 247px;
   }
 
   @media screen and (min-width: 88em) {
@@ -64,8 +70,8 @@ const FeatureList = styled(Box)`
 `;
 
 const Title = styled(Span)`
-  @media screen and (min-width: 64em) {
-    color: ${props => props.active && '#DC5F7D'};
+  @media screen and (min-width: 40em) {
+    /* color: ${props => props.active && '#DC5F7D'}; */
   }
 `;
 
@@ -73,6 +79,12 @@ const LearnMoreLink = styled(StyledLink)`
   color: #dc5f7d;
   &:hover {
     color: #dc5f7d;
+  }
+`;
+
+const LineBreak = styled.br`
+  @media screen and (min-width: 40em) {
+    display: none;
   }
 `;
 
@@ -165,19 +177,19 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
     activeFeature === id ? `/static/images/home/${id}-icon.png` : `/static/images/home/${id}-icon-black.png`;
 
   return (
-    <Flex alignItems="center" justifyContent="space-between" width={1} {...props}>
+    <Flex alignItems="center" justifyContent={['center', 'space-between']} width={1} {...props}>
       <Container display="flex" alignItems="center">
-        <Box width={['36px', null, '64px']} height={['36px', null, '64px']} mr={[3, null, 2]}>
+        <Box display={['none', 'block']} width={[null, '48px']} height={[null, '48px']} mr={[3, 2]}>
           <Illustration src={iconUrl} alt={`${id} icon`} />
         </Box>
         <Title
-          color={['black.700', null, null]}
+          color={['black.800', 'black.900', null]}
           active={id === activeFeature}
-          fontWeight={['500', null, 'bold']}
-          textAlign="left"
-          fontSize={['18px', null, '16px']}
-          lineHeight={['26px', null, '22px']}
-          letterSpacing={['-0.012em', null, '-0.008em']}
+          fontWeight="500"
+          textAlign={['center', 'left']}
+          fontSize={['20px', '16px', null, null, '18px']}
+          lineHeight={['28px', '24px', null, null, '27px']}
+          letterSpacing={['-0.6px', '-0.16px', null, null, '-0.2px']}
         >
           {intl.formatMessage(messages[`home.feature.${id}`])}
         </Title>
@@ -195,17 +207,26 @@ FeatureTitle.propTypes = {
 const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
   <Box {...props}>
     <P
-      fontSize={['Caption', 'LeadParagraph']}
-      lineHeight={['19px', '26px']}
-      color="black.600"
-      letterSpacing={'-0.016em'}
-      textAlign="left"
+      fontSize={['16px', null, null, null, '18px']}
+      lineHeight={['24px', null, null, null, '27px']}
+      color={['black.600', 'black.700']}
+      letterSpacing={['-0.04px', '-0.16px']}
+      textAlign={['center', 'left']}
     >
       {intl.formatMessage(messages[`home.feature.${id}.description`])}{' '}
       {learnMoreLink && (
-        <LearnMoreLink href={learnMoreLink} openInNewTab>
-          <FormattedMessage id="home.feature.learnmore" defaultMessage="Learn more..." />
-        </LearnMoreLink>
+        <React.Fragment>
+          <LineBreak />
+          <LearnMoreLink href={learnMoreLink} openInNewTab>
+            <FormattedMessage
+              id="home.feature.learnmore"
+              defaultMessage="Learn more {icon}"
+              values={{
+                icon: <ArrowRight size="24" />,
+              }}
+            />
+          </LearnMoreLink>
+        </React.Fragment>
       )}
     </P>
   </Box>
@@ -219,28 +240,28 @@ FeatureDescription.propTypes = {
 
 const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
-    <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, null, 'none']} />
-    <Container mb={[2, null, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
-      <H4 display={['none', null, 'block']} letterSpacing="-0.4px" fontWeight="500" color="black.800" my={3}>
+    <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, 'none']} />
+    <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
+      <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="black.800" my={3}>
         {intl.formatMessage(messages[`home.feature.${id}`])}
       </H4>
-      <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', null, 'block']} />
+      <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
     </Container>
-    <Container width={[null, null, '609px', null, '735px']}>
-      <Box display={['none', null, 'block']}>
+    <Container width={[null, '392px', '466px', null, '756px']}>
+      <Box display={['none', 'block']}>
         <Illustration
           src={`/static/images/home/${id}-screenshot.png`}
           alt={intl.formatMessage(messages[`home.feature.${id}`])}
         />
       </Box>
-      <Box display={['block', null, 'none']}>
+      <Box display={['block', 'none']}>
         <Illustration
           src={`/static/images/home/${id}-screenshot-sm.png`}
           alt={intl.formatMessage(messages[`home.feature.${id}`])}
         />
       </Box>
     </Container>
-    <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', null, 'none']} mt={2} />
+    <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', 'none']} mt={2} />
   </Container>
 );
 
@@ -260,20 +281,17 @@ const Features = () => {
         <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
       </SectionTitle>
       <SectionSubtitle>
-        <FormattedMessage
-          id="home.featureSection.subTitle"
-          defaultMessage="Discover the possibilities of our features."
-        />
+        <FormattedMessage id="home.featureSection.subTitle" defaultMessage="Discover our features." />
       </SectionSubtitle>
       <Flex
-        flexDirection={['column', null, 'row-reverse']}
-        alignItems={[null, null, 'center', null, 'flex-end']}
-        mt={4}
+        flexDirection={['column', 'row-reverse']}
+        alignItems={[null, 'flex-start']}
+        mt={[3, null, 4]}
         justifyContent="center"
       >
-        <FeatureListWrapper as="ul" display={['none', null, 'flex']}>
+        <FeatureListWrapper as="ul" display={['none', 'flex']}>
           {features.map(feature => (
-            <FeatureList ml={[null, null, 4, null, 6]} mr={[null, null, null, null, 2]} as="li" key={feature.id}>
+            <FeatureList ml={[null, 4, null, 6]} mr={[null, null, null, null, 2]} as="li" key={feature.id}>
               <SelectFeatureButton
                 width={1}
                 onClick={() => setActiveFeature(feature)}
@@ -284,14 +302,14 @@ const Features = () => {
             </FeatureList>
           ))}
         </FeatureListWrapper>
-        <StyledCarousel display={[null, null, 'none']} width={1}>
+        <StyledCarousel display={[null, 'none']} width={1}>
           {features.map(feature => (
             <Fragment key={feature.id}>
               <Feature id={feature.id} learnMoreLink={feature.learnMoreLink} intl={intl} />
             </Fragment>
           ))}
         </StyledCarousel>
-        <Container display={['none', null, 'block']} height="672px">
+        <Container display={['none', 'block']} height="672px">
           <Feature id={activeFeature.id} learnMoreLink={activeFeature.learnMoreLink} intl={intl} />
         </Container>
       </Flex>
