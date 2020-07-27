@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';
@@ -69,25 +69,24 @@ const transformResultInCSV = json => {
   return [header].concat(lines).join('\n');
 };
 
-const TransactionsDownloadCSV = ({ collective }) => {
+const TransactionsDownloadCSV = ({ collective, client }) => {
   const [dateInterval, setDateInterval] = React.useState({
     dateFrom: moment().subtract(1, 'months').format('YYYY-MM-DD'),
     dateTo: moment().format('YYYY-MM-DD'),
   });
   const [isEmpty, setEmpty] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
-  const { refetch } = useQuery(transactionsQuery, {
-    variables: {
-      ...dateInterval,
-      CollectiveId: collective.id,
-    },
-    skip: true,
-  });
 
   const download = async () => {
     setLoading(true);
     setEmpty(false);
-    const result = await refetch();
+    const result = await client.query({
+      query: transactionsQuery,
+      variables: {
+        ...dateInterval,
+        CollectiveId: collective.id,
+      },
+    });
     const csv = transformResultInCSV(result.data.allTransactions);
 
     setLoading(false);
@@ -200,6 +199,7 @@ TransactionsDownloadCSV.propTypes = {
     id: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
   }).isRequired,
+  client: PropTypes.object,
 };
 
-export default TransactionsDownloadCSV;
+export default withApollo(TransactionsDownloadCSV);

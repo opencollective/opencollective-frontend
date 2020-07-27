@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';

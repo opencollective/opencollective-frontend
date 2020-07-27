@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { Mutation } from '@apollo/client/react/components';
 import { FormattedMessage } from 'react-intl';
 
 import StyledButton from '../StyledButton';

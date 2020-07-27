@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, withApollo } from '@apollo/react-hoc';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -318,12 +318,6 @@ class ExpensePage extends React.Component {
     const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
-
-    // Adding that at GraphQL level is buggy
-    // data is coming from expensePageQuery and expensePageExpenseFieldsFragment
-    if (expense && expense.account.isHost) {
-      expense.account.host = { ...expense.account };
-    }
 
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>

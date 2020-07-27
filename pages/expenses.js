@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -315,6 +315,10 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         tag
       }
 
+      ... on AccountWithContributions {
+        balance
+      }
+
       ... on AccountWithHost {
         host {
           id
@@ -335,14 +339,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         isActive
       }
 
-      ... on Collective {
-        balance
-      }
-      ... on Fund {
-        balance
-      }
       ... on Event {
-        balance
         parent {
           id
           name
@@ -350,8 +347,8 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           type
         }
       }
+
       ... on Project {
-        balance
         parent {
           id
           name

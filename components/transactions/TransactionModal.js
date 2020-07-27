@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Link as IconLink } from '@styled-icons/feather/Link';
@@ -16,7 +16,7 @@ import Modal from '../StyledModal';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
 
-const hostFieldsFragment = gqlV2`
+const hostFieldsFragment = gqlV2/* GraphQL */ `
   fragment HostFields on Host {
     id
     name
@@ -39,7 +39,8 @@ const hostFieldsFragment = gqlV2`
     }
   }
 `;
-const transactionModalQuery = gqlV2`
+
+const transactionModalQuery = gqlV2/* GraphQL */ `
   query TransactionModal($legacyExpenseId: Int!) {
     expense(expense: { legacyId: $legacyExpenseId }) {
       id
@@ -113,8 +114,19 @@ const transactionModalQuery = gqlV2`
           address
           country
         }
+
+        ... on AccountWithContributions {
+          balance
+        }
+
+        ... on AccountWithHost {
+          isApproved
+          host {
+            ...HostFields
+          }
+        }
+
         ... on Organization {
-          id
           isHost
           balance
           host {
@@ -122,29 +134,7 @@ const transactionModalQuery = gqlV2`
           }
         }
 
-        ... on Collective {
-          id
-          isApproved
-          balance
-          host {
-            ...HostFields
-          }
-        }
-        ... on Fund {
-          id
-          isApproved
-          balance
-          host {
-            ...HostFields
-          }
-        }
         ... on Event {
-          id
-          isApproved
-          balance
-          host {
-            ...HostFields
-          }
           parent {
             id
             slug
@@ -153,13 +143,8 @@ const transactionModalQuery = gqlV2`
             imageUrl
           }
         }
+
         ... on Project {
-          id
-          isApproved
-          balance
-          host {
-            ...HostFields
-          }
           parent {
             id
             slug

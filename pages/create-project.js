@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
@@ -11,7 +11,7 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
-const createProjectPageParentAccountQuery = gqlV2`
+const createProjectPageParentAccountQuery = gqlV2/* GraphQL */ `
   query CreateProjectPageParentAccount($slug: String!) {
     account(slug: $slug) {
       id

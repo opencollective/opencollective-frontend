@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';

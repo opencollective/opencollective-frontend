@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { clamp, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -41,19 +41,7 @@ const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
   mutation EditAccountFeesStructure($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
     editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent, isCustomFee: $isCustomFee) {
       id
-      ... on Collective {
-        hostFeesStructure
-        hostFeePercent
-      }
-      ... on Fund {
-        hostFeesStructure
-        hostFeePercent
-      }
-      ... on Event {
-        hostFeesStructure
-        hostFeePercent
-      }
-      ... on Project {
+      ... on AccountWithHost {
         hostFeesStructure
         hostFeePercent
       }

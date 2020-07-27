@@ -33,12 +33,14 @@ describe('New users profiles', () => {
 
   describe('Transactions section', () => {
     it('Can filter by expense/contributions', () => {
-      cy.get('[data-cy=section-transactions]').click();
-      cy.hash().should('eq', '#section-transactions');
-      cy.get('[data-cy=section-transactions-title]').contains('Transactions');
+      cy.getByDataCy('section-transactions').click();
+      cy.wait(1000);
+      cy.getByDataCy('section-transactions-title').contains('Transactions');
       cy.get('button[data-cy="filter-button expenses"]').click();
+      cy.wait(300);
       cy.get('[data-cy="transaction-sign"]').first().contains('+');
       cy.get('button[data-cy="filter-button contributions"]').click();
+      cy.wait(300);
       cy.get('[data-cy="transaction-sign"]').first().contains('-');
     });
 

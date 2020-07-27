@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
@@ -57,12 +57,13 @@ export const hasProcessButtons = permissions => {
  */
 const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const mutationOptions = { context: API_V2_CONTEXT, variables: { id: expense.id, legacyId: expense.legacyId } };
+  const mutationOptions = { context: API_V2_CONTEXT };
+  const mutationVariables = { id: expense.id, legacyId: expense.legacyId };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
 
   const triggerAction = (action, paymentParams) => {
     setSelectedAction(action);
-    return processExpense({ variables: { action, paymentParams } });
+    return processExpense({ variables: { ...mutationVariables, action, paymentParams } });
   };
 
   const getButtonProps = (action, hasOnClick = true) => {

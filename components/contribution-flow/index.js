@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import * as LibTaxes from '@opencollective/taxes';
 import { themeGet } from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';

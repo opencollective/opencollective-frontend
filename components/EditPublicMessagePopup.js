@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { gql } from '@apollo/client';
+import { Mutation } from '@apollo/client/react/components';
 import { Times } from '@styled-icons/fa-solid/Times';
-import gql from 'graphql-tag';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Popper } from 'react-popper';

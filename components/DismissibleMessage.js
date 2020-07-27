@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 
 import { BANNER, DISMISSABLE_HELP_MESSAGE_KEY, HELP_MESSAGE } from '../lib/constants/dismissable-help-message';

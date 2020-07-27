@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/react-components';
+import { Mutation } from '@apollo/client/react/components';
 import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
 import { Button, Form } from 'react-bootstrap';

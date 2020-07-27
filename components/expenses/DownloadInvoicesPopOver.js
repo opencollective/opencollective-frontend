@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 import classnames from 'classnames';
-import gql from 'graphql-tag';
 import { groupBy, omit, uniq } from 'lodash';
 import moment from 'moment';
 import { OverlayTrigger, Popover } from 'react-bootstrap';

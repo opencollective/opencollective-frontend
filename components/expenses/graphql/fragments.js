@@ -143,38 +143,30 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         address
         country
       }
+
+      ... on AccountWithContributions {
+        balance
+      }
+
+      ... on AccountWithHost {
+        isApproved
+        host {
+          ...HostFields
+        }
+      }
+
+      # For Hosts with Budget capabilities
+
       ... on Organization {
-        id
         isHost
+        isActive
         balance
         host {
           ...HostFields
         }
       }
 
-      ... on Collective {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFields
-        }
-      }
-      ... on Fund {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFields
-        }
-      }
       ... on Event {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFields
-        }
         parent {
           id
           slug
@@ -184,12 +176,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         }
       }
       ... on Project {
-        id
-        isApproved
-        balance
-        host {
-          ...HostFields
-        }
         parent {
           id
           slug

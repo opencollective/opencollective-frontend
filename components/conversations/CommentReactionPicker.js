@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 

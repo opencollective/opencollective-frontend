@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { TimesCircle } from '@styled-icons/fa-solid/TimesCircle';

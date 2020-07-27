@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
@@ -82,6 +82,8 @@ const addPaymentMethodMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const mutationOptions = { context: API_V2_CONTEXT };
+
 const UpdatePaymentMethodPopUp = ({
   setMenuState,
   contribution,
@@ -111,13 +113,12 @@ const UpdatePaymentMethodPopUp = ({
   });
   const [submitUpdatePaymentMethod, { loading: loadingUpdatePaymentMethod }] = useMutation(
     updatePaymentMethodMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
+    mutationOptions,
   );
-  const [submitAddPaymentMethod, { loading: loadingAddPaymentMethod }] = useMutation(addPaymentMethodMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitAddPaymentMethod, { loading: loadingAddPaymentMethod }] = useMutation(
+    addPaymentMethodMutation,
+    mutationOptions,
+  );
 
   // load stripe on mount
   useEffect(() => {

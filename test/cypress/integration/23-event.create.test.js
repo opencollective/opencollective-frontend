@@ -58,6 +58,7 @@ describe('event.create.test.js', () => {
     // verify update
     cy.get('h1 a').click();
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
+    cy.wait(100);
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.get('h1[data-cy=collective-title]').contains(updatedTitle);
     // delete event tiers

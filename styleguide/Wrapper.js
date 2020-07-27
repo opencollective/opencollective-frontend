@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ApolloProvider } from '@apollo/react-components';
+import { ApolloProvider } from '@apollo/client';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
