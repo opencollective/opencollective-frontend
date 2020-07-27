@@ -2267,6 +2267,7 @@ This represents a Credit transaction
 """
 type Credit implements Transaction {
   id: String
+  uuid: String
   type: TransactionType
   description: String
   amount: Amount
@@ -2277,6 +2278,9 @@ type Credit implements Transaction {
   host: Account
   createdAt: DateTime
   updatedAt: DateTime
+  expense: Expense
+  order: Order
+  isRefunded: Boolean
   fromAccount: Account
   toAccount: Account
 }
@@ -2380,6 +2384,7 @@ This represents a Debit transaction
 """
 type Debit implements Transaction {
   id: String
+  uuid: String
   type: TransactionType
   description: String
   amount: Amount
@@ -2390,6 +2395,9 @@ type Debit implements Transaction {
   host: Account
   createdAt: DateTime
   updatedAt: DateTime
+  expense: Expense
+  order: Order
+  isRefunded: Boolean
   fromAccount: Account
   toAccount: Account
 }
@@ -4956,6 +4964,62 @@ type Query {
     """
     tier: TierReferenceInput!
   ): Tier
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account that submitted this expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the account where this expense was submitted
+    """
+    account: AccountReferenceInput
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+  ): TransactionCollection
   loggedInAccount: Account
 }
 
@@ -5048,6 +5112,7 @@ Transaction interface shared by all kind of transactions (Debit, Credit)
 """
 interface Transaction {
   id: String
+  uuid: String
   type: TransactionType
   description: String
   amount: Amount
@@ -5060,6 +5125,9 @@ interface Transaction {
   toAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
+  expense: Expense
+  order: Order
+  isRefunded: Boolean
 }
 
 """
