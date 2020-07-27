@@ -33,33 +33,40 @@ const Wrapper = styled(Box)`
 `;
 
 const Title = styled(H3)`
-  font-size: 15px;
-  line-height: 25px;
-  letter-spacing: -0.008em;
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.6px;
   font-weight: bold;
   margin-bottom: 16px;
   margin-top: 16px;
   color: ${themeGet('colors.black.800')};
   ${display}
 
-  @media screen and (min-width: 64em) {
-    font-size: ${props => props.theme.fontSizes.H4}px;
-    line-height: ${props => props.theme.lineHeights.H4};
-    letter-spacing: -0.2px;
+  @media screen and (min-width: 40em) {
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: -0.8px;
   }
 `;
 
 const Description = styled(P)`
-  font-size: ${props => props.theme.fontSizes.Caption}px;
-  line-height: 19px;
-  letter-spacing: -0.016em;
-  color: ${themeGet('colors.black.600')};
+  font-size: 15px;
+  line-height: 23px;
+  letter-spacing: -0.12px;
+  color: ${themeGet('colors.black.700')};
+  font-weight: 500;
+  margin-top: 10px;
   ${display}
 
-  @media screen and (min-width: 52em) {
-    font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
-    line-height: 26px;
-    letter-spacing: -0.016em;
+  @media screen and (min-width: 40em) {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.16px;
+  }
+  @media screen and (min-width: 88em) {
+    font-size: 18px;
+    line-height: 27px;
+    letter-spacing: -0.2px;
   }
 `;
 
@@ -71,11 +78,23 @@ const WhatCanYouDo = () => {
       <SectionTitle>
         <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do on Open Collective?" />
       </SectionTitle>
-      <Box width={['288px', 1, null, '672px']} textAlign="center">
-        <SectionSubTitle>
+      <Box width={['288px', '548px', '708px', null, '755px']} textAlign="center">
+        <SectionSubTitle
+          display={['none', 'block']}
+          fontSize={[null, '20px']}
+          lineHeight={[null, '28px']}
+          letterSpacing={[null, '-0.6px']}
+          color="black.700"
+        >
           <FormattedMessage
             id="home.whatCanYouDoSection.subTitle"
             defaultMessage="Accept donations and sponsorships, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
+          />
+        </SectionSubTitle>
+        <SectionSubTitle display={[null, 'none']}>
+          <FormattedMessage
+            id="home.whatCanYouDoSection.subTitleMobile"
+            defaultMessage="Money management made simple, plus great tools for community engagement, budget reporting, and fiscal sponsorship."
           />
         </SectionSubTitle>
       </Box>
@@ -89,7 +108,7 @@ const WhatCanYouDo = () => {
         <Title textAlign="center" display={['block', 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
         </Title>
-        <Box width={[null, '448px', null, null, '576px', '583px']} mr={[null, null, null, 5]}>
+        <Box width={[null, '390px', '488px', null, '558px']} mr={[null, null, 3, null, 5]}>
           <Illustration
             src="/static/images/home/collectmoney-illustration-md.png"
             display={['block', null, null, 'none']}
@@ -101,7 +120,7 @@ const WhatCanYouDo = () => {
             alt="Collect money"
           />
         </Box>
-        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left" ml={[null, null, null, 5]}>
+        <Box width={[null, '224px', '274px', null, '408px']} textAlign="left" ml={[null, 2, null, 5]}>
           <Title display={['none', 'block']}>
             <FormattedMessage id="home.whatCanYouDoSection.collectMoney" defaultMessage="Collect Money" />
           </Title>
@@ -123,7 +142,7 @@ const WhatCanYouDo = () => {
         <Title textAlign="center" display={['block', 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
         </Title>
-        <Box width={[null, '448px', null, null, '576px', '583px']} ml={[null, null, null, 5]}>
+        <Box width={[null, '390px', '488px', null, '558px']} ml={[null, null, 3, null, 5]}>
           <Illustration
             src="/static/images/home/spendmoney-illustration-md.png"
             display={['block', null, null, 'none']}
@@ -135,14 +154,14 @@ const WhatCanYouDo = () => {
             alt="Spend money"
           />
         </Box>
-        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left" mr={[null, null, null, 5]}>
+        <Box width={[null, '224px', '274px', null, '408px']} textAlign="left" mr={[null, 2, null, 5]}>
           <Title display={['none', 'block']}>
             <FormattedMessage id="home.whatCanYouDoSection.spendMoney" defaultMessage="Spend Money" />
           </Title>
           <Description>
             <FormattedMessage
               id="home.whatCanYouDoSection.spendMoney.longDescription"
-              defaultMessage="Anyone in your community can submit expenses. Once approved, pay in one click with Paypal or manually. All transactions are public in your transparent budget (with personal information kept private)."
+              defaultMessage="Anyone in your community can submit expenses. Once approved, pay in one click with Paypal or bank transfer. All transactions are public in your transparent budget (with personal information kept private)."
             />
           </Description>
         </Box>
@@ -157,7 +176,7 @@ const WhatCanYouDo = () => {
         <Title textAlign="center" display={['block', 'none']}>
           <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
         </Title>
-        <Box width={[null, '448px', null, null, '576px', '583px']} mr={[null, null, null, 5]}>
+        <Box width={[null, '390px', '488px', null, '558px']} mr={[null, null, 3, null, 5]}>
           <Illustration
             src="/static/images/home/managemoney-illustration-md.png"
             alt="Manage money"
@@ -169,7 +188,7 @@ const WhatCanYouDo = () => {
             display={['none', null, null, 'block']}
           />
         </Box>
-        <Box width={[null, '352px', null, null, '368px', '408px']} textAlign="left" ml={[null, 4, 0, 5]}>
+        <Box width={[null, '224px', '274px', null, '408px']} textAlign="left" ml={[null, 4, 0, 5]}>
           <Title display={['none', 'block']}>
             <FormattedMessage id="home.whatCanYouDoSection.manageMoney" defaultMessage="Manage Money" />
           </Title>
@@ -184,7 +203,7 @@ const WhatCanYouDo = () => {
       <Container
         mt={5}
         mb={4}
-        display="flex"
+        display="none"
         flexDirection={['column', 'row']}
         justifyContent="center"
         width={1}
