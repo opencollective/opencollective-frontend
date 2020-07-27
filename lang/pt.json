@@ -1467,7 +1467,6 @@
   "transactions.downloadcsvbutton": "Baixar em CSV",
   "transactions.downloadinvoicesbutton": "Baixar recibos",
   "transactions.empty": "Sem transações",
-  "transactions.emptysearch": "Não há transações neste período de tempo.",
   "transactions.viewAll": "Ver todas as transações",
   "transferwise.error.balance.payment-option-unavailable": "Unable to fund transfer, please check your balance and try again.",
   "transferwise.error.currencyNotSupported": "This currency is not supported",
