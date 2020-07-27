@@ -9,7 +9,7 @@ import { Link } from '../server/pages';
 
 import Container from './Container';
 import Currency from './Currency';
-import { Box, Flex } from './Grid';
+import { Box, Flex, Grid } from './Grid';
 import I18nFormatters from './I18nFormatters';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
@@ -149,7 +149,7 @@ const PledgedCollectivePage = ({ collective }) => {
           />
         </H3>
 
-        <P color="black.600" fontSize="Caption" my={4}>
+        <P color="black.600" fontSize="Caption" lineHeight="Caption" my={4}>
           <FormattedMessage
             id="pledge.definition"
             defaultMessage="A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
@@ -161,17 +161,17 @@ const PledgedCollectivePage = ({ collective }) => {
         </P>
       </Container>
 
-      <Container display="flex" flexWrap="wrap" maxWidth={800} mx="auto" mb={5} px={3} data-cy="contributersGrouped">
+      <Grid
+        maxWidth={800}
+        mx="auto"
+        mb={5}
+        px={3}
+        data-cy="contributersGrouped"
+        gridTemplateColumns={['1fr', '1fr 1fr 1fr', null, '1fr 1fr 1fr 1fr']}
+        gridGap={24}
+      >
         {pledges.map((pledge, index) => (
-          <Container
-            width={[0.5, null, 0.25]}
-            mb={2}
-            position="relative"
-            px={1}
-            minWidth={160}
-            key={pledge.id}
-            data-cy="contributers"
-          >
+          <Container position="relative" key={pledge.id} data-cy="contributers">
             {index === 0 && (
               <Container position="absolute" right={15} top={-10}>
                 <img src="/static/icons/first-pledge-badge.svg" alt="first pledge" />
@@ -180,7 +180,7 @@ const PledgedCollectivePage = ({ collective }) => {
             <PledgeCard {...pledge} />
           </Container>
         ))}
-      </Container>
+      </Grid>
       <Box px={3}>
         <Container
           alignItems="center"
