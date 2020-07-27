@@ -118,7 +118,9 @@ export default class Steps extends React.Component {
   }
 
   getStepByIndex(stepIdx) {
-    return stepIdx === -1 ? null : this.buildStep(this.props.steps[stepIdx], stepIdx);
+    return stepIdx === -1 || stepIdx >= this.props.steps.length
+      ? null
+      : this.buildStep(this.props.steps[stepIdx], stepIdx);
   }
 
   getStepByName(stepName) {
@@ -203,6 +205,8 @@ export default class Steps extends React.Component {
     const lastValidStep = this.getLastCompletedStep();
     return this.props.children({
       currentStep,
+      prevStep: this.getStepByIndex(currentStep.index - 1),
+      nextStep: this.getStepByIndex(currentStep.index + 1),
       lastValidStep,
       isValidating: this.state.isValidating,
       lastVisitedStep: this.getLastVisitedStep(lastValidStep),

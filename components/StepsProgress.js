@@ -16,6 +16,7 @@ import { P, Span } from './Text';
 const Bubble = styled(Flex)`
   justify-content: center;
   align-items: center;
+  flex: 0 0 32px;
   height: 32px;
   width: 32px;
   border-radius: 16px;
@@ -63,18 +64,33 @@ const Bubble = styled(Flex)`
     `}
 `;
 
-const SeparatorLine = styled(Box)`
-  height: 1px;
-  background: #e8e9eb;
+/**
+ * Border generated with https://gigacore.github.io/demos/svg-stroke-dasharray-generator/
+ * to have a consistent result across browsers.
+ */
+const SeparatorLine = styled(props => (
+  <Flex alignItems="center" {...props}>
+    <svg width="100%" height="2" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <line strokeDasharray="10%" x1="0" y1="0" x2="100%" y2="0" />
+    </svg>
+  </Flex>
+))`
+  height: 100%;
   z-index: 1;
   flex-grow: 1;
   flex-shrink: 1;
-  transition: border-color 0.3s;
+  line {
+    stroke-width: 1;
+    stroke: #c4c7cc;
+    transition: stroke 0.3s;
+  }
 
   ${props =>
     props.active &&
     css`
-      background: ${themeGet('colors.primary.400')};
+      line {
+        stroke: ${themeGet('colors.primary.400')};
+      }
     `}
 
   ${props =>
@@ -90,7 +106,7 @@ const StepMobile = styled(Flex)`
 `;
 
 const StepsOuter = styled(Flex)`
-  padding: 16px;
+  padding: 12px 16px;
 
   @media (max-width: 640px) {
     background: #f5f7fa;
@@ -104,8 +120,8 @@ const StepsMobileLeft = styled(Box)`
 
 const StepsMobileRight = styled(Flex)`
   margin-left: auto;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
@@ -222,14 +238,14 @@ const StepsProgress = ({
   const mobileNextStep = mobileNextStepIdx !== -1 && steps[mobileNextStepIdx];
   const progress = allCompleted ? 100 : (100 / steps.length) * (mobileStepIdx + 1);
   const bgColor = '#D9DBDD';
-  const pieSize = '48';
+  const pieSize = '56';
 
   return (
     <StepsOuter className="steps-progress">
       {viewport === VIEWPORTS.XSMALL ? (
         <StepMobile>
           <StepsMobileLeft>
-            <P color="black.900" fontWeight="600" fontSize="Paragraph">
+            <P color="black.900" fontWeight="500" fontSize="18px" lineHeight="26px" mb={1}>
               {steps[mobileStepIdx].label || steps[mobileStepIdx].name}
             </P>
 
