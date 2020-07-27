@@ -4,7 +4,7 @@ import {
   BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+} from '../../budget/BudgetItemsList';
 
 import * as fragments from './fragments';
 
@@ -34,7 +34,6 @@ export const getCollectivePageQuery = gql`
       isHost
       isIncognito
       hostFeePercent
-      platformFeePercent
       image
       imageUrl(height: 256)
       canApply

@@ -84,6 +84,21 @@ const TrixEditorContainer = styled.div`
       }
     }
 
+    /** Hide some buttons on the simplified version */
+    ${props =>
+      props.version === 'simplified' &&
+      css({
+        '.trix-button-group--file-tools': {
+          display: 'none',
+        },
+        '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)': {
+          display: 'none',
+        },
+        '.trix-button--icon-bullet-list': {
+          borderLeft: 'none',
+        },
+      })}
+
     /** Hide some buttons on mobile */
     @media (max-width: 500px) {
       .trix-button--icon-strike,
@@ -148,6 +163,8 @@ export default class RichTextEditor extends React.Component {
     withStickyToolbar: PropTypes.bool,
     /** This component is borderless by default. Set this to `true` to change that. */
     withBorders: PropTypes.bool,
+    /** This component is borderless by default. Set this to `true` to change that. */
+    version: PropTypes.oneOf(['default', 'simplified']),
     /** Wether the field should be disabled */
     disabled: PropTypes.bool,
     /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
@@ -158,6 +175,7 @@ export default class RichTextEditor extends React.Component {
     editorMinHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
     /** If truthy, will display a red outline */
     error: PropTypes.any,
+    'data-cy': PropTypes.string,
   };
 
   static defaultProps = {
@@ -166,6 +184,8 @@ export default class RichTextEditor extends React.Component {
     toolbarOffsetY: -62, // Default Trix toolbar height
     inputName: 'content',
     toolbarBackgroundColor: 'white',
+    version: 'default',
+    'data-cy': 'RichTextEditor',
   };
 
   constructor(props) {
@@ -371,7 +391,9 @@ export default class RichTextEditor extends React.Component {
       disabled,
       error,
       fontSize,
+      version,
     } = this.props;
+
     return !this.state.id ? (
       <LoadingPlaceholder height={editorMinHeight ? editorMinHeight + 56 : 200} />
     ) : (
@@ -382,9 +404,10 @@ export default class RichTextEditor extends React.Component {
         toolbarBackgroundColor={toolbarBackgroundColor}
         editorMinHeight={editorMinHeight}
         withBorders={withBorders}
+        version={version}
         isDisabled={disabled}
         error={error}
-        data-cy="RichTextEditor"
+        data-cy={this.props['data-cy']}
       >
         {this.state.error && (
           <MessageBox type="error" withIcon>

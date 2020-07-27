@@ -12,7 +12,7 @@ import BudgetItemsList, {
   BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+} from '../../budget/BudgetItemsList';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
@@ -50,7 +50,6 @@ const TransactionsAndExpensesQuery = gql`
 const SectionBudget = ({ collective, stats }) => {
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
-  const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
   const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
   const isProject = collective.type === CollectiveType.PROJECT;
   return (
@@ -88,7 +87,7 @@ const SectionBudget = ({ collective, stats }) => {
             const budgetItems = orderBy(budgetItemsUnsorted, i => new Date(i.createdAt), ['desc']).slice(0, 3);
             return (
               <Container flex="10" mb={3} width="100%" maxWidth={800}>
-                <BudgetItemsList items={budgetItems} isCompact isFeesOnTop={isFeesOnTop} />
+                <BudgetItemsList items={budgetItems} isCompact />
                 <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
                   <Box flex="1 1" mx={[0, 2]}>
                     <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
@@ -191,8 +190,7 @@ SectionBudget.propTypes = {
     type: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     isArchived: PropTypes.bool,
-    platformFeePercent: PropTypes.number,
-    settings: PropTypes.objec,
+    settings: PropTypes.object,
   }),
 
   /** Stats */

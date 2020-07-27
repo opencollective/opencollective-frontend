@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Dimensions } from '../components/collective-page/_constants';
@@ -16,57 +16,12 @@ import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';
 import I18nFormatters from '../components/I18nFormatters';
 import Loading from '../components/Loading';
+import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
 import StyledFilters from '../components/StyledFilters';
 import TemporaryNotification from '../components/TemporaryNotification';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-
-export const recurringContributionsPageQuery = gqlV2/* GraphQL */ `
-  query RecurringContributions($slug: String) {
-    account(slug: $slug) {
-      id
-      slug
-      name
-      type
-      settings
-      imageUrl
-      orders {
-        totalCount
-        nodes {
-          id
-          paymentMethod {
-            id
-          }
-          amount {
-            value
-            currency
-          }
-          status
-          frequency
-          tier {
-            id
-            name
-          }
-          totalDonations {
-            value
-            currency
-          }
-          toAccount {
-            id
-            slug
-            name
-            type
-            description
-            tags
-            imageUrl
-            settings
-          }
-        }
-      }
-    }
-  }
-`;
 
 const MainContainer = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
@@ -222,7 +177,7 @@ class recurringContributionsPage extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsPageQuery, {
+const getData = graphql(recurringContributionsQuery, {
   options: {
     context: API_V2_CONTEXT,
   },

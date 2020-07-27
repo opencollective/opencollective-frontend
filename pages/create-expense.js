@@ -7,6 +7,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -18,6 +19,7 @@ import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
@@ -34,8 +36,6 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-
-import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
@@ -170,11 +170,11 @@ class CreateExpensePage extends React.Component {
 
       // Redirect to the expense page
       const legacyExpenseId = result.data.createExpense.legacyId;
-      const { collectiveSlug, parentCollectiveSlug } = this.props;
+      const { collectiveSlug, parentCollectiveSlug, data } = this.props;
       Router.pushRoute(`expense-v2`, {
         parentCollectiveSlug,
         collectiveSlug,
-        collectiveType: parentCollectiveSlug && 'events',
+        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined,
         ExpenseId: legacyExpenseId,
         createSuccess: true,
       });
@@ -385,7 +385,46 @@ const getData = graphql(
             }
           }
         }
+        ... on Fund {
+          id
+          isApproved
+          balance
+          host {
+            id
+            name
+            slug
+            type
+            expensePolicy
+            settings
+            location {
+              address
+              country
+            }
+            transferwise {
+              availableCurrencies
+            }
+          }
+        }
         ... on Event {
+          id
+          isApproved
+          balance
+          host {
+            id
+            name
+            slug
+            type
+            expensePolicy
+            location {
+              address
+              country
+            }
+            transferwise {
+              availableCurrencies
+            }
+          }
+        }
+        ... on Project {
           id
           isApproved
           balance

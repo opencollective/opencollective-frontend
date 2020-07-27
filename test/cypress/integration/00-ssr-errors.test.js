@@ -1,5 +1,5 @@
 const notFoundSlug = 'a-collective-that-does-not-exist';
-const notFoundURL = `/${notFoundSlug}/v2`;
+const notFoundURL = `/${notFoundSlug}`;
 
 it("fetching a collective page that doesn't exist returns a 404", () => {
   cy.request({ url: notFoundURL, failOnStatusCode: false }).then(resp => {

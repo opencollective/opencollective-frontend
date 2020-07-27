@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
+import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
-import CollectiveNavbar, { getFilteredSectionsForCollective } from '../CollectiveNavbar';
+import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 
 import Hero from './hero/Hero';
@@ -61,6 +62,7 @@ class CollectivePage extends Component {
       backers: PropTypes.object,
     }),
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
+    refetch: PropTypes.func,
   };
 
   constructor(props) {
@@ -220,7 +222,13 @@ class CollectivePage extends Component {
           />
         );
       case Sections.PARTICIPANTS:
-        return <SectionParticipants collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
+        return (
+          <SectionParticipants
+            refetch={this.props.refetch}
+            collective={this.props.collective}
+            LoggedInUser={this.props.LoggedInUser}
+          />
+        );
       case Sections.LOCATION:
         return <SectionLocation collective={this.props.collective} />;
       case Sections.RECURRING_CONTRIBUTIONS:

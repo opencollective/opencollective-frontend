@@ -5,6 +5,7 @@ import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import colors from '../../lib/constants/colors';
+import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { capitalize } from '../../lib/utils';
 
 import Avatar from '..//Avatar';
@@ -89,6 +90,20 @@ class Order extends React.Component {
     }
   };
 
+  canMarkOrderAsPaid() {
+    const { LoggedInUser, collective, order } = this.props;
+
+    if (!LoggedInUser || order.status !== ORDER_STATUS.PENDING) {
+      return false;
+    } else if (collective.isHost) {
+      return LoggedInUser.canEditCollective(collective);
+    } else if (collective.host) {
+      return LoggedInUser.canEditCollective(collective.host);
+    } else {
+      return false;
+    }
+  }
+
   render() {
     const {
       intl,
@@ -110,7 +125,7 @@ class Order extends React.Component {
 
     const title = order.description;
     const status = order.status.toLowerCase();
-    const canMarkOrderAsPaid = LoggedInUser && collective.host && LoggedInUser.canEditCollective(collective.host);
+    const canMarkOrderAsPaid = this.canMarkOrderAsPaid();
 
     let { mode } = this.state;
     if (editable && LoggedInUser && !mode) {
@@ -289,7 +304,7 @@ class Order extends React.Component {
           {this.state.view === 'details' && transactions && transactions.length === 1 && (
             <TransactionDetails {...transactions[0]} mode="open" canRefund={isRoot || isHostAdmin} /> // Rendering credit transaction details
           )}
-          {order.status === 'PENDING' && canMarkOrderAsPaid && (
+          {canMarkOrderAsPaid && (
             <Flex>
               <MarkOrderAsPaidBtn order={order} collective={order.collective} />
               <StyledButton

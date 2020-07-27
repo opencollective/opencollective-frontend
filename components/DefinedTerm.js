@@ -86,7 +86,6 @@ const TranslationParams = {
 
 const UnderlinedTerm = styled.span`
   border-bottom: 2px dotted;
-  padding-bottom: 0.1em;
   cursor: help;
 
   ${color}

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureAllowedForCollectiveType } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { Flex } from '../Grid';
@@ -29,6 +29,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   TIERS: 'tiers',
   VIRTUAL_CARDS: 'gift-cards',
   WEBHOOKS: 'webhooks',
+  TWO_FACTOR_AUTH: 'two-factor-auth',
   ADVANCED: 'advanced', // Last on purpose
   // Host Specific
   FISCAL_HOSTING: 'fiscal-hosting',
@@ -128,6 +129,10 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.tickets',
     defaultMessage: 'Tickets',
   },
+  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: {
+    id: 'editCollective.menu.twofa',
+    defaultMessage: 'Two-factor authentication',
+  },
 });
 
 const MenuItem = styled(Link)`
@@ -155,11 +160,9 @@ const isFeatureAllowed = (c, feature) => isFeatureAllowedForCollectiveType(c.typ
 const isFund = c => c.type === CollectiveType.FUND || c.settings?.fund === true; // Funds MVP, to refactor
 const isHost = c => c.isHost === true;
 const isCollective = c => c.type === CollectiveType.COLLECTIVE;
-const isProject = c => c.type === CollectiveType.PROJECT;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE]: c => isCollective(c) || isFund(c) || isProject(c),
   [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || (isCollective(c) && !isFund(c)),
   [EDIT_COLLECTIVE_SECTIONS.UPDATES]: c => isFeatureAllowed(c, FEATURES.UPDATES),
@@ -191,6 +194,9 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
+  // 2FA
+  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c =>
+    isType(c, CollectiveType.USER) && hasFeature(c, FEATURES.TWO_FACTOR_AUTH),
 };
 
 const shouldDisplaySection = (collective, section) => {

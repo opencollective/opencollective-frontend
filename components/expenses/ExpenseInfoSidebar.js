@@ -2,16 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { CurrencyPrecision } from '../lib/constants/currency-precision';
+import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 
-import Container from '../components/Container';
-import ExpandableExpensePolicies from '../components/expenses/ExpandableExpensePolicies';
-import CreateExpenseFAQ from '../components/faqs/CreateExpenseFAQ';
-import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
-import { Box } from '../components/Grid';
-import LinkCollective from '../components/LinkCollective';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
-import { H5, P, Strong } from '../components/Text';
+import Container from '../Container';
+import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box } from '../Grid';
+import LinkCollective from '../LinkCollective';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import { H5, P, Strong } from '../Text';
+
+import ExpandableExpensePolicies from './ExpandableExpensePolicies';
 
 /**
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
@@ -22,7 +23,13 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
     <Box width="100%">
       <Box display={['none', 'block']}>
         <H5 mb={3}>
-          <FormattedMessage id="CollectiveBalance" defaultMessage="Collective balance" />
+          <FormattedMessage
+            id="CollectiveBalance"
+            defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
+            values={{
+              type: collective?.type, // collective can be null when it's loading
+            }}
+          />
         </H5>
         <Container
           borderLeft="1px solid"
@@ -75,6 +82,7 @@ ExpenseInfoSidebar.propTypes = {
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     balance: PropTypes.number.isRequired,
+    type: PropTypes.string,
   }),
   host: PropTypes.shape({
     name: PropTypes.string.isRequired,

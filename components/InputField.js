@@ -8,7 +8,6 @@ import { capitalize } from '../lib/utils';
 
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
-import InputTypeCreditCard from './InputTypeCreditCard';
 import InputTypeDropzone from './InputTypeDropzone';
 import InputTypeLocation from './InputTypeLocation';
 import StyledInputTags from './StyledInputTags';
@@ -106,9 +105,11 @@ class InputField extends React.Component {
     closeOnSelect: PropTypes.bool,
     charCount: PropTypes.number,
     maxLength: PropTypes.number,
+    step: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
     timeFormat: PropTypes.string,
     min: PropTypes.number,
+    max: PropTypes.number,
     focus: PropTypes.bool,
     help: PropTypes.string,
   };
@@ -153,9 +154,9 @@ class InputField extends React.Component {
   }
 
   handleChange(value) {
-    const { type } = this.props;
+    const { type, step } = this.props;
     if (type === 'number') {
-      const parsed = parseInt(value);
+      const parsed = step && parseFloat(step) !== 1 ? parseFloat(value) : parseInt(value);
       value = isNaN(parsed) ? null : parsed;
     } else if (type === 'currency') {
       value = this.roundCurrencyValue(value);
@@ -177,29 +178,6 @@ class InputField extends React.Component {
     let value = this.state.value;
     const horizontal = field.className && field.className.match(/horizontal/);
     switch (this.props.type) {
-      case 'creditcard':
-        this.input = (
-          <FormGroup controlId={field.name}>
-            {horizontal && (
-              <div>
-                <Col componentClass={ControlLabel} sm={2}>
-                  {capitalize(field.label)}
-                </Col>
-                <Col sm={10}>
-                  <InputTypeCreditCard options={field.options} onChange={this.handleChange} style={this.props.style} />
-                </Col>
-              </div>
-            )}
-            {!horizontal && (
-              <div>
-                <ControlLabel>{capitalize(field.label)}</ControlLabel>
-                <InputTypeCreditCard onChange={this.handleChange} style={this.props.style} />
-              </div>
-            )}
-          </FormGroup>
-        );
-        break;
-
       case 'textarea': {
         value = value || this.props.defaultValue || '';
         let after;
@@ -609,6 +587,9 @@ class InputField extends React.Component {
             value={field.value}
             defaultValue={field.defaultValue || ''}
             validationState={this.state.validationState}
+            step={field.step}
+            min={field.min}
+            max={field.max}
           />
         );
         break;

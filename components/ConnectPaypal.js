@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../lib/api';
 
+import Container from './Container';
 import Currency from './Currency';
 import MessageBox from './MessageBox';
 import SmallButton from './SmallButton';
@@ -165,12 +166,12 @@ class ConnectPaypal extends React.Component {
                 {this.state.connectingPaypal && 'Connecting...'}
                 {!this.state.connectingPaypal && 'Connect Paypal'}
               </SmallButton>
-              <div className="description">
+              <Container fontSize="12px" color="black.600" mt={2} maxWidth={300}>
                 <FormattedMessage
                   id="collective.paymentMethod.paypal.description"
                   defaultMessage="Connect a PayPal account to reimburse approved expenses in one click"
                 />
-              </div>
+              </Container>
             </div>
           )}
         </div>

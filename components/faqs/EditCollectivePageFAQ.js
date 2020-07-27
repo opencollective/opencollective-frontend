@@ -39,6 +39,17 @@ const EditCollectivePageFAQ = ({ defaultOpen, ...props }) => (
         />
       </Content>
     </Entry>
+    <Entry open={defaultOpen}>
+      <Title>
+        <FormattedMessage id="EditCollectivePageFAQ.HideBudget" defaultMessage="Why can't I hide my budget section?" />
+      </Title>
+      <Content>
+        <FormattedMessage
+          id="EditCollectivePageFAQ.HideBudgetDetails"
+          defaultMessage="Open Collective is all about transparency, and hiding collective's budgets could go against this value."
+        />
+      </Content>
+    </Entry>
   </FAQ>
 );
 

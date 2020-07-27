@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Wed Jun 24 2020 11:38:37 GMT+0200 (Central European Summer Time)
+# timestamp: Tue Jul 14 2020 16:19:16 GMT+0100 (British Summer Time)
 
 """
 Application model
@@ -102,7 +102,7 @@ type Collective implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -399,7 +399,7 @@ interface CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -1012,7 +1012,7 @@ type Event implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -1444,7 +1444,7 @@ type Fund implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -1966,7 +1966,7 @@ type Mutation {
   addFundsToCollective(order: OrderInputType!): OrderType
   createUpdate(update: UpdateInputType!): UpdateType
   editUpdate(update: UpdateAttributesInputType!): UpdateType
-  publishUpdate(id: Int!): UpdateType
+  publishUpdate(id: Int!, notificationAudience: UpdateAudienceTypeEnum!): UpdateType
   unpublishUpdate(id: Int!): UpdateType
   deleteUpdate(id: Int!): UpdateType
   createComment(comment: CommentInputType!): CommentType
@@ -2274,7 +2274,6 @@ type Order implements Transaction {
   updatedAt: DateString
   paymentMethod: PaymentMethodType
   description: String
-  privateMessage: String
   publicMessage: String
   order: OrderType
   subscription: Subscription
@@ -2325,6 +2324,7 @@ input OrderInputType {
   hostFeePercent: Int
   platformFeePercent: Int
   platformFee: Int
+  isFeesOnTop: Boolean
   currency: String
   interval: String
   description: String
@@ -2507,7 +2507,7 @@ type Organization implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -2919,7 +2919,7 @@ type Project implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged
@@ -3728,6 +3728,26 @@ input UpdateAttributesInputType {
 }
 
 """
+Defines targets for an update
+"""
+enum UpdateAudienceTypeEnum {
+  """
+  Will be sent to collective admins and financial contributors
+  """
+  ALL
+
+  """
+  Will be sent to collective admins
+  """
+  COLLECTIVE_ADMINS
+
+  """
+  Will be sent to financial contributors
+  """
+  FINANCIAL_CONTRIBUTORS
+}
+
+"""
 Input type for UpdateType
 """
 input UpdateInputType {
@@ -3754,6 +3774,7 @@ type UpdateType {
   slug: String
   image: String
   isPrivate: Boolean
+  notificationAudience: UpdateAudienceTypeEnum
   makePublicOn: IsoDateString
 
   """
@@ -3814,7 +3835,7 @@ type User implements CollectiveInterface {
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
-  settings: JSON
+  settings: JSON!
 
   """
   Defines if a collective is pledged

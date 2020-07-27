@@ -18,6 +18,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
       type
       name
       data
+      isSaved
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
       nodes {
@@ -37,6 +38,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
             type
             name
             data
+            isSaved
           }
         }
       }
@@ -101,6 +103,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       slug
       name
       type
+      isAdmin
       location {
         address
         country
@@ -110,6 +113,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         type
         name
         data
+        isSaved
       }
     }
     payeeLocation {
@@ -138,16 +142,28 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         id
         tag
       }
-
+      location {
+        address
+        country
+      }
       ... on Organization {
         id
         isHost
         balance
-        # Missing
-        # ...HostFieldsFragment
+        host {
+          ...HostFieldsFragment
+        }
       }
 
       ... on Collective {
+        id
+        isApproved
+        balance
+        host {
+          ...HostFieldsFragment
+        }
+      }
+      ... on Fund {
         id
         isApproved
         balance
@@ -162,7 +178,22 @@ export const expensePageExpenseFieldsFragment = gqlV2`
         host {
           ...HostFieldsFragment
         }
-        parentCollective {
+        parent {
+          id
+          slug
+          name
+          type
+          imageUrl
+        }
+      }
+       ... on Project {
+        id
+        isApproved
+        balance
+        host {
+          ...HostFieldsFragment
+        }
+        parent {
           id
           slug
           name
@@ -175,6 +206,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
       id
       type
       data
+      isSaved
     }
     comments(limit: 300) {
       nodes {
@@ -208,4 +240,60 @@ export const expensePageExpenseFieldsFragment = gqlV2`
 
   ${CommentFieldsFragment}
   ${HostFieldsFragment}
+`;
+
+export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensesListFieldsFragment on Expense {
+    id
+    legacyId
+    description
+    status
+    createdAt
+    tags
+    amount
+    currency
+    type
+    requiredLegalDocuments
+    permissions {
+      canDelete
+      canApprove
+      canUnapprove
+      canReject
+      canPay
+      canMarkAsUnpaid
+    }
+    payoutMethod {
+      id
+      type
+    }
+    payee {
+      id
+      type
+      slug
+      imageUrl(height: 80)
+      isAdmin
+    }
+    createdByAccount {
+      id
+      type
+      slug
+    }
+  }
+`;
+
+export const expensesListAdminFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensesListAdminFieldsFragment on Expense {
+    id
+    items {
+      id
+      description
+      incurredAt
+      url
+      amount
+    }
+    attachedFiles {
+      id
+      url
+    }
+  }
 `;

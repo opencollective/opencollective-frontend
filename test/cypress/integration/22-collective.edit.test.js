@@ -1,3 +1,5 @@
+import { Secret, TOTP } from 'otpauth';
+
 import { randomEmail } from '../support/faker';
 
 const addTier = tier => {
@@ -132,5 +134,42 @@ describe('edit collective', () => {
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
     cy.get(tierCardSelector, { timeout: 10000 }).should('have.length', 2);
+  });
+});
+
+describe('edit user collective', () => {
+  let user = null;
+  let secret;
+  let TOTPCode;
+
+  before(() => {
+    cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => (user = u));
+  });
+
+  it('adds two-factor authentication', () => {
+    cy.visit(`/${user.collective.slug}/edit`).then(() => {
+      cy.getByDataCy('menu-item-two-factor-auth').click();
+      cy.getByDataCy('qr-code').should('exist');
+      cy.getByDataCy('manual-entry-2fa-token')
+        .invoke('text')
+        .then(text => {
+          expect(text.trim()).to.have.lengthOf(117);
+          secret = text.split(':')[1].trim();
+          // typing the wrong code fails
+          cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
+          cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
+          cy.getByDataCy('add-two-factor-auth-error').should('exist');
+          // typing the right code passes
+          TOTPCode = new TOTP({
+            algorithm: 'SHA1',
+            digits: 6,
+            period: 30,
+            secret: Secret.fromB32(secret),
+          }).generate();
+          cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
+          cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
+          cy.getByDataCy('add-two-factor-auth-success').should('exist');
+        });
+    });
   });
 });

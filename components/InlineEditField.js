@@ -167,7 +167,7 @@ class InlineEditField extends Component {
     const { draft, isEditing } = this.state;
     const { buttonsMinWidth } = this.props;
     const value = get(values, field);
-    const touched = draft !== value;
+    const isValid = draft !== value && draft != '';
 
     if (!isEditing) {
       return (
@@ -182,7 +182,7 @@ class InlineEditField extends Component {
       );
     } else {
       return (
-        <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && touched}>
+        <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && isValid}>
           <Mutation mutation={mutation} {...mutationOptions}>
             {(updateField, { loading, error }) => (
               <React.Fragment>
@@ -239,7 +239,7 @@ class InlineEditField extends Component {
                     <FormButton
                       buttonStyle="primary"
                       loading={loading}
-                      disabled={!touched}
+                      disabled={!isValid}
                       data-cy="InlineEditField-Btn-Save"
                       minWidth={buttonsMinWidth}
                       onClick={() => {

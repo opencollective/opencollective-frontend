@@ -1,5 +1,4 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { defineMessages, useIntl } from 'react-intl';
 
 import FeaturesSection from '../components/home/sections/Features';
@@ -11,10 +10,6 @@ import OCUsersSection from '../components/home/sections/OCUsers';
 import WeAreOpenSection from '../components/home/sections/WeAreOpen';
 import WhatCanYouDoSection from '../components/home/sections/WhatCanYouDo';
 import Page from '../components/Page';
-
-const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
-  ssr: false,
-});
 
 const menuItems = { pricing: true, howItWorks: true };
 
@@ -37,7 +32,6 @@ const HomePage = () => {
       <WeAreOpenSection />
       <LearnMoreSection />
       <JoinUsSection />
-      <CovidBanner showLink />
     </Page>
   );
 };

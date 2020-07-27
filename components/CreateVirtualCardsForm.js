@@ -17,8 +17,10 @@ import { reportValidityHTML5 } from '../lib/utils';
 
 import CollectivePicker from './CollectivePicker';
 import CollectivePickerAsync from './CollectivePickerAsync';
+import Container from './Container';
 import CreateVirtualCardsSuccess from './CreateVirtualCardsSuccess';
 import { Box, Flex } from './Grid';
+import { I18nSupportLink } from './I18nFormatters';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
@@ -28,7 +30,7 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledMultiEmailInput from './StyledMultiEmailInput';
 import StyledSelectCreatable from './StyledSelectCreatable';
-import { H3 } from './Text';
+import { H3, P } from './Text';
 
 const MIN_AMOUNT = 500;
 const MAX_AMOUNT = 100000000;
@@ -175,6 +177,7 @@ class CreateVirtualCardsForm extends Component {
     collectiveSlug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     createVirtualCards: PropTypes.func.isRequired,
+    collectiveSettings: PropTypes.object.isRequired,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.object,
@@ -342,8 +345,19 @@ class CreateVirtualCardsForm extends Component {
 
   renderEmailFields() {
     const { submitting, errors, multiEmailsInitialState } = this.state;
+    const { collectiveSettings } = this.props;
     return (
       <Box>
+        <P>
+          <FormattedMessage
+            id="VirtualCard.Limitinfo"
+            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+            values={{
+              SupportLink: I18nSupportLink,
+              limit: get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100,
+            }}
+          />
+        </P>
         <Flex flexDirection="column" mb="2em">
           <label style={{ width: '100%' }}>
             <Flex flexDirection="column">
@@ -392,23 +406,37 @@ class CreateVirtualCardsForm extends Component {
   }
 
   renderManualFields() {
+    const { collectiveSettings } = this.props;
+    const virtualCardsMaxDailyCount = get(collectiveSettings, `virtualCardsMaxDailyCount`) || 100;
     return (
-      <Flex justifyContent="center" mt={4} mb={3}>
-        <H3 mr="1em">
-          <FormattedMessage id="virtualCards.create.number" defaultMessage="Number of gift cards" />
-        </H3>
-        <StyledInput
-          id="virtualcard-numberOfVirtualCards"
-          type="number"
-          step="1"
-          min="1"
-          max="100000"
-          maxWidth="6.5em"
-          onChange={e => this.onChange('numberOfVirtualCards', e.target.value)}
-          value={this.state.values.numberOfVirtualCards}
-          disabled={this.state.submitting}
-        />
-      </Flex>
+      <Container display="flex" flexDirection="column" width={1} justifyContent="center">
+        <P>
+          <FormattedMessage
+            id="VirtualCard.Limitinfo"
+            defaultMessage="Your account is currently limited to {limit} gift cards / day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+            values={{
+              SupportLink: I18nSupportLink,
+              limit: virtualCardsMaxDailyCount,
+            }}
+          />
+        </P>
+        <Flex justifyContent="center" mt={4} mb={3}>
+          <H3 mr="1em">
+            <FormattedMessage id="virtualCards.create.number" defaultMessage="Number of gift cards" />
+          </H3>
+          <StyledInput
+            id="virtualcard-numberOfVirtualCards"
+            type="number"
+            step="1"
+            min="1"
+            max={virtualCardsMaxDailyCount}
+            maxWidth="6.5em"
+            onChange={e => this.onChange('numberOfVirtualCards', e.target.value)}
+            value={this.state.values.numberOfVirtualCards}
+            disabled={this.state.submitting}
+          />
+        </Flex>
+      </Container>
     );
   }
 

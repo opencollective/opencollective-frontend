@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Wed Jun 24 2020 11:38:58 GMT+0200 (Central European Summer Time)
+# timestamp: Mon Jul 20 2020 11:47:07 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -59,6 +59,11 @@ interface Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
   members(
     limit: Int = 100
     offset: Int = 0
@@ -95,9 +100,14 @@ interface Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -256,6 +266,11 @@ type Activity {
   The person who triggered the action, if any
   """
   individual: Individual
+
+  """
+  Data attached to this activity (if any)
+  """
+  data: JSON!
 }
 
 enum ActivityType {
@@ -376,6 +391,11 @@ type Bot implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -407,9 +427,14 @@ type Bot implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -512,7 +537,7 @@ type Collective implements Account {
   isArchived: Boolean
 
   """
-  Returns whether this collective is active
+  Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean
 
@@ -520,6 +545,11 @@ type Collective implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -553,9 +583,14 @@ type Collective implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -599,27 +634,27 @@ type Collective implements Account {
   stats: AccountStats
 
   """
-  Amount of money in cents in the currency of the collective currently available to spend
+  Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
-  Get the host collective that is receiving the money on behalf of this collective
+  Returns the Fiscal Host
   """
   host: Host
 
   """
-  Return this collective approved date
+  Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
 
   """
-  Returns whether this collective is approved
+  Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean
 
   """
-  Number of unique financial contributors of the collective.
+  Number of unique financial contributors.
   """
   totalFinancialContributors(
     """
@@ -2153,6 +2188,11 @@ enum Currency {
   Czech Koruna
   """
   CZK
+
+  """
+  Brazilian Real
+  """
+  BRL
 }
 
 scalar DateString
@@ -2228,7 +2268,7 @@ type Event implements Account {
   isArchived: Boolean
 
   """
-  Returns whether the account accepts financial contributions.
+  Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean
 
@@ -2236,6 +2276,11 @@ type Event implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -2269,9 +2314,14 @@ type Event implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -2315,24 +2365,29 @@ type Event implements Account {
   stats: AccountStats
 
   """
-  Amount of money in cents in the currency of the collective currently available to spend
+  Amount of money in cents in the currency of the account currently available to spend
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
-  Get the host collective that is receiving the money on behalf of this collective
+  Returns the Fiscal Host
   """
   host: Host
 
   """
-  Returns whether this collective is approved
+  Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean
 
   """
-  The collective hosting this event
+  The Collective hosting this Event
   """
-  parentCollective: Collective
+  parent: Collective
+
+  """
+  The Collective hosting this Event
+  """
+  parentCollective: Collective @deprecated(reason: "2020/07/01 - Use parent instead.")
 }
 
 """
@@ -2425,7 +2480,7 @@ type Expense {
   items: [ExpenseItem]
 
   """
-  Additional information about the payment. Only visible to user and admins.
+  Additional information about the payment as HTML. Only visible to user and admins.
   """
   privateMessage: String
 
@@ -2501,7 +2556,7 @@ input ExpenseCreateInput {
   type: ExpenseType!
 
   """
-  A private note that will be attached to your invoice
+  A private note that will be attached to your invoice, as HTML
   """
   privateMessage: String
 
@@ -2776,7 +2831,7 @@ input ExpenseUpdateInput {
   type: ExpenseType
 
   """
-  A private note that will be attached to your invoice
+  A private note that will be attached to your invoice, as HTML
   """
   privateMessage: String
 
@@ -2852,7 +2907,7 @@ type Fund implements Account {
   isArchived: Boolean
 
   """
-  Returns whether the account accepts financial contributions.
+  Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean
 
@@ -2860,6 +2915,11 @@ type Fund implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -2893,9 +2953,14 @@ type Fund implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -2937,6 +3002,37 @@ type Fund implements Account {
   """
   location: Location
   stats: AccountStats
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int
+  tiers: TierCollection!
 }
 
 input FundCreateInput {
@@ -2992,6 +3088,11 @@ type Host implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -3023,9 +3124,14 @@ type Host implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -3197,6 +3303,11 @@ type Individual implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -3228,9 +3339,14 @@ type Individual implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -3278,6 +3394,7 @@ type Individual implements Account {
   lastName: String
   email: String
   isFollowingConversation(id: String!): Boolean!
+  hasTwoFactorAuth: Boolean
 }
 
 """
@@ -3645,6 +3762,21 @@ type Mutation {
   ): Account!
 
   """
+  Add 2FA to the Account if it does not have it
+  """
+  addTwoFactorAuthTokenToIndividual(
+    """
+    Account that will have 2FA added to it
+    """
+    account: AccountReferenceInput!
+
+    """
+    The generated secret to save to the Account
+    """
+    token: String!
+  ): Individual!
+
+  """
   Apply to an host with a collective
   """
   applyToHost(
@@ -3673,6 +3805,11 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): PayoutMethod
+
+  """
+  Remove the given payout method
+  """
+  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
   Cancel an order
@@ -3757,6 +3894,11 @@ type Order {
   """
   totalDonations: Amount
   paymentMethod: PaymentMethod
+
+  """
+  If an Order has fees on top, we should return the amount
+  """
+  platformFee: Amount
 }
 
 """
@@ -3847,6 +3989,11 @@ type Organization implements Account {
   isHost: Boolean
 
   """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+
+  """
   Get all members (admins, members, backers, followers)
   """
   members(limit: Int = 100, offset: Int = 0, role: [MemberRole], accountType: [AccountType]): MemberCollection
@@ -3878,9 +4025,14 @@ type Organization implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -3930,6 +4082,11 @@ type Organization implements Account {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   email: String
+
+  """
+  If the organization if a host account, this will return the matchig Host object
+  """
+  host: Host
 }
 
 """
@@ -4067,7 +4224,7 @@ type Project implements Account {
   isArchived: Boolean
 
   """
-  Returns whether the account accepts financial contributions.
+  Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean
 
@@ -4075,6 +4232,11 @@ type Project implements Account {
   Returns whether the account is setup to Host collectives.
   """
   isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
 
   """
   Get all members (admins, members, backers, followers)
@@ -4108,9 +4270,14 @@ type Project implements Account {
     filter: AccountOrdersFilter
     status: [OrderStatus]
     tierSlug: String
+
+    """
+    Only returns orders that have an subscription (monthly/yearly)
+    """
+    onlySubscriptions: Boolean
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection
-  settings: JSON
+  settings: JSON!
   conversations(
     limit: Int
     offset: Int
@@ -4154,9 +4321,24 @@ type Project implements Account {
   stats: AccountStats
 
   """
-  The collective hosting this Project
+  Amount of money in cents in the currency of the account currently available to spend
   """
-  parent: Collective
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean
+
+  """
+  The Fund hosting this Project
+  """
+  parent: Fund
 }
 
 input ProjectCreateInput {
@@ -4283,6 +4465,11 @@ type Query {
     account: AccountReferenceInput
 
     """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
     Use this field to filter expenses on their statuses
     """
     status: ExpenseStatus
@@ -4321,6 +4508,11 @@ type Query {
     Only return expenses that were created after this date
     """
     dateFrom: ISODateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
   ): ExpenseCollection
   expense(
     """

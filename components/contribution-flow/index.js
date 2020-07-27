@@ -4,7 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import * as LibTaxes from '@opencollective/taxes';
 import { themeGet } from '@styled-system/theme-get';
 import gql from 'graphql-tag';
-import { debounce, findIndex, get, isNil, pick } from 'lodash';
+import { debounce, findIndex, get, isNil, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { URLSearchParams } from 'universal-url';
@@ -460,11 +460,13 @@ class CreateOrderPage extends React.Component {
     }
 
     const { collective, tier, description, createOrder } = this.props;
+    const isFeesOnTop = this.canHaveFeesOnTop();
     const order = {
       paymentMethod,
       recaptchaToken,
       totalAmount: this.getTotalAmountWithTaxes(),
       platformFee: get(stepDetails, 'platformFee.value'),
+      isFeesOnTop,
       taxAmount: get(stepSummary, 'amount', 0),
       countryISO: get(stepSummary, 'countryISO'),
       taxIDNumber: get(stepSummary, 'number'),
@@ -681,7 +683,12 @@ class CreateOrderPage extends React.Component {
   }
 
   canHaveFeesOnTop(props = this.props, state = this.state) {
-    return props.feesOnTopAvailable && state.stepProfile?.type !== 'COLLECTIVE' && props.tier?.type !== 'TICKET';
+    return (
+      props.feesOnTopAvailable &&
+      props.tier?.type !== 'TICKET' &&
+      (state.stepProfile?.type !== 'COLLECTIVE' ||
+        (state.stepProfile?.host?.id && state.stepProfile?.host?.id === props.host?.id))
+    );
   }
 
   /** Get total amount based on stepDetails with taxes from step summary applied */
@@ -813,7 +820,20 @@ class CreateOrderPage extends React.Component {
   }
 
   // Debounce state update functions that may be called successively
-  updateProfile = debounce(stepProfile => this.setState({ stepProfile, stepPayment: null }), 300);
+  updateProfile = debounce(
+    stepProfile =>
+      this.setState(state => {
+        const stepDetails = omit(state.stepDetails, ['platformFee']);
+        stepDetails.totalAmount = stepDetails.amount;
+        return {
+          stepProfile,
+          stepDetails,
+          stepPayment: null,
+        };
+      }),
+    300,
+  );
+
   updateDetails = stepDetails => this.setState({ stepDetails });
 
   handleCustomFieldsChange = (name, value) => {
@@ -859,7 +879,7 @@ class CreateOrderPage extends React.Component {
   };
 
   renderStep(step) {
-    const { collective, tier, host, feesOnTopAvailable, taxDeductible } = this.props;
+    const { collective, tier, host, taxDeductible } = this.props;
     const { stepProfile, stepDetails, stepPayment, customData, platformFeeOptions } = this.state;
     const personalProfile = this.getPersonalProfile();
     const otherProfiles = this.getOtherProfiles();
@@ -867,8 +887,7 @@ class CreateOrderPage extends React.Component {
     const defaultStepDetails = this.getDefaultStepDetails(tier);
     const interval = get(stepDetails, 'interval') || defaultStepDetails.interval;
     const isIncognito = get(stepProfile, 'isIncognito');
-    const showFeesOnTop =
-      feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+    const showFeesOnTop = this.canHaveFeesOnTop();
 
     if (step.name === 'contributeAs') {
       return (
@@ -942,7 +961,7 @@ class CreateOrderPage extends React.Component {
                   <Box maxWidth={['100%', '75%']}>
                     <P fontSize="Caption" my={2}>
                       <FormattedMessage
-                        defaultMessage="Open Collective is free for COVID-19 Relief Collectives. We rely on the generosity of contributors like you to keep this possible!"
+                        defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
                       />
                     </P>
@@ -988,7 +1007,7 @@ class CreateOrderPage extends React.Component {
                       </P>
                     </Flex>
                   </Flex>
-                  {stepDetails.platformFee.label === 'Other' && (
+                  {stepDetails.platformFee?.label === 'Other' && (
                     <Box>
                       <StyledInputField
                         label="Other amount"
@@ -1027,7 +1046,7 @@ class CreateOrderPage extends React.Component {
                   <Box p={1} mt={2}>
                     <P fontSize="LeadCaption" color="colors.black.300">
                       <FormattedMessage
-                        defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contributione will be tax-deductible to the extent allowed by the law."
+                        defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
                         id="platformFee.taxDeductible"
                       />
                     </P>
@@ -1222,9 +1241,8 @@ class CreateOrderPage extends React.Component {
   }
 
   render() {
-    const { loadingLoggedInUser, LoggedInUser, feesOnTopAvailable, tier } = this.props;
-    const showFeesOnTop =
-      feesOnTopAvailable && this.state.stepProfile?.type !== 'COLLECTIVE' && tier?.type !== 'TICKET';
+    const { loadingLoggedInUser, LoggedInUser } = this.props;
+    const showFeesOnTop = this.canHaveFeesOnTop();
 
     return (
       <Steps

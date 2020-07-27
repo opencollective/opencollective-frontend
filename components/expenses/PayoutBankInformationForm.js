@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
+import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
-import { get, kebabCase, set } from 'lodash';
+import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -14,6 +14,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
 import StyledSpinner from '../StyledSpinner';
+import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
@@ -38,10 +39,6 @@ const accountHolderFieldOptions = {
     },
   ],
 };
-
-const FormFieldsContainer = styled(Flex)`
-  text-transform: capitalize;
-`;
 
 const requiredFieldsQuery = gqlV2`
   query Host($slug: String, $currency: String!, $accountDetails: JSON) {
@@ -76,15 +73,13 @@ const Input = props => {
   const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
   const fieldName =
     input.key === 'accountHolderName' ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
-  let validate = input.required ? value => (value ? undefined : 'Is required') : undefined;
+  let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
   if (input.type === 'text') {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
-        if (matches) {
-          undefined;
-        } else if (!value && input.required) {
-          return 'Is required';
+        if (!value && input.required) {
+          return `${input.name} is required`;
         } else if (!matches && value) {
           return `Invalid ${input.name}`;
         }
@@ -94,14 +89,19 @@ const Input = props => {
       <Box key={input.key} mt={2} flex="1">
         <Field name={fieldName} validate={validate}>
           {({ field, meta }) => (
-            <StyledInputField label={input.name} required={input.required} error={meta.touched && meta.error}>
+            <StyledInputField
+              label={input.name}
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+            >
               {() => (
                 <StyledInput
                   {...field}
                   placeholder={input.example}
-                  error={meta.touched && meta.error}
+                  error={(meta.touched || disabled) && meta.error}
                   disabled={disabled}
                   width="100%"
+                  value={get(formik.values, field.name) || ''}
                 />
               )}
             </StyledInputField>
@@ -113,17 +113,21 @@ const Input = props => {
     const options = formatTransferWiseSelectOptions(input.valuesAllowed || []);
     return (
       <Box mt={2} flex="1">
-        <Field name={fieldName}>
+        <Field name={fieldName} validate={validate}>
           {({ field, meta }) => (
-            <StyledInputField label={input.name} required={input.required} error={meta.touched && meta.error}>
+            <StyledInputField
+              label={input.name}
+              required={input.required}
+              error={(meta.touched || disabled) && meta.error}
+            >
               {() => (
                 <StyledSelect
                   disabled={disabled}
-                  error={meta.touched && meta.error}
+                  error={(meta.touched || disabled) && meta.error}
                   isLoading={loading && !options.length}
                   name={field.name}
                   options={options}
-                  value={options.find(c => c.value === get(formik.values, field.name))}
+                  value={options.find(c => c.value === get(formik.values, field.name)) || null}
                   onChange={({ value }) => {
                     formik.setFieldValue(field.name, value);
                     if (input.refreshRequirementsOnChange) {
@@ -205,18 +209,26 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     return <P>{error.message}</P>;
   }
 
-  const { fields, title } = data.host.transferwise.requiredFields[0];
+  const [requiredFields] = data.host.transferwise.requiredFields;
+  const [addressFields, otherFields] = partition(requiredFields.fields, f =>
+    f.group.every(g => g.key.includes('address.')),
+  );
 
   return (
-    <FormFieldsContainer flexDirection="column">
+    <Flex flexDirection="column">
       <Box mt={2} flex="1">
         <P fontSize="LeadParagraph" fontWeight="bold">
-          {title}
+          {requiredFields.title}
+        </P>
+      </Box>
+      <Box mt={3} flex="1">
+        <P fontSize="Paragraph" fontWeight="bold">
+          Account Information
         </P>
       </Box>
       {
         // Displays the account holder field only if the other fields are also loaded
-        Boolean(fields.length) && (
+        Boolean(requiredFields.fields.length) && (
           <FieldGroup
             currency={currency}
             disabled={disabled}
@@ -229,7 +241,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           />
         )
       }
-      {fields.map(field => (
+      {otherFields.map(field => (
         <FieldGroup
           currency={currency}
           disabled={disabled}
@@ -242,7 +254,28 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           refetch={refetch}
         />
       ))}
-    </FormFieldsContainer>
+      <Box mt={3} flex="1">
+        <P fontSize="Paragraph" fontWeight="bold">
+          Recipient&apos;s Address&nbsp;
+          <StyledTooltip content="Address of the owner of the bank account (not the address of the bank)">
+            <Info size={16} />
+          </StyledTooltip>
+        </P>
+      </Box>
+      {addressFields.map(field => (
+        <FieldGroup
+          currency={currency}
+          disabled={disabled}
+          field={field}
+          formik={formik}
+          getFieldName={getFieldName}
+          host={host}
+          key={kebabCase(field.name)}
+          loading={loading}
+          refetch={refetch}
+        />
+      ))}
+    </Flex>
   );
 };
 
@@ -309,11 +342,11 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
                 inputId={id}
                 name={field.name}
                 onChange={({ value }) => {
-                  formik.setFieldValue('data', {});
+                  formik.setFieldValue(getFieldName('data'), {});
                   formik.setFieldValue(field.name, value);
                 }}
                 options={currencies}
-                value={currencies.find(c => c.label === selectedCurrency)}
+                value={currencies.find(c => c.label === selectedCurrency) || null}
                 disabled={Boolean(fixedCurrency) || !isNew}
               />
             )}

@@ -34,22 +34,28 @@ class SigninPage extends React.Component {
     errorLoggedInUser: PropTypes.string,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
   };
 
   state = { error: null, success: null };
 
   async componentDidMount() {
     if (this.props.token) {
-      let user = await this.props.login(this.props.token);
+      let user;
+      try {
+        user = await this.props.login(this.props.token);
 
-      // If given token is invalid, try to login with the old one
-      if (!user) {
-        user = await this.props.login();
-      }
+        // If given token is invalid, try to login with the old one
+        if (!user) {
+          user = await this.props.login();
+        }
 
-      // If there's no user at this point, there's no chance we can login
-      if (!user) {
-        this.setState({ error: 'Token rejected' });
+        // If there's no user at this point, there's no chance we can login
+        if (!user) {
+          this.setState({ error: 'Token rejected' });
+        }
+      } catch (err) {
+        this.setState({ error: err.message || err });
       }
     } else {
       this.props.login();
@@ -67,7 +73,7 @@ class SigninPage extends React.Component {
       await Router.replaceRoute(redirect || '/');
       window.scroll(0, 0);
     } else if (this.props.token && oldProps.token !== this.props.token) {
-      // --- There's a new token in town ---
+      // --- There's a new token in town 🤠 ---
       const user = await this.props.login(this.props.token);
       if (!user) {
         this.setState({ error: 'Token rejected' });
@@ -87,7 +93,15 @@ class SigninPage extends React.Component {
   }
 
   renderContent() {
-    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
+    const {
+      loadingLoggedInUser,
+      errorLoggedInUser,
+      token,
+      next,
+      form,
+      LoggedInUser,
+      enforceTwoFactorAuthForLoggedInUser,
+    } = this.props;
 
     if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
@@ -104,25 +118,46 @@ class SigninPage extends React.Component {
     }
 
     const error = errorLoggedInUser || this.state.error;
+    const warning = error ? error.includes('Two-factor authentication is enabled') : null;
+
     return (
       <React.Fragment>
         {error && (
-          <MessageBox type="error" withIcon mb={4}>
+          <MessageBox type={warning ? 'warning' : 'error'} withIcon mb={4} data-cy="signin-message-box">
             <strong>
-              <FormattedMessage
-                id="login.failed"
-                defaultMessage="Sign In failed: {message}."
-                values={{ message: error }}
-              />
+              {warning ? (
+                <FormattedMessage
+                  id="login.warning.2fa"
+                  defaultMessage="Security challenge: {message}."
+                  values={{ message: error }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="login.failed"
+                  defaultMessage="Sign In failed: {message}."
+                  values={{ message: error }}
+                />
+              )}
             </strong>
             <br />
-            <FormattedMessage
-              id="login.askAnother"
-              defaultMessage="You can ask for a new sign in link using the form below."
-            />
+            {!error?.includes('Two-factor authentication') && (
+              <FormattedMessage
+                id="login.askAnother"
+                defaultMessage="You can ask for a new sign in link using the form below."
+              />
+            )}
           </MessageBox>
         )}
-        <SignInOrJoinFree redirect={next || '/'} form={form} routes={this.getRoutes()} />
+        <SignInOrJoinFree
+          redirect={next || '/'}
+          form={form}
+          routes={this.getRoutes()}
+          enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
+          submitTwoFactorAuthenticatorCode={(values, actions) => {
+            this.props.login(this.props.token, values.twoFactorAuthenticatorCode);
+            actions.setSubmitting(false);
+          }}
+        />
       </React.Fragment>
     );
   }

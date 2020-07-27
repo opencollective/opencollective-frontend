@@ -59,6 +59,7 @@ const ReactionButton = styled(StyledRoundButton).attrs({ isBorderless: true, but
 `;
 
 const getOptimisticResponse = (comment, emoji, isAdding) => {
+  const userReactions = comment.userReactions || [];
   if (isAdding) {
     const newCount = (comment.reactions[emoji] || 0) + 1;
     return {
@@ -67,7 +68,7 @@ const getOptimisticResponse = (comment, emoji, isAdding) => {
         __typename: 'Comment',
         id: comment.id,
         reactions: { ...comment.reactions, [emoji]: newCount },
-        userReactions: [...comment.userReactions, emoji],
+        userReactions: [...userReactions, emoji],
       },
     };
   } else {
@@ -84,7 +85,7 @@ const getOptimisticResponse = (comment, emoji, isAdding) => {
         __typename: 'Comment',
         id: comment.id,
         reactions,
-        userReactions: comment.userReactions.filter(userEmoji => userEmoji !== emoji),
+        userReactions: userReactions.filter(userEmoji => userEmoji !== emoji),
       },
     };
   }

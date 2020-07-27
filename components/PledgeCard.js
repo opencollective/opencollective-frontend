@@ -33,6 +33,7 @@ const PledgeCard = ({ currency, fromCollective, interval, publicMessage, totalAm
           currency={currency}
           interval={interval}
           amountStyles={{ fontWeight: 'bold' }}
+          precision={0}
         />
       </Span>
     </P>

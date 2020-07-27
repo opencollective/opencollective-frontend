@@ -35,6 +35,7 @@ class UserProvider extends React.Component {
     loadingLoggedInUser: true,
     LoggedInUser: null,
     errorLoggedInUser: null,
+    enforceTwoFactorAuthForLoggedInUser: null,
   };
 
   async componentDidMount() {
@@ -76,10 +77,12 @@ class UserProvider extends React.Component {
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
 
-  login = async token => {
+  login = async (token, twoFactorAuthenticatorCode) => {
     const { getLoggedInUser } = this.props;
     try {
-      const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
+      const LoggedInUser = token
+        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode })
+        : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
@@ -94,6 +97,10 @@ class UserProvider extends React.Component {
 
       // Store the error
       this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
+      if (error.message.includes('Two-factor authentication is enabled')) {
+        this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
+        throw new Error(error.message);
+      }
     }
   };
 

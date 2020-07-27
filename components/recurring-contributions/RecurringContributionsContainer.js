@@ -3,12 +3,16 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { ORDER_STATUS } from '../../lib/constants/order-status';
+
 import Container from '../Container';
 import { Flex } from '../Grid';
 import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
 
 import RecurringContributionsCard from './RecurringContributionsCard';
+
+import EmptyCollectivesSectionImageSVG from '../collective-page/images/EmptyCollectivesSectionImage.svg';
 
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
@@ -29,33 +33,24 @@ const CollectiveCardContainer = styled.div`
   }
 `;
 
-import EmptyCollectivesSectionImageSVG from '../collective-page/images/EmptyCollectivesSectionImage.svg';
+const filterContributions = (contributions, filterName) => {
+  const isActive = ({ status }) => status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR;
+  switch (filterName) {
+    case 'ACTIVE':
+      return contributions.filter(isActive);
+    case 'MONTHLY':
+      return contributions.filter(contrib => isActive(contrib) && contrib.frequency === 'MONTHLY');
+    case 'YEARLY':
+      return contributions.filter(contrib => isActive(contrib) && contrib.frequency === 'YEARLY');
+    case 'CANCELLED':
+      return contributions.filter(contrib => contrib.status === ORDER_STATUS.CANCELLED);
+    default:
+      return [];
+  }
+};
 
 const RecurringContributionsContainer = ({ recurringContributions, filter, createNotification, account }) => {
-  const activeRecurringContributions = recurringContributions.nodes.filter(
-    contribution => contribution.status === 'ACTIVE',
-  );
-  const monthlyRecurringContributions = activeRecurringContributions.filter(
-    contribution => contribution.status === 'ACTIVE' && contribution.frequency === 'MONTHLY',
-  );
-  const yearlyRecurringContributions = activeRecurringContributions.filter(
-    contribution => contribution.status === 'ACTIVE' && contribution.frequency === 'YEARLY',
-  );
-  const cancelledRecurringContributions = recurringContributions.nodes.filter(
-    contribution => contribution.status === 'CANCELLED',
-  );
-
-  let displayedRecurringContributions;
-  if (filter === 'ACTIVE') {
-    displayedRecurringContributions = activeRecurringContributions;
-  } else if (filter === 'MONTHLY') {
-    displayedRecurringContributions = monthlyRecurringContributions;
-  } else if (filter === 'YEARLY') {
-    displayedRecurringContributions = yearlyRecurringContributions;
-  } else if (filter === 'CANCELLED') {
-    displayedRecurringContributions = cancelledRecurringContributions;
-  }
-
+  const displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
   return (
     <Container mt={4}>
       {displayedRecurringContributions.length ? (

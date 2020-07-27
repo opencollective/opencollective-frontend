@@ -115,6 +115,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                         <FormattedMoneyAmount
                           amount={contributor.totalAmountDonated}
                           currency={currency}
+                          precision={0}
                           abbreviateAmount
                         />
                       </Span>

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-import { get, orderBy } from 'lodash';
+import { orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -11,7 +11,7 @@ import BudgetItemsList, {
   BudgetItemExpenseFragment,
   BudgetItemExpenseTypeFragment,
   BudgetItemOrderFragment,
-} from '../../BudgetItemsList';
+} from '../../budget/BudgetItemsList';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -92,7 +92,6 @@ class SectionTransactions extends React.Component {
             amount: PropTypes.number.isRequired,
             description: PropTypes.string.isRequired,
             createdAt: PropTypes.string.isRequired,
-            category: PropTypes.string.isRequired,
             transaction: PropTypes.shape({
               id: PropTypes.number,
             }),
@@ -138,7 +137,6 @@ class SectionTransactions extends React.Component {
     const { data, intl, collective, isAdmin, isRoot } = this.props;
     const { filter } = this.state;
     let showFilters = true;
-    const isFeesOnTop = collective.platformFeePercent === 0 && get(collective, 'host.settings.feesOnTop');
 
     if (!data || data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
@@ -183,12 +181,7 @@ class SectionTransactions extends React.Component {
         )}
 
         <ContainerSectionContent>
-          <BudgetItemsList
-            items={budgetItems}
-            canDownloadInvoice={isAdmin || isRoot}
-            isInverted
-            isFeesOnTop={isFeesOnTop}
-          />
+          <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin || isRoot} isInverted />
           <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
             <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
               <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →

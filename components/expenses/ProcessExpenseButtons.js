@@ -50,7 +50,7 @@ export const hasProcessButtons = permissions => {
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }) => {
+const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT, variables: { id: expense.id, legacyId: expense.legacyId } };
   const [processExpense, { loading, error }] = useMutation(PROCESS_EXPENSE_MUTATION, mutationOptions);
@@ -99,6 +99,7 @@ const ProcessExpenseButtons = ({ expense, collective, permissions, buttonProps }
           onSubmit={triggerAction}
           expense={expense}
           collective={collective}
+          host={host}
           error={error && getErrorFromGraphqlException(error).message}
         />
       )}
@@ -139,17 +140,20 @@ ProcessExpenseButtons.propTypes = {
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
+  host: PropTypes.object,
   /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
 };
 
+export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
+  buttonSize: 'small',
+  minWidth: 130,
+  mx: 2,
+  mt: 2,
+};
+
 ProcessExpenseButtons.defaultProps = {
-  buttonProps: {
-    buttonSize: 'small',
-    minWidth: 90,
-    mx: 2,
-    mt: 2,
-  },
+  buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
 };
 
 export default ProcessExpenseButtons;

@@ -16,6 +16,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
+import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { H4, P, Span } from '../Text';
@@ -193,6 +194,16 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
         {error && (
           <MessageBox type="error" withIcon my={3}>
             {error}
+            <br />
+            {/** TODO: Add a proper ID/Type to detect this error */}
+            {error.startsWith('Not enough funds in your existing Paypal preapproval') && (
+              <StyledLink href={`https://opencollective.com/${collective.host.slug}/dashboard`}>
+                <FormattedMessage
+                  id="PayExpenseModal.RefillBalanceError"
+                  defaultMessage="Refill balance from dashboard"
+                />
+              </StyledLink>
+            )}
           </MessageBox>
         )}
         {!error && formik.values.forceManual && (
@@ -243,6 +254,7 @@ PayExpenseModal.propTypes = {
     currency: PropTypes.string,
     host: PropTypes.shape({
       plan: PropTypes.object,
+      slug: PropTypes.string,
     }),
   }).isRequired,
   onClose: PropTypes.func.isRequired,

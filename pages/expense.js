@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/react-hoc';
-import { cloneDeep, debounce, get, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { Router } from '../server/pages';
@@ -18,6 +20,7 @@ import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
@@ -26,6 +29,7 @@ import {
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
+import HTMLContent from '../components/HTMLContent';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
@@ -36,8 +40,6 @@ import StyledButton from '../components/StyledButton';
 import TemporaryNotification from '../components/TemporaryNotification';
 import { H1, H5, P, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-
-import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 
 const messages = defineMessages({
   title: {
@@ -269,14 +271,14 @@ class ExpensePage extends React.Component {
 
   onSuccessMsgDismiss = () => {
     // Replaces the route by the version without `createSuccess=true`
-    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId } = this.props;
+    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId, data } = this.props;
     this.setState({ successMessageDismissed: true });
     return Router.replaceRoute(
       `expense-v2`,
       {
         parentCollectiveSlug,
         collectiveSlug,
-        collectiveType: parentCollectiveSlug && 'events',
+        collectiveType: parentCollectiveSlug ? getCollectiveTypeForUrl(data?.expense?.account) : undefined,
         ExpenseId: legacyExpenseId,
       },
       {
@@ -311,8 +313,10 @@ class ExpensePage extends React.Component {
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
-    const hasAttachedFiles = expense?.attachedFiles?.length > 0;
-    const showTaxFormMsg = expense?.requiredLegalDocuments.includes('US_TAX_FORM') && expense?.permissions.canEdit;
+    const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
+    const isInvoice = expense?.type === expenseTypes.INVOICE;
+    const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
+    const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
 
     // Adding that at GraphQL level is buggy
@@ -400,7 +404,12 @@ class ExpensePage extends React.Component {
                         <H5 fontSize="LeadParagraph" mb={3}>
                           <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
                         </H5>
-                        <ExpenseAttachedFiles files={expense.attachedFiles} />
+                        <ExpenseAttachedFiles
+                          files={expense.attachedFiles}
+                          collective={collective}
+                          expense={expense}
+                          showInvoice={canSeeInvoiceInfo}
+                        />
                       </Container>
                     )}
                     {expense?.privateMessage && (
@@ -409,9 +418,7 @@ class ExpensePage extends React.Component {
                           <FormattedMessage id="expense.notes" defaultMessage="Notes" />
                         </H5>
                         <PrivateNoteLabel mb={2} />
-                        <P color="black.700" mt={1} fontSize="LeadCaption" whiteSpace="pre-wrap">
-                          {expense.privateMessage}
-                        </P>
+                        <HTMLContent color="black.700" mt={1} fontSize="LeadCaption" content={expense.privateMessage} />
                       </Container>
                     )}
                   </React.Fragment>

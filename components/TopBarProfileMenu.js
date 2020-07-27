@@ -60,7 +60,7 @@ class TopBarProfileMenu extends React.Component {
     this.state = { showProfileMenu: false, loading: true };
     this.messages = defineMessages({
       'tooltip.balance': {
-        id: 'profilemenu.memberships.tooltip.balance',
+        id: 'BalanceAmount',
         defaultMessage: 'Balance {balance}',
       },
       'tooltip.pendingExpenses': {
@@ -229,6 +229,13 @@ class TopBarProfileMenu extends React.Component {
                   </StyledLink>
                 </Link>
               </ListItem>
+              <ListItem py={1}>
+                <Link route="editCollective" params={{ slug: LoggedInUser.collective.slug }} passHref>
+                  <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                    <FormattedMessage id="Settings" defaultMessage="Settings" />
+                  </StyledLink>
+                </Link>
+              </ListItem>
               {incognitoProfileMembership && (
                 <ListItem py={1}>
                   <Link
@@ -289,7 +296,7 @@ class TopBarProfileMenu extends React.Component {
               </ListItem>
             </Box>
           </Box>
-          <Box order={[1, 2]} flex="1 1 50%" width={[1, 1, 1 / 2]} p={3} maxHeight="420px" overflowY="auto">
+          <Box order={[1, 2]} flex="1 1 50%" width={[1, 1, 1 / 2]} p={3} maxHeight="450px" overflowY="auto">
             <Flex alignItems="center">
               <P
                 color="#4E5052"

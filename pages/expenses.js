@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { has, mapValues, pick } from 'lodash';
+import { has, mapValues, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import expenseStatus from '../lib/constants/expense-status';
@@ -17,11 +18,14 @@ import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
+import ExpensesSearchBar from '../components/expenses/ExpensesSearchBar';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
+import { expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
@@ -31,8 +35,7 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
-
-import ExpenseInfoSidebar from './ExpenseInfoSidebar';
+import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
   title: {
@@ -41,11 +44,29 @@ const messages = defineMessages({
   },
 });
 
+const SearchFormContainer = styled(Box)`
+  width: 100%;
+  max-width: 350px;
+  min-width: 10rem;
+`;
+
 const EXPENSES_PER_PAGE = 10;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query }) {
-    const { parentCollectiveSlug, collectiveSlug, offset, limit, type, status, tag, amount, payout, period } = query;
+    const {
+      parentCollectiveSlug,
+      collectiveSlug,
+      offset,
+      limit,
+      type,
+      status,
+      tag,
+      amount,
+      payout,
+      period,
+      searchTerm,
+    } = query;
     return {
       parentCollectiveSlug,
       collectiveSlug,
@@ -58,6 +79,7 @@ class ExpensePage extends React.Component {
         period,
         amount,
         tag,
+        searchTerm,
       },
     };
   }
@@ -65,15 +87,18 @@ class ExpensePage extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string,
     parentCollectiveSlug: PropTypes.string,
+    LoggedInUser: PropTypes.object,
     query: PropTypes.shape({
       type: PropTypes.string,
       tag: PropTypes.string,
+      searchTerm: PropTypes.string,
     }),
     /** from injectIntl */
     intl: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
+      refetch: PropTypes.func,
       variables: PropTypes.shape({
         offset: PropTypes.number.isRequired,
         limit: PropTypes.number.isRequired,
@@ -91,6 +116,15 @@ class ExpensePage extends React.Component {
     }),
   };
 
+  componentDidUpdate(oldProps) {
+    const { LoggedInUser, data } = this.props;
+    if (!oldProps.LoggedInUser && LoggedInUser) {
+      if (LoggedInUser.canEditCollective(data.account) || LoggedInUser.isHostAdmin(data.account)) {
+        data.refetch();
+      }
+    }
+  }
+
   getPageMetaData(collective) {
     if (collective) {
       return { title: this.props.intl.formatMessage(messages.title, { collectiveName: collective.name }) };
@@ -106,13 +140,18 @@ class ExpensePage extends React.Component {
   buildFilterLinkParams(params) {
     return {
       ...pick(this.props, ['collectiveSlug', 'parentCollectiveSlug']),
-      ...pick(this.props.query, ['limit', 'tag', 'type', 'status', 'amount', 'payout']),
+      ...omit(this.props.query, ['offset']),
       ...params,
     };
   }
 
   updateFilters = queryParams => {
     return Router.pushRoute('expenses', this.buildFilterLinkParams({ ...queryParams, offset: null }));
+  };
+
+  handleSearch = searchTerm => {
+    const params = this.buildFilterLinkParams({ searchTerm, offset: null });
+    Router.pushRoute('expenses', params);
   };
 
   getTagProps = tag => {
@@ -147,9 +186,15 @@ class ExpensePage extends React.Component {
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
             <Flex justifyContent="space-between" flexWrap="wrap">
               <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
-                <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-                  <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
-                </H1>
+                <Flex>
+                  <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
+                    <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                  </H1>
+                  <Box mx="auto" />
+                  <SearchFormContainer p={2}>
+                    <ExpensesSearchBar defaultValue={query.searchTerm} onSubmit={this.handleSearch} />
+                  </SearchFormContainer>
+                </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
                 <Box mb={34}>
                   {data.account ? (
@@ -189,6 +234,7 @@ class ExpensePage extends React.Component {
                     <ExpensesList
                       isLoading={data.loading}
                       collective={data.account}
+                      host={data.account?.isHost ? data.account : data.account?.host}
                       expenses={data.expenses?.nodes}
                       nbPlaceholders={data.variables.limit}
                     />
@@ -255,6 +301,7 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
     $dateFrom: ISODateTime
+    $searchTerm: String
   ) {
     account(slug: $collectiveSlug) {
       id
@@ -273,21 +320,7 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
         isHost
         isActive
       }
-      ... on Event {
-        balance
-        parentCollective {
-          id
-          name
-          slug
-          type
-        }
-        host {
-          id
-          name
-          slug
-          type
-        }
-      }
+
       ... on Collective {
         balance
         host {
@@ -295,6 +328,61 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
           name
           slug
           type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
+      ... on Fund {
+        balance
+        host {
+          id
+          name
+          slug
+          type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
+      ... on Event {
+        balance
+        parent {
+          id
+          name
+          slug
+          type
+        }
+        host {
+          id
+          name
+          slug
+          type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
+      ... on Project {
+        balance
+        parent {
+          id
+          name
+          slug
+          type
+        }
+        host {
+          id
+          name
+          slug
+          type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
         }
       }
     }
@@ -309,34 +397,18 @@ const EXPENSES_PAGE_QUERY = gqlV2/* GraphQL */ `
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
+      searchTerm: $searchTerm
     ) {
       totalCount
       offset
       limit
       nodes {
-        id
-        legacyId
-        description
-        status
-        createdAt
-        tags
-        amount
-        currency
-        type
-        payee {
-          id
-          type
-          slug
-          imageUrl(height: 80)
-        }
-        createdByAccount {
-          id
-          type
-          slug
-        }
+        ...ExpensesListFieldsFragment
       }
     }
   }
+
+  ${expensesListFieldsFragment}
 `;
 
 const getData = graphql(EXPENSES_PAGE_QUERY, {
@@ -357,9 +429,10 @@ const getData = graphql(EXPENSES_PAGE_QUERY, {
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,
         dateFrom,
+        searchTerm: props.query.searchTerm,
       },
     };
   },
 });
 
-export default injectIntl(getData(ExpensePage));
+export default injectIntl(getData(withUser(ExpensePage)));

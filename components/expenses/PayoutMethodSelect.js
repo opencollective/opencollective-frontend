@@ -1,14 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
+import ConfirmationModal from '../ConfirmationModal';
+import { Box, Flex } from '../Grid';
+import StyledRoundButton from '../StyledRoundButton';
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
+
+import PayoutMethodData from './PayoutMethodData';
+import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
 const newPayoutMethodMsg = defineMessages({
   [PayoutMethodType.PAYPAL]: {
@@ -39,6 +48,8 @@ class PayoutMethodSelect extends React.Component {
   static propTypes = {
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+    /** @ignore from mutation */
+    removePayoutMethod: PropTypes.func,
     /** Use this prop to control the component */
     payoutMethod: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -64,7 +75,11 @@ class PayoutMethodSelect extends React.Component {
         }),
       }),
     }).isRequired,
+    onChange: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
   };
+
+  state = { removingPayoutMethod: null };
 
   getPayoutMethodLabel = payoutMethod => {
     if (payoutMethod.id) {
@@ -123,9 +138,43 @@ class PayoutMethodSelect extends React.Component {
     }
   }
 
+  removePayoutMethod(payoutMethod) {
+    return this.props.removePayoutMethod(payoutMethod.id).then(() => {
+      this.setState({ removingPayoutMethod: null });
+      this.props.onRemove(payoutMethod);
+      if (this.props.payoutMethod?.id === payoutMethod.id) {
+        this.props.onChange({ value: null });
+      }
+    });
+  }
+
+  formatOptionLabel = ({ value }, { context }) => {
+    const isMenu = context === 'menu';
+    return (
+      <Flex justifyContent="space-between" alignItems="center">
+        <Span fontSize={isMenu ? '13px' : '14px'}>{this.getPayoutMethodLabel(value)}</Span>
+        {isMenu && value.id && this.props.onRemove && (
+          <StyledRoundButton
+            size={20}
+            ml={2}
+            type="button"
+            flex="0 0 20px"
+            buttonStyle="dangerSecondary"
+            isBorderless
+            onClick={e => {
+              e.stopPropagation();
+              this.setState({ removingPayoutMethod: value });
+            }}
+          >
+            <RemoveIcon size={10} />
+          </StyledRoundButton>
+        )}
+      </Flex>
+    );
+  };
+
   getOptionFromPayoutMethod = pm => ({
     value: pm,
-    label: this.getPayoutMethodLabel(pm),
     title: this.getPayoutMethodTitle(pm),
   });
 
@@ -158,17 +207,58 @@ class PayoutMethodSelect extends React.Component {
 
   render() {
     const { payoutMethods, defaultPayoutMethod, payoutMethod, ...props } = this.props;
+    const { removingPayoutMethod } = this.state;
     const value = payoutMethod && this.getOptionFromPayoutMethod(payoutMethod);
     return (
-      <StyledSelect
-        data-cy="payout-method-select"
-        {...props}
-        options={this.getOptions(payoutMethods)}
-        defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
-        value={typeof value === 'undefined' ? undefined : value}
-      />
+      <React.Fragment>
+        <StyledSelect
+          data-cy="payout-method-select"
+          {...props}
+          options={this.getOptions(payoutMethods)}
+          defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
+          value={typeof value === 'undefined' ? undefined : value}
+          formatOptionLabel={this.formatOptionLabel}
+          isSearchable={false}
+        />
+        {removingPayoutMethod && (
+          <ConfirmationModal
+            show
+            isDanger
+            type="remove"
+            onClose={() => this.setState({ removingPayoutMethod: null })}
+            continueHandler={() => this.removePayoutMethod(removingPayoutMethod)}
+            header={
+              <FormattedMessage
+                id="PayoutMethod.RemoveWarning"
+                defaultMessage="Do you want to remove this payout method?"
+              />
+            }
+          >
+            <Box mb={2}>
+              <PayoutMethodTypeWithIcon type={removingPayoutMethod.type} />
+            </Box>
+            <PayoutMethodData payoutMethod={removingPayoutMethod} />
+          </ConfirmationModal>
+        )}
+      </React.Fragment>
     );
   }
 }
 
-export default React.memo(injectIntl(PayoutMethodSelect));
+const addRemovePayoutMethodMutation = graphql(
+  gqlV2/* GraphQL */ `
+    mutation removePayoutMethod($id: String!) {
+      removePayoutMethod(payoutMethodId: $id) {
+        id
+        isSaved
+      }
+    }
+  `,
+  {
+    props: ({ mutate }) => ({
+      removePayoutMethod: id => mutate({ variables: { id }, context: API_V2_CONTEXT }),
+    }),
+  },
+);
+
+export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect)));

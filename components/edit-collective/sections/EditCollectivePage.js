@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, difference, get, isEqual, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -9,22 +10,26 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+import { filterSectionsByData, getDefaultSectionsForCollective } from '../../../lib/collective-sections';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
 import { Sections } from '../../collective-page/_constants';
-import { getDefaultSectionsForCollectiveType } from '../../CollectiveNavbar';
 import Container from '../../Container';
 import DndProviderHTML5Backend from '../../DndProviderHTML5Backend';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
-import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
+import StyledSelect from '../../StyledSelect';
+import StyledTooltip from '../../StyledTooltip';
 import { H3, P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 
@@ -33,6 +38,7 @@ const getSettingsQuery = gqlV2/* GraphQL */ `
     account(slug: $slug) {
       id
       type
+      isActive
       settings
     }
   }
@@ -57,7 +63,19 @@ const SectionEntryContainer = styled.div`
     `}
 `;
 
-const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDrop, onSectionToggle }) => {
+const CollectiveSectionEntry = ({
+  intl,
+  isEnabled,
+  restrictedTo,
+  section,
+  index,
+  onMove,
+  onDrop,
+  onSectionToggle,
+  collectiveType,
+  hasData,
+  showMissingDataWarning,
+}) => {
   const ref = React.useRef(null);
 
   const [, drop] = useDrop({
@@ -73,22 +91,84 @@ const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDro
 
   drag(drop(ref));
 
+  let options = [
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisible" defaultMessage="Always visible" />,
+      value: 'ALWAYS',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.OnlyAdmins" defaultMessage="Only for admins" />,
+      value: 'ADMIN',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.Disabled" defaultMessage="Disabled" />,
+      value: 'DISABLED',
+    },
+  ];
+
+  // Remove the "Only for admins" option if it's not a FUND or PROJECT
+  // That can be re-considered later
+  if (collectiveType !== CollectiveType.FUND && collectiveType !== CollectiveType.PROJECT) {
+    options = options.filter(({ value }) => value !== 'ADMIN');
+  }
+  if (section === 'budget' && ![CollectiveType.FUND, CollectiveType.PROJECT].includes(collectiveType)) {
+    options = options.filter(({ value }) => value !== 'DISABLED');
+  }
+
+  let defaultValue;
+  if (!isEnabled) {
+    defaultValue = options.find(({ value }) => value == 'DISABLED');
+  } else if (restrictedTo && restrictedTo.includes('ADMIN')) {
+    defaultValue = options.find(({ value }) => value == 'ADMIN');
+  } else {
+    defaultValue = options.find(({ value }) => value == 'ALWAYS');
+  }
+
   return (
     <SectionEntryContainer ref={preview} isDragging={isDragging}>
       <Container mr={3} cursor="move" ref={ref}>
         <DragIndicator size={14} />
       </Container>
-      <P fontWeight="bold">{i18nCollectivePageSection(intl, section)}</P>
-      <div>
-        <StyledCheckbox
-          name={`show-section-${section}`}
-          label={<FormattedMessage id="EditCollectivePage.ShowSection" defaultMessage="Show section" />}
-          checked={isEnabled}
-          onChange={({ checked }) => {
-            onSectionToggle(section, checked);
-          }}
-        />
-      </div>
+      <P fontSize="14px" fontWeight="bold" css={{ flex: '1' }}>
+        {i18nCollectivePageSection(intl, section)}
+      </P>
+
+      <StyledSelect
+        fontSize="11px"
+        name={`show-section-${section}`}
+        defaultValue={defaultValue}
+        options={options}
+        minWidth={150}
+        isSearchable={false}
+        onChange={({ value }) => {
+          const isEnabled = value !== 'DISABLED';
+          const restrictedTo = value === 'ADMIN' ? ['ADMIN'] : [];
+          onSectionToggle(section, isEnabled, restrictedTo);
+        }}
+        menuPortalTarget={document.body}
+        formatOptionLabel={option => <Span fontSize="11px">{option.label}</Span>}
+      />
+      {/**
+        Our query uses GQLV2, but the `filterSectionsByData` helper only work with GQLV1 at the moment.
+        We'll switch this flag once either https://github.com/opencollective/opencollective/issues/2807
+        or https://github.com/opencollective/opencollective/issues/3275 will be resolved.
+      */}
+      {showMissingDataWarning && (
+        <Box width={16} ml={2}>
+          {!hasData && (
+            <StyledTooltip
+              content={() => (
+                <FormattedMessage
+                  id="EditCollectivePage.EmptySection"
+                  defaultMessage="This section does not appear to have any associated data and will not appear publicly until it does."
+                />
+              )}
+            >
+              <InfoCircle size={16} />
+            </StyledTooltip>
+          )}
+        </Box>
+      )}
     </SectionEntryContainer>
   );
 };
@@ -96,11 +176,15 @@ const CollectiveSectionEntry = ({ intl, isEnabled, section, index, onMove, onDro
 CollectiveSectionEntry.propTypes = {
   intl: PropTypes.object,
   isEnabled: PropTypes.bool,
+  restrictedTo: PropTypes.array,
   section: PropTypes.oneOf(Object.values(Sections)),
   index: PropTypes.number,
   onMove: PropTypes.func,
   onDrop: PropTypes.func,
   onSectionToggle: PropTypes.func,
+  collectiveType: PropTypes.string,
+  hasData: PropTypes.bool,
+  showMissingDataWarning: PropTypes.bool,
 };
 
 export const isCollectiveSectionEnabled = (collective, section) => {
@@ -122,7 +206,7 @@ export const isCollectiveSectionEnabled = (collective, section) => {
  */
 const loadSectionsForCollective = collective => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
-  let defaultSections = getDefaultSectionsForCollectiveType(collective.type);
+  let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
 
   // Funds MVP, to refactor
   if (collective.settings?.fund === true) {
@@ -155,13 +239,14 @@ const EditCollectivePage = ({ collective }) => {
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
   const [tmpSections, setTmpSections] = React.useState(null);
+  const [sectionsWithData, setSectionsWithData] = React.useState([]);
 
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
     context: API_V2_CONTEXT,
   });
 
-  const [submitSetting, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {
+  const [submitSetting, { loading: isSubmitting, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -170,10 +255,17 @@ const EditCollectivePage = ({ collective }) => {
     if (data?.account) {
       const sectionsFromCollective = loadSectionsForCollective(data.account);
       setSections(sectionsFromCollective);
+      setSectionsWithData(
+        filterSectionsByData(
+          sectionsFromCollective.map(({ section }) => section),
+          collective,
+        ),
+      );
     }
   }, [data?.account]);
 
   const displayedSections = tmpSections || sections;
+
   return (
     <DndProviderHTML5Backend>
       <H3>
@@ -194,13 +286,16 @@ const EditCollectivePage = ({ collective }) => {
           ) : (
             <div>
               <StyledCard mb={4}>
-                {displayedSections.map(({ section, isEnabled }, index) => (
+                {displayedSections.map(({ section, isEnabled, restrictedTo }, index) => (
                   <React.Fragment key={section}>
                     <CollectiveSectionEntry
                       intl={intl}
                       section={section}
                       index={index}
                       isEnabled={isEnabled}
+                      collectiveType={collective.type}
+                      restrictedTo={restrictedTo}
+                      hasData={sectionsWithData.includes(section)}
                       onMove={(dragIndex, hoverIndex) => {
                         const newSections = getNewSections(sections, dragIndex, hoverIndex);
                         if (!isEqual(tmpSections, newSections)) {
@@ -212,9 +307,11 @@ const EditCollectivePage = ({ collective }) => {
                         setSections(getNewSections(sections, dragIndex, hoverIndex));
                         setDirty(true);
                       }}
-                      onSectionToggle={(selectedSection, isEnabled) => {
+                      onSectionToggle={(selectedSection, isEnabled, restrictedTo) => {
                         const sectionIdx = sections.findIndex(({ section }) => section === selectedSection);
-                        const newSections = set(cloneDeep(sections), `${sectionIdx}.isEnabled`, isEnabled);
+                        const newSections = cloneDeep(sections);
+                        set(newSections, `${sectionIdx}.isEnabled`, isEnabled);
+                        set(newSections, `${sectionIdx}.restrictedTo`, restrictedTo);
                         setSections(newSections);
                         setDirty(true);
                       }}
@@ -223,6 +320,11 @@ const EditCollectivePage = ({ collective }) => {
                   </React.Fragment>
                 ))}
               </StyledCard>
+              {error && (
+                <MessageBox type="error" fontSize="14px" withIcon my={2}>
+                  {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
+                </MessageBox>
+              )}
               <Flex flexWrap="wrap" alignItems="center" justifyContent={['center', 'flex-start']}>
                 <StyledButton
                   buttonStyle="primary"
@@ -270,6 +372,7 @@ const EditCollectivePage = ({ collective }) => {
 EditCollectivePage.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
   }),
 };
 

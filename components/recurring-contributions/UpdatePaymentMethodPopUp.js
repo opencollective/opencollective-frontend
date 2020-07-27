@@ -65,6 +65,7 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
   mutation updatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
     updateOrder(order: $order, paymentMethod: $paymentMethod) {
       id
+      status
       paymentMethod {
         id
       }
@@ -144,7 +145,7 @@ const UpdatePaymentMethodPopUp = ({
     }));
     const uniquePMs = uniqBy(paymentMethodsOptions, 'id');
     // put the PM that matches this recurring contribution on top of the list
-    let sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod.id);
+    let sortedPMs = uniquePMs.sort(a => a.id !== contribution.paymentMethod?.id);
     // if we've just added a PM, put it at the top of the list
     if (addedPaymentMethod !== null) {
       sortedPMs = sortedPMs.sort(a => a.id !== addedPaymentMethod.id);
@@ -153,7 +154,7 @@ const UpdatePaymentMethodPopUp = ({
   }, [paymentMethods]);
 
   useEffect(() => {
-    if (paymentOptions && selectedPaymentMethod === null) {
+    if (paymentOptions && selectedPaymentMethod === null && contribution.paymentMethod) {
       setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
       setLoadingSelectedPaymentMethod(false);
     } else if (paymentOptions && addedPaymentMethod) {

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
+import { includes } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -14,12 +15,18 @@ import { Span } from '../Text';
 
 import PayExpenseModal from './PayExpenseModal';
 
-const getDisabledMessage = (expense, collective, payoutMethod) => {
-  const host = collective.host;
+const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   if (!host) {
     return <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a host" />;
   } else if (collective.balance < expense.amount) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
+  } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
+    return (
+      <FormattedMessage
+        id="TaxForm.DisabledPayment"
+        defaultMessage="The payee must submit their tax form info before the expense can be paid."
+      />
+    );
   } else if (!payoutMethod) {
     return null;
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
@@ -60,9 +67,9 @@ PayoutMethodTypeIcon.propTypes = {
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...props }) => {
+const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
   const [hasModal, showModal] = React.useState(false);
-  const disabledMessage = getDisabledMessage(expense, collective, expense.payoutMethod);
+  const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
   const isDisabled = Boolean(disabled || disabledMessage);
 
   const button = (
@@ -75,7 +82,7 @@ const PayExpenseButton = ({ expense, collective, disabled, onSubmit, error, ...p
     >
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} size={12} />
       <Span ml="6px">
-        <FormattedMessage id="actions.pay" defaultMessage="Pay" />
+        <FormattedMessage id="actions.goToPay" defaultMessage="Go to Pay" />
       </Span>
     </StyledButton>
   );

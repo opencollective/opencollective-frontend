@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -91,6 +92,8 @@ const ExpenseSummary = ({
             letterSpacing="0.8px"
             fontWeight="600"
             fontSize="Tiny"
+            showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+            showTaxFormMsg={expense.payee.isAdmin}
           />
         )}
       </Flex>
@@ -141,18 +144,19 @@ const ExpenseSummary = ({
         <div data-cy="expense-summary-items">
           {expense.items.map(attachment => (
             <React.Fragment key={attachment.id}>
-              <Flex justifyContent="space-between" alignItems="center" my={24}>
-                <Flex>
-                  {(isReceipt || attachment.url) && (
-                    <Box mr={3}>
-                      <UploadedFilePreview
-                        url={attachment.url}
-                        isLoading={isLoading || isLoadingLoggedInUser}
-                        isPrivate={!attachment.url && !isLoading}
-                        size={48}
-                      />
-                    </Box>
-                  )}
+              <Flex my={24} flexWrap="wrap">
+                {(isReceipt || attachment.url) && (
+                  <Box mr={3} mb={3} width={['100%', 'auto']}>
+                    <UploadedFilePreview
+                      url={attachment.url}
+                      isLoading={isLoading || isLoadingLoggedInUser}
+                      isPrivate={!attachment.url && !isLoading}
+                      size={[640, 48]}
+                      maxHeight={48}
+                    />
+                  </Box>
+                )}
+                <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
                   <Flex flexDirection="column" justifyContent="center">
                     <Span color="black.900" fontWeight="500">
                       {attachment.description || (
@@ -172,16 +176,15 @@ const ExpenseSummary = ({
                       <FormattedDate value={attachment.incurredAt} />
                     </Span>
                   </Flex>
+                  <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
+                    <FormattedMoneyAmount
+                      amount={attachment.amount}
+                      currency={expense.currency}
+                      amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                      precision={2}
+                    />
+                  </P>
                 </Flex>
-
-                <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
-                  <FormattedMoneyAmount
-                    amount={attachment.amount}
-                    currency={expense.currency}
-                    amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
-                    precision={2}
-                  />
-                </P>
               </Flex>
               <StyledHr borderStyle="dotted" />
             </React.Fragment>
@@ -285,7 +288,7 @@ const ExpenseSummary = ({
       {showProcessButtons && (
         <Container borderTop="1px solid #DCDEE0" mt={4} pt={12}>
           <Flex flexWrap="wrap" justifyContent="flex-end">
-            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} />
+            <ProcessExpenseButtons expense={expense} permissions={permissions} collective={collective} host={host} />
           </Flex>
         </Container>
       )}
@@ -320,6 +323,7 @@ ExpenseSummary.propTypes = {
     status: PropTypes.oneOf(Object.values(expenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
+    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     items: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
@@ -334,6 +338,7 @@ ExpenseSummary.propTypes = {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
+      isAdmin: PropTypes.bool,
     }).isRequired,
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,

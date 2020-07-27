@@ -113,11 +113,15 @@ class HorizontalScroller extends React.PureComponent {
   // > - If specified as a value less than 0 (greater than 0 for right-to-left elements), scrollLeft is set to 0.
   // > - If specified as a value greater than the maximum that the content can be scrolled, scrollLeft is set to the maximum.
   onPrevClick = () => {
-    this.ref.current.scrollLeft -= this.getScrollDistance();
+    if (this.ref.current) {
+      this.ref.current.scrollLeft -= this.getScrollDistance();
+    }
   };
 
   onNextClick = () => {
-    this.ref.current.scrollLeft += this.getScrollDistance();
+    if (this.ref.current) {
+      this.ref.current.scrollLeft += this.getScrollDistance();
+    }
   };
 
   getScrollDistance() {

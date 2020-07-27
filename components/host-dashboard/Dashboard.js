@@ -25,7 +25,7 @@ import HostDashboardActionsBanner from './HostDashboardActionsBanner';
 class HostDashboard extends React.Component {
   static propTypes = {
     hostCollectiveSlug: PropTypes.string, // for addData
-    view: PropTypes.oneOf(['expenses', 'donations']).isRequired,
+    view: PropTypes.oneOf(['expenses', 'expenses-beta', 'donations']).isRequired,
     LoggedInUser: PropTypes.object,
     data: PropTypes.object, // from addData
   };

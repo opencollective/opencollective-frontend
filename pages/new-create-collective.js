@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
@@ -11,10 +10,6 @@ import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
-
-const CovidBanner = dynamic(() => import(/* webpackChunkName: 'CovidBanner' */ '../components/banners/CovidBanner'), {
-  ssr: false,
-});
 
 const GET_HOST = gqlV2`
   query host($slug: String!) {
@@ -51,7 +46,6 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   return (
     <Page>
       <CreateCollective host={data && data.host} />
-      <CovidBanner />
     </Page>
   );
 };

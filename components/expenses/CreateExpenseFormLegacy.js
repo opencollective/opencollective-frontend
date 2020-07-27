@@ -11,9 +11,12 @@ import { getCurrencySymbol } from '../../lib/currency-utils';
 import Button from '../Button';
 import Container from '../Container';
 import DefinedTerm, { Terms } from '../DefinedTerm';
+import { Box } from '../Grid';
 import InputField from '../InputField';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import { P } from '../Text';
+
+import ExpenseNotesForm from './ExpenseNotesForm';
 
 class CreateExpenseForm extends React.Component {
   static propTypes = {
@@ -549,18 +552,13 @@ class CreateExpenseForm extends React.Component {
               <label>
                 <FormattedMessage id="expense.privateMessage" defaultMessage="Private instructions" />
               </label>
-              <InputField
-                type="textarea"
-                name="privateMessage"
-                onChange={privateMessage => this.handleChange('privateMessage', privateMessage)}
-                defaultValue={expense.privateMessage}
-                description={
-                  <FormattedMessage
-                    id="expense.privateMessage.description"
-                    defaultMessage="Private instructions for the host to reimburse your expense"
-                  />
-                }
-              />
+              <Box mb={3}>
+                <ExpenseNotesForm
+                  hideLabel
+                  onChange={e => this.handleChange('privateMessage', e.target.value)}
+                  defaultValue={expense.privateMessage}
+                />
+              </Box>
             </div>
 
             <div className="row">

@@ -74,6 +74,17 @@ const StyledTable = styled(Box)`
     border-bottom-right-radius: 8px;
   }
 
+  @media screen and (max-width: 62em) {
+    tfoot tr:last-child td:last-child {
+      border-bottom-right-radius: 8px;
+      padding-left: 1%;
+      padding-right: 1%;
+    }
+    tfoot tr:last-child td:last-child a {
+      width: fit-content;
+    }
+  }
+
   thead tr:first-child th:first-child {
     border-top-left-radius: 8px;
   }
@@ -202,6 +213,7 @@ const Cell = ({ content, header, height }) => {
                 currency="USD"
                 amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontSize: 20 }}
                 showCurrencyCode={false}
+                precision={0}
               />
             </Box>
             <Box as="span" display={['inline', null, 'none']}>
@@ -212,6 +224,7 @@ const Cell = ({ content, header, height }) => {
                 amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontSize: 20 }}
                 showCurrencyCode={false}
                 abbreviateInterval
+                precision={0}
               />
             </Box>
           </td>
