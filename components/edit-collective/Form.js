@@ -434,6 +434,7 @@ class EditCollectiveForm extends React.Component {
             <CreateVirtualCardsForm
               collectiveId={collective.id}
               collectiveSlug={collective.slug}
+              collectiveSettings={collective.settings}
               currency={collective.currency}
             />
           </Flex>
