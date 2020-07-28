@@ -85,6 +85,7 @@
   "appRejectionReason.placeholder": "What is the reason for rejecting this application?",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Archive {name}",
+  "Attachment.Private": "This attachment is private",
   "authorization.loginRequired": "You need to be logged in to continue.",
   "Back": "Back",
   "BalanceAmount": "Balance {balance}",
