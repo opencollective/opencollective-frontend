@@ -400,13 +400,12 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
-        <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
         <Hide xs sm>
           <P
-            color="#46b0ed"
+            color="#4E5052"
             display="inline-block"
-            fontSize="1.2rem"
-            fontWeight="bold"
+            fontSize="13px"
+            fontWeight="500"
             letterSpacing="1px"
             mx={2}
             className="LoginTopBarProfileButton-name"
@@ -416,7 +415,8 @@ class TopBarProfileMenu extends React.Component {
             {LoggedInUser.username}
           </P>
         </Hide>
-        <ChevronDown color="#46b0ed" size="1.5em" cursor="pointer" />
+        <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
+        <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
         {showProfileMenu && (
           <React.Fragment>
             <HideGlobalScroll />

@@ -94,7 +94,7 @@ class SearchPage extends React.Component {
             <form method="GET" onSubmit={this.refetch}>
               <FormGroup controlId="search" bsSize="large">
                 <ControlLabel className="h1">
-                  <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective" />
+                  <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective..." />
                 </ControlLabel>
                 <Flex alignItems="flex-end" my={3}>
                   <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />

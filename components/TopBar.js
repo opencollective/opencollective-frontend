@@ -43,7 +43,8 @@ NavLinkContainer.defaultProps = {
 };
 
 const NavLink = styled.a`
-  color: #777777;
+  color: #313233;
+  font-weight: 500;
   font-size: 1.4rem;
 `;
 
@@ -91,17 +92,17 @@ class TopBar extends React.Component {
         </Link>
 
         {showSearch && (
-          <Flex justifyContent="center" flex="1 1 auto">
-            <Hide xs width={1}>
+          <Flex justifyContent="flex-end" flex="1 1 auto">
+            <Hide xs sm md>
               <SearchFormContainer p={2}>
-                <SearchForm />
+                <SearchForm borderRadius="6px" />
               </SearchFormContainer>
             </Hide>
           </Flex>
         )}
 
-        <Flex alignItems="center" justifyContent="flex-end" flex="1 1 auto">
-          <Hide sm md lg>
+        <Flex alignItems="center" justifyContent="flex-start" flex="1 1 auto">
+          <Hide lg>
             <Box mx={3}>
               <Link href="/search">
                 <Flex as="a">
@@ -159,9 +160,8 @@ class TopBar extends React.Component {
               )}
             </NavList>
           </Hide>
-
-          <TopBarProfileMenu />
         </Flex>
+        <TopBarProfileMenu />
       </Flex>
     );
   }
