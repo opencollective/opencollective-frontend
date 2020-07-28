@@ -121,7 +121,7 @@ fi
 read -d '' PAYLOAD << EOF
   {
     "channel": "${SLACK_CHANNEL}",
-    "text": ":rocket: Deploying *FRONTEND* to *${1}* ${CUSTOM_MESSAGE}",
+    "text": ":rocket: Deploying *FRONTEND* to *${1}* ($(git config user.name)) ${CUSTOM_MESSAGE}",
     "as_user": true,
     "attachments": [{
       "text": "
