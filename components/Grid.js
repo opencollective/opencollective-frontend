@@ -5,7 +5,7 @@
 
 import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
-import { color, compose, flexbox, layout, space, typography } from 'styled-system';
+import { color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
 
 const boxProps = compose(space, color, layout, typography, flexbox);
 export const Box = styled('div')(
@@ -30,3 +30,11 @@ export const Flex = styled(Box)({
 });
 
 Flex.displayName = 'Flex';
+
+export const Grid = styled('div')(
+  {
+    boxSizing: 'border-box',
+    display: 'grid',
+  },
+  compose(space, grid, layout),
+);
