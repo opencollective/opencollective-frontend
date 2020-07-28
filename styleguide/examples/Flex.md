@@ -1,5 +1,3 @@
-[See `components/Grid` docs for more info](https://www.npmjs.com/package/components/Grid#flex)
-
 The `<Flex />` component extends the `<Box />` with `display: flex` on by default;
 
 ```js
