@@ -85,6 +85,7 @@
   "appRejectionReason.placeholder": "Quina és la raó per rebutjar aquesta aplicació?",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Arxiva {name}",
+  "Attachment.Private": "This attachment is private",
   "authorization.loginRequired": "S'ha d'iniciar sessió per a poder continuar.",
   "Back": "Enrere",
   "BalanceAmount": "Balance {balance}",

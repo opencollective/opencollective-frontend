@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { max } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
@@ -37,6 +38,7 @@ const DownloadIcon = styled(Download)`
 `;
 
 const MainContainer = styled(Container)`
+  position: relative;
   border-radius: 8px;
   padding: 4px;
   display: flex;
@@ -76,6 +78,13 @@ const MainContainer = styled(Container)`
   }
 `;
 
+const PrivateIconContainer = styled.div`
+  text-align: center;
+  svg {
+    max-height: 32px;
+  }
+`;
+
 /**
  * To display the preview of a file uploaded on Open Collective.
  * Supports images and PDFs.
@@ -88,16 +97,20 @@ const UploadedFilePreview = ({ isPrivate, isLoading, isDownloading, url, size, a
   } else if (isDownloading) {
     content = <StyledSpinner size="50%" />;
   } else if (isPrivate) {
-    content = <PrivateInfoIcon color="#dcdee0" size={size / 2} />;
+    content = (
+      <PrivateInfoIcon color="#dcdee0" size="60%" tooltipProps={{ childrenContainer: PrivateIconContainer }}>
+        <FormattedMessage id="Attachment.Private" defaultMessage="This attachment is private" />
+      </PrivateInfoIcon>
+    );
   } else if (!url && props.onClick) {
     content = (
       <React.Fragment>
-        <FileTextIcon color="#dcdee0" size={size / 2} />
-        <DownloadIcon color="#b3b3b3" size={size / 4} />
+        <FileTextIcon color="#dcdee0" size="60%" />
+        <DownloadIcon color="#b3b3b3" size="30%" />
       </React.Fragment>
     );
   } else if (!url) {
-    content = <FileText color="#dcdee0" size={size / 2} />;
+    content = <FileText color="#dcdee0" size="60%" />;
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
     const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt} />;

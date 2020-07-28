@@ -85,6 +85,7 @@
   "appRejectionReason.placeholder": "Wat is de reden voor het afwijzen van deze aanvraag?",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Archive {name}",
+  "Attachment.Private": "This attachment is private",
   "authorization.loginRequired": "Je moet ingelogd zijn om verder te gaan.",
   "Back": "Terug",
   "BalanceAmount": "Balance {balance}",
