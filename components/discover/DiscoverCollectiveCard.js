@@ -15,13 +15,7 @@ import { P, Span } from '../Text';
  */
 const DiscoverCollectiveCard = ({ collective, ...props }) => {
   return (
-    <StyledCollectiveCard
-      collective={collective}
-      minWidth={250}
-      position="relative"
-      {...props}
-      data-cy="collective-card"
-    >
+    <StyledCollectiveCard collective={collective} position="relative" {...props} data-cy="collective-card">
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
           <P mt={3} fontSize="Caption" lineHeight="Caption">

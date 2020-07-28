@@ -14,7 +14,6 @@ describe('Discover Page', () => {
 
   describe('All collectives section', () => {
     it('Shows All collectives with no filter', () => {
-      cy.get('[data-cy=select] input').should('have.attr', 'type', 'text');
       cy.get('[data-cy=select]').contains('Most popular');
       cy.get('[data-cy=container-collectives] [data-cy=caption] p').contains('Financial contributors');
     });

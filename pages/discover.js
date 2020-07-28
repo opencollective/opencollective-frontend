@@ -11,28 +11,28 @@ import { Link } from '../server/pages';
 import Container from '../components/Container';
 import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
-import { Box, Flex } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import SearchForm from '../components/SearchForm';
+import { fadeIn } from '../components/StyledKeyframes';
 import StyledSelect from '../components/StyledSelect';
 import { H1, P } from '../components/Text';
 
-const AllCardsContainer = styled(Flex).attrs({
-  flexWrap: 'wrap',
+const AllCardsContainer = styled(Grid).attrs({
   width: '100%',
-  maxWidth: 1300,
+  maxWidth: 1200,
   mx: 'auto',
-  my: 3,
-  justifyContent: 'space-evenly',
+  my: 4,
+  gridTemplateColumns: ['1fr', '1fr 1fr 1fr', null, 'repeat(4, 1fr)'],
+  gridGap: [24, null, 50],
   'data-cy': 'container-collectives',
 })``;
 
 const CollectiveCardContainer = styled.div`
-  width: 280px;
-  padding: 20px 15px;
+  animation: ${fadeIn} 0.2s;
 `;
 
 const DiscoverPageDataQuery = gql`
@@ -268,6 +268,7 @@ const DiscoverPage = () => {
                     minWidth={140}
                     getOptionLabel={({ value }) => intl.formatMessage(I18nSortLabels[value])}
                     onChange={({ value }) => setRouteParam('sort', value)}
+                    isSearchable={false}
                   />
                 </Flex>
               </Flex>
