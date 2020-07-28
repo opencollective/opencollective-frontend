@@ -7,16 +7,18 @@ import { Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { getCurrencySymbol } from '../../../lib/currency-utils';
-
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';
-import { Flex } from '../../Grid';
-import InputField from '../../InputField';
+import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
+import StyledInput from '../../StyledInput';
+import StyledInputField from '../../StyledInputField';
+import StyledInputGroup from '../../StyledInputGroup';
+import StyledSelect from '../../StyledSelect';
+import StyledTextarea from '../../StyledTextarea';
 import { H3, P } from '../../Text';
 
 const BORDER = '1px solid #efefef';
@@ -48,7 +50,7 @@ class CollectiveGoals extends React.Component {
     this.defaultType = 'yearlyBudget';
     this.messages = defineMessages({
       add: { id: 'goal.add', defaultMessage: 'Add goal' },
-      remove: { id: 'goal.remove', defaultMessage: 'Remove goal' },
+      remove: { id: 'Remove', defaultMessage: 'Remove' },
       type: { id: 'goal.type.label', defaultMessage: 'Type' },
       balance: { id: 'goal.balance.label', defaultMessage: 'Balance' },
       yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
@@ -60,11 +62,17 @@ class CollectiveGoals extends React.Component {
 
     const getOptions = arr => {
       return arr.map(key => {
-        return { [key]: intl.formatMessage(this.messages[key]) };
+        return { value: key, label: intl.formatMessage(this.messages[key]) };
       });
     };
 
     this.fields = [
+      {
+        name: 'title',
+        label: intl.formatMessage(this.messages.title),
+        placeholder: 'Please add a title to your new goal',
+        maxLength: 64,
+      },
       {
         name: 'type',
         type: 'select',
@@ -73,20 +81,16 @@ class CollectiveGoals extends React.Component {
       },
       {
         name: 'amount',
-        pre: getCurrencySymbol(props.currency),
+        pre: props.currency,
         type: 'currency',
         label: intl.formatMessage(this.messages.amount),
-        defaultValue: 0,
-      },
-      {
-        name: 'title',
-        label: intl.formatMessage(this.messages.title),
-        maxLength: 64,
+        placeholder: '0.00',
       },
       {
         name: 'description',
         type: 'textarea',
         label: intl.formatMessage(this.messages.description),
+        placeholder: 'You can tell your community more details about your goal here.',
       },
     ];
   }
@@ -158,28 +162,54 @@ class CollectiveGoals extends React.Component {
 
     return (
       <Container mt={4} pb={4} borderBottom={BORDER} key={`goal-${index}-${goal.key}`}>
-        <div className="goalActions">
-          <StyledButton onClick={() => this.removeGoal(index)}>{intl.formatMessage(this.messages.remove)}</StyledButton>
-        </div>
-        <Form horizontal>
-          {this.fields.map(field => (
-            <InputField
-              className="horizontal"
-              key={field.name}
-              name={field.name}
-              label={field.label}
-              component={field.component}
-              description={field.description}
-              maxLength={field.maxLength}
-              type={field.type}
-              defaultValue={defaultValues[field.name] || field.defaultValue}
-              options={field.options}
-              pre={field.pre}
-              placeholder={field.placeholder}
-              onChange={value => this.editGoal(index, field.name, value)}
-            />
-          ))}
+        <Form>
+          <Box mb={4}>
+            <StyledInputField name={this.fields[0].name} label={this.fields[0].label}>
+              <StyledInput
+                width="100%"
+                type="text"
+                placeholder={this.fields[0].placeholder}
+                onChange={event => this.editGoal(index, this.fields[0].name, event.target.value)}
+                value={defaultValues[this.fields[0].name] || ''}
+              />
+            </StyledInputField>
+          </Box>
+          <Box mb={4}>
+            <StyledInputField name={this.fields[1].name} label={this.fields[1].label}>
+              <StyledSelect
+                options={this.fields[1].options}
+                onChange={obj => this.editGoal(index, this.fields[1].name, obj)}
+                defaultValue={defaultValues[this.fields[1].name] || {}}
+              />
+            </StyledInputField>
+          </Box>
+          <Box mb={4}>
+            <StyledInputField name={this.fields[2].name} label={this.fields[2].label}>
+              <StyledInputGroup
+                prepend={this.fields[2].pre}
+                type={this.fields[2].type}
+                placeholder={this.fields[2].placeholder}
+                onChange={event => this.editGoal(index, this.fields[2].name, event.target.value * 100)}
+                value={defaultValues[this.fields[2].name] / 100 || ''}
+              />
+            </StyledInputField>
+          </Box>
+          <Box mb={4}>
+            <StyledInputField name={this.fields[3].name} label={this.fields[3].label}>
+              <StyledTextarea
+                placeholder={this.fields[3].placeholder}
+                onChange={event => this.editGoal(index, this.fields[3].name, event.target.value)}
+                value={defaultValues[this.fields[3].name] || ''}
+                width="100%"
+              />
+            </StyledInputField>
+          </Box>
         </Form>
+        <Container className="goalActions" textAlign="right">
+          <StyledButton isBorderless={true} buttonStyle="dangerSecondary" onClick={() => this.removeGoal(index)}>
+            {intl.formatMessage(this.messages.remove)}
+          </StyledButton>
+        </Container>
       </Container>
     );
   };
@@ -209,14 +239,16 @@ class CollectiveGoals extends React.Component {
             />
           </Container>
         </Container>
-        <Container textAlign="right">
+        <Container textAlign="left">
           <Container background="rgb(245, 247, 250)" pt={5} pb={40}>
             <GoalsCover collective={{ ...collective, settings: { goals } }} />
           </Container>
           <Container borderTop={BORDER}>{goals.map(this.renderGoal)}</Container>
         </Container>
         <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
-          <StyledButton onClick={() => this.addGoal()}>+ {intl.formatMessage(this.messages.add)}</StyledButton>
+          <StyledButton width="100%" color="#297EFF" borderColor="#297EFF" onClick={() => this.addGoal()}>
+            {intl.formatMessage(this.messages.add)} +
+          </StyledButton>
         </Container>
         {error && (
           <MessageBox type="error" withIcon my={3}>
