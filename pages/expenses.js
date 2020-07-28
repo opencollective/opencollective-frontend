@@ -21,7 +21,6 @@ import ErrorPage from '../components/ErrorPage';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
-import ExpensesSearchBar from '../components/expenses/ExpensesSearchBar';
 import ExpenseTags from '../components/expenses/ExpenseTags';
 import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
@@ -33,6 +32,7 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
+import SearchBar from '../components/SearchBar';
 import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -192,7 +192,7 @@ class ExpensePage extends React.Component {
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
-                    <ExpensesSearchBar defaultValue={query.searchTerm} onSubmit={this.handleSearch} />
+                    <SearchBar defaultValue={query.searchTerm} onSubmit={this.handleSearch} />
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />

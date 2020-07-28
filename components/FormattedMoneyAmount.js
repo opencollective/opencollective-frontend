@@ -24,6 +24,7 @@ const FormattedMoneyAmount = ({
   interval,
   amountStyles,
   showCurrencyCode,
+  currencyCodeStyles,
 }) => {
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
@@ -38,7 +39,7 @@ const FormattedMoneyAmount = ({
       />
     );
 
-  const currencyCode = showCurrencyCode ? currency : '';
+  const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
   if (!interval) {
     return (
       <FormattedMessage

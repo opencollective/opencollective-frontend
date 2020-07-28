@@ -59,7 +59,6 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
             <CollectiveCardContainer key={contribution.id}>
               <RecurringContributionsCard
                 width={250}
-                height={360}
                 collective={contribution.toAccount}
                 status={contribution.status}
                 contribution={contribution}

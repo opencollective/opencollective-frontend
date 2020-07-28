@@ -4,7 +4,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { addMonths, addYears } from '../../../lib/date-utils';
 
-import { ExpensesFilter } from './ExpensesFilter';
+import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const OPTION_LABELS = defineMessages({
   ALL: {
@@ -65,9 +65,8 @@ const ExpensesDateFilter = ({ onChange, value, ...props }) => {
   });
 
   return (
-    <ExpensesFilter
+    <StyledSelectFilter
       data-cy="expenses-filter-period"
-      isSearchable={false}
       value={selected ? getOption(...selected) : allPeriodsOption}
       onChange={({ value }) => onChange(value)}
       options={[allPeriodsOption, getOption(1, 'month'), getOption(6, 'month'), getOption(1, 'year')]}

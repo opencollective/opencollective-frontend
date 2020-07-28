@@ -85,6 +85,7 @@ const StyledInputGroup = ({
   maxWidth,
   containerProps,
   prependProps,
+  appendProps,
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
@@ -140,10 +141,15 @@ const StyledInputGroup = ({
           }}
         />
         {append && (
-          <Container bg={getBgColor({ error, focused, success })} borderRadius="4px 0 0 4px" p={2}>
-            <Span color={getColor({ error, success })} fontSize="Paragraph">
-              {append}
-            </Span>
+          <Container
+            borderRadius="4px 0 0 4px"
+            p={2}
+            color={getColor({ error, success })}
+            fontSize="Paragraph"
+            {...appendProps}
+            bg={getBgColor({ error, focused, success })}
+          >
+            {append}
           </Container>
         )}
       </InputContainer>
@@ -173,6 +179,8 @@ StyledInputGroup.propTypes = {
   containerProps: PropTypes.object,
   /** Props passed to the prepend `Container` */
   prependProps: PropTypes.object,
+  /** Props passed to the append `Container` */
+  appendProps: PropTypes.object,
   /** Max Width */
   maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };

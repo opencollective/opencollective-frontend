@@ -26,7 +26,10 @@ class AddFundsSourcePicker extends React.Component {
   render() {
     const { intl, host } = this.props;
     const customOptions = [
-      { value: { id: host.id }, label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }) },
+      {
+        value: { id: host.legacyId || host.id },
+        label: intl.formatMessage(messages.addFundsFromHost, { host: host.name }),
+      },
     ];
 
     return (
@@ -70,7 +73,7 @@ class AddFundsSourcePickerForUser extends React.Component {
         >
           <option value="" key="addfsph-00" />
           {hosts.map(h => (
-            <option value={h.id} key={`addfsph-${h.id}`}>
+            <option value={h.legacyId || h.id} key={`addfsph-${h.id}`}>
               {h.name}
             </option>
           ))}
