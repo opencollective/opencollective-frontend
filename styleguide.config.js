@@ -53,6 +53,10 @@ module.exports = {
               name: 'Flex',
               content: 'styleguide/examples/Flex.md',
             },
+            {
+              name: 'Grid',
+              content: 'styleguide/examples/Grid.md',
+            },
           ],
         },
         {
