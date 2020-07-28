@@ -10,11 +10,12 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: i18nExpenseStatus(intl, value), value });
+  const options = [getOption('ALL'), ...Object.values(expenseStatus).map(getOption), getOption('READY_TO_PAY')];
 
   return (
     <StyledSelectFilter
       data-cy="expenses-filter-status"
-      options={[getOption('ALL'), ...Object.values(expenseStatus).map(getOption)]}
+      options={options}
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
       {...props}
