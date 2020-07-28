@@ -113,7 +113,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
 
   return (
     <Fragment>
-      <StyledCollectiveCard collective={host} minWidth={250} height={360} position="relative" {...props}>
+      <StyledCollectiveCard collective={host} minWidth={250} height={350} position="relative" {...props}>
         <Container pl={3} flexShrink={1}>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
             <P fontSize="LeadParagraph" fontWeight="bold">

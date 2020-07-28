@@ -80,7 +80,7 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
     ? defaultImage['ANONYMOUS']
     : getCollectiveImage({ slug: contributor.collectiveSlug });
 
-  return <StyledAvatar size={radius} type={contributor.type} src={image} {...styleProps} />;
+  return <StyledAvatar size={radius} type={contributor.type} src={image} title={contributor.name} {...styleProps} />;
 };
 
 ContributorAvatar.propTypes = {

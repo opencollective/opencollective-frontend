@@ -11,7 +11,6 @@ import { Router } from '../../server/pages';
 
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
-import ExpensesSearchBar from '../expenses/ExpensesSearchBar';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../expenses/filters/ExpensesDateFilter';
 import { expensesListAdminFieldsFragment, expensesListFieldsFragment } from '../expenses/graphql/fragments';
@@ -21,6 +20,7 @@ import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import Pagination from '../Pagination';
+import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
@@ -131,7 +131,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
         </H1>
         <Box mx="auto" />
         <Box p={2}>
-          <ExpensesSearchBar
+          <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm => Router.pushRoute('host.dashboard', { ...query, searchTerm, offset: null })}
           />

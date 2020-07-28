@@ -4,7 +4,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 
-import { ExpensesFilter } from './ExpensesFilter';
+import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const OPTION_LABELS = defineMessages({
   ALL: {
@@ -46,9 +46,8 @@ const ExpensesAmountFilter = ({ currency, onChange, value, ...props }) => {
   };
 
   return (
-    <ExpensesFilter
+    <StyledSelectFilter
       data-cy="expenses-filter-amount"
-      isSearchable={false}
       value={value ? getOption(...parseAmountRange(value)) : allExpensesOption}
       onChange={({ value }) => onChange(value)}
       options={[allExpensesOption, getOption(0, 50), getOption(50, 500), getOption(500, 5000), getOption(5000)]}

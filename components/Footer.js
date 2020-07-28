@@ -104,7 +104,12 @@ class Footer extends React.Component {
         >
           <Container display="flex" mt={3} width={[1, null, 1 / 3]} flexDirection="column" maxWidth="300px">
             <Flex justifyContent={['center', null, 'flex-start']}>
-              <object type="image/svg+xml" data="/static/images/opencollectivelogo-footer.svg" height="20" />
+              <object
+                type="image/svg+xml"
+                data="/static/images/opencollectivelogo-footer.svg"
+                height="20"
+                style={{ maxWidth: '100%' }}
+              />
             </Flex>
             <P textAlign={['center', null, 'left']} color="#6E747A" fontSize="1.4rem" py={2}>
               An organization for your community, transparent by design.

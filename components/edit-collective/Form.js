@@ -154,14 +154,6 @@ class EditCollectiveForm extends React.Component {
         id: 'Fields.website',
         defaultMessage: 'Website',
       },
-      'sendInvoiceByEmail.label': {
-        id: 'collective.sendInvoiceByEmail.label',
-        defaultMessage: 'Invoices',
-      },
-      'sendInvoiceByEmail.description': {
-        id: 'collective.sendInvoiceByEmail.description',
-        defaultMessage: 'Include a PDF of receipts with your monthly report email',
-      },
       'application.label': {
         id: 'collective.application.label',
         defaultMessage: 'Open to Applications',
@@ -246,7 +238,6 @@ class EditCollectiveForm extends React.Component {
 
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
-    collective.sendInvoiceByEmail = get(collective, 'settings.sendInvoiceByEmail');
     collective.application = get(collective, 'settings.apply');
     collective.markdown = get(collective, 'settings.markdown');
 
@@ -726,15 +717,6 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           defaultValue: get(this.state.collective, 'settings.tos'),
           when: () => collective.isHost,
-        },
-      ],
-      advanced: [
-        {
-          name: 'sendInvoiceByEmail',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'settings.sendInvoiceByEmail'),
-          when: () => section === 'advanced' && (collective.type === 'USER' || collective.type === 'ORGANIZATION'),
         },
       ],
     };

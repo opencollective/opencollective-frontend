@@ -5,7 +5,11 @@ import { createPortal } from 'react-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import { background, space } from 'styled-system';
 
+import Avatar from './Avatar';
 import Container from './Container';
+import { Flex } from './Grid';
+import { fadeIn } from './StyledKeyframes';
+import { P } from './Text';
 
 const ModalWrapper = styled(Container).attrs(props => ({
   maxWidth: props.maxWidth || '95%',
@@ -44,6 +48,8 @@ export const ModalOverlay = styled.div`
   background: rgba(0, 0, 0, 0.6);
   z-index: 2500;
   display: block;
+  animation: ${fadeIn} 0.25s;
+  will-change: opacity;
 `;
 
 const Header = styled(Container)`
@@ -101,6 +107,28 @@ ModalHeader.propTypes = {
 };
 
 ModalHeader.displayName = 'Header';
+
+/**
+ * A special header that displays collective name + avatar in the header.
+ */
+export const CollectiveModalHeader = ({ collective, ...props }) => (
+  <ModalHeader {...props}>
+    <Flex alignItems="center">
+      <Avatar collective={collective} radius={40} />
+      <P fontSize="16px" lineHeight="24px" fontWeight="bold" ml={3}>
+        {collective.name}
+      </P>
+    </Flex>
+  </ModalHeader>
+);
+
+CollectiveModalHeader.propTypes = {
+  collective: PropTypes.shape({
+    name: PropTypes.string,
+  }),
+};
+
+CollectiveModalHeader.displayName = 'Header';
 
 export const ModalFooter = ({ children, ...props }) => (
   <Container {...props}>

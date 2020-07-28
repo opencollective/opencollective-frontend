@@ -18,7 +18,6 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
     <StyledCollectiveCard
       collective={collective}
       minWidth={250}
-      height={360}
       position="relative"
       {...props}
       data-cy="collective-card"
@@ -33,7 +32,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
                 values={{
                   count: collective.stats.backers.all,
                   prettyCount: (
-                    <Span display="block" fontWeight="bold" fontSize="LeadParagraph">
+                    <Span display="block" fontWeight="bold" fontSize="LeadParagraph" lineHeight="LeadParagraph">
                       {collective.stats.backers.all}
                     </Span>
                   ),
@@ -47,7 +46,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
               <Span fontSize="Caption" lineHeight="Caption">
                 <FormattedMessage id="YearlyBudget" defaultMessage="Yearly budget" />
               </Span>
-              <Span display="block" fontSize="LeadParagraph" fontWeight="bold">
+              <Span display="block" fontSize="LeadParagraph" lineHeight="LeadParagraph" fontWeight="bold">
                 <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
               </Span>
             </P>
