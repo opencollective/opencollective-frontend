@@ -85,6 +85,7 @@
   "appRejectionReason.placeholder": "この申請を拒否する理由は何ですか？",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "{name}をアーカイブ",
+  "Attachment.Private": "This attachment is private",
   "authorization.loginRequired": "続けるにはログインする必要があります",
   "Back": "戻る",
   "BalanceAmount": "Balance {balance}",
