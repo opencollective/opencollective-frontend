@@ -229,8 +229,6 @@
   "collective.pending.description": "Коллектив ждёт одобрения от хоста ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {организация} other {организации}} поддерживают {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
-  "collective.sendInvoiceByEmail.description": "Включить PDF копии чеков в ваш ежемесячный отчёт на почту",
-  "collective.sendInvoiceByEmail.label": "Счета",
   "collective.sendMoney.description": "PayPal активирован по умолчанию, вам не нужно ничего настраивать.",
   "collective.slug.label": "url",
   "collective.stats.balance.title": "Доступный остаток",

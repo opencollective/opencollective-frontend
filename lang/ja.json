@@ -229,8 +229,6 @@
   "collective.pending.description": "This collective is pending approval from the host ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {つの組織が} other {つの組織が}} {collective} をサポートしています",
   "collective.section.backers.users.title": "{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}",
-  "collective.sendInvoiceByEmail.description": "Include a PDF of receipts with your monthly report email",
-  "collective.sendInvoiceByEmail.label": "請求書",
   "collective.sendMoney.description": "PayPal is activated by default, you don't have to configure anything.",
   "collective.slug.label": "URL",
   "collective.stats.balance.title": "利用可能な残高:",

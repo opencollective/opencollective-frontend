@@ -229,8 +229,6 @@
   "collective.pending.description": "This collective is pending approval from the host ({host}).",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}",
   "collective.section.backers.users.title": "{n}명의 {n, plural, one {개인이} other {개인이}} {collective}를 지원함",
-  "collective.sendInvoiceByEmail.description": "Include a PDF of receipts with your monthly report email",
-  "collective.sendInvoiceByEmail.label": "청구서",
   "collective.sendMoney.description": "PayPal은 기본적으로 활성화되어 있지만, 아무것도 설정하지 않으셨습니다.",
   "collective.slug.label": "url",
   "collective.stats.balance.title": "사용 가능 잔액",
