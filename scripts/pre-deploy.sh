@@ -100,12 +100,12 @@ confirm "❔ Are you sure (yes/no) > " || exit 1
 # ---- Slack notification ----
 
 cd -- "$(dirname $0)/.."
-eval $(cat .env | grep OC_SLACK_USER_TOKEN=)
+eval $(cat .env | grep OC_SLACK_DEPLOY_WEBHOOK=)
 
-if [ -z "$OC_SLACK_USER_TOKEN" ]; then
+if [ -z "$OC_SLACK_DEPLOY_WEBHOOK" ]; then
   # Emit a warning as we don't want the deploy to crash just because we
   # havn't setup a Slack token. Get yours on https://api.slack.com/custom-integrations/legacy-tokens
-  echo "ℹ️  OC_SLACK_USER_TOKEN is not set, I will not notify Slack about this deploy 😞  (please do it manually)"
+  echo "ℹ️  OC_SLACK_DEPLOY_WEBHOOK is not set, I will not notify Slack about this deploy 😞  (please do it manually)"
   exit_success
 fi
 
@@ -136,15 +136,14 @@ EOF
 if [ $PUSH_TO_SLACK = "true" ]; then
   curl \
     -H "Content-Type: application/json; charset=utf-8" \
-    -H "Authorization: Bearer ${OC_SLACK_USER_TOKEN}" \
     -d "$PAYLOAD" \
     -s \
     --fail \
-    https://slack.com/api/chat.postMessage \
+    "$OC_SLACK_DEPLOY_WEBHOOK" \
     &> /dev/null
 
   if [ $? -ne 0 ]; then
-    echo "⚠️  I won't be able to notify slack. Please do it manually and check your OC_SLACK_USER_TOKEN"
+    echo "⚠️  I won't be able to notify slack. Please do it manually and check your OC_SLACK_DEPLOY_WEBHOOK"
   else
     echo "🔔  Slack notified about this deployment."
   fi
