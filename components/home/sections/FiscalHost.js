@@ -349,7 +349,7 @@ const FiscalHost = () => (
         ml={[null, null, null, null, 5]}
         mr={[2, null, null, null, 4]}
       >
-        <Illustration src="/static/images/home/umbrella-illustration.png" alt="Umbrella" />
+        <Illustration src="/static/images/home/umbrella-Illustration.png" alt="Umbrella" />
       </Box>
       <Container display={['block', 'flex']} alignItems={[null, 'center']}>
         <Container display={[null, null, 'flex']} mr={[null, 3]} alignItems={[null, null, 'center']}>
