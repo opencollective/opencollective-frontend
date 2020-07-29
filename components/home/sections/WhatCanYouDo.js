@@ -1,36 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { display } from 'styled-system';
 
-import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
-import StyledButton from '../../StyledButton';
-import { H3, H4, P } from '../../Text';
+import { H3, P } from '../../Text';
 import Illustration from '../HomeIllustration';
 import SectionSubTitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
-
-const Wrapper = styled(Box)`
-  background-image: ${props =>
-    props.hovering
-      ? "url('/static/images/home/create-collective-bg-illustration-hover-sm.png')"
-      : "url('/static/images/home/create-collective-bg-illustration-sm.png')"};
-  background-size: 100% 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  @media screen and (min-width: 52em) {
-    background-image: ${props =>
-      props.hovering
-        ? "url('/static/images/home/create-collective-bg-illustration-hover.png')"
-        : "url('/static/images/home/create-collective-bg-illustration.png')"};
-    background-size: 100% 100%;
-  }
-`;
 
 const Title = styled(H3)`
   font-size: 20px;
@@ -71,8 +49,6 @@ const Description = styled(P)`
 `;
 
 const WhatCanYouDo = () => {
-  const [hoverCreateCollectiveButton, setHoverCreateCollectiveButton] = useState(false);
-
   return (
     <Flex mx={[3, 4]} my={4} flexDirection="column" alignItems="center" textAlign="center">
       <SectionTitle>
@@ -200,36 +176,6 @@ const WhatCanYouDo = () => {
           </Description>
         </Box>
       </Flex>
-      <Container
-        mt={5}
-        mb={4}
-        display="none"
-        flexDirection={['column', 'row']}
-        justifyContent="center"
-        width={1}
-        alignItems="center"
-      >
-        <Box width={[null, null, '286px']} mb={2} textAlign={['center', 'left']}>
-          <H4 fontSize="H4" lineHeight="H4" letterSpacing="-0.2px" fontWeight="bold">
-            <FormattedMessage
-              id="home.whatCanYouDoSection.areYouReady"
-              defaultMessage="Are you ready to make your community sustainable?"
-            />
-          </H4>
-        </Box>
-        <Wrapper width={['288px', '380px']} height={['288px', '375px']} hovering={hoverCreateCollectiveButton}>
-          <Link route="/create">
-            <StyledButton
-              buttonStyle="dark"
-              minWidth={232}
-              onMouseEnter={() => setHoverCreateCollectiveButton(true)}
-              onMouseLeave={() => setHoverCreateCollectiveButton(false)}
-            >
-              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-            </StyledButton>
-          </Link>
-        </Wrapper>
-      </Container>
     </Flex>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
+import CreateCollective from '../components/home/sections/CreateCollective';
 import FeaturesSection from '../components/home/sections/Features';
 import FiscalHostSection from '../components/home/sections/FiscalHost';
 import JoinUsSection from '../components/home/sections/JoinUs';
@@ -29,6 +30,7 @@ const HomePage = () => {
       <FeaturesSection />
       <FiscalHostSection />
       <OCUsersSection />
+      <CreateCollective />
       <WeAreOpenSection />
       <LearnMoreSection />
       <JoinUsSection />

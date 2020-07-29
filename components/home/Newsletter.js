@@ -22,6 +22,7 @@ class Newsletter extends React.Component {
           >
             <Container
               borderRadius={10}
+              border="1px solid #9D9FA3"
               bg="white.full"
               display="flex"
               justifyContent="space-between"
@@ -57,6 +58,7 @@ class Newsletter extends React.Component {
                 borderLeft="1px solid"
                 borderColor="black.700"
                 outline="none"
+                backgroundColor="black.100"
               >
                 <FormattedMessage id="newsletter.subscribe" defaultMessage="Subscribe" />
               </StyledButton>

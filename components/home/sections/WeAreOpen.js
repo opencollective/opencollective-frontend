@@ -1,34 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import Container from '../../Container';
-import { Box } from '../../Grid';
-import Hide from '../../Hide';
+import { Box, Flex } from '../../Grid';
 import StyledCard from '../../StyledCard';
-import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
 import { H4, P } from '../../Text';
 import Illustration from '../HomeIllustration';
 import SectionSubtitle from '../SectionSubtitle';
 import SectionTitle from '../SectionTitle';
-
-const Wrapper = styled(Container)`
-  background-image: ${props => props.openFeature && `url('/static/images/home/${props.openFeature}-bg-sm.png')`};
-  background-size: 100% 100%;
-  flex-wrap: wrap;
-
-  @media screen and (min-width: 64em) {
-    background-image: url('/static/images/home/weareopen-bg.png');
-    background-size: 100% 100%;
-  }
-
-  @media screen and (min-width: 88em) {
-    background-image: url('/static/images/home/weareopen-bg-lg.png');
-    background-size: 100% 100%;
-  }
-`;
 
 const messsages = defineMessages({
   'home.weAreOpenSection.openData': {
@@ -81,25 +62,6 @@ const messsages = defineMessages({
   },
 });
 
-const openFeatures = [
-  {
-    id: 'openData',
-    url: 'https://docs.opencollective.com/help/product/privacy-policy#your-choices',
-  },
-  {
-    id: 'openSource',
-    url: 'https://github.com/opencollective',
-  },
-  {
-    id: 'openCompany',
-    url: 'http://drive.opencollective.com',
-  },
-  {
-    id: 'openFinances',
-    url: 'https://opencollective.com/opencollectiveinc',
-  },
-];
-
 const OpenFeature = ({ id, url }) => {
   const intl = useIntl();
 
@@ -147,98 +109,46 @@ OpenFeature.propTypes = {
 };
 
 const WeAreOpen = () => (
-  <Container display="flex" flexDirection="column" alignItems="center" mx={[0, 4, 0, null, null, 5]}>
-    <Box textAlign="center">
-      <SectionTitle>
-        <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
-      </SectionTitle>
-      <SectionSubtitle>
-        <FormattedMessage
-          id="home.weAreOpenSection.subtitle"
-          defaultMessage="We not only help you be transparent, we are too!"
-        />
-      </SectionSubtitle>
-    </Box>
-    <Hide md lg my={3}>
-      <Illustration src="/static/images/home/weareopen-illustration-sm.png" alt="We are open in every way" />
-    </Hide>
-    <StyledCarousel display={[null, null, 'none']} width={1}>
-      {openFeatures.map(openFeature => (
-        <Wrapper
-          width={1}
-          key={openFeature.id}
-          display="flex"
-          justifyContent="center"
-          openFeature={openFeature.id}
-          py="40px"
-        >
-          <Container width="90%">
-            <OpenFeature {...openFeature} />
-          </Container>
-        </Wrapper>
-      ))}
-    </StyledCarousel>
-    <Container display={['none', null, 'flex']} justifyContent={'center'} my={5}>
-      <Illustration
-        display={['none', null, 'block', null, 'none']}
-        src="/static/images/home/weareopen-illustration-md.png"
-        alt="We are open in every way"
-      />
-      <Illustration
-        display={['none', null, null, null, 'block']}
-        src="/static/images/home/weareopen-illustration-md.png"
-        alt="We are open in every way"
-        mr={3}
-      />
-    </Container>
-    <Wrapper
-      width={[1, null, null, null, '1376px']}
-      display={['none', null, 'flex']}
-      justifyContent={[null, null, null, 'center']}
-      pt={[null, null, '85px', null, '80px']}
-      pb={[null, null, '90px', null, '120px']}
-      px={[null, null, '50px', null, '70px']}
+  <Flex display="flex" flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mx={[3, 4]}>
+    <Container
+      display="flex"
+      flexDirection={'column'}
+      alignItems="center"
+      width={[1, '392px', null, null, '657px']}
+      mr={[null, 2, 5]}
     >
-      {openFeatures.map(openFeature => {
-        const id = openFeature.id;
-        return (
-          <Box
-            key={id}
-            mr={[
-              null,
-              null,
-              id === 'openData' || id === 'openCompany' ? '10px' : null,
-              null,
-              id === 'openData' || id === 'openCompany' ? '33px' : null,
-            ]}
-            ml={[
-              null,
-              null,
-              id === 'openSource' || id === 'openFinances' ? '10px' : null,
-              null,
-              id === 'openSource' || id === 'openFinances' ? '33px' : null,
-            ]}
-            mb={[
-              null,
-              null,
-              id === 'openData' || id === 'openSource' ? '13px' : null,
-              null,
-              id === 'openData' || id === 'openSource' ? '26px' : null,
-            ]}
-            mt={[
-              null,
-              null,
-              id === 'openCompany' || id === 'openFinances' ? '13px' : null,
-              null,
-              id === 'openCompany' || id === 'openFinances' ? '26px' : null,
-            ]}
-          >
-            <OpenFeature {...openFeature} />
-          </Box>
-        );
-      })}
-    </Wrapper>
-  </Container>
+      <Box textAlign={['center', 'left']} width={['288px', 1]}>
+        <SectionTitle fontSize={['32px']} lineHeight={['40px']} letterSpacing={['-1.2px']} color="black.800">
+          <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
+        </SectionTitle>
+      </Box>
+      <Box display={['block', 'none']} my={3} width={['224px']} height={['144px']}>
+        <Illustration src="/static/images/home/weareopen-illustration-sm.png" alt="We are open in every way" />
+      </Box>
+      <Box my={2} width={['288px', 1]} textAlign={['center', 'left']}>
+        <SectionSubtitle
+          color={['black.600', 'black.700']}
+          fontSize={['16px', '20px']}
+          lineHeight={['24px', '28px']}
+          letterSpacing={['-0.16px', '-0.6px']}
+        >
+          <FormattedMessage
+            id="home.weAreOpenSection.subtitle"
+            defaultMessage="We not only help you be transparent, we are too!"
+          />
+        </SectionSubtitle>
+      </Box>
+    </Container>
+    <Box
+      display={['none', 'block']}
+      width={['224px', null, null, null, '336px']}
+      height={['144px', null, null, null, '216px']}
+      my={5}
+      ml={[null, null, 5]}
+    >
+      <Illustration src="/static/images/home/weareopen-illustration-md.png" alt="We are open in every way" />
+    </Box>
+  </Flex>
 );
 
 export default WeAreOpen;

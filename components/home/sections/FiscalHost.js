@@ -375,10 +375,6 @@ const FiscalHost = () => (
                 id="home.becomeFiscalHost.description"
                 defaultMessage="Support your community with fundholding and fiscal sponsorship services. "
               />
-              <LineBreak display={[null, 'none']} />
-              <StyledLink href="#" color="#1A1E43">
-                <FormattedMessage id="becomeFiscalHost.learnMore" defaultMessage="Learn More" />
-              </StyledLink>
             </P>
           </Box>
         </Container>

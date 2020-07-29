@@ -1,12 +1,12 @@
 import React from 'react';
-import { ArrowRight } from '@styled-icons/feather/ArrowRight';
+import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
-import { H1, P } from '../../Text';
+import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
@@ -42,7 +42,6 @@ const Wrapper = styled(Container)`
   justify-content: space-between;
   align-items: center;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.1);
   padding: 16px;
 
   @media screen and (min-width: 64em) {
@@ -52,99 +51,144 @@ const Wrapper = styled(Container)`
 
 const JoinUs = () => (
   <SectionWrapper py={[5, null, 4]} width={1}>
-    <Flex mx={[3, 4]} flexDirection={['column', null, 'row']} color="white.full">
+    <Flex mx={[3, 4]} flexDirection={['column', null, 'row']} color="black.900" alignItems={[null, null, 'center']}>
       <Box
-        my={[2, null, 5]}
-        width={[null, null, '288px', null, '309px']}
+        my={[2, 3, 5]}
+        width={[null, null, '335px', null, '309px']}
         ml={[null, null, null, null, 6]}
         mr={[null, null, 4, null, 5]}
       >
         <H1
-          color="white.full"
           mb={2}
           textAlign="left"
-          fontSize={['H4', null, 'H1']}
-          lineHeight={['H4', null, 'H1']}
-          fontWeight="bold"
+          fontSize={['32px', '40px', '52px']}
+          lineHeight={['40px', '48px', '56px']}
+          letterSpacing={['-1.2px', '-1.6px', '-2px']}
         >
-          <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join us" />
+          <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box width={['208px', null, null]}>
-          <SectionSubtitle color="white.full">
+        <Box width={['288px', 1, null]}>
+          <SectionSubtitle
+            fontSize={['20px', null, '24px']}
+            lineHeight={['28px', null, '32px']}
+            letterSpacing={['-0.6px', null, '-0.8px']}
+          >
             <FormattedMessage
               id="home.joinUsSection.subtitle"
-              defaultMessage="Be part of the community and spread the word!"
+              defaultMessage="Be part of the new generation of communities."
             />
           </SectionSubtitle>
         </Box>
       </Box>
 
-      <Container>
+      <Container ml={[null, null, 3]}>
         <Link route="/create">
-          <Wrapper className="linkWrapper" my={[1, null, 4]} width={[1, null, '607px', null, '500px']}>
-            <Box>
-              <H1
-                fontSize={['15px', null, 'H3']}
+          <Wrapper
+            color="black.900"
+            backgroundColor={['white.full', null, 'rgba(255, 255, 255, 0.7)']}
+            className="linkWrapper"
+            my={[1, null, 4]}
+            width={['288px', '648px', '569px', null, '594px']}
+          >
+            <Box width={['192px', 1]}>
+              <H3
+                fontSize={['24px', '32px', null]}
                 textAlign="left"
-                lineHeight={['25px', null, '40px']}
-                letterSpacing={['-0.008em', null, '-0.4px']}
+                lineHeight={['25px', '40px', null]}
+                letterSpacing={['-0.08px', '-1.2px', null]}
                 mb={2}
                 fontWeight="bold"
               >
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-              </H1>
-              <P fontSize={['Caption', null, '15px']} lineHeight={['19px', null, '25px']} letterSpacing="-0.016em">
+              </H3>
+              <P
+                fontSize={['15px', null, null]}
+                color="black.800"
+                lineHeight={['23px', null, null]}
+                letterSpacing={['-0.12px']}
+              >
                 <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />
               </P>
             </Box>
-            <Box className="arrowWrapper" color="black.500">
-              <ArrowRight size={'20'} />
+            <Box className="arrowWrapper" color="black.900" fontWeight="bold">
+              <ArrowRight2 size={'24'} />
             </Box>
           </Wrapper>
         </Link>
 
         <Link route="/hiring">
-          <Wrapper my={4} width={[1, null, '607px', null, '500px']} className="linkWrapper">
-            <Container mb={2}>
-              <H1
-                fontSize={['15px', null, 'H3']}
+          <Wrapper
+            backgroundColor="rgba(255, 255, 255, 0.7)"
+            color="black.900"
+            my={4}
+            width={['288px', '648px', '569px', null, '594px']}
+            className="linkWrapper"
+          >
+            <Container mb={2} width={['192px', 1]}>
+              <H3
+                fontSize={['24px', '32px', null]}
                 textAlign="left"
-                lineHeight={['25px', null, '40px']}
-                letterSpacing={['-0.008em', null, '-0.4px']}
+                lineHeight={['25px', '40px', null]}
+                letterSpacing={['-0.08px', '-1.2px', null]}
                 mb={2}
                 fontWeight="bold"
               >
-                <FormattedMessage id="home.joinUsSection.team" defaultMessage="Join our team" />
-              </H1>
-              <Box width={[null, null, '400px']}>
-                <P fontSize={['Caption', null, '15px']} lineHeight={['19px', null, '25px']} letterSpacing="-0.016em">
+                <FormattedMessage id="home.joinUsSection.team" defaultMessage="Read our stories" />
+              </H3>
+              <Box width={[null, null, '460px']}>
+                <P
+                  fontSize={['15px', null, null]}
+                  lineHeight={['23px', null, null]}
+                  letterSpacing="-0.12px"
+                  color="black.700"
+                  display={[null, 'none']}
+                >
+                  <FormattedMessage id="home.joinUsSection.joinTeam" defaultMessage="Know more about our impact." />
+                </P>
+                <P
+                  fontSize={['15px', null, null]}
+                  lineHeight={['23px', null, null]}
+                  letterSpacing="-0.12px"
+                  color="black.700"
+                  display={['none', 'block']}
+                >
                   <FormattedMessage
-                    id="home.joinUsSection.joinTeam"
-                    defaultMessage="We are citizens from around the world. We don’t have an office. We are all remote. We don’t bite."
+                    id="home.joinUsSection.ourStories"
+                    defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could participate."
                   />
                 </P>
               </Box>
             </Container>
-            <Box className="arrowWrapper" color="black.500">
-              <ArrowRight size={'20'} />
+            <Box className="arrowWrapper" color="black.900">
+              <ArrowRight2 size={'24'} />
             </Box>
           </Wrapper>
         </Link>
 
-        <Wrapper my={4} width={[1, null, '607px', null, '500px']}>
+        <Wrapper
+          backgroundColor={['rgba(255, 255, 255, 0.7)', null, 'white.full']}
+          color="black.900"
+          my={4}
+          width={['288px', '648px', '569px', null, '594px']}
+        >
           <Container>
-            <H1
-              fontSize={['15px', null, 'H3']}
+            <H3
+              fontSize={['24px', '32px', null]}
               textAlign="left"
-              lineHeight={['25px', null, '40px']}
-              letterSpacing={['-0.008em', null, '-0.4px']}
+              lineHeight={['25px', '40px', null]}
+              letterSpacing={['-0.08px', '-1.2px', null]}
               mb={2}
               fontWeight="bold"
             >
-              <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe to our newsletter" />
-            </H1>
+              <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe our newsletter" />
+            </H3>
             <Box mb={3}>
-              <P fontSize={['Caption', null, '15px']} lineHeight={['19px', null, '25px']} letterSpacing="-0.016em">
+              <P
+                fontSize={['15px', null, '15px']}
+                lineHeight={['23px', null, '25px']}
+                letterSpacing="-0.12px"
+                color="black.800"
+              >
                 <FormattedMessage id="home.joinUsSection.weNeedUpdate" defaultMessage="We send updates once a month." />
               </P>
             </Box>
