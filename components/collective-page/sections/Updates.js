@@ -18,6 +18,7 @@ import LinkCollective from '../../LinkCollective';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
+import StyledLink from '../../StyledLink';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
@@ -171,7 +172,18 @@ class SectionUpdates extends React.PureComponent {
                       </P>
                     </Link>
                     {update.userCanSeeUpdate ? (
-                      <HTMLContent content={update.summary} />
+                      <Container>
+                        <HTMLContent style={{ display: 'inline' }} content={update.summary} />
+                        {` `}
+                        <StyledLink
+                          as={Link}
+                          fontSize="12px"
+                          route="update"
+                          params={{ collectiveSlug: collective.slug, updateSlug: update.slug }}
+                        >
+                          <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+                        </StyledLink>
+                      </Container>
                     ) : (
                       <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
                         <FormattedMessage
