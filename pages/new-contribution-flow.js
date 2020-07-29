@@ -194,7 +194,7 @@ class NewContributionFlowPage extends React.Component {
 }
 
 const hostFieldsFragment = gqlV2/* GraphQL */ `
-  fragment HostFields on Host {
+  fragment ContributionFlowHostFields on Host {
     id
     slug
     name
@@ -227,22 +227,22 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
         }
       }
       host {
-        ...HostFields
+        ...ContributionFlowHostFields
       }
     }
     ... on Event {
       host {
-        ...HostFields
+        ...ContributionFlowHostFields
       }
     }
     ... on Fund {
       host {
-        ...HostFields
+        ...ContributionFlowHostFields
       }
     }
     ... on Project {
       host {
-        ...HostFields
+        ...ContributionFlowHostFields
       }
     }
   }
