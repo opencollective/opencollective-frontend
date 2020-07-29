@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import themeGet from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { facebooKShareURL, tweetURL } from '../../lib/url_helpers';
+import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../../components/Container';
 import { Box, Flex } from '../../components/Grid';
@@ -31,15 +31,19 @@ const CTAContainer = styled(Container)`
   border-radius: 10px;
   background-color: white;
 
-  &:hover {
-    border: 1px solid ${themeGet('colors.primary.500')};
-    cursor: pointer;
+  ${props =>
+    props.hoverable &&
+    css`
+      &:hover {
+        border: 1px solid ${themeGet('colors.primary.500')};
+        cursor: pointer;
 
-    h3,
-    span {
-      color: ${themeGet('colors.primary.800')};
-    }
-  }
+        h3,
+        span {
+          color: ${themeGet('colors.primary.800')};
+        }
+      }
+    `}
 `;
 
 const ShareLink = styled(StyledLink)`
@@ -96,7 +100,7 @@ class NewContributionFlowSuccess extends React.Component {
         defaultMessage: 'Read our stories',
       },
       subscribe: {
-        id: 'NewContributionFlow.Success.CTA.Subscribe.Header',
+        id: 'home.joinUsSection.newsletter',
         defaultMessage: 'Subscribe to our newsletter',
       },
     });
@@ -123,12 +127,14 @@ class NewContributionFlowSuccess extends React.Component {
       headerText: this.props.intl.formatMessage(this.headerMessages.join),
       contentText: this.props.intl.formatMessage(this.contentMessages.join),
       subscribe: false,
+      link: '/create-account',
     };
 
     const readCallToAction = {
       headerText: this.props.intl.formatMessage(this.headerMessages.read),
       contentText: this.props.intl.formatMessage(this.contentMessages.read),
       subscribe: false,
+      link: 'https://blog.opencollective.com',
     };
 
     const subscribeCallToAction = {
@@ -157,32 +163,44 @@ class NewContributionFlowSuccess extends React.Component {
     //   callsToAction.push(readCallToAction, subscribeCallToAction);
     // }
 
+    const innerCTA = cta => {
+      return (
+        <CTAContainer
+          display="flex"
+          my={2}
+          px={4}
+          py={2}
+          justifyContent="space-between"
+          maxWidth={600}
+          hoverable={cta.link}
+        >
+          <Flex flexDirection="column" alignItems="left" justifyContent="center" width={4 / 5} my={3}>
+            <H3 mb={3}>{cta.headerText}</H3>
+            <P fontSize="Paragraph" lineHeight="LeadParagraph" fontWeight={300} color="black.700">
+              {cta.contentText}
+            </P>
+            {/* {cta.subscribe && email form here} */}
+          </Flex>
+          {!cta.subscribe && (
+            <Flex alignItems="center" justifyContent="center">
+              <Span fontSize={40}>&rarr;</Span>
+            </Flex>
+          )}
+        </CTAContainer>
+      );
+    };
+
     return (
       <Flex flexDirection="column" justifyContent="center">
-        {callsToAction.map(cta => (
-          <CTAContainer
-            key={cta.headerText}
-            display="flex"
-            my={2}
-            px={4}
-            py={2}
-            justifyContent="space-between"
-            maxWidth={600}
-          >
-            <Flex flexDirection="column" alignItems="left" justifyContent="center" width={4 / 5} my={3}>
-              <H3 mb={3}>{cta.headerText}</H3>
-              <P fontSize="Paragraph" lineHeight="LeadParagraph" fontWeight={300} color="black.700">
-                {cta.contentText}
-              </P>
-              {/* {cta.subscribe && email form here} */}
-            </Flex>
-            {!cta.subscribe && (
-              <Flex alignItems="center" justifyContent="center">
-                <Span fontSize={40}>&rarr;</Span>
-              </Flex>
-            )}
-          </CTAContainer>
-        ))}
+        {callsToAction.map(cta =>
+          cta.link ? (
+            <StyledLink href={cta.link} openInNewTab key={cta.headerText} color="black.700">
+              {innerCTA(cta)}
+            </StyledLink>
+          ) : (
+            <Fragment>{innerCTA(cta)}</Fragment>
+          ),
+        )}
       </Flex>
     );
   };
@@ -230,7 +248,7 @@ class NewContributionFlowSuccess extends React.Component {
                 <Twitter size="1.2em" color="#4E5052" />
                 <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
               </ShareLink>
-              <ShareLink href={facebooKShareURL({ url: shareURL })}>
+              <ShareLink href={facebookShareURL({ url: shareURL })}>
                 <Facebook size="1.2em" color="#4E5052" />
                 <FormattedMessage id="shareIt" defaultMessage="Share it" />
               </ShareLink>

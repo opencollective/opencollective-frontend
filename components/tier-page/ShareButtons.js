@@ -10,7 +10,7 @@ import copy from 'copy-to-clipboard';
 import { defineMessages, injectIntl } from 'react-intl';
 
 // Open Collective Frontend imports
-import { facebooKShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url_helpers';
+import { facebookShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -48,7 +48,7 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
 
   return (
     <Flex justifyContent="space-between">
-      <StyledLink title="Facebook" href={facebooKShareURL({ u: pageUrl })} openInNewTab>
+      <StyledLink title="Facebook" href={facebookShareURL({ u: pageUrl })} openInNewTab>
         <StyledRoundButton size={40}>
           <Facebook size={14} />
         </StyledRoundButton>

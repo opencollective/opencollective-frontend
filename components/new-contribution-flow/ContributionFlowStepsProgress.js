@@ -70,7 +70,7 @@ const ContributionFlowStepsProgress = ({
       {({ step }) => {
         let details = null;
         if (step.name === STEPS.PROFILE) {
-          details = get(stepProfile, 'name', null);
+          details = get(stepProfile, 'name') || get(stepProfile, 'email', null);
         } else if (step.name === STEPS.DETAILS) {
           if (stepDetails && stepDetails.amount) {
             const formattedAmount = showFeesOnTop

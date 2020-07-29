@@ -20,6 +20,7 @@ const StyledInputField = ({
   inputType,
   labelFontSize,
   labelProps,
+  showLabelRequired,
   ...props
 }) => {
   const labelContent = label && <Span color="black.800">{label}</Span>;
@@ -45,6 +46,14 @@ const StyledInputField = ({
                 <FormattedMessage
                   id="OptionalFieldLabel"
                   defaultMessage="{field} (optional)"
+                  values={{ field: labelContent }}
+                />
+              </Span>
+            ) : required === true && showLabelRequired && !isCheckbox ? (
+              <Span color="black.500">
+                <FormattedMessage
+                  id="RequiredFieldLabel"
+                  defaultMessage="{field} (required)"
                   values={{ field: labelContent }}
                 />
               </Span>
@@ -97,6 +106,8 @@ StyledInputField.propTypes = {
   labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
+  /** Set this to true to display a "(Required)" next to the label when the field is required */
+  showLabelRequired: PropTypes.bool,
   /** All props from `Box` */
   ...Box.propTypes,
 };
