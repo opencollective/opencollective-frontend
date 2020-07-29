@@ -36,6 +36,7 @@ const SelectFeatureButton = styled.button`
         border-radius: 8px;
         background: #ffffff;
         outline: none;
+        padding: 8px;
         box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
       `}
 
@@ -222,7 +223,15 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
               id="home.feature.learnmore"
               defaultMessage="Learn more {icon}"
               values={{
-                icon: <ArrowRight size="24" />,
+                icon: (
+                  <React.Fragment>
+                    <Span display={[null, 'none']}>
+                      {' '}
+                      <ArrowRight size="24" />
+                    </Span>
+                    <Span display={['none', 'inline-block']}>...</Span>
+                  </React.Fragment>
+                ),
               }}
             />
           </LearnMoreLink>
@@ -285,7 +294,7 @@ const Features = () => {
       </SectionSubtitle>
       <Flex
         flexDirection={['column', 'row-reverse']}
-        alignItems={[null, 'flex-start']}
+        alignItems={[null, 'flex-start', null, null, 'center']}
         mt={[3, null, 4]}
         justifyContent="center"
       >

@@ -131,33 +131,48 @@ const MakeCommunity = () => {
       </Flex>
       {/* What is great about Open Collective? */}
       <Container
-        display={['none', 'flex']}
+        display={'flex'}
         justifyContent="center"
         alignItems={[null, null, 'center']}
-        mx={[null, 4]}
-        my={[null, 5]}
+        flexDirection={['column', 'row']}
+        mx={[3, 4]}
+        my={[4, 5]}
       >
-        <Flex width={[null, '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
+        <H2
+          mb={4}
+          letterSpacing={['-0.6px', '-0.8px']}
+          fontSize={['20px', '24px']}
+          lineHeight={['28px', '32px']}
+          color="black.800"
+          display={[null, 'none']}
+          textAlign="center"
+        >
+          <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />
+        </H2>
+        <Flex width={['288px', '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
           <Illustration
             alt="Make your community sustainable"
             src="/static/images/home/whatisgreataboutOC-Illustration.png"
           />
         </Flex>
-        <Box width={[null, '224px', '396px']}>
+        <Box width={['288px', '224px', '396px']}>
           <H2
             mb={[null, 2]}
             letterSpacing={[null, '-0.8px']}
             fontSize={[null, '24px']}
             lineHeight={[null, '32px']}
             color="black.800"
+            display={['none', 'block']}
           >
             <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />
           </H2>
           <P
-            letterSpacing={[null, '-0.16px', '-0.2px']}
-            fontSize={[null, '16px', '18px']}
-            lineHeight={[null, '24px', '27px']}
+            letterSpacing={['-0.12px', '-0.16px', '-0.2px']}
+            fontSize={['15px', '16px', '18px']}
+            lineHeight={['23px', '24px', '27px']}
             color="black.800"
+            fontWeight={['500', 'normal']}
+            mt={3}
           >
             <FormattedMessage
               id="home.whatIsGreatAboutOC.description"

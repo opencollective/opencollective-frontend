@@ -51,13 +51,14 @@ const Wrapper = styled(Container)`
 
 const JoinUs = () => (
   <SectionWrapper py={[5, null, 4]} width={1}>
-    <Flex mx={[3, 4]} flexDirection={['column', null, 'row']} color="black.900" alignItems={[null, null, 'center']}>
-      <Box
-        my={[2, 3, 5]}
-        width={[null, null, '335px', null, '309px']}
-        ml={[null, null, null, null, 6]}
-        mr={[null, null, 4, null, 5]}
-      >
+    <Flex
+      mx={[3, 4]}
+      flexDirection={['column', null, 'row']}
+      color="black.900"
+      alignItems="center"
+      justifyContent="center"
+    >
+      <Box my={[2, 3, 5]} width={[null, null, '335px', null, '309px']} mr={[null, null, 5, null, 5]}>
         <H1
           mb={2}
           textAlign="left"
@@ -81,7 +82,7 @@ const JoinUs = () => (
         </Box>
       </Box>
 
-      <Container ml={[null, null, 3]}>
+      <Container ml={[null, null, 3, null, 6]}>
         <Link route="/create">
           <Wrapper
             color="black.900"
@@ -180,7 +181,7 @@ const JoinUs = () => (
               mb={2}
               fontWeight="bold"
             >
-              <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe our newsletter" />
+              <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe to our newsletter" />
             </H3>
             <Box mb={3}>
               <P
