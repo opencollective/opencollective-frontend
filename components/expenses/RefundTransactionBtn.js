@@ -4,7 +4,7 @@ import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
-import { transactionFields, transactionsQuery } from '../../lib/graphql/queries';
+import { transactionFieldsFragment, transactionsQuery } from '../../lib/graphql/queries';
 
 import SmallButton from '../SmallButton';
 
@@ -139,21 +139,21 @@ class RefundTransactionBtn extends React.Component {
   }
 }
 
-/* eslint-disable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 const refundTransactionMutation = gql`
   mutation RefundTransaction($id: Int!) {
     refundTransaction(id: $id) {
       id
       refundTransaction {
-        ${transactionFields}
+        ...TransactionFields
         refundTransaction {
-          ${transactionFields}
+          ...TransactionFields
         }
       }
     }
   }
+
+  ${transactionFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings, graphql/no-deprecated-fields, graphql/capitalized-type-name, graphql/named-operations */
 
 const addRefundTransactionMutation = graphql(refundTransactionMutation, {
   props: ({ ownProps, mutate }) => ({

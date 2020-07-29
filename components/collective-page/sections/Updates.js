@@ -30,7 +30,7 @@ const updatesSectionQuery = gql`
     Collective(slug: $slug) {
       id
       updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
-        ...UpdatesFieldsFragment
+        ...UpdatesFields
       }
     }
   }

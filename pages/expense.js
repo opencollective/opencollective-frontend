@@ -51,11 +51,11 @@ const messages = defineMessages({
 const expensePageQuery = gqlV2/* GraphQL */ `
   query ExpensePage($legacyExpenseId: Int!) {
     expense(expense: { legacyId: $legacyExpenseId }) {
-      ...ExpensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFields
     }
 
     loggedInAccount {
-      ...LoggedInAccountExpensePayoutFieldsFragment
+      ...LoggedInAccountExpensePayoutFields
     }
   }
 
@@ -66,7 +66,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
 const editExpenseMutation = gqlV2/* GraphQL */ `
   mutation EditExpense($expense: ExpenseUpdateInput!) {
     editExpense(expense: $expense) {
-      ...ExpensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFields
     }
   }
 

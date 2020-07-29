@@ -447,7 +447,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       }
     }
     loggedInAccount {
-      ...LoggedInAccountExpensePayoutFieldsFragment
+      ...LoggedInAccountExpensePayoutFields
     }
   }
 
@@ -464,7 +464,7 @@ const addCreateExpensePageData = graphql(createExpensePageQuery, {
 const createExpenseMutation = gqlV2/* GraphQL */ `
   mutation CreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
     createExpense(expense: $expense, account: $account) {
-      ...ExpensePageExpenseFieldsFragment
+      ...ExpensePageExpenseFields
     }
   }
   ${expensePageExpenseFieldsFragment}

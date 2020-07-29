@@ -366,7 +366,7 @@ class Members extends React.Component {
 }
 
 const memberFieldsFragment = gql`
-  fragment MemberFieldsFragment on Member {
+  fragment MemberFields on Member {
     id
     role
     since
@@ -390,7 +390,7 @@ const coreContributorsQuery = gql`
     Collective(id: $collectiveId) {
       id
       members(roles: ["ADMIN", "MEMBER"]) {
-        ...MemberFieldsFragment
+        ...MemberFields
       }
     }
     memberInvitations(CollectiveId: $collectiveId) {
@@ -426,7 +426,7 @@ const editCoreContributorsMutation = gql`
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
       members(roles: ["ADMIN", "MEMBER"]) {
-        ...MemberFieldsFragment
+        ...MemberFields
       }
     }
   }
