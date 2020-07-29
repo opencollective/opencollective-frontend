@@ -32,8 +32,8 @@ import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
-import { EditAccountSettingMutation } from '../graphql/mutations';
-import { getCollectivePageQuery } from '../graphql/queries';
+import { editAccountSettingMutation } from '../graphql/mutations';
+import { collectivePageQuery } from '../graphql/queries';
 import SectionTitle from '../SectionTitle';
 import TopContributors from '../TopContributors';
 
@@ -191,9 +191,9 @@ class SectionContribute extends React.PureComponent {
         update: (store, response) => {
           // We need to update the store manually because the response comes from API V2
           const collectivePageQueryVariables = getCollectivePageQueryVariables(collective.slug);
-          const data = store.readQuery({ query: getCollectivePageQuery, variables: collectivePageQueryVariables });
+          const data = store.readQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables });
           const newData = set(cloneDeep(data), 'Collective.settings', response.data.editAccountSetting.settings);
-          store.writeQuery({ query: getCollectivePageQuery, variables: collectivePageQueryVariables, data: newData });
+          store.writeQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables, data: newData });
         },
       });
       this.setState({ isSaving: false, draggingContributionsOrder: null });
@@ -463,9 +463,9 @@ class SectionContribute extends React.PureComponent {
   }
 }
 
-const withEditAccountSettings = graphql(EditAccountSettingMutation, {
+const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
   options: { context: API_V2_CONTEXT },
 });
 
-export default withEditAccountSettings(SectionContribute);
+export default addEditAccountSettingMutation(SectionContribute);

@@ -98,8 +98,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 }
 
-const addPaymentMethodsQuery = gql`
-  query Collective($slug: String) {
+const paymentMethodsQuery = gql`
+  query SendMoneyToCollectivePaymentMethods($slug: String) {
     Collective(slug: $slug) {
       id
       paymentMethods(service: "opencollective") {
@@ -112,7 +112,7 @@ const addPaymentMethodsQuery = gql`
   }
 `;
 
-const addPaymentMethods = graphql(addPaymentMethodsQuery, {
+const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   options: props => ({
     variables: {
       slug: get(props, 'fromCollective.slug'),
@@ -123,8 +123,8 @@ const addPaymentMethods = graphql(addPaymentMethodsQuery, {
   },
 });
 
-const createOrderQuery = gql`
-  mutation createOrder($order: OrderInputType!) {
+const sendMoneyToCollectiveMutation = gql`
+  mutation SendMoneyToCollective($order: OrderInputType!) {
     createOrder(order: $order) {
       id
       fromCollective {
@@ -145,7 +145,7 @@ const createOrderQuery = gql`
   }
 `;
 
-const addMutation = graphql(createOrderQuery, {
+const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, {
   props: ({ mutate }) => ({
     createOrder: async order => {
       return await mutate({ variables: { order } });
@@ -153,6 +153,6 @@ const addMutation = graphql(createOrderQuery, {
   }),
 });
 
-const addData = compose(addMutation, addPaymentMethods);
+const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
 
-export default addData(SendMoneyToCollectiveBtn);
+export default addGraphql(SendMoneyToCollectiveBtn);

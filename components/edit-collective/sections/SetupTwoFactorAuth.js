@@ -287,51 +287,49 @@ class SetupTwoFactorAuth extends React.Component {
   }
 }
 
-const addTwoFactorAuthToAccountMutation = graphql(
-  gqlV2/* GraphQL */ `
-    mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
-      addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
-        id
-        ... on Individual {
-          hasTwoFactorAuth
-        }
+const twoFactorAuthToAccountMutation = gqlV2/* GraphQL */ `
+  mutation AddTwoFactorAuthToAccount($account: AccountReferenceInput!, $token: String!) {
+    addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+      id
+      ... on Individual {
+        hasTwoFactorAuth
       }
     }
-  `,
-  {
-    name: 'addTwoFactorAuthTokenToIndividual',
-    options: { context: API_V2_CONTEXT },
-  },
-);
+  }
+`;
 
-const fetchAccountHasTwoFactorAuth = graphql(
-  gqlV2/* GraphQL */ `
-    query AccountHasTwoFactorAuth($slug: String) {
-      individual(slug: $slug) {
-        id
-        slug
-        name
-        type
-        id
-        slug
-        name
-        type
-        ... on Individual {
-          hasTwoFactorAuth
-        }
+const addTwoFactorAuthToAccountMutation = graphql(twoFactorAuthToAccountMutation, {
+  name: 'addTwoFactorAuthTokenToIndividual',
+  options: { context: API_V2_CONTEXT },
+});
+
+const accountHasTwoFactorAuthQuery = gqlV2/* GraphQL */ `
+  query AccountHasTwoFactorAuth($slug: String) {
+    individual(slug: $slug) {
+      id
+      slug
+      name
+      type
+      id
+      slug
+      name
+      type
+      ... on Individual {
+        hasTwoFactorAuth
       }
     }
-  `,
-  {
-    options: props => ({
-      context: API_V2_CONTEXT,
-      variables: {
-        slug: props.slug,
-      },
-    }),
-  },
-);
+  }
+`;
 
-const inject = compose(addTwoFactorAuthToAccountMutation, fetchAccountHasTwoFactorAuth, withUser, injectIntl);
+const addAccountHasTwoFactorAuthData = graphql(accountHasTwoFactorAuthQuery, {
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: {
+      slug: props.slug,
+    },
+  }),
+});
 
-export default inject(SetupTwoFactorAuth);
+const addGraphql = compose(addTwoFactorAuthToAccountMutation, addAccountHasTwoFactorAuthData);
+
+export default injectIntl(withUser(addGraphql(SetupTwoFactorAuth)));

@@ -467,7 +467,7 @@ class ExpenseDetails extends React.Component {
   }
 }
 
-const getExpenseQuery = gql`
+const expenseQuery = gql`
   query Expense($id: Int!) {
     Expense(id: $id) {
       id
@@ -534,7 +534,7 @@ const getExpenseQuery = gql`
   }
 `;
 
-export const addGetExpense = component => {
+export const addExpenseData = component => {
   const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
 
   // if we don't have an accessToken, there is no need to get the details of a expense
@@ -543,7 +543,7 @@ export const addGetExpense = component => {
     return component;
   }
 
-  return graphql(getExpenseQuery, {
+  return graphql(expenseQuery, {
     options: props => ({
       variables: {
         id: props.expense.id,
@@ -552,4 +552,4 @@ export const addGetExpense = component => {
   })(component);
 };
 
-export default addGetExpense(injectIntl(ExpenseDetails));
+export default addExpenseData(injectIntl(ExpenseDetails));

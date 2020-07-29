@@ -15,7 +15,7 @@ import StyledButton from '../StyledButton';
 
 import HostCollectiveCard from './HostCollectiveCard';
 
-const Limit = 12; // nice round number to make even rows of 2, 3, 4
+const LIMIT = 12; // nice round number to make even rows of 2, 3, 4
 
 const AllCardsContainer = styled(Flex).attrs({
   flexWrap: 'wrap',
@@ -116,39 +116,39 @@ class HostsContainer extends React.Component {
   }
 }
 
-const getHostsQuery = gqlV2`
-query getHosts($tags: [String], $limit: Int) {
-  hosts(tags: $tags, limit: $limit) {
-    totalCount
-    nodes {
-      id
-      legacyId
-      createdAt
-      settings
-      type
-      name
-      slug
-      description
-      longDescription
-      currency
-      totalHostedCollectives
-      hostFeePercent
-      stats {
-        yearlyBudgetManaged {
-          value
+const hostsQuery = gqlV2/* GraphQL */ `
+  query AcceptFinancialContributionsHosts($tags: [String], $limit: Int) {
+    hosts(tags: $tags, limit: $limit) {
+      totalCount
+      nodes {
+        id
+        legacyId
+        createdAt
+        settings
+        type
+        name
+        slug
+        description
+        longDescription
+        currency
+        totalHostedCollectives
+        hostFeePercent
+        stats {
+          yearlyBudgetManaged {
+            value
+          }
         }
       }
     }
   }
-}
 `;
 
-export const addHostsData = graphql(getHostsQuery, {
+const addHostsData = graphql(hostsQuery, {
   options(props) {
     return {
       variables: {
         tags: props.tags,
-        limit: Limit,
+        limit: LIMIT,
       },
       context: API_V2_CONTEXT,
     };

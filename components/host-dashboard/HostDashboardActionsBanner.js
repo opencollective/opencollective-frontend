@@ -231,7 +231,7 @@ class HostDashboardActionsBanner extends React.Component {
 }
 
 const addFundsToCollectiveMutation = gql`
-  mutation addFundsToCollective($order: OrderInputType!) {
+  mutation AddFundsToCollective($order: OrderInputType!) {
     addFundsToCollective(order: $order) {
       id
       fromCollective {

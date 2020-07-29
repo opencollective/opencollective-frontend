@@ -16,15 +16,15 @@ import { P } from '../Text';
 import CommentActions from './CommentActions';
 import CommentReactionPicker from './CommentReactionPicker';
 import CommentReactions from './CommentReactions';
-import { CommentFieldsFragment } from './graphql';
+import { commentFieldsFragment } from './graphql';
 
-const editCommentMutation = gqlV2`
-  mutation editComment($comment: CommentUpdateInput!) {
+const editCommentMutation = gqlV2/* GraphQL */ `
+  mutation EditComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       ...CommentFields
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const mutationOptions = { context: API_V2_CONTEXT };

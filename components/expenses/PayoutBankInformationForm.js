@@ -40,31 +40,31 @@ const accountHolderFieldOptions = {
   ],
 };
 
-const requiredFieldsQuery = gqlV2`
-  query Host($slug: String, $currency: String!, $accountDetails: JSON) {
+const requiredFieldsQuery = gqlV2/* GraphQL */ `
+  query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
-        transferwise {
-          requiredFields(currency: $currency, accountDetails: $accountDetails) {
-            type
-            title
-            fields {
+      transferwise {
+        requiredFields(currency: $currency, accountDetails: $accountDetails) {
+          type
+          title
+          fields {
+            name
+            group {
+              key
               name
-              group {
+              type
+              required
+              example
+              validationRegexp
+              refreshRequirementsOnChange
+              valuesAllowed {
                 key
                 name
-                type
-                required
-                example
-                validationRegexp
-                refreshRequirementsOnChange
-                valuesAllowed {
-                  key
-                  name
-                }
               }
             }
           }
         }
+      }
     }
   }
 `;
@@ -289,8 +289,8 @@ DetailsForm.propTypes = {
   getFieldName: PropTypes.func.isRequired,
 };
 
-const availableCurrenciesQuery = gqlV2`
-  query Host($slug: String) {
+const availableCurrenciesQuery = gqlV2/* GraphQL */ `
+  query PayoutBankInformationAvailableCurrencies($slug: String) {
     host(slug: $slug) {
       slug
       transferwise {

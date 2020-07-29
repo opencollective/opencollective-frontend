@@ -9,9 +9,9 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 
 import BudgetItemsList, {
-  BudgetItemExpenseFragment,
-  BudgetItemExpenseTypeFragment,
-  BudgetItemOrderFragment,
+  budgetItemExpenseFragment,
+  budgetItemExpenseTypeFragment,
+  budgetItemOrderFragment,
 } from '../../budget/BudgetItemsList';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
@@ -25,7 +25,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch transactions and expenses */
-const TransactionsAndExpensesQuery = gql`
+const budgetSectionQuery = gql`
   query BudgetSection($slug: String!) {
     Collective(slug: $slug) {
       id
@@ -38,9 +38,9 @@ const TransactionsAndExpensesQuery = gql`
       }
     }
   }
-  ${BudgetItemExpenseFragment}
-  ${BudgetItemOrderFragment}
-  ${BudgetItemExpenseTypeFragment}
+  ${budgetItemExpenseFragment}
+  ${budgetItemOrderFragment}
+  ${budgetItemExpenseTypeFragment}
 `;
 
 /**
@@ -65,7 +65,7 @@ const SectionBudget = ({ collective, stats }) => {
         />
       </P>
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
-        <Query query={TransactionsAndExpensesQuery} variables={{ slug: collective.slug }}>
+        <Query query={budgetSectionQuery} variables={{ slug: collective.slug }}>
           {({ data }) => {
             const expenses = get(data, 'Collective.expenses');
             const transactions = get(data, 'Collective.transactions');

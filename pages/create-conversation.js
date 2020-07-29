@@ -130,34 +130,33 @@ class CreateConversationPage extends React.Component {
   }
 }
 
-const getCollective = graphql(
-  gqlV2`
-    query CreateConversations($collectiveSlug: String!) {
-      account(slug: $collectiveSlug, throwIfMissing: false) {
+const createConversationPageQuery = gqlV2/* GraphQL */ `
+  query CreateConversationPage($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      conversationsTags {
         id
-        slug
-        name
-        type
-        description
-        settings
-        imageUrl
-        twitterHandle
-        conversationsTags {
-          id
-          tag
-        }
+        tag
+      }
 
-        ... on Collective {
-          isApproved
-        }
+      ... on Collective {
+        isApproved
       }
     }
-  `,
-  {
-    options: {
-      context: API_V2_CONTEXT,
-    },
-  },
-);
+  }
+`;
 
-export default withUser(getCollective(withRouter(CreateConversationPage)));
+const addCreateConversationPageData = graphql(createConversationPageQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default withUser(withRouter(addCreateConversationPageData(CreateConversationPage)));

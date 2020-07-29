@@ -10,8 +10,13 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const DEFAULT_SEARCH_QUERY = gql`
-  query SearchCollective($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
+const collectivePickerSearchQuery = gql`
+  query CollectivePickerSearchQuery(
+    $term: String!
+    $types: [TypeOfCollective]
+    $limit: Int
+    $hostCollectiveIds: [Int]
+  ) {
     search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, useAlgolia: false) {
       id
       collectives {
@@ -131,7 +136,7 @@ CollectivePickerAsync.propTypes = {
 CollectivePickerAsync.defaultProps = {
   preload: false,
   limit: 20,
-  searchQuery: DEFAULT_SEARCH_QUERY,
+  searchQuery: collectivePickerSearchQuery,
 };
 
 export default CollectivePickerAsync;

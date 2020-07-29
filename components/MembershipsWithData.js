@@ -118,8 +118,8 @@ class MembershipsWithData extends React.Component {
   }
 }
 
-const getMembershipsQuery = gql`
-  query Members($memberCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String) {
+const membershipsQuery = gql`
+  query Memberships($memberCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String) {
     allMembers(
       memberCollectiveSlug: $memberCollectiveSlug
       role: $role
@@ -161,7 +161,7 @@ const getMembershipsQuery = gql`
   }
 `;
 
-export const addMembershipsData = graphql(getMembershipsQuery, {
+export const addMembershipsData = graphql(membershipsQuery, {
   options: props => ({
     variables: {
       memberCollectiveSlug: props.memberCollectiveSlug,

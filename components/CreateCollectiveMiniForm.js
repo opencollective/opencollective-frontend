@@ -106,7 +106,7 @@ const prepareMutationVariables = collective => {
   }
 };
 
-const CreateCollectiveMutation = gql`
+const createCollectiveMutation = gql`
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -127,7 +127,7 @@ const CreateCollectiveMutation = gql`
   }
 `;
 
-const CreateUserMutation = gql`
+const createUserMutation = gql`
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {
@@ -165,7 +165,7 @@ const CreateCollectiveMiniForm = ({
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
   const noAdminFields = isOrganization && excludeAdminFields;
-  const mutation = isUser ? CreateUserMutation : CreateCollectiveMutation;
+  const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
   const { formatMessage } = useIntl();
 

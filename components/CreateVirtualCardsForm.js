@@ -13,7 +13,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPrepaid } from '../lib/constants/payment-methods';
-import { reportValidityHTML5 } from '../lib/utils';
+import { compose, reportValidityHTML5 } from '../lib/utils';
 
 import CollectivePicker from './CollectivePicker';
 import CollectivePickerAsync from './CollectivePickerAsync';
@@ -666,8 +666,8 @@ class CreateVirtualCardsForm extends Component {
  * virtual cards, as a virtual card cannot be used as a source payment method
  * for another payment method.
  */
-export const getCollectiveSourcePaymentMethodsQuery = gql`
-  query Collective($id: Int) {
+export const collectiveSourcePaymentMethodsQuery = gql`
+  query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
       virtualCardsBatches {
@@ -701,15 +701,15 @@ export const getCollectiveSourcePaymentMethodsQuery = gql`
   }
 `;
 
-const addData = graphql(getCollectiveSourcePaymentMethodsQuery, {
+const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMethodsQuery, {
   options: props => ({
     variables: { id: props.collectiveId },
     fetchPolicy: 'network-only',
   }),
 });
 
-const createVirtualCardsMutationQuery = gql`
-  mutation createVirtualCards(
+const createVirtualCardsMutation = gql`
+  mutation CreateVirtualCards(
     $CollectiveId: Int!
     $numberOfVirtualCards: Int
     $emails: [String]
@@ -757,7 +757,7 @@ const createVirtualCardsMutationQuery = gql`
   }
 `;
 
-const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutationQuery, {
+const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutation, {
   props: ({ mutate, ownProps }) => ({
     createVirtualCards: variables =>
       mutate({
@@ -769,4 +769,6 @@ const addCreateVirtualCardsMutation = graphql(createVirtualCardsMutationQuery, {
   }),
 });
 
-export default injectIntl(addData(addCreateVirtualCardsMutation(CreateVirtualCardsForm)));
+const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateVirtualCardsMutation);
+
+export default injectIntl(addGraphql(CreateVirtualCardsForm));

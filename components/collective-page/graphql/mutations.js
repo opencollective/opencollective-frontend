@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
-export const EditCollectiveSettingsMutation = gql`
+export const editCollectiveSettingsMutation = gql`
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
     editCollective(collective: { id: $id, settings: $settings }) {
       id
@@ -11,7 +11,7 @@ export const EditCollectiveSettingsMutation = gql`
   }
 `;
 
-export const EditAccountSettingMutation = gqlV2`
+export const editAccountSettingMutation = gqlV2/* GraphQL */ `
   mutation EditAccountSetting($collectiveId: Int!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: { legacyId: $collectiveId }, key: $key, value: $value) {
       id
@@ -21,8 +21,8 @@ export const EditAccountSettingMutation = gqlV2`
 `;
 
 /** A mutation used by child components to update the collective */
-export const EditCollectiveLongDescriptionMutation = gql`
-  mutation EditCollective($id: Int!, $longDescription: String) {
+export const editCollectiveLongDescriptionMutation = gql`
+  mutation EditCollectiveLongDescription($id: Int!, $longDescription: String) {
     editCollective(collective: { id: $id, longDescription: $longDescription }) {
       id
       longDescription
@@ -30,8 +30,8 @@ export const EditCollectiveLongDescriptionMutation = gql`
   }
 `;
 
-export const EditAvatarMutation = gql`
-  mutation EditCollectiveImage($id: Int!, $image: String) {
+export const editCollectiveAvatarMutation = gql`
+  mutation EditCollectiveAvatar($id: Int!, $image: String) {
     editCollective(collective: { id: $id, image: $image }) {
       id
       image
@@ -40,8 +40,8 @@ export const EditAvatarMutation = gql`
   }
 `;
 
-export const EditCollectiveBackgroundMutation = gql`
-  mutation EditCollective($id: Int!, $settings: JSON, $backgroundImage: String) {
+export const editCollectiveBackgroundMutation = gql`
+  mutation EditCollectiveBackground($id: Int!, $settings: JSON, $backgroundImage: String) {
     editCollective(collective: { id: $id, settings: $settings, backgroundImage: $backgroundImage }) {
       id
       settings

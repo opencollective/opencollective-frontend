@@ -18,7 +18,7 @@ import Comment from '../components/conversations/Comment';
 import CommentForm from '../components/conversations/CommentForm';
 import FollowConversationButton from '../components/conversations/FollowConversationButton';
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
-import { CommentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
+import { commentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
@@ -36,8 +36,8 @@ import StyledTag from '../components/StyledTag';
 import { H2, H4 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const conversationPageQuery = gqlV2`
-  query Conversation($collectiveSlug: String!, $id: String!) {
+const conversationPageQuery = gqlV2/* GraphQL */ `
+  query ConversationPage($collectiveSlug: String!, $id: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
@@ -82,10 +82,10 @@ const conversationPageQuery = gqlV2`
       }
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
-const editConversationMutation = gqlV2`
+const editConversationMutation = gqlV2/* GraphQL */ `
   mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
     editConversation(id: $id, title: $title, tags: $tags) {
       id

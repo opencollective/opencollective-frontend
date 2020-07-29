@@ -17,10 +17,15 @@ import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
-const PROCESS_EXPENSE_MUTATION = gqlV2`
-  mutation processExpense($id: String, $legacyId: Int, $action: ExpenseProcessAction!, $paymentParams: ProcessExpensePaymentParams) {
-    processExpense(expense: {id: $id, legacyId: $legacyId}, action: $action, paymentParams: $paymentParams) {
-      ...expensePageExpenseFieldsFragment
+const processExpenseMutation = gqlV2/* GraphQL */ `
+  mutation ProcessExpense(
+    $id: String
+    $legacyId: Int
+    $action: ExpenseProcessAction!
+    $paymentParams: ProcessExpensePaymentParams
+  ) {
+    processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, paymentParams: $paymentParams) {
+      ...ExpensePageExpenseFieldsFragment
     }
   }
 
@@ -53,7 +58,7 @@ export const hasProcessButtons = permissions => {
 const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT, variables: { id: expense.id, legacyId: expense.legacyId } };
-  const [processExpense, { loading, error }] = useMutation(PROCESS_EXPENSE_MUTATION, mutationOptions);
+  const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
 
   const triggerAction = (action, paymentParams) => {
     setSelectedAction(action);

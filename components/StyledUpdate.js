@@ -318,8 +318,8 @@ class StyledUpdate extends Component {
   }
 }
 
-const editUpdateQuery = gql`
-  mutation editUpdate($update: UpdateAttributesInputType!) {
+const editUpdateMutation = gql`
+  mutation EditUpdate($update: UpdateAttributesInputType!) {
     editUpdate(update: $update) {
       id
       updatedAt
@@ -332,15 +332,16 @@ const editUpdateQuery = gql`
   }
 `;
 
-const deleteUpdateQuery = gql`
-  mutation deleteUpdate($id: Int!) {
+const deleteUpdateMutation = gql`
+  mutation DeleteUpdate($id: Int!) {
     deleteUpdate(id: $id) {
       id
     }
   }
 `;
 
-const editUpdateMutation = graphql(editUpdateQuery, {
+/* TODO(GraphQL): refactor unnecessary mutate */
+const addEditUpdateMutation = graphql(editUpdateMutation, {
   props: ({ mutate }) => ({
     editUpdate: async update => {
       return await mutate({ variables: { update } });
@@ -348,7 +349,8 @@ const editUpdateMutation = graphql(editUpdateQuery, {
   }),
 });
 
-const deleteUpdateMutation = graphql(deleteUpdateQuery, {
+/* TODO(GraphQL): refactor unnecessary mutate */
+const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   props: ({ mutate }) => ({
     deleteUpdate: async updateID => {
       return await mutate({ variables: { id: updateID } });
@@ -356,6 +358,6 @@ const deleteUpdateMutation = graphql(deleteUpdateQuery, {
   }),
 });
 
-const addUpdateMutations = compose(editUpdateMutation, deleteUpdateMutation);
+const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);
 
-export default injectIntl(addUpdateMutations(StyledUpdate));
+export default injectIntl(addGraphql(StyledUpdate));

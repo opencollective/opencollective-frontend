@@ -10,8 +10,8 @@ import styled from 'styled-components';
 
 import withViewport from '../lib/withViewport';
 
-import { getCollectivePageQuery } from '../components/collective-page/graphql/queries';
-import { getTierPageQuery } from '../components/tier-page/graphql/queries';
+import { collectivePageQuery } from '../components/collective-page/graphql/queries';
+import { tierPageQuery } from '../components/tier-page/graphql/queries';
 
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from './contribute-cards/Contribute';
 import { Box, Flex } from './Grid';
@@ -93,8 +93,8 @@ const Arrow = styled('div')`
   }
 `;
 
-const EditPublicMessageMutation = gql`
-  mutation EditPublicMessageMutation($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
+const editPublicMessageMutation = gql`
+  mutation EditPublicMessage($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
     editPublicMessage(FromCollectiveId: $FromCollectiveId, CollectiveId: $CollectiveId, message: $message) {
       id
       publicMessage
@@ -136,7 +136,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
   }
 
   return createPortal(
-    <Mutation mutation={EditPublicMessageMutation}>
+    <Mutation mutation={editPublicMessageMutation}>
       {(submitMessage, { loading, error }) => (
         <Popper
           referenceElement={cardRef.current}
@@ -200,7 +200,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           const tier = member.tier;
                           const queries = [
                             {
-                              query: getCollectivePageQuery,
+                              query: collectivePageQuery,
                               variables: {
                                 slug: collectiveSlug,
                                 nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
@@ -209,7 +209,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           ];
                           if (tier) {
                             queries.push({
-                              query: getTierPageQuery,
+                              query: tierPageQuery,
                               variables: { tierId: tier.id },
                             });
                           }

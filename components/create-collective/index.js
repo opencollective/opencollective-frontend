@@ -177,8 +177,8 @@ class CreateCollective extends Component {
   }
 }
 
-const createCollective = gqlV2`
-  mutation createCollective(
+const createCollectiveMutation = gqlV2/* GraphQL */ `
+  mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
     $automateApprovalWithGithub: Boolean
@@ -195,7 +195,7 @@ const createCollective = gqlV2`
   }
 `;
 
-const addCreateCollectiveMutation = graphql(createCollective, {
+const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   name: 'createCollective',
   options: { context: API_V2_CONTEXT },
 });

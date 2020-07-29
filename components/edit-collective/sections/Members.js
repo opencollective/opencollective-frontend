@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { compose } from '../../../lib/utils';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
@@ -364,7 +365,7 @@ class Members extends React.Component {
   }
 }
 
-const MemberFieldsFragment = gql`
+const memberFieldsFragment = gql`
   fragment MemberFieldsFragment on Member {
     id
     role
@@ -384,45 +385,44 @@ const MemberFieldsFragment = gql`
   }
 `;
 
-const addGetCoreContributorsQuery = graphql(
-  gql`
-    query CollectiveCoreContributors($collectiveId: Int!) {
-      Collective(id: $collectiveId) {
-        id
-        members(roles: ["ADMIN", "MEMBER"]) {
-          ...MemberFieldsFragment
-        }
+const coreContributorsQuery = gql`
+  query CoreContributors($collectiveId: Int!) {
+    Collective(id: $collectiveId) {
+      id
+      members(roles: ["ADMIN", "MEMBER"]) {
+        ...MemberFieldsFragment
       }
-      memberInvitations(CollectiveId: $collectiveId) {
+    }
+    memberInvitations(CollectiveId: $collectiveId) {
+      id
+      role
+      since
+      createdAt
+      description
+      member {
         id
-        role
-        since
-        createdAt
-        description
-        member {
-          id
-          name
-          slug
-          type
-          imageUrl(height: 64)
-          ... on User {
-            email
-          }
+        name
+        slug
+        type
+        imageUrl(height: 64)
+        ... on User {
+          email
         }
       }
     }
-    ${MemberFieldsFragment}
-  `,
-  {
-    options: props => ({
-      fetchPolicy: 'network-only',
-      variables: { collectiveId: props.collective.id },
-    }),
-  },
-);
+  }
+  ${memberFieldsFragment}
+`;
 
-const addEditCoreContributorsMutation = graphql(gql`
-  mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
+const addCoreContributorsData = graphql(coreContributorsQuery, {
+  options: props => ({
+    fetchPolicy: 'network-only',
+    variables: { collectiveId: props.collective.id },
+  }),
+});
+
+const editCoreContributorsMutation = gql`
+  mutation EditCoreContributors($collectiveId: Int!, $members: [MemberInputType!]!) {
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
       members(roles: ["ADMIN", "MEMBER"]) {
@@ -430,7 +430,11 @@ const addEditCoreContributorsMutation = graphql(gql`
       }
     }
   }
-  ${MemberFieldsFragment}
-`);
+  ${memberFieldsFragment}
+`;
 
-export default injectIntl(addEditCoreContributorsMutation(addGetCoreContributorsQuery(Members)));
+const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation);
+
+const addGraphql = compose(addCoreContributorsData, addEditCoreContributorsMutation);
+
+export default injectIntl(addGraphql(Members));

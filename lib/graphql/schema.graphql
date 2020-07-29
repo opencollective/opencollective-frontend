@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Mon Jul 27 2020 12:31:41 GMT+0100 (British Summer Time)
+# timestamp: Tue Jul 28 2020 10:49:49 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -843,7 +843,7 @@ type Contributor {
   isBacker: Boolean!
 
   """
-  True if the contributor is a core contributor (admin)
+  True if the contributor is a fundraiser
   """
   isFundraiser: Boolean!
 

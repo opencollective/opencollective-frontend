@@ -12,8 +12,8 @@ import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 
-const activateCollectiveAsHostQuery = gql`
-  mutation activateCollectiveAsHost($id: Int!) {
+const activateCollectiveAsHostMutation = gql`
+  mutation ActivateCollectiveAsHost($id: Int!) {
     activateCollectiveAsHost(id: $id) {
       id
       isHost
@@ -21,8 +21,8 @@ const activateCollectiveAsHostQuery = gql`
   }
 `;
 
-const deactivateCollectiveAsHostQuery = gql`
-  mutation deactivateCollectiveAsHost($id: Int!) {
+const deactivateCollectiveAsHostMutation = gql`
+  mutation DeactivateCollectiveAsHost($id: Int!) {
     deactivateCollectiveAsHost(id: $id) {
       id
       isHost
@@ -30,7 +30,7 @@ const deactivateCollectiveAsHostQuery = gql`
   }
 `;
 
-const addActivateCollectiveAsHostMutation = graphql(activateCollectiveAsHostQuery, {
+const addActivateCollectiveAsHostMutation = graphql(activateCollectiveAsHostMutation, {
   props: ({ mutate }) => ({
     activateCollectiveAsHost: async id => {
       return await mutate({ variables: { id } });
@@ -38,7 +38,7 @@ const addActivateCollectiveAsHostMutation = graphql(activateCollectiveAsHostQuer
   }),
 });
 
-const addDeactivateCollectiveAsHostMutation = graphql(deactivateCollectiveAsHostQuery, {
+const addDeactivateCollectiveAsHostMutation = graphql(deactivateCollectiveAsHostMutation, {
   props: ({ mutate }) => ({
     deactivateCollectiveAsHost: async id => {
       return await mutate({ variables: { id } });

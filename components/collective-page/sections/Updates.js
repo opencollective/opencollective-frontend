@@ -21,11 +21,11 @@ import StyledCard from '../../StyledCard';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { UpdatesFieldsFragment } from '../graphql/fragments';
+import { updatesFieldsFragment } from '../graphql/fragments';
 import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch updates */
-const UpdatesQuery = gql`
+const updatesSectionQuery = gql`
   query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     Collective(slug: $slug) {
       id
@@ -35,7 +35,7 @@ const UpdatesQuery = gql`
     }
   }
 
-  ${UpdatesFieldsFragment}
+  ${updatesFieldsFragment}
 `;
 
 const PrivateUpdateMesgBox = styled(MessageBox)`
@@ -241,13 +241,13 @@ class SectionUpdates extends React.PureComponent {
   }
 }
 
-export default injectIntl(
-  graphql(UpdatesQuery, {
-    options: props => ({
-      variables: {
-        slug: props.collective.slug,
-        onlyPublishedUpdates: !props.isAdmin,
-      },
-    }),
-  })(SectionUpdates),
-);
+const addUpdatesSectionData = graphql(updatesSectionQuery, {
+  options: props => ({
+    variables: {
+      slug: props.collective.slug,
+      onlyPublishedUpdates: !props.isAdmin,
+    },
+  }),
+});
+
+export default injectIntl(addUpdatesSectionData(SectionUpdates));

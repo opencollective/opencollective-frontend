@@ -39,8 +39,8 @@ const messages = defineMessages({
   },
 });
 
-const getPaymentMethodsQuery = gqlV2`
-  query UpdatePaymentMethodPopUpQuery($slug: String) {
+const paymentMethodsQuery = gqlV2/* GraphQL */ `
+  query UpdatePaymentMethodPopUpPaymentMethod($slug: String) {
     account(slug: $slug) {
       id
       paymentMethods(types: ["creditcard", "virtualcard", "prepaid"]) {
@@ -62,7 +62,7 @@ const getPaymentMethodsQuery = gqlV2`
 `;
 
 const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
-  mutation updatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
+  mutation UpdatePaymentMethod($order: OrderReferenceInput!, $paymentMethod: PaymentMethodReferenceInput!) {
     updateOrder(order: $order, paymentMethod: $paymentMethod) {
       id
       status
@@ -74,7 +74,7 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
 `;
 
 const addPaymentMethodMutation = gqlV2/* GraphQL */ `
-  mutation addPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
+  mutation AddPaymentMethod($paymentMethod: PaymentMethodCreateInput!, $account: AccountReferenceInput!) {
     addStripeCreditCard(paymentMethod: $paymentMethod, account: $account) {
       id
       name
@@ -103,7 +103,7 @@ const UpdatePaymentMethodPopUp = ({
   const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
 
   // GraphQL mutations and queries
-  const { data } = useQuery(getPaymentMethodsQuery, {
+  const { data } = useQuery(paymentMethodsQuery, {
     variables: {
       slug: router.query.slug,
     },
@@ -278,7 +278,7 @@ const UpdatePaymentMethodPopUp = ({
                     variables: { paymentMethod: newPaymentMethod, account: { id: account.id } },
                     refetchQueries: [
                       {
-                        query: getPaymentMethodsQuery,
+                        query: paymentMethodsQuery,
                         variables: { slug: router.query.slug },
                         context: API_V2_CONTEXT,
                       },

@@ -43,8 +43,8 @@ class RejectExpenseBtn extends React.Component {
   }
 }
 
-const rejectExpenseQuery = gql`
-  mutation rejectExpense($id: Int!) {
+const rejectExpensemutation = gql`
+  mutation RejectExpense($id: Int!) {
     rejectExpense(id: $id) {
       id
       status
@@ -52,7 +52,7 @@ const rejectExpenseQuery = gql`
   }
 `;
 
-const addMutation = graphql(rejectExpenseQuery, {
+const addRejectExpensemutation = graphql(rejectExpensemutation, {
   props: ({ mutate }) => ({
     rejectExpense: async id => {
       return await mutate({ variables: { id } });
@@ -60,4 +60,4 @@ const addMutation = graphql(rejectExpenseQuery, {
   }),
 });
 
-export default addMutation(RejectExpenseBtn);
+export default addRejectExpensemutation(RejectExpenseBtn);

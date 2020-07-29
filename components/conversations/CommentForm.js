@@ -19,15 +19,15 @@ import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
-import { CommentFieldsFragment } from './graphql';
+import { commentFieldsFragment } from './graphql';
 
-const createCommentMutation = gqlV2`
+const createCommentMutation = gqlV2/* GraphQL */ `
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       ...CommentFields
     }
   }
-  ${CommentFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const messages = defineMessages({

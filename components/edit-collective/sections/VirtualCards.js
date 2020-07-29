@@ -187,8 +187,14 @@ const getIsConfirmedFromFilter = filter => {
 };
 
 /** A query to get the virtual cards created by a collective. Must be authenticated. */
-export const getCollectiveVirtualCards = gql`
-  query CollectiveVirtualCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
+const virtualCardsQuery = gql`
+  query EditCollectiveVirtualCards(
+    $CollectiveId: Int
+    $isConfirmed: Boolean
+    $limit: Int
+    $offset: Int
+    $batch: String
+  ) {
     Collective(id: $CollectiveId) {
       id
       virtualCardsBatches {
@@ -231,7 +237,7 @@ export const getCollectiveVirtualCards = gql`
   }
 `;
 
-const getGraphQLVariablesFromProps = ({ collectiveId, router, limit }) => ({
+const getVirtualCardsVariablesFromProps = ({ collectiveId, router, limit }) => ({
   CollectiveId: collectiveId,
   isConfirmed: getIsConfirmedFromFilter(router.query.filter),
   batch: router.query.batch === NOT_BATCHED_KEY ? null : router.query.batch,
@@ -239,11 +245,11 @@ const getGraphQLVariablesFromProps = ({ collectiveId, router, limit }) => ({
   limit: limit || VIRTUALCARDS_PER_PAGE,
 });
 
-export const addData = graphql(getCollectiveVirtualCards, {
+const addVirtualCardsData = graphql(virtualCardsQuery, {
   options: props => ({
-    variables: getGraphQLVariablesFromProps(props),
+    variables: getVirtualCardsVariablesFromProps(props),
     fetchPolicy: 'network-only',
   }),
 });
 
-export default withRouter(addData(injectIntl(VirtualCards)));
+export default withRouter(injectIntl(addVirtualCardsData(VirtualCards)));

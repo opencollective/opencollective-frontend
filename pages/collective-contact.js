@@ -122,24 +122,23 @@ class CollectiveContact extends React.Component {
   }
 }
 
-// eslint-disable graphql/template-strings
-const getCollective = graphql(
-  gql`
-    query ContactPage($collectiveSlug: String!) {
-      Collective(slug: $collectiveSlug, throwIfMissing: false) {
-        id
-        slug
-        path
-        name
-        type
-        canContact
-        description
-        settings
-        imageUrl
-        twitterHandle
-      }
+const collectiveContactPageQuery = gql`
+  query CollectiveContactPage($collectiveSlug: String!) {
+    Collective(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      path
+      name
+      type
+      canContact
+      description
+      settings
+      imageUrl
+      twitterHandle
     }
-  `,
-);
+  }
+`;
 
-export default withUser(getCollective(CollectiveContact));
+const addCollectiveContactPageData = graphql(collectiveContactPageQuery);
+
+export default withUser(addCollectiveContactPageData(CollectiveContact));

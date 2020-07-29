@@ -18,7 +18,7 @@ import { withUser } from '../UserProvider';
 
 import { isUserFollowingConversationQuery } from './graphql';
 
-const followConversationMutation = gqlV2`
+const followConversationMutation = gqlV2/* GraphQL */ `
   mutation FollowConversation($id: String!, $isActive: Boolean) {
     followConversation(id: $id, isActive: $isActive)
   }

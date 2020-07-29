@@ -10,8 +10,8 @@ import StyledButton from '../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 
-const rejectCollectiveQuery = gql`
-  mutation rejectCollective($id: Int!, $rejectionReason: String) {
+const rejectCollectiveMutation = gql`
+  mutation RejectCollective($id: Int!, $rejectionReason: String) {
     rejectCollective(id: $id, rejectionReason: $rejectionReason) {
       id
       isActive
@@ -36,7 +36,7 @@ const messages = defineMessages({
 
 const ApplicationRejectionReasonModal = ({ show, onClose, collectiveId }) => {
   const [rejectionReason, setRejectionReason] = useState('');
-  const [rejectCollective, { loading, error }] = useMutation(rejectCollectiveQuery);
+  const [rejectCollective, { loading, error }] = useMutation(rejectCollectiveMutation);
   const intl = useIntl();
 
   return (

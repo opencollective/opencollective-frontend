@@ -8,8 +8,8 @@ import Error from '../Error';
 import { getI18nLink, I18nSupportLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 
-const getIsTaxFormRequiredQuery = gql`
-  query Expense($id: Int!) {
+const expenseNeedsTaxFormQuery = gql`
+  query ExpenseNeedsTaxForm($id: Int!) {
     Expense(id: $id) {
       id
       userTaxFormRequiredBeforePayment
@@ -59,5 +59,6 @@ class ExpenseNeedsTaxFormMessage extends React.Component {
   }
 }
 
-const addExpenseData = graphql(getIsTaxFormRequiredQuery);
-export default addExpenseData(ExpenseNeedsTaxFormMessage);
+const addExpenseNeedsTaxFormData = graphql(expenseNeedsTaxFormQuery);
+
+export default addExpenseNeedsTaxFormData(ExpenseNeedsTaxFormMessage);

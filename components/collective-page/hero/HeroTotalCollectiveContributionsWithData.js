@@ -9,7 +9,7 @@ import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box } from '../../Grid';
 import { P } from '../../Text';
 
-const TotalCollectiveContributionsQuery = gql`
+const totalCollectiveContributionsQuery = gql`
   query TotalCollectiveContributions($id: Int) {
     Collective(id: $id) {
       id
@@ -29,7 +29,7 @@ const amountStyles = { fontSize: 'H5', fontWeight: 'bold' };
  * for regular collective.
  */
 const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
-  const { data, loading, error } = useQuery(TotalCollectiveContributionsQuery, {
+  const { data, loading, error } = useQuery(totalCollectiveContributionsQuery, {
     variables: { id: collective.id },
   });
 

@@ -98,7 +98,7 @@ class UpdatesWithData extends React.Component {
   }
 }
 
-const getUpdatesQuery = gql`
+const updatesQuery = gql`
   query Updates($CollectiveId: Int!, $limit: Int, $offset: Int, $includeHostedCollectives: Boolean) {
     allUpdates(
       CollectiveId: $CollectiveId
@@ -144,7 +144,7 @@ const getUpdatesVariables = props => {
 
 const UPDATES_PER_PAGE = 10;
 
-export const addUpdatesData = graphql(getUpdatesQuery, {
+export const addUpdatesData = graphql(updatesQuery, {
   options: props => ({
     variables: getUpdatesVariables(props),
   }),

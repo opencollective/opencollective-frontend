@@ -64,7 +64,7 @@ class ExpensesWithData extends React.Component {
   }
 }
 
-const getExpensesQuery = gql`
+const expensesQuery = gql`
   query Expenses(
     $CollectiveId: Int!
     $status: String
@@ -169,7 +169,7 @@ const getExpensesVariables = props => {
   return vars;
 };
 
-export const addExpensesData = graphql(getExpensesQuery, {
+export const addExpensesData = graphql(expensesQuery, {
   options: props => ({
     variables: getExpensesVariables(props),
     fetchPolicy: 'network-only',

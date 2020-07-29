@@ -11,7 +11,7 @@ import OrderBudgetItem from './OrderBudgetItem';
 import OrderBudgetItemDetails from './OrderBudgetItemDetails';
 
 /** A fragment to use for `ExpenseType` items */
-export const BudgetItemExpenseTypeFragment = gql`
+export const budgetItemExpenseTypeFragment = gql`
   fragment BudgetItemExpenseTypeFragment on ExpenseType {
     id
     amount
@@ -60,7 +60,7 @@ export const BudgetItemExpenseTypeFragment = gql`
 `;
 
 /** A fragment to use for `Expense` items */
-export const BudgetItemExpenseFragment = gql`
+export const budgetItemExpenseFragment = gql`
   fragment BudgetItemExpenseFragment on Expense {
     id
     uuid
@@ -110,7 +110,7 @@ export const BudgetItemExpenseFragment = gql`
 `;
 
 /** A fragment to use for `Order` items */
-export const BudgetItemOrderFragment = gql`
+export const budgetItemOrderFragment = gql`
   fragment BudgetItemOrderFragment on Order {
     id
     uuid

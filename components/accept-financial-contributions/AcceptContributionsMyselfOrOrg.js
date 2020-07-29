@@ -14,7 +14,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
 import Avatar from '../Avatar';
-import { getCollectivePageQuery } from '../collective-page/graphql/queries';
+import { collectivePageQuery } from '../collective-page/graphql/queries';
 import CollectiveNavbar from '../CollectiveNavbar';
 import Container from '../Container';
 import CreateCollectiveMiniForm from '../CreateCollectiveMiniForm';
@@ -68,7 +68,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
     collective: PropTypes.object,
     router: PropTypes.object,
     LoggedInUser: PropTypes.object.isRequired,
-    editAccountSettings: PropTypes.func,
+    editBankAccount: PropTypes.func,
     refetchLoggedInUser: PropTypes.func,
     createPayoutMethod: PropTypes.func,
     applyToHost: PropTypes.func.isRequired,
@@ -98,7 +98,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
           collective: collectiveInput,
           host: hostInput,
         },
-        refetchQueries: [{ query: getCollectivePageQuery, variables: { slug: this.props.collective.slug } }],
+        refetchQueries: [{ query: collectivePageQuery, variables: { slug: this.props.collective.slug } }],
         awaitRefetchQueries: true,
       });
     } catch (err) {
@@ -121,7 +121,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
           account,
         },
       });
-      await this.props.editAccountSettings({
+      await this.props.editBankAccount({
         variables: {
           account,
           key: 'paymentMethods',
@@ -391,9 +391,8 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
   }
 }
 
-const createPayoutMethodMutation = graphql(
-  gqlV2`
-  mutation createPayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
+const createPayoutMethodMutation = gqlV2/* GraphQL */ `
+  mutation CreatePayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
     createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
       data
       id
@@ -401,30 +400,29 @@ const createPayoutMethodMutation = graphql(
       type
     }
   }
-`,
-  {
-    name: 'createPayoutMethod',
-    options: { context: API_V2_CONTEXT },
-  },
-);
+`;
 
-const editAccountSettingsMutation = graphql(
-  gqlV2`
-  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+const addCreatePayoutMethodMutation = graphql(createPayoutMethodMutation, {
+  name: 'createPayoutMethod',
+  options: { context: API_V2_CONTEXT },
+});
+
+const editBankAccountMutation = gqlV2/* GraphQL */ `
+  mutation EditBankAccount($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
     }
   }
-`,
-  {
-    name: 'editAccountSettings',
-    options: { context: API_V2_CONTEXT },
-  },
-);
+`;
 
-const applyToHostMutation = gqlV2`
-  mutation applyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
+const addEditBankAccountMutation = graphql(editBankAccountMutation, {
+  name: 'editBankAccount',
+  options: { context: API_V2_CONTEXT },
+});
+
+const applyToHostMutation = gqlV2/* GraphQL */ `
+  mutation ApplyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
     applyToHost(collective: $collective, host: $host) {
       id
       slug
@@ -445,8 +443,8 @@ const inject = compose(
   withUser,
   withRouter,
   addApplyToHostMutation,
-  editAccountSettingsMutation,
-  createPayoutMethodMutation,
+  addEditBankAccountMutation,
+  addCreatePayoutMethodMutation,
 );
 
 export default inject(AcceptContributionsMyselfOrOrg);

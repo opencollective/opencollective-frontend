@@ -140,28 +140,27 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-export const addConfirmOrderMutation = graphql(
-  gql`
-    mutation confirmOrder($order: ConfirmOrderInputType!) {
-      confirmOrder(order: $order) {
+const confirmOrderMutation = gql`
+  mutation ConfirmOrder($order: ConfirmOrderInputType!) {
+    confirmOrder(order: $order) {
+      id
+      status
+      stripeError {
+        message
+        account
+        response
+      }
+      transactions {
         id
-        status
-        stripeError {
-          message
-          account
-          response
-        }
-        transactions {
-          id
-        }
       }
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      confirmOrder: id => mutate({ variables: { order: { id } } }),
-    }),
-  },
-);
+  }
+`;
 
-export default addConfirmOrderMutation(withUser(ConfirmOrderPage));
+export const addConfirmOrderMutation = graphql(confirmOrderMutation, {
+  props: ({ mutate }) => ({
+    confirmOrder: id => mutate({ variables: { order: { id } } }),
+  }),
+});
+
+export default withUser(addConfirmOrderMutation(ConfirmOrderPage));

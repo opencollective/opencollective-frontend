@@ -24,7 +24,7 @@ import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
-const dashboardExpensesQuery = gqlV2/* GraphQL */ `
+const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   query HostDashboardExpenses(
     $hostSlug: String!
     $limit: Int!
@@ -111,7 +111,7 @@ const getVariablesFromQuery = query => {
 
 const HostDashboardExpenses = ({ hostSlug }) => {
   const { query } = useRouter() || {};
-  const { data, error, loading, variables } = useQuery(dashboardExpensesQuery, {
+  const { data, error, loading, variables } = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
   });

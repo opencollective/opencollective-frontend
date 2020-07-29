@@ -15,7 +15,7 @@ import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledCheckbox from '../../StyledCheckbox';
 import { H3, P } from '../../Text';
-import { updateSettingsMutation } from '../mutations';
+import { editCollectiveSettingsMutation } from '../mutations';
 
 import imgPreviewReplies from '../../../public/static/images/conversations/conversation-replies-preview.png';
 import imgPreviewThread from '../../../public/static/images/conversations/conversations-list-preview.png';
@@ -55,7 +55,7 @@ const ScreenshotPreview = styled.div`
 const Conversations = ({ collective }) => {
   const defaultIsChecked = hasFeature(collective, FEATURES.CONVERSATIONS);
   const { formatMessage } = useIntl();
-  const [setSettings, { loading, error }] = useMutation(updateSettingsMutation);
+  const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
 
   return (
     <Container>

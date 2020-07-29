@@ -9,6 +9,7 @@ import { isURL, matches } from 'validator';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { compose } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
@@ -396,7 +397,7 @@ class OnboardingModal extends React.Component {
 }
 
 // GraphQL for editing Collective admins info
-const editCoreContributorsMutation = gql`
+const editCollectiveMembersMutation = gql`
   mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
@@ -412,7 +413,7 @@ const editCoreContributorsMutation = gql`
   }
 `;
 
-const addEditCoreContributorsMutation = graphql(editCoreContributorsMutation, {
+const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   props: ({ mutate }) => ({
     EditCollectiveMembers: async ({ collectiveId, members }) => {
       return await mutate({
@@ -444,4 +445,6 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
   }),
 });
 
-export default addEditCollectiveContactMutation(addEditCoreContributorsMutation(injectIntl(OnboardingModal)));
+const addGraphql = compose(addEditCollectiveMembersMutation, addEditCollectiveContactMutation);
+
+export default injectIntl(addGraphql(OnboardingModal));

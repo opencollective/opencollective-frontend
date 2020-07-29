@@ -55,8 +55,8 @@ ShareLink.defaultProps = {
   target: '_blank',
 };
 
-const GetOrderQuery = gql`
-  query OrderSuccess($OrderId: Int!) {
+const orderSuccessPageQuery = gql`
+  query OrderSuccessPage($OrderId: Int!) {
     Order(id: $OrderId) {
       id
       quantity
@@ -284,4 +284,6 @@ class OrderSuccessPage extends React.Component {
   }
 }
 
-export default withUser(graphql(GetOrderQuery)(injectIntl(OrderSuccessPage)));
+const addOrderSuccessPageData = graphql(orderSuccessPageQuery);
+
+export default withUser(injectIntl(addOrderSuccessPageData(OrderSuccessPage)));

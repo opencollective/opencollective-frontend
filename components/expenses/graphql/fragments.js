@@ -1,9 +1,9 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
-import { CommentFieldsFragment } from '../../conversations/graphql';
+import { commentFieldsFragment } from '../../conversations/graphql';
 
-export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
-  fragment loggedInAccountExpensePayoutFieldsFragment on Individual {
+export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
+  fragment LoggedInAccountExpensePayoutFieldsFragment on Individual {
     id
     slug
     imageUrl
@@ -46,7 +46,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2`
   }
 `;
 
-const HostFieldsFragment = gqlV2`
+const hostFieldsFragment = gqlV2/* GraphQL */ `
   fragment HostFieldsFragment on Host {
     id
     name
@@ -73,8 +73,8 @@ const HostFieldsFragment = gqlV2`
   }
 `;
 
-export const expensePageExpenseFieldsFragment = gqlV2`
-  fragment expensePageExpenseFieldsFragment on Expense {
+export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
+  fragment ExpensePageExpenseFieldsFragment on Expense {
     id
     legacyId
     description
@@ -186,7 +186,7 @@ export const expensePageExpenseFieldsFragment = gqlV2`
           imageUrl
         }
       }
-       ... on Project {
+      ... on Project {
         id
         isApproved
         balance
@@ -238,8 +238,8 @@ export const expensePageExpenseFieldsFragment = gqlV2`
     }
   }
 
-  ${CommentFieldsFragment}
-  ${HostFieldsFragment}
+  ${commentFieldsFragment}
+  ${hostFieldsFragment}
 `;
 
 export const expensesListFieldsFragment = gqlV2/* GraphQL */ `

@@ -97,8 +97,8 @@ class MarkOrderAsPaidBtn extends React.Component {
   }
 }
 
-const markOrderAsPaidQuery = gql`
-  mutation markOrderAsPaid($id: Int!) {
+const markOrderAsPaidMutation = gql`
+  mutation MarkOrderAsPaid($id: Int!) {
     markOrderAsPaid(id: $id) {
       id
       status
@@ -113,7 +113,7 @@ const markOrderAsPaidQuery = gql`
   }
 `;
 
-const addMutation = graphql(markOrderAsPaidQuery, {
+const addMarkOrderAsPaidMutation = graphql(markOrderAsPaidMutation, {
   props: ({ mutate }) => ({
     markOrderAsPaid: async id => {
       return await mutate({ variables: { id } });
@@ -121,4 +121,4 @@ const addMutation = graphql(markOrderAsPaidQuery, {
   }),
 });
 
-export default addMutation(MarkOrderAsPaidBtn);
+export default addMarkOrderAsPaidMutation(MarkOrderAsPaidBtn);

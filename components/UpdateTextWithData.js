@@ -37,8 +37,8 @@ class UpdateText extends React.Component {
   }
 }
 
-const getUpdateQuery = gql`
-  query Update($id: Int) {
+const updateTextQuery = gql`
+  query UpdateText($id: Int) {
     Update(id: $id) {
       id
       html
@@ -50,6 +50,6 @@ const getUpdateQuery = gql`
   }
 `;
 
-export const addGetUpdate = graphql(getUpdateQuery);
+const addUpdateTextData = graphql(updateTextQuery);
 
-export default addGetUpdate(UpdateText);
+export default addUpdateTextData(UpdateText);

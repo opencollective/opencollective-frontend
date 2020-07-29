@@ -116,23 +116,22 @@ class ConfirmEmailPage extends React.Component {
   }
 }
 
-export const addConfirmUserEmailMutation = graphql(
-  gql`
-    mutation confirmUserEmail($token: String!) {
-      confirmUserEmail(token: $token) {
-        id
-        email
-        emailWaitingForValidation
-      }
+const confirmUserEmailMutation = gql`
+  mutation ConfirmUserEmail($token: String!) {
+    confirmUserEmail(token: $token) {
+      id
+      email
+      emailWaitingForValidation
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      confirmUserEmail: token => {
-        return mutate({ variables: { token } });
-      },
-    }),
-  },
-);
+  }
+`;
 
-export default addConfirmUserEmailMutation(withUser(ConfirmEmailPage));
+export const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
+  props: ({ mutate }) => ({
+    confirmUserEmail: token => {
+      return mutate({ variables: { token } });
+    },
+  }),
+});
+
+export default withUser(addConfirmUserEmailMutation(ConfirmEmailPage));

@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-export const getTierPageQuery = gql`
+export const tierPageQuery = gql`
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id

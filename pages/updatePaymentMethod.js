@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { getSubscriptionsQuery } from '../lib/graphql/queries';
+import { subscriptionsQuery } from '../lib/graphql/queries';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
 
@@ -314,30 +314,27 @@ class UpdatePaymentPage extends React.Component {
   }
 }
 
-export const replaceCreditCard = graphql(
-  gql`
-    mutation replaceCreditCard(
-      $id: Int!
-      $CollectiveId: Int!
-      $name: String!
-      $token: String!
-      $data: StripeCreditCardDataInputType!
-    ) {
-      replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
-        id
-        data
-        createdAt
-      }
+const replaceCreditCardMutation = gql`
+  mutation ReplaceCreditCard(
+    $id: Int!
+    $CollectiveId: Int!
+    $name: String!
+    $token: String!
+    $data: StripeCreditCardDataInputType!
+  ) {
+    replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
+      id
+      data
+      createdAt
     }
-  `,
-  {
-    props: ({ mutate }) => ({
-      replaceCreditCard: variables => mutate({ variables }),
-    }),
-  },
-);
+  }
+`;
 
-const addSubscriptionsData = graphql(getSubscriptionsQuery, {
+const addReplaceCreditCardMutation = graphql(replaceCreditCardMutation, {
+  name: 'replaceCreditCard',
+});
+
+const addSubscriptionsData = graphql(subscriptionsQuery, {
   options: props => ({
     variables: {
       slug: props.slug,
@@ -362,6 +359,6 @@ const addSubscriptionsData = graphql(getSubscriptionsQuery, {
   },
 });
 
-const addData = compose(addSubscriptionsData, replaceCreditCard);
+const addGraphql = compose(addSubscriptionsData, addReplaceCreditCardMutation);
 
-export default injectIntl(withUser(addData(withStripeLoader(UpdatePaymentPage))));
+export default injectIntl(withUser(addGraphql(withStripeLoader(UpdatePaymentPage))));

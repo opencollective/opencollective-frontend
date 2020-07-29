@@ -21,8 +21,8 @@ import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
-export const CollectivePledgesQuery = gql`
-  query CollectivePledges($id: Int!) {
+export const pledgedCollectivePageQuery = gql`
+  query PledgedCollectivePage($id: Int!) {
     Collective(id: $id) {
       id
       pledges: orders(status: PENDING) {
@@ -49,7 +49,7 @@ export const CollectivePledgesQuery = gql`
  * Display a collective with all its pledges
  */
 const PledgedCollectivePage = ({ collective }) => {
-  const { loading, error, data } = useQuery(CollectivePledgesQuery, { variables: { id: collective.id } });
+  const { loading, error, data } = useQuery(pledgedCollectivePageQuery, { variables: { id: collective.id } });
 
   if (loading) {
     return (

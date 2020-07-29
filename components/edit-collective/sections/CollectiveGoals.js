@@ -281,20 +281,19 @@ class CollectiveGoals extends React.Component {
   }
 }
 
-const addEditCollectiveSettingsMutation = graphql(
-  gql`
-    mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
-      editCollective(collective: { id: $id, settings: $settings }) {
-        id
-        settings
-      }
+const editCollectiveSettingsMutation = gql`
+  mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
+    editCollective(collective: { id: $id, settings: $settings }) {
+      id
+      settings
     }
-  `,
-  {
-    props: ({ ownProps, mutate }) => ({
-      updateSettings: settings => mutate({ variables: { id: ownProps.collective.id, settings } }),
-    }),
-  },
-);
+  }
+`;
+
+const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
+  props: ({ ownProps, mutate }) => ({
+    updateSettings: settings => mutate({ variables: { id: ownProps.collective.id, settings } }),
+  }),
+});
 
 export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));

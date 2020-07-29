@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/react-hooks';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import themeGet from '@styled-system/theme-get';
+import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectiveTiersDescriptionQuery } from '../../../lib/graphql/queries';
 import { parseToBoolean } from '../../../lib/utils';
 
 import Button from '../../Button';
@@ -108,9 +108,36 @@ GenericPlanFeatures.propTypes = {
   plan: PropTypes.string.isRequired,
 };
 
+const editCollectiveHostPlansQuery = gql`
+  query EditCollectiveHostPlans($slug: String) {
+    Collective(slug: $slug) {
+      id
+      slug
+      tiers {
+        id
+        slug
+        type
+        name
+        data
+        description
+        longDescription
+        hasLongDescription
+        button
+        amount
+        amountType
+        minimumAmount
+        presets
+        interval
+        currency
+        maxQuantity
+      }
+    }
+  }
+`;
+
 const HostPlan = props => {
   const { collective } = props;
-  const { data: opencollective, loading } = useQuery(getCollectiveTiersDescriptionQuery, {
+  const { data: opencollective, loading } = useQuery(editCollectiveHostPlansQuery, {
     variables: { slug: 'opencollective' },
   });
 

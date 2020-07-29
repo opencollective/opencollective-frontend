@@ -149,8 +149,8 @@ class PublishUpdateBtn extends React.Component {
   }
 }
 
-const publishUpdateQuery = gql`
-  mutation publishUpdate($id: Int!, $notificationAudience: UpdateAudienceTypeEnum!) {
+const publishUpdateMutation = gql`
+  mutation PublishUpdate($id: Int!, $notificationAudience: UpdateAudienceTypeEnum!) {
     publishUpdate(id: $id, notificationAudience: $notificationAudience) {
       id
       publishedAt
@@ -159,7 +159,7 @@ const publishUpdateQuery = gql`
   }
 `;
 
-const getUpdateQuery = gql`
+const updateQuery = gql`
   query Update($id: Int!) {
     Update(id: $id) {
       id
@@ -180,9 +180,9 @@ const getUpdateQuery = gql`
   }
 `;
 
-export const addGetUpdate = graphql(getUpdateQuery);
+const addUpdateData = graphql(updateQuery);
 
-const addMutation = graphql(publishUpdateQuery, {
+const addPublishUpdateMutation = graphql(publishUpdateMutation, {
   props: ({ mutate }) => ({
     publishUpdate: async (id, notificationAudience) => {
       return await mutate({ variables: { id, notificationAudience } });
@@ -190,6 +190,6 @@ const addMutation = graphql(publishUpdateQuery, {
   }),
 });
 
-const addGraphQL = compose(addMutation, addGetUpdate);
+const addGraphql = compose(addPublishUpdateMutation, addUpdateData);
 
-export default addGraphQL(PublishUpdateBtn);
+export default addGraphql(PublishUpdateBtn);

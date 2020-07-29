@@ -16,7 +16,7 @@ import StyledCard from '../../StyledCard';
 import StyledInput from '../../StyledInput';
 import StyledInputGroup from '../../StyledInputGroup';
 import { P } from '../../Text';
-import { EditCollectiveSettingsMutation } from '../graphql/mutations';
+import { editCollectiveSettingsMutation } from '../graphql/mutations';
 
 const colorPath = 'collectivePage.primaryColor';
 
@@ -55,7 +55,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   };
 
   return (
-    <Mutation mutation={EditCollectiveSettingsMutation}>
+    <Mutation mutation={editCollectiveSettingsMutation}>
       {(editSettings, { loading }) => (
         <StyledCard
           data-cy="collective-color-picker-card"
