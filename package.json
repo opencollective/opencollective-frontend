@@ -128,6 +128,7 @@
     "commit": "git-cz",
     "cypress:open": "cross-env TZ=UTC cypress open",
     "cypress:run": "cross-env TZ=UTC cypress run",
+    "depcheck": "npx depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production master",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging master",
     "dev": "node --icu-data-dir=node_modules/full-icu server",
@@ -198,7 +199,6 @@
     "file-loader": "^6.0.0",
     "html-loader": "^1.1.0",
     "husky": "^4.2.5",
-    "istanbul-lib-coverage": "^3.0.0",
     "jest": "^26.1.0",
     "jest-styled-components": "^7.0.2",
     "lint-staged": "^10.2.11",
@@ -264,5 +264,14 @@
     },
     "componentsDefaultDirectory": "components/{name}",
     "packageManager": "npm"
+  },
+  "depcheck": {
+    "ignores": [
+      "@formatjs/intl-relativetimeformat",
+      "full-icu",
+      "imagemin",
+      "imagemin-optipng",
+      "imagemin-pngquant"
+    ]
   }
 }
