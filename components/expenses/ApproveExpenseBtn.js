@@ -24,7 +24,7 @@ class ApproveExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     try {
-      await this.props.approveExpense(id);
+      await this.props.approveExpense({ variables: { id } });
       await this.props.refetch();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
@@ -53,11 +53,7 @@ const approveExpenseMutation = gql`
 `;
 
 const addApproveExpenseMutation = graphql(approveExpenseMutation, {
-  props: ({ mutate }) => ({
-    approveExpense: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+  name: 'approveExpense',
 });
 
 export default addApproveExpenseMutation(ApproveExpenseBtn);

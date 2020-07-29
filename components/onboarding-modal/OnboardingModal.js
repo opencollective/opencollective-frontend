@@ -119,8 +119,8 @@ class OnboardingModal extends React.Component {
     mode: PropTypes.string,
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
-    EditCollectiveMembers: PropTypes.func,
-    EditCollectiveContact: PropTypes.func,
+    editCollectiveMembers: PropTypes.func,
+    editCollectiveContact: PropTypes.func,
     showOnboardingModal: PropTypes.bool,
     setShowOnboardingModal: PropTypes.func,
     intl: PropTypes.object.isRequired,
@@ -172,16 +172,18 @@ class OnboardingModal extends React.Component {
   submitAdmins = async () => {
     try {
       this.setState({ isSubmitting: true });
-      await this.props.EditCollectiveMembers({
-        collectiveId: this.props.collective.id,
-        members: this.state.members.map(member => ({
-          id: member.id,
-          role: member.role,
-          member: {
-            id: member.member.id,
-            name: member.member.name,
-          },
-        })),
+      await this.props.editCollectiveMembers({
+        variables: {
+          collectiveId: this.props.collective.id,
+          members: this.state.members.map(member => ({
+            id: member.id,
+            role: member.role,
+            member: {
+              id: member.member.id,
+              name: member.member.name,
+            },
+          })),
+        },
       });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
@@ -196,9 +198,7 @@ class OnboardingModal extends React.Component {
     };
     try {
       this.setState({ isSubmitting: true });
-      await this.props.EditCollectiveContact({
-        collective,
-      });
+      await this.props.editCollectiveContact({ variables: { collective } });
     } catch (e) {
       const errorMsg = getErrorFromGraphqlException(e).message;
       throw new Error(errorMsg);
@@ -414,13 +414,7 @@ const editCollectiveMembersMutation = gql`
 `;
 
 const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
-  props: ({ mutate }) => ({
-    EditCollectiveMembers: async ({ collectiveId, members }) => {
-      return await mutate({
-        variables: { collectiveId, members },
-      });
-    },
-  }),
+  name: 'editCollectiveMembers',
 });
 
 // GraphQL for editing Collective contact info
@@ -436,13 +430,7 @@ const editCollectiveContactMutation = gql`
 `;
 
 const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
-  props: ({ mutate }) => ({
-    EditCollectiveContact: async ({ collective }) => {
-      return await mutate({
-        variables: { collective },
-      });
-    },
-  }),
+  name: 'editCollectiveContact',
 });
 
 const addGraphql = compose(addEditCollectiveMembersMutation, addEditCollectiveContactMutation);

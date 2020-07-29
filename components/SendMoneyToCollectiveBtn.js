@@ -20,7 +20,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
     toCollective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     data: PropTypes.object,
-    createOrder: PropTypes.func,
+    sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
   };
@@ -58,7 +58,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
       paymentMethod: { uuid: paymentMethods[0].uuid },
     };
     try {
-      await this.props.createOrder(order);
+      await this.props.sendMoneyToCollective({ variables: { order } });
       this.setState({ loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -146,11 +146,7 @@ const sendMoneyToCollectiveMutation = gql`
 `;
 
 const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, {
-  props: ({ mutate }) => ({
-    createOrder: async order => {
-      return await mutate({ variables: { order } });
-    },
-  }),
+  name: 'sendMoneyToCollective',
 });
 
 const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);

@@ -26,12 +26,13 @@ const BORDER = '1px solid #efefef';
 class CollectiveGoals extends React.Component {
   static propTypes = {
     collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
       slug: PropTypes.string.isRequired,
       settings: PropTypes.object,
     }).isRequired,
     currency: PropTypes.string.isRequired,
     intl: PropTypes.object.isRequired,
-    updateSettings: PropTypes.func.isRequired,
+    editCollectiveSettings: PropTypes.func.isRequired,
     title: PropTypes.string,
   };
 
@@ -136,13 +137,16 @@ class CollectiveGoals extends React.Component {
   handleSubmit = async () => {
     try {
       this.setState({ isSubmitting: true });
-
-      await this.props.updateSettings({
-        ...this.props.collective.settings,
-        goals: this.state.goals,
-        collectivePage: this.state.collectivePage,
+      await this.props.editCollectiveSettings({
+        variables: {
+          id: this.props.collective.id,
+          settings: {
+            ...this.props.collective.settings,
+            goals: this.state.goals,
+            collectivePage: this.state.collectivePage,
+          },
+        },
       });
-
       this.setState({ isSubmitting: false, isTouched: false, submitted: true });
       setTimeout(() => this.setState({ submitted: false }), 2000);
     } catch (e) {
@@ -291,9 +295,7 @@ const editCollectiveSettingsMutation = gql`
 `;
 
 const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
-  props: ({ ownProps, mutate }) => ({
-    updateSettings: settings => mutate({ variables: { id: ownProps.collective.id, settings } }),
-  }),
+  name: 'editCollectiveSettings',
 });
 
 export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));

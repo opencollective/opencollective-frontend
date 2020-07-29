@@ -64,7 +64,7 @@ class CreateUpdatePage extends React.Component {
     } = this.props;
     try {
       update.collective = { id: Collective.id };
-      const res = await this.props.createUpdate(update);
+      const res = await this.props.createUpdate({ variables: { update } });
       this.setState({ isModified: false });
       return Router.pushRoute(`/${Collective.slug}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
@@ -186,11 +186,7 @@ const createUpdateMutation = gql`
 `;
 
 const addCreateUpdateMutation = graphql(createUpdateMutation, {
-  props: ({ mutate }) => ({
-    createUpdate: async update => {
-      return await mutate({ variables: { update } });
-    },
-  }),
+  name: 'createUpdate',
 });
 
 const addGraphql = compose(addCollectiveCoverData, addCreateUpdateMutation);

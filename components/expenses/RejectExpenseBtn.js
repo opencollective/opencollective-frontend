@@ -24,7 +24,7 @@ class RejectExpenseBtn extends React.Component {
   async onClick() {
     const { id } = this.props;
     try {
-      await this.props.rejectExpense(id);
+      await this.props.rejectExpense({ variables: { id } });
       await this.props.refetch();
     } catch (e) {
       const error = getErrorFromGraphqlException(e).message;
@@ -53,11 +53,7 @@ const rejectExpensemutation = gql`
 `;
 
 const addRejectExpensemutation = graphql(rejectExpensemutation, {
-  props: ({ mutate }) => ({
-    rejectExpense: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+  name: 'rejectExpense',
 });
 
 export default addRejectExpensemutation(RejectExpenseBtn);

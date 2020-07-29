@@ -81,7 +81,9 @@ class EditPaymentMethods extends React.Component {
           throw error;
         }
         const paymentMethod = stripeTokenToPaymentMethod(token);
-        const res = await this.props.addCreditCard({ CollectiveId: this.props.data.Collective.id, ...paymentMethod });
+        const res = await this.props.addCreditCard({
+          variables: { CollectiveId: this.props.data.Collective.id, ...paymentMethod },
+        });
         const createdCreditCard = res.data.createCreditCard;
 
         if (createdCreditCard.stripeError) {
@@ -126,7 +128,7 @@ class EditPaymentMethods extends React.Component {
   updatePaymentMethod = async paymentMethod => {
     this.setState({ savingId: paymentMethod.id });
     try {
-      await this.props.updatePaymentMethod(paymentMethod);
+      await this.props.updatePaymentMethod({ variables: paymentMethod });
       await this.props.data.refetch();
       this.setState({ savingId: null });
     } catch (e) {
@@ -135,13 +137,13 @@ class EditPaymentMethods extends React.Component {
     }
   };
 
-  removePaymentMethod = async pm => {
-    const pmLabel = paymentMethodLabel(this.props.intl, pm, get(this.props.data, 'Collective.name'));
+  removePaymentMethod = async paymentMethod => {
+    const pmLabel = paymentMethodLabel(this.props.intl, paymentMethod, get(this.props.data, 'Collective.name'));
     const confirmQuestion = this.props.intl.formatMessage(this.messages['removeConfirm']);
     if (confirm(`${pmLabel} - ${confirmQuestion}`)) {
       try {
-        this.setState({ removedId: pm.id });
-        await this.props.removePaymentMethod(pm.id);
+        this.setState({ removedId: paymentMethod.id });
+        await this.props.removePaymentMethod({ variables: { id: paymentMethod.id } });
         this.setState({ error: null });
         await this.props.data.refetch();
       } catch (e) {
@@ -365,10 +367,8 @@ const createCreditCardMutation = gql`
   }
 `;
 
-export const addCreateCreditCardMutation = graphql(createCreditCardMutation, {
-  props: ({ mutate }) => ({
-    addCreditCard: variables => mutate({ variables }),
-  }),
+const addCreateCreditCardMutation = graphql(createCreditCardMutation, {
+  name: 'addCreditCard',
 });
 
 const removePaymentMethodMutation = gql`
@@ -380,13 +380,11 @@ const removePaymentMethodMutation = gql`
 `;
 
 const addRemovePaymentMethodMutation = graphql(removePaymentMethodMutation, {
-  props: ({ mutate }) => ({
-    removePaymentMethod: id => mutate({ variables: { id } }),
-  }),
+  name: 'removePaymentMethod',
 });
 
 const updatePaymentMethodMutation = gql`
-  mutation EditCollectiveupdatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
+  mutation EditCollectiveUpdatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
     updatePaymentMethod(id: $id, monthlyLimitPerMember: $monthlyLimitPerMember) {
       id
     }
@@ -394,9 +392,7 @@ const updatePaymentMethodMutation = gql`
 `;
 
 const addUpdatePaymentMethodMutation = graphql(updatePaymentMethodMutation, {
-  props: ({ mutate }) => ({
-    updatePaymentMethod: paymentMethod => mutate({ variables: paymentMethod }),
-  }),
+  name: 'updatePaymentMethod',
 });
 
 const addGraphql = compose(

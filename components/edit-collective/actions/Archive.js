@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { addArchiveCollectiveMutation, addUnarchiveCollectiveMutation } from '../../../lib/graphql/mutations';
 
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
@@ -11,7 +12,25 @@ import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H2, P } from '../../Text';
 
-const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective }) => {
+const archiveCollectiveMutation = gql`
+  mutation ArchiveCollective($id: Int!) {
+    archiveCollective(id: $id) {
+      id
+      isArchived
+    }
+  }
+`;
+
+const unarchiveCollectiveMutation = gql`
+  mutation UnarchiveCollective($id: Int!) {
+    unarchiveCollective(id: $id) {
+      id
+      isArchived
+    }
+  }
+`;
+
+const ArchiveCollective = ({ collective }) => {
   const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
@@ -22,11 +41,15 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
   const { processing, isArchived, error, confirmationMsg } = archiveStatus;
   const [modal, setModal] = useState({ type: defaultAction, show: false });
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
-  const handleArchiveCollective = async ({ archiveCollective, id }) => {
+
+  const [archiveCollective] = useMutation(archiveCollectiveMutation);
+  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation);
+
+  const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
-      await archiveCollective(id);
+      await archiveCollective({ variables: { id } });
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
@@ -38,11 +61,11 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
     }
   };
 
-  const handleUnarchiveCollective = async ({ unarchiveCollective, id }) => {
+  const handleUnarchiveCollective = async ({ id }) => {
     setModal({ type: 'Unarchive', show: false });
     try {
       setArchiveStatus({ ...archiveStatus, processing: true });
-      await unarchiveCollective(id);
+      await unarchiveCollective({ variables: { id } });
       setArchiveStatus({
         ...archiveStatus,
         processing: false,
@@ -191,9 +214,9 @@ const ArchiveCollective = ({ collective, archiveCollective, unarchiveCollective 
               data-cy="action"
               onClick={() => {
                 if (modal.type === 'Unarchive') {
-                  handleUnarchiveCollective({ unarchiveCollective, id: collective.id });
+                  handleUnarchiveCollective({ id: collective.id });
                 } else {
-                  handleArchiveCollective({ archiveCollective, id: collective.id });
+                  handleArchiveCollective({ id: collective.id });
                 }
               }}
             >
@@ -216,4 +239,4 @@ ArchiveCollective.propTypes = {
   unarchiveCollective: PropTypes.func,
 };
 
-export default addArchiveCollectiveMutation(addUnarchiveCollectiveMutation(ArchiveCollective));
+export default ArchiveCollective;

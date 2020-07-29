@@ -57,7 +57,7 @@ class ConfirmOrderPage extends React.Component {
   async triggerRequest() {
     try {
       this.setState({ isRequestSent: true });
-      const res = await this.props.confirmOrder(this.props.id);
+      const res = await this.props.confirmOrder({ variables: { order: { id: this.props.id } } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -91,7 +91,7 @@ class ConfirmOrderPage extends React.Component {
     this.setState({ status: ConfirmOrderPage.SUBMITTING, error: null });
 
     try {
-      const res = await this.props.confirmOrder(order);
+      const res = await this.props.confirmOrder({ variables: { order: { id: order.id } } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -157,10 +157,8 @@ const confirmOrderMutation = gql`
   }
 `;
 
-export const addConfirmOrderMutation = graphql(confirmOrderMutation, {
-  props: ({ mutate }) => ({
-    confirmOrder: id => mutate({ variables: { order: { id } } }),
-  }),
+const addConfirmOrderMutation = graphql(confirmOrderMutation, {
+  name: 'confirmOrder',
 });
 
 export default withUser(addConfirmOrderMutation(ConfirmOrderPage));

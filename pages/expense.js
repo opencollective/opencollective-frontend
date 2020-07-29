@@ -108,8 +108,8 @@ class ExpensePage extends React.Component {
     client: PropTypes.object.isRequired,
     /** from withData */
     data: PropTypes.object.isRequired,
-    /** from withData */
-    mutate: PropTypes.func.isRequired,
+    /** from addEditExpenseMutation */
+    editExpense: PropTypes.func.isRequired,
     /** from injectIntl */
     intl: PropTypes.object,
     expensesTags: PropTypes.arrayOf(
@@ -203,7 +203,7 @@ class ExpensePage extends React.Component {
     try {
       this.setState({ isSubmitting: true, error: null });
       const { editedExpense } = this.state;
-      await this.props.mutate({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
+      await this.props.editExpense({ variables: { expense: prepareExpenseForSubmit(editedExpense) } });
       this.setState({ status: PAGE_STATUS.VIEW, isSubmitting: false, editedExpense: undefined, error: null });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSubmitting: false });
@@ -537,15 +537,12 @@ class ExpensePage extends React.Component {
 }
 
 const addExpensePageData = graphql(expensePageQuery, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
+  options: { context: API_V2_CONTEXT },
 });
 
 const addEditExpenseMutation = graphql(editExpenseMutation, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
+  name: 'editExpense',
+  options: { context: API_V2_CONTEXT },
 });
 
 export default injectIntl(addExpensePageData(withApollo(withUser(addEditExpenseMutation(ExpensePage)))));

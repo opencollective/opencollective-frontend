@@ -18,7 +18,6 @@ class MarkOrderAsPaidBtn extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      paymentProcessorFeeInHostCurrency: 0,
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -30,7 +29,7 @@ class MarkOrderAsPaidBtn extends React.Component {
     }
     this.setState({ loading: true });
     try {
-      await this.props.markOrderAsPaid(order.id, this.state.paymentProcessorFeeInHostCurrency);
+      await this.props.markOrderAsPaid({ variables: { id: order.id } });
       this.setState({ loading: false });
     } catch (e) {
       const error = e.message && e.message.replace(/GraphQL error:/, '');
@@ -114,11 +113,7 @@ const markOrderAsPaidMutation = gql`
 `;
 
 const addMarkOrderAsPaidMutation = graphql(markOrderAsPaidMutation, {
-  props: ({ mutate }) => ({
-    markOrderAsPaid: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+  name: 'markOrderAsPaid',
 });
 
 export default addMarkOrderAsPaidMutation(MarkOrderAsPaidBtn);

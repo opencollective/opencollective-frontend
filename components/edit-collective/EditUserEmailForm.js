@@ -101,7 +101,7 @@ class EditUserEmailForm extends React.Component {
               onClick={async () => {
                 this.setState({ isSubmitting: true });
                 try {
-                  const { data } = await updateUserEmail(newEmail);
+                  const { data } = await updateUserEmail({ variables: { email: newEmail } });
                   this.setState({
                     step: LoggedInUser.email === newEmail ? 'initial' : 'success',
                     error: null,
@@ -125,7 +125,7 @@ class EditUserEmailForm extends React.Component {
                 onClick={async () => {
                   this.setState({ isResendingConfirmation: true });
                   try {
-                    await updateUserEmail(newEmail);
+                    await updateUserEmail({ variables: { email: newEmail } });
                     this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
                   } catch (e) {
                     this.setState({ error: e.message.replace('GraphQL error: ', ''), isResendingConfirmation: false });
@@ -185,11 +185,7 @@ const updateUserEmailMutation = gql`
 `;
 
 const addUpdateUserEmailMutation = graphql(updateUserEmailMutation, {
-  props: ({ mutate }) => ({
-    updateUserEmail: email => {
-      return mutate({ variables: { email } });
-    },
-  }),
+  name: 'updateUserEmail',
 });
 
 export default addUpdateUserEmailMutation(addloggedInUserEmailData(EditUserEmailForm));

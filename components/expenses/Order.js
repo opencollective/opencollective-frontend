@@ -78,7 +78,7 @@ class Order extends React.Component {
 
   handleCancelOrder = async id => {
     try {
-      await this.props.markPendingOrderAsExpired(id);
+      await this.props.markPendingOrderAsExpired({ variables: { id } });
       this.setState({
         showCancelOrderModal: false,
       });
@@ -337,7 +337,7 @@ class Order extends React.Component {
 }
 
 const markPendingOrderAsExpiredMutation = gql`
-  mutation markPendingOrderAsExpired($id: Int!) {
+  mutation MarkPendingOrderAsExpired($id: Int!) {
     markPendingOrderAsExpired(id: $id) {
       id
       status
@@ -352,12 +352,8 @@ const markPendingOrderAsExpiredMutation = gql`
   }
 `;
 
-const addMutation = graphql(markPendingOrderAsExpiredMutation, {
-  props: ({ mutate }) => ({
-    markPendingOrderAsExpired: async id => {
-      return await mutate({ variables: { id } });
-    },
-  }),
+const addMarkPendingOrderAsExpiredMutation = graphql(markPendingOrderAsExpiredMutation, {
+  name: 'markPendingOrderAsExpired',
 });
 
-export default addMutation(injectIntl(Order));
+export default addMarkPendingOrderAsExpiredMutation(injectIntl(Order));

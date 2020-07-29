@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -16,7 +16,16 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch, onError }) => {
+const markExpenseAsUnpaidMutation = gql`
+  mutation MarkExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
+    markExpenseAsUnpaid(id: $id, processorFeeRefunded: $processorFeeRefunded) {
+      id
+      status
+    }
+  }
+`;
+
+const MarkExpenseAsUnpaidBtn = ({ id, refetch, onError }) => {
   const [state, setState] = useState({
     showProcessorFeeConfirmation: false,
     processorFeeRefunded: false,
@@ -25,10 +34,14 @@ const MarkExpenseAsUnpaidBtn = ({ id, markExpenseAsUnpaid, refetch, onError }) =
 
   const intl = useIntl();
 
+  const [markExpenseAsUnpaid] = useMutation(markExpenseAsUnpaidMutation);
+
+  const { processorFeeRefunded } = state;
+
   async function handleOnClickContinue() {
     try {
       setState({ ...state, disableBtn: true });
-      await markExpenseAsUnpaid(id, state.processorFeeRefunded);
+      await markExpenseAsUnpaid({ variables: { id, processorFeeRefunded } });
       await refetch();
     } catch (err) {
       const error = getErrorFromGraphqlException(err).message;
@@ -72,21 +85,4 @@ MarkExpenseAsUnpaidBtn.propTypes = {
   onError: PropTypes.func.isRequired,
 };
 
-const markExpenseAsUnpaidMutation = gql`
-  mutation MarkExpenseAsUnpaid($id: Int!, $processorFeeRefunded: Boolean!) {
-    markExpenseAsUnpaid(id: $id, processorFeeRefunded: $processorFeeRefunded) {
-      id
-      status
-    }
-  }
-`;
-
-const addMarkExpenseAsUnpaidMutation = graphql(markExpenseAsUnpaidMutation, {
-  props: ({ mutate }) => ({
-    markExpenseAsUnpaid: async (id, processorFeeRefunded) => {
-      return await mutate({ variables: { id, processorFeeRefunded } });
-    },
-  }),
-});
-
-export default addMarkExpenseAsUnpaidMutation(MarkExpenseAsUnpaidBtn);
+export default MarkExpenseAsUnpaidBtn;

@@ -725,7 +725,6 @@ const createPledgeMutation = gql`
   }
 `;
 
-/* TODO(GraphQL): refactor unnecessary mutate */
 export const addCreatePledgeMutation = graphql(createPledgeMutation, {
   props: ({ mutate }) => ({
     createPledge: async (order, collective) => {

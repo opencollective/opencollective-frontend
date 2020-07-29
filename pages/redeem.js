@@ -62,7 +62,7 @@ class RedeemPage extends React.Component {
   static propTypes = {
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     intl: PropTypes.object.isRequired, // from injectIntl
-    claimPaymentMethod: PropTypes.func.isRequired, // from redeemMutation
+    redeemPaymentMethod: PropTypes.func.isRequired, // from addRedeemPaymentMethodMutation
     LoggedInUser: PropTypes.object, // from withUser
     loadingLoggedInUser: PropTypes.bool, // from withUser
     code: PropTypes.string,
@@ -108,12 +108,12 @@ class RedeemPage extends React.Component {
     const { code, email, name } = this.state.form;
     try {
       if (this.props.LoggedInUser) {
-        await this.props.claimPaymentMethod(code);
+        await this.props.redeemPaymentMethod({ variables: { code } });
         await this.props.refetchLoggedInUser();
         Router.pushRoute('redeemed', { code, collectiveSlug: this.props.collectiveSlug });
         return;
       } else {
-        await this.props.claimPaymentMethod(code, { email, name });
+        await this.props.redeemPaymentMethod({ variables: { code, user: { email, name } } });
       }
       // TODO: need to know from API if an account was created or not
       // TODO: or refuse to create an account automatically and ask to sign in
@@ -295,11 +295,7 @@ const redeemPaymentMethodMutation = gql`
 `;
 
 const addRedeemPaymentMethodMutation = graphql(redeemPaymentMethodMutation, {
-  props: ({ mutate }) => ({
-    claimPaymentMethod: async (code, user) => {
-      return await mutate({ variables: { code, user } });
-    },
-  }),
+  name: 'redeemPaymentMethod',
 });
 
 const addGraphql = compose(addRedeemPageData, addRedeemPaymentMethodMutation);
