@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
 import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import Markdown from 'react-markdown';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -175,11 +174,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
         </ModalHeader>
         <ModalBody>
           <Fragment>
-            {host.longDescription !== null && host.longDescription.slice(0, 1) === '<' ? (
-              <HTMLContent content={host.longDescription} />
-            ) : (
-              <Markdown source={host.longDescription} />
-            )}
+            {host.longDescription && <HTMLContent content={host.longDescription} />}
             {get(host, 'settings.tos') && (
               <Flex flexDirection="column" mx={1} my={4}>
                 <StyledCheckbox

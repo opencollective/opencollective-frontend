@@ -27,13 +27,11 @@ const ActionButtonWrapper = styled(Container)`
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let HTMLEditor, MarkdownEditor;
+let HTMLEditor;
 if (process.env.DYNAMIC_IMPORT) {
   HTMLEditor = dynamic(() => import(/* webpackChunkName: 'HTMLEditor' */ './HTMLEditor'));
-  MarkdownEditor = dynamic(() => import(/* webpackChunkName: 'MarkdownEditor' */ './MarkdownEditor'));
 } else {
   HTMLEditor = require('./HTMLEditor').default;
-  MarkdownEditor = require('./MarkdownEditor').default;
 }
 
 class EditUpdateForm extends React.Component {
@@ -54,7 +52,7 @@ class EditUpdateForm extends React.Component {
 
     this.state = {
       modified: false,
-      update: props.update ? pick(props.update, 'title', 'html', 'markdown', 'isPrivate', 'makePublicOn') : {},
+      update: props.update ? pick(props.update, 'title', 'html', 'isPrivate', 'makePublicOn') : {},
       loading: false,
       error: '',
     };
@@ -107,17 +105,11 @@ class EditUpdateForm extends React.Component {
   }
 
   render() {
-    const { collective, LoggedInUser } = this.props;
+    const { collective } = this.props;
     const { update } = this.state;
     if (!this._isMounted) {
       return <div />;
     }
-
-    const editor =
-      get(LoggedInUser, 'collective.settings.editor') === 'markdown' ||
-      get(collective, 'settings.editor') === 'markdown'
-        ? 'markdown'
-        : 'html';
 
     return (
       <UpdateFormWrapper className={`EditUpdateForm ${this.props.mode}`}>
@@ -183,15 +175,7 @@ class EditUpdateForm extends React.Component {
               <Container fontWeight="500" mb={2} mt={3} fontSize="1.6rem" lineHeight="1.7">
                 <Box as="span">Message</Box>
               </Container>
-              {editor === 'markdown' && (
-                <MarkdownEditor
-                  onChange={markdown => this.handleChange('markdown', markdown)}
-                  defaultValue={update.markdown}
-                />
-              )}
-              {editor === 'html' && (
-                <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
-              )}
+              <HTMLEditor onChange={html => this.handleChange('html', html)} defaultValue={update.html} />
             </Container>
           </div>
 

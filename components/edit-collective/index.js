@@ -58,12 +58,10 @@ class EditCollective extends React.Component {
 
     collective.settings = {
       ...this.props.collective.settings,
-      editor: collective.markdown ? 'markdown' : 'html',
       apply: collective.application,
       tos: collective.tos,
     };
 
-    delete collective.markdown;
     delete collective.tos;
     delete collective.application;
 
