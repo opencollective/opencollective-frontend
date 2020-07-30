@@ -172,7 +172,7 @@ StyledCollectiveCard.propTypes = {
   /** To replace the default tag. Set to `null` to hide tag */
   tag: PropTypes.node,
   /** A fixed height for the content */
-  bodyHeight: PropTypes.number,
+  bodyHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   /** The collective to display */
   collective: PropTypes.shape({
     name: PropTypes.string.isRequired,

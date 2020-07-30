@@ -6,7 +6,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Box, Flex } from '../Grid';
+import { Box } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledTag from '../StyledTag';
@@ -47,6 +47,7 @@ const RecurringContributionsCard = ({
     <StyledCollectiveCard
       {...props}
       collective={collective}
+      bodyHeight="290px"
       tag={
         <StyledTag display="inline-block" textTransform="uppercase" my={2} type={isError ? 'error' : undefined}>
           {formatMessage(messages.tag, { status })}
@@ -59,7 +60,7 @@ const RecurringContributionsCard = ({
             <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
               <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
             </P>
-            <Flex>
+            <div>
               <P
                 fontSize="Paragraph"
                 lineHeight="Paragraph"
@@ -80,7 +81,7 @@ const RecurringContributionsCard = ({
                   />
                 )}
               >
-                <P fontSize="Caption" lineHeight="Paragraph" color="black.700" ml={1}>
+                <P fontSize="Caption" lineHeight="Paragraph" color="black.700">
                   (
                   <FormattedMoneyAmount
                     amount={contribution.amount.value * 100}
@@ -100,7 +101,7 @@ const RecurringContributionsCard = ({
                   )
                 </P>
               </StyledTooltip>
-            </Flex>
+            </div>
           </Box>
         ) : (
           <Box mb={3}>
