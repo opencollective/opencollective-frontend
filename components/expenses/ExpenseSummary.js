@@ -43,13 +43,12 @@ CreatedByUserLink.propTypes = {
   account: PropTypes.object,
 };
 
-const PrivateInfoColumn = styled(Box).attrs({ mr: [0, 3] })`
+const PrivateInfoColumn = styled(Box).attrs({ mx: [0, '8px'], flexBasis: [0, '200px'] })`
   border-top: 1px solid #e8e9eb;
   padding-top: 16px;
   margin-top: 16px;
-  flex: 1 1 200px;
+  flex: 1 1;
   min-width: 150px;
-  max-width: 250px;
 `;
 
 const PrivateInfoColumnHeader = styled(H4).attrs({
@@ -73,6 +72,8 @@ const ExpenseSummary = ({
   isLoadingLoggedInUser,
   permissions,
   showProcessActions,
+  borderless,
+  ...props
 }) => {
   const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
@@ -80,7 +81,7 @@ const ExpenseSummary = ({
   const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
 
   return (
-    <StyledCard p={[16, 24, 32]}>
+    <StyledCard p={borderless ? 0 : [16, 24, 32]} borderStyle={borderless ? 'none' : 'solid'} {...props}>
       <Flex justifyContent="space-between" alignItems="center">
         <H4 my={2} mr={2} fontWeight="500">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
@@ -207,7 +208,7 @@ const ExpenseSummary = ({
       {isLoading ? (
         <LoadingPlaceholder height={150} mt={3} />
       ) : (
-        <Flex flexWrap="wrap">
+        <Flex flexDirection={['column', 'row']} alignItems={['stretch', 'flex-start']}>
           <PrivateInfoColumn data-cy="expense-summary-payee">
             <PrivateInfoColumnHeader>
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
@@ -362,6 +363,8 @@ ExpenseSummary.propTypes = {
   collective: PropTypes.object,
   /** To know which process buttons to display (if any) */
   permissions: PropTypes.object,
+  /** Disable border and paiding in styled card, usefull for modals */
+  borderless: PropTypes.bool,
 };
 
 export default ExpenseSummary;
