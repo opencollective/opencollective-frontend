@@ -37,31 +37,37 @@ const learningChannels = [
     id: 'slack',
     name: 'Slack',
     link: 'https://slack.opencollective.com',
+    desktopItemOrder: 2,
   },
   {
     id: 'documentation',
     name: 'Documentation',
     link: 'https://docs.opencollective.com',
+    desktopItemOrder: 1,
   },
   {
     id: 'openSourceCode',
     name: 'Open Source code',
     link: 'https://github.com/opencollective/opencollective',
+    desktopItemOrder: 4,
   },
   {
     id: 'blog',
     name: 'Blog',
     link: 'https://blog.opencollective.com',
+    desktopItemOrder: 3,
   },
   {
     id: 'openFinances',
     name: 'Open Finances',
-    link: '#',
+    link: 'https://opencollective.com/opencollectiveinc',
+    desktopItemOrder: 5,
   },
   {
     id: 'openCompany',
     name: 'Open Company',
-    link: '#',
+    link: 'http://drive.opencollective.com',
+    desktopItemOrder: 6,
   },
 ];
 
@@ -140,7 +146,13 @@ const LearnMore = () => {
       >
         {learningChannels.map(channel => (
           <Fragment key={channel.id}>
-            <Container display="flex" flexDirection="column" alignItems="flex-start" my={[2, null, null, null, 4]}>
+            <Container
+              display="flex"
+              flexDirection="column"
+              alignItems="flex-start"
+              my={[2, null, null, null, 4]}
+              order={[null, channel.desktopItemOrder]}
+            >
               <IconWrapper my={2}>
                 <Illustration
                   src={`/static/images/home/${channel.id}-illustration.png`}
@@ -152,7 +164,7 @@ const LearnMore = () => {
                   {channel.name}
                 </H3>
                 <P
-                  color={['black.700', 'black.600']}
+                  color={['black.700', 'black.600', 'black.700']}
                   fontSize={['15px', '16px', null, null, '18px']}
                   lineHeight={['23px', '24px', null, null, '27px']}
                   letterSpacing={['-0.12px', '-0.16px']}
@@ -169,7 +181,7 @@ const LearnMore = () => {
                   my={2}
                 >
                   {intl.formatMessage(messages[`home.learnMore.${channel.id}.buttonText`], {
-                    arrowIcon: <ArrowRight2 size="15" color="#DC5F7D" />,
+                    arrowIcon: <ArrowRight2 size="15" />,
                   })}
                 </StyledLink>
               </Box>

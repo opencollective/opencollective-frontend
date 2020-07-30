@@ -165,7 +165,7 @@ const FiscalHost = () => (
           <Container display="flex" flexDirection={['column', 'row', 'column']}>
             <FiscalHostCard mr={[null, 2, 0]} my={2} background={[null, null, 'rgba(255, 255, 255, 0.7)']}>
               <Box width={['48px', null, '72px']} height={['48px', null, '72px']} my={2} mr={[null, null, 3]}>
-                <Illustration src="/static/images/home/fiscalhost-cat.png" alt="Cat" />
+                <Illustration src="/static/images/home/opencollective-foundation.png" alt="Cat" />
               </Box>
               <Container
                 display={[null, null, 'flex']}
@@ -197,7 +197,7 @@ const FiscalHost = () => (
                   </Box>
                   <Box my={[3, null, 0]}>
                     <StyledLink
-                      href="#"
+                      href="/foundation"
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -219,7 +219,7 @@ const FiscalHost = () => (
             </FiscalHostCard>
             <FiscalHostCard mx={[null, 2, 0]} my={2} background={[null, 'rgba(255, 255, 255, 0.7)']}>
               <Box width={['48px', null, '72px']} height={['48px', null, '72px']} my={2} mr={[null, null, 3]}>
-                <Illustration src="/static/images/home/fiscalhost-cat.png" alt="Cat" />
+                <Illustration src="/static/images/home/opensource-collective.png" alt="Cat" />
               </Box>
               <Container
                 display={[null, null, 'flex']}
@@ -251,7 +251,7 @@ const FiscalHost = () => (
                   </Box>
                   <Box my={[3, null, 0]}>
                     <StyledLink
-                      href="#"
+                      href="/opensource"
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -273,7 +273,7 @@ const FiscalHost = () => (
             </FiscalHostCard>
             <FiscalHostCard ml={[null, 2, 0]} my={2} background={[null, 'rgba(255, 255, 255, 0.7)', '#fff']}>
               <Box width={['48px', null, '72px']} height={['48px', null, '72px']} my={2} mr={[null, null, 3]}>
-                <Illustration src="/static/images/home/fiscalhost-cat.png" alt="Cat" />
+                <Illustration src="/static/images/home/opencollective-foundation.png" alt="Cat" />
               </Box>
               <Container
                 display={[null, null, 'flex']}
@@ -305,7 +305,7 @@ const FiscalHost = () => (
                   </Box>
                   <Box my={[3, null, 0]}>
                     <StyledLink
-                      href="#"
+                      href="/europe"
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -328,7 +328,7 @@ const FiscalHost = () => (
           </Container>
           <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
             <StyledLink
-              href="#"
+              href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
               fontSize={['15px']}
               lineHeight={['23px']}
               letterSpacing={['-0.12px']}

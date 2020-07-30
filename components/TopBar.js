@@ -97,7 +97,7 @@ class TopBar extends React.Component {
               <SearchFormContainer p={2}>
                 <SearchForm borderRadius="6px" />
               </SearchFormContainer>
-            </Box>
+            </Hide>
           </Flex>
         )}
 

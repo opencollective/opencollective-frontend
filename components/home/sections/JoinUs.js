@@ -55,10 +55,15 @@ const JoinUs = () => (
       mx={[3, 4]}
       flexDirection={['column', null, 'row']}
       color="black.900"
-      alignItems="center"
+      alignItems={'center'}
       justifyContent="center"
     >
-      <Box my={[2, 3, 5]} width={[null, null, '335px', null, '309px']} mr={[null, null, 5, null, 5]}>
+      <Box
+        alignSelf={[null, 'flex-start', 'center']}
+        my={[2, 3, 5]}
+        width={[null, null, '335px', null, '309px']}
+        mr={[null, null, 5, null, 5]}
+      >
         <H1
           mb={2}
           textAlign="left"
@@ -68,7 +73,7 @@ const JoinUs = () => (
         >
           <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box width={['288px', 1, null]}>
+        <Box width={['288px', 1, '408px']}>
           <SectionSubtitle
             fontSize={['20px', null, '24px']}
             lineHeight={['28px', null, '32px']}
