@@ -296,7 +296,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatus
+    $status: ExpenseStatusFilter
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType

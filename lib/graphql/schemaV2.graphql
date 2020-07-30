@@ -2987,6 +2987,24 @@ enum ExpenseStatus {
 }
 
 """
+Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
+"""
+enum ExpenseStatusFilter {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+
+  """
+  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
+  """
+  READY_TO_PAY
+}
+
+"""
 All supported expense types
 """
 enum ExpenseType {
@@ -4830,7 +4848,7 @@ type Query {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatus
+    status: ExpenseStatusFilter
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -4942,7 +4960,7 @@ type Tier {
   """
   orders(limit: Int = 100, offset: Int = 0, status: [OrderStatus]): OrderCollection
   amount: Amount
-  type: TierType
+  type: TierType!
   interval: TierInterval
   presets: [Int]
   amountType: TierAmountType!
