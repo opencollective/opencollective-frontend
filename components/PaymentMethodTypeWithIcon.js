@@ -16,7 +16,7 @@ import { Span } from './Text';
 /**
  * Shows the data of the given payout method
  */
-const PaymentMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color, iconSize }) => {
+const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={15} width={90} />;
@@ -27,45 +27,35 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, colo
       return (
         <Flex alignItems="center">
           <GiftCard size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color} textTransform="capitalize">
-            {i18nPaymentMethodType(intl, type)}
-          </Span>
+          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
     case PaymentMethodType.CREDIT_CARD:
       return (
         <Flex alignItems="center">
           <CreditCard size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color} textTransform="capitalize">
-            {i18nPaymentMethodType(intl, type)}
-          </Span>
+          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
     case PaymentMethodType.PAYMENT:
       return (
         <Flex alignItems="center">
           <PaypalIcon size={iconSize} color="#192f86" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color} textTransform="capitalize">
-            {i18nPaymentMethodType(intl, type)}
-          </Span>
+          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
     case PaymentMethodType.COLLECTIVE:
       return (
         <Flex alignItems="center">
           <OtherIcon size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color} textTransform="capitalize">
-            {i18nPaymentMethodType(intl, type)}
-          </Span>
+          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
     default:
       return (
         <Flex alignItems="center">
           <OtherIcon size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color} textTransform="capitalize">
-            {i18nPaymentMethodType(intl, type)}
-          </Span>
+          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
         </Flex>
       );
   }
@@ -74,16 +64,10 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, colo
 PaymentMethodTypeWithIcon.propTypes = {
   isLoading: PropTypes.bool,
   type: PropTypes.oneOf(Object.values(PaymentMethodType)),
-  fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  fontWeight: PropTypes.string,
-  color: PropTypes.string,
   iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 PaymentMethodTypeWithIcon.defaultProps = {
-  fontSize: '13px',
-  fontWeight: 'normal',
-  color: 'black.900',
   iconSize: 24,
 };
 

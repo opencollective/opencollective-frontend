@@ -11,11 +11,11 @@ import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import TransactionsWithData from '../components/expenses/TransactionsWithData';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import Transactions from '../components/transactions/Transactions';
 import { withUser } from '../components/UserProvider';
 
 const TransactionPageWrapper = styled.div`
@@ -91,15 +91,13 @@ class TransactionsPage extends React.Component {
             />
           </Container>
 
-          <div className="content">
-            <TransactionsWithData
-              collective={collective}
-              LoggedInUser={LoggedInUser}
-              showCSVlink={true}
-              filters={true}
-              dateDisplayType="date"
-            />
-          </div>
+          <Transactions
+            collective={collective}
+            showCSVlink={true}
+            filters={true}
+            LoggedInUser={LoggedInUser}
+            dateDisplayType="date"
+          />
         </Body>
 
         <Footer />
