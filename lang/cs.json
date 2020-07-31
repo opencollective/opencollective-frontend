@@ -1329,7 +1329,7 @@
   "Search": "Hledat",
   "search.ifYouDontSee": "Pokud nevidíte kolektiv, který hledáte:",
   "search.noResult": "Nebyly nalezeny žádné kolektivy odpovídající vašemu dotazu: \"{query}\"",
-  "search.OpenCollective": "Prohledat Open Collective",
+  "search.OpenCollective": "Search Open Collective...",
   "search.placeholder": "Search...",
   "SearchFor": "Hledat {entity}",
   "SearchFor2": "Hledat {entity1} nebo {entity2}",
