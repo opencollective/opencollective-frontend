@@ -1329,7 +1329,7 @@
   "Search": "Rechercher",
   "search.ifYouDontSee": "Si vous ne voyez pas le collectif que vous cherchez :",
   "search.noResult": "Aucun collectif trouvé correspondant à votre requête : \"{query}\"",
-  "search.OpenCollective": "Rechercher sur Open Collective",
+  "search.OpenCollective": "Search Open Collective...",
   "search.placeholder": "Rechercher...",
   "SearchFor": "Rechercher des {entity}",
   "SearchFor2": "Rechercher des {entity1} ou des {entity2}",
