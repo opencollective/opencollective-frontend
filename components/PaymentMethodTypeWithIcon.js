@@ -41,7 +41,7 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
       return (
         <Flex alignItems="center">
           <PaypalIcon size={iconSize} color="#192f86" />
-          <Span ml={2}>{i18nPaymentMethodType(intl, type)}</Span>
+          <Span ml={2}>PayPal</Span>
         </Flex>
       );
     case PaymentMethodType.COLLECTIVE:
