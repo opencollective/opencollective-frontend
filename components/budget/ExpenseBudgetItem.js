@@ -273,7 +273,7 @@ ExpenseBudgetItem.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     balance: PropTypes.number,
-    currency: PropTypes.number,
+    currency: PropTypes.string,
     parent: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
