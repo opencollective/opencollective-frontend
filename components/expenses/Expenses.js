@@ -162,7 +162,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'PROCESSING' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'PROCESSING' })}
               >
-                <FormattedMessage id="expenses.processing" defaultMessage="Processing" />
+                <FormattedMessage id="expense.processing" defaultMessage="Processing" />
               </Button>
               <Button
                 className="filterBtn error"
@@ -170,7 +170,7 @@ class Expenses extends React.Component {
                 bsStyle={status === 'ERROR' ? 'primary' : 'default'}
                 onClick={() => updateVariables({ status: 'ERROR' })}
               >
-                <FormattedMessage id="expenses.error" defaultMessage="Error" />
+                <FormattedMessage id="expense.error" defaultMessage="Error" />
               </Button>
               <Button
                 className="filterBtn paid"

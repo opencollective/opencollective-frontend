@@ -96,7 +96,7 @@ class NewContributionFlowSuccess extends React.Component {
         defaultMessage: 'Read our stories',
       },
       subscribe: {
-        id: 'NewContributionFlow.Success.CTA.Subscribe.Header',
+        id: 'home.joinUsSection.newsletter',
         defaultMessage: 'Subscribe to our newsletter',
       },
     });

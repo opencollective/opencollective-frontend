@@ -36,7 +36,7 @@ const messages = defineMessages({
     defaultMessage: 'Apply',
   },
   currency: {
-    id: 'collective.currency.label',
+    id: 'Currency',
     defaultMessage: 'Currency',
   },
   hostFee: {

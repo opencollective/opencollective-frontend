@@ -268,7 +268,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                   {collective.connectedTo.length !== 0 && (
                     <Container mx={1} color="#969ba3" my="12px">
                       <FormattedMessage
-                        id="Collective.Hero.Parent"
+                        id="Collective.Hero.ParentCollective"
                         defaultMessage="Part of: {parentName}"
                         values={{
                           parentName: (

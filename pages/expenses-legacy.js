@@ -46,7 +46,7 @@ class ExpensesPage extends React.Component {
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
     let action, subtitle, filter;
-    subtitle = <FormattedMessage id="section.expenses.subtitle" defaultMessage="All expenses" />;
+    subtitle = <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />;
 
     if (this.props.value) {
       action = {

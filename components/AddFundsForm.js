@@ -333,7 +333,7 @@ class AddFundsForm extends React.Component {
                 <Col sm={12}>
                   <div className="form-group">
                     <label className="col-sm-2 control-label inputField">
-                      <FormattedMessage id="addfunds.details" defaultMessage="Details" />
+                      <FormattedMessage id="Details" defaultMessage="Details" />
                     </label>
                     <Col sm={10}>
                       <table className="details">

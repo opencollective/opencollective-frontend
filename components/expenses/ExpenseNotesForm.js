@@ -10,7 +10,7 @@ import { Span } from '../Text';
 
 const msg = defineMessages({
   notesPlaceholder: {
-    id: 'ExpenseSummary.addNotesPlaceholder',
+    id: 'ExpenseSummary.addNotesLabel',
     defaultMessage: 'Add notes',
   },
 });

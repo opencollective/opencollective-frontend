@@ -71,7 +71,7 @@ class EditUserEmailForm extends React.Component {
     return (
       <Box mb={4} data-cy="EditUserEmailForm">
         <H2>
-          <FormattedMessage id="EditUserEmailForm.title" defaultMessage="Email address" />
+          <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
         </H2>
         <Flex flexWrap="wrap">
           <StyledInput

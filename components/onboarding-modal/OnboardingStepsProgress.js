@@ -71,7 +71,7 @@ class OnboardingStepsProgress extends React.Component {
               label = <FormattedMessage id="administrators" defaultMessage="Administrators" />;
             }
             if (step.name === 'Contact') {
-              label = <FormattedMessage id="contact" defaultMessage="Contact" />;
+              label = <FormattedMessage id="Contact" defaultMessage="Contact" />;
             }
             return (
               <Flex flexDirection="column" alignItems="center">

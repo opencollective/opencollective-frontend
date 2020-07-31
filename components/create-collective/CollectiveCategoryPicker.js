@@ -56,7 +56,7 @@ const CollectiveCategoryPicker = () => {
     <Fragment>
       <Box mb={4} mt={5}>
         <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
-          <FormattedMessage id="createCollective.header.create" defaultMessage="Create a Collective" />
+          <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
         </H1>
       </Box>
       <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>

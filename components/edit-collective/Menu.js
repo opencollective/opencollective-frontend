@@ -126,7 +126,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Webhooks',
   },
   [EDIT_COLLECTIVE_SECTIONS.TICKETS]: {
-    id: 'editCollective.menu.tickets',
+    id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: {

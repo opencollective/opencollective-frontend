@@ -54,7 +54,7 @@ class SectionProjects extends React.PureComponent {
       <Box pt={[4, 5]} data-cy="Projects">
         <ContainerSectionContent>
           <SectionTitle>
-            <FormattedMessage id="section.projects.title" defaultMessage="Projects" />
+            <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
           </SectionTitle>
         </ContainerSectionContent>
 
