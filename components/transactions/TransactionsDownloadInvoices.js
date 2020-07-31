@@ -24,8 +24,8 @@ const FREQUENCIES = {
   yearly: <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />,
 };
 
-const getInvoicesQuery = gql`
-  query allInvoices($fromCollectiveSlug: String!) {
+const invoicesQuery = gql`
+  query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug
       year
@@ -99,7 +99,7 @@ const makeYearlyOptions = invoices => {
 const TransactionsDownloadCSV = ({ collective }) => {
   const [interval, setInterval] = React.useState('monthly');
   const [year, setYear] = React.useState();
-  const { data, loading } = useQuery(getInvoicesQuery, {
+  const { data, loading } = useQuery(invoicesQuery, {
     variables: {
       fromCollectiveSlug: collective.slug,
     },

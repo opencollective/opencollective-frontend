@@ -16,8 +16,8 @@ import Modal from '../StyledModal';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
 
-const HostFieldsFragment = gqlV2`
-  fragment HostFieldsFragment on Host {
+const hostFieldsFragment = gqlV2`
+  fragment HostFields on Host {
     id
     name
     slug
@@ -40,7 +40,7 @@ const HostFieldsFragment = gqlV2`
   }
 `;
 const transactionModalQuery = gqlV2`
-  query ExpensePage($legacyExpenseId: Int!) {
+  query TransactionModal($legacyExpenseId: Int!) {
     expense(expense: { legacyId: $legacyExpenseId }) {
       id
       legacyId
@@ -118,7 +118,7 @@ const transactionModalQuery = gqlV2`
           isHost
           balance
           host {
-            ...HostFieldsFragment
+            ...HostFields
           }
         }
 
@@ -127,7 +127,7 @@ const transactionModalQuery = gqlV2`
           isApproved
           balance
           host {
-            ...HostFieldsFragment
+            ...HostFields
           }
         }
         ... on Fund {
@@ -135,7 +135,7 @@ const transactionModalQuery = gqlV2`
           isApproved
           balance
           host {
-            ...HostFieldsFragment
+            ...HostFields
           }
         }
         ... on Event {
@@ -143,7 +143,7 @@ const transactionModalQuery = gqlV2`
           isApproved
           balance
           host {
-            ...HostFieldsFragment
+            ...HostFields
           }
           parent {
             id
@@ -158,7 +158,7 @@ const transactionModalQuery = gqlV2`
           isApproved
           balance
           host {
-            ...HostFieldsFragment
+            ...HostFields
           }
           parent {
             id
@@ -205,7 +205,7 @@ const transactionModalQuery = gqlV2`
       }
     }
   }
-  ${HostFieldsFragment}
+  ${hostFieldsFragment}
 `;
 
 const ArrowRightIcon = styled(ArrowRight)`
