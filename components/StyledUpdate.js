@@ -324,7 +324,6 @@ const editUpdateMutation = gql`
       id
       updatedAt
       title
-      markdown
       html
       isPrivate
       makePublicOn

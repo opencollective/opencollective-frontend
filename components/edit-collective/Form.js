@@ -239,7 +239,6 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
     collective.application = get(collective, 'settings.apply');
-    collective.markdown = get(collective, 'settings.markdown');
 
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);

@@ -51,7 +51,6 @@ const updateQuery = gql`
       createdAt
       publishedAt
       html
-      markdown
       isPrivate
       makePublicOn
       userCanSeeUpdate
