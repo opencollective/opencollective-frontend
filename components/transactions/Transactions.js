@@ -164,11 +164,7 @@ const Transactions = ({ collective, LoggedInUser }) => {
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const isCollectiveAdmin = LoggedInUser?.canEditCollective(collective);
   const canDownloadInvoices =
-    isRoot ||
-    isHostAdmin ||
-    (isCollectiveAdmin &&
-      (collective.type === 'ORGANIZATION' || collective.type === 'USER') &&
-      LoggedInUser?.canEditCollective(collective));
+    isRoot || isHostAdmin || (isCollectiveAdmin && (collective.type === 'ORGANIZATION' || collective.type === 'USER'));
 
   return (
     <Box maxWidth={1000} m="0 auto" py={[0, 5]} px={2}>

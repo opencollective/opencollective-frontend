@@ -54,9 +54,10 @@ const TransactionItem = transaction => {
 
   const isRoot = LoggedInUser && LoggedInUser.isRoot();
   const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(fromAccount);
-  const isCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(fromAccount);
-  const canDownloadInvoice = isRoot || isHostAdmin || isCollectiveAdmin;
-  const displayedAmount = isCredit && !isRefunded ? amount : netAmount;
+  const isFromCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(fromAccount);
+  const isToCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(toAccount);
+  const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
+  const displayedAmount = isCredit && isOrder && !isRefunded ? amount : netAmount;
 
   return (
     <Item>
