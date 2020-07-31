@@ -67,9 +67,6 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
       transferwisePayouts
       transferwisePayoutsLimit
     }
-    transferwise {
-      availableCurrencies
-    }
   }
 `;
 
