@@ -15,6 +15,7 @@ const routes = require('./routes');
 const { Sentry } = require('./sentry');
 const hyperwatch = require('./hyperwatch');
 const rateLimiter = require('./rate-limiter');
+const getContentSecurityPolicyConfig = require('./content-security-policy');
 
 const app = express();
 
@@ -35,7 +36,7 @@ nextApp.prepare().then(() => {
 
   rateLimiter(app);
 
-  app.use(helmet());
+  app.use(helmet({ contentSecurityPolicy: getContentSecurityPolicyConfig() }));
 
   app.use(cookieParser());
 
