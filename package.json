@@ -226,7 +226,8 @@
     "testPathIgnorePatterns": [
       "/.next/",
       "/dist/",
-      "/node_modules/"
+      "/node_modules/",
+      "/.history"
     ]
   },
   "config": {

@@ -30,7 +30,7 @@ class NewContributionFlowHeader extends React.Component {
 
   render() {
     const { collective } = this.props;
-    const contributors = collective.contributors.nodes;
+    const contributors = collective.contributors?.nodes;
     const loggedInUserIsContributor = false; // TODO
     const loggedInUserTotalDonations = 0; // TODO
 

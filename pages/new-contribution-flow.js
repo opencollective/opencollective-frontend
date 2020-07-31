@@ -154,8 +154,7 @@ class NewContributionFlowPage extends React.Component {
   renderPageContent() {
     const { router, data = {}, intl, step } = this.props;
     const { account, tier } = data;
-    const feesOnTopAvailable = get(data, 'Collective.platformFeePercent') === 0;
-    const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
+    const isTaxDeductibleInTheUS = get(data, 'account.host.settings.taxDeductibleDonations');
 
     if (data.loading) {
       return (
@@ -167,11 +166,11 @@ class NewContributionFlowPage extends React.Component {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!account.isActive) {
       return this.renderMessage('info', intl.formatMessage(messages.inactiveCollective));
-    } else if (this.props.tierId && !data.Tier) {
+    } else if (this.props.tierId && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.missingTier), true);
-    } else if (data.Tier && data.Tier.endsAt && new Date(data.Tier.endsAt) < new Date()) {
+    } else if (tier && tier.endsAt && new Date(tier.endsAt) < new Date()) {
       return this.renderMessage('warning', intl.formatMessage(messages.expiredTier), true);
-    } else if (account.settings.disableCustomContributions && !data.Tier) {
+    } else if (account.settings.disableCustomContributions && !tier) {
       return this.renderMessage('warning', intl.formatMessage(messages.disableCustomContributions), true);
     } else if (router.query.step === 'success') {
       return <NewContributionFlowSuccess collective={account} />;
@@ -181,8 +180,7 @@ class NewContributionFlowPage extends React.Component {
           collective={account}
           host={account.host}
           tier={tier}
-          feesOnTopAvailable={feesOnTopAvailable}
-          taxDeductible={taxDeductible}
+          isTaxDeductibleInTheUS={isTaxDeductibleInTheUS}
           step={step}
           verb={this.props.verb}
           redirect={this.props.redirect}
@@ -279,13 +277,15 @@ const accountWithTierQuery = gqlV2/* GraphQL */ `
       name
       slug
       description
+      customFields
+      maxQuantity
       amount {
-        value
+        valueInCents
         currency
       }
       amountType
       minimumAmount {
-        value
+        valueInCents
         currency
       }
       interval

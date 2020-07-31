@@ -19,17 +19,18 @@ const StyledInputField = ({
   required,
   inputType,
   labelFontSize,
+  labelColor,
   labelProps,
   showLabelRequired,
   ...props
 }) => {
-  const labelContent = label && <Span color="black.800">{label}</Span>;
+  const labelContent = label && <Span color={labelColor}>{label}</Span>;
   const isCheckbox = inputType === 'checkbox';
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
 
   return (
     <Box {...props}>
-      <Flex flexDirection={isCheckbox ? 'row' : 'column'}>
+      <Flex flexDirection={isCheckbox ? 'row-reverse' : 'column'} justifyContent="flex-end">
         {label && (
           <P
             as="label"
@@ -39,6 +40,8 @@ const StyledInputField = ({
             fontWeight="normal"
             mb={isCheckbox ? 0 : 2}
             mr={2}
+            ml={isCheckbox ? 2 : undefined}
+            cursor={isCheckbox ? 'pointer' : undefined}
             {...labelProps}
           >
             {required === false && !isCheckbox ? (
@@ -104,12 +107,17 @@ StyledInputField.propTypes = {
   required: PropTypes.bool,
   /** Font size for the label */
   labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  labelColor: PropTypes.string,
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
   /** Set this to true to display a "(Required)" next to the label when the field is required */
   showLabelRequired: PropTypes.bool,
   /** All props from `Box` */
   ...Box.propTypes,
+};
+
+StyledInputField.defaultProps = {
+  labelColor: 'black.800',
 };
 
 export default StyledInputField;
