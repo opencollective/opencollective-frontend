@@ -141,7 +141,7 @@ const JoinUs = () => (
               mb={2}
               fontWeight="bold"
             >
-              <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe our newsletter" />
+              <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe to our newsletter" />
             </H1>
             <Box mb={3}>
               <P fontSize={['Caption', null, '15px']} lineHeight={['19px', null, '25px']} letterSpacing="-0.016em">
