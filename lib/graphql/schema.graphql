@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql
-# timestamp: Tue Jul 28 2020 10:49:49 GMT+0200 (Central European Summer Time)
+# timestamp: Sat Aug 01 2020 11:00:30 GMT+0200 (Central European Summer Time)
 
 """
 Application model
@@ -2321,7 +2321,7 @@ input OrderInputType {
   id: Int
   quantity: Int = 1
   totalAmount: Int
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   platformFee: Int
   isFeesOnTop: Boolean
