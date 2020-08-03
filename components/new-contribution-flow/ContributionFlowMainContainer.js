@@ -32,6 +32,7 @@ class NewContributionFlowMainContainer extends React.Component {
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.object,
       stepSummary: PropTypes.object,
+      stepPayment: PropTypes.object,
     }),
     contributeAs: PropTypes.object,
   };
@@ -141,7 +142,15 @@ class NewContributionFlowMainContainer extends React.Component {
         );
       }
       case 'payment':
-        return <StepPayment collective={this.props.collective} />;
+        return (
+          <StepPayment
+            collective={this.props.collective}
+            stepDetails={this.props.mainState.stepDetails}
+            stepProfile={this.props.mainState.stepProfile}
+            stepPayment={this.props.mainState.stepPayment}
+            onChange={this.props.onChange}
+          />
+        );
       case 'summary':
         return (
           <StepSummary
@@ -163,14 +172,16 @@ class NewContributionFlowMainContainer extends React.Component {
     const { LoggedInUser, step } = this.props;
 
     return (
-      <StyledCard p={32} borderRadius={15}>
+      <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
         <Flex flexDirection="column" alignItems="center">
           <Flex width="100%" mb={3}>
-            <H4 fontWeight={500} py={2}>
-              {this.renderHeader(step.name, LoggedInUser)}
-            </H4>
+            <Flex width={3 / 4} alignItems="center" justifyContent="center">
+              <H4 fontSize={[20, 24]} fontWeight={500} py={2}>
+                {this.renderHeader(step.name, LoggedInUser)}
+              </H4>
+            </Flex>
             <Flex flexGrow={1} alignItems="center" justifyContent="center">
-              <StyledHr width="100%" ml={3} borderColor="black.300" />
+              <StyledHr width="100%" ml={[null, 3]} borderColor="black.300" />
             </Flex>
           </Flex>
           {this.renderStep(step.name)}

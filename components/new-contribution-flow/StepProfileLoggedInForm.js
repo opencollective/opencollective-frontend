@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { remove } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -18,6 +17,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
   defaultSelectedProfile,
   onChange,
   canUseIncognito,
+  collective,
 }) => {
   const intl = useIntl();
 
@@ -27,20 +27,29 @@ const NewContributionFlowStepProfileLoggedInForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedProfile]);
 
-  // if the user doesn't have an incognito profile yet, we offer to create one
-  if (canUseIncognito) {
-    const incognitoProfile = profiles.find(p => p.type === 'USER' && p.isIncognito);
-    if (!incognitoProfile) {
-      profiles.push({
-        id: 'incognito',
-        type: 'USER',
-        isIncognito: true,
-        name: intl.formatMessage(messages['incognito']),
-      });
+  const filteredProfiles = React.useMemo(() => {
+    const filtered = [...profiles];
+
+    // if admin of collective you are donating to, remove it from the list
+    remove(filtered, p => p.id === collective.legacyId);
+
+    // if the user doesn't have an incognito profile yet, we offer to create one
+    if (canUseIncognito) {
+      const incognitoProfile = filtered.find(p => p.type === 'USER' && p.isIncognito);
+      if (!incognitoProfile) {
+        filtered.push({
+          id: 'incognito',
+          type: 'USER',
+          isIncognito: true,
+          name: intl.formatMessage(messages['incognito']),
+        });
+      }
+    } else {
+      remove(filtered, p => p.isIncognito);
     }
-  } else {
-    remove(profiles, p => p.isIncognito);
-  }
+
+    return filtered;
+  }, [profiles]);
 
   return (
     <Fragment>
@@ -48,7 +57,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
         <StyledRadioList
           name="ContributionProfile"
           id="ContributionProfile"
-          options={profiles}
+          options={filteredProfiles}
           keyGetter="id"
           defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}
           radioSize={16}
@@ -58,40 +67,45 @@ const NewContributionFlowStepProfileLoggedInForm = ({
         >
           {({ radio, value }) => (
             <Box minHeight={70} py={2} bg="white.full" px={3}>
-              <Flex alignItems="center" justifyContent="space-between">
-                <Flex alignItems="center" maxWidth={400}>
-                  <Box as="span" mr={3} flexWrap="wrap">
-                    {radio}
-                  </Box>
-                  <Flex mr={3} css={{ flexBasis: '26px' }}>
-                    <Avatar collective={value} size="3.6rem" />
-                  </Flex>
-                  <Flex flexDirection="column" maxWidth={200}>
-                    <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900">
-                      {value.name}
-                    </P>
-                    {value.type === 'USER' && (
+              <Flex alignItems="center" width={1}>
+                <Box as="span" mr={3} flexWrap="wrap">
+                  {radio}
+                </Box>
+                <Flex mr={3} css={{ flexBasis: '26px' }}>
+                  <Avatar collective={value} size="3.6rem" />
+                </Flex>
+                <Flex flexDirection="column" flexGrow={1}>
+                  <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900">
+                    {value.name}
+                  </P>
+                  {value.type === 'USER' &&
+                    (value.isIncognito ? (
+                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
+                        <FormattedMessage
+                          id="profile.incognito.description"
+                          defaultMessage="Keep my contribution private (see FAQ for more info)"
+                        />
+                      </P>
+                    ) : (
                       <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
                         <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" /> -{' '}
                         {value.email}
                       </P>
-                    )}
-                    {value.type === 'COLLECTIVE' && (
-                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage id="ContributionFlow.CollectiveProfile" defaultMessage="Collective profile" />
-                      </P>
-                    )}
-                    {value.type === 'ORGANIZATION' && (
-                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage
-                          id="ContributionFlow.OrganizationProfile"
-                          defaultMessage="Organization profile"
-                        />
-                      </P>
-                    )}
-                  </Flex>
+                    ))}
+                  {value.type === 'COLLECTIVE' && (
+                    <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
+                      <FormattedMessage id="ContributionFlow.CollectiveProfile" defaultMessage="Collective profile" />
+                    </P>
+                  )}
+                  {value.type === 'ORGANIZATION' && (
+                    <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
+                      <FormattedMessage
+                        id="ContributionFlow.OrganizationProfile"
+                        defaultMessage="Organization profile"
+                      />
+                    </P>
+                  )}
                 </Flex>
-                <InfoCircle size={16} color="#C4C7CC" />
               </Flex>
             </Box>
           )}
@@ -107,6 +121,7 @@ NewContributionFlowStepProfileLoggedInForm.propTypes = {
   defaultSelectedProfile: PropTypes.object,
   profiles: PropTypes.array,
   canUseIncognito: PropTypes.bool,
+  collective: PropTypes.object,
 };
 
 export default NewContributionFlowStepProfileLoggedInForm;

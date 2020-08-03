@@ -245,12 +245,14 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       hostFeePercent
       host {
         id
+        legacyId
         slug
         name
         settings
         location {
           country
         }
+        supportedPaymentMethods
       }
     }
     ... on Event {

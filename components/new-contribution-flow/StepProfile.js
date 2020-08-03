@@ -9,6 +9,7 @@ import StepProfileLoggedInForm from './StepProfileLoggedInForm';
 
 const NewContributionFlowStepProfile = ({
   LoggedInUser,
+  collective,
   stepDetails,
   profiles,
   defaultSelectedProfile,
@@ -24,6 +25,7 @@ const NewContributionFlowStepProfile = ({
           defaultSelectedProfile={defaultSelectedProfile}
           onChange={onChange}
           canUseIncognito={canUseIncognito}
+          collective={collective}
         />
       ) : (
         <StepProfileGuestForm stepDetails={stepDetails} data={data} onChange={onChange} />
@@ -34,6 +36,7 @@ const NewContributionFlowStepProfile = ({
 
 NewContributionFlowStepProfile.propTypes = {
   LoggedInUser: PropTypes.object,
+  collective: PropTypes.object,
   stepDetails: PropTypes.shape({
     amount: PropTypes.number,
     interval: PropTypes.string,
