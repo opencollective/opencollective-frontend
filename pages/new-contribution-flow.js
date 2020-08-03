@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
@@ -183,6 +184,15 @@ class NewContributionFlowPage extends React.Component {
           feesOnTopAvailable={feesOnTopAvailable}
           taxDeductible={taxDeductible}
           step={step}
+          verb={this.props.verb}
+          redirect={this.props.redirect}
+          description={this.props.description}
+          defaultQuantity={this.props.quantity}
+          fixedInterval={this.props.interval}
+          fixedAmount={this.props.totalAmount}
+          customData={this.props.customData}
+          skipStepDetails={this.props.skipStepDetails}
+          contributeAs={this.props.contributeAs}
         />
       );
     }
