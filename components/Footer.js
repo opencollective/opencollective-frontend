@@ -115,7 +115,7 @@ class Footer extends React.Component {
               An organization for your community, transparent by design.
             </P>
             <Container color="#6E747A" textAlign={['center', null, 'left']}>
-              <P as="div" fontSize="1.2rem" color="#555658" letterSpacing="1px" pb={2} pt={2}>
+              <P as="div" fontSize="1.2rem" color="black.800" letterSpacing="1px" pb={2} pt={2}>
                 <Span mr={1} style={{ verticalAlign: 'middle' }}>
                   LANGUAGES
                 </Span>
@@ -181,7 +181,7 @@ class Footer extends React.Component {
           <Flex as="nav" flexWrap="wrap" justifyContent="center" mt={3} flex="1 1 auto" order={['3', null, '2']}>
             {Object.keys(navigation).map(key => (
               <Box key={key} width={[0.5, null, 0.25]} mb={3}>
-                <P textAlign={['center', null, 'left']} fontSize="1.2rem" color="#555658" letterSpacing="1px" pb={3}>
+                <P textAlign={['center', null, 'left']} fontSize="1.2rem" color="black.800" letterSpacing="1px" pb={3}>
                   {key}
                 </P>
                 <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
