@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import INTERVALS from '../../lib/constants/intervals';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { i18nInterval } from '../../lib/i18n/interval';
+import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
 import { Box } from '../../components/Grid';
 import StyledButtonSet from '../../components/StyledButtonSet';
@@ -17,7 +18,6 @@ import { H5, P, Span } from '../Text';
 
 import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
-import { getTierMinAmount, getTierPresets } from './utils';
 
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDeductibleInTheUS }) => {
   const intl = useIntl();

@@ -9,6 +9,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { TierTypes } from '../../lib/constants/tiers-types';
+import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getWebsiteUrl } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
@@ -25,7 +26,7 @@ import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowMainContainer from './ContributionFlowMainContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import SafeTransactionMessage from './SafeTransactionMessage';
-import { getDefaultAmount, getTierMinAmount, isFixedContribution, taxesMayApply } from './utils';
+import { taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 115px;
@@ -78,7 +79,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.tier?.interval,
-        amount: getDefaultAmount(props.tier),
+        amount: getDefaultTierAmount(props.tier),
       },
     };
   }
