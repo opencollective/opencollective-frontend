@@ -65,7 +65,7 @@
     "glob": "7.1.6",
     "graphql": "14.7.0",
     "graphql-tag": "2.11.0",
-    "helmet": "3.23.3",
+    "helmet": "4.0.0",
     "i18n-iso-countries": "6.0.0",
     "jsdom": "16.3.0",
     "jsonwebtoken": "8.5.1",
