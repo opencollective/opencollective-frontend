@@ -57,7 +57,11 @@ const TransactionItem = transaction => {
   const isFromCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(fromAccount);
   const isToCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(toAccount);
   const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
-  const displayedAmount = isCredit && isOrder && !isRefunded ? amount : netAmount;
+  const displayedAmount =
+    (isCredit && isOrder && !isRefunded) || // Credit from donations should display the full amount donated by the user
+    (!isCredit && !isOrder) // Expense Debits should display the Amount without Payment Method fees
+      ? amount
+      : netAmount;
 
   return (
     <Item>
