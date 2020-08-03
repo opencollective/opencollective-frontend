@@ -34,9 +34,6 @@ const TransactionsList = ({ transactions }) => {
 
 TransactionsList.propTypes = {
   isLoading: PropTypes.bool,
-  /** When `isLoading` is true, this sets the number of "loadin" items displayed */
-  nbPlaceholders: PropTypes.number,
-  view: PropTypes.oneOf(['public', 'admin']),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     parent: PropTypes.shape({
@@ -51,7 +48,6 @@ TransactionsList.propTypes = {
 };
 
 TransactionsList.defaultProps = {
-  nbPlaceholders: 10,
   view: 'public',
 };
 
