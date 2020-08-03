@@ -57,7 +57,7 @@
   "addfunds.organization.label": "organisation",
   "addfunds.platformFees": "Commission de la plateforme ({platformFees})",
   "addfunds.submit": "Ajouter des fonds",
-  "AddFunds.Success": "Funds added successfully",
+  "AddFunds.Success": "Fonds ajoutés avec succès",
   "addfunds.title": "Ajouter des fonds à {collective}",
   "addfunds.totalAmount": "Montant",
   "AddFundsForm.PutAside": "Please put aside {hostFeePercent}% ({hostFeeAmount}) for your host fees and {platformFeePercent}% ({platformFeeAmount}) for platform fees.",
