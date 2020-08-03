@@ -28,7 +28,7 @@ class NextJSErrorPage extends React.Component {
       const slugRegex = /^\/([^/?]+)/;
       const parsedUrl = slugRegex.exec(url);
       const pageSlug = parsedUrl && parsedUrl[1];
-      return <ErrorPage log={false} error={generateNotFoundError(pageSlug, false)} />;
+      return <ErrorPage log={false} error={generateNotFoundError(pageSlug)} />;
     } else {
       return <ErrorPage />;
     }

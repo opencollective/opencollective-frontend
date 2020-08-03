@@ -6,7 +6,6 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { generateNotFoundError } from '../lib/errors';
-import { ssrNotFoundError } from '../lib/nextjs_utils';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveContactForm from '../components/CollectiveContactForm';
@@ -95,8 +94,7 @@ class CollectiveContact extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        ssrNotFoundError(); // Force 404 when rendered server side
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       }
     }
 
