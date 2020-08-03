@@ -295,6 +295,6 @@ const signupMutation = gql`
   }
 `;
 
-const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
+export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
 export default injectIntl(addSignupMutation(SignInOrJoinFree));

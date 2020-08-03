@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Jul 28 2020 10:50:11 GMT+0200 (Central European Summer Time)
+# timestamp: Sat Aug 01 2020 11:00:40 GMT+0200 (Central European Summer Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -2577,6 +2577,22 @@ type Event implements Account {
   ): Int!
 
   """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
   The Collective hosting this Event
   """
   parent: Collective
@@ -4218,11 +4234,12 @@ type Order {
   """
   totalDonations: Amount
   paymentMethod: PaymentMethod
+  platformFee: Amount @deprecated(reason: "2020-07-31: Please use platformContributionAmount")
 
   """
-  If an Order has fees on top, we should return the amount
+  Platform contribution attached to the Order.
   """
-  platformFee: Amount
+  platformContributionAmount: Amount
 }
 
 """
@@ -4712,6 +4729,22 @@ type Project implements Account {
   ): Int!
 
   """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
   The Fund hosting this Project
   """
   parent: Fund
@@ -4963,6 +4996,8 @@ type Tier {
   type: TierType!
   interval: TierInterval
   presets: [Int]
+  maxQuantity: Int
+  customFields: JSON
   amountType: TierAmountType!
   minimumAmount: Amount
 }

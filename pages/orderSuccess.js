@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { confettiFireworks } from '../lib/confettis';
 import { formatCurrency } from '../lib/currency-utils';
-import { facebooKShareURL, tweetURL } from '../lib/url_helpers';
+import { facebookShareURL, tweetURL } from '../lib/url_helpers';
 
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
@@ -241,7 +241,7 @@ class OrderSuccessPage extends React.Component {
                 <Twitter size="1.2em" color="#38A1F3" />
                 <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
               </ShareLink>
-              <ShareLink href={facebooKShareURL({ u: shareURL })}>
+              <ShareLink href={facebookShareURL({ u: shareURL })}>
                 <Facebook size="1.2em" color="#3c5a99" />
                 <FormattedMessage id="shareIt" defaultMessage="Share it" />
               </ShareLink>

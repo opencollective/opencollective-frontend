@@ -7,11 +7,13 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getWebsiteUrl } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
 import NewContributeFAQ from '../../components/faqs/NewContributeFAQ';
 import { Box, Flex } from '../../components/Grid';
+import { addSignupMutation } from '../../components/SignInOrJoinFree';
 
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
@@ -61,6 +63,7 @@ class ContributionFlow extends React.Component {
     host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
+    createUser: PropTypes.func,
   };
 
   constructor(props) {
@@ -68,17 +71,58 @@ class ContributionFlow extends React.Component {
     this.mainContainerRef = React.createRef();
     this.state = {
       stepDetails: null,
+      stepProfile: null,
       stepPayment: null,
       stepSummary: null,
     };
   }
+
+  getEmailRedirectURL() {
+    let currentPath = window.location.pathname;
+    if (window.location.search) {
+      currentPath = currentPath + window.location.search;
+    } else {
+      currentPath = `${currentPath}?`;
+    }
+    // add 'emailRedirect' to the query so we can load the Payment step when
+    // the user comes back from signing up to make a recurring contribution
+    currentPath = `${currentPath.replace('profile', 'payment')}&emailRedirect=true`;
+    return encodeURIComponent(currentPath);
+  }
+
+  createProfileForRecurringContributions = async data => {
+    if (this.state.submitting) {
+      return false;
+    }
+
+    const user = pick(data, ['email', 'name']);
+
+    this.setState({ submitting: true });
+
+    try {
+      await this.props.createUser({
+        variables: {
+          user,
+          redirect: this.getEmailRedirectURL(),
+          websiteUrl: getWebsiteUrl(),
+        },
+      });
+      await Router.pushRoute('signinLinkSent', { email: user.email });
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.log(error);
+      this.setState({ error: error.message, submitting: false });
+      window.scrollTo(0, 0);
+    }
+  };
 
   /** Steps component callback  */
   onStepChange = async step => this.pushStepRoute(step.name);
 
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, routeParams = {}) => {
-    const { collective, tier } = this.props;
+    const { collective, tier, LoggedInUser } = this.props;
+    const { stepDetails, stepProfile } = this.state;
 
     const params = {
       verb: this.props.verb || 'new-donate',
@@ -114,7 +158,13 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    await Router.pushRoute(stepName === 'success' ? `${route}Success` : route, params);
+    if (stepName === 'success') {
+      await Router.pushRoute(`${route}/success`);
+    } else if (stepName === 'payment' && !LoggedInUser && stepDetails?.interval) {
+      await this.createProfileForRecurringContributions(stepProfile);
+    } else {
+      await Router.pushRoute(route, params);
+    }
 
     if (this.mainContainerRef.current) {
       this.mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -175,6 +225,7 @@ class ContributionFlow extends React.Component {
 
   render() {
     const { collective, tier, showFeesOnTop, LoggedInUser } = this.props;
+
     return (
       <Steps
         steps={this.getSteps()}
@@ -226,7 +277,7 @@ class ContributionFlow extends React.Component {
             {/* main container */}
             <Flex justifyContent="center" width={1} maxWidth={1340} flexWrap={['wrap', 'nowrap']} px={[2, 3]}>
               <Box display={['none', null, null, 'block']} width={[0.5, null, null, null, 1 / 3]} />
-              <Box as="form" flex="1 1 50%">
+              <Box as="form" flex="1 1 50%" onSubmit={e => e.preventDefault()}>
                 <ContributionFlowMainContainer
                   collective={collective}
                   tier={tier}
@@ -241,7 +292,7 @@ class ContributionFlow extends React.Component {
                     step={currentStep}
                     prevStep={prevStep}
                     nextStep={nextStep}
-                    isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.frequency}
+                    isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.interval}
                   />
                 </Box>
               </Box>
@@ -259,4 +310,4 @@ class ContributionFlow extends React.Component {
   }
 }
 
-export default injectIntl(withUser(ContributionFlow));
+export default injectIntl(withUser(addSignupMutation(ContributionFlow)));

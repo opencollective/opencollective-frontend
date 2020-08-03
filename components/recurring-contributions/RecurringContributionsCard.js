@@ -55,7 +55,7 @@ const RecurringContributionsCard = ({
       }
     >
       <Container p={3}>
-        {contribution.platformFee ? (
+        {contribution.platformContributionAmount ? (
           <Box mb={3}>
             <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
               <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
@@ -68,7 +68,7 @@ const RecurringContributionsCard = ({
                 data-cy="recurring-contribution-amount-contributed"
               >
                 <FormattedMoneyAmount
-                  amount={(contribution.amount.value + contribution.platformFee.value) * 100}
+                  amount={(contribution.amount.value + contribution.platformContributionAmount.value) * 100}
                   interval={contribution.frequency.toLowerCase().slice(0, -2)}
                   currency={contribution.amount.currency}
                 />
@@ -92,7 +92,7 @@ const RecurringContributionsCard = ({
                   />{' '}
                   +{' '}
                   <FormattedMoneyAmount
-                    amount={contribution.platformFee.value * 100}
+                    amount={contribution.platformContributionAmount.value * 100}
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision={0}
@@ -159,7 +159,12 @@ const RecurringContributionsCard = ({
 
 RecurringContributionsCard.propTypes = {
   collective: PropTypes.object.isRequired,
-  contribution: PropTypes.object.isRequired,
+  contribution: PropTypes.shape({
+    amount: PropTypes.object.isRequired,
+    platformContributionAmount: PropTypes.object,
+    frequency: PropTypes.string.isRequired,
+    totalDonations: PropTypes.object.isRequired,
+  }),
   status: PropTypes.string.isRequired,
   LoggedInUser: PropTypes.object.isRequired,
   createNotification: PropTypes.func,

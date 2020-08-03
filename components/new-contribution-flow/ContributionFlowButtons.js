@@ -9,17 +9,17 @@ class NewContributionFlowButtons extends React.Component {
   static propTypes = {
     goNext: PropTypes.func,
     goBack: PropTypes.func,
-    currentStep: PropTypes.shape({ name: PropTypes.string }),
+    step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
     isRecurringContributionLoggedOut: PropTypes.bool,
   };
 
   getNextButtonLabel() {
-    const { currentStep, nextStep, isRecurringContributionLoggedOut } = this.props;
+    const { step, nextStep, isRecurringContributionLoggedOut } = this.props;
     if (!nextStep) {
       return <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />;
-    } else if (currentStep === 'profile' && isRecurringContributionLoggedOut) {
+    } else if (step.name === 'profile' && isRecurringContributionLoggedOut) {
       return <FormattedMessage id="NewContributionFlow.JoinAndGoNext" defaultMessage="Join and go next" />;
     } else {
       return <FormattedMessage id="contribute.nextStep" defaultMessage="Next step" />;
@@ -28,6 +28,7 @@ class NewContributionFlowButtons extends React.Component {
 
   render() {
     const { goBack, goNext } = this.props;
+
     return (
       <Flex justifyContent={'center'} mt={3}>
         <Fragment>
