@@ -59,7 +59,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
 
 const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
-    return get(stepProfile, 'name', null);
+    return get(stepProfile, 'name') || get(stepProfile, 'email', null);
   } else if (step.name === STEPS.DETAILS) {
     if (stepDetails) {
       return (
