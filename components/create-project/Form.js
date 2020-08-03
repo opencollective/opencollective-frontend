@@ -228,7 +228,7 @@ class CreateProjectForm extends React.Component {
                         onSubmit={handleSubmit}
                         data-cy="ccf-form-submit"
                       >
-                        <FormattedMessage id="createProject.button" defaultMessage="Create Project" />
+                        <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
                       </StyledButton>
                     </Flex>
                   </Form>

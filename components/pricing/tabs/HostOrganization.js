@@ -29,7 +29,7 @@ const rows = [
       render() {
         return (
           <Span fontSize={20} fontWeight="bold">
-            <FormattedMessage id="pricingTable.cell.free" defaultMessage="Free" />
+            <FormattedMessage id="Amount.Free" defaultMessage="Free" />
           </Span>
         );
       },
@@ -70,7 +70,7 @@ const rows = [
     {
       type: 'component',
       render() {
-        return <FormattedMessage id="pricingTable.cell.unlimited" defaultMessage="Unlimited" />;
+        return <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />;
       },
     },
     {

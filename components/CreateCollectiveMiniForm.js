@@ -41,7 +41,7 @@ const CreateNewMessages = defineMessages({
 
 const msg = defineMessages({
   emailTitle: {
-    id: 'EditUserEmailForm.title',
+    id: 'User.EmailAddress',
     defaultMessage: 'Email address',
   },
   adminEmail: {

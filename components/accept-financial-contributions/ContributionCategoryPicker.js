@@ -85,7 +85,7 @@ class ContributionCategoryPicker extends React.Component {
         defaultMessage: 'Use my personal bank account',
       },
       host: { id: 'acceptContributions.picker.host', defaultMessage: 'A fiscal host' },
-      organization: { id: 'acceptContributions.picker.organization', defaultMessage: 'Our organization' },
+      organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our organization' },
       organizationInfo: {
         id: 'acceptContributions.picker.organizationInfo',
         defaultMessage: 'Use my company or organization bank account',

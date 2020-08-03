@@ -23,7 +23,7 @@ const msg = defineMessages({
     defaultMessage: 'Email',
   },
   content: {
-    id: 'PayoutMethod.Other.content',
+    id: 'editCollective.menu.info',
     defaultMessage: 'Info',
   },
   savePayout: {

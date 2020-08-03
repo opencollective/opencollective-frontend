@@ -18,7 +18,7 @@ import RecurringContributionsPopUp from './RecurringContributionsPopUp';
 
 const messages = defineMessages({
   manage: {
-    id: 'Subscriptions.Edit',
+    id: 'Edit',
     defaultMessage: 'Edit',
   },
   tag: {
@@ -58,7 +58,7 @@ const RecurringContributionsCard = ({
         {contribution.platformContributionAmount ? (
           <Box mb={3}>
             <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
-              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
+              <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
             <div>
               <P
@@ -106,7 +106,7 @@ const RecurringContributionsCard = ({
         ) : (
           <Box mb={3}>
             <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
-              <FormattedMessage id="Subscriptions.AmountContributed" defaultMessage="Amount contributed" />
+              <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
             <P
               fontSize="Paragraph"

@@ -189,7 +189,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Country',
       },
       'currency.label': {
-        id: 'collective.currency.label',
+        id: 'Currency',
         defaultMessage: 'Currency',
       },
       'currency.placeholder': {

@@ -20,7 +20,7 @@ const BackButton = ({ onClick }) => (
   <Button buttonStyle="secondary" onClick={onClick}>
     <ArrowBack size="13" />{' '}
     <Span fontSize="12px" lineHeight="14px">
-      <FormattedMessage id="pricing.back.btn" defaultMessage="Back" />
+      <FormattedMessage id="Back" defaultMessage="Back" />
     </Span>
   </Button>
 );

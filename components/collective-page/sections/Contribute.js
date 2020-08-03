@@ -303,7 +303,7 @@ class SectionContribute extends React.PureComponent {
         {isAdmin && !hasHost && !isHost && (
           <ContainerSectionContent pt={5} pb={3}>
             <SectionTitle mb={24}>
-              <FormattedMessage id="contributions" defaultMessage="Contributions" />
+              <FormattedMessage id="Contributions" defaultMessage="Contributions" />
             </SectionTitle>
             <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
               <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>

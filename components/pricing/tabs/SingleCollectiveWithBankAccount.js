@@ -29,7 +29,7 @@ const rows = [
       render() {
         return (
           <Span className="price">
-            <FormattedMessage id="pricingTable.cell.free" defaultMessage="Free" />
+            <FormattedMessage id="Amount.Free" defaultMessage="Free" />
           </Span>
         );
       },
