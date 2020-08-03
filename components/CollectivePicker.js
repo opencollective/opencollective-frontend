@@ -74,7 +74,7 @@ DefaultCollectiveLabel.propTypes = {
 };
 
 // Some flags to differentiate options in the picker
-const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
+export const FLAG_COLLECTIVE_PICKER_COLLECTIVE = '__collective_picker_collective__';
 const FLAG_NEW_COLLECTIVE = '__collective_picker_new__';
 
 /**

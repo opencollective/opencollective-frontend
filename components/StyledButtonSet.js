@@ -84,7 +84,7 @@ StyledButtonSet.propTypes = {
   /** Button child content renderer. Get passed an object like { item, isSelected } */
   children: PropTypes.func.isRequired,
   /** Based on the design system theme */
-  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  size: PropTypes.oneOf(['small', 'medium', 'large', 'tiny']),
   /** Currently selected item */
   selected: PropTypes.any,
   /** An optional func called with the new item when option changes */
