@@ -15,7 +15,7 @@ const routes = require('./routes');
 const { Sentry } = require('./sentry');
 const hyperwatch = require('./hyperwatch');
 const rateLimiter = require('./rate-limiter');
-const getContentSecurityPolicyConfig = require('./content-security-policy');
+const { getContentSecurityPolicyConfig } = require('./content-security-policy');
 
 const app = express();
 
