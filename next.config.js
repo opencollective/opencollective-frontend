@@ -106,9 +106,9 @@ const nextConfig = {
       },
     });
 
-    // Load SVGs in base64
+    // Load images in base64
     config.module.rules.push({
-      test: /components\/.*\.(svg)$/,
+      test: /components\/.*\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {

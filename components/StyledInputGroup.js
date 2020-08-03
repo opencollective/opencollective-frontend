@@ -69,7 +69,7 @@ const getBorderColor = ({ error, focused, success }) => {
     return 'green.300';
   }
 
-  return 'black.400';
+  return 'black.300';
 };
 
 /**
@@ -109,6 +109,7 @@ const StyledInputGroup = ({
             py={2}
             px={2}
             color={getColor({ error, success })}
+            maxHeight="100%"
             {...prependProps}
             bg={(disabled && 'black.50') || get(prependProps, 'bg') || getBgColor({ error, focused, success })}
           >
@@ -125,6 +126,7 @@ const StyledInputGroup = ({
           disabled={disabled}
           py="0"
           px={2}
+          maxHeight="100%"
           error={error}
           {...inputProps}
           onFocus={e => {

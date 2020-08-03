@@ -7,6 +7,9 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/constants/collectives';
+import { TierTypes } from '../../lib/constants/tiers-types';
+import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getWebsiteUrl } from '../../lib/utils';
 import { Router } from '../../server/pages';
 
@@ -23,10 +26,10 @@ import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowMainContainer from './ContributionFlowMainContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import SafeTransactionMessage from './SafeTransactionMessage';
-import { getTierMinAmount, isFixedContribution, taxesMayApply } from './utils';
+import { taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
-  min-height: 100px;
+  min-height: 115px;
   max-width: 450px;
 
   @media screen and (max-width: 640px) {
@@ -59,6 +62,7 @@ class ContributionFlow extends React.Component {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
+      feesOnTopAvailable: PropTypes.bool.isRequired,
     }).isRequired,
     host: PropTypes.object.isRequired,
     tier: PropTypes.object,
@@ -70,10 +74,13 @@ class ContributionFlow extends React.Component {
     super(props);
     this.mainContainerRef = React.createRef();
     this.state = {
-      stepDetails: null,
-      stepProfile: null,
       stepPayment: null,
       stepSummary: null,
+      stepDetails: {
+        quantity: 1,
+        interval: props.tier?.interval,
+        amount: getDefaultTierAmount(props.tier),
+      },
     };
   }
 
@@ -178,6 +185,19 @@ class ContributionFlow extends React.Component {
   getTierMinAmount = memoizeOne(getTierMinAmount);
   taxesMayApply = memoizeOne(taxesMayApply);
 
+  canHaveFeesOnTop() {
+    // TODO add feesOnTopAvailable to the query
+    if (!this.props.collective.feesOnTopAvailable) {
+      return false;
+    } else if (this.props.tier?.type === TierTypes.TICKET) {
+      return false;
+    } else if (this.state.stepProfile?.type === CollectiveType.COLLECTIVE) {
+      return this.state.stepProfile.host?.id && this.state.stepProfile.host.id === this.props.host?.id;
+    } else {
+      return true;
+    }
+  }
+
   /** Returns the steps list */
   getSteps() {
     const { skipStepDetails, fixedInterval, fixedAmount, intl, collective, host, tier } = this.props;
@@ -224,8 +244,7 @@ class ContributionFlow extends React.Component {
   }
 
   render() {
-    const { collective, tier, showFeesOnTop, LoggedInUser } = this.props;
-
+    const { collective, tier, isTaxDeductibleInTheUS, LoggedInUser } = this.props;
     return (
       <Steps
         steps={this.getSteps()}
@@ -258,7 +277,7 @@ class ContributionFlow extends React.Component {
             <Box px={[2, 3]} mb={4}>
               <ContributionFlowHeader collective={collective} />
             </Box>
-            <StepsProgressBox mb={[3, null, 4]} width={[1.0, 0.8]}>
+            <StepsProgressBox mb={3} width={[1.0, 0.8]}>
               <ContributionFlowStepsProgress
                 steps={steps}
                 currentStep={currentStep}
@@ -271,7 +290,6 @@ class ContributionFlow extends React.Component {
                 loading={this.state.loading || this.state.submitting}
                 currency={collective.currency}
                 isFreeTier={this.getTierMinAmount(tier) === 0}
-                showFeesOnTop={showFeesOnTop}
               />
             </StepsProgressBox>
             {/* main container */}
@@ -284,6 +302,8 @@ class ContributionFlow extends React.Component {
                   mainState={this.state}
                   onChange={data => this.setState(data)}
                   step={currentStep}
+                  isTaxDeductibleInTheUS={isTaxDeductibleInTheUS}
+                  showFeesOnTop={this.canHaveFeesOnTop()}
                 />
                 <Box mt={[4, 5]}>
                   <NewContributionFlowButtons
