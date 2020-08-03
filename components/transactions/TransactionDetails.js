@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { TransactionTypes } from '../../lib/constants/transactions';
@@ -58,6 +58,7 @@ const TransactionDetails = ({
   amount,
   netAmount,
 }) => {
+  const intl = useIntl();
   const isCredit = type === TransactionTypes.CREDIT;
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
 
@@ -102,6 +103,8 @@ const TransactionDetails = ({
               netAmount,
               isCredit,
               isRefunded,
+              toAccount,
+              intl,
             })}
           </DetailDescription>
           {hasInvoiceBtn && (
