@@ -864,6 +864,7 @@
   "Fields.name": "名前",
   "Fields.website": "ウェブサイト",
   "FilesPreviewModal.AttachmentPreview": "Attachment preview",
+  "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "名前によるフィルター",
   "FinancialContributions": "財政コントリビュータ",
   "FinancialContributorsCountWithBold": "<bold>{count}</bold> {count, plural, one {financial contributor} other {financial contributors} }",

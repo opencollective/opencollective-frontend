@@ -864,6 +864,7 @@
   "Fields.name": "Nom",
   "Fields.website": "Site Web",
   "FilesPreviewModal.AttachmentPreview": "Aperçu des pièces jointes",
+  "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "Filtrer par nom",
   "FinancialContributions": "Contributions financières",
   "FinancialContributorsCountWithBold": "<bold>{count}</bold> {count, plural, one {financial contributor} other {financial contributors} }",
