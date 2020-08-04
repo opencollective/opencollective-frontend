@@ -70,12 +70,6 @@ const FeatureList = styled(Box)`
   margin: 14px 0;
 `;
 
-const Title = styled(Span)`
-  @media screen and (min-width: 40em) {
-    /* color: ${props => props.active && '#DC5F7D'}; */
-  }
-`;
-
 const LearnMoreLink = styled(StyledLink)`
   color: #dc5f7d;
   &:hover {
@@ -183,7 +177,7 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
         <Box display={['none', 'block']} width={[null, '48px']} height={[null, '48px']} mr={[3, 2]}>
           <Illustration src={iconUrl} alt={`${id} icon`} />
         </Box>
-        <Title
+        <Span
           color={['black.800', 'black.900', null]}
           active={id === activeFeature}
           fontWeight="500"
@@ -193,7 +187,7 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
           letterSpacing={['-0.6px', '-0.16px', null, null, '-0.2px']}
         >
           {intl.formatMessage(messages[`home.feature.${id}`])}
-        </Title>
+        </Span>
       </Container>
     </Flex>
   );

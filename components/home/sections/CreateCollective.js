@@ -1,34 +1,42 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
+import { flicker } from '../../StyledKeyframes';
 import { H4 } from '../../Text';
 
 const Wrapper = styled(Box)`
-  background-image: ${props =>
-    props.hovering
-      ? "url('/static/images/home/create-collective-bg-illustration-hover-sm.png')"
-      : "url('/static/images/home/create-collective-bg-illustration-sm.png')"};
+  background-image: url('/static/images/home/create-collective-bg-illustration.png');
   background-size: 100% 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 
-  @media screen and (min-width: 52em) {
-    background-image: ${props =>
-      props.hovering
-        ? "url('/static/images/home/create-collective-bg-illustration-hover.png')"
-        : "url('/static/images/home/create-collective-bg-illustration.png')"};
+  &:hover {
+    animation: ${flicker({ minOpacity: 0.9 })} 1s linear;
+    background-image: url('/static/images/home/create-collective-bg-illustration-hover.png');
     background-size: 100% 100%;
   }
 `;
 
-const CreateCollective = () => {
-  const [hoverCreateCollectiveButton, setHoverCreateCollectiveButton] = useState(false);
+const CreateCollectiveButton = styled(StyledButton)`
+  pointer-events: auto;
+`;
 
+const HoverBGImagePreLoader = styled.img.attrs({
+  alt: '',
+  src: '/static/images/home/create-collective-bg-illustration-hover.png',
+})`
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+`;
+
+const CreateCollective = () => {
   return (
     <Flex
       mx={[3, 4]}
@@ -47,16 +55,12 @@ const CreateCollective = () => {
           />
         </H4>
       </Box>
-      <Wrapper width={['288px', '283px']} height={['288px', '294']} hovering={hoverCreateCollectiveButton}>
+      <HoverBGImagePreLoader />
+      <Wrapper width={['288px', '283px']} height={['288px', '294px']}>
         <Link route="/create">
-          <StyledButton
-            buttonStyle="dark"
-            minWidth={'164px'}
-            onMouseEnter={() => setHoverCreateCollectiveButton(true)}
-            onMouseLeave={() => setHoverCreateCollectiveButton(false)}
-          >
+          <CreateCollectiveButton buttonStyle="dark" minWidth={'164px'}>
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-          </StyledButton>
+          </CreateCollectiveButton>
         </Link>
       </Wrapper>
     </Flex>
