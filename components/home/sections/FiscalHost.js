@@ -392,6 +392,7 @@ const FiscalHost = () => (
               padding="12px 20px"
               borderRadius="100px"
               color="black.700"
+              whiteSpace="nowrap"
             >
               <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
             </StyledButton>

@@ -86,7 +86,7 @@ const MakeCommunity = () => {
                 defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes."
               />
               <LineBreak />{' '}
-              <Span fontWeight="bold" display={['none', 'block']}>
+              <Span fontWeight="bold" display={['none', 'block', null, null, 'inline-block']}>
                 <FormattedMessage
                   id="home.makeCommunitySection.subTitle"
                   defaultMessage="Collect and spend money transparently."
@@ -133,7 +133,7 @@ const MakeCommunity = () => {
       <Container
         display={'flex'}
         justifyContent="center"
-        alignItems={[null, null, 'center']}
+        alignItems="center"
         flexDirection={['column', 'row']}
         mx={[3, 4]}
         my={[4, 5]}

@@ -138,7 +138,7 @@ const LearnMore = () => {
         width={[null, '650px', '704px', null, '1150px']}
         display="flex"
         flexDirection={['column', 'row']}
-        alignItems={['flex-start', 'center', null, null, 'baseline']}
+        alignItems={['center', null, null, null, 'baseline']}
         my={4}
         ml={[3, 0]}
         flexWrap={[null, 'wrap']}
@@ -202,7 +202,7 @@ const LearnMore = () => {
           </P>
         </Box>
         <IllustrationWrapper width={['287px']} height={['300px']} my={3} ml={[null, 4]}>
-          <Link route="/create">
+          <Link route="/opencollective/donate">
             <StyledButton buttonStyle="dark" minWidth={'97'}>
               <FormattedMessage id="home.donate" defaultMessage="Donate" />
             </StyledButton>
