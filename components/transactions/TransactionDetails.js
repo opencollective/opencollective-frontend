@@ -54,6 +54,7 @@ const TransactionDetails = ({
   order,
   platformFee,
   hostFee,
+  paymentMethod,
   paymentProcessorFee,
   amount,
   netAmount,
@@ -67,28 +68,30 @@ const TransactionDetails = ({
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
-      <Flex flexDirection="column" width={[1, 0.4]}>
-        {toAccount.host && (
-          <Box>
-            <DetailTitle>
-              <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
-            </DetailTitle>
-            <DetailDescription>
-              <LinkCollective collective={toAccount.host} />
-            </DetailDescription>
-          </Box>
-        )}
-        {order.paymentMethod && (
-          <Box>
-            <DetailTitle>
-              <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
-            </DetailTitle>
-            <DetailDescription>
-              <PaymentMethodTypeWithIcon type={order.paymentMethod.type} fontSize={11} iconSize={16} />
-            </DetailDescription>
-          </Box>
-        )}
-      </Flex>
+      {(toAccount.host || paymentMethod) && (
+        <Flex flexDirection="column" width={[1, 0.4]}>
+          {toAccount.host && (
+            <Box>
+              <DetailTitle>
+                <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
+              </DetailTitle>
+              <DetailDescription>
+                <LinkCollective collective={toAccount.host} />
+              </DetailDescription>
+            </Box>
+          )}
+          {paymentMethod && (
+            <Box>
+              <DetailTitle>
+                <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+              </DetailTitle>
+              <DetailDescription>
+                <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
+              </DetailDescription>
+            </Box>
+          )}
+        </Flex>
+      )}
       <Flex flexDirection="column" width={[1, 0.4]}>
         <Box>
           <DetailTitle>
@@ -148,9 +151,6 @@ TransactionDetails.propTypes = {
   order: PropTypes.shape({
     id: PropTypes.number,
     status: PropTypes.string,
-    paymentMethod: PropTypes.shape({
-      type: PropTypes.string,
-    }),
   }),
   uuid: PropTypes.string,
   type: PropTypes.string,
@@ -158,6 +158,9 @@ TransactionDetails.propTypes = {
   description: PropTypes.string,
   createdAt: PropTypes.string,
   taxAmount: PropTypes.number,
+  paymentMethod: PropTypes.shape({
+    type: PropTypes.string,
+  }),
   amount: PropTypes.shape({
     valueInCents: PropTypes.number,
     currency: PropTypes.string,

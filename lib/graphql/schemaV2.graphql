@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Sat Aug 01 2020 11:00:40 GMT+0200 (Central European Summer Time)
+# timestamp: Tue Aug 04 2020 10:43:42 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -237,6 +237,83 @@ enum AccountType {
   INDIVIDUAL
   ORGANIZATION
   PROJECT
+}
+
+"""
+An account that can receive financial contributions
+"""
+interface AccountWithContributions {
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers: TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+}
+
+"""
+An account that can be hosted by a Host
+"""
+interface AccountWithHost {
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Returns whether it's active: can accept financial contributions and pay expenses.
+  """
+  isActive: Boolean!
 }
 
 """
@@ -522,7 +599,7 @@ interface Collection {
 """
 This represents a Collective account
 """
-type Collective implements Account {
+type Collective implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -557,7 +634,7 @@ type Collective implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -667,11 +744,6 @@ type Collective implements Account {
   stats: AccountStats
 
   """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
-
-  """
   Returns the Fiscal Host
   """
   host: Host
@@ -694,7 +766,7 @@ type Collective implements Account {
   """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -722,6 +794,16 @@ type Collective implements Account {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 }
 
 input CollectiveCreateInput {
@@ -2281,6 +2363,7 @@ type Credit implements Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  paymentMethod: PaymentMethod
   fromAccount: Account
   toAccount: Account
 }
@@ -2398,6 +2481,7 @@ type Debit implements Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  paymentMethod: PaymentMethod
   fromAccount: Account
   toAccount: Account
 }
@@ -2405,7 +2489,7 @@ type Debit implements Transaction {
 """
 This represents an Event account
 """
-type Event implements Account {
+type Event implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -2440,7 +2524,7 @@ type Event implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -2550,11 +2634,6 @@ type Event implements Account {
   stats: AccountStats
 
   """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
-
-  """
   Returns the Fiscal Host
   """
   host: Host
@@ -2570,9 +2649,14 @@ type Event implements Account {
   hostFeePercent: Float
 
   """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -2583,6 +2667,7 @@ type Event implements Account {
     """
     accountType: AccountType
   ): Int!
+  tiers: TierCollection!
 
   """
   All the persons and entities that contribute to this account
@@ -2599,6 +2684,16 @@ type Event implements Account {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   The Collective hosting this Event
@@ -3114,7 +3209,7 @@ input ExpenseUpdateInput {
 """
 This represents an Project account
 """
-type Fund implements Account {
+type Fund implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -3149,7 +3244,7 @@ type Fund implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -3259,11 +3354,6 @@ type Fund implements Account {
   stats: AccountStats
 
   """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
-
-  """
   Returns the Fiscal Host
   """
   host: Host
@@ -3286,7 +3376,7 @@ type Fund implements Account {
   """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -3314,6 +3404,16 @@ type Fund implements Account {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 }
 
 input FundCreateInput {
@@ -4557,7 +4657,7 @@ input ProcessExpensePaymentParams {
 """
 This represents an Project account
 """
-type Project implements Account {
+type Project implements Account & AccountWithHost & AccountWithContributions {
   id: String
   legacyId: Int
 
@@ -4592,7 +4692,7 @@ type Project implements Account {
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -4702,11 +4802,6 @@ type Project implements Account {
   stats: AccountStats
 
   """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
-
-  """
   Returns the Fiscal Host
   """
   host: Host
@@ -4722,9 +4817,14 @@ type Project implements Account {
   hostFeePercent: Float
 
   """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
-  isApproved: Boolean
+  isApproved: Boolean!
 
   """
   Number of unique financial contributors.
@@ -4735,6 +4835,7 @@ type Project implements Account {
     """
     accountType: AccountType
   ): Int!
+  tiers: TierCollection!
 
   """
   All the persons and entities that contribute to this account
@@ -4751,6 +4852,16 @@ type Project implements Account {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
 
   """
   The Fund hosting this Project
@@ -5128,6 +5239,7 @@ interface Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  paymentMethod: PaymentMethod
 }
 
 """

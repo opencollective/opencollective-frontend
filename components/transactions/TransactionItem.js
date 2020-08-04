@@ -46,11 +46,12 @@ const TransactionItem = transaction => {
   } = transaction;
   const { LoggedInUser } = useUser();
   const [isExpanded, setExpanded] = React.useState(false);
-  const isOrder = order !== null;
+  const hasOrder = order !== null;
+  const hasExpense = expense !== null;
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
 
-  const avatarCollective = isOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
+  const avatarCollective = hasOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
 
   const isRoot = LoggedInUser && LoggedInUser.isRoot();
   const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(fromAccount);
@@ -58,8 +59,8 @@ const TransactionItem = transaction => {
   const isToCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(toAccount);
   const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
   const displayedAmount =
-    (isCredit && isOrder && !isRefunded) || // Credit from donations should display the full amount donated by the user
-    (!isCredit && !isOrder) // Expense Debits should display the Amount without Payment Method fees
+    (isCredit && hasOrder && !isRefunded) || // Credit from donations should display the full amount donated by the user
+    (!isCredit && !hasOrder) // Expense Debits should display the Amount without Payment Method fees
       ? amount
       : netAmount;
 
@@ -81,8 +82,8 @@ const TransactionItem = transaction => {
                 lineHeight="21px"
                 color={description ? 'black.900' : 'black.500'}
                 title={description}
-                cursor={!isOrder ? 'pointer' : 'initial'}
-                onClick={() => !isOrder && setExpanded(true)}
+                cursor={!hasOrder ? 'pointer' : 'initial'}
+                onClick={() => !hasOrder && setExpanded(true)}
               >
                 {description ? (
                   truncate(description, { length: 60 })
@@ -91,7 +92,7 @@ const TransactionItem = transaction => {
                 )}
               </P>
               <P mt="5px" fontSize="12px" lineHeight="16px" color="black.600" data-cy="transaction-details">
-                {isOrder ? (
+                {hasOrder ? (
                   <FormattedMessage
                     id="Transaction.from"
                     defaultMessage="from {name}"
@@ -121,7 +122,7 @@ const TransactionItem = transaction => {
                 <span data-cy="transaction-date">
                   <FormattedDate value={createdAt} />
                 </span>
-                {!isOrder && expense.comments?.totalCount && (
+                {hasExpense && expense.comments?.totalCount && (
                   <React.Fragment>
                     {INFO_SEPARATOR}
                     <span>
@@ -153,14 +154,11 @@ const TransactionItem = transaction => {
                 {displayedAmount.currency}
               </Span>
             </Container>
-            {isOrder ? (
-              <OrderStatusTag status={'PAID'} isRefund={isRefunded} fontSize="9px" px="6px" py="2px" />
-            ) : (
-              <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />
-            )}
+            {hasOrder && <OrderStatusTag status={'PAID'} isRefund={isRefunded} fontSize="9px" px="6px" py="2px" />}{' '}
+            {hasExpense && <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />}
           </Flex>
         </Flex>
-        {isOrder ? (
+        {!hasExpense && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
             <StyledButton
               data-cy="transaction-details"
@@ -188,14 +186,15 @@ const TransactionItem = transaction => {
               </Span>
             </StyledButton>
           </Container>
-        ) : (
+        )}
+        {hasExpense && (
           <Container mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
           </Container>
         )}
       </Box>
-      {isExpanded && isOrder && <TransactionDetails {...transaction} canDownloadInvoice={canDownloadInvoice} />}
-      {isExpanded && !isOrder && (
+      {isExpanded && !hasExpense && <TransactionDetails {...transaction} canDownloadInvoice={canDownloadInvoice} />}
+      {isExpanded && hasExpense && (
         <TransactionModal
           {...transaction}
           canDownloadInvoice={canDownloadInvoice}
