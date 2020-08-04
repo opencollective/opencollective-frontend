@@ -21,7 +21,7 @@ import TierCustomFields from './TierCustomFields';
 
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDeductibleInTheUS }) => {
   const intl = useIntl();
-  const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
+  const presets = React.useMemo(() => getTierPresets(tier, collective?.type), [tier, collective?.type]);
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value } });
   };
@@ -37,7 +37,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           onChange={amount => dispatchChange('amount', amount)}
         />
       </Box>
-      {tier.type === TierTypes.TICKET && (
+      {tier?.type === TierTypes.TICKET && (
         <Box mb={3}>
           <StyledInputField
             htmlFor="quantity"
@@ -53,7 +53,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
                 type="number"
                 min={1}
                 step={1}
-                max={tier.maxQuantity}
+                max={tier?.maxQuantity}
                 value={data?.quantity}
                 maxWidth={80}
                 onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
@@ -64,7 +64,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           </StyledInputField>
         </Box>
       )}
-      {(!tier || tier.amountType === 'FLEXIBLE') && (
+      {(!tier || tier?.amountType === 'FLEXIBLE') && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
           htmlFor="interval"
@@ -115,13 +115,13 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           </P>
         </React.Fragment>
       )}
-      {tier.customFields && (
+      {tier?.customFields && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
             <FormattedMessage id="OtherInfo" defaultMessage="Other information" />
           </H5>
           <TierCustomFields
-            fields={tier.customFields}
+            fields={tier?.customFields}
             data={data?.customFieldsData}
             onChange={customFieldsData => dispatchChange('customFieldsData', customFieldsData)}
           />
