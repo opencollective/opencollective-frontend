@@ -86,7 +86,7 @@ const ExpenseInvoicePreview = ({ isLoading, fileURL }) => {
 
 const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
   const [invoiceFile, setInvoiceFile] = React.useState(false);
-  const [invoiceBlob, setInvoiceBlob] = React.useState(false);
+  const [invoiceBlob, setInvoiceBlob] = React.useState(null);
   const files = React.useMemo(() => getFilesFromExpense(collective, expense), [collective, expense]);
 
   React.useEffect(() => {
@@ -111,7 +111,7 @@ const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
           collective={collective}
           expense={expense}
           item={item}
-          invoiceBlob={item.type === 'EXPENSE_INVOICE' && invoiceBlob}
+          invoiceBlob={item.type === 'EXPENSE_INVOICE' ? invoiceBlob : null}
         />
       )}
       renderItemPreview={({ item }) =>
