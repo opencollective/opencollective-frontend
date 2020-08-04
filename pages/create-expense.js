@@ -351,6 +351,25 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         tag
       }
 
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+          name
+          slug
+          type
+          expensePolicy
+          settings
+          location {
+            address
+            country
+          }
+          transferwise {
+            availableCurrencies
+          }
+        }
+      }
+
       ... on Organization {
         id
         isHost
@@ -368,84 +387,22 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
 
       ... on Collective {
         id
-        isApproved
         balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          settings
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
-        }
       }
 
       ... on Fund {
         id
-        isApproved
         balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          settings
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
-        }
       }
 
       ... on Event {
         id
-        isApproved
         balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
-        }
       }
 
       ... on Project {
         id
-        isApproved
         balance
-        host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
-        }
       }
     }
     loggedInAccount {

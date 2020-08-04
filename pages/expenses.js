@@ -314,6 +314,20 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         id
         tag
       }
+
+      ... on AccountWithHost {
+        host {
+          id
+          name
+          slug
+          type
+          plan {
+            transferwisePayouts
+            transferwisePayoutsLimit
+          }
+        }
+      }
+
       ... on Organization {
         balance
         # We add that for hasFeature
@@ -323,29 +337,9 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 
       ... on Collective {
         balance
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
-        }
       }
       ... on Fund {
         balance
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
-        }
       }
       ... on Event {
         balance
@@ -355,16 +349,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           slug
           type
         }
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
-        }
       }
       ... on Project {
         balance
@@ -373,16 +357,6 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           name
           slug
           type
-        }
-        host {
-          id
-          name
-          slug
-          type
-          plan {
-            transferwisePayouts
-            transferwisePayoutsLimit
-          }
         }
       }
     }

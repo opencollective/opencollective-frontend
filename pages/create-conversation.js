@@ -146,7 +146,7 @@ const createConversationPageQuery = gqlV2/* GraphQL */ `
         tag
       }
 
-      ... on Collective {
+      ... on AccountWithHost {
         isApproved
       }
     }

@@ -72,25 +72,12 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
                 valueInCents
               }
             }
-            ... on Collective {
-              totalFinancialContributors
+            ... on AccountWithHost {
               hostFeesStructure
               hostFeePercent
             }
-            ... on Fund {
+            ... on AccountWithContributions {
               totalFinancialContributors
-              hostFeesStructure
-              hostFeePercent
-            }
-            ... on Project {
-              totalFinancialContributors
-              hostFeesStructure
-              hostFeePercent
-            }
-            ... on Event {
-              totalFinancialContributors
-              hostFeesStructure
-              hostFeePercent
             }
           }
         }
