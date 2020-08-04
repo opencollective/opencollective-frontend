@@ -96,12 +96,12 @@ const transactionsQuery = gqlV2/* GraphQL */ `
           type
           imageUrl
         }
+        paymentMethod {
+          type
+        }
         order {
           id
           status
-          paymentMethod {
-            type
-          }
         }
         expense {
           id
