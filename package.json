@@ -74,7 +74,7 @@
     "memoize-one": "5.1.1",
     "moment": "2.27.0",
     "moment-timezone": "0.5.31",
-    "next": "9.3.2",
+    "next": "9.5.1",
     "next-routes": "1.4.2",
     "node-fetch": "2.6.0",
     "nprogress": "0.2.0",
