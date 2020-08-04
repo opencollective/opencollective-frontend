@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
 import { mapValues } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
@@ -24,112 +22,9 @@ import TransactionsDownloadInvoices from './TransactionsDownloadInvoices';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
 
-const transactionsQuery = gqlV2/* GraphQL */ `
-  query Transactions(
-    $slug: String!
-    $limit: Int!
-    $offset: Int!
-    $type: TransactionType
-    $minAmount: Int
-    $maxAmount: Int
-    $dateFrom: ISODateTime
-    $searchTerm: String
-  ) {
-    transactions(
-      account: { slug: $slug }
-      limit: $limit
-      offset: $offset
-      type: $type
-      minAmount: $minAmount
-      maxAmount: $maxAmount
-      dateFrom: $dateFrom
-      searchTerm: $searchTerm
-    ) {
-      totalCount
-      offset
-      limit
-      nodes {
-        id
-        uuid
-        amount {
-          currency
-          valueInCents
-        }
-        netAmount {
-          currency
-          valueInCents
-        }
-        platformFee {
-          currency
-          valueInCents
-        }
-        paymentProcessorFee {
-          currency
-          valueInCents
-        }
-        hostFee {
-          currency
-          valueInCents
-        }
-        type
-        description
-        createdAt
-        isRefunded
-        toAccount {
-          id
-          name
-          slug
-          type
-          imageUrl
-          ... on Collective {
-            host {
-              name
-              slug
-              type
-            }
-          }
-        }
-        fromAccount {
-          id
-          name
-          slug
-          type
-          imageUrl
-        }
-        paymentMethod {
-          type
-        }
-        order {
-          id
-          status
-        }
-        expense {
-          id
-          status
-          tags
-          type
-          legacyId
-          comments {
-            totalCount
-          }
-          payoutMethod {
-            type
-          }
-          account {
-            slug
-          }
-          createdByAccount {
-            slug
-          }
-        }
-      }
-    }
-  }
-`;
-
 const EXPENSES_PER_PAGE = 15;
 
-const getVariablesFromQuery = query => {
+export const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
   const [dateFrom] = getDateRangeFromPeriod(query.period);
   return {
@@ -146,12 +41,9 @@ const getVariablesFromQuery = query => {
   };
 };
 
-const Transactions = ({ collective, LoggedInUser }) => {
+const Transactions = ({ collective, transactionsQuery, LoggedInUser }) => {
   const { query } = useRouter() || {};
-  const { data, error, loading, variables } = useQuery(transactionsQuery, {
-    variables: { slug: collective.slug, ...getVariablesFromQuery(query) },
-    context: API_V2_CONTEXT,
-  });
+  const { transactions, error, loading, variables } = transactionsQuery;
   const hasFilters = React.useMemo(
     () =>
       Object.entries(query).some(([key, value]) => {
@@ -210,7 +102,7 @@ const Transactions = ({ collective, LoggedInUser }) => {
         <MessageBox type="error" withIcon>
           {getErrorFromGraphqlException(error).message}
         </MessageBox>
-      ) : !loading && !data.transactions?.nodes.length ? (
+      ) : !loading && !transactions?.nodes?.length ? (
         <MessageBox type="info" withIcon data-cy="zero-transactions-message">
           {hasFilters ? (
             <FormattedMessage
@@ -240,15 +132,11 @@ const Transactions = ({ collective, LoggedInUser }) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <TransactionsList
-            isLoading={loading}
-            nbPlaceholders={variables.limit}
-            transactions={data?.transactions?.nodes}
-          />
+          <TransactionsList isLoading={loading} nbPlaceholders={variables.limit} transactions={transactions?.nodes} />
           <Flex mt={5} justifyContent="center">
             <Pagination
               route="transactions"
-              total={data?.transactions?.totalCount}
+              total={transactions?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
               scrollToTopOnChange
@@ -270,6 +158,12 @@ Transactions.propTypes = {
     currency: PropTypes.string.isRequired,
     platformFeePercent: PropTypes.number,
   }).isRequired,
+  transactionsQuery: PropTypes.shape({
+    transactions: PropTypes.object,
+    loading: PropTypes.bool,
+    variables: PropTypes.object,
+    error: PropTypes.object,
+  }),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   LoggedInUser: PropTypes.object,

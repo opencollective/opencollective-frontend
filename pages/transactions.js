@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
 import { get } from 'lodash';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
 
 import Body from '../components/Body';
@@ -15,8 +17,111 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
-import Transactions from '../components/transactions/Transactions';
+import Transactions, { getVariablesFromQuery } from '../components/transactions/Transactions';
 import { withUser } from '../components/UserProvider';
+
+const transactionsQuery = gqlV2/* GraphQL */ `
+  query Transactions(
+    $slug: String!
+    $limit: Int!
+    $offset: Int!
+    $type: TransactionType
+    $minAmount: Int
+    $maxAmount: Int
+    $dateFrom: ISODateTime
+    $searchTerm: String
+  ) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      offset: $offset
+      type: $type
+      minAmount: $minAmount
+      maxAmount: $maxAmount
+      dateFrom: $dateFrom
+      searchTerm: $searchTerm
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        uuid
+        amount {
+          currency
+          valueInCents
+        }
+        netAmount {
+          currency
+          valueInCents
+        }
+        platformFee {
+          currency
+          valueInCents
+        }
+        paymentProcessorFee {
+          currency
+          valueInCents
+        }
+        hostFee {
+          currency
+          valueInCents
+        }
+        type
+        description
+        createdAt
+        isRefunded
+        toAccount {
+          id
+          name
+          slug
+          type
+          imageUrl
+          ... on Collective {
+            host {
+              name
+              slug
+              type
+            }
+          }
+        }
+        fromAccount {
+          id
+          name
+          slug
+          type
+          imageUrl
+        }
+        paymentMethod {
+          type
+        }
+        order {
+          id
+          status
+        }
+        expense {
+          id
+          status
+          tags
+          type
+          legacyId
+          comments {
+            totalCount
+          }
+          payoutMethod {
+            type
+          }
+          account {
+            slug
+          }
+          createdByAccount {
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
 
 const TransactionPageWrapper = styled.div`
   display: flex;
@@ -28,13 +133,14 @@ const TransactionPageWrapper = styled.div`
 `;
 
 class TransactionsPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { slug: collectiveSlug };
+  static async getInitialProps({ query: { collectiveSlug, ...query } }) {
+    return { slug: collectiveSlug, query };
   }
 
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveCoverData
     data: PropTypes.object.isRequired, // from withData
+    transactionsQuery: PropTypes.object,
     LoggedInUser: PropTypes.object,
   };
 
@@ -92,6 +198,7 @@ class TransactionsPage extends React.Component {
           </Container>
 
           <Transactions
+            transactionsQuery={this.props.transactionsQuery}
             collective={collective}
             showCSVlink={true}
             filters={true}
@@ -106,4 +213,15 @@ class TransactionsPage extends React.Component {
   }
 }
 
-export default withUser(addCollectiveCoverData(TransactionsPage));
+const addTransactionsData = graphql(transactionsQuery, {
+  skip: props => !props.slug,
+  name: 'transactionsQuery',
+  options: props => {
+    return {
+      variables: { slug: props.slug, ...getVariablesFromQuery(props.query) },
+      context: API_V2_CONTEXT,
+    };
+  },
+});
+
+export default withUser(addTransactionsData(addCollectiveCoverData(TransactionsPage)));
