@@ -64,7 +64,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           </StyledInputField>
         </Box>
       )}
-      {(!tier || tier?.amountType === 'FLEXIBLE') && (
+      {(!tier || tier.amountType === 'FLEXIBLE') && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
           htmlFor="interval"
