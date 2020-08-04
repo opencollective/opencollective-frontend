@@ -121,7 +121,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
             <FormattedMessage id="OtherInfo" defaultMessage="Other information" />
           </H5>
           <TierCustomFields
-            fields={tier?.customFields}
+            fields={tier.customFields}
             data={data?.customFieldsData}
             onChange={customFieldsData => dispatchChange('customFieldsData', customFieldsData)}
           />
