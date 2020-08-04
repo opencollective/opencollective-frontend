@@ -53,7 +53,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
                 type="number"
                 min={1}
                 step={1}
-                max={tier?.maxQuantity}
+                max={tier.maxQuantity}
                 value={data?.quantity}
                 maxWidth={80}
                 onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
