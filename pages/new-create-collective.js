@@ -40,7 +40,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   if (!skipQuery && (!data || !data.host)) {
-    return <ErrorPage error={generateNotFoundError(slug, true)} data={{ error }} log={false} />;
+    return <ErrorPage error={generateNotFoundError(slug)} data={{ error }} log={false} />;
   }
 
   return (

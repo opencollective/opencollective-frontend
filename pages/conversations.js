@@ -112,7 +112,7 @@ class ConversationsPage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       }
     }
 

@@ -138,7 +138,7 @@ class CollectivePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
-        return <ErrorPage error={generateNotFoundError(slug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
       } else if (data.Collective.isPledged && !data.Collective.isActive) {
         return <PledgedCollectivePage collective={data.Collective} />;
       } else if (data.Collective.isIncognito) {

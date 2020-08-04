@@ -303,9 +303,9 @@ class ExpensePage extends React.Component {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.expense) {
-        return <ErrorPage error={generateNotFoundError(null, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(null)} log={false} />;
       } else if (!data.expense.account || this.props.collectiveSlug !== data.expense.account.slug) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       }
     }
 

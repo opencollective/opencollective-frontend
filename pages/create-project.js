@@ -38,7 +38,7 @@ const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   if (!skipQuery && (!data || !data.account)) {
-    return <ErrorPage error={generateNotFoundError(slug, true)} data={{ error }} log={false} />;
+    return <ErrorPage error={generateNotFoundError(slug)} data={{ error }} log={false} />;
   }
 
   return (

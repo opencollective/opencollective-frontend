@@ -168,7 +168,7 @@ class ExpensePage extends React.Component {
       if (data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account || !data.expenses?.nodes) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug, true)} log={false} />;
+        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
       }
