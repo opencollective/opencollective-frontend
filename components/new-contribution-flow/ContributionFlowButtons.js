@@ -13,6 +13,7 @@ class NewContributionFlowButtons extends React.Component {
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
     isRecurringContributionLoggedOut: PropTypes.bool,
+    isValidating: PropTypes.bool,
   };
 
   getNextButtonLabel() {
@@ -27,17 +28,17 @@ class NewContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, goNext } = this.props;
+    const { goBack, goNext, isValidating } = this.props;
 
     return (
       <Flex justifyContent={'center'} mt={3}>
         <Fragment>
           {goBack && (
-            <StyledButton onClick={goBack} color="black.600">
+            <StyledButton onClick={goBack} color="black.600" disabled={isValidating}>
               &larr; <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
             </StyledButton>
           )}
-          <StyledButton ml={17} buttonStyle="primary" onClick={goNext} disabled={!goNext}>
+          <StyledButton ml={17} buttonStyle="primary" onClick={goNext} disabled={!goNext} loading={isValidating}>
             {this.getNextButtonLabel()} &rarr;
           </StyledButton>
         </Fragment>

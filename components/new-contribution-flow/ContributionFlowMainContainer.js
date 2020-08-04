@@ -24,7 +24,6 @@ class NewContributionFlowMainContainer extends React.Component {
     tier: PropTypes.object,
     onChange: PropTypes.func,
     showFeesOnTop: PropTypes.bool,
-    isTaxDeductibleInTheUS: PropTypes.bool,
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
@@ -117,7 +116,6 @@ class NewContributionFlowMainContainer extends React.Component {
             onChange={this.props.onChange}
             data={this.props.mainState.stepDetails}
             showFeesOnTop={this.props.showFeesOnTop}
-            isTaxDeductibleInTheUS={this.props.isTaxDeductibleInTheUS}
           />
         );
       case 'profile': {

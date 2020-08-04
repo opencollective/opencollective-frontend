@@ -7,10 +7,12 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
+import ErrorPage from '../components/ErrorPage';
 import { Flex } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
@@ -154,7 +156,6 @@ class NewContributionFlowPage extends React.Component {
   renderPageContent() {
     const { router, data = {}, intl, step } = this.props;
     const { account, tier } = data;
-    const isTaxDeductibleInTheUS = get(data, 'account.host.settings.taxDeductibleDonations');
 
     if (data.loading) {
       return (
@@ -180,7 +181,6 @@ class NewContributionFlowPage extends React.Component {
           collective={account}
           host={account.host}
           tier={tier}
-          isTaxDeductibleInTheUS={isTaxDeductibleInTheUS}
           step={step}
           verb={this.props.verb}
           redirect={this.props.redirect}
@@ -197,18 +197,18 @@ class NewContributionFlowPage extends React.Component {
   }
 
   render() {
+    const { data } = this.props;
+    if (!data.loading && !data.account) {
+      const error = data.error
+        ? getErrorFromGraphqlException(data.error)
+        : generateNotFoundError(this.props.collectiveSlug);
+
+      return <ErrorPage error={error} />;
+    }
+
     return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
   }
 }
-
-const hostFieldsFragment = gqlV2/* GraphQL */ `
-  fragment ContributionFlowHostFields on Host {
-    id
-    slug
-    name
-    settings
-  }
-`;
 
 const accountFieldsFragment = gqlV2/* GraphQL */ `
   fragment ContributionFlowAccountFields on Account {
@@ -224,7 +224,8 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     imageUrl
     isHost
     isActive
-    ... on Collective {
+    ... on AccountWithContributions {
+      platformContributionAvailable
       contributors(limit: 6) {
         totalCount
         nodes {
@@ -234,27 +235,16 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
           collectiveSlug
         }
       }
-      host {
-        ...ContributionFlowHostFields
-      }
     }
-    ... on Event {
+    ... on AccountWithHost {
       host {
-        ...ContributionFlowHostFields
-      }
-    }
-    ... on Fund {
-      host {
-        ...ContributionFlowHostFields
-      }
-    }
-    ... on Project {
-      host {
-        ...ContributionFlowHostFields
+        id
+        slug
+        name
+        settings
       }
     }
   }
-  ${hostFieldsFragment}
 `;
 
 const accountQuery = gqlV2/* GraphQL */ `
@@ -273,6 +263,7 @@ const accountWithTierQuery = gqlV2/* GraphQL */ `
     }
     tier(tier: $tier) {
       id
+      legacyId
       type
       name
       slug

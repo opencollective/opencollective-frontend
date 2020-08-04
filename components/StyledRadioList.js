@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { find, isUndefined } from 'lodash';
 import styled from 'styled-components';
+import { size } from 'styled-system';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -26,6 +27,7 @@ export const getKeyExtractor = (options, keyGetter) => {
 };
 
 const RadioInput = styled.input`
+  ${size}
   &[type='radio'] {
     margin: 0;
   }
@@ -67,6 +69,7 @@ const StyledRadioList = ({
   disabled,
   containerProps,
   labelProps,
+  radioSize,
   ...props
 }) => {
   const [localStateSelected, setSelected] = useState(props.defaultValue);
@@ -90,6 +93,7 @@ const StyledRadioList = ({
                 name={name}
                 id={id && key + id}
                 value={key}
+                size={radioSize}
                 defaultChecked={isUndefined(props.defaultValue) ? undefined : defaultValueStr === key}
                 checked={isUndefined(props.value) ? undefined : props.value === key}
                 disabled={disabled || (value && value.disabled)} // disable a specific option or entire options
@@ -143,6 +147,7 @@ StyledRadioList.propTypes = {
   labelProps: PropTypes.object,
   /** If true, user won't be able to interact with the element */
   disabled: PropTypes.bool,
+  radioSize: PropTypes.number,
 };
 
 const defaultChild = ({ value, radio }) => (
