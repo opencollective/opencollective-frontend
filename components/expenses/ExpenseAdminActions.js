@@ -89,7 +89,7 @@ const ExpenseAdminActions = ({ expense, collective, permissions, onError, onEdit
   return (
     <React.Fragment>
       {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
-        <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError} disablePreview>
+        <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
           {({ isLoading, downloadInvoice }) => (
             <ButtonWithLabel
               loading={isLoading}

@@ -26,11 +26,7 @@ export const generateInvoiceBlob = async expense => {
   return fetchFromPDFService(invoiceUrl);
 };
 
-export const downloadExpenseInvoice = async (
-  collective,
-  expense,
-  { setLoading, isLoading, onError, disablePreview },
-) => {
+export const downloadExpenseInvoice = async (collective, expense, { setLoading, isLoading, onError }) => {
   if (isLoading) {
     return false;
   }
@@ -39,16 +35,7 @@ export const downloadExpenseInvoice = async (
   setLoading(true);
   try {
     const file = await generateInvoiceBlob(expense);
-    if (disablePreview) {
-      return saveAs(file, filename);
-    } else {
-      try {
-        const blobURL = URL.createObjectURL(file);
-        window.open(blobURL);
-      } catch (e) {
-        return saveAs(file, filename);
-      }
-    }
+    return saveAs(file, filename);
   } catch (e) {
     const error = getErrorFromPdfService(e);
     onError(error);
