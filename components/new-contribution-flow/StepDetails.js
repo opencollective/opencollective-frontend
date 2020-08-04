@@ -37,7 +37,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           onChange={amount => dispatchChange('amount', amount)}
         />
       </Box>
-      {tier.type === TierTypes.TICKET && (
+      {tier?.type === TierTypes.TICKET && (
         <Box mb={3}>
           <StyledInputField
             htmlFor="quantity"
@@ -115,7 +115,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           </P>
         </React.Fragment>
       )}
-      {tier.customFields && (
+      {tier?.customFields && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
             <FormattedMessage id="OtherInfo" defaultMessage="Other information" />
