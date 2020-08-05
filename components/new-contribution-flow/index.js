@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, pick } from 'lodash';
@@ -18,6 +16,7 @@ import NewContributeFAQ from '../../components/faqs/NewContributeFAQ';
 import { Box, Flex } from '../../components/Grid';
 import { addSignupMutation } from '../../components/SignInOrJoinFree';
 
+import Loading from '../Loading';
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
@@ -62,12 +61,22 @@ class ContributionFlow extends React.Component {
     collective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
-      feesOnTopAvailable: PropTypes.bool.isRequired,
+      platformContributionAvailable: PropTypes.bool,
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string,
+      }),
     }).isRequired,
     host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
     createUser: PropTypes.func,
+    fixedInterval: PropTypes.string,
+    fixedAmount: PropTypes.number,
+    skipStepDetails: PropTypes.bool,
+    step: PropTypes.string,
+    verb: PropTypes.oneOf(['new-donate', 'new-contribute']),
+    /** @ignore from withUser */
+    LoggedInUser: PropTypes.object,
   };
 
   constructor(props) {
@@ -78,8 +87,8 @@ class ContributionFlow extends React.Component {
       stepSummary: null,
       stepDetails: {
         quantity: 1,
-        interval: props.tier?.interval,
-        amount: getDefaultTierAmount(props.tier),
+        interval: props.fixedInterval || props.tier?.interval,
+        amount: props.fixedAmount || getDefaultTierAmount(props.tier),
       },
     };
   }
@@ -143,7 +152,7 @@ class ContributionFlow extends React.Component {
 
     let route = 'new-donate';
     if (tier) {
-      params.tierId = tier.id;
+      params.tierId = tier.legacyId;
       params.tierSlug = tier.slug;
       if (tier.type === 'TICKET' && collective.parentCollective) {
         route = 'orderEventTier';
@@ -186,8 +195,7 @@ class ContributionFlow extends React.Component {
   taxesMayApply = memoizeOne(taxesMayApply);
 
   canHaveFeesOnTop() {
-    // TODO add feesOnTopAvailable to the query
-    if (!this.props.collective.feesOnTopAvailable) {
+    if (!this.props.collective.platformContributionAvailable) {
       return false;
     } else if (this.props.tier?.type === TierTypes.TICKET) {
       return false;
@@ -244,7 +252,7 @@ class ContributionFlow extends React.Component {
   }
 
   render() {
-    const { collective, tier, isTaxDeductibleInTheUS, LoggedInUser } = this.props;
+    const { collective, tier, LoggedInUser } = this.props;
     return (
       <Steps
         steps={this.getSteps()}
@@ -264,67 +272,71 @@ class ContributionFlow extends React.Component {
           nextStep,
           isValidating,
           isValidStep,
-        }) => (
-          <Container
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            py={[3, 4, 5]}
-            mb={4}
-            ref={this.mainContainerRef}
-          >
-            <Box px={[2, 3]} mb={4}>
-              <ContributionFlowHeader collective={collective} />
-            </Box>
-            <StepsProgressBox mb={3} width={[1.0, 0.8]}>
-              <ContributionFlowStepsProgress
-                steps={steps}
-                currentStep={currentStep}
-                lastVisitedStep={lastVisitedStep}
-                goToStep={goToStep}
-                stepProfile={this.state.stepProfile}
-                stepDetails={this.state.stepDetails}
-                stepPayment={this.state.stepPayment}
-                submitted={this.state.submitted}
-                loading={this.state.loading || this.state.submitting}
-                currency={collective.currency}
-                isFreeTier={this.getTierMinAmount(tier) === 0}
-              />
-            </StepsProgressBox>
-            {/* main container */}
-            <Flex justifyContent="center" width={1} maxWidth={1340} flexWrap={['wrap', 'nowrap']} px={[2, 3]}>
-              <Box display={['none', null, null, 'block']} width={[0.5, null, null, null, 1 / 3]} />
-              <Box as="form" flex="1 1 50%" onSubmit={e => e.preventDefault()}>
-                <ContributionFlowMainContainer
-                  collective={collective}
-                  tier={tier}
-                  mainState={this.state}
-                  onChange={data => this.setState(data)}
-                  step={currentStep}
-                  isTaxDeductibleInTheUS={isTaxDeductibleInTheUS}
-                  showFeesOnTop={this.canHaveFeesOnTop()}
+        }) =>
+          !isValidStep ? (
+            <Loading />
+          ) : (
+            <Container
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              py={[3, 4, 5]}
+              mb={4}
+              ref={this.mainContainerRef}
+            >
+              <Box px={[2, 3]} mb={4}>
+                <ContributionFlowHeader collective={collective} />
+              </Box>
+              <StepsProgressBox mb={3} width={[1.0, 0.8]}>
+                <ContributionFlowStepsProgress
+                  steps={steps}
+                  currentStep={currentStep}
+                  lastVisitedStep={lastVisitedStep}
+                  goToStep={goToStep}
+                  stepProfile={this.state.stepProfile}
+                  stepDetails={this.state.stepDetails}
+                  stepPayment={this.state.stepPayment}
+                  submitted={this.state.submitted}
+                  loading={this.state.loading || this.state.submitting}
+                  currency={collective.currency}
+                  isFreeTier={this.getTierMinAmount(tier) === 0}
                 />
-                <Box mt={[4, 5]}>
-                  <NewContributionFlowButtons
-                    goNext={goNext}
-                    goBack={goBack}
+              </StepsProgressBox>
+              {/* main container */}
+              <Flex justifyContent="center" width={1} maxWidth={1340} flexWrap={['wrap', 'nowrap']} px={[2, 3]}>
+                <Box display={['none', null, null, 'block']} width={[0.5, null, null, null, 1 / 3]} />
+                <Box as="form" flex="1 1 50%" onSubmit={e => e.preventDefault()}>
+                  <ContributionFlowMainContainer
+                    collective={collective}
+                    tier={tier}
+                    mainState={this.state}
+                    onChange={data => this.setState(data)}
                     step={currentStep}
-                    prevStep={prevStep}
-                    nextStep={nextStep}
-                    isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.interval}
+                    showFeesOnTop={this.canHaveFeesOnTop()}
                   />
+                  <Box mt={[4, 5]}>
+                    <NewContributionFlowButtons
+                      goNext={goNext}
+                      goBack={goBack}
+                      step={currentStep}
+                      prevStep={prevStep}
+                      nextStep={nextStep}
+                      isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.interval}
+                      isValidating={isValidating}
+                    />
+                  </Box>
                 </Box>
-              </Box>
-              <Box minWidth="300px" width={1 / 3} ml={[0, 4]} mt={[4, 0]}>
-                <Box maxWidth={['100%', 300]}>
-                  <SafeTransactionMessage />
-                  <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                <Box minWidth="300px" width={1 / 3} ml={[0, 4]} mt={[4, 0]}>
+                  <Box maxWidth={['100%', 300]}>
+                    <SafeTransactionMessage />
+                    <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
+                  </Box>
                 </Box>
-              </Box>
-            </Flex>
-          </Container>
-        )}
+              </Flex>
+            </Container>
+          )
+        }
       </Steps>
     );
   }

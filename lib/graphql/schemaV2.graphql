@@ -5158,7 +5158,8 @@ type TagStat {
 Tier model
 """
 type Tier {
-  id: String
+  id: String!
+  legacyId: Int!
   slug: String
   name: String
   description: String

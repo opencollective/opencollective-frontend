@@ -51,6 +51,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
           options={profiles}
           keyGetter="id"
           defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}
+          radioSize={16}
           onChange={selected => {
             onChange({ stepProfile: selected.value });
           }}
@@ -62,27 +63,26 @@ const NewContributionFlowStepProfileLoggedInForm = ({
                   <Box as="span" mr={3} flexWrap="wrap">
                     {radio}
                   </Box>
-                  <Flex mr={2} css={{ flexBasis: '26px' }}>
-                    {value.type === 'USER' && <Avatar collective={value} size="3.6rem" />}
-                    {value.type !== 'USER' && value.slug && <Avatar collective={value} radius="3.6rem" />}
+                  <Flex mr={3} css={{ flexBasis: '26px' }}>
+                    <Avatar collective={value} size="3.6rem" />
                   </Flex>
                   <Flex flexDirection="column" maxWidth={200}>
-                    <P fontSize="14px" fontWeight={600} color="black.900" mb={1}>
+                    <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900">
                       {value.name}
                     </P>
                     {value.type === 'USER' && (
-                      <P fontSize="12px" fontWeight={400} color="black.500">
+                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
                         <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" /> -{' '}
                         {value.email}
                       </P>
                     )}
                     {value.type === 'COLLECTIVE' && (
-                      <P fontSize="12px" fontWeight={400} color="black.500">
+                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
                         <FormattedMessage id="ContributionFlow.CollectiveProfile" defaultMessage="Collective profile" />
                       </P>
                     )}
                     {value.type === 'ORGANIZATION' && (
-                      <P fontSize="12px" fontWeight={400} color="black.500">
+                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
                         <FormattedMessage
                           id="ContributionFlow.OrganizationProfile"
                           defaultMessage="Organization profile"
@@ -91,7 +91,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
                     )}
                   </Flex>
                 </Flex>
-                <InfoCircle size={16} />
+                <InfoCircle size={16} color="#C4C7CC" />
               </Flex>
             </Box>
           )}

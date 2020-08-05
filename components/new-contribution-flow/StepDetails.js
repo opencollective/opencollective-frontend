@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { i18nInterval } from '../../lib/i18n/interval';
@@ -19,7 +20,7 @@ import { H5, P, Span } from '../Text';
 import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDeductibleInTheUS }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
   const dispatchChange = (field, value) => {
@@ -104,7 +105,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
           />
         </Box>
       )}
-      {isTaxDeductibleInTheUS && (
+      {hostIsTaxDeductibeInTheUs(collective.host) && (
         <React.Fragment>
           <StyledHr borderColor="black.300" mb={2} mt={24} />
           <P fontSize="11px" lineHeight="16px" fontStyle="italic" color="black.600">
@@ -134,7 +135,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, isTaxDed
 StepDetails.propTypes = {
   onChange: PropTypes.func,
   showFeesOnTop: PropTypes.bool,
-  isTaxDeductibleInTheUS: PropTypes.bool,
   data: PropTypes.shape({
     amount: PropTypes.number,
     feesOnTop: PropTypes.number,
@@ -145,6 +145,7 @@ StepDetails.propTypes = {
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
+    host: PropTypes.object,
   }).isRequired,
   tier: PropTypes.shape({
     amountType: PropTypes.string,
