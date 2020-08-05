@@ -340,7 +340,6 @@ class TransactionsPage extends React.Component {
 
 const addTransactionsData = graphql(transactionsQuery, {
   name: 'transactionsData',
-  // skip: props => !props.slug,
   options: props => {
     return {
       variables: { slug: props.slug, ...getVariablesFromQuery(props.query) },
