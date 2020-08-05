@@ -1,23 +1,38 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import { get } from 'lodash';
+import { get, mapValues } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveCoverData } from '../lib/graphql/queries';
+import { Router } from '../server/pages';
 
 import Body from '../components/Body';
 import { Sections } from '../components/collective-page/_constants';
 import CollectiveNavbar from '../components/CollectiveNavbar';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
+import { parseAmountRange } from '../components/expenses/filters/ExpensesAmountFilter';
+import { getDateRangeFromPeriod } from '../components/expenses/filters/ExpensesDateFilter';
 import Footer from '../components/Footer';
+import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import Link from '../components/Link';
 import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
-import Transactions, { getVariablesFromQuery } from '../components/transactions/Transactions';
+import Pagination from '../components/Pagination';
+import SearchBar from '../components/SearchBar';
+import StyledHr from '../components/StyledHr';
+import { H1 } from '../components/Text';
+import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
+import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
+import TransactionsFilters from '../components/transactions/TransactionsFilters';
+import TransactionsList from '../components/transactions/TransactionsList';
 import { withUser } from '../components/UserProvider';
 
 const transactionsQuery = gqlV2/* GraphQL */ `
@@ -132,6 +147,25 @@ const TransactionPageWrapper = styled.div`
   }
 `;
 
+const EXPENSES_PER_PAGE = 15;
+
+const getVariablesFromQuery = query => {
+  const amountRange = parseAmountRange(query.amount);
+  const [dateFrom] = getDateRangeFromPeriod(query.period);
+  return {
+    offset: parseInt(query.offset) || 0,
+    limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
+    type: query.type,
+    status: query.status,
+    tags: query.tag ? [query.tag] : undefined,
+    minAmount: amountRange[0] && amountRange[0] * 100,
+    maxAmount: amountRange[1] && amountRange[1] * 100,
+    payoutMethodType: query.payout,
+    dateFrom,
+    searchTerm: query.searchTerm,
+  };
+};
+
 class TransactionsPage extends React.Component {
   static async getInitialProps({ query: { collectiveSlug, ...query } }) {
     return { slug: collectiveSlug, query };
@@ -140,8 +174,9 @@ class TransactionsPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveCoverData
     data: PropTypes.object.isRequired, // from withData
-    transactionsQuery: PropTypes.object,
+    transactionsData: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    query: PropTypes.object,
   };
 
   constructor(props) {
@@ -167,17 +202,25 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser } = this.props;
+    const { LoggedInUser, query, transactionsData, data, slug } = this.props;
     const collective = get(this.props, 'data.Collective') || this.state.Collective;
+    const { transactions, error, loading, variables } = transactionsData;
+    const hasFilters = Object.entries(query).some(([key, value]) => {
+      return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
+    });
+    const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
+    const isCollectiveAdmin = LoggedInUser?.canEditCollective(collective);
+    const canDownloadInvoices =
+      isHostAdmin || (isCollectiveAdmin && (collective.type === 'ORGANIZATION' || collective.type === 'USER'));
 
-    if (!collective && this.props.data.loading) {
+    if (!collective && data.loading) {
       return (
         <Page title="Transactions">
           <Loading />
         </Page>
       );
     } else if (!collective) {
-      return <ErrorPage data={this.props.data} />;
+      return <ErrorPage data={data} />;
     }
 
     return (
@@ -196,15 +239,98 @@ class TransactionsPage extends React.Component {
               }}
             />
           </Container>
-
-          <Transactions
-            transactionsQuery={this.props.transactionsQuery}
-            collective={collective}
-            showCSVlink={true}
-            filters={true}
-            LoggedInUser={LoggedInUser}
-            dateDisplayType="date"
-          />
+          <Box maxWidth={1000} m="0 auto" py={[0, 5]} px={2}>
+            <Flex justifyContent="space-between">
+              <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
+                <FormattedMessage id="section.transactions.title" defaultMessage="Transactions" />
+              </H1>
+              <Box p={2} flexGrow={[1, 0]}>
+                <SearchBar
+                  defaultValue={query.searchTerm}
+                  onSubmit={searchTerm => Router.pushRoute('transactions', { ...query, searchTerm, offset: null })}
+                />
+              </Box>
+            </Flex>
+            <StyledHr my="24px" mx="8px" borderWidth="0.5px" />
+            <Flex
+              mb={['8px', '46px']}
+              mx="8px"
+              justifyContent="space-between"
+              flexDirection={['column', 'row']}
+              alignItems={['stretch', 'flex-end']}
+            >
+              <TransactionsFilters
+                filters={query}
+                collective={collective}
+                onChange={queryParams =>
+                  Router.pushRoute('transactions', {
+                    ...query,
+                    ...queryParams,
+                    collectiveSlug: slug,
+                    offset: null,
+                  })
+                }
+              />
+              <Flex>
+                {canDownloadInvoices && (
+                  <Box mr="8px">
+                    <TransactionsDownloadInvoices collective={collective} />
+                  </Box>
+                )}
+                <TransactionsDownloadCSV collective={collective} />
+              </Flex>
+            </Flex>
+            {error ? (
+              <MessageBox type="error" withIcon>
+                {getErrorFromGraphqlException(error).message}
+              </MessageBox>
+            ) : !loading && !transactions?.nodes?.length ? (
+              <MessageBox type="info" withIcon data-cy="zero-transactions-message">
+                {hasFilters ? (
+                  <FormattedMessage
+                    id="TransactionsList.Empty"
+                    defaultMessage="No transaction matches the given filters, <ResetLink>reset them</ResetLink> to see all transactions."
+                    values={{
+                      ResetLink(text) {
+                        return (
+                          <Link
+                            data-cy="reset-transactions-filters"
+                            route="transactions"
+                            params={{
+                              ...mapValues(query, () => null),
+                              collectiveSlug: collective.slug,
+                              view: 'transactions',
+                            }}
+                          >
+                            {text}
+                          </Link>
+                        );
+                      },
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
+                )}
+              </MessageBox>
+            ) : (
+              <React.Fragment>
+                <TransactionsList
+                  isLoading={loading}
+                  nbPlaceholders={variables.limit}
+                  transactions={transactions?.nodes}
+                />
+                <Flex mt={5} justifyContent="center">
+                  <Pagination
+                    route="transactions"
+                    total={transactions?.totalCount}
+                    limit={variables.limit}
+                    offset={variables.offset}
+                    scrollToTopOnChange
+                  />
+                </Flex>
+              </React.Fragment>
+            )}
+          </Box>
         </Body>
 
         <Footer />
@@ -214,8 +340,8 @@ class TransactionsPage extends React.Component {
 }
 
 const addTransactionsData = graphql(transactionsQuery, {
-  skip: props => !props.slug,
-  name: 'transactionsQuery',
+  name: 'transactionsData',
+  // skip: props => !props.slug,
   options: props => {
     return {
       variables: { slug: props.slug, ...getVariablesFromQuery(props.query) },
