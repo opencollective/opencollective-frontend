@@ -29,6 +29,7 @@ import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
+import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
 import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
 import TransactionsFilters from '../components/transactions/TransactionsFilters';
@@ -56,86 +57,10 @@ const transactionsQuery = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       searchTerm: $searchTerm
     ) {
-      totalCount
-      offset
-      limit
-      nodes {
-        id
-        uuid
-        amount {
-          currency
-          valueInCents
-        }
-        netAmount {
-          currency
-          valueInCents
-        }
-        platformFee {
-          currency
-          valueInCents
-        }
-        paymentProcessorFee {
-          currency
-          valueInCents
-        }
-        hostFee {
-          currency
-          valueInCents
-        }
-        type
-        description
-        createdAt
-        isRefunded
-        toAccount {
-          id
-          name
-          slug
-          type
-          imageUrl
-          ... on Collective {
-            host {
-              name
-              slug
-              type
-            }
-          }
-        }
-        fromAccount {
-          id
-          name
-          slug
-          type
-          imageUrl
-        }
-        paymentMethod {
-          type
-        }
-        order {
-          id
-          status
-        }
-        expense {
-          id
-          status
-          tags
-          type
-          legacyId
-          comments {
-            totalCount
-          }
-          payoutMethod {
-            type
-          }
-          account {
-            slug
-          }
-          createdByAccount {
-            slug
-          }
-        }
-      }
+      ...TransactionsQueryCollectionFragment
     }
   }
+  ${transactionsQueryCollectionFragment}
 `;
 
 const TransactionPageWrapper = styled.div`

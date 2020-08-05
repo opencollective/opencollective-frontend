@@ -1,23 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
-import { orderBy } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+
 import { Dimensions } from '../_constants';
-import BudgetItemsList, {
-  budgetItemExpenseFragment,
-  budgetItemExpenseTypeFragment,
-  budgetItemOrderFragment,
-} from '../../budget/BudgetItemsList';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledFilters from '../../StyledFilters';
+import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
+import TransactionsList from '../../transactions/TransactionsList';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -39,181 +35,112 @@ const I18nFilters = defineMessages({
   },
 });
 
-class SectionTransactions extends React.Component {
-  static propTypes = {
-    /** Collective */
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      platformFeePercent: PropTypes.number,
-    }).isRequired,
+const SectionTransactions = props => {
+  const [filter, setFilter] = React.useState(FILTERS.ALL);
+  React.useEffect(() => {
+    props.data.refetch();
+  }, [props.data, props.isAdmin, props.isRoot]);
+  React.useEffect(() => {
+    const hasExpense = filter === FILTERS.EXPENSES || undefined;
+    const hasOrder = filter === FILTERS.CONTRIBUTIONS || undefined;
+    props.data.refetch({ slug: props.collective.slug, limit: NB_DISPLAYED, hasExpense, hasOrder });
+  }, [filter, props.collective.slug, props.data]);
 
-    /** Wether user is admin of `collective` */
-    isAdmin: PropTypes.bool,
+  const { data, intl, collective } = props;
+  const showFilters = data?.transactions?.length !== 0;
 
-    /** Wether user is root user */
-    isRoot: PropTypes.bool,
-
-    /** @ignore from withData */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      refetch: PropTypes.func,
-      /** Expenses paid + refunds */
-      contributions: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.number.isRequired,
-          amount: PropTypes.number.isRequired,
-          createdAt: PropTypes.string.isRequired,
-          type: PropTypes.string.isRequired,
-          description: PropTypes.string,
-          fromcollective: PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            name: PropTypes.string.isRequired,
-            slug: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            imageUrl: PropTypes.string,
-            isIncognito: PropTypes.bool,
-          }),
-          usingVirtualCardFromCollective: PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            name: PropTypes.string.isRequired,
-            slug: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-          }),
-        }),
-      ),
-      /** Financial contributions */
-      expenses: PropTypes.shape({
-        entries: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            amount: PropTypes.number.isRequired,
-            description: PropTypes.string.isRequired,
-            createdAt: PropTypes.string.isRequired,
-            transaction: PropTypes.shape({
-              id: PropTypes.number,
-            }),
-            fromCollective: PropTypes.shape({
-              id: PropTypes.number,
-              slug: PropTypes.string.isRequired,
-              name: PropTypes.string.isRequired,
-              imageUrl: PropTypes.string,
-              isIncognito: PropTypes.bool,
-            }).isRequired,
-          }),
-        ),
-      }),
-    }),
-
-    /** @ignore from injectIntl */
-    intl: PropTypes.object,
-  };
-
-  state = { filter: FILTERS.ALL };
-
-  componentDidUpdate(oldProps) {
-    // If users just logged in (or logged  out), refetch the data so we can get the transactions
-    // `uuid` that will make it possible for them to download the expenses.
-    const hadAccess = oldProps.isAdmin || oldProps.isRoot;
-    const hasAccess = this.props.isAdmin || this.props.isRoot;
-    if (hadAccess !== hasAccess) {
-      this.props.data.refetch();
-    }
-  }
-
-  getBudgetItems = memoizeOne((contributions, expenses, filter) => {
-    if (filter === FILTERS.EXPENSES) {
-      return expenses;
-    } else if (filter === FILTERS.CONTRIBUTIONS) {
-      return contributions;
-    } else {
-      return orderBy([...contributions, ...expenses], t => new Date(t.createdAt), ['desc']).slice(0, NB_DISPLAYED);
-    }
-  });
-
-  render() {
-    const { data, intl, collective, isAdmin, isRoot } = this.props;
-    const { filter } = this.state;
-    let showFilters = true;
-
-    if (!data || data.loading) {
-      return <LoadingPlaceholder height={600} borderRadius={0} />;
-    }
-
-    const contributions = data.contributions || [];
-    const expenses = (data.expenses && data.expenses.entries) || [];
-    if (contributions.length === 0 && expenses.length === 0) {
-      return (
-        <ContainerSectionContent pt={5} pb={6}>
-          <SectionTitle mb={4} fontSize={['H4', 'H2']}>
-            <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-          </SectionTitle>
-          <MessageBox type="info" withIcon>
-            <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
-          </MessageBox>
-        </ContainerSectionContent>
-      );
-    } else if (contributions.length === 0 || expenses.length === 0) {
-      showFilters = false;
-    }
-
-    const budgetItems = this.getBudgetItems(contributions, expenses, filter);
+  if (!data?.transactions?.nodes?.length) {
     return (
-      <Box py={5}>
-        <ContainerSectionContent>
-          <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
-            <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-          </SectionTitle>
-        </ContainerSectionContent>
-        {showFilters && (
-          <Box mb={3} maxWidth={Dimensions.MAX_SECTION_WIDTH} mx="auto">
-            <StyledFilters
-              filters={FILTERS_LIST}
-              selected={this.state.filter}
-              onChange={filter => this.setState({ filter })}
-              getLabel={filter => intl.formatMessage(I18nFilters[filter])}
-              minButtonWidth={180}
-              px={Dimensions.PADDING_X}
-            />
-          </Box>
-        )}
-
-        <ContainerSectionContent>
-          <BudgetItemsList items={budgetItems} canDownloadInvoice={isAdmin || isRoot} isInverted />
-          <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
-              <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
-            </StyledButton>
-          </Link>
-        </ContainerSectionContent>
-      </Box>
+      <ContainerSectionContent pt={5} pb={6}>
+        <SectionTitle mb={4} fontSize={['H4', 'H2']}>
+          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+        </SectionTitle>
+        <MessageBox type="info" withIcon>
+          <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
+        </MessageBox>
+      </ContainerSectionContent>
     );
   }
-}
 
-const transactionsSectionQuery = gql`
-  query TransactionsSection($id: Int!, $nbDisplayed: Int!) {
-    contributions: allTransactions(CollectiveId: $id, includeExpenseTransactions: false, limit: $nbDisplayed) {
-      ...BudgetItemExpenseFragment
-      ...BudgetItemOrderFragment
-    }
-    expenses(FromCollectiveId: $id, limit: $nbDisplayed) {
-      entries: expenses {
-        ...BudgetItemExpenseTypeFragment
-      }
+  return (
+    <Box py={5}>
+      <ContainerSectionContent>
+        <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
+          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+        </SectionTitle>
+      </ContainerSectionContent>
+      {showFilters && (
+        <Box mb={3} maxWidth={Dimensions.MAX_SECTION_WIDTH} mx="auto">
+          <StyledFilters
+            filters={FILTERS_LIST}
+            selected={filter}
+            onChange={setFilter}
+            getLabel={filter => intl.formatMessage(I18nFilters[filter])}
+            minButtonWidth={180}
+            px={Dimensions.PADDING_X}
+          />
+        </Box>
+      )}
+
+      <ContainerSectionContent>
+        {data.loading ? (
+          <LoadingPlaceholder height={600} borderRadius={8} />
+        ) : (
+          <TransactionsList transactions={data?.transactions?.nodes} />
+        )}
+        <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+          <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
+            <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
+          </StyledButton>
+        </Link>
+      </ContainerSectionContent>
+    </Box>
+  );
+};
+
+SectionTransactions.propTypes = {
+  /** Collective */
+  collective: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
+    platformFeePercent: PropTypes.number,
+  }).isRequired,
+
+  /** Wether user is admin of `collective` */
+  isAdmin: PropTypes.bool,
+
+  /** Wether user is root user */
+  isRoot: PropTypes.bool,
+
+  /** @ignore from withData */
+  data: PropTypes.shape({
+    loading: PropTypes.bool,
+    refetch: PropTypes.func,
+    transactions: PropTypes.arrayOf(PropTypes.object),
+  }),
+
+  /** @ignore from injectIntl */
+  intl: PropTypes.object,
+};
+
+const transactionsQuery = gqlV2/* GraphQL */ `
+  query Transactions($slug: String!, $limit: Int!, $hasOrder: Boolean, $hasExpense: Boolean) {
+    transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense) {
+      ...TransactionsQueryCollectionFragment
     }
   }
-  ${budgetItemExpenseFragment}
-  ${budgetItemOrderFragment}
-  ${budgetItemExpenseTypeFragment}
+  ${transactionsQueryCollectionFragment}
 `;
 
-const addTransactionsSectionData = graphql(transactionsSectionQuery, {
-  options: props => ({
-    variables: { id: props.collective.id, nbDisplayed: NB_DISPLAYED },
-  }),
+const addTransactionsSectionData = graphql(transactionsQuery, {
+  options: props => {
+    return {
+      variables: { slug: props.collective.slug, limit: NB_DISPLAYED },
+      context: API_V2_CONTEXT,
+    };
+  },
 });
 
 export default React.memo(injectIntl(addTransactionsSectionData(SectionTransactions)));
