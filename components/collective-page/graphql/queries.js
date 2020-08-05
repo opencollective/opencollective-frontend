@@ -1,11 +1,5 @@
 import gql from 'graphql-tag';
 
-import {
-  budgetItemExpenseFragment,
-  budgetItemExpenseTypeFragment,
-  budgetItemOrderFragment,
-} from '../../budget/BudgetItemsList';
-
 import * as fragments from './fragments';
 
 export const collectivePageQuery = gql`
@@ -203,13 +197,6 @@ export const collectivePageQuery = gql`
           }
         }
       }
-      transactions(limit: 3, includeExpenseTransactions: false) {
-        ...BudgetItemOrderFragment
-        ...BudgetItemExpenseFragment
-      }
-      expenses(limit: 3) {
-        ...BudgetItemExpenseTypeFragment
-      }
       updates(limit: 3, onlyPublishedUpdates: true) {
         ...UpdatesFields
       }
@@ -259,9 +246,6 @@ export const collectivePageQuery = gql`
     }
   }
 
-  ${budgetItemExpenseFragment}
-  ${budgetItemOrderFragment}
-  ${budgetItemExpenseTypeFragment}
   ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
 `;

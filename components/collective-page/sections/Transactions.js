@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { useQuery } from '@apollo/react-hooks';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -35,18 +35,31 @@ const I18nFilters = defineMessages({
   },
 });
 
+const transactionsSectionQuery = gqlV2/* GraphQL */ `
+  query TransactionsSection($slug: String!, $limit: Int!, $hasOrder: Boolean, $hasExpense: Boolean) {
+    transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense) {
+      ...TransactionsQueryCollectionFragment
+    }
+  }
+  ${transactionsQueryCollectionFragment}
+`;
+
 const SectionTransactions = props => {
+  const { data, refetch, loading } = useQuery(transactionsSectionQuery, {
+    variables: { slug: props.collective.slug, limit: NB_DISPLAYED },
+    context: API_V2_CONTEXT,
+  });
   const [filter, setFilter] = React.useState(FILTERS.ALL);
   React.useEffect(() => {
-    props.data.refetch();
-  }, [props.data, props.isAdmin, props.isRoot]);
+    refetch();
+  }, [props.isAdmin, props.isRoot, refetch]);
   React.useEffect(() => {
     const hasExpense = filter === FILTERS.EXPENSES || undefined;
     const hasOrder = filter === FILTERS.CONTRIBUTIONS || undefined;
-    props.data.refetch({ slug: props.collective.slug, limit: NB_DISPLAYED, hasExpense, hasOrder });
-  }, [filter, props.collective.slug, props.data]);
+    refetch({ slug: props.collective.slug, limit: NB_DISPLAYED, hasExpense, hasOrder });
+  }, [filter, props.collective.slug, refetch]);
 
-  const { data, intl, collective } = props;
+  const { intl, collective } = props;
   const showFilters = data?.transactions?.length !== 0;
 
   if (!data?.transactions?.nodes?.length) {
@@ -83,7 +96,7 @@ const SectionTransactions = props => {
       )}
 
       <ContainerSectionContent>
-        {data.loading ? (
+        {loading ? (
           <LoadingPlaceholder height={600} borderRadius={8} />
         ) : (
           <TransactionsList transactions={data?.transactions?.nodes} />
@@ -125,22 +138,4 @@ SectionTransactions.propTypes = {
   intl: PropTypes.object,
 };
 
-const transactionsQuery = gqlV2/* GraphQL */ `
-  query Transactions($slug: String!, $limit: Int!, $hasOrder: Boolean, $hasExpense: Boolean) {
-    transactions(account: { slug: $slug }, limit: $limit, hasOrder: $hasOrder, hasExpense: $hasExpense) {
-      ...TransactionsQueryCollectionFragment
-    }
-  }
-  ${transactionsQueryCollectionFragment}
-`;
-
-const addTransactionsSectionData = graphql(transactionsQuery, {
-  options: props => {
-    return {
-      variables: { slug: props.collective.slug, limit: NB_DISPLAYED },
-      context: API_V2_CONTEXT,
-    };
-  },
-});
-
-export default React.memo(injectIntl(addTransactionsSectionData(SectionTransactions)));
+export default React.memo(injectIntl(SectionTransactions));
