@@ -75,7 +75,7 @@ const WhatCanYouDo = () => {
         </SectionSubTitle>
       </Box>
       <Flex
-        my={3}
+        my="32px"
         flexDirection={['column', 'row']}
         alignItems="center"
         justifyContent={[null, 'space-between', null, 'center']}
@@ -109,7 +109,7 @@ const WhatCanYouDo = () => {
         </Box>
       </Flex>
       <Flex
-        my={3}
+        my="32px"
         flexDirection={['column', 'row-reverse']}
         alignItems="center"
         justifyContent={[null, 'space-between', null, 'center']}
@@ -143,7 +143,7 @@ const WhatCanYouDo = () => {
         </Box>
       </Flex>
       <Flex
-        my={3}
+        my="32px"
         flexDirection={['column', 'row']}
         alignItems="center"
         justifyContent={[null, 'space-between', null, 'center']}

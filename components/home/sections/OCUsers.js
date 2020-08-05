@@ -76,7 +76,7 @@ const User = ({ id, name, picture, type, collectivePath }) => {
 
   return (
     <Container textAlign="center" display="flex" flexDirection="column" alignItems="center" mx={[null, 3, 3]}>
-      <ImgWrapper width={[1, '205px', '288px', null, '368px']}>
+      <ImgWrapper width={[1, '205px', null, '288px', '368px']}>
         <Link route={collectivePath}>
           <Img alt={name} src={picture} width="100%" />
         </Link>
@@ -86,7 +86,7 @@ const User = ({ id, name, picture, type, collectivePath }) => {
         display="flex"
         flexDirection="column"
         alignItems="flex-start"
-        width={[1, '206px', '288px', null, '368px']}
+        width={[1, '206px', null, '288px', '368px']}
       >
         <P
           fontSize={['15px', '18px']}
@@ -147,7 +147,7 @@ const OCUsers = () => {
       >
         <FormattedMessage id="home.OCUsersSection.title" defaultMessage="Who is using Open Collective?" />
       </SectionTitle>
-      <Container width={['286px', '548px', '768px', null, '991px']} mb={4} textAlign="center">
+      <Container width={['286px', '548px', null, '768px', '991px']} mb={4} textAlign="center">
         <SectionSubTitle
           color="black.700"
           fontWeight="500"

@@ -49,7 +49,7 @@ const FiscalHostCard = styled(Container)`
     height: 226px;
   }
 
-  @media screen and (min-width: 52em) {
+  @media screen and (min-width: 64em) {
     width: 408px;
     height: 96px;
     flex-direction: row;
@@ -64,7 +64,7 @@ const FiscalHost = () => (
   <Wrapper mb={5} pt={4} mt={[null, null, null, null, 7]}>
     <Flex mx={[3, 4]} flexDirection="column" alignItems="center">
       <Flex
-        flexDirection={['column', null, 'row']}
+        flexDirection={['column', null, null, 'row']}
         alignItems="center"
         justifyContent={[null, null, 'space-around', null, 'center']}
       >
@@ -76,7 +76,7 @@ const FiscalHost = () => (
           mr={[null, null, 3, null, 4]}
           ml={[null, null, null, null, 4]}
         >
-          <Box width={['268px', '648px', '456px', null, '657px']} textAlign={['left']}>
+          <Box width={['268px', '648px', null, '456px', '657px']} textAlign={['left']}>
             <SectionTitle
               display={[null, null, null, null, 'none']}
               color="black.900"
@@ -99,7 +99,7 @@ const FiscalHost = () => (
               <FormattedMessage id="home.fiscalHostSection.title.xl" defaultMessage="Do you need a fiscal host?" />
             </H2>
           </Box>
-          <Box width={['288px', '477px', '456px', null, '444px']}>
+          <Box width={['288px', '477px', null, '456px', '444px']}>
             <P
               display={[null, null, null, null, 'none']}
               color="black.800"
@@ -162,15 +162,20 @@ const FiscalHost = () => (
           >
             <FormattedMessage id="home.OC.fiscalHosts.xl" defaultMessage="Find the right fiscal host for you:" />
           </H5>
-          <Container display="flex" flexDirection={['column', 'row', 'column']}>
-            <FiscalHostCard mr={[null, 2, 0]} my={2} background={[null, null, 'rgba(255, 255, 255, 0.7)']}>
-              <Box width={['48px', null, '72px']} height={['48px', null, '72px']} my={2} mr={[null, null, 3]}>
+          <Container display="flex" flexDirection={['column', 'row', null, 'column']}>
+            <FiscalHostCard mr={[null, 2, null, 0]} my={2} background={[null, null, null, 'rgba(255, 255, 255, 0.7)']}>
+              <Box
+                width={['48px', null, null, '72px']}
+                height={['48px', null, null, '72px']}
+                my={2}
+                mr={[null, null, null, 3]}
+              >
                 <Illustration src="/static/images/home/opencollective-foundation.png" alt="Cat" />
               </Box>
               <Container
-                display={[null, null, 'flex']}
-                flexDirection={[null, null, 'column']}
-                width={[null, null, '292px']}
+                display={[null, null, null, 'flex']}
+                flexDirection={[null, null, null, 'column']}
+                width={[null, null, null, '292px']}
               >
                 <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']}>
                   <FormattedMessage id="home.fiscalHostSection.OCF" defaultMessage="Open Collective Foundation" />
@@ -178,9 +183,9 @@ const FiscalHost = () => (
                 <Container
                   display="flex"
                   alignItems="center"
-                  justifyContent={['space-between', null, 'normal']}
+                  justifyContent={['space-between', null, null, 'normal']}
                   width={1}
-                  mt={[null, 3, 1]}
+                  mt={[null, 3, null, 1]}
                 >
                   <Box
                     fontSize={['14px']}
@@ -188,14 +193,14 @@ const FiscalHost = () => (
                     letterSpacing={['-0.1px']}
                     color="black.800"
                     fontWeight="500"
-                    mr={[null, null, 3]}
+                    mr={[null, null, null, 3]}
                   >
                     <FormattedMessage
                       id="home.fiscalHostSection.OCF.description"
                       defaultMessage="For US charity initiatives"
                     />
                   </Box>
-                  <Box my={[3, null, 0]}>
+                  <Box my={[3, null, null, 0]}>
                     <StyledLink
                       href="/foundation"
                       whiteSpace="nowrap"
@@ -217,14 +222,19 @@ const FiscalHost = () => (
                 </Container>
               </Container>
             </FiscalHostCard>
-            <FiscalHostCard mx={[null, 2, 0]} my={2} background={[null, 'rgba(255, 255, 255, 0.7)']}>
-              <Box width={['48px', null, '72px']} height={['48px', null, '72px']} my={2} mr={[null, null, 3]}>
+            <FiscalHostCard mx={[null, 2, null, 0]} my={2} background={[null, 'rgba(255, 255, 255, 0.7)']}>
+              <Box
+                width={['48px', null, null, '72px']}
+                height={['48px', null, null, '72px']}
+                my={2}
+                mr={[null, null, null, 3]}
+              >
                 <Illustration src="/static/images/home/opensource-collective.png" alt="Cat" />
               </Box>
               <Container
-                display={[null, null, 'flex']}
-                flexDirection={[null, null, 'column']}
-                width={[1, null, '292px']}
+                display={[null, null, null, 'flex']}
+                flexDirection={[null, null, null, 'column']}
+                width={[1, null, null, '292px']}
               >
                 <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']}>
                   <FormattedMessage id="home.fiscalHostSection.OSC" defaultMessage="Open Source Collective" />
@@ -232,9 +242,9 @@ const FiscalHost = () => (
                 <Container
                   display="flex"
                   alignItems="center"
-                  justifyContent={['space-between', null, 'normal']}
+                  justifyContent={['space-between', null, null, 'normal']}
                   width={1}
-                  mt={[null, 3, 1]}
+                  mt={[null, 3, null, 1]}
                 >
                   <Box
                     fontSize={['14px']}
@@ -242,14 +252,14 @@ const FiscalHost = () => (
                     letterSpacing={['-0.1px']}
                     color="black.800"
                     fontWeight="500"
-                    mr={[null, null, 3]}
+                    mr={[null, null, null, 3]}
                   >
                     <FormattedMessage
                       id="home.fiscalHostSection.OSC.description"
                       defaultMessage="For open source projects"
                     />
                   </Box>
-                  <Box my={[3, null, 0]}>
+                  <Box my={[3, null, null, 0]}>
                     <StyledLink
                       href="/opensource"
                       whiteSpace="nowrap"
@@ -271,14 +281,23 @@ const FiscalHost = () => (
                 </Container>
               </Container>
             </FiscalHostCard>
-            <FiscalHostCard ml={[null, 2, 0]} my={2} background={[null, 'rgba(255, 255, 255, 0.7)', '#fff']}>
-              <Box width={['48px', null, '72px']} height={['48px', null, '72px']} my={2} mr={[null, null, 3]}>
+            <FiscalHostCard
+              ml={[null, 2, null, 0]}
+              my={2}
+              background={[null, 'rgba(255, 255, 255, 0.7)', null, '#fff']}
+            >
+              <Box
+                width={['48px', null, null, '72px']}
+                height={['48px', null, null, '72px']}
+                my={2}
+                mr={[null, null, null, 3]}
+              >
                 <Illustration src="/static/images/home/opencollective-foundation.png" alt="Cat" />
               </Box>
               <Container
-                display={[null, null, 'flex']}
-                flexDirection={[null, null, 'column']}
-                width={[1, null, '292px']}
+                display={[null, null, null, 'flex']}
+                flexDirection={[null, null, null, 'column']}
+                width={[1, null, null, '292px']}
               >
                 <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']}>
                   <FormattedMessage id="home.fiscalHostSection.OCE" defaultMessage="Open Collective Europe" />
@@ -286,9 +305,9 @@ const FiscalHost = () => (
                 <Container
                   display="flex"
                   alignItems="center"
-                  justifyContent={['space-between', null, 'normal']}
+                  justifyContent={['space-between', null, null, 'normal']}
                   width={1}
-                  mt={[null, 3, 1]}
+                  mt={[null, 3, null, 1]}
                 >
                   <Box
                     fontSize={['14px']}
@@ -296,14 +315,14 @@ const FiscalHost = () => (
                     letterSpacing={['-0.1px']}
                     color="black.800"
                     fontWeight="500"
-                    mr={[null, null, 3]}
+                    mr={[null, null, null, 3]}
                   >
                     <FormattedMessage
                       id="home.fiscalHostSection.OCE.description"
                       defaultMessage="For EU-based groups"
                     />
                   </Box>
-                  <Box my={[3, null, 0]}>
+                  <Box my={[3, null, null, 0]}>
                     <StyledLink
                       href="/europe"
                       whiteSpace="nowrap"
@@ -369,7 +388,7 @@ const FiscalHost = () => (
             >
               <FormattedMessage id="home.becomeFiscalHost" defaultMessage="Become a Fiscal Host" />
             </H3>
-            <Box width={['197px', '322px', '462px']} ml={[null, null, 3]}>
+            <Box width={['197px', '322px', null, '462px']} ml={[null, null, 3]}>
               <P
                 mb={2}
                 fontSize={['13px', null, '14px']}

@@ -50,34 +50,29 @@ const Wrapper = styled(Container)`
 `;
 
 const JoinUs = () => (
-  <SectionWrapper py={[5, null, 4]} width={1}>
+  <SectionWrapper py={[5, null, null, 4]} width={1}>
     <Flex
       mx={[3, 4]}
-      flexDirection={['column', null, 'row']}
+      flexDirection={['column', null, null, 'row']}
       color="black.900"
       alignItems={'center'}
       justifyContent="center"
     >
-      <Box
-        alignSelf={[null, 'flex-start', 'center']}
-        my={[2, 3, 5]}
-        width={[null, null, '335px', null, '309px']}
-        mr={[null, null, 5, null, 5]}
-      >
+      <Box my={[2, 3, null, 5]} width={[null, '648px', '569px', '335px', '309px']} mr={[null, null, null, 5]}>
         <H1
           mb={2}
-          textAlign="left"
-          fontSize={['32px', '40px', '52px']}
-          lineHeight={['40px', '48px', '56px']}
-          letterSpacing={['-1.2px', '-1.6px', '-2px']}
+          fontSize={['32px', '40px', null, '52px']}
+          lineHeight={['40px', '48px', null, '56px']}
+          letterSpacing={['-1.2px', '-1.6px', null, '-2px']}
         >
           <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box width={['288px', 1, '408px']}>
+        <Box my={(null, null, null, null, 3)} width={['288px', 1, null, '335px']}>
           <SectionSubtitle
-            fontSize={['20px', null, '24px']}
-            lineHeight={['28px', null, '32px']}
-            letterSpacing={['-0.6px', null, '-0.8px']}
+            fontSize={['20px', null, null, '24px']}
+            lineHeight={['28px', null, null, '32px']}
+            letterSpacing={['-0.6px', null, null, '-0.8px']}
+            color={['black.800', null, null, 'black.900']}
           >
             <FormattedMessage
               id="home.joinUsSection.subtitle"
@@ -141,7 +136,7 @@ const JoinUs = () => (
               >
                 <FormattedMessage id="home.joinUsSection.team" defaultMessage="Read our stories" />
               </H3>
-              <Box width={[null, null, '460px']}>
+              <Box width={[null, '460px']}>
                 <P
                   fontSize={['15px', null, null]}
                   lineHeight={['23px', null, null]}

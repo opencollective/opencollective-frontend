@@ -40,7 +40,7 @@ class Newsletter extends React.Component {
                 name="EMAIL"
                 px={3}
                 py={2}
-                minWidth={[121, null, 230]}
+                minWidth={[121, 230]}
                 placeholder="Enter your email address"
                 type="email"
                 width={1}
