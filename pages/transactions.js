@@ -208,10 +208,9 @@ class TransactionsPage extends React.Component {
     const hasFilters = Object.entries(query).some(([key, value]) => {
       return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
     });
-    const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
-    const isCollectiveAdmin = LoggedInUser?.canEditCollective(collective);
     const canDownloadInvoices =
-      isHostAdmin || (isCollectiveAdmin && (collective.type === 'ORGANIZATION' || collective.type === 'USER'));
+      (LoggedInUser?.isHostAdmin(collective) || LoggedInUser?.canEditCollective(collective)) &&
+      (collective.type === 'ORGANIZATION' || collective.type === 'USER');
 
     if (!collective && data.loading) {
       return (
