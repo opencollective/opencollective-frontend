@@ -863,6 +863,7 @@
   "Fields.name": "Název",
   "Fields.website": "Webová stránka",
   "FilesPreviewModal.AttachmentPreview": "Attachment preview",
+  "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "Filtrovat podle jména",
   "FinancialContributions": "Finanční příspěvky",
   "FinancialContributorsCountWithBold": "<bold>{count}</bold> {count, plural, one {financial contributor} other {financial contributors} }",

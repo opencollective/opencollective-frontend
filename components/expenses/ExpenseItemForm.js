@@ -85,7 +85,7 @@ const AttachmentLabel = () => (
 /**
  * Form for a single attachment. Must be used with Formik.
  */
-const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, name }) => {
+const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency, requireFile, name }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
@@ -124,6 +124,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, currency, requireFile, 
                     fontSize="LeadCaption"
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
+                    onReject={onUploadError}
                   />
                 </StyledInputField>
               );
@@ -229,6 +230,8 @@ ExpenseItemForm.propTypes = {
   errors: PropTypes.object,
   /** Wether a file is required for this attachment type */
   requireFile: PropTypes.bool,
+  /** Called when an attachment upload fails */
+  onUploadError: PropTypes.func.isRequired,
   /** the attachment data */
   attachment: PropTypes.shape({
     id: PropTypes.string,
