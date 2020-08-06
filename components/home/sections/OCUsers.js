@@ -93,8 +93,9 @@ const User = ({ id, name, picture, type, collectivePath }) => {
           lineHeight={['23px', '27px']}
           color="black.600"
           lineSpacing={['-0.12px', '-0.2px']}
-          fontWeight="300"
-          my={2}
+          fontWeight="normal"
+          mt={24}
+          mb={12}
         >
           {type}
         </P>

@@ -8,32 +8,42 @@ import StyledButton from '../../StyledButton';
 import { flicker } from '../../StyledKeyframes';
 import { H4 } from '../../Text';
 
+const BackgroundImage = styled.img.attrs({ src: '/static/images/home/create-collective-bg-illustration.png' })`
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+`;
+
+const BackgroundImageHover = styled.img.attrs({
+  src: '/static/images/home/create-collective-bg-illustration-hover.png',
+})`
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.2s;
+`;
+
 const Wrapper = styled(Box)`
-  background-image: url('/static/images/home/create-collective-bg-illustration.png');
-  background-size: 100% 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
 
   &:hover {
-    animation: ${flicker({ minOpacity: 0.9 })} 1s linear;
-    background-image: url('/static/images/home/create-collective-bg-illustration-hover.png');
-    background-size: 100% 100%;
+    ${BackgroundImageHover} {
+      opacity: 1;
+      animation: ${flicker({ minOpacity: 0.7 })} 1s infinite;
+      animation-delay: 0.2s;
+    }
   }
 `;
 
 const CreateCollectiveButton = styled(StyledButton)`
   pointer-events: auto;
-`;
-
-const HoverBGImagePreLoader = styled.img.attrs({
-  alt: '',
-  src: '/static/images/home/create-collective-bg-illustration-hover.png',
-})`
-  position: absolute;
-  left: -9999px;
-  top: -9999px;
 `;
 
 const CreateCollective = () => {
@@ -55,8 +65,9 @@ const CreateCollective = () => {
           />
         </H4>
       </Box>
-      <HoverBGImagePreLoader />
       <Wrapper width={['288px', '283px']} height={['288px', '294px']}>
+        <BackgroundImage />
+        <BackgroundImageHover />
         <Link route="/create">
           <CreateCollectiveButton buttonStyle="dark" minWidth={'164px'}>
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />

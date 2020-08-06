@@ -28,12 +28,6 @@ const SustainTextWrapper = styled(Span)`
   }
 `;
 
-const LineBreak = styled.br`
-  @media screen and (min-width: 64em) {
-    display: none;
-  }
-`;
-
 const MakeCommunity = () => {
   const [showModal, setShowModal] = useState(false);
 
@@ -84,9 +78,8 @@ const MakeCommunity = () => {
               <FormattedMessage
                 id="home.makeCommunitySection.description"
                 defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes."
-              />
-              <LineBreak />{' '}
-              <Span fontWeight="bold" display={['none', 'block', null, null, 'inline-block']}>
+              />{' '}
+              <Span fontWeight="bold" display={['none', 'inline']}>
                 <FormattedMessage
                   id="home.makeCommunitySection.subTitle"
                   defaultMessage="Collect and spend money transparently."

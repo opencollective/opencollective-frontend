@@ -44,7 +44,7 @@ const Wrapper = styled(Container)`
   border-radius: 8px;
   padding: 16px;
 
-  @media screen and (min-width: 64em) {
+  @media screen and (min-width: 52em) {
     padding: 24px 32px;
   }
 `;
@@ -61,6 +61,7 @@ const JoinUs = () => (
       <Box my={[2, 3, null, 5]} width={[null, '648px', '569px', '335px', '309px']} mr={[null, null, null, 5]}>
         <H1
           mb={2}
+          mt={[5, null, null, 0]}
           fontSize={['32px', '40px', null, '52px']}
           lineHeight={['40px', '48px', null, '56px']}
           letterSpacing={['-1.2px', '-1.6px', null, '-2px']}
@@ -82,7 +83,7 @@ const JoinUs = () => (
         </Box>
       </Box>
 
-      <Container ml={[null, null, 3, null, 6]}>
+      <Container ml={[null, null, null, 3, 6]}>
         <Link route="/create">
           <Wrapper
             color="black.900"
@@ -104,7 +105,7 @@ const JoinUs = () => (
               </H3>
               <P
                 fontSize={['15px', null, null]}
-                color="black.800"
+                color="black.700"
                 lineHeight={['23px', null, null]}
                 letterSpacing={['-0.12px']}
               >
@@ -188,7 +189,7 @@ const JoinUs = () => (
                 fontSize={['15px', null, '15px']}
                 lineHeight={['23px', null, '25px']}
                 letterSpacing="-0.12px"
-                color="black.800"
+                color="black.700"
               >
                 <FormattedMessage id="home.joinUsSection.weNeedUpdate" defaultMessage="We send updates once a month." />
               </P>

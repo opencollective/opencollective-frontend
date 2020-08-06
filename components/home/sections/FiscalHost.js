@@ -80,6 +80,7 @@ const FiscalHost = () => (
             <SectionTitle
               display={[null, null, null, null, 'none']}
               color="black.900"
+              mt={[5, null, null, 0]}
               fontSize={['32px', '40px']}
               lineHeight={['40px', '48px']}
               letterSpacing={['-1.2px', '-1.6px']}
@@ -379,7 +380,7 @@ const FiscalHost = () => (
           width={['72px', '81px']}
           height={['48px', '54px']}
           ml={[null, null, null, null, 5]}
-          mr={[4, null, null, 4]}
+          mr={[3, null, null, 4]}
         >
           <Illustration src="/static/images/home/umbrella-Illustration.png" alt="Umbrella" />
         </Box>

@@ -53,12 +53,10 @@ class Newsletter extends React.Component {
                 lineHeight="16px"
                 name="subscribe"
                 type="submit"
-                borderRadius="0"
+                borderRadius="0 10px 10px 0"
                 border="none"
-                borderLeft="1px solid"
-                borderColor="black.700"
+                borderLeft="1px solid #9D9FA3"
                 outline="none"
-                backgroundColor="black.100"
               >
                 <FormattedMessage id="newsletter.subscribe" defaultMessage="Subscribe" />
               </StyledButton>

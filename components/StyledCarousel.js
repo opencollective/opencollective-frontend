@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ArrowLeftCircle } from '@styled-icons/feather/ArrowLeftCircle';
-import { ArrowRightCircle } from '@styled-icons/feather/ArrowRightCircle';
 import { throttle } from 'lodash';
 import { Swipeable } from 'react-swipeable';
 import styled from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import StyledRoundButton from './StyledRoundButton';
 
 const CarouselContainer = styled(Container)`
   display: flex;
@@ -172,9 +171,9 @@ class StyledCarousel extends React.Component {
 
         <Container width={1} display="flex" alignItems="center" justifyContent={'center'}>
           {showArrowController && (
-            <Box mx={1} color="black.600" onClick={() => this.handleSwipe()}>
-              <ArrowLeftCircle size="40" />
-            </Box>
+            <StyledRoundButton size={40} mx={1} onClick={() => this.handleSwipe()}>
+              ←
+            </StyledRoundButton>
           )}
           <Flex mx={3} my={3} display={props.display}>
             {Array.from({ length: children.length }, (_, i) => (
@@ -182,9 +181,9 @@ class StyledCarousel extends React.Component {
             ))}
           </Flex>
           {showArrowController && (
-            <Box mx={1} color="black.600" onClick={() => this.handleSwipe(true)}>
-              <ArrowRightCircle size="40" />
-            </Box>
+            <StyledRoundButton size={40} mx={1} onClick={() => this.handleSwipe(true)}>
+              →
+            </StyledRoundButton>
           )}
         </Container>
       </Container>

@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -74,11 +73,11 @@ const learningChannels = [
 const messages = defineMessages({
   'home.learnMore.documentation': {
     id: 'home.learnMore.documentation',
-    defaultMessage: 'Support your community with fundholding and fiscal sponsorship services. Learn more',
+    defaultMessage: 'Support your community with fundholding and fiscal sponsorship services.',
   },
   'home.learnMore.documentation.buttonText': {
     id: 'home.learnMore.buttonText',
-    defaultMessage: 'View our documentation {arrowIcon}',
+    defaultMessage: 'View our documentation',
   },
   'home.learnMore.blog': {
     id: 'home.learnMore.blog',
@@ -86,7 +85,7 @@ const messages = defineMessages({
   },
   'home.learnMore.blog.buttonText': {
     id: 'home.learnMore.blog.buttonText',
-    defaultMessage: 'Visit our blog {arrowIcon}',
+    defaultMessage: 'Visit our blog',
   },
   'home.learnMore.slack': {
     id: 'home.learnMore.slack',
@@ -94,7 +93,7 @@ const messages = defineMessages({
   },
   'home.learnMore.slack.buttonText': {
     id: 'home.learnMore.slack.buttonText',
-    defaultMessage: 'Join our slack {arrowIcon}',
+    defaultMessage: 'Join our slack',
   },
   'home.learnMore.openSourceCode': {
     id: 'home.learnMore.OpenSourceCode',
@@ -102,7 +101,7 @@ const messages = defineMessages({
   },
   'home.learnMore.openSourceCode.buttonText': {
     id: 'home.learnMore.openSourceCode.buttonText',
-    defaultMessage: 'See our code base {arrowIcon}',
+    defaultMessage: 'See our code base',
   },
   'home.learnMore.openFinances': {
     id: 'home.learnMore.openFinances',
@@ -110,7 +109,7 @@ const messages = defineMessages({
   },
   'home.learnMore.openFinances.buttonText': {
     id: 'home.learnMore.openFinances.buttonText',
-    defaultMessage: 'See our Collectives {arrowIcon}',
+    defaultMessage: 'See our Collectives',
   },
   'home.learnMore.openCompany': {
     id: 'home.learnMore.openCompany',
@@ -118,7 +117,7 @@ const messages = defineMessages({
   },
   'home.learnMore.openCompany.buttonText': {
     id: 'home.learnMore.openCompany.buttonText',
-    defaultMessage: 'See our public company {arrowIcon}',
+    defaultMessage: 'See our public company',
   },
 });
 
@@ -180,9 +179,7 @@ const LearnMore = () => {
                   letterSpacing="-0.12px"
                   my={2}
                 >
-                  {intl.formatMessage(messages[`home.learnMore.${channel.id}.buttonText`], {
-                    arrowIcon: <ArrowRight2 size="15" />,
-                  })}
+                  {intl.formatMessage(messages[`home.learnMore.${channel.id}.buttonText`])}&nbsp;→
                 </StyledLink>
               </Box>
             </Container>
