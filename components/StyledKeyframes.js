@@ -44,7 +44,7 @@ export const fadeInDown = keyframes`
   }
 `;
 
-export const flicker = ({ minOpacity = 0, baseOpacity = 1 }) => keyframes`
+export const flicker = ({ minOpacity = 0 }) => keyframes`
   0%   { opacity: 1; }
   50%  { opacity: ${minOpacity}; }
   100% { opacity: 1; }
