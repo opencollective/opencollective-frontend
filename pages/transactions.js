@@ -171,7 +171,9 @@ class TransactionsPage extends React.Component {
               <Box p={2} flexGrow={[1, 0]}>
                 <SearchBar
                   defaultValue={query.searchTerm}
-                  onSubmit={searchTerm => Router.pushRoute('transactions', { ...query, searchTerm, offset: null })}
+                  onSubmit={searchTerm =>
+                    Router.pushRoute('transactions', { ...query, searchTerm, offset: null, collectiveSlug: slug })
+                  }
                 />
               </Box>
             </Flex>
