@@ -78,12 +78,6 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
           <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fees structure" />
         </P>
-        <P color="black.700" fontSize="14px" lineHeight="21px">
-          <FormattedMessage
-            id="CollectiveFeesForm.Description"
-            defaultMessage="This helps you to set different fees per Collective if you need it. You may want to set the fee at 0% for in-house projects, or set a monthly retainer instead of a fee."
-          />
-        </P>
 
         <StyledRadioList
           id="fees-structure-radio"
