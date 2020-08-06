@@ -145,7 +145,13 @@ const MakeCommunity = () => {
         <Flex width={['288px', '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
           <Illustration
             alt="Make your community sustainable"
-            src="/static/images/home/whatisgreataboutOC-Illustration.png"
+            src="/static/images/home/whatisgreataboutOC-Illustration-sm.png"
+            display={[null, 'none']}
+          />
+          <Illustration
+            alt="Make your community sustainable"
+            src="/static/images/home/whatisgreataboutOC-Illustration-2x.png"
+            display={['none', 'inline-block']}
           />
         </Flex>
         <Box width={['288px', '224px', '396px']}>
