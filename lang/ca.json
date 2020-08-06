@@ -256,7 +256,6 @@
   "CollectiveFeesForm.CustomFees": "Set custom fee for this Collective only.",
   "CollectiveFeesForm.Default": "Use global host fees",
   "CollectiveFeesForm.DefaultDescription": "You set this global fee for all Collectives hosted using <Link>settings</Link>.",
-  "CollectiveFeesForm.Description": "This helps you to set different fees per Collective if you need it. You may want to set the fee at 0% for in-house projects, or set a monthly retainer instead of a fee.",
   "CollectiveFeesForm.Title": "Set fees structure",
   "CollectivePage.AddLongDescription": "Afegeix una descripció",
   "CollectivePage.AllOfUs": "{collectiveName} is all of us",
