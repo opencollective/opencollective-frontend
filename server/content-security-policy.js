@@ -1,5 +1,5 @@
 const mergeWith = require('lodash/mergeWith');
-const { kebabCase } = require('lodash');
+const { kebabCase, omit } = require('lodash');
 const env = process.env.NODE_ENV;
 
 const SELF = "'self'";
@@ -7,7 +7,7 @@ const UNSAFE_INLINE = "'unsafe-inline'";
 const UNSAFE_EVAL = "'unsafe-eval'";
 
 const COMMON_DIRECTIVES = {
-  blockAllMixedContent: true,
+  blockAllMixedContent: [],
   defaultSrc: [SELF],
   imgSrc: [SELF, process.env.IMAGES_URL, 'data:', 't.paypal.com'],
   workerSrc: [
@@ -39,11 +39,20 @@ const COMMON_DIRECTIVES = {
 };
 
 const generateDirectives = customValues => {
-  return mergeWith(COMMON_DIRECTIVES, customValues, (objValue, srcValue) => {
-    if (Array.isArray(objValue)) {
+  const toRemove = [];
+
+  const result = mergeWith(COMMON_DIRECTIVES, customValues, (objValue, srcValue, key) => {
+    if (typeof srcValue === 'boolean') {
+      if (!srcValue) {
+        toRemove.push(key);
+      }
+      return srcValue;
+    } else if (Array.isArray(objValue)) {
       return objValue.concat(srcValue);
     }
   });
+
+  return omit(result, toRemove);
 };
 
 /**
