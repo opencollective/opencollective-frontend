@@ -23,6 +23,10 @@ const ExpenseTypeLabels = defineMessages({
     id: 'ExpenseForm.ReceiptLabel',
     defaultMessage: 'Reimbursement',
   },
+  [expenseTypes.FUNDING_REQUEST]: {
+    id: 'ExpenseForm.Type.Request',
+    defaultMessage: 'Request Grant',
+  },
 });
 
 const ExpenseTypeDescription = defineMessages({
@@ -34,6 +38,10 @@ const ExpenseTypeDescription = defineMessages({
     id: 'ExpenseForm.InvoiceDescription',
     defaultMessage: 'Bill for your time or a service.',
   },
+  [expenseTypes.FUNDING_REQUEST]: {
+    id: 'ExpenseForm.FundingRequestDescription',
+    defaultMessage: 'Request a grant for your project or initiative.',
+  },
 });
 
 const TypeIllustration = styled.img.attrs({ alt: '' })`
@@ -42,7 +50,7 @@ const TypeIllustration = styled.img.attrs({ alt: '' })`
 `;
 
 const StaticTypeIllustration = styled(TypeIllustration).attrs(props => ({
-  src: props.expenseType === expenseTypes.RECEIPT ? receiptIllustrationStatic : invoiceIllustrationStatic,
+  src: props.expenseType === expenseTypes.INVOICE ? invoiceIllustrationStatic : receiptIllustrationStatic,
 }))`
   position: absolute;
   background: white;
@@ -85,7 +93,7 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
       <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
       <Box mr={3} size={64}>
         <StaticTypeIllustration expenseType={type} />
-        <TypeIllustration src={type === expenseTypes.RECEIPT ? receiptIllustration : invoiceIllustration} />
+        <TypeIllustration src={type === expenseTypes.INVOICE ? invoiceIllustration : receiptIllustration} />
       </Box>
       <Box maxWidth={250}>
         <P fontSize="16px" fontWeight="bold" mb={2}>
@@ -119,7 +127,7 @@ const Fieldset = styled.fieldset`
  * IE & Chrome don't support using `flex` on fieldset yet, so we have to create a custom
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */
-const ExpenseTypeRadioSelect = ({ name, onChange, value }) => {
+const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
@@ -136,6 +144,14 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value }) => {
             isChecked={value === expenseTypes.INVOICE}
             onChange={onChange}
           />
+          {options.fundingRequest && (
+            <ExpenseTypeOption
+              name={name}
+              type={expenseTypes.FUNDING_REQUEST}
+              isChecked={value === expenseTypes.FUNDING_REQUEST}
+              onChange={onChange}
+            />
+          )}
         </Flex>
       </Fieldset>
     </StyledCard>
@@ -149,6 +165,8 @@ ExpenseTypeRadioSelect.propTypes = {
   value: PropTypes.oneOf(Object.values(expenseTypes)),
   /** A function called with the new value when it changes */
   onChange: PropTypes.func,
+  /** Extra options */
+  options: PropTypes.object,
 };
 
 ExpenseTypeRadioSelect.defaultProps = {

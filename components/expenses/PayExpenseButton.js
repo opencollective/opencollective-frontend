@@ -48,6 +48,23 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
         />
       );
     }
+  } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
+    if (!expense.payee.host) {
+      return (
+        <FormattedMessage
+          id="expense.pay.error.payee.noHost"
+          defaultMessage="The payee needs to have an Host to be able to be paid on its Open Collective balance."
+        />
+      );
+    }
+    if (expense.payee.host.id !== host.id) {
+      return (
+        <FormattedMessage
+          id="expense.pay.error.payee.sameHost"
+          defaultMessage="The payee needs to be on the same Host than the payer to be paid on its Open Collective balance."
+        />
+      );
+    }
   }
 };
 
@@ -126,6 +143,10 @@ PayExpenseButton.propTypes = {
       plan: PropTypes.object,
     }),
   }).isRequired,
+  host: PropTypes.shape({
+    id: PropTypes.string,
+    plan: PropTypes.object,
+  }),
   /** To disable the button */
   disabled: PropTypes.bool,
   /** Function called when users click on one of the "Pay" buttons */

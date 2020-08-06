@@ -38,6 +38,15 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
           </Span>
         </Flex>
       );
+    case PayoutMethodType.ACCOUNT_BALANCE:
+      return (
+        <Flex alignItems="center">
+          <OtherIcon size={iconSize} color="#9D9FA3" />
+          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
+            Open Collective
+          </Span>
+        </Flex>
+      );
     case PayoutMethodType.OTHER:
     default:
       return (

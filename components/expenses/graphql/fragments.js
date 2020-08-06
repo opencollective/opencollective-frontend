@@ -20,7 +20,11 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
       data
       isSaved
     }
-    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, INDIVIDUAL]) {
+    adminMemberships: memberOf(
+      role: ADMIN
+      includeIncognito: false
+      accountType: [ORGANIZATION, COLLECTIVE, EVENT, FUND, PROJECT, INDIVIDUAL]
+    ) {
       nodes {
         id
         account {
@@ -29,6 +33,12 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           imageUrl
           type
           name
+          isActive
+          ... on AccountWithHost {
+            host {
+              id
+            }
+          }
           location {
             address
             country
@@ -75,6 +85,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     id
     legacyId
     description
+    longDescription
     currency
     type
     status
@@ -111,6 +122,11 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         name
         data
         isSaved
+      }
+      ... on AccountWithHost {
+        host {
+          id
+        }
       }
     }
     payeeLocation {

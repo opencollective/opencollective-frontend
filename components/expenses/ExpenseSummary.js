@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
@@ -78,6 +78,7 @@ const ExpenseSummary = ({
   const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
+  const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
 
@@ -130,6 +131,17 @@ const ExpenseSummary = ({
           </React.Fragment>
         )}
       </Flex>
+      {isFundingRequest && expense.longDescription && (
+        <Fragment>
+          <Flex alignItems="center" mt={4}>
+            <Span fontWeight="bold" fontSize="16px">
+              <FormattedMessage id="Expense.RequestDescription" defaultMessage="Request Description" />
+            </Span>
+            <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+          </Flex>
+          <P mt={4}>{expense.longDescription}</P>
+        </Fragment>
+      )}
       <Flex my={4} alignItems="center">
         {isLoading ? (
           <LoadingPlaceholder height={20} maxWidth={150} />
@@ -137,6 +149,8 @@ const ExpenseSummary = ({
           <Span fontWeight="bold" fontSize="16px">
             {isReceipt ? (
               <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
+            ) : isFundingRequest ? (
+              <FormattedMessage id="Expense.RequestDetails" defaultMessage="Request Details" />
             ) : (
               <FormattedMessage id="Expense.InvoiceItems" defaultMessage="Invoice items" />
             )}
@@ -325,6 +339,7 @@ ExpenseSummary.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     description: PropTypes.string.isRequired,
+    longDescription: PropTypes.string,
     currency: PropTypes.string.isRequired,
     invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,

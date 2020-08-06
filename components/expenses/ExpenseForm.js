@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field, FieldArray, Form, Formik } from 'formik';
 import { first, get, isEmpty, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
+import { CollectiveFamilyTypes, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ERROR, isErrorType } from '../../lib/errors';
@@ -35,6 +35,10 @@ const msg = defineMessages({
   descriptionPlaceholder: {
     id: `ExpenseForm.DescriptionPlaceholder`,
     defaultMessage: 'Enter expense title here...',
+  },
+  subjectPlaceholder: {
+    id: `ExpenseForm.RequestSubjectPlaceholder`,
+    defaultMessage: 'Enter request subject here...',
   },
   payeeLabel: {
     id: `ExpenseForm.payeeLabel`,
@@ -80,6 +84,10 @@ const msg = defineMessages({
     id: 'ExpenseForm.Step1Invoice',
     defaultMessage: 'Set invoice details',
   },
+  step1FundingRequest: {
+    id: 'ExpenseForm.Step1FundingRequest',
+    defaultMessage: 'Set grant request details',
+  },
   step2: {
     id: 'ExpenseForm.Step2',
     defaultMessage: 'Reimbursements details',
@@ -92,6 +100,7 @@ const msg = defineMessages({
 
 const getDefaultExpense = collective => ({
   description: '',
+  longDescription: '',
   items: [],
   attachedFiles: [],
   payee: null,
@@ -113,8 +122,9 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
+  const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
   return {
-    ...pick(expenseData, ['id', 'description', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
+    ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee: expenseData.payee && { [payeeIdField]: expenseData.payee.id },
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
     payeeLocation: isInvoice ? pick(expenseData.payeeLocation, ['address', 'country']) : null,
@@ -123,7 +133,7 @@ export const prepareExpenseForSubmit = expenseData => {
     items: expenseData.items.map(item => {
       return pick(item, [
         ...(item.__isNew ? [] : ['id']),
-        ...(isInvoice ? [] : ['url']), // never submit URLs for invoices
+        ...(isInvoice || isFundingRequest ? [] : ['url']), // never submit URLs for invoices or requests
         'description',
         'incurredAt',
         'amount',
@@ -172,7 +182,28 @@ const setLocationFromPayee = (formik, payee) => {
 
 const getPayoutMethodsFromPayee = payee => {
   const basePms = get(payee, 'payoutMethods') || EMPTY_ARRAY;
-  const filteredPms = basePms.filter(({ isSaved }) => isSaved);
+  let filteredPms = basePms.filter(({ isSaved }) => isSaved);
+
+  // If the Payee is active (can manage a budget and has a balance). This is usually:
+  // - a "Collective" family (Collective, Fund, Event, Project) with an host
+  // - an "Host" Organization with budget activated
+  if (payee?.isActive) {
+    if (!filteredPms.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
+      filteredPms.unshift({
+        id: 'new',
+        data: {},
+        type: PayoutMethodType.ACCOUNT_BALANCE,
+        isSaved: true,
+      });
+    }
+  }
+
+  // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
+  // Then the Account Balance should be its only option
+  if (payee && CollectiveFamilyTypes.includes(payee.type)) {
+    filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
+  }
+
   return filteredPms.length > 0 ? filteredPms : EMPTY_ARRAY;
 };
 
@@ -201,7 +232,8 @@ const ExpenseFormBody = ({
   const stepOneCompleted = hasBaseFormFieldsCompleted && values.items.length > 0;
   const stepTwoCompleted = stepOneCompleted && values.payoutMethod;
   const isReceipt = values.type === expenseTypes.RECEIPT;
-  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
+  const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee, collective), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
@@ -242,7 +274,12 @@ const ExpenseFormBody = ({
 
   return (
     <Form>
-      <ExpenseTypeRadioSelect name="type" onChange={handleChange} value={values.type} />
+      <ExpenseTypeRadioSelect
+        name="type"
+        onChange={handleChange}
+        value={values.type}
+        options={{ fundingRequest: [CollectiveType.FUND].includes(collective.type) }}
+      />
       {values.type && (
         <Box width="100%">
           <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
@@ -255,19 +292,35 @@ const ExpenseFormBody = ({
                 lineHeight="24px"
                 fontWeight="bold"
               >
-                <FormattedMessage
-                  id="Expense.EnterExpenseTitle"
-                  defaultMessage="Enter expense title <small>(Public)</small>"
-                  values={{
-                    small(msg) {
-                      return (
-                        <Span fontWeight="normal" color="black.600">
-                          {msg}
-                        </Span>
-                      );
-                    },
-                  }}
-                />
+                {values.type === expenseTypes.FUNDING_REQUEST ? (
+                  <FormattedMessage
+                    id="Expense.EnterRequestSubject"
+                    defaultMessage="Enter request subject <small>(Public)</small>"
+                    values={{
+                      small(msg) {
+                        return (
+                          <Span fontWeight="normal" color="black.600">
+                            {msg}
+                          </Span>
+                        );
+                      },
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="Expense.EnterExpenseTitle"
+                    defaultMessage="Enter expense title <small>(Public)</small>"
+                    values={{
+                      small(msg) {
+                        return (
+                          <Span fontWeight="normal" color="black.600">
+                            {msg}
+                          </Span>
+                        );
+                      },
+                    }}
+                  />
+                )}
               </P>
               <StyledHr flex="1" borderColor="black.300" ml={2} />
             </Flex>
@@ -282,7 +335,11 @@ const ExpenseFormBody = ({
               autoFocus={autoFocusTitle}
               id="expense-description"
               name="description"
-              placeholder={formatMessage(msg.descriptionPlaceholder)}
+              placeholder={
+                values.type === expenseTypes.FUNDING_REQUEST
+                  ? formatMessage(msg.subjectPlaceholder)
+                  : formatMessage(msg.descriptionPlaceholder)
+              }
               width="100%"
               fontSize="24px"
               border="0"
@@ -294,9 +351,54 @@ const ExpenseFormBody = ({
               withOutline
             />
             {hasBaseFormFieldsCompleted && (
-              <React.Fragment>
+              <Fragment>
+                {values.type === expenseTypes.FUNDING_REQUEST && (
+                  <Fragment>
+                    <Flex alignItems="center" mt={20} mb={10}>
+                      <P
+                        as="label"
+                        htmlFor="expense-longDescription"
+                        color="black.900"
+                        fontSize="16px"
+                        lineHeight="24px"
+                        fontWeight="bold"
+                      >
+                        <FormattedMessage
+                          id="Expense.EnterExpenseMessage"
+                          defaultMessage="Enter a message explaining your request"
+                          values={{
+                            small(msg) {
+                              return (
+                                <Span fontWeight="normal" color="black.600">
+                                  {msg}
+                                </Span>
+                              );
+                            },
+                          }}
+                        />
+                      </P>
+                      <StyledHr flex="1" borderColor="black.300" ml={2} />
+                    </Flex>
+                    <Field
+                      as={StyledTextarea}
+                      id="expense-longDescription"
+                      name="longDescription"
+                      placeholder=""
+                      width="100%"
+                      height={200}
+                      fontSize="P"
+                      error={errors.message}
+                      mt={3}
+                      px={2}
+                      py={1}
+                      maxLength={1000}
+                      withOutline
+                      showCount={true}
+                    />
+                  </Fragment>
+                )}
                 <Flex alignItems="flex-start" mt={3}>
-                  <ExpenseTypeTag type={values.type} mr="4px" />
+                  <ExpenseTypeTag type={values.type === 'FUNDING_REQUEST' ? 'grant' : values.type} mr="4px" />
                   <StyledInputTags
                     renderUpdatedTags
                     suggestedTags={expensesTags}
@@ -317,9 +419,12 @@ const ExpenseFormBody = ({
                     />
                   </Box>
                 )}
+
                 <Flex alignItems="center" my={24}>
                   <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                    {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
+                    {formatMessage(
+                      isReceipt ? msg.step1 : isFundingRequest ? msg.step1FundingRequest : msg.step1Invoice,
+                    )}
                   </Span>
                   <StyledHr flex="1" borderColor="black.300" mx={2} />
                   <StyledButton
@@ -335,10 +440,10 @@ const ExpenseFormBody = ({
                 <Box>
                   <FieldArray name="items" component={ExpenseFormItems} />
                 </Box>
-              </React.Fragment>
+              </Fragment>
             )}
             {stepOneCompleted && (
-              <React.Fragment>
+              <Fragment>
                 <Flex alignItems="center" mt={24} mb={16}>
                   <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
                     {formatMessage(isReceipt ? msg.step2 : msg.step2Invoice)}
@@ -379,7 +484,7 @@ const ExpenseFormBody = ({
                         )}
                       </Field>
                       {values.type === expenseTypes.INVOICE && (
-                        <React.Fragment>
+                        <Fragment>
                           <FastField name="payeeLocation.country">
                             {({ field }) => (
                               <StyledInputField
@@ -447,7 +552,7 @@ const ExpenseFormBody = ({
                               </StyledInputField>
                             )}
                           </FastField>
-                        </React.Fragment>
+                        </Fragment>
                       )}
                     </Box>
                     <Box minWidth={250} flex="1 1 50%">
@@ -475,6 +580,7 @@ const ExpenseFormBody = ({
                                 onRemove={onPayoutMethodRemove}
                                 payoutMethod={values.payoutMethod}
                                 payoutMethods={allPayoutMethods}
+                                payee={values.payee}
                                 disabled={!values.payee}
                                 collective={collective}
                               />
@@ -500,7 +606,7 @@ const ExpenseFormBody = ({
                     </Box>
                   </Flex>
                 </Box>
-              </React.Fragment>
+              </Fragment>
             )}
           </StyledCard>
         </Box>
@@ -559,6 +665,7 @@ ExpenseFormBody.propTypes = {
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
