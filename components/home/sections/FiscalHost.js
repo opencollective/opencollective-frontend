@@ -202,7 +202,9 @@ const FiscalHost = () => (
                   </Box>
                   <Box my={[3, null, null, 0]}>
                     <StyledLink
-                      href="/foundation"
+                      as={Link}
+                      route="collective"
+                      params={{ slug: 'foundation' }}
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -261,7 +263,9 @@ const FiscalHost = () => (
                   </Box>
                   <Box my={[3, null, null, 0]}>
                     <StyledLink
-                      href="/opensource"
+                      as={Link}
+                      route="collective"
+                      params={{ slug: 'opensource' }}
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -324,7 +328,9 @@ const FiscalHost = () => (
                   </Box>
                   <Box my={[3, null, null, 0]}>
                     <StyledLink
-                      href="/europe"
+                      as={Link}
+                      route="collective"
+                      params={{ slug: 'europe' }}
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -347,7 +353,8 @@ const FiscalHost = () => (
           </Container>
           <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
             <StyledLink
-              href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
+              as={Link}
+              route="hosts"
               fontSize={['15px']}
               lineHeight={['23px']}
               letterSpacing={['-0.12px']}
@@ -403,7 +410,7 @@ const FiscalHost = () => (
               </P>
             </Box>
           </Container>
-          <Link route="#">
+          <StyledLink openInNewTab href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">
             <StyledButton
               my={2}
               ml={[null, 3]}
@@ -415,7 +422,7 @@ const FiscalHost = () => (
             >
               <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
             </StyledButton>
-          </Link>
+          </StyledLink>
         </Container>
       </Flex>
     </Flex>
