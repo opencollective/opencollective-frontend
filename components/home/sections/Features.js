@@ -213,21 +213,12 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
         <React.Fragment>
           <LineBreak />
           <LearnMoreLink href={learnMoreLink} openInNewTab>
-            <FormattedMessage
-              id="home.feature.learnmore"
-              defaultMessage="Learn more {icon}"
-              values={{
-                icon: (
-                  <React.Fragment>
-                    <Span display={[null, 'none']}>
-                      {' '}
-                      <ArrowRight size="24" />
-                    </Span>
-                    <Span display={['none', 'inline-block']}>...</Span>
-                  </React.Fragment>
-                ),
-              }}
-            />
+            <FormattedMessage id="LearnMore" defaultMessage="Learn more" />
+            <Span display={[null, 'none']}>
+              {' '}
+              <ArrowRight size="24" />
+            </Span>
+            <Span display={['none', 'inline-block']}>...</Span>
           </LearnMoreLink>
         </React.Fragment>
       )}
