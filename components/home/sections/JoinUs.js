@@ -11,7 +11,7 @@ import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
 const SectionWrapper = styled(Container)`
-  background: url('/static/images/home/joinus-bg-sm.png');
+  background: url('/static/images/home/joinus-pink-bg-sm.png');
   background-size: 100% 100%;
 
   a {
@@ -27,12 +27,12 @@ const SectionWrapper = styled(Container)`
   }
 
   @media screen and (min-width: 64em) {
-    background: url('/static/images/home/joinus-bg-md.png');
+    background: url('/static/images/home/joinus-pink-bg-md.png');
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background: url('/static/images/home/joinus-bg-lg.png');
+    background: url('/static/images/home/joinus-pink-bg-lg.png');
     background-size: 100% 100%;
   }
 `;

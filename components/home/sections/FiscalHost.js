@@ -14,16 +14,16 @@ import Illustration from '../HomeIllustration';
 import SectionTitle from '../SectionTitle';
 
 const Wrapper = styled(Container)`
-  background-image: url('/static/images/home/fiscalhost-bg-sm.png');
+  background-image: url('/static/images/home/fiscalhost-blue-bg-sm.png');
   background-size: 100% 100%;
 
   @media screen and (min-width: 52em) {
-    background-image: url('/static/images/home/fiscalhost-bg-md.png');
+    background-image: url('/static/images/home/fiscalhost-blue-bg-md.png');
     background-size: 100% 100%;
   }
 
   @media screen and (min-width: 88em) {
-    background-image: url('/static/images/home/fiscalhost-bg-lg.png');
+    background-image: url('/static/images/home/fiscalhost-blue-bg-lg.png');
     background-size: 100% 100%;
   }
 `;
