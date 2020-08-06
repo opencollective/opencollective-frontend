@@ -96,7 +96,7 @@ const makeYearlyOptions = invoices => {
     .reverse();
 };
 
-const TransactionsDownloadCSV = ({ collective }) => {
+const TransactionsDownloadInvoices = ({ collective }) => {
   const [interval, setInterval] = React.useState('monthly');
   const [year, setYear] = React.useState();
   const { data, loading } = useQuery(invoicesQuery, {
@@ -169,7 +169,7 @@ const TransactionsDownloadCSV = ({ collective }) => {
   );
 };
 
-TransactionsDownloadCSV.propTypes = {
+TransactionsDownloadInvoices.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   collective: PropTypes.shape({
@@ -179,4 +179,4 @@ TransactionsDownloadCSV.propTypes = {
   }).isRequired,
 };
 
-export default TransactionsDownloadCSV;
+export default TransactionsDownloadInvoices;
