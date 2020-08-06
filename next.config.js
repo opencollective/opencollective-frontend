@@ -1,6 +1,7 @@
 require('./env');
 
 const withSourceMaps = require('@zeit/next-source-maps')();
+const { getCSPHeaderForNextJS } = require('./server/content-security-policy');
 
 const nextConfig = {
   webpack: (config, { webpack, isServer, buildId }) => {
@@ -122,6 +123,14 @@ const nextConfig = {
     }
 
     return config;
+  },
+  async headers() {
+    const cspHeader = getCSPHeaderForNextJS();
+    if (cspHeader) {
+      return [{ source: '/', headers: [cspHeader] }];
+    } else {
+      return [];
+    }
   },
 };
 
