@@ -75,6 +75,8 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, isFreeTier, cur
     } else {
       return get(stepPayment, 'title', null);
     }
+  } else {
+    return null;
   }
 };
 

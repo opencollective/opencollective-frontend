@@ -224,7 +224,12 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
     imageUrl
     isHost
     isActive
+    settings
+    location {
+      country
+    }
     ... on AccountWithContributions {
+      platformFeePercent
       platformContributionAvailable
       contributors(limit: 6) {
         totalCount
@@ -237,11 +242,31 @@ const accountFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     ... on AccountWithHost {
+      hostFeePercent
       host {
         id
         slug
         name
         settings
+        location {
+          country
+        }
+      }
+    }
+    ... on Event {
+      parent {
+        id
+        location {
+          country
+        }
+      }
+    }
+    ... on Project {
+      parent {
+        id
+        location {
+          country
+        }
       }
     }
   }

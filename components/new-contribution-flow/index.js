@@ -208,27 +208,23 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { skipStepDetails, fixedInterval, fixedAmount, intl, collective, host, tier } = this.props;
+    const { fixedInterval, fixedAmount, intl, collective, host, tier } = this.props;
     const { stepDetails, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && get(stepDetails, 'amount') === 0;
-    const steps = [];
-
-    // If amount and interval are forced by a tier or by params, skip StepDetails (except for events)
-    if (!skipStepDetails && (!isFixedContribution || tier?.type === 'TICKET' || this.canHaveFeesOnTop())) {
-      steps.push({
+    const steps = [
+      {
         name: 'details',
         label: intl.formatMessage(stepsLabels.details),
         isCompleted: Boolean(stepDetails && stepDetails.amount >= minAmount),
-      });
-    }
-
-    steps.push({
-      name: 'profile',
-      label: intl.formatMessage(stepsLabels.contributeAs),
-      isCompleted: Boolean(this.state.stepProfile),
-    });
+      },
+      {
+        name: 'profile',
+        label: intl.formatMessage(stepsLabels.contributeAs),
+        isCompleted: Boolean(this.state.stepProfile),
+      },
+    ];
 
     // Hide step payment if using a free tier with fixed price
     if (!(minAmount === 0 && isFixedContribution)) {
@@ -252,14 +248,15 @@ class ContributionFlow extends React.Component {
   }
 
   render() {
-    const { collective, tier, LoggedInUser } = this.props;
+    const { collective, tier, LoggedInUser, skipStepDetails } = this.props;
+
     return (
       <Steps
         steps={this.getSteps()}
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
-        onInvalidStep={this.onInvalidStep}
-        onComplete={this.submitOrder}
+        onComplete={console.log}
+        skip={skipStepDetails ? ['details'] : null}
       >
         {({
           steps,
