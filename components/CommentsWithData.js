@@ -7,15 +7,11 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
-import PrivateInfoIcon from './icons/PrivateInfoIcon';
+import PrivateCommentsMessage from './expenses/PrivateCommentsMessage';
 import CommentForm from './CommentForm';
 import Comments from './Comments';
 import Error from './Error';
-import { Flex } from './Grid';
-import LoadingPlaceholder from './LoadingPlaceholder';
 import LoginBtn from './LoginBtn';
-import MessageBox from './MessageBox';
-import { P } from './Text';
 
 class CommentsWithData extends React.Component {
   static propTypes = {
@@ -113,21 +109,7 @@ class CommentsWithData extends React.Component {
     }
 
     if (!expenseComments?.comments) {
-      return loading || this.props.loadingLoggedInUser ? (
-        <LoadingPlaceholder height={76} borderRadius={8} />
-      ) : (
-        <MessageBox type="info" px={4}>
-          <Flex alignItems="center">
-            <PrivateInfoIcon size={42} withoutTooltip />
-            <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
-              <FormattedMessage
-                id="expense.privateCommentsWarning"
-                defaultMessage="Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them."
-              />
-            </P>
-          </Flex>
-        </MessageBox>
-      );
+      return <PrivateCommentsMessage isLoading={loading || this.props.loadingLoggedInUser} isAllowed={false} />;
     }
 
     return (

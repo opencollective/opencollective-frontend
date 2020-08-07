@@ -28,17 +28,17 @@ import {
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
+import PrivateCommentsMessage from '../components/expenses/PrivateCommentsMessage';
 import { Box, Flex } from '../components/Grid';
 import HTMLContent from '../components/HTMLContent';
 import I18nFormatters, { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import TemporaryNotification from '../components/TemporaryNotification';
-import { H1, H5, P, Span } from '../components/Text';
+import { H1, H5, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
@@ -479,25 +479,12 @@ class ExpensePage extends React.Component {
                 />
               </Box>
             )}
-            {!expense?.permissions.canComment && (
-              <Box my={4}>
-                {loadingLoggedInUser || isRefetchingDataForUser ? (
-                  <LoadingPlaceholder height={76} borderRadius={8} />
-                ) : (
-                  <MessageBox type="info" px={4}>
-                    <Flex alignItems="center">
-                      <PrivateInfoIcon size={42} withoutTooltip />
-                      <P ml={3} fontSize="Paragraph" lineHeight="Paragraph">
-                        <FormattedMessage
-                          id="expense.privateCommentsWarning"
-                          defaultMessage="Comments for this expense are private. You must be signed in as an admin or the expense submitter to view them."
-                        />
-                      </P>
-                    </Flex>
-                  </MessageBox>
-                )}
-              </Box>
-            )}
+            <Box my={4}>
+              <PrivateCommentsMessage
+                isAllowed={expense?.permissions.canComment}
+                isLoading={loadingLoggedInUser || isRefetchingDataForUser}
+              />
+            </Box>
             {expense && (
               <Box mb={3} pt={3}>
                 <Thread
