@@ -20,10 +20,6 @@ const SectionWrapper = styled(Container)`
 
   .linkWrapper:hover {
     background-color: #ffffff;
-
-    .arrowWrapper {
-      color: #fff;
-    }
   }
 
   @media screen and (min-width: 64em) {

@@ -6,6 +6,7 @@ import Container from '../../Container';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
+import { flicker } from '../../StyledKeyframes';
 import StyledLink from '../../StyledLink';
 import { H3, P } from '../../Text';
 import Illustration from '../HomeIllustration';
@@ -23,12 +24,40 @@ const IconWrapper = styled(Box)`
   }
 `;
 
-const IllustrationWrapper = styled(Box)`
-  background-image: url('/static/images/home/donate-button-bg-sm.png');
-  background-size: 100% 100%;
+const DonateButtonBGHover = styled.img.attrs({ src: '/static/images/home/donateButton-bg-withStar.png' })`
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.2s;
+`;
+
+const DonateButtonBG = styled.img.attrs({ src: '/static/images/home/donateButton-bg.png' })`
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+`;
+
+const DonateButtonWrapper = styled(Box)`
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+
+  &:hover {
+    ${DonateButtonBGHover} {
+      opacity: 1;
+      animation: ${flicker({ minOpacity: 0.7 })} 1s infinite;
+      animation-delay: 0.2s;
+    }
+  }
+`;
+
+const DonateButton = styled(StyledButton)`
+  pointer-events: auto;
 `;
 
 const learningChannels = [
@@ -198,13 +227,15 @@ const LearnMore = () => {
             />
           </P>
         </Box>
-        <IllustrationWrapper width={['287px']} height={['300px']} my={3} ml={[null, 4]}>
+        <DonateButtonWrapper width={['287px']} height={['300px']} my={3} ml={[null, 4]}>
+          <DonateButtonBG />
+          <DonateButtonBGHover />
           <Link route="/opencollective/donate">
-            <StyledButton buttonStyle="dark" minWidth={'97'}>
+            <DonateButton buttonStyle="dark" minWidth={'97'}>
               <FormattedMessage id="home.donate" defaultMessage="Donate" />
-            </StyledButton>
+            </DonateButton>
           </Link>
-        </IllustrationWrapper>
+        </DonateButtonWrapper>
       </Container>
     </Container>
   );
