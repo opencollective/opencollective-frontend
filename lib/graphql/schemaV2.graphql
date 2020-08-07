@@ -1,5 +1,5 @@
 # source: http://localhost:3060/graphql/v2
-# timestamp: Tue Aug 04 2020 10:43:42 GMT-0300 (Brasilia Standard Time)
+# timestamp: Wed Aug 05 2020 16:44:39 GMT-0300 (Brasilia Standard Time)
 
 """
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
@@ -5130,6 +5130,16 @@ type Query {
     The term to search
     """
     searchTerm: String
+
+    """
+    Transaction is attached to Expense
+    """
+    hasExpense: Boolean
+
+    """
+    Transaction is attached to Order
+    """
+    hasOrder: Boolean
   ): TransactionCollection
   loggedInAccount: Account
 }

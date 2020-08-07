@@ -65,7 +65,7 @@ const TransactionItem = transaction => {
       : netAmount;
 
   return (
-    <Item>
+    <Item data-cy="transaction-item">
       <Box px={[16, 27]} py={16}>
         <Flex flexWrap="wrap" justifyContent="space-between">
           <Flex flex="1" minWidth="60%" mr={3}>
