@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/react-hooks';
-import { isNil, round } from 'lodash';
+import { clamp, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
@@ -118,11 +118,11 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                     maxWidth={90}
                     appendProps={{ color: 'black.600' }}
                     fontWeight="normal"
-                    value={hostFeePercent}
+                    value={isNaN(hostFeePercent) ? '' : hostFeePercent}
                     step="0.01"
-                    onChange={e => setHostFeePercent(e.target.value)}
+                    onChange={e => setHostFeePercent(parseFloat(e.target.value))}
                     onBlur={e => {
-                      const newValue = round(parseFloat(e.target.value), 2);
+                      const newValue = clamp(round(parseFloat(e.target.value), 2), 0, 100);
                       setHostFeePercent(isNaN(newValue) ? host.hostFeePercent : newValue);
                     }}
                   />
