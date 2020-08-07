@@ -495,6 +495,11 @@ type Bot implements Account {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -665,6 +670,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -2562,6 +2572,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -3287,6 +3302,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -3510,6 +3530,11 @@ type Host implements Account {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -3595,6 +3620,11 @@ type Host implements Account {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+
+  """
+  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
+  """
+  supportedPaymentMethods: [PaymentMethodType]
 }
 
 """
@@ -3759,6 +3789,11 @@ type Individual implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -4484,6 +4519,11 @@ type Organization implements Account {
     isHostAccount: Boolean
 
     """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -4620,6 +4660,15 @@ input PaymentMethodReferenceInput {
   id: String
 }
 
+enum PaymentMethodType {
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  COLLECTIVE_BALANCE
+  PAYPAL
+  BANK_TRANSFER
+}
+
 """
 A payout method
 """
@@ -4743,6 +4792,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
 
     """
     Wether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
