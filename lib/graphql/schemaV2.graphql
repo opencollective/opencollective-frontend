@@ -271,6 +271,11 @@ interface AccountWithContributions {
   ): ContributorCollection!
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -794,6 +799,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -2686,6 +2696,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -3404,6 +3419,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -4207,6 +4227,11 @@ type Mutation {
     The host fee percent to apply to this account
     """
     hostFeePercent: Float!
+
+    """
+    If using a custom fee, set this to true
+    """
+    isCustomFee: Boolean!
   ): Account!
 
   """
@@ -4852,6 +4877,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
