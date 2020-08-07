@@ -38,8 +38,8 @@ const getDefaultFee = (collective, host) => {
 };
 
 const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
-  mutation EditAccountFeesStructure($account: AccountReferenceInput!, $hostFeePercent: Float!) {
-    editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent) {
+  mutation EditAccountFeesStructure($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
+    editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent, isCustomFee: $isCustomFee) {
       id
       ... on Collective {
         hostFeesStructure
@@ -145,6 +145,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                 variables: {
                   account: { id: collective.id },
                   hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
+                  isCustomFee,
                 },
               }).then(props.onClose);
             }}

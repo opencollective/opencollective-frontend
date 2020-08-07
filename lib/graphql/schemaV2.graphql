@@ -4227,6 +4227,11 @@ type Mutation {
     The host fee percent to apply to this account
     """
     hostFeePercent: Float!
+
+    """
+    If using a custom fee, set this to true
+    """
+    isCustomFee: Boolean!
   ): Account!
 
   """
