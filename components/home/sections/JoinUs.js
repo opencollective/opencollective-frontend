@@ -19,7 +19,7 @@ const SectionWrapper = styled(Container)`
   }
 
   .linkWrapper:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: #ffffff;
 
     .arrowWrapper {
       color: #fff;
@@ -43,6 +43,7 @@ const Wrapper = styled(Container)`
   align-items: center;
   border-radius: 8px;
   padding: 16px;
+  background-color: rgba(255, 255, 255, 0.7);
 
   @media screen and (min-width: 52em) {
     padding: 24px 32px;
@@ -87,7 +88,6 @@ const JoinUs = () => (
         <Link route="/create">
           <Wrapper
             color="black.900"
-            backgroundColor={['white.full', null, 'rgba(255, 255, 255, 0.7)']}
             className="linkWrapper"
             my={[1, null, 4]}
             width={['288px', '648px', '569px', null, '594px']}
@@ -119,13 +119,7 @@ const JoinUs = () => (
         </Link>
 
         <Link route="/hiring">
-          <Wrapper
-            backgroundColor="rgba(255, 255, 255, 0.7)"
-            color="black.900"
-            my={4}
-            width={['288px', '648px', '569px', null, '594px']}
-            className="linkWrapper"
-          >
+          <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']} className="linkWrapper">
             <Container mb={2} width={['192px', 1]}>
               <H3
                 fontSize={['24px', '32px', null]}
@@ -167,12 +161,7 @@ const JoinUs = () => (
           </Wrapper>
         </Link>
 
-        <Wrapper
-          backgroundColor={['rgba(255, 255, 255, 0.7)', null, 'white.full']}
-          color="black.900"
-          my={4}
-          width={['288px', '648px', '569px', null, '594px']}
-        >
+        <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']}>
           <Container>
             <H3
               fontSize={['24px', '32px', null]}
