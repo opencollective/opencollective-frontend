@@ -15,6 +15,7 @@ import StyledCard from '../StyledCard';
 import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
+import StepSummary from './StepSummary';
 
 class NewContributionFlowMainContainer extends React.Component {
   static propTypes = {
@@ -30,6 +31,7 @@ class NewContributionFlowMainContainer extends React.Component {
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.object,
+      stepSummary: PropTypes.object,
     }),
     contributeAs: PropTypes.object,
   };
@@ -45,6 +47,7 @@ class NewContributionFlowMainContainer extends React.Component {
         defaultMessage: 'Sign up to contribute recurrently',
       },
       payment: { id: 'NewContributionFlow.ChoosePaymentMethod', defaultMessage: 'Choose your payment method' },
+      summary: { id: 'contribute.step.summary', defaultMessage: 'Summary' },
     });
   }
 
@@ -107,14 +110,16 @@ class NewContributionFlowMainContainer extends React.Component {
   }
 
   renderStep = step => {
+    const { collective, mainState, tier } = this.props;
+    const { stepProfile, stepDetails, stepSummary } = mainState;
     switch (step) {
       case 'details':
         return (
           <StepDetails
-            collective={this.props.collective}
-            tier={this.props.tier}
+            collective={collective}
+            tier={tier}
             onChange={this.props.onChange}
-            data={this.props.mainState.stepDetails}
+            data={stepDetails}
             showFeesOnTop={this.props.showFeesOnTop}
           />
         );
@@ -125,21 +130,32 @@ class NewContributionFlowMainContainer extends React.Component {
         const options = uniqBy([personalProfile, ...otherProfiles], 'id');
         return (
           <StepProfile
-            collective={this.props.collective}
-            stepDetails={this.props.mainState.stepDetails}
+            collective={collective}
+            stepDetails={stepDetails}
             profiles={options}
             defaultSelectedProfile={defaultSelectedProfile}
             onChange={this.props.onChange}
-            data={this.props.mainState.stepProfile}
-            canUseIncognito={
-              this.props.collective.type !== CollectiveType.EVENT &&
-              (!this.props.tier || this.props.tier.type !== 'TICKET')
-            }
+            data={stepProfile}
+            canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
           />
         );
       }
       case 'payment':
         return <StepPayment collective={this.props.collective} />;
+      case 'summary':
+        return (
+          <StepSummary
+            collective={collective}
+            tier={tier}
+            stepProfile={stepProfile}
+            stepDetails={stepDetails}
+            data={stepSummary}
+            onChange={this.props.onChange}
+            applyTaxes
+          />
+        );
+      default:
+        return null;
     }
   };
 

@@ -206,7 +206,7 @@ pages.add(
 );
 pages.add(
   'new-contribute',
-  '/:collectiveSlug/:verb(new-contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(details|profile|payment|success)?',
+  '/:collectiveSlug/:verb(new-contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(details|profile|payment|success|summary)?',
   'new-contribution-flow',
 );
 

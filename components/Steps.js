@@ -31,6 +31,8 @@ export default class Steps extends React.Component {
      * Default to `goToStep(lastValidStep, {ignoreValidation: true})`
      */
     onInvalidStep: PropTypes.func.isRequired,
+    /** A list of steps to be skipped */
+    skip: PropTypes.arrayOf(PropTypes.string),
   };
 
   static defaultProps = {
@@ -54,6 +56,9 @@ export default class Steps extends React.Component {
       this.onInvalidStep(currentStep, lastValidStep);
     } else {
       this.props.steps.slice(0, currentStep.index + 1).map(this.markStepAsVisited);
+      if (this.isSkippedStep(currentStep)) {
+        this.goNext();
+      }
     }
   }
 
@@ -71,6 +76,10 @@ export default class Steps extends React.Component {
       }
     }
   }
+
+  isSkippedStep = step => {
+    return step && this.props.skip?.includes(step.name);
+  };
 
   onInvalidStep = (step, lastValidStep) => {
     const firstStep = this.getStepByIndex(0);
@@ -203,10 +212,12 @@ export default class Steps extends React.Component {
     }
 
     const lastValidStep = this.getLastCompletedStep();
+    const prevStep = this.getStepByIndex(currentStep.index - 1);
+    const nextStep = this.getStepByIndex(currentStep.index + 1);
     return this.props.children({
       currentStep,
-      prevStep: this.getStepByIndex(currentStep.index - 1),
-      nextStep: this.getStepByIndex(currentStep.index + 1),
+      prevStep,
+      nextStep,
       lastValidStep,
       isValidating: this.state.isValidating,
       lastVisitedStep: this.getLastVisitedStep(lastValidStep),

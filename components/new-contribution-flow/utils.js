@@ -10,10 +10,10 @@ export const taxesMayApply = (collective, host, tier) => {
   }
 
   // Don't apply VAT if not configured (default)
-  const vatType = get(collective, 'settings.VAT.type') || get(collective, 'parentCollective.settings.VAT.type');
+  const vatType = get(collective, 'settings.VAT.type') || get(collective, 'parent.settings.VAT.type');
   const hostCountry = get(host.location, 'country');
   const collectiveCountry = get(collective.location, 'country');
-  const parentCountry = get(collective, 'parentCollective.location.country');
+  const parentCountry = get(collective, 'parent.location.country');
   const country = collectiveCountry || parentCountry || hostCountry;
 
   if (!vatType) {
