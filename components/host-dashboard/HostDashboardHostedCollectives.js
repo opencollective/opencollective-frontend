@@ -48,6 +48,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
         orderBy: $orderBy
         hostFeesStructure: $hostFeesStructure
         searchTerm: $searchTerm
+        isApproved: true
       ) {
         offset
         limit
