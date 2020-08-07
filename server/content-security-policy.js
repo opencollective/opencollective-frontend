@@ -9,7 +9,13 @@ const UNSAFE_EVAL = "'unsafe-eval'";
 const COMMON_DIRECTIVES = {
   blockAllMixedContent: [],
   defaultSrc: [SELF],
-  imgSrc: [SELF, process.env.IMAGES_URL, 'data:', 't.paypal.com'],
+  imgSrc: [
+    SELF,
+    process.env.IMAGES_URL,
+    'data:',
+    't.paypal.com',
+    'opencollective.com', // for widgets on /edit/export
+  ],
   workerSrc: [
     SELF,
     'blob:', // For confettis worker. TODO: Limit for nonce
@@ -34,7 +40,7 @@ const COMMON_DIRECTIVES = {
     '*.paypal.com',
     '*.paypalobjects.com',
   ],
-  frameSrc: ['www.youtube.com', 'opencollective.com', 'js.stripe.com', '*.paypal.com'],
+  frameSrc: ['www.youtube.com', 'opencollective.com', 'js.stripe.com', '*.paypal.com', '*.openstreetmap.org'],
   objectSrc: ['opencollective.com'],
 };
 
@@ -98,12 +104,14 @@ const getContentSecurityPolicyConfig = () => {
   } else if (env === 'production') {
     if (process.env.WEBSITE_URL === 'https://staging.opencollective.com') {
       return {
-        reportOnly: true,
+        reportOnly: false,
         directives: generateDirectives(),
       };
     } else if (process.env.WEBSITE_URL === 'https://opencollective.com') {
-      // Disabled for production until ready
-      return false;
+      return {
+        reportOnly: true,
+        directives: generateDirectives(),
+      };
     } else {
       // Third party deploy, or Zeit deploy preview
       return {
