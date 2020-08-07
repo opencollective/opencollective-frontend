@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, truncate } from 'lodash';
+import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -145,8 +145,8 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, ...props 
         <Flex flexDirection="column" justifyContent="space-between" height={bodyHeight}>
           <Container p={3}>
             <LinkCollective collective={collective}>
-              <P fontSize="LeadParagraph" fontWeight="bold" color="black.800">
-                {truncate(collective.name, { length: 50 })}
+              <P fontSize="LeadParagraph" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
+                {collective.name}
               </P>
             </LinkCollective>
             {tag === undefined ? (
