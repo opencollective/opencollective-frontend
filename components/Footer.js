@@ -53,19 +53,17 @@ const navigation = {
   PLATFORM: {
     'Explainer video': 'https://www.youtube.com/watch?v=IBU5fSILAe8',
     'How it Works': '/how-it-works',
-    Pricing: '/pricing',
-    'Join Free': '/create-account',
+    'Use Cases': 'https://blog.opencollective.com/tag/case-studies/',
+    'Sign up': '/create-account',
     Login: '/signin',
   },
   JOIN: {
     'Create a Collective': '/create',
-    'Become a Sponsor': '/become-a-sponsor',
-    'Become a Fiscal Host': '/become-a-fiscal-host',
-    'Make a Pledge': '/pledges/new',
-    'Gift Cards': '/gift-cards',
+    Discover: '/discover',
+    'Find a fiscal host': '/hosts',
   },
   COMMUNITY: {
-    'Report an issue': 'https://github.com/opencollective/opencollective/issues',
+    'Open Source': 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     'Docs & help': 'https://docs.opencollective.com',
     Support: '/support',
@@ -242,7 +240,7 @@ class Footer extends React.Component {
                   textAlign={['center', 'left']}
                   fontSize="10px"
                   fontWeight="600"
-                  color="black.800"
+                  color={['black.800', 'black.500']}
                   letterSpacing="0.8px"
                   pb={3}
                 >
@@ -307,6 +305,7 @@ class Footer extends React.Component {
             </P>
             <Container width={['220px']} my={2}>
               <StyledSelect
+                data-cy="language-switcher"
                 options={languageOptions}
                 onChange={({ value }) => switchLanguage(value)}
                 defaultValue={languageOptions[0]}
