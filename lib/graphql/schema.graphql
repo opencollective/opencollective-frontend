@@ -616,6 +616,11 @@ enum CollectiveOrderField {
   Order collectives by total donations.
   """
   totalDonations
+
+  """
+  Order collectives by number of financial contributors (unique members).
+  """
+  financialContributors
 }
 
 """
@@ -2189,7 +2194,7 @@ type Mutation {
   """
   activateBudget(
     """
-    ID of the collective (Organization or User)
+    ID of the "collective" (Host Organization)
     """
     id: Int!
   ): CollectiveInterface
@@ -2199,7 +2204,7 @@ type Mutation {
   """
   deactivateBudget(
     """
-    ID of the collective (Organization or User)
+    ID of the "collective" (Host Organization)
     """
     id: Int!
   ): CollectiveInterface
