@@ -2381,6 +2381,11 @@ type Credit implements Transaction {
   order: Order
   isRefunded: Boolean
   paymentMethod: PaymentMethod
+
+  """
+  The permissions given to current logged in user for this transaction
+  """
+  permissions: TransactionPermissions!
   fromAccount: Account
   toAccount: Account
 }
@@ -2499,6 +2504,11 @@ type Debit implements Transaction {
   order: Order
   isRefunded: Boolean
   paymentMethod: PaymentMethod
+
+  """
+  The permissions given to current logged in user for this transaction
+  """
+  permissions: TransactionPermissions!
   fromAccount: Account
   toAccount: Account
 }
@@ -4375,6 +4385,16 @@ type Mutation {
     """
     account: AccountReferenceInput
   ): PaymentMethod
+
+  """
+  Refunds transaction
+  """
+  refundTransaction(
+    """
+    Reference of the transaction to refund
+    """
+    transaction: TransactionReferenceInput!
+  ): Transaction!
 }
 
 """
@@ -5332,6 +5352,7 @@ interface Transaction {
   order: Order
   isRefunded: Boolean
   paymentMethod: PaymentMethod
+  permissions: TransactionPermissions
 }
 
 """
@@ -5342,6 +5363,33 @@ type TransactionCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Transaction]
+}
+
+"""
+Fields for the user permissions on an transaction
+"""
+type TransactionPermissions {
+  """
+  Whether the current user can edit the transaction
+  """
+  canRefund: Boolean!
+
+  """
+  Whether the current user can download this transaction's invoice
+  """
+  canDownloadInvoice: Boolean!
+}
+
+input TransactionReferenceInput {
+  """
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the transaction (ie: 580)
+  """
+  legacyId: Int
 }
 
 """

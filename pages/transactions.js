@@ -124,6 +124,11 @@ class TransactionsPage extends React.Component {
     if (currentCollective && get(oldProps, 'data.Collective') !== currentCollective) {
       this.setState({ Collective: currentCollective });
     }
+
+    // Refetch to get permissions with the currently logged in user
+    if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
+      this.props.transactionsData?.refetch();
+    }
   }
 
   render() {
@@ -244,6 +249,7 @@ class TransactionsPage extends React.Component {
                   isLoading={loading}
                   nbPlaceholders={variables.limit}
                   transactions={transactions?.nodes}
+                  displayActions
                 />
                 <Flex mt={5} justifyContent="center">
                   <Pagination
@@ -271,6 +277,7 @@ const addTransactionsData = graphql(transactionsQuery, {
     return {
       variables: { slug: props.slug, ...getVariablesFromQuery(props.query) },
       context: API_V2_CONTEXT,
+      fetchPolicy: 'cache-and-network',
     };
   },
 });

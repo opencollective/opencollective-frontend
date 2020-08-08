@@ -53,6 +53,10 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         type
         imageUrl
       }
+      permissions {
+        canRefund
+        canDownloadInvoice
+      }
       paymentMethod {
         type
       }

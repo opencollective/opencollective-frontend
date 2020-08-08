@@ -30,7 +30,7 @@ import TransactionModal from './TransactionModal';
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const TransactionItem = transaction => {
+const TransactionItem = ({ displayActions, ...transaction }) => {
   const {
     toAccount,
     fromAccount,
@@ -199,7 +199,7 @@ const TransactionItem = transaction => {
           </Container>
         )}
       </Box>
-      {isExpanded && !hasExpense && <TransactionDetails {...transaction} canDownloadInvoice={canDownloadInvoice} />}
+      {isExpanded && !hasExpense && <TransactionDetails {...transaction} displayActions={displayActions} />}
       {isExpanded && hasExpense && (
         <TransactionModal
           {...transaction}
@@ -213,6 +213,8 @@ const TransactionItem = transaction => {
 };
 
 TransactionItem.propTypes = {
+  /* Display Refund and Download buttons in transactions */
+  displayActions: PropTypes.bool,
   isRefunded: PropTypes.bool,
   fromAccount: PropTypes.shape({
     id: PropTypes.string,
