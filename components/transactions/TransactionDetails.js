@@ -11,6 +11,7 @@ import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 
 const DetailTitle = styled.p`
   margin: 8px 8px 4px 8px;
@@ -76,7 +77,7 @@ const TransactionDetails = ({
                 <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
               </DetailTitle>
               <DetailDescription>
-                <LinkCollective collective={toAccount.host} />
+                <StyledLink as={LinkCollective} collective={toAccount.host} colorShade={600} />
               </DetailDescription>
             </Box>
           )}

@@ -20,12 +20,12 @@ const StyledLink = styled.a.attrs(props => {
     };
   }
 })`
-  color: ${themeGet('colors.primary.500')};
+  color: ${props => themeGet(`colors.primary.${props.colorShade}`)};
   cursor: pointer;
   text-decoration: none;
 
   &:hover {
-    color: ${themeGet('colors.primary.300')};
+    color: ${props => themeGet(`colors.primary.${props.colorShade - 200}`)};
   }
 
   ${border}
@@ -106,6 +106,12 @@ StyledLink.propTypes = {
   truncateOverflow: PropTypes.bool,
   /** If true, the link will open in a new tab when clicked */
   openInNewTab: PropTypes.bool,
+  /** Color Shade, defaults to 500 */
+  colorShade: PropTypes.number,
+};
+
+StyledLink.defaultProps = {
+  colorShade: 500,
 };
 
 /** @component */

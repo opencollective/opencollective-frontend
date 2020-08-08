@@ -96,13 +96,13 @@ const TransactionItem = transaction => {
                   <FormattedMessage
                     id="Transaction.from"
                     defaultMessage="from {name}"
-                    values={{ name: <LinkCollective collective={fromAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} colorShade={600} /> }}
                   />
                 ) : (
                   <FormattedMessage
                     id="Transaction.by"
                     defaultMessage="by {name}"
-                    values={{ name: <LinkCollective collective={toAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} colorShade={600} /> }}
                   />
                 )}
                 {usingVirtualCardFromCollective && (
@@ -113,7 +113,13 @@ const TransactionItem = transaction => {
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
                         giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                        collective: <StyledLink as={LinkCollective} collective={usingVirtualCardFromCollective} />,
+                        collective: (
+                          <StyledLink
+                            as={LinkCollective}
+                            collective={usingVirtualCardFromCollective}
+                            colorShade={600}
+                          />
+                        ),
                       }}
                     />
                   </React.Fragment>
