@@ -32,7 +32,7 @@ const DetailDescription = styled.div`
 
 const DetailsContainer = styled(Flex)`
   background: #f7f8fa;
-  ont-size: 12px;
+  font-size: 12px;
   padding: 16px 24px;
 
   ${props =>
