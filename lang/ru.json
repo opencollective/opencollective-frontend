@@ -650,7 +650,6 @@
   "EditUserEmailForm.reSend": "Выслать подтверждение повторно",
   "EditUserEmailForm.submit": "Подтвердить новую почту",
   "EditUserEmailForm.success": "Письмо с ссылкой для подтверждения отправлено на {email}.",
-  "EditWebhooks.ZapierAd": "NEW! You can now use the Beta {zapierLink} app to manage your integrations.",
   "Email": "Email",
   "emptyBalance": "Empty Balance",
   "Error.BadCollectiveType": "This profile type is not supported",

@@ -650,7 +650,6 @@
   "EditUserEmailForm.reSend": "확인 메일 재전송",
   "EditUserEmailForm.submit": "새 이메일 확인",
   "EditUserEmailForm.success": "An email with a confirmation link has been sent to {email}.",
-  "EditWebhooks.ZapierAd": "신규! 연결을 관리하기 위해 Beta {zapierLink}를 사용해볼 수 있습니다.",
   "Email": "이메일",
   "emptyBalance": "Empty Balance",
   "Error.BadCollectiveType": "이 프로필 유형은 지원되지 않습니다",
