@@ -53,7 +53,7 @@ const users = [
   },
   {
     id: 'meetups',
-    name: 'Women Who Code Atlanta',
+    name: 'Women Who Code',
     type: 'Meetups',
     description: 'We will never lock you in. Everything we do is open source (MIT License)',
     collectivePath: '/wwcodeatl',
@@ -71,12 +71,12 @@ const users = [
   },
 ];
 
-const User = ({ id, name, picture, type, collectivePath, learnMorePath }) => {
+const User = ({ id, name, picture, type, collectivePath }) => {
   const intl = useIntl();
 
   return (
-    <Container textAlign="center" display="flex" flexDirection="column" alignItems="center" mx={[null, null, 3]}>
-      <ImgWrapper width={[1, null, '288px', null, '368px']}>
+    <Container textAlign="center" display="flex" flexDirection="column" alignItems="center" mx={[null, 3, 3]}>
+      <ImgWrapper width={[1, '205px', null, '288px', '368px']}>
         <Link route={collectivePath}>
           <Img alt={name} src={picture} width="100%" />
         </Link>
@@ -85,39 +85,44 @@ const User = ({ id, name, picture, type, collectivePath, learnMorePath }) => {
         textAlign="center"
         display="flex"
         flexDirection="column"
-        alignItems="center"
-        width={[1, null, '288px', null, '368px']}
+        alignItems="flex-start"
+        width={[1, '206px', null, '288px', '368px']}
       >
         <P
-          fontSize={['15px', 'H5']}
-          lineHeight={['25px', '28px']}
+          fontSize={['15px', '18px']}
+          lineHeight={['23px', '27px']}
           color="black.600"
-          lineSpacing={['-0.016em', '-0.6px']}
-          fontWeight="300"
-          my={3}
+          lineSpacing={['-0.12px', '-0.2px']}
+          fontWeight="normal"
+          mt={24}
+          mb={12}
         >
           {type}
         </P>
-        <Box width={[null, null, id === 'opensource' ? '150px' : null]} mb={[2, null, 4]}>
+        <Box mb={2}>
           <P
-            fontSize={['H5', null, 'H4', null, 'H3']}
-            lineHeight={['28px', null, 'H4', null, '40px']}
-            color="black.900"
-            letterSpacing="-0.2px"
+            fontSize={['15px', '24px']}
+            lineHeight={['23px', '32px']}
+            color="black.800"
+            letterSpacing={['-0.12px', '-0.8px']}
             fontWeight="bold"
             wordWrap="break-word"
+            textAlign="left"
           >
             {name}
           </P>
         </Box>
-        <Box display={['none', null, null, null, 'block']} width="360px" height="75px" my={3}>
-          <P fontSize={'15px'} lineHeight={'25px'} letterSpacing={'-0.016em'} color="black.600">
+        <Box my={2}>
+          <P
+            fontSize={['15px', '16px', null, null, '18px']}
+            textAlign="left"
+            lineHeight={['25px', '24px', null, null, '27px']}
+            letterSpacing={['-0.016em', '-0.16px', null, null, '-0.2px']}
+            color="black.600"
+          >
             {intl.formatMessage(messages[`home.OCusers.${id}`])}
           </P>
         </Box>
-        <StyledLink minWidth="72px" href={learnMorePath} buttonStyle="standard" buttonSize="small">
-          <FormattedMessage id="home.more" defaultMessage="More" />
-        </StyledLink>
       </Container>
     </Container>
   );
@@ -134,34 +139,38 @@ User.propTypes = {
 
 const OCUsers = () => {
   return (
-    <Flex my={[4, null, 6]} flexDirection="column" mx={[3, 4]} alignItems="center">
-      <SectionTitle textAlign="center">
+    <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
+      <SectionTitle
+        textAlign="center"
+        fontSize={[null, '32px']}
+        lineHeight={[null, '40px']}
+        letterSpacing={[null, '-1.2px']}
+      >
         <FormattedMessage id="home.OCUsersSection.title" defaultMessage="Who is using Open Collective?" />
       </SectionTitle>
-      <Container width={['288px', 1, '768px', null, '991px']} mb={4} textAlign="center">
-        <SectionSubTitle fontWeight="300" textAlign="center" mb={4}>
+      <Container width={['286px', '548px', null, '768px', '991px']} mb={4} textAlign="center">
+        <SectionSubTitle
+          color="black.700"
+          fontWeight="500"
+          textAlign="center"
+          mb={4}
+          fontSize={[null, '20px']}
+          lineHeight={[null, '28px']}
+          letterSpacing={[null, '-0.6px']}
+        >
           <FormattedMessage
             id="home.OCUsersSection.subtitle"
             defaultMessage="Communities around the world are using Open Collective. Find out more about them!"
           />
         </SectionSubTitle>
-        <Box mt={5}>
-          <StyledLink
-            buttonStyle="standard"
-            buttonSize="medium"
-            href="https://blog.opencollective.com/tag/case-studies/"
-          >
-            <FormattedMessage id="home.discover" defaultMessage="Discover more" />
-          </StyledLink>
-        </Box>
       </Container>
-      <StyledCarousel options={users} display={[null, null, 'none']} width={1}>
+      <StyledCarousel options={users} display={[null, 'none']} width={1}>
         {users.map(user => (
           <User key={user.id} {...user} />
         ))}
       </StyledCarousel>
-      <Flex mt={4}>
-        <Container display={['none', null, 'flex']}>
+      <Flex mt={2}>
+        <Container display={['none', 'flex']}>
           {users.map(user => (
             <Fragment key={user.id}>
               <User {...user} />
@@ -169,6 +178,11 @@ const OCUsers = () => {
           ))}
         </Container>
       </Flex>
+      <Box mt={4}>
+        <StyledLink buttonStyle="standard" buttonSize="medium" href="https://blog.opencollective.com/tag/case-studies/">
+          <FormattedMessage id="home.discover" defaultMessage="Discover more" />
+        </StyledLink>
+      </Box>
     </Flex>
   );
 };

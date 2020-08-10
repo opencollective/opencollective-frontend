@@ -22,6 +22,7 @@ class Newsletter extends React.Component {
           >
             <Container
               borderRadius={10}
+              border="1px solid #9D9FA3"
               bg="white.full"
               display="flex"
               justifyContent="space-between"
@@ -39,7 +40,7 @@ class Newsletter extends React.Component {
                 name="EMAIL"
                 px={3}
                 py={2}
-                minWidth={[121, null, 230]}
+                minWidth={[121, 230]}
                 placeholder="Enter your email address"
                 type="email"
                 width={1}
@@ -52,10 +53,9 @@ class Newsletter extends React.Component {
                 lineHeight="16px"
                 name="subscribe"
                 type="submit"
-                borderRadius="0"
+                borderRadius="0 10px 10px 0"
                 border="none"
-                borderLeft="1px solid"
-                borderColor="black.700"
+                borderLeft="1px solid #9D9FA3"
                 outline="none"
               >
                 <FormattedMessage id="newsletter.subscribe" defaultMessage="Subscribe" />
