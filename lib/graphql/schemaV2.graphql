@@ -303,6 +303,11 @@ interface AccountWithHost {
   hostFeePercent: Float
 
   """
+  Fees percentage that the platform takes for this collective
+  """
+  platformFeePercent: Int
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -771,6 +776,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -806,11 +816,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -2681,6 +2686,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -2716,11 +2726,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3411,6 +3416,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -3446,11 +3456,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -4913,6 +4918,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -4948,11 +4958,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account

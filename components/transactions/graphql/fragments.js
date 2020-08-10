@@ -45,6 +45,10 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
             type
           }
         }
+        ... on AccountWithHost {
+          hostFeePercent
+          platformFeePercent
+        }
       }
       fromAccount {
         id
@@ -52,6 +56,10 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         slug
         type
         imageUrl
+        ... on AccountWithHost {
+          hostFeePercent
+          platformFeePercent
+        }
       }
       permissions {
         canRefund

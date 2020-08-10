@@ -54,6 +54,7 @@ const TransactionDetails = ({
   type,
   isRefunded,
   toAccount,
+  fromAccount,
   uuid,
   platformFee,
   hostFee,
@@ -108,6 +109,7 @@ const TransactionDetails = ({
               isCredit,
               isRefunded,
               toAccount,
+              fromAccount,
               intl,
             })}
           </DetailDescription>
