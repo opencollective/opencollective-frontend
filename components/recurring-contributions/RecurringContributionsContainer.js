@@ -39,11 +39,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
   return (
     <Container mt={4}>
       {displayedRecurringContributions.length ? (
-        <Grid
-          gridGap={24}
-          gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr', 'repeat(4, 1fr)', 'repeat(5, 1fr)']}
-          my={2}
-        >
+        <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))" my={2}>
           {displayedRecurringContributions.map(contribution => (
             <CollectiveCardContainer key={contribution.id}>
               <RecurringContributionsCard

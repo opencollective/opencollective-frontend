@@ -159,7 +159,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <Grid gridGap={24} gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr', '1fr 1fr 1fr 1fr']}>
+          <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))">
             {loading
               ? Array.from(new Array(COLLECTIVES_PER_PAGE)).map((_, index) => (
                   // eslint-disable-next-line react/no-array-index-key
