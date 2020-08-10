@@ -30,7 +30,7 @@ import TransactionModal from './TransactionModal';
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const TransactionItem = transaction => {
+const TransactionItem = ({ displayActions, ...transaction }) => {
   const {
     toAccount,
     fromAccount,
@@ -96,13 +96,13 @@ const TransactionItem = transaction => {
                   <FormattedMessage
                     id="Transaction.from"
                     defaultMessage="from {name}"
-                    values={{ name: <LinkCollective collective={fromAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} colorShade={600} /> }}
                   />
                 ) : (
                   <FormattedMessage
                     id="Transaction.by"
                     defaultMessage="by {name}"
-                    values={{ name: <LinkCollective collective={toAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} colorShade={600} /> }}
                   />
                 )}
                 {usingVirtualCardFromCollective && (
@@ -113,7 +113,13 @@ const TransactionItem = transaction => {
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
                         giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                        collective: <StyledLink as={LinkCollective} collective={usingVirtualCardFromCollective} />,
+                        collective: (
+                          <StyledLink
+                            as={LinkCollective}
+                            collective={usingVirtualCardFromCollective}
+                            colorShade={600}
+                          />
+                        ),
                       }}
                     />
                   </React.Fragment>
@@ -193,7 +199,7 @@ const TransactionItem = transaction => {
           </Container>
         )}
       </Box>
-      {isExpanded && !hasExpense && <TransactionDetails {...transaction} canDownloadInvoice={canDownloadInvoice} />}
+      {isExpanded && !hasExpense && <TransactionDetails {...transaction} displayActions={displayActions} />}
       {isExpanded && hasExpense && (
         <TransactionModal
           {...transaction}
@@ -207,6 +213,8 @@ const TransactionItem = transaction => {
 };
 
 TransactionItem.propTypes = {
+  /* Display Refund and Download buttons in transactions */
+  displayActions: PropTypes.bool,
   isRefunded: PropTypes.bool,
   fromAccount: PropTypes.shape({
     id: PropTypes.string,

@@ -30,6 +30,11 @@ interface Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -303,6 +308,11 @@ interface AccountWithHost {
   hostFeePercent: Float
 
   """
+  Fees percentage that the platform takes for this collective
+  """
+  platformFeePercent: Int
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -447,6 +457,11 @@ type Bot implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -624,6 +639,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -771,6 +791,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -806,11 +831,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -2381,6 +2401,11 @@ type Credit implements Transaction {
   order: Order
   isRefunded: Boolean
   paymentMethod: PaymentMethod
+
+  """
+  The permissions given to current logged in user for this transaction
+  """
+  permissions: TransactionPermissions!
   fromAccount: Account
   toAccount: Account
 }
@@ -2499,6 +2524,11 @@ type Debit implements Transaction {
   order: Order
   isRefunded: Boolean
   paymentMethod: PaymentMethod
+
+  """
+  The permissions given to current logged in user for this transaction
+  """
+  permissions: TransactionPermissions!
   fromAccount: Account
   toAccount: Account
 }
@@ -2524,6 +2554,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -2671,6 +2706,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -2706,11 +2746,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3254,6 +3289,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -3401,6 +3441,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -3436,11 +3481,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3482,6 +3522,11 @@ type Host implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -3743,6 +3788,11 @@ type Individual implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -4375,6 +4425,16 @@ type Mutation {
     """
     account: AccountReferenceInput
   ): PaymentMethod
+
+  """
+  Refunds transaction
+  """
+  refundTransaction(
+    """
+    Reference of the transaction to refund
+    """
+    transaction: TransactionReferenceInput!
+  ): Transaction!
 }
 
 """
@@ -4471,6 +4531,11 @@ type Organization implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -4746,6 +4811,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -4893,6 +4963,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent: Float
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
   Date of approval by the Fiscal Host.
   """
   approvedAt: DateTime
@@ -4928,11 +5003,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int = 0
     roles: [MemberRole]
   ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -5332,6 +5402,7 @@ interface Transaction {
   order: Order
   isRefunded: Boolean
   paymentMethod: PaymentMethod
+  permissions: TransactionPermissions
 }
 
 """
@@ -5342,6 +5413,33 @@ type TransactionCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Transaction]
+}
+
+"""
+Fields for the user permissions on an transaction
+"""
+type TransactionPermissions {
+  """
+  Whether the current user can edit the transaction
+  """
+  canRefund: Boolean!
+
+  """
+  Whether the current user can download this transaction's invoice
+  """
+  canDownloadInvoice: Boolean!
+}
+
+input TransactionReferenceInput {
+  """
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the transaction (ie: 580)
+  """
+  legacyId: Int
 }
 
 """

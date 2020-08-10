@@ -11,6 +11,9 @@ import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
+
+import TransactionRefundButton from './TransactionRefundButton';
 
 const DetailTitle = styled.p`
   margin: 8px 8px 4px 8px;
@@ -31,7 +34,7 @@ const DetailDescription = styled.div`
 
 const DetailsContainer = styled(Flex)`
   background: #f7f8fa;
-  ont-size: 12px;
+  font-size: 12px;
   padding: 16px 24px;
 
   ${props =>
@@ -46,25 +49,24 @@ const DetailsContainer = styled(Flex)`
 `;
 
 const TransactionDetails = ({
-  canDownloadInvoice,
+  displayActions,
+  id,
   type,
   isRefunded,
   toAccount,
+  fromAccount,
   uuid,
-  order,
   platformFee,
   hostFee,
   paymentMethod,
   paymentProcessorFee,
   amount,
   netAmount,
+  permissions,
 }) => {
   const intl = useIntl();
   const isCredit = type === TransactionTypes.CREDIT;
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
-
-  const hasAccessToInvoice = canDownloadInvoice && uuid;
-  const hasInvoiceBtn = hasAccessToInvoice && !isRefunded && !isCredit && order;
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -76,7 +78,7 @@ const TransactionDetails = ({
                 <FormattedMessage id="Member.Role.FISCAL_HOST" defaultMessage="Fiscal Host" />
               </DetailTitle>
               <DetailDescription>
-                <LinkCollective collective={toAccount.host} />
+                <StyledLink as={LinkCollective} collective={toAccount.host} colorShade={600} />
               </DetailDescription>
             </Box>
           )}
@@ -107,19 +109,26 @@ const TransactionDetails = ({
               isCredit,
               isRefunded,
               toAccount,
+              fromAccount,
               intl,
             })}
           </DetailDescription>
-          {hasInvoiceBtn && (
-            <StyledButton
-              buttonSize="small"
-              loading={loadingInvoice}
-              onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
-              minWidth={140}
-              background="transparent"
-            >
-              <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />
-            </StyledButton>
+          {displayActions && ( // Let us overide so we can hide buttons in the collective page
+            <React.Fragment>
+              {permissions?.canRefund && <TransactionRefundButton id={id} />}
+              {!permissions?.canRefund && // Just so we don't polute the UI, the Credit transaction will display the Download button
+                permissions?.canDownloadInvoice && (
+                  <StyledButton
+                    buttonSize="small"
+                    loading={loadingInvoice}
+                    onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
+                    minWidth={140}
+                    background="transparent"
+                  >
+                    <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />
+                  </StyledButton>
+                )}
+            </React.Fragment>
           )}
         </Box>
       </Flex>
@@ -128,17 +137,16 @@ const TransactionDetails = ({
 };
 
 TransactionDetails.propTypes = {
-  /** If true, a button to download invoice will be displayed when possible */
-  canDownloadInvoice: PropTypes.bool,
+  displayActions: PropTypes.bool,
   isRefunded: PropTypes.bool,
   fromAccount: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     imageUrl: PropTypes.string,
   }).isRequired,
   toAccount: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     imageUrl: PropTypes.string,
@@ -149,9 +157,10 @@ TransactionDetails.propTypes = {
     }),
   }),
   order: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     status: PropTypes.string,
   }),
+  id: PropTypes.string,
   uuid: PropTypes.string,
   type: PropTypes.string,
   currency: PropTypes.string,
@@ -180,6 +189,10 @@ TransactionDetails.propTypes = {
   hostFee: PropTypes.shape({
     valueInCents: PropTypes.number,
     currency: PropTypes.string,
+  }),
+  permissions: PropTypes.shape({
+    canRefund: PropTypes.bool,
+    canDownloadInvoice: PropTypes.bool,
   }),
   usingVirtualCardFromCollective: PropTypes.object,
 };

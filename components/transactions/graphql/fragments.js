@@ -38,12 +38,17 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         slug
         type
         imageUrl
+        isIncognito
         ... on Collective {
           host {
             name
             slug
             type
           }
+        }
+        ... on AccountWithHost {
+          hostFeePercent
+          platformFeePercent
         }
       }
       fromAccount {
@@ -52,6 +57,15 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         slug
         type
         imageUrl
+        isIncognito
+        ... on AccountWithHost {
+          hostFeePercent
+          platformFeePercent
+        }
+      }
+      permissions {
+        canRefund
+        canDownloadInvoice
       }
       paymentMethod {
         type
