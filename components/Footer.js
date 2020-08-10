@@ -90,9 +90,17 @@ class Footer extends React.Component {
       return {
         value: key,
         label: (
-          <Span fontSize="12px" color="black.800" lineHeight="18px" fontWeight="500" letterSpacing="-0.04px">
-            {language.flag} {language.name} - {language.nativeName} ({language.completion})
-          </Span>
+          <Flex
+            alignItems="center"
+            justifyContent="space-around"
+            fontSize="12px"
+            color="black.800"
+            lineHeight="18px"
+            fontWeight="500"
+            letterSpacing="-0.04px"
+          >
+            <Span fontSize="24px">{language.flag}</Span> {language.name} - {language.nativeName} ({language.completion})
+          </Flex>
         ),
       };
     });
@@ -132,11 +140,12 @@ class Footer extends React.Component {
               flexDirection="column"
               maxWidth="300px"
             >
-              <Flex>
+              <Flex my="12px">
                 <object
                   type="image/svg+xml"
                   data="/static/images/opencollectivelogo-footer-n.svg"
-                  height="20"
+                  height="28px"
+                  width="167px"
                   style={{ maxWidth: '100%' }}
                 />
               </Flex>
@@ -146,7 +155,6 @@ class Footer extends React.Component {
                 fontSize={['12px']}
                 lineHeight={['18px']}
                 letterSpacing={['-0.04px']}
-                py={2}
               >
                 <FormattedMessage id="footer.OC.description" defaultMessage="Make your community sustainable." />
               </P>
@@ -155,22 +163,21 @@ class Footer extends React.Component {
               order={[null, null, null, null, '3']}
               color="#6E747A"
               textAlign={'left'}
-              mt={3}
+              mt={[4, null, null, null, 0]}
               display={[null, 'none', null, null, 'block']}
             >
-              <P
-                as="div"
-                fontSize="10px"
-                fontWeight="600"
-                color="black.800"
-                lineHeight="15px"
-                letterSpacing="0.8px"
-                pb={2}
-                pt={2}
-                textTransform="uppercase"
-              >
+              <P as="div" pb={2} pt={2}>
                 <TranslateIcon />
-                <Span mx={2} style={{ verticalAlign: 'middle' }}>
+                <Span
+                  mx={2}
+                  style={{ verticalAlign: 'middle' }}
+                  fontSize="10px"
+                  fontWeight="600"
+                  color="black.800"
+                  lineHeight="15px"
+                  letterSpacing="0.8px"
+                  textTransform="uppercase"
+                >
                   <FormattedMessage id="footer.changeLanguage" defaultMessage="change language" />
                 </Span>
                 <StyledTooltip
@@ -196,6 +203,7 @@ class Footer extends React.Component {
                   options={languageOptions}
                   onChange={({ value }) => switchLanguage(value)}
                   defaultValue={languageOptions[0]}
+                  borderRadius="10px"
                 />
               </Container>
             </Container>
@@ -204,7 +212,7 @@ class Footer extends React.Component {
               justifyContent="space-evenly"
               alignItems="center"
               width={1}
-              my={3}
+              my={4}
               order={['2', '3', null, null, '2']}
               maxWidth="288px"
             >
@@ -240,9 +248,10 @@ class Footer extends React.Component {
                   textAlign={['center', 'left']}
                   fontSize="10px"
                   fontWeight="600"
+                  lineHeight="15px"
                   color={['black.800', 'black.500']}
                   letterSpacing="0.8px"
-                  pb={3}
+                  mb={[3, '24px']}
                 >
                   {key}
                 </P>
@@ -270,19 +279,18 @@ class Footer extends React.Component {
             mx={3}
             display={['none', 'block', null, null, 'none']}
           >
-            <P
-              as="div"
-              fontSize="10px"
-              fontWeight="600"
-              color="black.800"
-              lineHeight="15px"
-              letterSpacing="0.8px"
-              pb={2}
-              pt={2}
-              textTransform="uppercase"
-            >
+            <P as="div" pb={2} pt={2} textTransform="uppercase">
               <TranslateIcon />
-              <Span mx={2} style={{ verticalAlign: 'middle' }}>
+              <Span
+                mx={2}
+                style={{ verticalAlign: 'middle' }}
+                fontSize="10px"
+                fontWeight="600"
+                color="black.800"
+                lineHeight="15px"
+                letterSpacing="0.8px"
+                textTransform="uppercase"
+              >
                 <FormattedMessage id="footer.changeLanguage" defaultMessage="change language" />
               </Span>
               <StyledTooltip
