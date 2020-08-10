@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { background, display } from 'styled-system';
 
+import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
@@ -171,7 +172,10 @@ const FiscalHost = () => (
                 my={2}
                 mr={[null, null, null, 3]}
               >
-                <Illustration src="/static/images/home/opencollective-foundation.png" alt="Cat" />
+                <Avatar
+                  src="https://images.opencollective.com/foundation/a7d522f/logo/256.png"
+                  name="Open Collective Foundation"
+                />
               </Box>
               <Container
                 display={[null, null, null, 'flex']}
@@ -232,7 +236,10 @@ const FiscalHost = () => (
                 my={2}
                 mr={[null, null, null, 3]}
               >
-                <Illustration src="/static/images/home/opensource-collective.png" alt="Cat" />
+                <Avatar
+                  src="https://images.opencollective.com/opensource/426badd/logo/256.png"
+                  name="Open Source Collective"
+                />
               </Box>
               <Container
                 display={[null, null, null, 'flex']}
@@ -297,7 +304,10 @@ const FiscalHost = () => (
                 my={2}
                 mr={[null, null, null, 3]}
               >
-                <Illustration src="/static/images/home/opencollective-foundation.png" alt="Cat" />
+                <Avatar
+                  src="https://images.opencollective.com/europe/019a512/logo/256.png"
+                  name="Open Collective Europe"
+                />
               </Box>
               <Container
                 display={[null, null, null, 'flex']}
