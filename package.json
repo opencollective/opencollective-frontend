@@ -67,7 +67,7 @@
     "graphql-tag": "2.11.0",
     "helmet": "4.0.0",
     "i18n-iso-countries": "6.0.0",
-    "jsdom": "16.3.0",
+    "jsdom": "16.4.0",
     "jsonwebtoken": "8.5.1",
     "load-script": "1.0.0",
     "lodash": "4.17.19",
