@@ -2415,24 +2415,19 @@ All supported currencies
 """
 enum Currency {
   """
-  US Dollar
+  Australian Dollar
   """
-  USD
+  AUD
 
   """
-  Euro
+  Bulgarian Lev
   """
-  EUR
+  BGN
 
   """
-  Pound Sterling
+  Brazilian Real
   """
-  GBP
-
-  """
-  Mexican Peso
-  """
-  MXN
+  BRL
 
   """
   Canadian Dollar
@@ -2445,14 +2440,34 @@ enum Currency {
   CHF
 
   """
-  Peso Uruguayo
+  Czech Koruna
   """
-  UYU
+  CZK
 
   """
-  Australian Dollar
+  Danish Krone
   """
-  AUD
+  DKK
+
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Forint
+  """
+  HUF
 
   """
   Indian Rupee
@@ -2460,14 +2475,19 @@ enum Currency {
   INR
 
   """
+  Iceland Krona
+  """
+  ISK
+
+  """
   Yen
   """
   JPY
 
   """
-  New Zealand Dollar
+  Mexican Peso
   """
-  NZD
+  MXN
 
   """
   Naira
@@ -2475,14 +2495,39 @@ enum Currency {
   NGN
 
   """
-  Czech Koruna
+  Norwegian Krone
   """
-  CZK
+  NOK
 
   """
-  Brazilian Real
+  New Zealand Dollar
   """
-  BRL
+  NZD
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  Peso Uruguayo
+  """
+  UYU
 }
 
 scalar DateString
