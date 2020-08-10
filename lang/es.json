@@ -650,7 +650,6 @@
   "EditUserEmailForm.reSend": "Reenviar confirmación",
   "EditUserEmailForm.submit": "Confirme el nuevo email",
   "EditUserEmailForm.success": "Se ha enviado un correo con el link de confirmación a {email}.",
-  "EditWebhooks.ZapierAd": "¡NUEVO! Ahora puedes usar la aplicación {zapierLink} Beta para gestionar tus integraciones.",
   "Email": "Correo electrónico",
   "emptyBalance": "Empty Balance",
   "Error.BadCollectiveType": "Este tipo de perfil no es compatible",
