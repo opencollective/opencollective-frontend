@@ -30,6 +30,11 @@ interface Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -452,6 +457,11 @@ type Bot implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -629,6 +639,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -2539,6 +2554,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -3269,6 +3289,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -3497,6 +3522,11 @@ type Host implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -3758,6 +3788,11 @@ type Individual implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -4496,6 +4531,11 @@ type Organization implements Account {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
@@ -4771,6 +4811,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   githubHandle: String
   currency: String
   expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
   backgroundImageUrl(height: Int, format: ImageFormat): String
 

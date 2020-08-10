@@ -18,7 +18,7 @@ const getEventParentCollectiveSlug = parentCollective => {
  * It properly deals with type `EVENT` and `isIncognito`
  */
 const LinkCollective = ({ target, title, collective, children, ...props }) => {
-  if (!collective) {
+  if (!collective || collective.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
 

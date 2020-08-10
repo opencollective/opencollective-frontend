@@ -38,6 +38,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         slug
         type
         imageUrl
+        isIncognito
         ... on Collective {
           host {
             name
@@ -56,6 +57,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         slug
         type
         imageUrl
+        isIncognito
         ... on AccountWithHost {
           hostFeePercent
           platformFeePercent
