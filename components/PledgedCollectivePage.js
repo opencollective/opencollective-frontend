@@ -167,7 +167,7 @@ const PledgedCollectivePage = ({ collective }) => {
         mb={5}
         px={3}
         data-cy="contributersGrouped"
-        gridTemplateColumns={['1fr', '1fr 1fr 1fr', null, '1fr 1fr 1fr 1fr']}
+        gridTemplateColumns="repeat(auto-fill, minmax(165px, 1fr))"
         gridGap={24}
       >
         {pledges.map((pledge, index) => (

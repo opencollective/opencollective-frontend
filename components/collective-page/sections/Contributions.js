@@ -78,7 +78,7 @@ const filterFuncs = {
   [FILTERS.EVENTS]: ({ role }) => role === roles.ATTENDEE,
 };
 
-const GRID_TEMPLATE_COLUMNS = ['1fr', '1fr 1fr', '1fr 1fr 1fr', 'repeat(4, 1fr)', 'repeat(5, 1fr)'];
+const GRID_TEMPLATE_COLUMNS = 'repeat(auto-fill, minmax(220px, 1fr))';
 
 /** A container for membership cards to ensure we have a smooth transition */
 const MembershipCardContainer = styled.div`

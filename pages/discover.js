@@ -26,7 +26,8 @@ const AllCardsContainer = styled(Grid).attrs({
   maxWidth: 1200,
   mx: 'auto',
   my: 4,
-  gridTemplateColumns: ['1fr', '1fr 1fr 1fr', null, 'repeat(4, 1fr)'],
+  px: 3,
+  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
   gridGap: [24, null, 50],
   'data-cy': 'container-collectives',
 })``;
@@ -283,7 +284,7 @@ const DiscoverPage = () => {
                     {loading
                       ? times(params.limit, idx => (
                           <CollectiveCardContainer key={idx}>
-                            <LoadingPlaceholder height={360} width={250} />
+                            <LoadingPlaceholder height={334} borderRadius={16} />
                           </CollectiveCardContainer>
                         ))
                       : get(data, 'allCollectives.collectives', []).map(c =>
