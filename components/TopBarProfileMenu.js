@@ -370,11 +370,11 @@ class TopBarProfileMenu extends React.Component {
                 <FormattedMessage id="organization" defaultMessage="my organizations" />
               </P>
               <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-              <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-                <Link route="/organizations/new" passHref>
+              <ComponentLink route="/organizations/new">
+                <StyledRoundButton ml={2} size={24} color="#C4C7CC">
                   <Plus size={12} color="#76777A" />
-                </Link>
-              </StyledRoundButton>
+                </StyledRoundButton>
+              </ComponentLink>
             </Flex>
             <Box as="ul" p={0} my={2}>
               {orgs.map(this.renderMembershipLine)}

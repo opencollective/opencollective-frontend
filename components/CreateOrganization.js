@@ -9,7 +9,7 @@ import { Router } from '../server/pages';
 
 import Body from './Body';
 import Container from './Container';
-import CreateCollectiveForm from './CreateCollectiveForm';
+import CreateOrganizationForm from './CreateOrganizationForm';
 import Footer from './Footer';
 import Header from './Header';
 import SignInOrJoinFree from './SignInOrJoinFree';
@@ -143,7 +143,7 @@ class CreateOrganization extends React.Component {
             )}
             {LoggedInUser && (
               <div>
-                <CreateCollectiveForm
+                <CreateOrganizationForm
                   collective={this.state.collective}
                   onSubmit={this.createCollective}
                   onChange={this.resetError}

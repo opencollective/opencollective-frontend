@@ -133,7 +133,7 @@ class StyledCheckbox extends React.Component {
     }
 
     if (onChange) {
-      onChange({ name, checked: newValue, type: 'checkbox', target: { name, value: newValue } });
+      onChange({ name, checked: newValue, type: 'checkbox', target: { name, value: newValue, checked: newValue } });
     }
   }
 

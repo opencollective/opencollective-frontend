@@ -58,7 +58,6 @@
     "express-limiter": "1.6.1",
     "express-winston": "4.0.5",
     "express-ws": "4.0.0",
-    "fetch-jsonp": "1.1.3",
     "file-saver": "2.0.2",
     "formik": "2.1.5",
     "full-icu": "1.3.1",
