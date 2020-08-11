@@ -104,7 +104,10 @@ const StyledTagBase = styled.div`
   ${textTransform}
 `;
 
-const CloseButton = styled.button`
+const CloseButton = styled.button.attrs({
+  type: 'button',
+  'data-cy': 'remove-btn',
+})`
   cursor: pointer;
   color: inherit;
   text-align: center;
@@ -124,7 +127,7 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
       <Span mr={2} letterSpacing="inherit">
         {children}
       </Span>
-      <CloseButton data-cy="remove-btn" {...closeButtonProps}>
+      <CloseButton {...closeButtonProps}>
         <Times size="10px" />
       </CloseButton>
     </StyledTagBase>

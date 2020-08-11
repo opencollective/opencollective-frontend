@@ -5,6 +5,7 @@ import memoizeOne from 'memoize-one';
 import ReactDOM from 'react-dom';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
+import styled from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -45,6 +46,13 @@ const Messages = defineMessages({
   },
 });
 
+const CollectiveLabelTextContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-left: 8px;
+`;
+
 /**
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
@@ -52,14 +60,14 @@ const Messages = defineMessages({
 const DefaultCollectiveLabel = ({ value: collective }) => (
   <Flex alignItems="center">
     <Avatar collective={collective} radius={28} />
-    <Flex flexDirection="column" ml={2}>
+    <CollectiveLabelTextContainer>
       <Span fontSize="Caption" fontWeight="500" lineHeight="18px" color="black.700">
         {truncate(collective.name, { length: 40 })}
       </Span>
-      <Span fontSize="SmallCaption" lineHeight="16px" color="black.500">
+      <Span fontSize="SmallCaption" lineHeight="13px" color="black.500">
         @{collective.slug}
       </Span>
-    </Flex>
+    </CollectiveLabelTextContainer>
   </Flex>
 );
 
