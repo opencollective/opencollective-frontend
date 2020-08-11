@@ -5,7 +5,7 @@ import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
@@ -49,31 +49,118 @@ const MenuLink = styled(StyledLink)`
 
 const FlexList = styled.ul([], ...Box.componentStyle.rules, ...Flex.componentStyle.rules);
 
+const messages = defineMessages({
+  platform: {
+    id: 'platform',
+    defaultMessage: 'Platform',
+  },
+  'platform.explainerVideo': {
+    id: 'platform.explainerVideo',
+    defaultMessage: 'Explainer video',
+  },
+  'platform.howItWorks': {
+    id: 'platform.howItWorks',
+    defaultMessage: 'How it works',
+  },
+  'platform.useCases': {
+    id: 'platform.useCases',
+    defaultMessage: 'Use Cases',
+  },
+  'platform.signup': {
+    id: 'platform.signup',
+    defaultMessage: 'Sign up',
+  },
+  'platform.login': {
+    id: 'platform.login',
+    defaultMessage: 'Login',
+  },
+  join: {
+    id: 'join',
+    defaultMessage: 'Join',
+  },
+  'join.createACollective': {
+    id: 'join.createACollective',
+    defaultMessage: 'Create a Collective',
+  },
+  'join.discover': {
+    id: 'join.discover',
+    defaultMessage: 'Discover',
+  },
+  'join.findAFiscalHost': {
+    id: 'join.findAFiscalHost',
+    defaultMessage: 'Find a fiscal host',
+  },
+  community: {
+    id: 'community',
+    defaultMessage: 'Community',
+  },
+  'community.openSource': {
+    id: 'community.openSource',
+    defaultMessage: 'Open Source',
+  },
+  'community.slack': {
+    id: 'community.slack',
+    defaultMessage: 'Slack',
+  },
+  'community.docsAndHelp': {
+    id: 'community.docsAndHelp',
+    defaultMessage: 'Docs & Help',
+  },
+  'community.support': {
+    id: 'community.support',
+    defaultMessage: 'Support',
+  },
+  company: {
+    id: 'company',
+    defaultMessage: 'Company',
+  },
+  'company.about': {
+    id: 'company.about',
+    defaultMessage: 'About',
+  },
+  'company.blog': {
+    id: 'company.blog',
+    defaultMessage: 'Blog',
+  },
+  'company.hiring': {
+    id: 'company.hiring',
+    defaultMessage: 'Hiring',
+  },
+  'company.termsOfService': {
+    id: 'company.termsOfService',
+    defaultMessage: 'Terms of service',
+  },
+  'company.privacyPolicy': {
+    id: 'company.privacyPolicy',
+    defaultMessage: 'Privacy Policy',
+  },
+});
+
 const navigation = {
-  PLATFORM: {
-    'Explainer video': 'https://www.youtube.com/watch?v=IBU5fSILAe8',
-    'How it Works': '/how-it-works',
-    'Use Cases': 'https://blog.opencollective.com/tag/case-studies/',
-    'Sign up': '/create-account',
-    Login: '/signin',
+  platform: {
+    explainerVideo: 'https://www.youtube.com/watch?v=IBU5fSILAe8',
+    howItWorks: '/how-it-works',
+    useCases: 'https://blog.opencollective.com/tag/case-studies/',
+    signup: '/create-account',
+    login: '/signin',
   },
-  JOIN: {
-    'Create a Collective': '/create',
-    Discover: '/discover',
-    'Find a fiscal host': '/hosts',
+  join: {
+    createACollective: '/create',
+    discover: '/discover',
+    findAFiscalHost: '/hosts',
   },
-  COMMUNITY: {
-    'Open Source': 'https://github.com/opencollective/opencollective/issues',
-    Slack: 'https://slack.opencollective.com',
-    'Docs & help': 'https://docs.opencollective.com',
-    Support: '/support',
+  community: {
+    openSource: 'https://github.com/opencollective/opencollective/issues',
+    slack: 'https://slack.opencollective.com',
+    docsAndHelp: 'https://docs.opencollective.com',
+    support: '/support',
   },
-  COMPANY: {
-    About: 'https://docs.opencollective.com/help/about/introduction',
-    Blog: 'https://blog.opencollective.com/',
-    Hiring: '/hiring',
-    'Terms of Service': '/tos',
-    'Privacy Policy': '/privacypolicy',
+  company: {
+    about: 'https://docs.opencollective.com/help/about/introduction',
+    blog: 'https://blog.opencollective.com/',
+    hiring: '/hiring',
+    termsOfService: '/tos',
+    privacyPolicy: '/privacypolicy',
   },
 };
 
@@ -83,203 +170,93 @@ const switchLanguage = key => {
   window.scrollTo(0, 0);
 };
 
-class Footer extends React.Component {
-  render() {
-    const languageOptions = Object.keys(languages).map(key => {
-      const language = languages[key];
-      return {
-        value: key,
-        label: (
-          <Flex
-            alignItems="center"
-            justifyContent="space-around"
-            fontSize="12px"
-            color="black.800"
-            lineHeight="18px"
-            fontWeight="500"
-            letterSpacing="-0.04px"
-          >
-            <Span fontSize="24px">{language.flag}</Span> {language.name} - {language.nativeName} ({language.completion})
-          </Flex>
-        ),
-      };
-    });
-
-    return (
-      <Flex
-        id="footer"
-        background="white"
-        borderTop="1px solid #E8E9EB"
-        bottom={0}
-        minHeight="7.5rem"
-        p="1rem"
-        width={1}
-        justifyContent="center"
-      >
-        <Container
-          display="flex"
-          flexDirection={['column', null, null, null, 'row']}
-          justifyContent="space-between"
-          alignItems={['center', null, null, null, 'flex-start']}
-          width={[1, '650px', null, '671px', '1280px']}
+const Footer = () => {
+  const intl = useIntl();
+  const languageOptions = Object.keys(languages).map(key => {
+    const language = languages[key];
+    return {
+      value: key,
+      label: (
+        <Flex
+          alignItems="center"
+          justifyContent="flex-start"
+          fontSize="12px"
+          color="black.800"
+          lineHeight="18px"
+          fontWeight="500"
+          letterSpacing="-0.04px"
         >
-          <Flex
-            justifyContent="space-between"
-            alignItems={['center', 'flex-start']}
-            mx={['auto', 3]}
-            flexDirection={['column', 'row', null, null, 'column']}
-            css="max-width: 1300px;"
-            width={[1, null, null, null, '228px']}
-          >
-            <Container
-              order={[null, null, null, null, '1']}
-              display="flex"
-              mt={3}
-              width={[1, 1 / 3, null, null, 1]}
-              alignItems={['center', 'flex-start']}
-              flexDirection="column"
-              maxWidth="300px"
-            >
-              <Flex my="12px">
-                <object
-                  type="image/svg+xml"
-                  data="/static/images/opencollectivelogo-footer-n.svg"
-                  height="28px"
-                  width="167px"
-                  style={{ maxWidth: '100%' }}
-                />
-              </Flex>
-              <P
-                textAlign={['center', 'left']}
-                color="black.800"
-                fontSize={['12px']}
-                lineHeight={['18px']}
-                letterSpacing={['-0.04px']}
-              >
-                <FormattedMessage id="footer.OC.description" defaultMessage="Make your community sustainable." />
-              </P>
-            </Container>
-            <Container
-              order={[null, null, null, null, '3']}
-              color="#6E747A"
-              textAlign={'left'}
-              mt={[4, null, null, null, 0]}
-              display={[null, 'none', null, null, 'block']}
-            >
-              <P as="div" pb={2} pt={2}>
-                <TranslateIcon />
-                <Span
-                  mx={2}
-                  style={{ verticalAlign: 'middle' }}
-                  fontSize="10px"
-                  fontWeight="600"
-                  color="black.800"
-                  lineHeight="15px"
-                  letterSpacing="0.8px"
-                  textTransform="uppercase"
-                >
-                  <FormattedMessage id="footer.changeLanguage" defaultMessage="change language" />
-                </Span>
-                <StyledTooltip
-                  content={() => (
-                    <FormattedMessage
-                      id="Footer.Languages.JoinEffort"
-                      defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
-                      values={{
-                        crowdinLink: (
-                          <StyledLink href="https://crowdin.com/project/opencollective" openInNewTab>
-                            Crowdin
-                          </StyledLink>
-                        ),
-                      }}
-                    />
-                  )}
-                >
-                  <InfoCircle size={16} />
-                </StyledTooltip>
-              </P>
-              <Container width={['220px']} my={2}>
-                <StyledSelect
-                  options={languageOptions}
-                  onChange={({ value }) => switchLanguage(value)}
-                  defaultValue={languageOptions[0]}
-                  borderRadius="10px"
-                />
-              </Container>
-            </Container>
-            <Container
-              display="flex"
-              justifyContent="space-evenly"
-              alignItems="center"
-              width={1}
-              my={4}
-              order={['2', '3', null, null, '2']}
-              maxWidth="288px"
-            >
-              <SocialLink href="https://blog.opencollective.com/">
-                <Blog size={17} color="#76777A" />
-              </SocialLink>
-              <SocialLink href="https://twitter.com/opencollect">
-                <Twitter size={17} color="#76777A" />
-              </SocialLink>
-              <SocialLink href="https://github.com/opencollective">
-                <Github size={17} color="#76777A" />
-              </SocialLink>
-              <SocialLink href="https://slack.opencollective.com">
-                <Slack size={17} color="#76777A" />
-              </SocialLink>
-              <SocialLink href="mailto:info@opencollective.com">
-                <Mail size={19} color="#76777A" />
-              </SocialLink>
-            </Container>
-          </Flex>
-          <Flex
-            width={[1, null, null, null, '804px']}
-            as="nav"
-            flexWrap="wrap"
-            justifyContent="center"
-            mt={3}
-            mx={[null, 3]}
-            flex={['1 1 auto', null, null, null, 'none']}
-          >
-            {Object.keys(navigation).map(key => (
-              <Box key={key} width={[0.5, 0.25]} mb={3}>
-                <P
-                  textAlign={['center', 'left']}
-                  fontSize="10px"
-                  fontWeight="600"
-                  lineHeight="15px"
-                  color={['black.800', 'black.500']}
-                  letterSpacing="0.8px"
-                  mb={[3, '24px']}
-                >
-                  {key}
-                </P>
-                <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
-                  {Object.keys(navigation[key]).map(item => (
-                    <ListItem key={item} textAlign={['center', 'left']} mb={2}>
-                      {navigation[key][item][0] === '/' ? (
-                        <Link route={navigation[key][item]} passHref>
-                          <MenuLink>{item}</MenuLink>
-                        </Link>
-                      ) : (
-                        <MenuLink href={navigation[key][item]}>{item}</MenuLink>
-                      )}
-                    </ListItem>
-                  ))}
-                </FlexList>
-              </Box>
-            ))}
-          </Flex>
+          <Span fontSize="24px">{language.flag}</Span>
+          <Span ml={1} whiteSpace="nowrap">
+            {language.name} - {language.nativeName} ({language.completion})
+          </Span>
+        </Flex>
+      ),
+    };
+  });
+
+  return (
+    <Flex
+      id="footer"
+      background="white"
+      borderTop="1px solid #E8E9EB"
+      bottom={0}
+      minHeight="7.5rem"
+      p="1rem"
+      width={1}
+      justifyContent="center"
+    >
+      <Container
+        display="flex"
+        flexDirection={['column', null, null, null, 'row']}
+        justifyContent="space-between"
+        alignItems={['center', null, null, null, 'flex-start']}
+        width={[1, '650px', null, '671px', '1280px']}
+      >
+        <Flex
+          justifyContent="space-between"
+          alignItems={['center', 'flex-start']}
+          mx={['auto', 3]}
+          flexDirection={['column', 'row', null, null, 'column']}
+          css="max-width: 1300px;"
+          width={[1, null, null, null, '228px']}
+        >
           <Container
-            width={1}
+            order={[null, null, null, null, '1']}
+            display="flex"
+            mt={3}
+            width={[1, 1 / 3, null, null, 1]}
+            alignItems={['center', 'flex-start']}
+            flexDirection="column"
+            maxWidth="300px"
+          >
+            <Flex my="12px">
+              <object
+                type="image/svg+xml"
+                data="/static/images/opencollectivelogo-footer-n.svg"
+                height="28px"
+                width="167px"
+                style={{ maxWidth: '100%' }}
+              />
+            </Flex>
+            <P
+              textAlign={['center', 'left']}
+              color="black.800"
+              fontSize={['12px']}
+              lineHeight={['18px']}
+              letterSpacing={['-0.04px']}
+            >
+              <FormattedMessage id="footer.OC.description" defaultMessage="Make your community sustainable." />
+            </P>
+          </Container>
+          <Container
+            order={[null, null, null, null, '3']}
             color="#6E747A"
             textAlign={'left'}
-            mt={3}
-            mx={3}
-            display={['none', 'block', null, null, 'none']}
+            mt={[4, null, null, null, 0]}
+            display={[null, 'none', null, null, 'block']}
           >
-            <P as="div" pb={2} pt={2} textTransform="uppercase">
+            <P as="div" pb={2} pt={2}>
               <TranslateIcon />
               <Span
                 mx={2}
@@ -311,19 +288,135 @@ class Footer extends React.Component {
                 <InfoCircle size={16} />
               </StyledTooltip>
             </P>
-            <Container width={['220px']} my={2}>
+            <Container width={['230px']} my={2}>
               <StyledSelect
-                data-cy="language-switcher"
                 options={languageOptions}
                 onChange={({ value }) => switchLanguage(value)}
                 defaultValue={languageOptions[0]}
+                borderRadius="10px"
+                menuPlacement="auto"
+                width={1}
               />
             </Container>
           </Container>
+          <Container
+            display="flex"
+            justifyContent="space-evenly"
+            alignItems="center"
+            width={1}
+            my={4}
+            order={['2', '3', null, null, '2']}
+            maxWidth="288px"
+          >
+            <SocialLink href="https://blog.opencollective.com/">
+              <Blog size={17} color="#76777A" />
+            </SocialLink>
+            <SocialLink href="https://twitter.com/opencollect">
+              <Twitter size={17} color="#76777A" />
+            </SocialLink>
+            <SocialLink href="https://github.com/opencollective">
+              <Github size={17} color="#76777A" />
+            </SocialLink>
+            <SocialLink href="https://slack.opencollective.com">
+              <Slack size={17} color="#76777A" />
+            </SocialLink>
+            <SocialLink href="mailto:info@opencollective.com">
+              <Mail size={19} color="#76777A" />
+            </SocialLink>
+          </Container>
+        </Flex>
+        <Flex
+          width={[1, null, null, null, '804px']}
+          as="nav"
+          flexWrap="wrap"
+          justifyContent="center"
+          mt={3}
+          mx={[null, 3]}
+          flex={['1 1 auto', null, null, null, 'none']}
+        >
+          {Object.keys(navigation).map(key => (
+            <Box key={key} width={[0.5, 0.25]} mb={3}>
+              <P
+                textAlign={['center', 'left']}
+                fontSize="10px"
+                fontWeight="600"
+                lineHeight="15px"
+                color="black.800"
+                letterSpacing="0.8px"
+                textTransform="uppercase"
+                mb={[3, '24px']}
+              >
+                {intl.formatMessage(messages[key])}
+              </P>
+              <FlexList justifyContent="center" flexDirection="column" pl={0} pr={2}>
+                {Object.keys(navigation[key]).map(item => (
+                  <ListItem key={item} textAlign={['center', 'left']} mb={2}>
+                    {navigation[key][item][0] === '/' ? (
+                      <Link route={navigation[key][item]} passHref>
+                        <MenuLink>{intl.formatMessage(messages[`${key}.${item}`])}</MenuLink>
+                      </Link>
+                    ) : (
+                      <MenuLink href={navigation[key][item]}>{intl.formatMessage(messages[`${key}.${item}`])}</MenuLink>
+                    )}
+                  </ListItem>
+                ))}
+              </FlexList>
+            </Box>
+          ))}
+        </Flex>
+        <Container
+          width={1}
+          color="#6E747A"
+          textAlign={'left'}
+          mt={3}
+          mx={3}
+          display={['none', 'block', null, null, 'none']}
+        >
+          <P as="div" pb={2} pt={2} textTransform="uppercase">
+            <TranslateIcon />
+            <Span
+              mx={2}
+              style={{ verticalAlign: 'middle' }}
+              fontSize="10px"
+              fontWeight="600"
+              color="black.800"
+              lineHeight="15px"
+              letterSpacing="0.8px"
+              textTransform="uppercase"
+            >
+              <FormattedMessage id="footer.changeLanguage" defaultMessage="change language" />
+            </Span>
+            <StyledTooltip
+              content={() => (
+                <FormattedMessage
+                  id="Footer.Languages.JoinEffort"
+                  defaultMessage="No technical skill is required to contribute to translations. You can join the effort on {crowdinLink} 🌐"
+                  values={{
+                    crowdinLink: (
+                      <StyledLink href="https://crowdin.com/project/opencollective" openInNewTab>
+                        Crowdin
+                      </StyledLink>
+                    ),
+                  }}
+                />
+              )}
+            >
+              <InfoCircle size={16} />
+            </StyledTooltip>
+          </P>
+          <Container width={['230px']} my={2}>
+            <StyledSelect
+              data-cy="language-switcher"
+              options={languageOptions}
+              onChange={({ value }) => switchLanguage(value)}
+              defaultValue={languageOptions[0]}
+              menuPlacement="auto"
+            />
+          </Container>
         </Container>
-      </Flex>
-    );
-  }
-}
+      </Container>
+    </Flex>
+  );
+};
 
 export default Footer;
