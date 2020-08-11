@@ -8,10 +8,7 @@ const { default: fileExistsCaseInsensitive } = require('react-styleguidist/lib/s
 
 module.exports = {
   assetsDir: 'styleguide',
-  require: [
-    path.join(__dirname, 'public/static/styles/app.css'),
-    path.join(__dirname, 'styleguide/static/styleguide.css'),
-  ],
+  require: [path.join(__dirname, 'styleguide/static/styleguide.css')],
   getExampleFilename(componentPath) {
     const parsedPath = path.parse(componentPath);
     const parentDirName = parsedPath.dir.split('components/')[1] || '';
@@ -166,6 +163,21 @@ module.exports = {
               esModule: false,
             },
           },
+        },
+        {
+          test: /fonts[\\/].*\.(woff|woff2|eot|ttf|otf|svg)$/,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192,
+                fallback: 'file-loader',
+                publicPath: '/_next/static/fonts/',
+                outputPath: 'static/fonts/',
+                name: '[name]-[hash].[ext]',
+              },
+            },
+          ],
         },
         {
           test: /\.(css)$/,
