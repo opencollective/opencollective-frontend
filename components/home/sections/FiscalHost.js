@@ -61,6 +61,13 @@ const FiscalHostCard = styled(Container)`
   ${background}
 `;
 
+const DiscoverLink = styled(StyledLink)`
+  &:hover {
+    color: #1a1e43;
+    text-decoration: underline !important;
+  }
+`;
+
 const FiscalHost = () => (
   <Wrapper mb={5} pt={4} mt={[null, null, null, null, 7]}>
     <Flex mx={[3, 4]} flexDirection="column" alignItems="center">
@@ -208,8 +215,7 @@ const FiscalHost = () => (
                   <Box my={[3, null, null, 0]}>
                     <StyledLink
                       as={Link}
-                      route="collective"
-                      params={{ slug: 'foundation' }}
+                      route="/foundation/apply"
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -272,8 +278,7 @@ const FiscalHost = () => (
                   <Box my={[3, null, null, 0]}>
                     <StyledLink
                       as={Link}
-                      route="collective"
-                      params={{ slug: 'opensource' }}
+                      route="/opensouce/apply"
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -340,8 +345,7 @@ const FiscalHost = () => (
                   <Box my={[3, null, null, 0]}>
                     <StyledLink
                       as={Link}
-                      route="collective"
-                      params={{ slug: 'europe' }}
+                      route="/europe/apply"
                       whiteSpace="nowrap"
                       fontSize={['14px']}
                       lineHeight={['21px']}
@@ -363,7 +367,7 @@ const FiscalHost = () => (
             </FiscalHostCard>
           </Container>
           <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
-            <StyledLink
+            <DiscoverLink
               as={Link}
               route="hosts"
               fontSize={['15px']}
@@ -379,7 +383,7 @@ const FiscalHost = () => (
                   arrowIcon: <ArrowRight2 size="15" />,
                 }}
               />
-            </StyledLink>
+            </DiscoverLink>
           </Box>
         </Flex>
       </Flex>
