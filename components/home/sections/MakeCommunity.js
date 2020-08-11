@@ -142,7 +142,7 @@ const MakeCommunity = () => {
         >
           <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />
         </H2>
-        <Flex width={['288px', '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
+        <Box width={['320px', '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
           <Illustration
             alt="Make your community sustainable"
             src="/static/images/home/whatisgreataboutOC-Illustration-sm.png"
@@ -153,7 +153,7 @@ const MakeCommunity = () => {
             src="/static/images/home/whatisgreataboutOC-Illustration-2x.png"
             display={['none', 'inline-block']}
           />
-        </Flex>
+        </Box>
         <Box width={['288px', '224px', '396px']}>
           <H2
             mb={[null, 2]}
