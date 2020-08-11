@@ -19,8 +19,8 @@ import { Box, Flex } from './Grid';
 import Link from './Link';
 import MessageBox from './MessageBox';
 import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
-import Role from './Role';
 import StyledHr from './StyledHr';
+import StyledTag from './StyledTag';
 import { H3 } from './Text';
 import UpdateTextWithData from './UpdateTextWithData';
 
@@ -176,7 +176,9 @@ class StyledUpdate extends Component {
             />
           </Box>
         )}
-        <Role role="ADMIN" />
+        <StyledTag fontSize="10px" py={1}>
+          <FormattedMessage id="Member.Role.ADMIN" defaultMessage="Admin" />
+        </StyledTag>
         {editable && (
           <React.Fragment>
             <Box mr={2} fontSize="12px">
