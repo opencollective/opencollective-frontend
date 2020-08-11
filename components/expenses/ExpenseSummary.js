@@ -77,6 +77,7 @@ const ExpenseSummary = ({
 }) => {
   const { payee, createdByAccount, payeeLocation } = expense || {};
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
+  const isInvoice = expense?.type === expenseTypes.INVOICE;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const showProcessButtons = showProcessActions && existsInAPI && collective && hasProcessButtons(permissions);
 
@@ -221,9 +222,11 @@ const ExpenseSummary = ({
                 </Span>
               </Flex>
             </LinkCollective>
-            <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
-              <LocationAddress location={payeeLocation} isLoading={isLoading || isLoadingLoggedInUser} />
-            </Container>
+            {payeeLocation && isInvoice && (
+              <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+                <LocationAddress location={payeeLocation} isLoading={isLoading || isLoadingLoggedInUser} />
+              </Container>
+            )}
             {payee.website && (
               <P mt={2} fontSize="11px">
                 <StyledLink href={payee.website} openInNewTab>
