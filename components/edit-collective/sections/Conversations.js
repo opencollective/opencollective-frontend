@@ -88,7 +88,7 @@ const Conversations = ({ collective }) => {
         </Flex>
       </Flex>
       {error && (
-        <MessageBox type="error" fontSize="Paragraph" withIcon mb={3}>
+        <MessageBox type="error" fontSize="14px" withIcon mb={3}>
           {getErrorFromGraphqlException(error).message}
         </MessageBox>
       )}

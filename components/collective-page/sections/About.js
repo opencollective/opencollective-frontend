@@ -86,7 +86,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   {canEdit ? (
                     <Flex flexDirection="column" alignItems="center">
                       {isCollective && !isFund && (
-                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="Paragraph" mb={4}>
+                        <MessageBox type="info" withIcon fontStyle="italic" fontSize="14px" mb={4}>
                           <FormattedMessage
                             id="SectionAbout.Why"
                             defaultMessage="Your collective is unique and wants to achieve great things. Here is the place to explain it!"

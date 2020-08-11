@@ -212,7 +212,7 @@ class EditUpdateForm extends React.Component {
                     as="label"
                     htmlFor="makePublicOn"
                     fontWeight="normal"
-                    fontSize="Paragraph"
+                    fontSize="14px"
                     color="black.900"
                     mb={2}
                   >

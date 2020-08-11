@@ -233,14 +233,14 @@ const HostOrganization = () => (
     <Container display="flex" flexDirection="column" alignItems="center">
       <Box textAlign="center" my={3}>
         <H1
-          fontSize={['H3', null, 'H4']}
-          lineHeight={['40px', null, 'H4']}
+          fontSize={['32px', null, '24px']}
+          lineHeight={['40px', null, '24px']}
           letterSpacing={['-0.4px', null, '-0.2px']}
           textAlign="center"
         >
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
-        <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
           <FormattedMessage
             id="pricing.tab.hostOrganization.description"
             defaultMessage="You will be a <strong>Fiscal Host</strong> on our platform. That means you hold funds on behalf of Collectives. You decide which Collectives to accept and what if any fees to charge them."
@@ -254,7 +254,7 @@ const HostOrganization = () => (
       </Container>
 
       <Box textAlign="center" my={3}>
-        <P my={3} fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
           <StyledLink href={'/become-a-fiscal-host'}>
             <FormattedMessage
               id="pricing.fiscalHost.learnMore"
@@ -268,8 +268,8 @@ const HostOrganization = () => (
         <Container my={4} p={3} backgroundColor="black.50" borderRadius="8px" width={[1, null, '681px']}>
           <H3
             my={2}
-            fontSize={['LeadParagraph', null, 'H4']}
-            lineHeight={['26px', null, 'H4']}
+            fontSize={['16px', null, '32px']}
+            lineHeight={['26px', null, '24px']}
             letterSpacing={['-0.008em', null, '-0.2px']}
           >
             <FormattedMessage id="pricing.starterPlans" defaultMessage="The STARTER PLAN includes:" />
@@ -322,8 +322,8 @@ const HostOrganization = () => (
           </Box>
           <H3
             my={2}
-            fontSize={['LeadParagraph', null, 'H4']}
-            lineHeight={['26px', null, 'H4']}
+            fontSize={['16px', null, '24px']}
+            lineHeight={['26px', null, '32px']}
             letterSpacing={['-0.008em', null, '-0.2px']}
           >
             <FormattedMessage id="pricing.accessTo" defaultMessage="You will have access to:" />
@@ -358,7 +358,7 @@ const HostOrganization = () => (
 
         <Container my={3} p={3} ml={[null, null, 2]} width={[1, null, '262px']}>
           <Box mb={3}>
-            <P fontSize={['Caption']} lineHeight={['19px']} letterSpacing="-0.016em;">
+            <P fontSize="12px" lineHeight="19px" letterSpacing="-0.016em;">
               <FormattedMessage
                 id="pricing.hostOrganization.note1"
                 defaultMessage="Your choice of plan will depend on the number of Collectives you host."
@@ -367,7 +367,7 @@ const HostOrganization = () => (
           </Box>
 
           <Box my={3}>
-            <P fontSize={['Caption']} lineHeight={['19px']} letterSpacing="-0.016em">
+            <P fontSize="12px" lineHeight="19px" letterSpacing="-0.016em">
               <FormattedMessage
                 id="pricing.hostOrganization.note2"
                 defaultMessage="You pay Open Collective for use of our platform on behalf of your Collectives, and can charge them a fee if you wish."

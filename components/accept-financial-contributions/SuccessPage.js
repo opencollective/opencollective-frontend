@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -20,7 +19,7 @@ import successIllustration from '../../public/static/images/create-collective/ac
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
 const SmallExternalLink = styled(StyledLink)`
-  font-size: ${themeGet('fontSizes.LeadCaption')}px;
+  font-size: 13px;
 `;
 
 SmallExternalLink.defaultProps = {
@@ -47,8 +46,8 @@ class SuccessPage extends React.Component {
         <Flex justifyContent={'center'} alignItems={'center'}>
           <Box mb={4} mt={5} mx={[2, 6]} maxWidth={'575px'}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['20px', '32px']}
+              lineHeight={['24px', '36px']}
               fontWeight="bold"
               color="black.900"
               textAlign="center"
@@ -78,10 +77,10 @@ class SuccessPage extends React.Component {
             {path === 'host' ? (
               <Fragment>
                 <Avatar collective={chosenHost} radius={64} mb={2} />
-                <P fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold" mb={4}>
+                <P fontSize="16px" lineHeight="21px" fontWeight="bold" mb={4}>
                   {chosenHost.name}
                 </P>
-                <P fontSize="LeadParagraph" lineHeight={'H5'} color="black.600" textAlign="center">
+                <P fontSize="16px" lineHeight="24px" color="black.600" textAlign="center">
                   <FormattedMessage
                     id="acceptContributions.notifiedWhen"
                     defaultMessage="You will be notified when {hostName} has approved or rejected your application. Contribution tiers will only go live once the Collective is approved by the fiscal host."
@@ -92,7 +91,7 @@ class SuccessPage extends React.Component {
                 </P>
               </Fragment>
             ) : (
-              <P fontSize="LeadParagraph" lineHeight={'H5'} color="black.600" textAlign="center">
+              <P fontSize="16px" lineHeight="24px" color="black.600" textAlign="center">
                 <FormattedMessage
                   id="acceptContributions.success.toConsider"
                   defaultMessage="A few more things you should consider:"
@@ -109,10 +108,10 @@ class SuccessPage extends React.Component {
           >
             <img src={successIllustration} width="264px" height="352px" />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
-              <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
+              <H2 fontSize="13px" fontWeight="bold" color="black.800">
                 <FormattedMessage id="tiers.about" defaultMessage="About contribution tiers" />
               </H2>
-              <P fontSize="LeadCaption" lineHeight="Paragraph" mb={3} color="black.800">
+              <P fontSize="13px" lineHeight="20px" mb={3} color="black.800">
                 <FormattedMessage
                   id="acceptContributions.tiers.paragraphOne"
                   defaultMessage="We created a one-time donation tier for you to begin with. Go ahead and create different one-time and subscription tiers to define the levels or types of financial contributions your collective accepts. {knowMore}."
@@ -127,13 +126,13 @@ class SuccessPage extends React.Component {
               </P>
               {path !== 'host' && (
                 <Fragment>
-                  <H2 fontSize="LeadCaption" fontWeight="bold" color="black.800">
+                  <H2 fontSize="13px" fontWeight="bold" color="black.800">
                     <FormattedMessage
                       id="acceptContributions.success.hostSettings"
                       defaultMessage="Fiscal Host Settings"
                     />
                   </H2>
-                  <P fontSize="LeadCaption" lineHeight="Paragraph" mb={1} color="black.800">
+                  <P fontSize="13px" lineHeight="20px" mb={1} color="black.800">
                     <FormattedMessage
                       id="acceptContributions.success.hostSettingsInfo"
                       defaultMessage="You can manage your Fiscal Host settings — like adding more payment methods — from your Fiscal Host Organization's profile. {takeMeThere}."

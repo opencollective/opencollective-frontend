@@ -274,8 +274,8 @@ class OnboardingModal extends React.Component {
                   <Container display="flex" flexDirection="column" alignItems="center">
                     <Box maxWidth={['336px']}>
                       <H1
-                        fontSize={['H2']}
-                        lineHeight={['H2']}
+                        fontSize="40px"
+                        lineHeight="44px"
                         fontWeight="bold"
                         color="black.900"
                         textAlign="center"
@@ -291,14 +291,7 @@ class OnboardingModal extends React.Component {
                       </H1>
                     </Box>
                     <Box maxWidth={['450px']}>
-                      <P
-                        fontSize={['LeadParagraph']}
-                        lineHeight={['LeadParagraph']}
-                        color="black.900"
-                        textAlign="center"
-                        mb={[4]}
-                        mx={[2, null]}
-                      >
+                      <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={[4]} mx={[2, null]}>
                         <FormattedMessage
                           id="onboarding.success.text"
                           defaultMessage="You're all set! Now you can make this space your own by customizing the look, start

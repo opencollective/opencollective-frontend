@@ -134,7 +134,7 @@ class SearchPage extends React.Component {
                   <Link route="createPledge" params={{ name: term }} passHref>
                     <StyledLink
                       display="block"
-                      fontSize="Paragraph"
+                      fontSize="14px"
                       fontWeight="bold"
                       maxWidth="220px"
                       py={2}
@@ -150,7 +150,7 @@ class SearchPage extends React.Component {
             )}
           </Flex>
           {showCollectives && collectives.length !== 0 && total > limit && (
-            <Container display="flex" justifyContent="center" fontSize="Paragraph" my={3}>
+            <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
               <Pagination offset={offset} total={total} limit={limit} />
             </Container>
           )}
@@ -169,7 +169,7 @@ class SearchPage extends React.Component {
                 <Link route="createPledge" params={{ name: term }} passHref>
                   <StyledLink
                     display="block"
-                    fontSize="Paragraph"
+                    fontSize="14px"
                     fontWeight="bold"
                     maxWidth="220px"
                     py={2}

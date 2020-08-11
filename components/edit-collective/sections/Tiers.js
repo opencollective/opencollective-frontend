@@ -317,7 +317,7 @@ class Tiers extends React.Component {
       return (
         <Flex flexDirection="column">
           <Span>{capitalize(field.label)}</Span>
-          <Span fontSize="Tiny" color="black.400">
+          <Span fontSize="10px" color="black.400">
             (without tax)
           </Span>
         </Flex>

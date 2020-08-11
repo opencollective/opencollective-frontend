@@ -104,7 +104,7 @@ const StyledInputGroup = ({
       >
         {prepend && (
           <Container
-            fontSize="Paragraph"
+            fontSize="14px"
             borderRadius="4px 0 0 4px"
             py={2}
             px={2}
@@ -121,7 +121,7 @@ const StyledInputGroup = ({
           color={getColor({ error, success })}
           type="text"
           overflow="scroll"
-          fontSize="Paragraph"
+          fontSize="14px"
           flex="1 1 auto"
           disabled={disabled}
           py="0"
@@ -147,7 +147,7 @@ const StyledInputGroup = ({
             borderRadius="4px 0 0 4px"
             p={2}
             color={getColor({ error, success })}
-            fontSize="Paragraph"
+            fontSize="14px"
             {...appendProps}
             bg={getBgColor({ error, focused, success })}
           >
@@ -156,7 +156,7 @@ const StyledInputGroup = ({
         )}
       </InputContainer>
       {error && typeof error !== 'boolean' && (
-        <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+        <Span display="block" color="red.500" pt={2} fontSize="10px">
           {error}
         </Span>
       )}

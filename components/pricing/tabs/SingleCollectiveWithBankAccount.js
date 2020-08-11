@@ -127,14 +127,14 @@ const SingleCollectiveWithBankAccount = () => (
       <Box textAlign="center" my={3}>
         <H1
           color="black.900"
-          fontSize={['H3', null, 'H4']}
-          lineHeight={['40px', null, 'H4']}
+          fontSize={['32px', null, '24px']}
+          lineHeight={['40px', null, '24px']}
           letterSpacing={['-0.4px', null, '-0.2px']}
           textAlign="center"
         >
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
-        <P color="black.700" fontSize={['Paragraph']} lineHeight={['H5']} letterSpacing={['-0.012em']}>
+        <P color="black.700" fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
           <FormattedMessage
             id="pricing.tab.description"
             defaultMessage="You will begin with the <strong>STARTER PLAN</strong>. This plan is <strong>FREE</strong> to set up!"
@@ -155,12 +155,7 @@ const SingleCollectiveWithBankAccount = () => (
           borderRadius="8px"
           ml={[null, null, 3]}
         >
-          <H3
-            my={2}
-            fontSize={['LeadParagraph', null, '16px']}
-            lineHeight={['26px', null, '26px']}
-            letterSpacing={['-0.008em']}
-          >
+          <H3 my={2} fontSize={['24px', null, '16px']} lineHeight={['26px', null, '26px']} letterSpacing={['-0.008em']}>
             <FormattedMessage id="pricing.starterPlans" defaultMessage="The STARTER PLAN includes:" />
           </H3>
           <Box as="ul" color="black.800" mt={3} px={3} fontSize="13px" lineHeight="21px" letterSpacing="-0.012em">

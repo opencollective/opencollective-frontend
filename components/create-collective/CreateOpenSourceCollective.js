@@ -17,7 +17,7 @@ import { H1, P } from '../Text';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
+  font-size: 14px;
 `;
 
 const messages = defineMessages({
@@ -60,12 +60,18 @@ const CreateOpenSourceCollective = () => {
           </BackButton>
         </Box>
         <Box mb={[2, 3]}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" textAlign="center" color="black.900">
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            textAlign="center"
+            color="black.900"
+          >
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
           </H1>
         </Box>
         <Box textAlign="center" minHeight={['24px']}>
-          <P fontSize="LeadParagraph" color="black.600" mb={2}>
+          <P fontSize="16px" color="black.600" mb={2}>
             <FormattedMessage
               id="collective.subtitle.opensource"
               defaultMessage="Open source projects are invited to join the Open Source Collective fiscal host."

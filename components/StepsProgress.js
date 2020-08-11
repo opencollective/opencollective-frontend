@@ -269,7 +269,7 @@ const StepsProgress = ({
               </PieProgress>
               <PieShadow pieSize={pieSize} bgColor={bgColor} />
             </PieProgressWrapper>
-            <P color="black.500" fontSize="Tiny">
+            <P color="black.500" fontSize="10px">
               <FormattedMessage
                 id="StepsProgress.mobile.status"
                 defaultMessage="{from} of {to}"

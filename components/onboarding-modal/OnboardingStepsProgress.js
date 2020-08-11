@@ -16,7 +16,7 @@ const StepLabel = styled(Span)`
 
 StepLabel.defaultProps = {
   color: 'black.400',
-  fontSize: 'Tiny',
+  fontSize: '10px',
   mt: 1,
 };
 

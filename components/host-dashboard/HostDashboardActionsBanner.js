@@ -151,7 +151,7 @@ class HostDashboardActionsBanner extends React.Component {
             <div className="title">
               <H2 mb={3}>
                 <FormattedMessage id="expenses.collectivePicker.title" defaultMessage="Finances" />{' '}
-                <Span fontSize="H3" fontWeight="normal">
+                <Span fontSize="32px" fontWeight="normal">
                   <FormattedMessage
                     id="expenses.collectivePicker.subtitle"
                     defaultMessage="for {n} {n, plural, one {collective} other {collectives}}"

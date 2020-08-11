@@ -15,7 +15,7 @@ const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
   return (
     <StyledCollectiveCard {...props} collective={collective} tag={null}>
       <Box px={3}>
-        <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400" color="black.900">
+        <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.900">
           <FormattedMessage
             id="NewContributionFlow.NumberOfFinancialContributors"
             defaultMessage="{contributors} financial contributors"
@@ -32,14 +32,14 @@ const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
       <StyledHr width="100%" />
       <Container display="flex" flexDirection="column" justifyContent="center" px={3} height={150}>
         <Box mb={3}>
-          <P textTransform="uppercase" fontSize="Tiny" fontWeight="400" color="black.500">
+          <P textTransform="uppercase" fontSize="10px" fontWeight="400" color="black.500">
             <FormattedMessage
               id="NewContributionFlow.AmountContributedToDate"
               defaultMessage="Amount contributed to date"
             />
           </P>
           <Flex>
-            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="bold">
+            <P fontSize="14px" lineHeight="20px" fontWeight="bold">
               <FormattedMoneyAmount
                 amount={(contribution.amount.value + contribution.platformFee.value) * 100}
                 currency={contribution.amount.currency}
@@ -53,7 +53,7 @@ const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
                 />
               )}
             >
-              <P fontSize="Caption" lineHeight="Paragraph" color="primary.600" ml={1}>
+              <P fontSize="12px" lineHeight="20px" color="primary.600" ml={1}>
                 (
                 <FormattedMoneyAmount
                   amount={contribution.amount.value * 100}
@@ -76,10 +76,10 @@ const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
           </Flex>
         </Box>
         <Box mb={3}>
-          <P textTransform="uppercase" fontSize="Tiny" fontWeight="400" color="black.500">
+          <P textTransform="uppercase" fontSize="10px" fontWeight="400" color="black.500">
             <FormattedMessage id="To" defaultMessage="To" />
           </P>
-          <P fontSize="Caption" fontWeight="bold">
+          <P fontSize="12px" fontWeight="bold">
             <FormattedMessage
               id="NewContributionFlow.CollectiveAndTier"
               defaultMessage="{collective} - {tier}"

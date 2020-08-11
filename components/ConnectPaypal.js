@@ -71,7 +71,7 @@ class ConnectPaypal extends React.Component {
       );
     } else {
       return (
-        <P fontSize="Caption" color="black.500" mt={3}>
+        <P fontSize="12px" color="black.500" mt={3}>
           <FormattedMessage
             id="collective.paymentMethod.paypal.connected"
             defaultMessage="Paypal account {paypalEmail} connected on {createdAt, date, short}, token will expire on {expiryDate, date, short}"

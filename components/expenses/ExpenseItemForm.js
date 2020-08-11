@@ -75,7 +75,7 @@ export const validateExpenseItem = (expense, item) => {
 };
 
 const AttachmentLabel = () => (
-  <Span fontSize="LeadCaption" whiteSpace="nowrap">
+  <Span fontSize="13px" whiteSpace="nowrap">
     <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />
     &nbsp;&nbsp;
     <PrivateInfoIcon color="#969BA3" />
@@ -121,7 +121,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
                     error={meta.error}
                     onSuccess={url => form.setFieldValue(field.name, url)}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
-                    fontSize="LeadCaption"
+                    fontSize="13px"
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
                     onReject={onUploadError}
@@ -137,7 +137,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
             error={getError('description')}
             htmlFor={`${attachmentKey}-description`}
             label={formatMessage(msg.descriptionLabel)}
-            labelFontSize="LeadCaption"
+            labelfontSize="13px"
             required
           >
             {inputProps => <Field as={StyledInput} {...inputProps} />}
@@ -150,7 +150,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
               inputType="date"
               required
               label={formatMessage(msg.dateLabel)}
-              labelFontSize="LeadCaption"
+              labelfontSize="13px"
               flex={requireFile ? '1 1 44%' : '1 1 50%'}
               mt={3}
             >
@@ -173,7 +173,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
               htmlFor={`${attachmentKey}-amount`}
               label={formatMessage(msg.amountLabel)}
               required
-              labelFontSize="LeadCaption"
+              labelfontSize="13px"
               inputType="number"
               flex="1 1 30%"
               minWidth={150}

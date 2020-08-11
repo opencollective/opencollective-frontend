@@ -57,13 +57,13 @@ const RecurringContributionsCard = ({
       <Container p={3}>
         {contribution.platformContributionAmount ? (
           <Box mb={3}>
-            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
+            <P fontSize="14px" lineHeight="20px" fontWeight="400">
               <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
             <div>
               <P
-                fontSize="Paragraph"
-                lineHeight="Paragraph"
+                fontSize="14px"
+                lineHeight="20px"
                 fontWeight="bold"
                 data-cy="recurring-contribution-amount-contributed"
               >
@@ -81,7 +81,7 @@ const RecurringContributionsCard = ({
                   />
                 )}
               >
-                <P fontSize="Caption" lineHeight="Paragraph" color="black.700">
+                <P fontSize="12px" lineHeight="20px" color="black.700">
                   (
                   <FormattedMoneyAmount
                     amount={contribution.amount.value * 100}
@@ -105,15 +105,10 @@ const RecurringContributionsCard = ({
           </Box>
         ) : (
           <Box mb={3}>
-            <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
+            <P fontSize="14px" lineHeight="20px" fontWeight="400">
               <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
             </P>
-            <P
-              fontSize="Paragraph"
-              lineHeight="Paragraph"
-              fontWeight="bold"
-              data-cy="recurring-contribution-amount-contributed"
-            >
+            <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
                 amount={contribution.amount.value * 100}
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}
@@ -123,10 +118,10 @@ const RecurringContributionsCard = ({
           </Box>
         )}
         <Box mb={3}>
-          <P fontSize="Paragraph" lineHeight="Paragraph" fontWeight="400">
+          <P fontSize="14px" lineHeight="20px" fontWeight="400">
             <FormattedMessage id="Subscriptions.ContributedToDate" defaultMessage="Contributed to date" />
           </P>
-          <P fontSize="Paragraph" lineHeight="Paragraph">
+          <P fontSize="14px" lineHeight="20px">
             <FormattedMoneyAmount
               amount={contribution.totalDonations.value * 100}
               currency={contribution.totalDonations.currency}

@@ -132,7 +132,7 @@ class SectionUpdates extends React.PureComponent {
           {isAdmin && (
             <Link route="createUpdate" params={{ collectiveSlug: collective.slug }}>
               <StyledButton data-cy="create-new-update-btn" buttonStyle="primary">
-                <Span fontSize="LeadParagraph" fontWeight="bold" mr={2}>
+                <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
                 </Span>
                 <FormattedMessage id="CollectivePage.SectionUpdates.CreateBtn" defaultMessage="Create a new update" />
@@ -142,7 +142,7 @@ class SectionUpdates extends React.PureComponent {
         </Flex>
         {isEmpty(updates) ? (
           <div>
-            <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="Paragraph">
+            <MessageBox my={5} type="info" withIcon maxWidth={700} fontStyle="italic" fontSize="14px">
               <FormattedMessage
                 id="SectionUpdates.PostFirst"
                 defaultMessage="Use this section to promote your actions and keep your community up-to-date."
@@ -193,7 +193,7 @@ class SectionUpdates extends React.PureComponent {
                         />
                       </PrivateUpdateMesgBox>
                     )}
-                    <Container color="black.400" mt={2} fontSize="Caption">
+                    <Container color="black.400" mt={2} fontSize="12px">
                       {update.isPrivate && (
                         <StyledTooltip
                           content={() => (
@@ -243,7 +243,7 @@ class SectionUpdates extends React.PureComponent {
         )}
         {updates.length > 0 && (
           <Link route="updates" params={{ collectiveSlug: collective.slug }}>
-            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="Paragraph">
+            <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
               <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
             </StyledButton>
           </Link>

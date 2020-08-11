@@ -75,7 +75,7 @@ const editExpenseMutation = gqlV2/* GraphQL */ `
 
 const PrivateNoteLabel = () => {
   return (
-    <Span fontSize="Caption" color="black.700" fontWeight="bold">
+    <Span fontSize="12px" color="black.700" fontWeight="bold">
       <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
       &nbsp;&nbsp;
       <PrivateInfoIcon color="#969BA3" />
@@ -363,7 +363,7 @@ class ExpensePage extends React.Component {
             </Flex>
           </Container>
           <Box flex="1 1 650px" minWidth={300} maxWidth={792} mr={[null, 2, 3, 4, 5]} px={2} ref={this.expenseTopRef}>
-            <H1 fontSize="H4" lineHeight="H4" mb={24} py={2}>
+            <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
               <FormattedMessage id="Expense.summary" defaultMessage="Expense summary" />
             </H1>
             {error && (
@@ -401,7 +401,7 @@ class ExpensePage extends React.Component {
                   <React.Fragment>
                     {hasAttachedFiles && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                        <H5 fontSize="LeadParagraph" mb={3}>
+                        <H5 fontSize="16px" mb={3}>
                           <FormattedMessage id="Expense.Downloads" defaultMessage="Downloads" />
                         </H5>
                         <ExpenseAttachedFiles
@@ -414,11 +414,11 @@ class ExpensePage extends React.Component {
                     )}
                     {expense?.privateMessage && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                        <H5 fontSize="LeadParagraph" mb={3}>
+                        <H5 fontSize="16px" mb={3}>
                           <FormattedMessage id="expense.notes" defaultMessage="Notes" />
                         </H5>
                         <PrivateNoteLabel mb={2} />
-                        <HTMLContent color="black.700" mt={1} fontSize="LeadCaption" content={expense.privateMessage} />
+                        <HTMLContent color="black.700" mt={1} fontSize="13px" content={expense.privateMessage} />
                       </Container>
                     )}
                   </React.Fragment>

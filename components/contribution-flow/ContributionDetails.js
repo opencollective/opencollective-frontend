@@ -15,8 +15,8 @@ import { P, Span } from '../Text';
 const ContributionDetails = ({ totalAmount, interval, currency, tax }) => {
   return (
     <Container mt={4} mx={2} width={1 / 5} minWidth="300px" maxWidth="370px" data-cy="contribution-details">
-      <Container fontSize="Paragraph" mb={3}>
-        <P fontSize="LeadParagraph" fontWeight="bold" mb={2}>
+      <Container fontSize="14px" mb={3}>
+        <P fontSize="16px" fontWeight="bold" mb={2}>
           <FormattedMessage id="contribute.ContributionDetailsTitle" defaultMessage="Contribution details:" />
         </P>
         <FormattedMessage

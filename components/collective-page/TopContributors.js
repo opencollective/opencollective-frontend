@@ -81,7 +81,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
   return (
     <Box flex="50% 1 3" style={{ flexBasis: getFlexBasisForCol(contributors.length, totalNbContributors) }}>
       {showTitle && (
-        <P fontSize="LeadParagraph" color="black.700" mb={3}>
+        <P fontSize="16px" color="black.700" mb={3}>
           {title}
         </P>
       )}
@@ -96,7 +96,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
             </AvatarWithRank>
             <div>
               <LinkContributor contributor={contributor}>
-                <P fontSize="Caption" lineHeight="Caption" fontWeight="bold" color="black.700">
+                <P fontSize="12px" lineHeight="18px" fontWeight="bold" color="black.700">
                   {contributor.isIncognito ? (
                     <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />
                   ) : (
@@ -104,7 +104,7 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                   )}
                 </P>
               </LinkContributor>
-              <P color="black.500" fontSize="Tiny" lineHeight="Tiny">
+              <P color="black.500" fontSize="10px" lineHeight="14px">
                 <FormattedMessage
                   id="TotalDonatedSince"
                   defaultMessage="{totalDonated} since {date}"

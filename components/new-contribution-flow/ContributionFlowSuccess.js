@@ -176,7 +176,7 @@ class NewContributionFlowSuccess extends React.Component {
         >
           <Flex flexDirection="column" alignItems="left" justifyContent="center" width={4 / 5} my={3}>
             <H3 mb={3}>{cta.headerText}</H3>
-            <P fontSize="Paragraph" lineHeight="LeadParagraph" fontWeight={300} color="black.700">
+            <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
               {cta.contentText}
             </P>
             {/* {cta.subscribe && email form here} */}
@@ -219,7 +219,7 @@ class NewContributionFlowSuccess extends React.Component {
               <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
             </H3>
             <Box mb={3}>
-              <P fontSize={'H5'} fontColor="black.700" fontWeight={500}>
+              <P fontSize="20px" fontColor="black.700" fontWeight={500}>
                 <FormattedMessage
                   id="NewContributionFlow.Success.NowSupporting"
                   defaultMessage="You are now supporting {collective}."

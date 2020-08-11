@@ -17,7 +17,7 @@ const renderObject = object =>
     }
     return [
       ...acc,
-      <P key={key} fontSize="11px" lineHeight="Caption">
+      <P key={key} fontSize="11px" lineHeight="18px">
         <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
       </P>,
     ];

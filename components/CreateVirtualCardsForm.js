@@ -551,7 +551,7 @@ class CreateVirtualCardsForm extends Component {
               onChange={({ value }) => this.onChange('batch', truncate(value, { length: 200 }))}
               minWidth={300}
               disabled={submitting}
-              fontSize="Paragraph"
+              fontSize="14px"
               options={batchesOptions}
               defaultValue={batchesOptions[0]}
             />

@@ -78,7 +78,7 @@ const StyledInputField = ({
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+        <Span display="block" color="red.500" pt={2} fontSize="10px">
           {error}
         </Span>
       )}

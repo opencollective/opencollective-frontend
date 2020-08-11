@@ -117,7 +117,7 @@ const BankTransfer = props => {
           </H4>
 
           <Box>
-            <Container fontSize="Caption" mt={2} color="black.600" textAlign="left">
+            <Container fontSize="12px" mt={2} color="black.600" textAlign="left">
               {data.host.plan.manualPayments ? (
                 <FormattedMessage
                   id="paymentMethods.manual.add.info"

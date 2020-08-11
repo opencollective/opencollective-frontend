@@ -84,7 +84,7 @@ class SectionConversations extends React.PureComponent {
             <ConversationsList collectiveSlug={collective.slug} conversations={conversations.nodes} />
             {conversations.totalCount > 3 && (
               <Link route="conversations" params={{ collectiveSlug: collective.slug }}>
-                <StyledButton width="100%" mt={4} buttonSize="small" fontSize="Paragraph">
+                <StyledButton width="100%" mt={4} buttonSize="small" fontSize="14px">
                   <FormattedMessage id="Conversations.ViewAll" defaultMessage="View all conversations" /> →
                 </StyledButton>
               </Link>

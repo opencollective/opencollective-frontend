@@ -147,7 +147,7 @@ class EditConnectedAccount extends React.Component {
       <Flex className="EditConnectedAccount">
         {!connectedAccount && (
           <Box>
-            <P lineHeight="0" fontSize="Caption" color="black.600" fontWeight="normal">
+            <P lineHeight="0" fontSize="12px" color="black.600" fontWeight="normal">
               {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
             </P>
             <StyledButton

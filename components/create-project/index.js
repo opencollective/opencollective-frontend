@@ -62,12 +62,12 @@ class CreateProject extends Component {
         <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
           <Flex flexDirection="column" p={4} mt={2}>
             <Box mb={3}>
-              <H1 fontSize="H3" lineHeight="H3" fontWeight="bold" textAlign="center">
+              <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
                 <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
               </H1>
             </Box>
             <Box textAlign="center">
-              <P fontSize="Paragraph" color="black.600" mb={1}>
+              <P fontSize="14px" color="black.600" mb={1}>
                 <FormattedMessage
                   id="collective.create.createOrSignIn"
                   defaultMessage="Create an account (or sign in) to start a collective."

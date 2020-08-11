@@ -58,7 +58,7 @@ const SectionBudget = ({ collective, stats }) => {
       </P>
       <Flex flexDirection={['column-reverse', null, 'row']} justifyContent="space-between" alignItems="flex-start">
         {isEmpty(data?.transactions) && (
-          <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="Paragraph">
+          <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="14px">
             <FormattedMessage
               id="SectionBudget.Empty"
               defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
@@ -78,7 +78,7 @@ const SectionBudget = ({ collective, stats }) => {
                   minWidth={290}
                   width="100%"
                   buttonSize="small"
-                  fontSize="Paragraph"
+                  fontSize="14px"
                 >
                   <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" />
                 </StyledButton>
@@ -92,7 +92,7 @@ const SectionBudget = ({ collective, stats }) => {
                   minWidth={290}
                   width="100%"
                   buttonSize="small"
-                  fontSize="Paragraph"
+                  fontSize="14px"
                 >
                   <FormattedMessage
                     id="CollectivePage.SectionBudget.ViewAllExpenses"
@@ -115,10 +115,10 @@ const SectionBudget = ({ collective, stats }) => {
           mx={[null, null, 3]}
         >
           <Box data-cy="budgetSection-today-balance" flex="1" py={16} px={4}>
-            <P fontSize="Tiny" textTransform="uppercase" color="black.700">
+            <P fontSize="10px" textTransform="uppercase" color="black.700">
               <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
             </P>
-            <P fontSize="H5" mt={1}>
+            <P fontSize="20px" mt={1}>
               {formatCurrency(stats.balance, collective.currency)} <Span color="black.400">{collective.currency}</Span>
             </P>
           </Box>
@@ -126,7 +126,7 @@ const SectionBudget = ({ collective, stats }) => {
             <Container data-cy="budgetSection-estimated-budget" flex="1" background="#F5F7FA" py={16} px={4}>
               <DefinedTerm
                 term={Terms.ESTIMATED_BUDGET}
-                fontSize="Tiny"
+                fontSize="10px"
                 textTransform="uppercase"
                 color="black.700"
                 extraTooltipContent={
@@ -145,7 +145,7 @@ const SectionBudget = ({ collective, stats }) => {
                   </Box>
                 }
               />
-              <P fontSize="H5" mt={2}>
+              <P fontSize="20px" mt={2}>
                 <Span fontWeight="bold">~ {formatCurrency(stats.yearlyBudget, collective.currency)}</Span>{' '}
                 <Span color="black.400">{collective.currency}</Span>
               </P>

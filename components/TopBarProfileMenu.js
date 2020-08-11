@@ -147,7 +147,7 @@ class TopBarProfileMenu extends React.Component {
           >
             <Flex alignItems="center">
               <Avatar collective={get(membership, 'collective')} radius="2.8rem" mr={2} />
-              <P fontSize="Caption" truncateOverflow>
+              <P fontSize="12px" truncateOverflow>
                 {get(membership, 'collective.name')}
               </P>
             </Flex>

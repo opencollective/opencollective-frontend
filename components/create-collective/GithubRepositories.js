@@ -64,8 +64,8 @@ const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) =
             <StyledInput
               bare
               type="text"
-              fontSize="Paragraph"
-              lineHeight="Paragraph"
+              fontSize="14px"
+              lineHeight="20px"
               placeholder={formatMessage(messages.filterByName)}
               onChange={({ target }) => {
                 setSearch(target.value);

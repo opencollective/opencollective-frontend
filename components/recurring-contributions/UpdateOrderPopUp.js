@@ -179,7 +179,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
   return (
     <Fragment>
       <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
-        <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+        <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
           <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
         </P>
         <Flex flexGrow={1} alignItems="center">
@@ -221,7 +221,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                       />
                       {selectedAmountOption?.label === 'Other' && (
                         <Flex flexDirection="column">
-                          <P fontSize="Caption" fontWeight="600" my={2}>
+                          <P fontSize="12px" fontWeight="600" my={2}>
                             <FormattedMessage id="RecurringContributions.customAmount" defaultMessage="Custom amount" />
                           </P>
                           <Box>
@@ -235,7 +235,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                               px="2px"
                             />
                           </Box>
-                          <P fontSize="Caption" fontWeight="600" my={2}>
+                          <P fontSize="12px" fontWeight="600" my={2}>
                             <FormattedMessage
                               defaultMessage="Min. amount: {minAmount}"
                               id="RecurringContributions.minAmount"
@@ -250,7 +250,7 @@ const UpdateOrderPopUp = ({ setMenuState, contribution, createNotification, setS
                   ) : (
                     <Fragment>
                       {flexible && (
-                        <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
+                        <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
                           <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
                         </P>
                       )}

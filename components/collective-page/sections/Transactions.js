@@ -65,7 +65,7 @@ const SectionTransactions = props => {
   if (!data?.transactions?.nodes?.length) {
     return (
       <ContainerSectionContent pt={5} pb={6}>
-        <SectionTitle mb={4} fontSize={['H4', 'H2']}>
+        <SectionTitle mb={4} fontSize={['24px', '40px']}>
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
         </SectionTitle>
         <MessageBox type="info" withIcon>
@@ -102,7 +102,7 @@ const SectionTransactions = props => {
           <TransactionsList transactions={data?.transactions?.nodes} />
         )}
         <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
+          <StyledButton mt={3} width="100%" buttonSize="small" fontSize="14px">
             <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
           </StyledButton>
         </Link>

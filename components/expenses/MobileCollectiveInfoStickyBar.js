@@ -33,7 +33,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
     >
       <Flex justifyContent="space-between" alignItems="center">
         <Box minWidth={135} flex="1 1 45%">
-          <P fontSize="Caption" fontWeight="bold" color="black.900" mb={1}>
+          <P fontSize="12px" fontWeight="bold" color="black.900" mb={1}>
             <FormattedMessage
               id="CollectiveBalance"
               defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
@@ -45,7 +45,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
           {isLoading ? (
             <LoadingPlaceholder height={16} width={75} />
           ) : (
-            <Span color="black.500" fontSize="LeadParagraph">
+            <Span color="black.500" fontSize="16px">
               <FormattedMoneyAmount
                 currency={collective.currency}
                 amount={collective.balance}
@@ -57,7 +57,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
         <Box flex="0 0 5%" />
         {host && (
           <Box flex="1 1 45%" maxWidth="45%">
-            <P color="black.600" fontSize="SmallCaption" lineHeight="SmallCaption">
+            <P color="black.600" fontSize="11px" lineHeight="17px">
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
@@ -65,7 +65,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
               />
             </P>
             <LinkCollective collective={host}>
-              <P color="black.600" fontSize="SmallCaption" fontWeight="bold" truncateOverflow maxWidth={135}>
+              <P color="black.600" fontSize="11px" fontWeight="bold" truncateOverflow maxWidth={135}>
                 {host.name}
               </P>
             </LinkCollective>

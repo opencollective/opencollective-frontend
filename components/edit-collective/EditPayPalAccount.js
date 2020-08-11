@@ -94,7 +94,7 @@ const EditPayPalAccount = props => {
   if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <P fontSize="Caption" color="black.600" fontWeight="normal">
+        <P fontSize="12px" color="black.600" fontWeight="normal">
           <FormattedMessage
             id="collective.create.connectedAccounts.paypal.description"
             defaultMessage="Connect a PayPal account to pay expenses with one click. For instructions on how to connect to PayPal, please, <a>read our documentation</a>."

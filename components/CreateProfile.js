@@ -65,12 +65,12 @@ Tab.propTypes = {
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
     <Link route={onSecondaryAction} passHref>
-      <StyledLink disabled={loading} fontSize="Paragraph">
+      <StyledLink disabled={loading} fontSize="14px">
         {children}
       </StyledLink>
     </Link>
   ) : (
-    <StyledButton asLink fontSize="Paragraph" onClick={onSecondaryAction} disabled={loading}>
+    <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}
     </StyledButton>
   );
@@ -105,8 +105,8 @@ const useForm = ({ onEmailChange, errors }) => {
   return {
     getFieldProps: name => ({
       defaultValue: state[name] || '',
-      fontSize: 'Paragraph',
-      lineHeight: 'Paragraph',
+      fontSize: '14px',
+      lineHeight: '20px',
       type: 'text',
       width: 1,
       onChange: ({ target }) => {
@@ -254,7 +254,7 @@ const CreateProfile = ({
           }}
           method="POST"
         >
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mb={24} fontWeight="600">
+          <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.PersonalInfo" defaultMessage="Your personal information" />
           </P>
           <Box mb={24}>
@@ -290,7 +290,7 @@ const CreateProfile = ({
             </StyledInputField>
           </Box>
 
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mb={24} fontWeight="600">
+          <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization's information" />
           </P>
           <Box mb={24}>
@@ -375,10 +375,10 @@ const CreateProfile = ({
       )}
 
       <Container alignItems="center" bg="black.50" display="flex" justifyContent="center" px={4} py={3}>
-        <Span color="black.700" mr={1} fontSize="Paragraph">
+        <Span color="black.700" mr={1} fontSize="14px">
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </Span>{' '}
-        <Span fontSize="Paragraph">
+        <Span fontSize="14px">
           <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
             <FormattedMessage id="signIn" defaultMessage="Sign In" />
             &nbsp;→

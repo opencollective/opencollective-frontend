@@ -263,8 +263,8 @@ class OrderSuccessPage extends React.Component {
                     key={tag}
                     route="search"
                     params={{ q: tag }}
-                    fontSize="Paragraph"
-                    lineHeight="Caption"
+                    fontSize="14px"
+                    lineHeight="18px"
                     mr={1}
                     textAlign="center"
                   >

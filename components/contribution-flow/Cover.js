@@ -25,7 +25,7 @@ const Cover = ({ collective, tier }) => {
         </LinkCollective>
 
         {tier && (
-          <P fontSize="LeadParagraph" fontWeight="LeadParagraph" color="black.600" mt={3} textAlign="center">
+          <P fontSize="16px" color="black.600" mt={3} textAlign="center">
             {tier.type === 'TICKET' ? (
               <FormattedMessage
                 id="contribute.ticketType"

@@ -39,7 +39,7 @@ class OnboardingProfileCard extends React.Component {
             >
               <Flex alignItems="center">
                 <Avatar radius={16} collective={collective} />
-                <Box fontSize="Caption" ml={2} data-cy="name-of-admins">
+                <Box fontSize="12px" ml={2} data-cy="name-of-admins">
                   {name}
                 </Box>
               </Flex>
@@ -59,7 +59,7 @@ class OnboardingProfileCard extends React.Component {
           >
             <Flex alignItems="center">
               <Avatar radius={16} collective={collective} />
-              <Box fontSize="Caption" ml={2} data-cy="name-of-admins">
+              <Box fontSize="12px" ml={2} data-cy="name-of-admins">
                 {name}
               </Box>
             </Flex>

@@ -101,7 +101,7 @@ const PledgedCollectivePage = ({ collective }) => {
           <H2 as="h1">{collective.name}</H2>
 
           <Box mb={4} mt={3}>
-            <StyledLink href={website} color="primary.500" fontSize="Caption">
+            <StyledLink href={website} color="primary.500" fontSize="12px">
               <ExternalLinkAlt size="1em" /> {website}
             </StyledLink>
           </Box>
@@ -149,7 +149,7 @@ const PledgedCollectivePage = ({ collective }) => {
           />
         </H3>
 
-        <P color="black.600" fontSize="Caption" lineHeight="Caption" my={4}>
+        <P color="black.600" fontSize="12px" lineHeight="18px" my={4}>
           <FormattedMessage
             id="pledge.definition"
             defaultMessage="A pledge is a way for the community to show interest in supporting a cause or project that is not yet on
@@ -204,7 +204,7 @@ const PledgedCollectivePage = ({ collective }) => {
                 values={{ collective: <strong>{collective.name}</strong> }}
               />
             </H5>
-            <P fontSize="Caption" color="black.500" mt={3}>
+            <P fontSize="12px" color="black.500" mt={3}>
               <FormattedMessage
                 id="pledge.contactToClaim"
                 defaultMessage="To claim this Collective, contact <SupportLink></SupportLink>."

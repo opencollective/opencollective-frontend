@@ -122,7 +122,7 @@ HTMLContent.propTypes = {
 };
 
 HTMLContent.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
 };
 
 export default HTMLContent;

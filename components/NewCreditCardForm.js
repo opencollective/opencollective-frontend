@@ -75,7 +75,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
           onReady={input => input.focus()}
         />
         {error && (
-          <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+          <Span display="block" color="red.500" pt={2} fontSize="10px">
             {error}
           </Span>
         )}

@@ -22,7 +22,7 @@ import { H1, P } from '../Text';
 
 const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
-  font-size: ${themeGet('fontSizes.Paragraph')}px;
+  font-size: 14px;
 `;
 
 const ContainerWithImage = styled(Container)`
@@ -152,8 +152,8 @@ class CreateCollectiveForm extends React.Component {
           </Box>
           <Box mb={[2, 3]}>
             <H1
-              fontSize={['H5', 'H3']}
-              lineHeight={['H5', 'H3']}
+              fontSize={['20px', '32px']}
+              lineHeight={['24px', '36px']}
               fontWeight="bold"
               textAlign="center"
               color="black.900"
@@ -162,7 +162,7 @@ class CreateCollectiveForm extends React.Component {
             </H1>
           </Box>
           <Box textAlign="center" minHeight={['24px']}>
-            <P fontSize="LeadParagraph" color="black.600" mb={2}>
+            <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="createCollective.subtitle.introduce"
                 defaultMessage="Introduce your Collective to the community."
@@ -245,7 +245,7 @@ class CreateCollectiveForm extends React.Component {
                       )}
                     </StyledInputField>
                     {values.name.length > 0 && !touched.slug && (
-                      <P fontSize="Tiny">{intl.formatMessage(messages.suggestedLabel)}</P>
+                      <P fontSize="10px">{intl.formatMessage(messages.suggestedLabel)}</P>
                     )}
                     <StyledInputField
                       name="description"
@@ -266,7 +266,7 @@ class CreateCollectiveForm extends React.Component {
                         />
                       )}
                     </StyledInputField>
-                    <P fontSize="SmallCaption">{intl.formatMessage(messages.descriptionHint)}</P>
+                    <P fontSize="11px">{intl.formatMessage(messages.descriptionHint)}</P>
 
                     <Flex flexDirection="column" mx={1} my={4}>
                       <StyledCheckbox

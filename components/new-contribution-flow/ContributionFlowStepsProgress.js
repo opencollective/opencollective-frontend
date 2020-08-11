@@ -19,7 +19,7 @@ const StepLabel = styled(Span)`
 
 StepLabel.defaultProps = {
   color: 'black.400',
-  fontSize: 'Tiny',
+  fontSize: '10px',
   mt: 1,
 };
 
@@ -106,7 +106,7 @@ const ContributionFlowStepsProgress = ({
       {({ step }) => (
         <Flex flexDirection="column" alignItems="center">
           <StepLabel>{STEP_LABELS[step.name] ? formatMessage(STEP_LABELS[step.name]) : step.name}</StepLabel>
-          <Span fontSize="Caption" textAlign="center">
+          <Span fontSize="12px" textAlign="center">
             {step.isVisited && (
               <StepInfo
                 step={step}

@@ -57,7 +57,7 @@ const RecurringContributionsContainer = ({ recurringContributions, filter, creat
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
           <img src={EmptyCollectivesSectionImageSVG} alt="" />
-          <P color="black.600" fontSize="LeadParagraph" mt={5}>
+          <P color="black.600" fontSize="16px" mt={5}>
             <FormattedMessage
               id="RecurringContributions.none"
               defaultMessage="No recurring contributions to see here! 👀"

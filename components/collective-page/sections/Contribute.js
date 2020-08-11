@@ -338,7 +338,7 @@ class SectionContribute extends React.PureComponent {
                     <div>
                       <ContainerSectionContent>
                         <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                          <H3 fontSize="H5" fontWeight="600" color="black.700">
+                          <H3 fontSize="20px" fontWeight="600" color="black.700">
                             <FormattedMessage id="CP.Contribute.Financial" defaultMessage="Financial contributions" />
                           </H3>
                           <Box m={2} flex="0 0 50px">
@@ -386,7 +386,7 @@ class SectionContribute extends React.PureComponent {
                   <div>
                     <ContainerSectionContent>
                       <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                        <H3 fontSize="H5" fontWeight="600" color="black.700">
+                        <H3 fontSize="20px" fontWeight="600" color="black.700">
                           {connectedCollectives.length > 0 ? (
                             <FormattedMessage
                               id="SectionContribute.MoreWays"
@@ -443,7 +443,7 @@ class SectionContribute extends React.PureComponent {
             {!isEvent && (
               <ContainerSectionContent>
                 <Link route="contribute" params={{ collectiveSlug: collective.slug, verb: 'contribute' }}>
-                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="Paragraph">
+                  <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="View all the ways to contribute" /> →
                   </StyledButton>
                 </Link>

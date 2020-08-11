@@ -103,7 +103,7 @@ StyledButtonSet.propTypes = {
 StyledButtonSet.defaultProps = {
   combo: false,
   size: 'medium',
-  fontSize: 'Paragraph',
+  fontSize: '14px',
 };
 
 export default StyledButtonSet;

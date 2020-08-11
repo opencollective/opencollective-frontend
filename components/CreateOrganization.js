@@ -124,7 +124,7 @@ class CreateOrganization extends React.Component {
 
         <Body>
           <Container mt={2} mb={2}>
-            <H1 fontSize={['H4', 'H2']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
+            <H1 fontSize={['24px', '40px']} lineHeight={3} fontWeight="bold" textAlign="center" color="black.900">
               {title}
             </H1>
             <P textAlign="center">

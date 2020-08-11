@@ -43,7 +43,7 @@ class SignInLinkSent extends Component {
           <H3 as="h1" fontWeight="800">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
           </H3>
-          <P fontSize="LeadParagraph" lineHeight="LeadParagraph" color="black.900" mt={4}>
+          <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
             <FormattedMessage
               id="SignIn.SentTo"
               defaultMessage="We've sent it to {email}."
