@@ -16,7 +16,6 @@ import RecurringContributionsContainer from '../../recurring-contributions/Recur
 import StyledFilters from '../../StyledFilters';
 import TemporaryNotification from '../../TemporaryNotification';
 import { P } from '../../Text';
-import { withUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -53,7 +52,6 @@ class SectionRecurringContributions extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -88,12 +86,12 @@ class SectionRecurringContributions extends React.Component {
   };
 
   render() {
-    const { data, LoggedInUser, intl } = this.props;
+    const { data, intl } = this.props;
     const { notification, notificationType, notificationText } = this.state;
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
-    if (data.loading || !LoggedInUser) {
+    if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
     } else if (!data.account) {
       return (
@@ -180,4 +178,4 @@ const getData = graphql(recurringContributionsQuery, {
   },
 });
 
-export default injectIntl(withUser(getData(SectionRecurringContributions)));
+export default injectIntl(getData(SectionRecurringContributions));

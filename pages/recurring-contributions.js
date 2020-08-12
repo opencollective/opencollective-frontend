@@ -21,7 +21,6 @@ import RecurringContributionsContainer from '../components/recurring-contributio
 import StyledFilters from '../components/StyledFilters';
 import TemporaryNotification from '../components/TemporaryNotification';
 import { P } from '../components/Text';
-import { withUser } from '../components/UserProvider';
 
 const MainContainer = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
@@ -60,7 +59,6 @@ class recurringContributionsPage extends React.Component {
 
   static propTypes = {
     slug: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -95,7 +93,7 @@ class recurringContributionsPage extends React.Component {
   };
 
   render() {
-    const { slug, data, LoggedInUser, intl } = this.props;
+    const { slug, data, intl } = this.props;
     const { notification, notificationType, notificationText } = this.state;
 
     const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
@@ -113,7 +111,7 @@ class recurringContributionsPage extends React.Component {
 
     return (
       <AuthenticatedPage>
-        {data.loading || !LoggedInUser ? (
+        {data.loading ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
@@ -183,4 +181,4 @@ const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
   },
 });
 
-export default injectIntl(withUser(addRecurringContributionsPageData(recurringContributionsPage)));
+export default injectIntl(addRecurringContributionsPageData(recurringContributionsPage));
