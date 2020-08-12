@@ -6,7 +6,7 @@ import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { formatFormErrorMessage } from '../../lib/form-utils';
+import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
@@ -322,25 +322,37 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
   }
 
   const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
-  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies);
+  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies.map(c => c.code));
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = fixedCurrency || get(formik.values, currencyFieldName);
+  const validateCurrencyMinimumAmount = () => {
+    // Only validate minimum amount if the form has items
+    if (formik?.values?.items) {
+      const invoiceTotalAmount = formik.values.items.reduce(
+        (amount, attachment) => amount + (attachment.amount || 0),
+        0,
+      );
+      const minAmountForSelectedCurrency =
+        availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
+      if (invoiceTotalAmount < minAmountForSelectedCurrency) {
+        return `The minimum amount for ${selectedCurrency} is ${formatCurrency(
+          minAmountForSelectedCurrency,
+          selectedCurrency,
+        )}`;
+      }
+    }
+  };
 
   return (
     <React.Fragment>
-      <Field name={currencyFieldName}>
+      <Field name={currencyFieldName} validate={validateCurrencyMinimumAmount}>
         {({ field, meta }) => (
-          <StyledInputField
-            name={field.name}
-            error={meta.error && formatFormErrorMessage(meta.error)}
-            label={formatMessage(msg.currency)}
-            mt={3}
-            mb={2}
-          >
+          <StyledInputField name={field.name} error={meta.error} label={formatMessage(msg.currency)} mt={3} mb={2}>
             {({ id }) => (
               <StyledSelect
                 inputId={id}
                 name={field.name}
+                error={meta.error}
                 onChange={({ value }) => {
                   formik.setFieldValue(getFieldName('data'), {});
                   formik.setFieldValue(field.name, value);
@@ -370,7 +382,7 @@ PayoutBankInformationForm.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
     }),
   }).isRequired,
   isNew: PropTypes.bool,

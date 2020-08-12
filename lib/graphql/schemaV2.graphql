@@ -3998,6 +3998,11 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 """
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+"""
 Type for a required legal document
 """
 enum LegalDocumentType {
@@ -5521,7 +5526,7 @@ type TransferWise {
     """
     accountDetails: JSON
   ): [TransferWiseRequiredField]
-  availableCurrencies: [String]
+  availableCurrencies: [JSONObject]
 }
 
 type TransferWiseField {
