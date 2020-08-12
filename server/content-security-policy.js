@@ -106,7 +106,12 @@ const getContentSecurityPolicyConfig = () => {
     if (process.env.WEBSITE_URL === 'https://staging.opencollective.com') {
       return {
         reportOnly: false,
-        directives: generateDirectives(),
+        directives: generateDirectives({
+          imgSrc: [
+            'opencollective-staging.s3.us-west-1.amazonaws.com',
+            'opencollective-staging.s3-us-west-1.amazonaws.com',
+          ],
+        }),
         reportUri: [
           'https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625',
         ],
@@ -114,7 +119,12 @@ const getContentSecurityPolicyConfig = () => {
     } else if (process.env.WEBSITE_URL === 'https://opencollective.com') {
       return {
         reportOnly: true,
-        directives: generateDirectives(),
+        directives: generateDirectives({
+          imgSrc: [
+            'opencollective-production.s3.us-west-1.amazonaws.com',
+            'opencollective-production.s3-us-west-1.amazonaws.com',
+          ],
+        }),
         reportUri: [
           'https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625',
         ],
