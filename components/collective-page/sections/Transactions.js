@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
@@ -44,10 +45,17 @@ const transactionsSectionQuery = gqlV2/* GraphQL */ `
   ${transactionsQueryCollectionFragment}
 `;
 
+const ResetAnchor = styled.a`
+  cursor: pointer;
+`;
+
 const SectionTransactions = props => {
   const { data, refetch, loading } = useQuery(transactionsSectionQuery, {
     variables: { slug: props.collective.slug, limit: NB_DISPLAYED },
     context: API_V2_CONTEXT,
+    // We keep notifyOnNetworkStatusChange to remove the flash of collectiveHasNoTransactions bug
+    // See https://github.com/apollographql/apollo-client/blob/9c80adf65ccbbb88ea5b9313c002f85976c225e3/src/core/ObservableQuery.ts#L274-L304
+    notifyOnNetworkStatusChange: true,
   });
   const [filter, setFilter] = React.useState(FILTERS.ALL);
   React.useEffect(() => {
@@ -60,20 +68,7 @@ const SectionTransactions = props => {
   }, [filter, props.collective.slug, refetch]);
 
   const { intl, collective } = props;
-  const showFilters = data?.transactions?.length !== 0;
-
-  if (!data?.transactions?.nodes?.length) {
-    return (
-      <ContainerSectionContent pt={5} pb={6}>
-        <SectionTitle mb={4} fontSize={['24px', '40px']}>
-          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
-        </SectionTitle>
-        <MessageBox type="info" withIcon>
-          <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
-        </MessageBox>
-      </ContainerSectionContent>
-    );
-  }
+  const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
 
   return (
     <Box py={5}>
@@ -81,8 +76,13 @@ const SectionTransactions = props => {
         <SectionTitle data-cy="section-transactions-title" mb={4} textAlign="left">
           <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
         </SectionTitle>
+        {collectiveHasNoTransactions && (
+          <MessageBox type="info" withIcon>
+            <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transaction yet." />
+          </MessageBox>
+        )}
       </ContainerSectionContent>
-      {showFilters && (
+      {!collectiveHasNoTransactions && (
         <Box mb={3} maxWidth={Dimensions.MAX_SECTION_WIDTH} mx="auto">
           <StyledFilters
             filters={FILTERS_LIST}
@@ -95,18 +95,33 @@ const SectionTransactions = props => {
         </Box>
       )}
 
-      <ContainerSectionContent>
-        {loading ? (
-          <LoadingPlaceholder height={600} borderRadius={8} />
-        ) : (
-          <TransactionsList transactions={data?.transactions?.nodes} />
-        )}
-        <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
-          <StyledButton mt={3} width="100%" buttonSize="small" fontSize="14px">
-            <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
-          </StyledButton>
-        </Link>
-      </ContainerSectionContent>
+      {!collectiveHasNoTransactions && (
+        <ContainerSectionContent>
+          {loading ? (
+            <LoadingPlaceholder height={600} borderRadius={8} />
+          ) : (
+            <TransactionsList transactions={data?.transactions?.nodes} />
+          )}
+          {data?.transactions.totalCount === 0 && (
+            <MessageBox type="info">
+              <FormattedMessage
+                id="TransactionsList.Empty"
+                defaultMessage="No transaction matches the given filters, <ResetLink>reset them</ResetLink> to see all transactions."
+                values={{
+                  ResetLink(text) {
+                    return <ResetAnchor onClick={() => setFilter(FILTERS.ALL)}>{text}</ResetAnchor>;
+                  },
+                }}
+              />
+            </MessageBox>
+          )}
+          <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
+            <StyledButton mt={3} width="100%" buttonSize="small" fontSize="Paragraph">
+              <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" /> →
+            </StyledButton>
+          </Link>
+        </ContainerSectionContent>
+      )}
     </Box>
   );
 };
