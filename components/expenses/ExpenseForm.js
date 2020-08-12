@@ -225,7 +225,7 @@ const ExpenseFormBody = ({
       const formValues = formPersister.loadValues();
       if (formValues) {
         // Reset payoutMethod if host is no longer connected to TransferWise
-        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host.transferwise) {
+        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host?.transferwise) {
           formValues.payoutMethod = undefined;
         }
         setValues(formValues);

@@ -108,7 +108,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
           )}
         </Field>
       )}
-      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
+      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && host && (
         <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
       )}
       {isNew && (
@@ -128,7 +128,7 @@ PayoutMethodForm.propTypes = {
     transferwise: PropTypes.shape({
       availableCurrencies: PropTypes.arrayOf(PropTypes.string),
     }),
-  }).isRequired,
+  }),
   /** Set this to nil to create a new one */
   payoutMethod: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
