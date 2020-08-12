@@ -12,6 +12,7 @@ import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
+import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { withUser } from './UserProvider';
 
@@ -67,6 +68,29 @@ class TopBar extends React.Component {
     },
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { showMobileMenu: false };
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.onClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.onClickOutside);
+  }
+
+  onClickOutside = () => {
+    this.setState({ showMobileMenu: false });
+  };
+
+  toggleMobileMenu = e => {
+    this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
+    // don't propagate to onClickOutside
+    e.nativeEvent.stopImmediatePropagation();
+  };
+
   render() {
     const { showSearch, menuItems } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
@@ -112,16 +136,6 @@ class TopBar extends React.Component {
             </Box>
           </Hide>
 
-          <Hide sm md lg>
-            <Box mx={3}>
-              <Link href="#footer">
-                <Flex as="a">
-                  <MenuIcon color="#aaaaaa" size={24} />
-                </Flex>
-              </Link>
-            </Box>
-          </Hide>
-
           <Hide xs>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
@@ -162,6 +176,14 @@ class TopBar extends React.Component {
           </Hide>
         </Flex>
         <TopBarProfileMenu />
+        <Hide sm md lg>
+          <TopBarMobileMenu showMobileMenu={this.state.showMobileMenu} />
+          <Box mx={3} onClick={this.toggleMobileMenu}>
+            <Flex as="a">
+              <MenuIcon color="#aaaaaa" size={24} />
+            </Flex>
+          </Box>
+        </Hide>
       </Flex>
     );
   }
