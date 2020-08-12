@@ -543,6 +543,7 @@
   "createProfile.faq.persoVSOrg.title": "What's the difference between a personal and an organization profile?",
   "createProfile.faq.privacy.content": "我们关心隐私。我们不使用 cookie。没有 Google Analytic。无跟踪。 那么我们为什么要问你个人信息？ 因为出于法律原因，许多政府需要知道谁给他们钱( 就像了解你的客户)。 然而，我们让您完全控制您的信息是如何公开显示的 (是的，您可以提供隐身的捐款，见下文)。",
   "createProfile.faq.privacy.title": "What about privacy?",
+  "CreateProfile.name.conflict": "You can't use the same name for your Personal profile and your Organization.",
   "CreateProfile.OrgInfo": "Organization's information",
   "CreateProfile.PersonalInfo": "Your personal information",
   "createProject.create": "Create a Project",

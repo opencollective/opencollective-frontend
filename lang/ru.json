@@ -543,6 +543,7 @@
   "createProfile.faq.persoVSOrg.title": "What's the difference between a personal and an organization profile?",
   "createProfile.faq.privacy.content": "We care about privacy. We don't use cookies. No Google Analytics. No tracking. Then why are we asking you for your personal information? Because for legal reasons the host of the collective needs to know who is giving them money (KYC as in Know Your Customer). However, we give you full control on how your information is being shown publicly (yes you can make incognito contributions, see below).",
   "createProfile.faq.privacy.title": "What about privacy?",
+  "CreateProfile.name.conflict": "You can't use the same name for your Personal profile and your Organization.",
   "CreateProfile.OrgInfo": "Organization's information",
   "CreateProfile.PersonalInfo": "Your personal information",
   "createProject.create": "Create a Project",

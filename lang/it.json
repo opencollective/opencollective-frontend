@@ -543,6 +543,7 @@
   "createProfile.faq.persoVSOrg.title": "Qual è la differenza tra un profilo personale e il profilo di un'organizzazione?",
   "createProfile.faq.privacy.content": "Ci preoccupiamo della privacy. Non usiamo i cookie. Nessun Google Analytics. Nessun tracciamento. Allora perché le chiediamo le sue informazioni personali? Perché per ragioni legali l'host ha bisogno di sapere chi sta dando loro soldi (KYC ovvero Know Your Customer). Tuttavia, ti diamo pieno controllo su come vengono mostrate pubblicamente le tue informazioni (sì puoi fare contributi in incognito, vedi sotto).",
   "createProfile.faq.privacy.title": "E la privacy?",
+  "CreateProfile.name.conflict": "You can't use the same name for your Personal profile and your Organization.",
   "CreateProfile.OrgInfo": "Informazioni dell'organizzazione",
   "CreateProfile.PersonalInfo": "Le tue informazioni personali",
   "createProject.create": "Create a Project",

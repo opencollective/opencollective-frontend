@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { pick } from 'lodash';
+import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from '../server/pages';
@@ -36,6 +36,10 @@ const messages = defineMessages({
   website: {
     id: 'Fields.website',
     defaultMessage: 'Website',
+  },
+  profileNameError: {
+    id: 'CreateProfile.name.conflict',
+    defaultMessage: "You can't use the same name for your Personal profile and your Organization.",
   },
 });
 
@@ -99,7 +103,7 @@ NewsletterCheckBox.propTypes = {
   checked: PropTypes.bool,
 };
 
-const useForm = ({ onEmailChange, errors }) => {
+const useForm = ({ onEmailChange, errors, formatMessage }) => {
   const [state, setState] = useState({ errors, newsletterOptIn: false });
 
   return {
@@ -111,19 +115,22 @@ const useForm = ({ onEmailChange, errors }) => {
       width: 1,
       onChange: ({ target }) => {
         // Email state is not local so any changes should be handled seprately
+        let value = target.value,
+          error = null;
         if (target.name === 'email') {
+          value = undefined;
           onEmailChange(target.value);
-          setState({
-            ...state,
-            errors: { ...state.errors, [target.name]: null },
-          });
-        } else {
-          setState({
-            ...state,
-            [target.name]: target.value,
-            errors: { ...state.errors, [target.name]: null },
-          });
+        } else if (
+          (target.name === 'name' && target.value === state.orgName) ||
+          (target.name === 'orgName' && target.value === state.name)
+        ) {
+          error = formatMessage(messages.profileNameError);
         }
+        setState({
+          ...state,
+          [target.name]: value,
+          errors: { ...state.errors, [target.name]: error },
+        });
       },
       onInvalid: event => {
         event.persist();
@@ -157,7 +164,8 @@ const CreateProfile = ({
 }) => {
   const { formatMessage } = useIntl();
   const [tab, setTab] = useState('personal');
-  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors });
+  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
+  const isValid = isEmpty(compact(values(state.errors)));
 
   return (
     <StyledCard width={1} maxWidth={480} {...props}>
@@ -225,7 +233,7 @@ const CreateProfile = ({
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!email || !state.name}
+            disabled={!email || !state.name || !isValid}
             width={1}
             type="submit"
             fontWeight="600"
@@ -363,7 +371,7 @@ const CreateProfile = ({
 
           <StyledButton
             buttonStyle="primary"
-            disabled={!email || !state.name || !state.orgName}
+            disabled={!email || !state.name || !state.orgName || !isValid}
             width={1}
             type="submit"
             fontWeight="600"
