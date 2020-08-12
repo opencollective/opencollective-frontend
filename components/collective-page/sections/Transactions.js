@@ -100,7 +100,7 @@ const SectionTransactions = props => {
           {loading ? (
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (
-            <TransactionsList transactions={data?.transactions?.nodes} />
+            <TransactionsList transactions={data?.transactions?.nodes} displayActions />
           )}
           {data?.transactions.totalCount === 0 && (
             <MessageBox type="info">

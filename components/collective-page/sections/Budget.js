@@ -68,7 +68,7 @@ const SectionBudget = ({ collective, stats }) => {
         )}
 
         <Container flex="10" mb={3} width="100%" maxWidth={800}>
-          <TransactionsList transactions={data?.transactions?.nodes} />
+          <TransactionsList transactions={data?.transactions?.nodes} displayActions />
           <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
             <Box flex="1 1" mx={[0, 2]}>
               <Link route="transactions" params={{ collectiveSlug: collective.slug }}>
