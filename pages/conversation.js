@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, withApollo } from '@apollo/react-hoc';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';

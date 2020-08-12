@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import gql from 'graphql-tag';
 import { assign, cloneDeep, get, pick } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 

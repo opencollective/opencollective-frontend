@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { cloneDeep, pick, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';

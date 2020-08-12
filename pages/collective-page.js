@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { createGlobalStyle } from 'styled-components';
@@ -134,7 +134,9 @@ class CollectivePage extends React.Component {
     const { slug, data, LoggedInUser, status, step, mode } = this.props;
     const { showOnboardingModal } = this.state;
 
-    if (!data.loading) {
+    const loading = data.loading && !data.Collective;
+
+    if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.Collective) {
@@ -151,7 +153,7 @@ class CollectivePage extends React.Component {
     return (
       <Page {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <GlobalStyles smooth={this.state.smooth} />
-        {data.loading ? (
+        {loading ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>

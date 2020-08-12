@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { Bell } from '@styled-icons/feather/Bell';
 import { BellOff } from '@styled-icons/feather/BellOff';
 import { get } from 'lodash';
@@ -37,7 +37,6 @@ const ButtonLabel = styled(Span).attrs({
 const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedInUser, loadingLoggedInUser }) => {
   const [followConversation, { loading: submitting }] = useMutation(followConversationMutation, {
     context: API_V2_CONTEXT,
-    variables: { id: conversationId },
   });
 
   const { data, loading } = useQuery(isUserFollowingConversationQuery, {
@@ -83,7 +82,7 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
       disabled={!LoggedInUser || loadingLoggedInUser || loading || submitting}
       onClick={() => {
         return followConversation({
-          variables: { isActive: !isFollowing },
+          variables: { id: conversationId, isActive: !isFollowing },
           update: (client, { data }) => {
             const isFollowing = get(data, 'followConversation');
             const queryParams = { query: isUserFollowingConversationQuery, variables: { id: conversationId } };

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import moment from 'moment';

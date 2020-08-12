@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -160,12 +160,6 @@ class CreateOrderPage extends React.Component {
     const feesOnTopAvailable = get(data, 'Collective.platformFeePercent') === 0;
     const taxDeductible = get(data, 'Collective.host.settings.taxDeductibleDonations');
 
-    // Adding that at GraphQL level is buggy
-    // data is coming from CollectiveDataQuery or CollectiveWithTierDataQuery with collectiveFields
-    if (data.Collective.isHost) {
-      data.Collective.host = { ...data.Collective };
-    }
-
     if (!data.Collective.host && !data.Collective.isHost) {
       return this.renderMessage('info', intl.formatMessage(messages.missingHost));
     } else if (!data.Collective.isActive) {
@@ -180,7 +174,7 @@ class CreateOrderPage extends React.Component {
       return (
         <ContributionFlow
           collective={data.Collective}
-          host={data.Collective.host}
+          host={data.Collective.isHost ? data.Collective : data.Collective.host}
           tier={data.Tier}
           verb={this.props.verb}
           step={this.props.step}

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -34,16 +33,16 @@ const DeleteCollective = ({ collective, ...props }) => {
   const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(deleteCollectiveMutation, { variables: { id: collective.id } });
-  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation, { variables: { id: collective.id } });
+  const [deleteCollective] = useMutation(deleteCollectiveMutation);
+  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
 
   const handleDelete = async () => {
     try {
       setDeleteStatus({ ...deleteStatus, deleting: true });
       if (collective.type === 'USER') {
-        await deleteUserCollective();
+        await deleteUserCollective({ variables: { id: collective.id } });
       } else {
-        await deleteCollective();
+        await deleteCollective({ variables: { id: collective.id } });
         await props.refetchLoggedInUser();
       }
       await Router.pushRoute(`/deleteCollective/confirmed?type=${collective.type}`);

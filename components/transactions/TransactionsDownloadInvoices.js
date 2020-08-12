@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/react-hooks';
+import { gql, useQuery } from '@apollo/client';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import gql from 'graphql-tag';
 import { groupBy, sumBy, truncate, uniq } from 'lodash';
 import moment from 'moment';
 import { FormattedMessage } from 'react-intl';

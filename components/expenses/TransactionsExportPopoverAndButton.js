@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withApollo } from '@apollo/react-hoc';
+import { withApollo } from '@apollo/client/react/hoc';
 import { FileDownload } from '@styled-icons/fa-solid/FileDownload';
 import moment from 'moment';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';

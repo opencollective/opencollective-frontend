@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql, useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 

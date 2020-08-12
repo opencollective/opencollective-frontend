@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
-import gql from 'graphql-tag';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 

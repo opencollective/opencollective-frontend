@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 
 import AcceptFinancialContributions from '../components/accept-financial-contributions/index.js';
 import AuthenticatedPage from '../components/AuthenticatedPage';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { Upload } from '@styled-icons/feather/Upload';
 import { get, set } from 'lodash';
 import Dropzone from 'react-dropzone';

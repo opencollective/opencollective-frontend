@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import classNames from 'classnames';
-import gql from 'graphql-tag';
 import { uniqBy } from 'lodash';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';

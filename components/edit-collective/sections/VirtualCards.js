@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
-import gql from 'graphql-tag';
 import { get, last } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';

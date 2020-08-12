@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import { Query } from '@apollo/react-components';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { get, times } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, Form, Formik } from 'formik';
 import QRCode from 'qrcode.react';

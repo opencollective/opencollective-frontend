@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
@@ -82,10 +82,6 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
 
   const [applyToHost, { loading }] = useMutation(applyToHostMutation, {
     context: API_V2_CONTEXT,
-    variables: {
-      collective: { legacyId: collective.id },
-      host: { id: host.id },
-    },
   });
 
   const handleApplication = async () => {
@@ -94,7 +90,12 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
       return;
     }
     try {
-      await applyToHost();
+      await applyToHost({
+        variables: {
+          collective: { legacyId: collective.id },
+          host: { id: host.id },
+        },
+      });
       Router.pushRoute('accept-financial-contributions', {
         slug: collective.slug,
         path: 'host',

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import { Form, Formik } from 'formik';
 import { compose, uniqBy } from 'lodash';

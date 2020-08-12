@@ -1,8 +1,8 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import themeGet from '@styled-system/theme-get';
-import gql from 'graphql-tag';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';

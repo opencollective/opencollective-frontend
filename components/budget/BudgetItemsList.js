@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import styled, { css } from 'styled-components';
 
 import { TransactionTypes } from '../../lib/constants/transactions';

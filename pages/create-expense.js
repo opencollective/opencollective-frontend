@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -223,12 +223,6 @@ class CreateExpensePage extends React.Component {
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
 
-    // Adding that at GraphQL level is buggy
-    // data is coming from CreateExpensePage
-    if (collective && collective.isHost) {
-      collective.host = { ...collective };
-    }
-
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
         <React.Fragment>
@@ -333,6 +327,24 @@ class CreateExpensePage extends React.Component {
   }
 }
 
+const hostFieldsFragment = gqlV2/* GraphQL */ `
+  fragment CreateExpenseHostFields on Host {
+    id
+    name
+    slug
+    type
+    expensePolicy
+    settings
+    location {
+      address
+      country
+    }
+    transferwise {
+      availableCurrencies
+    }
+  }
+`;
+
 const createExpensePageQuery = gqlV2/* GraphQL */ `
   query CreateExpensePage($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
@@ -351,58 +363,26 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         tag
       }
 
+      ... on AccountWithContributions {
+        balance
+      }
+
       ... on AccountWithHost {
         isApproved
         host {
-          id
-          name
-          slug
-          type
-          expensePolicy
-          settings
-          location {
-            address
-            country
-          }
-          transferwise {
-            availableCurrencies
-          }
+          ...CreateExpenseHostFields
         }
       }
+
+      # For Hosts with Budget capabilities
 
       ... on Organization {
-        id
+        balance
         isHost
         isActive
-        balance
-        expensePolicy
-        location {
-          address
-          country
+        host {
+          ...CreateExpenseHostFields
         }
-        transferwise {
-          availableCurrencies
-        }
-      }
-
-      ... on Collective {
-        id
-        balance
-      }
-
-      ... on Fund {
-        id
-        balance
-      }
-
-      ... on Event {
-        id
-        balance
-      }
-
-      ... on Project {
-        id
-        balance
       }
     }
     loggedInAccount {
@@ -411,6 +391,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
   }
 
   ${loggedInAccountExpensePayoutFieldsFragment}
+  ${hostFieldsFragment}
 `;
 
 const addCreateExpensePageData = graphql(createExpensePageQuery, {

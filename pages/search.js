@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
-import gql from 'graphql-tag';
 import { withRouter } from 'next/router';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';

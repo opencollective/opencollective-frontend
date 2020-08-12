@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 import { gqlV2 } from '../../lib/graphql/helpers';
 
