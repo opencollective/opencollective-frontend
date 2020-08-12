@@ -66,7 +66,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
           }}
         >
           {({ radio, value }) => (
-            <Box minHeight={70} py={2} bg="white.full" px={3}>
+            <Box minHeight={70} py={2} bg="white.full" px={[0, 3]}>
               <Flex alignItems="center" width={1}>
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
@@ -74,8 +74,8 @@ const NewContributionFlowStepProfileLoggedInForm = ({
                 <Flex mr={3} css={{ flexBasis: '26px' }}>
                   <Avatar collective={value} size="3.6rem" />
                 </Flex>
-                <Flex flexDirection="column" flexGrow={1}>
-                  <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900">
+                <Flex flexDirection="column" flexGrow={1} maxWidth="75%">
+                  <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900" truncateOverflow>
                     {value.name}
                   </P>
                   {value.type === 'USER' &&

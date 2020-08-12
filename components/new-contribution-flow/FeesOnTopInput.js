@@ -76,7 +76,7 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
           defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
         />
       </P>
-      <Flex justifyContent="space-between">
+      <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
         <Flex alignItems="center">
           <Illustration />
           <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
@@ -87,7 +87,9 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
           </P>
         </Flex>
         <StyledSelect
-          minWidth={215}
+          width="100%"
+          maxWidth={['100%', 190]}
+          mt={[2, 0]}
           isSearchable={false}
           fontSize="15px"
           options={options}
@@ -101,7 +103,7 @@ const FeesOnTopInput = ({ currency, amount, fees, interval, onChange }) => {
           <StyledInputAmount id="feesOnTop" currency={currency} onChange={onChange} />
         </Flex>
       )}
-      <P fontSize="12px" lineHeight="18px" color="black.500" mt={1} textAlign="right">
+      <P fontSize="12px" lineHeight="18px" color="black.500" fontWeight="500" mt={2} textAlign={['left', 'right']}>
         <FormattedMessage
           defaultMessage="Total contribution: {amount}"
           id="TotalContribution"

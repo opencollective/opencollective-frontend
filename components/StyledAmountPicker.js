@@ -58,9 +58,9 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
           <StyledInputField
             htmlFor="amount"
             css={{ flexGrow: 1 }}
-            labelFontSize="20px"
+            labelFontSize={['17px', '20px']}
             labelColor="black.700"
-            labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
+            labelProps={{ fontWeight: 500, lineHeight: '24px', mb: 1, whiteSpace: 'nowrap' }}
             label={
               <FormattedMessage
                 id="contribution.amount.currency.label"
@@ -102,7 +102,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
             htmlFor="custom-amount"
             labelColor="black.600"
             labelFontSize="14px"
-            labelProps={{ mb: 1, pt: '13px' }}
+            labelProps={{ mb: 1, pt: '6px', lineHeight: '18px' }}
             label={
               hasPresets ? (
                 <FormattedMessage id="contribution.amount.other.label" defaultMessage="Other" />
