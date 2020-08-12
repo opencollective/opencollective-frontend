@@ -103,7 +103,7 @@ class StripeOrBankAccountPicker extends React.Component {
     const stripeAccount = find(host.connectedAccounts, { service: 'stripe' });
 
     return (
-      <Flex flexDirection="column" justifyContent="center" alignItems="center" my={[5]}>
+      <Flex flexDirection="column" justifyContent="center" alignItems="center" my={5}>
         <Box alignItems="center">
           <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
             <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>

@@ -120,7 +120,7 @@ const TransactionsDownloadCSV = ({ collective, client }) => {
             buttonSize="small"
             minWidth={140}
             isBorderless
-            flexGrow={[1, null]}
+            flexGrow={1}
           >
             <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
             <IconDownload size="13px" style={{ marginLeft: '8px' }} />

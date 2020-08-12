@@ -119,7 +119,7 @@ class CreateFundForm extends React.Component {
               <FormattedMessage id="createFund.create" defaultMessage="Create a Fund" />
             </H1>
           </Box>
-          <Box textAlign="center" minHeight={['24px']}>
+          <Box textAlign="center" minHeight="24px">
             <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="createFund.subtitle.introduce"

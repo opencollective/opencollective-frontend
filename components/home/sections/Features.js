@@ -178,7 +178,7 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
           <Illustration src={iconUrl} alt={`${id} icon`} />
         </Box>
         <Span
-          color={['black.800', 'black.900', null]}
+          color={['black.800', 'black.900']}
           active={id === activeFeature}
           fontWeight="500"
           textAlign={['center', 'left']}

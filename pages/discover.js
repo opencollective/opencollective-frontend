@@ -215,7 +215,7 @@ const DiscoverPage = () => {
               py={[20, 60]}
               width={1}
             >
-              <Flex width={[1]} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
+              <Flex width={1} justifyContent="left" flexWrap="wrap" mb={4} maxWidth={1200} m="0 auto">
                 <Flex width={[1, 0.8]} my={2}>
                   <NavList as="ul" p={0} justifyContent="space-between" width={1}>
                     <NavLinkContainer>

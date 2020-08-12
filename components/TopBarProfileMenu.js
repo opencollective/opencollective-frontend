@@ -208,7 +208,7 @@ class TopBarProfileMenu extends React.Component {
         data-cy="user-menu"
       >
         <Flex flexDirection={['column', 'row']} maxHeight={['calc(100vh - 68px)', '100%']}>
-          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={[3]} bg="#F7F8FA">
+          <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} bg="#F7F8FA">
             <Hide xs>
               <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
               <P mt={2} color="#313233" fontWeight="500">

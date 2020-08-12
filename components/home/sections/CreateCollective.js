@@ -58,7 +58,7 @@ const CreateCollective = () => {
       alignItems="center"
     >
       <Box width={['288px', '325px']} my={2} textAlign={['center', 'left']} mr={[null, 2]}>
-        <H4 fontSize={['24px']} lineHeight={['32px']} letterSpacing="-0.8px" fontWeight="bold">
+        <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.8px" fontWeight="bold">
           <FormattedMessage
             id="home.whatCanYouDoSection.areYouReady"
             defaultMessage="Are you ready to make your community sustainable?"

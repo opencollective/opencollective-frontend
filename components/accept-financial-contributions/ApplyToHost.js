@@ -176,7 +176,7 @@ class ApplyToHost extends React.Component {
                   lineHeight={['24px', '24px']}
                   color="black.600"
                   textAlign="center"
-                  order={[2]}
+                  order={2}
                   py={[2, 0]}
                 >
                   {intl.formatMessage(this.messages.interestedInHosting)}
