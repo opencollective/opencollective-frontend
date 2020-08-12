@@ -55,7 +55,7 @@ const FinancialContributionsFAQ = props => (
         as={StyledLink}
         href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
         openInNewTab
-        fontSize="Caption"
+        fontSize="12px"
         color="black.700"
       >
         <FormattedMessage id="moreInfo" defaultMessage="More info" />

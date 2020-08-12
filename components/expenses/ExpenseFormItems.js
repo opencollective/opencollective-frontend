@@ -162,7 +162,7 @@ class ExpenseFormItems extends React.PureComponent {
         ))}
         <Flex alignItems="center" my={3}>
           <Box flex="0 1" flexBasis={['3%', requireFile ? '53%' : '47%']} />
-          <Container fontSize="Caption" fontWeight="500" mr={3} whiteSpace="nowrap">
+          <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap">
             <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
           </Container>
           <ExpenseItemsTotalAmount name={name} currency={values.currency} items={items} />

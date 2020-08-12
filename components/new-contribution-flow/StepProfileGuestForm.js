@@ -76,7 +76,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
                   width="100%"
                   height="150px"
                   maxWidth={350}
-                  fontSize="LeadCaption"
+                  fontSize="13px"
                   onChange={e => onChange({ stepProfile: { ...data, [e.target.name]: e.target.value } })}
                 />
               )}
@@ -105,7 +105,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
           </Box>
         </Flex>
       )}
-      <P fontSize="SmallCaption" color="black.600">
+      <P fontSize="11px" color="black.600">
         <FormattedMessage
           id="ContributionFlow.PublicContribution"
           defaultMessage="Your name and contribution will be public."
@@ -113,7 +113,7 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
       </P>
       <StepProfileInfoMessage amount={amount} />
       {interval && (
-        <P color="black.500" fontSize="Caption" my={3} data-cy="join-conditions">
+        <P color="black.500" fontSize="12px" my={3} data-cy="join-conditions">
           <FormattedMessage
             id="SignIn.legal"
             defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
@@ -128,11 +128,11 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
         <StyledHr width="100%" borderColor="black.300" />
       </Flex>
       <Flex alignItems="center" mt={3}>
-        <P fontSize="Paragraph" mr={2}>
+        <P fontSize="14px" mr={2}>
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </P>
         <Link route={'/signin'} passHref>
-          <StyledLink fontSize="Paragraph">
+          <StyledLink fontSize="14px">
             <FormattedMessage id="signIn" defaultMessage="Sign In" />
             &nbsp;→
           </StyledLink>

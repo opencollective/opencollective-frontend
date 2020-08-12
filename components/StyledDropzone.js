@@ -187,7 +187,7 @@ const StyledDropzone = ({
       ) : (
         <Container position="relative">
           {isDragActive ? (
-            <Container color="primary.500" fontSize="Caption">
+            <Container color="primary.500" fontSize="12px">
               <Box mb={2}>
                 <DownloadIcon size={20} />
               </Box>
@@ -274,7 +274,7 @@ StyledDropzone.defaultProps = {
   minHeight: 96,
   mockImageGenerator: () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   isMulti: true,
-  fontSize: 'Paragraph',
+  fontSize: '14px',
 };
 
 export default StyledDropzone;

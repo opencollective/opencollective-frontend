@@ -13,7 +13,7 @@ import { H1 } from '../Text';
 
 const ExamplesLink = styled(StyledLink)`
   color: ${themeGet('colors.blue.500')};
-  font-size: ${themeGet('fontSizes.Caption')}px;
+  font-size: 12px;
 
   &:hover {
     color: #dc5f7d;
@@ -55,7 +55,13 @@ const CollectiveCategoryPicker = () => {
   return (
     <Fragment>
       <Box mb={4} mt={5}>
-        <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+        <H1
+          fontSize={['20px', '32px']}
+          lineHeight={['24px', '36px']}
+          fontWeight="bold"
+          color="black.900"
+          textAlign="center"
+        >
           <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
         </H1>
       </Box>

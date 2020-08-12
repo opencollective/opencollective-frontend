@@ -126,7 +126,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               error={touched.title && errors.title}
               withOutline
               width="100%"
-              fontSize="H4"
+              fontSize="24px"
               border="none"
               maxLength={255}
               px={0}

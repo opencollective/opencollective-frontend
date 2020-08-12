@@ -97,7 +97,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
         <div>
           {tier.goal && (
             <Box mb={3}>
-              <P fontSize="Paragraph" color="black.600" mb={2}>
+              <P fontSize="14px" color="black.600" mb={2}>
                 <FormattedMessage
                   id="TierPage.AmountGoal"
                   defaultMessage="{amountWithInterval} goal"
@@ -107,14 +107,14 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                         amount={tier.goal}
                         interval={tier.interval}
                         currency={currency}
-                        amountStyles={{ fontWeight: 'bold', fontSize: 'H5', color: 'black.900' }}
+                        amountStyles={{ fontWeight: 'bold', fontSize: '20px', color: 'black.900' }}
                         precision={getPrecisionFromAmount(tier.goal)}
                       />
                     ),
                   }}
                 />
               </P>
-              <P fontSize="Caption" color="black.500">
+              <P fontSize="12px" color="black.500">
                 <FormattedMessage
                   id="TierPage.AmountRaised"
                   defaultMessage="{amountWithInterval} raised"
@@ -171,7 +171,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
         {!isPassed && minAmount > 0 && (
           <div>
             {isFlexibleAmount && (
-              <P fontSize="Tiny" color="black.600" textTransform="uppercase" mb={1}>
+              <P fontSize="10px" color="black.600" textTransform="uppercase" mb={1}>
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
               </P>
             )}
@@ -180,7 +180,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 amount={minAmount}
                 interval={tier.interval}
                 currency={currency}
-                amountStyles={{ fontSize: 'H5', fontWeight: 'bold', color: 'black.900' }}
+                amountStyles={{ fontSize: '20px', fontWeight: 'bold', color: 'black.900' }}
                 precision={getPrecisionFromAmount(minAmount)}
               />
             </P>

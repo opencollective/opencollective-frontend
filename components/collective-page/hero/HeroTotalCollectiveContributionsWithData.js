@@ -21,7 +21,7 @@ const totalCollectiveContributionsQuery = gql`
   }
 `;
 
-const amountStyles = { fontSize: 'H5', fontWeight: 'bold' };
+const amountStyles = { fontSize: '20px', fontWeight: 'bold' };
 
 /**
  * This component fetches its own data because we don't want to query these fields
@@ -39,7 +39,7 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
   const { stats, currency } = data.Collective;
   return (
     <Box my={2}>
-      <P fontSize="Tiny" textTransform="uppercase">
+      <P fontSize="10px" textTransform="uppercase">
         <FormattedMessage id="membership.totalDonations" defaultMessage="Total amount contributed" />
       </P>
       <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountStyles={amountStyles} />

@@ -134,7 +134,7 @@ class ConversationsPage extends React.Component {
               <CollectiveNavbar collective={collective} selected={Sections.CONVERSATIONS} />
               <Container py={[4, 5]} px={[2, 3, 4]}>
                 <Container maxWidth={1200} m="0 auto">
-                  <H1 fontSize="H2" fontWeight="normal" textAlign="left" mb={2}>
+                  <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
                     <FormattedMessage id="conversations" defaultMessage="Conversations" />
                   </H1>
                   <Flex flexWrap="wrap" alignItems="center" mb={4} pr={2} justifyContent="space-between">

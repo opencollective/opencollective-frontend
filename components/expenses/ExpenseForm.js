@@ -284,7 +284,7 @@ const ExpenseFormBody = ({
               name="description"
               placeholder={formatMessage(msg.descriptionPlaceholder)}
               width="100%"
-              fontSize="H4"
+              fontSize="24px"
               border="0"
               error={errors.description}
               mt={3}
@@ -318,7 +318,7 @@ const ExpenseFormBody = ({
                   </Box>
                 )}
                 <Flex alignItems="center" my={24}>
-                  <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
+                  <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
                     {formatMessage(isReceipt ? msg.step1 : msg.step1Invoice)}
                   </Span>
                   <StyledHr flex="1" borderColor="black.300" mx={2} />
@@ -340,7 +340,7 @@ const ExpenseFormBody = ({
             {stepOneCompleted && (
               <React.Fragment>
                 <Flex alignItems="center" mt={24} mb={16}>
-                  <Span color="black.900" fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold">
+                  <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
                     {formatMessage(isReceipt ? msg.step2 : msg.step2Invoice)}
                   </Span>
                   <Box ml={2}>

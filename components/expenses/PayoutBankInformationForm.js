@@ -217,12 +217,12 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   return (
     <Flex flexDirection="column">
       <Box mt={2} flex="1">
-        <P fontSize="LeadParagraph" fontWeight="bold">
+        <P fontSize="16px" fontWeight="bold">
           {requiredFields.title}
         </P>
       </Box>
       <Box mt={3} flex="1">
-        <P fontSize="Paragraph" fontWeight="bold">
+        <P fontSize="14px" fontWeight="bold">
           Account Information
         </P>
       </Box>
@@ -255,7 +255,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
         />
       ))}
       <Box mt={3} flex="1">
-        <P fontSize="Paragraph" fontWeight="bold">
+        <P fontSize="14px" fontWeight="bold">
           Recipient&apos;s Address&nbsp;
           <StyledTooltip content="Address of the owner of the bank account (not the address of the bank)">
             <Info size={16} />

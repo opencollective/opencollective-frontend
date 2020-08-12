@@ -239,7 +239,7 @@ class SectionContributions extends React.PureComponent {
         {!hasContributions ? (
           <Flex flexDirection="column" alignItems="center">
             <img src={EmptyCollectivesSectionImageSVG} alt="" />
-            <P color="black.600" fontSize="LeadParagraph" mt={5}>
+            <P color="black.600" fontSize="16px" mt={5}>
               <FormattedMessage
                 id="CollectivePage.SectionContributions.Empty"
                 defaultMessage="{collectiveName} seems to be hibernating in a cave in the North Pole ❄️☃️!"
@@ -256,7 +256,7 @@ class SectionContributions extends React.PureComponent {
                     <FormattedMessage id="Contributions" defaultMessage="Contributions" />
                   </SectionTitle>
                   {data.Collective.stats.collectives.hosted > 0 && (
-                    <H3 fontSize="H5" fontWeight="500" color="black.600">
+                    <H3 fontSize="20px" fontWeight="500" color="black.600">
                       <FormattedMessage
                         id="organization.collective.memberOf.collective.host.title"
                         values={{ n: data.Collective.stats.collectives.hosted }}

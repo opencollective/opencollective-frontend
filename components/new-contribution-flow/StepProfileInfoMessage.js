@@ -31,7 +31,7 @@ const NewContributionFlowStepProfileInfoMessage = ({ amount }) => {
   };
 
   return (
-    <MessageBox type="info" fontSize="Caption" color="black.800" my={3} py={2}>
+    <MessageBox type="info" fontSize="12px" color="black.800" my={3} py={2}>
       {renderInfoMessage(amount)}
     </MessageBox>
   );

@@ -89,7 +89,7 @@ class GiftCard extends React.Component {
         </Container>
         {expiryDate && (
           <Container position="absolute" left={['6px', '12px']} bottom={['3px', '5px']}>
-            <P mt={2} fontSize="Caption" color="black.700">
+            <P mt={2} fontSize="12px" color="black.700">
               <Clock size="1.2em" />
               <Span ml={1} css={{ verticalAlign: 'middle' }}>
                 <FormattedMessage

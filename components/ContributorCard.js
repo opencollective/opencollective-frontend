@@ -117,17 +117,17 @@ const ContributorCard = ({ intl, width, height, contributor, currency, isLoggedU
       </CollectiveLogoContainer>
       <Flex flexDirection="column" alignItems="center" p={2} pt={1}>
         <LinkContributor contributor={contributor}>
-          <H5 fontSize="Paragraph" fontWeight="bold" textAlign="center" lineHeight="Caption" title={contributor.name}>
+          <H5 fontSize="14px" fontWeight="bold" textAlign="center" lineHeight="18px" title={contributor.name}>
             {truncate(contributor.name, { length: 16 })}
           </H5>
         </LinkContributor>
         <ContributorTag>{formatMemberRole(intl, getMainContributorRole(contributor))}</ContributorTag>
         {contributor.totalAmountDonated > 0 && (
           <React.Fragment>
-            <P fontSize="Tiny" lineHeight="Caption" color="black.500">
+            <P fontSize="10px" lineHeight="18px" color="black.500">
               <FormattedMessage id="ContributorCard.Total" defaultMessage="Total contributions" />
             </P>
-            <P fontSize="Caption" fontWeight="bold">
+            <P fontSize="12px" fontWeight="bold">
               <FormattedMoneyAmount amount={contributor.totalAmountDonated} currency={currency} precision={0} />
             </P>
           </React.Fragment>

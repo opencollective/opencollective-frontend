@@ -90,7 +90,7 @@ const OrderBudgetItem = ({ collective, fromCollective, isInverted, isExpanded, s
             minWidth={100}
             justifyContent="flex-end"
             data-cy="transaction-amount"
-            fontSize="LeadParagraph"
+            fontSize="16px"
             ml="auto"
           >
             <TransactionSign isCredit={isCredit} />

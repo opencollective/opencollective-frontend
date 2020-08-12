@@ -138,7 +138,7 @@ class EditUserEmailForm extends React.Component {
           </Flex>
         </Flex>
         {error && (
-          <Span p={2} color="red.500" fontSize="Caption">
+          <Span p={2} color="red.500" fontSize="12px">
             {error}
           </Span>
         )}

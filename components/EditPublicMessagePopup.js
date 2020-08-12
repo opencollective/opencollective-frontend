@@ -154,7 +154,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                 <Times size="1em" color="#a2a2a2" cursor="pointer" onClick={onClose} />
               </Flex>
               <Flex flexDirection="column" p={2}>
-                <Span fontSize="Paragraph" color="black.600" mb={2}>
+                <Span fontSize="14px" color="black.600" mb={2}>
                   <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (Optional)" />
                 </Span>
 
@@ -165,7 +165,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                   py={10}
                   width="100%"
                   height={112}
-                  fontSize="Paragraph"
+                  fontSize="14px"
                   style={{ resize: 'none' }}
                   placeholder={intl.formatMessage(messages.publicMessagePlaceholder)}
                   value={messageDraft}
@@ -174,7 +174,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                   disabled={loading}
                 />
                 {error && (
-                  <Span color="red.500" fontSize="Caption" mt={2}>
+                  <Span color="red.500" fontSize="12px" mt={2}>
                     {error}
                   </Span>
                 )}

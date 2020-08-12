@@ -11,8 +11,8 @@ const SectionTitle = styled.h2`
 `;
 
 SectionTitle.defaultProps = {
-  fontSize: 'H3',
-  lineHeight: 'H3',
+  fontSize: '32px',
+  lineHeight: '36px',
   fontWeight: 'normal',
   color: 'black.900',
   mb: 3,

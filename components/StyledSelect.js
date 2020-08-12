@@ -78,8 +78,8 @@ const GroupHeading = ({ children, ...props }) => (
     <Flex justifyContent="space-between" alignItems="center" mr={2}>
       <P
         fontWeight="600"
-        fontSize="H6"
-        lineHeight="H6"
+        fontSize="9px"
+        lineHeight="14px"
         textTransform="uppercase"
         letterSpacing="0.6px"
         whiteSpace="nowrap"
@@ -232,7 +232,7 @@ StyledSelect.propTypes = {
 };
 
 StyledSelect.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
   controlStyles: {},
 };
 

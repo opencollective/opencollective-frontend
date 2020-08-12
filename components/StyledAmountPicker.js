@@ -149,7 +149,7 @@ const StyledAmountPicker = ({ presets, currency, min, value, onChange }) => {
         </Container>
       </Flex>
       {Boolean(min) && (
-        <Flex fontSize="Caption" color="black.500" flexDirection="column" alignItems="flex-end" mt={1}>
+        <Flex fontSize="12px" color="black.500" flexDirection="column" alignItems="flex-end" mt={1}>
           <FormattedMessage
             id="contribuion.minimumAmount"
             defaultMessage="Minimum amount: {minAmount} {currency}"

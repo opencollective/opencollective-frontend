@@ -52,7 +52,7 @@ const PrivateInfoColumn = styled(Box).attrs({ mx: [0, '8px'], flexBasis: [0, '20
 `;
 
 const PrivateInfoColumnHeader = styled(H4).attrs({
-  fontSize: 'Tiny',
+  fontSize: '10px',
   fontWeight: 'bold',
   textTransform: 'uppercase',
   color: 'black.500',
@@ -93,7 +93,7 @@ const ExpenseSummary = ({
             status={expense.status}
             letterSpacing="0.8px"
             fontWeight="600"
-            fontSize="Tiny"
+            fontSize="10px"
             showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
             showTaxFormMsg={expense.payee.isAdmin}
           />
@@ -108,7 +108,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} fontSize="Caption" color="black.600">
+            <P ml={2} fontSize="12px" color="black.600">
               {expense.createdAt ? (
                 <FormattedMessage
                   id="Expense.SubmittedByOnDate"
@@ -130,7 +130,7 @@ const ExpenseSummary = ({
         {isLoading ? (
           <LoadingPlaceholder height={20} maxWidth={150} />
         ) : (
-          <Span fontWeight="bold" fontSize="LeadParagraph">
+          <Span fontWeight="bold" fontSize="16px">
             {isReceipt ? (
               <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
             ) : (
@@ -167,7 +167,7 @@ const ExpenseSummary = ({
                         </Span>
                       )}
                     </Span>
-                    <Span mt={1} fontSize="Caption" color="black.500">
+                    <Span mt={1} fontSize="12px" color="black.500">
                       <FormattedMessage
                         id="withColon"
                         defaultMessage="{item}:"
@@ -195,7 +195,7 @@ const ExpenseSummary = ({
       )}
       <Flex justifyContent="flex-end" mt={4} mb={2}>
         <Flex alignItems="center">
-          <Container fontSize="Caption" fontWeight="500" mr={3} whiteSpace="nowrap">
+          <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap">
             <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
           </Container>
           {isLoading ? (
@@ -217,7 +217,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={payee}>
               <Flex alignItems="center">
                 <Avatar collective={payee} radius={24} />
-                <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
+                <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
                   {payee.name}
                 </Span>
               </Flex>
@@ -239,7 +239,7 @@ const ExpenseSummary = ({
             <PrivateInfoColumnHeader>
               <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
             </PrivateInfoColumnHeader>
-            <Container fontSize="Caption" color="black.600">
+            <Container fontSize="12px" color="black.600">
               <Box mb={3} data-cy="expense-summary-payout-method-type">
                 <PayoutMethodTypeWithIcon type={expense.payoutMethod?.type} />
               </Box>
@@ -268,7 +268,7 @@ const ExpenseSummary = ({
               <LinkCollective collective={host}>
                 <Flex alignItems="center">
                   <Avatar collective={host} radius={24} />
-                  <Span ml={2} color="black.900" fontSize="Caption" fontWeight="bold" truncateOverflow>
+                  <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
                     {host.name}
                   </Span>
                 </Flex>

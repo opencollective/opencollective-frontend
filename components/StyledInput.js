@@ -104,7 +104,7 @@ StyledInput.defaultProps = {
   px: 3,
   py: 2,
   lineHeight: '1.5',
-  fontSize: 'Paragraph',
+  fontSize: '14px',
 };
 
 export const TextInput = styled(StyledInput)``;

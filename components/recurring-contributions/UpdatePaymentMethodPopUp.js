@@ -167,7 +167,7 @@ const UpdatePaymentMethodPopUp = ({
   return (
     <Fragment>
       <Flex width={1} alignItems="center" justifyContent="center" minHeight={50} px={3}>
-        <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+        <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
           {showAddPaymentMethod
             ? intl.formatMessage(messages.addPaymentMethod)
             : intl.formatMessage(messages.updatePaymentMethod)}
@@ -221,7 +221,7 @@ const UpdatePaymentMethodPopUp = ({
                     {title}
                   </P>
                   {subtitle && (
-                    <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
+                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
                       {subtitle}
                     </P>
                   )}

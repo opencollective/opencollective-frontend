@@ -960,7 +960,7 @@ class CreateOrderPage extends React.Component {
               <Fragment>
                 <FeesOnTopContainer p={3} mt={3}>
                   <Box maxWidth={['100%', '75%']}>
-                    <P fontSize="Caption" my={2}>
+                    <P fontSize="12px" my={2}>
                       <FormattedMessage
                         defaultMessage="Open Collective Platform is free for charitable initiatives. We rely on the generosity of contributors like you to keep this possible!"
                         id="platformFee.info"
@@ -969,7 +969,7 @@ class CreateOrderPage extends React.Component {
                   </Box>
                   <Flex mt={3} flexDirection={['column', 'row']}>
                     <Box maxWidth="50%">
-                      <P fontSize="Caption" fontWeight="600" my={2}>
+                      <P fontSize="12px" fontWeight="600" my={2}>
                         <FormattedMessage
                           defaultMessage="Thank you for supporting us with a contribution:"
                           id="platformFee.support"
@@ -992,7 +992,7 @@ class CreateOrderPage extends React.Component {
                         my={2}
                         width="100%"
                       />
-                      <P fontSize="Caption" color="colors.black.300" mt={1} textAlign={['right', null]}>
+                      <P fontSize="12px" color="colors.black.300" mt={1} textAlign={['right', null]}>
                         <FormattedMessage
                           defaultMessage="Total contribution: {amount} {frequency}"
                           id="platformFee.totalContribution"
@@ -1045,7 +1045,7 @@ class CreateOrderPage extends React.Component {
                 </FeesOnTopContainer>
                 {taxDeductible && (
                   <Box p={1} mt={2}>
-                    <P fontSize="LeadCaption" color="colors.black.300">
+                    <P fontSize="13px" color="colors.black.300">
                       <FormattedMessage
                         defaultMessage="This Collective's Fiscal Host is a registered 501 c(3) non-profit organization. Your contribution will be tax-deductible to the extent allowed by the law."
                         id="platformFee.taxDeductible"

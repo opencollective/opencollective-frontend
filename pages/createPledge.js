@@ -47,7 +47,7 @@ const labelStyles = {
 
 const Details = styled.details`
   &[open] {
-    font-size: ${themeGet('fontSizes.Paragraph')}px;
+    font-size: 14px;
     margin-bottom: ${themeGet('space.4')}px;
 
     summary::after {
@@ -57,7 +57,7 @@ const Details = styled.details`
 
   summary {
     color: ${themeGet('colors.black.900')};
-    font-size: ${themeGet('fontSizes.LeadParagraph')}px;
+    font-size: 16px;
     font-weight: 500;
     margin-bottom: ${themeGet('space.3')}px;
   }
@@ -85,7 +85,7 @@ const WordCountTextarea = () => {
         border="1px solid"
         borderColor="black.300"
         borderRadius="4px"
-        fontSize="Paragraph"
+        fontSize="14px"
         as="textarea"
         id="publicMessage"
         name="publicMessage"
@@ -348,13 +348,7 @@ class CreatePledgePage extends React.Component {
               )}
 
               {!loadingLoggedInUser && !LoggedInUser && (
-                <P
-                  mt={[5, null, 4]}
-                  color="black.700"
-                  fontSize="LeadParagraph"
-                  lineHeight="LeadParagraph"
-                  data-cy="signupOrLogin"
-                >
+                <P mt={[5, null, 4]} color="black.700" fontSize="16px" lineHeight="24px" data-cy="signupOrLogin">
                   <FormattedMessage
                     id="createPledge.signinToCreate"
                     defaultMessage="<signin-link>Sign in or join free</signin-link> to create a pledge."
@@ -390,7 +384,7 @@ class CreatePledgePage extends React.Component {
                         </P>
                       </Container>
 
-                      <P color="black.500" fontSize="Caption" mt={2}>
+                      <P color="black.500" fontSize="12px" mt={2}>
                         <FormattedMessage
                           id="createPledge.priviledge"
                           defaultMessage="You’ve earned the privilege to name and describe this awesome cause. We’ll create a pledged
@@ -528,7 +522,7 @@ class CreatePledgePage extends React.Component {
                     {data.Collective.name}
                   </H3>
 
-                  <StyledLink fontSize="Paragraph" href={website}>
+                  <StyledLink fontSize="14px" href={website}>
                     {website}
                   </StyledLink>
                 </Container>

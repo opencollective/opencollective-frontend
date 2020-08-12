@@ -243,7 +243,7 @@ class EditPaymentMethods extends React.Component {
               {'  '}
               <FormattedMessage id="paymentMethods.creditcard.add" defaultMessage="Add a credit card" />
             </StyledButton>
-            <Span fontSize="Caption" mt={2} color="black.600">
+            <Span fontSize="12px" mt={2} color="black.600">
               <FormattedMessage
                 id="paymentMethods.creditcard.add.info"
                 defaultMessage="To make donations as {contributeAs}"

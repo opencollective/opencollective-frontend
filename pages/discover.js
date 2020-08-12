@@ -187,10 +187,15 @@ const DiscoverPage = () => {
               textAlign="center"
               data-cy="discover-banner"
             >
-              <H1 color="white.full" fontSize={['H3', null, 'H2']} lineHeight={['H3', null, 'H2']} textAlign="center">
+              <H1
+                color="white.full"
+                fontSize={['32px', null, '40px']}
+                lineHeight={['36px', null, '44px']}
+                textAlign="center"
+              >
                 <FormattedMessage id="discover.title" defaultMessage="Discover awesome collectives to support" />
               </H1>
-              <P color="white.full" fontSize="H5" lineHeight="H5" mt={1}>
+              <P color="white.full" fontSize="20px" lineHeight="24px" mt={1}>
                 <FormattedMessage id="discover.subTitle" defaultMessage="Let's make great things together." />
               </P>
 

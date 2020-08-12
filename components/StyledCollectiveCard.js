@@ -145,7 +145,7 @@ const StyledCollectiveCard = ({ collective, tag, bodyHeight, children, ...props 
         <Flex flexDirection="column" justifyContent="space-between" height={bodyHeight}>
           <Container p={3}>
             <LinkCollective collective={collective}>
-              <P fontSize="LeadParagraph" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
+              <P fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
                 {collective.name}
               </P>
             </LinkCollective>

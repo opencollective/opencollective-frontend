@@ -88,10 +88,10 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
         <TypeIllustration src={type === expenseTypes.RECEIPT ? receiptIllustration : invoiceIllustration} />
       </Box>
       <Box maxWidth={250}>
-        <P fontSize="LeadParagraph" fontWeight="bold" mb={2}>
+        <P fontSize="16px" fontWeight="bold" mb={2}>
           {formatMessage(ExpenseTypeLabels[type])}
         </P>
-        <P fontSize="Caption" color="black.600" fontWeight="normal">
+        <P fontSize="12px" color="black.600" fontWeight="normal">
           {formatMessage(ExpenseTypeDescription[type])}
         </P>
       </Box>

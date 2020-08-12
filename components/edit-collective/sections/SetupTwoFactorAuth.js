@@ -42,7 +42,7 @@ const messages = defineMessages({
 
 const content = () => (
   <div>
-    <P fontSize="Caption" lineHeight="Caption">
+    <P fontSize="12px" lineHeight="18px">
       <FormattedMessage
         id="TwoFactorAuth.Setup.AppInfo"
         defaultMessage="You can use apps such as Google Authenticator, Authy, 1Password, LastPass, or Microsoft Authenticator to scan the QR code and receive a code to input."
@@ -248,7 +248,7 @@ class SetupTwoFactorAuth extends React.Component {
                                   {...inputProps}
                                   minWidth={300}
                                   minHeight={75}
-                                  fontSize={'H5'}
+                                  fontSize="20px"
                                   placeholder="123456"
                                   pattern="[0-9]{6}"
                                   autoFocus

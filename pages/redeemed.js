@@ -228,7 +228,7 @@ class RedeemedPage extends React.Component {
                             mb={3}
                             size={[48, 64]}
                             avatarSize={[24, 32]}
-                            fontSize="Paragraph"
+                            fontSize="14px"
                             boxShadow="0 0 8px rgba(0, 0, 0, 0.24) inset"
                             borderColor="blue.200"
                             p={2}

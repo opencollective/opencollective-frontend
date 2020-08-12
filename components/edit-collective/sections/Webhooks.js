@@ -197,7 +197,7 @@ class Webhooks extends React.Component {
 
         <Box width={[1, 0.75]}>
           <Box mb={4}>
-            <Span fontSize="Paragraph" mb={1}>
+            <Span fontSize="14px" mb={1}>
               {intl.formatMessage(messages['webhooks.url.label'])}
             </Span>
             <StyledInputGroup
@@ -210,7 +210,7 @@ class Webhooks extends React.Component {
             />
           </Box>
           <Box>
-            <Span fontSize="Paragraph">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
+            <Span fontSize="14px">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
             <StyledSelect
               options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(webhook => ({
                 label: webhook,

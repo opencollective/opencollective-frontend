@@ -150,8 +150,8 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
           <Flex justifyContent="space-between" alignItems="center" mb={2}>
             <P
               fontWeight="600"
-              fontSize="H6"
-              lineHeight="H6"
+              fontSize="9px"
+              lineHeight="14px"
               textTransform="uppercase"
               letterSpacing="0.6px"
               whiteSpace="nowrap"

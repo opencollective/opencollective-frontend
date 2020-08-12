@@ -64,10 +64,10 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
           maxWidth={360}
         >
           <Box px={32} py={24}>
-            <P fontSize="H5" fontWeight={600} mb={3}>
+            <P fontSize="20px" fontWeight={600} mb={3}>
               <FormattedMessage id="CollectiveColorPicker.Title" defaultMessage="Select page color" />
             </P>
-            <P fontSize="LeadParagraph" mb={3}>
+            <P fontSize="16px" mb={3}>
               <FormattedMessage id="CollectiveColorPicker.Preset" defaultMessage="Preset colors" />
             </P>
             <Flex flexWrap="wrap" justifyContent="space-between">
@@ -82,7 +82,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                 </ColorPreset>
               ))}
             </Flex>
-            <P fontSize="LeadParagraph" mt={3} mb={2}>
+            <P fontSize="16px" mt={3} mb={2}>
               <FormattedMessage id="CollectiveColorPicker.Custom" defaultMessage="Use custom color" />
             </P>
             <Flex>

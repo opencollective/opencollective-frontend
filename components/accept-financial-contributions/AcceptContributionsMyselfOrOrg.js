@@ -193,7 +193,13 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
       <Fragment>
         <CollectiveNavbar collective={collective} onlyInfos={true} />
         <Box mb={2} mt={5} mx={[2, 6]}>
-          <H1 fontSize={['H5', 'H3']} lineHeight={['H5', 'H3']} fontWeight="bold" color="black.900" textAlign="center">
+          <H1
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '36px']}
+            fontWeight="bold"
+            color="black.900"
+            textAlign="center"
+          >
             <FormattedMessage id="acceptContributions.picker.header" defaultMessage="Accept financial contributions" />
           </H1>
         </Box>
@@ -202,17 +208,17 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
             {noOrganizationPicked ? (
               <Fragment>
                 <Image src={acceptOrganizationIllustration} alt="" />
-                <H2 fontSize="H5" fontWeight="bold" color="black.900" textAlign="center">
+                <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
                   <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our organization" />
                 </H2>
               </Fragment>
             ) : (
               <Fragment>
                 <Avatar collective={organizationPicked ? organization : LoggedInUser.collective} radius={64} mb={2} />
-                <P fontSize="LeadParagraph" lineHeight="LeadCaption" fontWeight="bold" mb={3}>
+                <P fontSize="16px" lineHeight="21px" fontWeight="bold" mb={3}>
                   {organizationPicked ? organization.name : LoggedInUser.collective.name}
                 </P>
-                <H2 fontSize="H5" fontWeight="bold" color="black.900" textAlign="center">
+                <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
                   {router.query.method === 'bank' ? (
                     <FormattedMessage id="acceptContributions.addBankAccount" defaultMessage="Add bank account" />
                   ) : (
@@ -228,7 +234,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
           {noOrganizationPicked && (
             <Flex flexDirection="column" justifyContent="center" alignItems="center" my={3} minWidth={'450px'}>
               <Flex px={3} width="100%">
-                <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+                <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
                   <FormattedMessage id="acceptContributions.organization.myOrgs" defaultMessage="My organizations" />
                 </P>
                 <Flex flexGrow={1} alignItems="center">
@@ -257,7 +263,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                 </Flex>
               )}
               <Flex px={3} width="100%">
-                <P my={2} fontSize="Caption" textTransform="uppercase" color="black.700">
+                <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
                   <FormattedMessage id="CollectivePicker.CreateNew" defaultMessage="Create new" />
                 </P>
                 <Flex flexGrow={1} alignItems="center">
@@ -282,7 +288,7 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
                     data-cy="afc-organization-create-new"
                   >
                     <PlusCircle size="24" color="gray" />
-                    <P fontSize="Caption" color="black.800" ml={2}>
+                    <P fontSize="12px" color="black.800" ml={2}>
                       <FormattedMessage id="Organization.CreateNew" defaultMessage="Create new Organization" />
                     </P>
                   </CreateNewOrg>
@@ -295,22 +301,22 @@ class AcceptContributionsMyselfOrOrg extends React.Component {
               <Box width={1 / 5} display={['none', null, 'block']}></Box>
               <Flex width={[1, 1 / 2]} flexDirection="column" justifyContent="center" alignItems="center" px={3}>
                 <Box alignItems="center">
-                  <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize={['Paragraph']}>
+                  <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize="14px">
                     <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
                   </P>
-                  <P color="black.900" textAlign="left" mt={[2, 3]} fontSize={['Paragraph']}>
+                  <P color="black.900" textAlign="left" mt={[2, 3]} fontSize="14px">
                     <FormattedMessage
                       id="acceptContributions.HowDoesItWork.details"
                       defaultMessage="Financial contributors will be able to choose 'Bank transfer' as a payment method. Instructions to make the transfer, which you define, will be emailed to them, along with a unique order ID. Once you receive the money, you can mark the corresponding pending order as paid and the funds will be credited to the Collective's balance."
                     />
                   </P>
-                  <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize={['Paragraph']}>
+                  <P color="black.900" textAlign="left" mt={[2, 3]} fontWeight="bold" fontSize="14px">
                     <FormattedMessage
                       id="acceptContributions.definePaymentInstructions"
                       defaultMessage="Define payment instructions"
                     />
                   </P>
-                  <P color="black.900" textAlign="left" mt={[2, 3]} fontSize={['Paragraph']}>
+                  <P color="black.900" textAlign="left" mt={[2, 3]} fontSize="14px">
                     <FormattedMessage
                       id="acceptContributions.definePaymentInstructionsDetails"
                       defaultMessage="Include any details contributors will need to send you money, such as: account name and number; IBAN, Swift, or routing codes; bank name and address, etc. The amount and order ID will be automatically included."

@@ -39,7 +39,7 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
             {title}
           </H5>
         </Link>
-        <P color="black.500" fontSize="Caption">
+        <P color="black.500" fontSize="12px">
           <FormattedMessage
             id="update.publishedAtBy"
             defaultMessage="Published on {date} by {author}"
@@ -74,7 +74,7 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
                 alignItems="center"
                 color="black.500"
                 title={formatMessage(messages.commentsCount, { n: stats.commentsCount })}
-                fontSize="Caption"
+                fontSize="12px"
                 data-cy="replies-count"
               >
                 <CommentIcon size="1em" color="#9D9FA3" />

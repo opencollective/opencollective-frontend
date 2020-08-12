@@ -182,7 +182,7 @@ class SignInOrJoinFree extends React.Component {
                         {...inputProps}
                         minWidth={300}
                         minHeight={75}
-                        fontSize={'H5'}
+                        fontSize="20px"
                         placeholder="123456"
                         pattern="[0-9]{6}"
                         autoFocus
@@ -260,7 +260,7 @@ class SignInOrJoinFree extends React.Component {
                   />
                   <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
                 </Flex>
-                <P mt={4} color="black.500" fontSize="Caption" mb={3} data-cy="join-conditions">
+                <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions">
                   <FormattedMessage
                     id="SignIn.legal"
                     defaultMessage="By joining, you agree to our <tos-link>Terms of Service</tos-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."

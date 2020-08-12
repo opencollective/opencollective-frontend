@@ -152,7 +152,7 @@ const ThreadActivity = ({ activity }) => {
                 }}
               />
             </Span>
-            <Span color="black.600" fontSize="Caption" title={activity.createdAt}>
+            <Span color="black.600" fontSize="12px" title={activity.createdAt}>
               <FormattedMessage
                 id="UpdatedOnDate"
                 defaultMessage="Updated on {date, date, long}"

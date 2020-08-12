@@ -171,7 +171,7 @@ class UpdateBankDetailsForm extends React.Component {
         </Container>
 
         {error && (
-          <Span display="block" color="red.500" pt={2} fontSize="Tiny">
+          <Span display="block" color="red.500" pt={2} fontSize="10px">
             {error}
           </Span>
         )}

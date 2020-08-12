@@ -59,7 +59,7 @@ const Translations = defineMessages({
 
 const StyledShortDescription = styled.h2`
   margin-top: 8px;
-  font-size: ${props => props.theme.fontSizes.LeadParagraph}px;
+  font-size: 16px;
   line-height: 24px;
 
   @media (min-width: 40em) {
@@ -168,12 +168,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
               </StyledButton>
             </Link>
           )}
-          <H1 color="black.800" fontSize="H3" lineHeight="H3" textAlign="left" data-cy="collective-title">
+          <H1 color="black.800" fontSize="32px" lineHeight="36px" textAlign="left" data-cy="collective-title">
             {collective.name || collective.slug}
           </H1>
 
           {collective.company && (
-            <StyledLink as={UserCompany} fontSize="H5" fontWeight={600} company={collective.company} />
+            <StyledLink as={UserCompany} fontSize="20px" fontWeight={600} company={collective.company} />
           )}
           {!isEvent && (
             <Flex alignItems="center" flexWrap="wrap">
@@ -294,13 +294,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                       borderBottom="2px dotted #969ba3"
                       color="black.700"
                       textDecoration="none"
-                      fontSize="Caption"
+                      fontSize="12px"
                       mr={2}
                     >
                       <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
                     </StyledLink>
                   )}
-                  <Container ml={2} mr={3} color="black.500" fontSize="Caption">
+                  <Container ml={2} mr={3} color="black.500" fontSize="12px">
                     <FormattedMessage
                       id="Hero.HostFee"
                       defaultMessage="Host fee: {fee}"

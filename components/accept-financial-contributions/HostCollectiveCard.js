@@ -116,18 +116,18 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
       <StyledCollectiveCard collective={host} minWidth={250} height={350} position="relative" {...props}>
         <Container pl={3} flexShrink={1}>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
-            <P fontSize="LeadParagraph" fontWeight="bold">
+            <P fontSize="16px" fontWeight="bold">
               {host.totalHostedCollectives || 0}
             </P>
-            <P ml={2} fontSize="Caption">
+            <P ml={2} fontSize="12px">
               {formatMessage(messages.collectives)}
             </P>
           </Flex>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
-            <P fontSize="LeadParagraph" fontWeight="bold">
+            <P fontSize="16px" fontWeight="bold">
               {formatCurrency(host.stats.yearlyBudgetManaged.value * 100, host.currency, { precision: 0 })}
             </P>
-            <P ml={2} fontSize="Caption">
+            <P ml={2} fontSize="12px">
               {host.currency} {formatMessage(messages.managed)}
             </P>
           </Flex>
@@ -150,7 +150,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
         <ModalHeader onClose={() => setShow(false)}>
           <Flex flexDirection="column" alignItems="flex-start" width="100%">
             <Avatar collective={host} radius={64} />
-            <H1 fontSize="H5" color="black.900">
+            <H1 fontSize="20px" color="black.900">
               {host.name}
             </H1>
             <Flex justifyContent="space-between" width="100%">
@@ -161,10 +161,10 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
                 </P>
               </Flex>
               <Flex flexDirection="column">
-                <P fontSize="Caption" color="black.500">
+                <P fontSize="12px" color="black.500">
                   {formatMessage(messages.currency)}
                 </P>
-                <P fontSize="LeadParagraph">{host.currency}</P>
+                <P fontSize="16px">{host.currency}</P>
               </Flex>
               <Flex flexDirection="column">
                 <P>{formatMessage(messages.hostFee)}</P>

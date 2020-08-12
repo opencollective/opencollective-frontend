@@ -58,7 +58,7 @@ const InvoicesReceipts = ({ collective }) => {
         &nbsp;<i>Payment Receipt</i>.
       </P>
       {error && (
-        <MessageBox type="error" fontSize="Paragraph" withIcon mb={3}>
+        <MessageBox type="error" fontSize="14px" withIcon mb={3}>
           {getErrorFromGraphqlException(setValue).message}
         </MessageBox>
       )}
@@ -80,7 +80,7 @@ const InvoicesReceipts = ({ collective }) => {
             width="100%"
             height="150px"
             maxWidth={350}
-            fontSize="LeadCaption"
+            fontSize="13px"
             my={2}
           />
 

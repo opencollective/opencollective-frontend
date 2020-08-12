@@ -17,8 +17,8 @@ import StyledCard from './StyledCard';
 import { Span } from './Text';
 
 const PublicMessage = styled.p`
-  font-size: ${themeGet('fontSizes.Tiny')}px;
-  lineheight: ${themeGet('fontSizes.Caption')}px;
+  font-size: 10px;
+  line-height: 14px;
   color: ${themeGet('colors.black.600')};
   margin-top: 12px;
   text-align: center;
@@ -131,9 +131,9 @@ class OrderSuccessContributorCardWithData extends React.Component {
             mt={2}
             px={2}
             justifyContent="center"
-            fontSize="Paragraph"
+            fontSize="14px"
             fontWeight="bold"
-            lineHeight="Caption"
+            lineHeight="18px"
             color="black.900"
             textAlign="center"
           >
@@ -142,10 +142,10 @@ class OrderSuccessContributorCardWithData extends React.Component {
           <Flex flexDirection="column" p={12} alignItems="center">
             {totalAmount !== 0 && (
               <React.Fragment>
-                <Span fontSize="Tiny">
+                <Span fontSize="10px">
                   <FormattedMessage id="contributeFlow.contributedTotal" defaultMessage="Contributed a total of:" />
                 </Span>
-                <Span fontSize="Caption">
+                <Span fontSize="12px">
                   <FormattedMoneyAmount
                     precision={2}
                     amount={totalAmount}
@@ -166,7 +166,7 @@ class OrderSuccessContributorCardWithData extends React.Component {
               <Span
                 mt={2}
                 cursor="pointer"
-                fontSize="Tiny"
+                fontSize="10px"
                 color="black.600"
                 textAlign="center"
                 onClick={this.showPopup}

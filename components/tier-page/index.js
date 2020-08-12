@@ -146,7 +146,7 @@ class TierPage extends Component {
     const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
     return (
       <div>
-        <P fontSize="LeadParagraph" color="black.700" fontWeight="bold" mt={4} mb={3}>
+        <P fontSize="16px" color="black.700" fontWeight="bold" mt={4} mb={3}>
           <FormattedMessage id="TierPage.ShareGoal" defaultMessage="Share this goal" />
         </P>
         <ShareButtons pageUrl={pageUrl} collective={this.props.collective} />
@@ -199,10 +199,10 @@ class TierPage extends Component {
                 py={[4, 5]}
                 boxShadow="-3px 11px 13px rgba(75, 75, 75, 0.1)"
               >
-                <P fontSize="LeadParagraph" color="#C0C5CC" mb={3}>
+                <P fontSize="16px" color="#C0C5CC" mb={3}>
                   <FormattedMessage id="TierPage.FinancialGoal" defaultMessage="Financial Goal" />
                 </P>
-                <H1 fontSize="H2" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
+                <H1 fontSize="40px" textAlign="left" color="black.900" wordBreak="break-word" mb={3} data-cy="TierName">
                   <InlineEditField
                     mutation={editTierMutation}
                     canEdit={canEdit}
@@ -214,7 +214,7 @@ class TierPage extends Component {
                 </H1>
                 <H2
                   color="black.600"
-                  fontSize="H5"
+                  fontSize="20px"
                   lineHeight="1.5em"
                   mb={4}
                   whiteSpace="pre-line"
@@ -271,9 +271,9 @@ class TierPage extends Component {
               <ProgressInfoContainer>
                 {tier.goal && (
                   <P
-                    fontSize={['Caption', 'Paragraph', null, 'H5']}
+                    fontSize={['12px', '14px', null, '20px']}
                     color="black.500"
-                    lineHeight={['LeadParagraph', null, null, 'H3']}
+                    lineHeight={['24px', null, null, '36px']}
                     mb={[0, null, null, 3]}
                     truncateOverflow
                   >
@@ -297,9 +297,9 @@ class TierPage extends Component {
                   </P>
                 )}
                 <P
-                  fontSize={['Tiny', 'Paragraph']}
+                  fontSize={['10px', '14px']}
                   color="black.500"
-                  lineHeight={['Caption', null, 'LeadParagraph']}
+                  lineHeight={['18px', null, '24px']}
                   mb={[0, null, null, 2]}
                   truncateOverflow
                 >

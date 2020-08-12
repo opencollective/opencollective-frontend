@@ -202,7 +202,7 @@ const StepDetails = ({
           </StyledInputField>
         )}
       </Flex>
-      <Flex fontSize="Caption" color="black.500" flexDirection="column" alignItems="flex-end" mb={3}>
+      <Flex fontSize="12px" color="black.500" flexDirection="column" alignItems="flex-end" mb={3}>
         <FormattedMessage
           id="contribuion.minimumAmount"
           values={{ minAmount: formatCurrency(minAmount, currency), currency: currency }}

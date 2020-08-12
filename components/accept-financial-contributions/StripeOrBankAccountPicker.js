@@ -142,7 +142,7 @@ class StripeOrBankAccountPicker extends React.Component {
                   </StyledButton>
                 )}
                 <Box minHeight={50} px={3}>
-                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.stripe.info"
                       defaultMessage="Automatically accept contributions with credit cards from all over the world. {fees}."
@@ -210,7 +210,7 @@ class StripeOrBankAccountPicker extends React.Component {
                   </Link>
                 )}
                 <Box minHeight={50} px={3}>
-                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['Caption', 'Paragraph']}>
+                  <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                     <FormattedMessage
                       id="acceptContributions.bankAccount.info"
                       defaultMessage="Manually sync contributions received on your bank account with your Collective's budget. It's free up to $1000. {hostPlans}."

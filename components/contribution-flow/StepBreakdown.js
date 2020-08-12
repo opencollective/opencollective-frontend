@@ -35,7 +35,7 @@ const Label = styled(Span)`
   min-width: 210px;
 `;
 Label.defaultProps = {
-  fontSize: 'Paragraph',
+  fontSize: '14px',
   mr: 1,
 };
 
@@ -51,7 +51,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
         <Label fontWeight={500} color="black.800">
           <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for collective" />
         </Label>
-        <Span fontSize="LeadParagraph" fontWeight={500} color="black.700">
+        <Span fontSize="16px" fontWeight={500} color="black.700">
           {formatCurrency(netAmountForCollective, currency)}
         </Span>
       </AmountLine>
@@ -61,7 +61,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
             <FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />
             {` (-${platformFeePercent}%)`}
           </Label>
-          <Span fontSize="LeadParagraph" color="black.500">
+          <Span fontSize="16px" color="black.500">
             {formatCurrency(platformFee, currency)}
           </Span>
         </AmountLine>
@@ -72,7 +72,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
             <FormattedMessage id="contribution.hostFeePercent" defaultMessage="Fiscal host fee" />
             {` (-${hostFeePercent}%)`}
           </Label>
-          <Span fontSize="LeadParagraph" color="black.500">
+          <Span fontSize="16px" color="black.500">
             {formatCurrency(hostFee, currency)}
           </Span>
         </AmountLine>
@@ -91,7 +91,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
             )}
             {`, ${pmFeeInfo.isExact ? '-' : '~'}${pmFeeInfo.feePercent.toFixed(1)}%)`}
           </Label>
-          <Span fontSize="LeadParagraph" color="black.500">
+          <Span fontSize="16px" color="black.500">
             {!pmFeeInfo.isExact && '~ '}
             {formatCurrency(pmFeeInfo.fee, currency)}
           </Span>
@@ -115,7 +115,7 @@ ClickableLabel.defaultProps = {
   display: 'inline-block',
   borderBottom: '1px dashed',
   borderColor: 'black.400',
-  fontSize: 'Paragraph',
+  fontSize: '14px',
   color: 'black.500',
   cursor: 'pointer',
   mb: 2,
@@ -200,7 +200,7 @@ const StepBreakdown = ({
             <Label fontWeight="bold">
               <FormattedMessage id="contribution.itemPrice" defaultMessage="Item price" />
             </Label>
-            <Span fontSize="LeadParagraph">
+            <Span fontSize="16px">
               {amount ? (
                 formatCurrency(amount / quantity, currency)
               ) : (
@@ -214,7 +214,7 @@ const StepBreakdown = ({
             <Label fontWeight="bold">
               <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
             </Label>
-            <Span fontSize="LeadParagraph">{quantity}</Span>
+            <Span fontSize="16px">{quantity}</Span>
           </AmountLine>
         </React.Fragment>
       )}
@@ -222,14 +222,14 @@ const StepBreakdown = ({
         <Label fontWeight="bold">
           <FormattedMessage id="contribution.your" defaultMessage="Your contribution" />
         </Label>
-        <Span fontSize="LeadParagraph">{formatCurrency(amount, currency)}</Span>
+        <Span fontSize="16px">{formatCurrency(amount, currency)}</Span>
       </AmountLine>
       {applyTaxes && amount > 0 && (
         <React.Fragment>
           <AmountLine my={3}>
             <Flex flexDirection="column">
               <Container display="flex" alignItems="center">
-                <Span fontSize="Paragraph" fontWeight="bold" mr={2}>
+                <Span fontSize="14px" fontWeight="bold" mr={2}>
                   <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />
                 </Span>
                 <InputTypeCountry
@@ -324,7 +324,7 @@ const StepBreakdown = ({
                         </StyledButton>
                       </Container>
                       {formState.error === 'invalid' && (
-                        <Span mt={1} fontSize="Caption" color="red.500">
+                        <Span mt={1} fontSize="12px" color="red.500">
                           <FormattedMessage
                             id="contribute.taxInfoInvalid"
                             defaultMessage="Invalid {taxName} number"
@@ -333,7 +333,7 @@ const StepBreakdown = ({
                         </Span>
                       )}
                       {formState.error === 'bad_country' && (
-                        <Span mt={1} fontSize="Caption" color="red.500">
+                        <Span mt={1} fontSize="12px" color="red.500">
                           <FormattedMessage
                             id="contribute.vatBadCountry"
                             defaultMessage="The VAT number doesn't match the country"
@@ -345,7 +345,7 @@ const StepBreakdown = ({
                 </Box>
               )}
             </Flex>
-            <Span fontSize="LeadParagraph" pt={2}>
+            <Span fontSize="16px" pt={2}>
               {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}
             </Span>
           </AmountLine>
@@ -356,7 +356,7 @@ const StepBreakdown = ({
         <Label fontWeight="bold">
           <FormattedMessage id="contribution.total" defaultMessage="TOTAL" />
         </Label>
-        <Span fontWeight="bold" fontSize="LeadParagraph" color={taxInfo.isReady ? 'black.800' : 'black.400'}>
+        <Span fontWeight="bold" fontSize="16px" color={taxInfo.isReady ? 'black.800' : 'black.400'}>
           {formatCurrency(amount + (taxInfo.isReady ? taxInfo.amount : 0), currency)}
         </Span>
       </AmountLine>
