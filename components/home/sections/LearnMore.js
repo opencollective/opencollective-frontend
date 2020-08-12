@@ -187,8 +187,8 @@ const LearnMore = () => {
                   alt={`${channel.id} illustration`}
                 />
               </IconWrapper>
-              <Box width={['288px', '306px', null, null, '289px']} height={[null, null, null, null, null]}>
-                <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']} mb={2} color="black.800">
+              <Box width={['288px', '306px', null, null, '289px']}>
+                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" mb={2} color="black.800">
                   {channel.name}
                 </H3>
                 <P
@@ -203,8 +203,8 @@ const LearnMore = () => {
                 <StyledLink
                   href={channel.link}
                   color="#DC5F7D"
-                  fontSize={['15px']}
-                  lineHeight={['23px']}
+                  fontSize="15px"
+                  lineHeight="23px"
                   letterSpacing="-0.12px"
                   my={2}
                 >
@@ -217,17 +217,17 @@ const LearnMore = () => {
       </Container>
       <Container display="flex" flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
         <Box width={['288px', '332px', null, null, '360px']} textAlign={['center', 'left']} mr={[null, 4]}>
-          <H3 color="color.800" fontSize={['24px']} lineHeight={['32px']} letterSpacing={['-0.12px']} my={2}>
+          <H3 color="color.800" fontSize="24px" lineHeight="32px" letterSpacing="-0.12px" my={2}>
             <FormattedMessage id="home.contributeToPlatform" defaultMessage="Contribute to the platform!" />
           </H3>
-          <P color="color.700" fontSize={['18px']} lineHeight={['27px']} letterSpacing={['-0.2px']} my={3}>
+          <P color="color.700" fontSize="18px" lineHeight="27px" letterSpacing="-0.2px" my={3}>
             <FormattedMessage
               id="home.contributeToPlatform.description"
               defaultMessage="Open Collective is free for charitable initiatives. We rely on generosity of contributors like you to make this possible."
             />
           </P>
         </Box>
-        <DonateButtonWrapper width={['287px']} height={['300px']} my={3} ml={[null, 4]}>
+        <DonateButtonWrapper width="287px" height="300px" my={3} ml={[null, 4]}>
           <DonateButtonBG />
           <DonateButtonBGHover />
           <Link route="/opencollective/donate">

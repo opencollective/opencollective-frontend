@@ -121,7 +121,7 @@ const TransactionsDownloadInvoices = ({ collective }) => {
       <PopupMenu
         placement="bottom-end"
         Button={({ onClick }) => (
-          <StyledButton onClick={onClick} buttonSize="small" minWidth={140} isBorderless flexGrow={[1, null]}>
+          <StyledButton onClick={onClick} buttonSize="small" minWidth={140} isBorderless flexGrow={1}>
             <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
             <IconDownload size="13px" style={{ marginLeft: '8px' }} />
           </StyledButton>

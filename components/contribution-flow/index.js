@@ -992,7 +992,7 @@ class CreateOrderPage extends React.Component {
                         my={2}
                         width="100%"
                       />
-                      <P fontSize="12px" color="colors.black.300" mt={1} textAlign={['right', null]}>
+                      <P fontSize="12px" color="colors.black.300" mt={1} textAlign="right">
                         <FormattedMessage
                           defaultMessage="Total contribution: {amount} {frequency}"
                           id="platformFee.totalContribution"

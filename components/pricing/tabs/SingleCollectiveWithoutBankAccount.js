@@ -59,34 +59,34 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
           >
             <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
           </H1>
-          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.tab.joinHost"
               defaultMessage="If you don't have access to a bank account you can use, please <strong>join a Fiscal Host</strong>!"
               values={I18nFormatters}
             />
           </P>
-          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.description"
               defaultMessage="A Fiscal Host is an <strong>organization who offers fund-holding as a service</strong>. They keep your money in their bank account and  <strong>handle things like accounting, taxes, admin, payments, and liability</strong>-so you don’t have to!"
               values={I18nFormatters}
             />
           </P>
-          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.reasonToJoin"
               defaultMessage="If you join a Fiscal Host, <strong>you don’t need to go on an Open Collective paid plan</strong>, as your Collective is already included. Each Fiscal Host sets their own fees and acceptance criteria for Collectives. Open Collective keeps a 5% of the donations you raise via credit card payments (Stripe). All other payment methods such as PayPal and Bank transfers are included in your Host's plan."
               values={I18nFormatters}
             />
           </P>
-          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.applyOpenSource"
               defaultMessage="If you are an open source project, you can apply to join  the Open Source Collective."
             />
           </P>
-          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+          <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
             <FormattedMessage
               id="pricing.fiscalHost.featured"
               defaultMessage="Below are some of our most popular hosts or <hosts-link>browse all of them</hosts-link>."
@@ -151,7 +151,7 @@ const SingleCollectiveWithoutBankAccount = ({ data }) => {
             </Box>
           ))}
         </HostsWrapper>
-        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
           <StyledLink href={'/hosts'}>
             <FormattedMessage id="pricing.fiscalHost.more" defaultMessage="See more fiscal hosts" />
           </StyledLink>

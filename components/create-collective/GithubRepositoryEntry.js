@@ -23,7 +23,7 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
         <Flex>
           <Span mr={3}>{radio}</Span>
           <Span mr={3} color="black.300">
-            <Github size={[40]} />
+            <Github size={40} />
           </Span>
           <Flex flexDirection="column">
             <P fontWeight={500} fontSize="1.4rem">

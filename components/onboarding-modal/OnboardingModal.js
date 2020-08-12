@@ -272,16 +272,16 @@ class OnboardingModal extends React.Component {
               <ModalBody>
                 <Flex flexDirection="column" alignItems="center">
                   <Container display="flex" flexDirection="column" alignItems="center">
-                    <Box maxWidth={['336px']}>
+                    <Box maxWidth="336px">
                       <H1
                         fontSize="40px"
                         lineHeight="44px"
                         fontWeight="bold"
                         color="black.900"
                         textAlign="center"
-                        mt={[6]}
-                        mb={[4]}
-                        mx={[2, null]}
+                        mt={6}
+                        mb={4}
+                        mx={2}
                         data-cy="welcome-collective"
                       >
                         <FormattedMessage
@@ -290,8 +290,8 @@ class OnboardingModal extends React.Component {
                         />
                       </H1>
                     </Box>
-                    <Box maxWidth={['450px']}>
-                      <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={[4]} mx={[2, null]}>
+                    <Box maxWidth="450px">
+                      <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={4} mx={2}>
                         <FormattedMessage
                           id="onboarding.success.text"
                           defaultMessage="You're all set! Now you can make this space your own by customizing the look, start

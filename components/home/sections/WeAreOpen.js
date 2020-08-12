@@ -17,11 +17,11 @@ const WeAreOpen = () => (
       mr={[null, 2, 5]}
     >
       <Box textAlign={['center', 'left']} width={['288px', 1]}>
-        <SectionTitle fontSize={['32px']} lineHeight={['40px']} letterSpacing={['-1.2px']} color="black.800">
+        <SectionTitle fontSize="32px" lineHeight="40px" letterSpacing="-1.2px" color="black.800">
           <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
         </SectionTitle>
       </Box>
-      <Box display={['block', 'none']} my={3} width={['224px']} height={['144px']}>
+      <Box display={['block', 'none']} my={3} width="224px" height="144px">
         <Illustration src="/static/images/home/weareopen-illustration-sm.png" alt="We are open in every way" />
       </Box>
       <Box my={2} width={['288px', 1]} textAlign={['center', 'left']}>

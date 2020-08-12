@@ -240,7 +240,7 @@ const HostOrganization = () => (
         >
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
-        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
           <FormattedMessage
             id="pricing.tab.hostOrganization.description"
             defaultMessage="You will be a <strong>Fiscal Host</strong> on our platform. That means you hold funds on behalf of Collectives. You decide which Collectives to accept and what if any fees to charge them."
@@ -254,7 +254,7 @@ const HostOrganization = () => (
       </Container>
 
       <Box textAlign="center" my={3}>
-        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+        <P my={3} fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
           <StyledLink href={'/become-a-fiscal-host'}>
             <FormattedMessage
               id="pricing.fiscalHost.learnMore"

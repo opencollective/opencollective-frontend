@@ -76,9 +76,9 @@ class ConnectGithub extends React.Component {
     const { repositories, loadingRepos, error } = this.state;
 
     return (
-      <Flex flexDirection="column" m={[3, 0]} mb={[4]}>
+      <Flex flexDirection="column" m={[3, 0]} mb={4}>
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight={['32px']} marginLeft={['none', '224px']}>
+          <Box textAlign="left" minHeight="32px" marginLeft={['none', '224px']}>
             <BackButton asLink onClick={() => window && window.history.back()}>
               ←&nbsp;
               <FormattedMessage id="Back" defaultMessage="Back" />
@@ -96,7 +96,7 @@ class ConnectGithub extends React.Component {
               <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
             </H1>
           </Box>
-          <Box textAlign="center" minHeight={['24px']}>
+          <Box textAlign="center" minHeight="24px">
             <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
                 id="collective.subtitle.seeRepo"

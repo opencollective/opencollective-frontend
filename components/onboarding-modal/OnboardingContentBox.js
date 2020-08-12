@@ -70,15 +70,15 @@ class OnboardingContentBox extends React.Component {
     return (
       <Container display="flex" flexDirection="column" width={['90%', '80%']} alignItems="center">
         {step === 0 && (
-          <Flex flexDirection="column" alignItems="center" maxWidth={['336px']}>
+          <Flex flexDirection="column" alignItems="center" maxWidth="336px">
             <H1
               fontSize="20px"
               lineHeight="24px"
               fontWeight="bold"
               color="black.900"
               textAlign="center"
-              mb={[4]}
-              mx={[2, null]}
+              mb={4}
+              mx={2}
               data-cy="onboarding-collective-created"
             >
               <FormattedMessage
@@ -159,7 +159,7 @@ class OnboardingContentBox extends React.Component {
         )}
         {step === 2 && (
           <Fragment>
-            <Box maxWidth={['336px']}>
+            <Box maxWidth="336px">
               <H1 fontSize="20px" lineHeight="24px" fontWeight="bold" color="black.900" textAlign="center" mb={4}>
                 <FormattedMessage id="onboarding.contact.header" defaultMessage="Links and contact info" />
               </H1>

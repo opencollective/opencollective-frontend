@@ -90,21 +90,16 @@ const JoinUs = () => (
           >
             <Box width={['192px', 1]}>
               <H3
-                fontSize={['24px', '32px', null]}
+                fontSize={['24px', '32px']}
                 textAlign="left"
-                lineHeight={['25px', '40px', null]}
-                letterSpacing={['-0.08px', '-1.2px', null]}
+                lineHeight={['25px', '40px']}
+                letterSpacing={['-0.08px', '-1.2px']}
                 mb={2}
                 fontWeight="bold"
               >
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </H3>
-              <P
-                fontSize={['15px', null, null]}
-                color="black.700"
-                lineHeight={['23px', null, null]}
-                letterSpacing={['-0.12px']}
-              >
+              <P fontSize="15px" color="black.700" lineHeight="23px" letterSpacing="-0.12px">
                 <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />
               </P>
             </Box>
@@ -118,28 +113,22 @@ const JoinUs = () => (
           <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']} className="linkWrapper">
             <Container mb={2} width={['192px', 1]}>
               <H3
-                fontSize={['24px', '32px', null]}
+                fontSize={['24px', '32px']}
                 textAlign="left"
-                lineHeight={['25px', '40px', null]}
-                letterSpacing={['-0.08px', '-1.2px', null]}
+                lineHeight={['25px', '40px']}
+                letterSpacing={['-0.08px', '-1.2px']}
                 mb={2}
                 fontWeight="bold"
               >
                 <FormattedMessage id="home.joinUsSection.team" defaultMessage="Read our stories" />
               </H3>
               <Box width={[null, '460px']}>
-                <P
-                  fontSize={['15px', null, null]}
-                  lineHeight={['23px', null, null]}
-                  letterSpacing="-0.12px"
-                  color="black.700"
-                  display={[null, 'none']}
-                >
+                <P fontSize="15px" lineHeight="23px" letterSpacing="-0.12px" color="black.700" display={[null, 'none']}>
                   <FormattedMessage id="home.joinUsSection.joinTeam" defaultMessage="Know more about our impact." />
                 </P>
                 <P
-                  fontSize={['15px', null, null]}
-                  lineHeight={['23px', null, null]}
+                  fontSize="15px"
+                  lineHeight="23px"
                   letterSpacing="-0.12px"
                   color="black.700"
                   display={['none', 'block']}
@@ -160,10 +149,10 @@ const JoinUs = () => (
         <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']}>
           <Container>
             <H3
-              fontSize={['24px', '32px', null]}
+              fontSize={['24px', '32px']}
               textAlign="left"
-              lineHeight={['25px', '40px', null]}
-              letterSpacing={['-0.08px', '-1.2px', null]}
+              lineHeight={['25px', '40px']}
+              letterSpacing={['-0.08px', '-1.2px']}
               mb={2}
               fontWeight="bold"
             >

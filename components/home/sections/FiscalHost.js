@@ -84,7 +84,7 @@ const FiscalHost = () => (
           mr={[null, null, 3, null, 4]}
           ml={[null, null, null, null, 4]}
         >
-          <Box width={['268px', '648px', null, '456px', '657px']} textAlign={['left']}>
+          <Box width={['268px', '648px', null, '456px', '657px']} textAlign="left">
             <SectionTitle
               display={[null, null, null, null, 'none']}
               color="black.900"
@@ -117,7 +117,7 @@ const FiscalHost = () => (
               fontWeight="500"
               fontSize={['15px', '20px']}
               lineHeight={['23px', '28px']}
-              letterSpacing={['-0.12px']}
+              letterSpacing="-0.12px"
             >
               <FormattedMessage
                 id="home.fiscalHostSection.explanation1"
@@ -153,9 +153,9 @@ const FiscalHost = () => (
             my={2}
             textAlign="left"
             color="black.900"
-            fontSize={['20px']}
-            lineHeight={['28px']}
-            letterSpacing={['-0.6px']}
+            fontSize="20px"
+            lineHeight="28px"
+            letterSpacing="-0.6px"
           >
             <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="There are our fiscal hosts:" />
           </H5>
@@ -165,9 +165,9 @@ const FiscalHost = () => (
             textAlign="left"
             color="black.800"
             fontWeight="bold"
-            fontSize={['20px']}
-            lineHeight={['28px']}
-            letterSpacing={['-0.6px']}
+            fontSize="20px"
+            lineHeight="28px"
+            letterSpacing="-0.6px"
           >
             <FormattedMessage id="home.OC.fiscalHosts.xl" defaultMessage="Find the right fiscal host for you:" />
           </H5>
@@ -189,7 +189,7 @@ const FiscalHost = () => (
                 flexDirection={[null, null, null, 'column']}
                 width={[null, null, null, '292px']}
               >
-                <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']}>
+                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
                   <FormattedMessage id="home.fiscalHostSection.OCF" defaultMessage="Open Collective Foundation" />
                 </H3>
                 <Container
@@ -200,9 +200,9 @@ const FiscalHost = () => (
                   mt={[null, 3, null, 1]}
                 >
                   <Box
-                    fontSize={['14px']}
-                    lineHeight={['21px']}
-                    letterSpacing={['-0.1px']}
+                    fontSize="14px"
+                    lineHeight="21px"
+                    letterSpacing="-0.1px"
                     color="black.800"
                     fontWeight="500"
                     mr={[null, null, null, 3]}
@@ -217,9 +217,9 @@ const FiscalHost = () => (
                       as={Link}
                       route="/foundation/apply"
                       whiteSpace="nowrap"
-                      fontSize={['14px']}
-                      lineHeight={['21px']}
-                      letterSpacing={['-0.1px']}
+                      fontSize="14px"
+                      lineHeight="21px"
+                      letterSpacing="-0.1px"
                       color="#DC5F7D"
                       fontWeight="500"
                     >
@@ -252,7 +252,7 @@ const FiscalHost = () => (
                 flexDirection={[null, null, null, 'column']}
                 width={[1, null, null, '292px']}
               >
-                <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']}>
+                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
                   <FormattedMessage id="home.fiscalHostSection.OSC" defaultMessage="Open Source Collective" />
                 </H3>
                 <Container
@@ -263,9 +263,9 @@ const FiscalHost = () => (
                   mt={[null, 3, null, 1]}
                 >
                   <Box
-                    fontSize={['14px']}
-                    lineHeight={['21px']}
-                    letterSpacing={['-0.1px']}
+                    fontSize="14px"
+                    lineHeight="21px"
+                    letterSpacing="-0.1px"
                     color="black.800"
                     fontWeight="500"
                     mr={[null, null, null, 3]}
@@ -280,9 +280,9 @@ const FiscalHost = () => (
                       as={Link}
                       route="/opensouce/apply"
                       whiteSpace="nowrap"
-                      fontSize={['14px']}
-                      lineHeight={['21px']}
-                      letterSpacing={['-0.1px']}
+                      fontSize="14px"
+                      lineHeight="21px"
+                      letterSpacing="-0.1px"
                       color="#DC5F7D"
                       fontWeight="500"
                     >
@@ -319,7 +319,7 @@ const FiscalHost = () => (
                 flexDirection={[null, null, null, 'column']}
                 width={[1, null, null, '292px']}
               >
-                <H3 fontSize={['20px']} lineHeight={['28px']} letterSpacing={['-0.6px']}>
+                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
                   <FormattedMessage id="home.fiscalHostSection.OCE" defaultMessage="Open Collective Europe" />
                 </H3>
                 <Container
@@ -330,9 +330,9 @@ const FiscalHost = () => (
                   mt={[null, 3, null, 1]}
                 >
                   <Box
-                    fontSize={['14px']}
-                    lineHeight={['21px']}
-                    letterSpacing={['-0.1px']}
+                    fontSize="14px"
+                    lineHeight="21px"
+                    letterSpacing="-0.1px"
                     color="black.800"
                     fontWeight="500"
                     mr={[null, null, null, 3]}
@@ -347,9 +347,9 @@ const FiscalHost = () => (
                       as={Link}
                       route="/europe/apply"
                       whiteSpace="nowrap"
-                      fontSize={['14px']}
-                      lineHeight={['21px']}
-                      letterSpacing={['-0.1px']}
+                      fontSize="14px"
+                      lineHeight="21px"
+                      letterSpacing="-0.1px"
                       color="#DC5F7D"
                       fontWeight="500"
                     >
@@ -370,9 +370,9 @@ const FiscalHost = () => (
             <DiscoverLink
               as={Link}
               route="hosts"
-              fontSize={['15px']}
-              lineHeight={['23px']}
-              letterSpacing={['-0.12px']}
+              fontSize="15px"
+              lineHeight="23px"
+              letterSpacing="-0.12px"
               color="#1A1E43"
               fontWeight="500"
             >

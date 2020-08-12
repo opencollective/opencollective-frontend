@@ -123,7 +123,7 @@ const SingleCollectiveWithBankAccount = () => (
         <BackButton onClick={() => Router.pushRoute('pricing')} />
       </Box>
     </Container>
-    <Flex alignItems="center" justifyContent="center" flexDirection={['column', null]}>
+    <Flex alignItems="center" justifyContent="center" flexDirection="column">
       <Box textAlign="center" my={3}>
         <H1
           color="black.900"
@@ -134,7 +134,7 @@ const SingleCollectiveWithBankAccount = () => (
         >
           <FormattedMessage id="pricing.tab.welcome" defaultMessage="Welcome!" />
         </H1>
-        <P color="black.700" fontSize="14px" lineHeight="24px" letterSpacing={['-0.012em']}>
+        <P color="black.700" fontSize="14px" lineHeight="24px" letterSpacing="-0.012em">
           <FormattedMessage
             id="pricing.tab.description"
             defaultMessage="You will begin with the <strong>STARTER PLAN</strong>. This plan is <strong>FREE</strong> to set up!"
@@ -155,7 +155,7 @@ const SingleCollectiveWithBankAccount = () => (
           borderRadius="8px"
           ml={[null, null, 3]}
         >
-          <H3 my={2} fontSize={['24px', null, '16px']} lineHeight={['26px', null, '26px']} letterSpacing={['-0.008em']}>
+          <H3 my={2} fontSize={['24px', null, '16px']} lineHeight={['26px', null, '26px']} letterSpacing="-0.008em">
             <FormattedMessage id="pricing.starterPlans" defaultMessage="The STARTER PLAN includes:" />
           </H3>
           <Box as="ul" color="black.800" mt={3} px={3} fontSize="13px" lineHeight="21px" letterSpacing="-0.012em">
