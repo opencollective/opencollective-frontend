@@ -98,10 +98,6 @@ const messages = defineMessages({
     id: 'community.openSource',
     defaultMessage: 'Open Source',
   },
-  'community.slack': {
-    id: 'community.slack',
-    defaultMessage: 'Slack',
-  },
   'community.docsAndHelp': {
     id: 'community.docsAndHelp',
     defaultMessage: 'Docs & Help',
@@ -151,7 +147,7 @@ const navigation = {
   },
   community: {
     openSource: 'https://github.com/opencollective/opencollective/issues',
-    slack: 'https://slack.opencollective.com',
+    Slack: 'https://slack.opencollective.com',
     docsAndHelp: 'https://docs.opencollective.com',
     support: '/support',
   },
@@ -353,10 +349,14 @@ const Footer = () => {
                   <ListItem key={item} textAlign={['center', 'left']} mb={2}>
                     {navigation[key][item][0] === '/' ? (
                       <Link route={navigation[key][item]} passHref>
-                        <MenuLink>{intl.formatMessage(messages[`${key}.${item}`])}</MenuLink>
+                        <MenuLink>
+                          {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
+                        </MenuLink>
                       </Link>
                     ) : (
-                      <MenuLink href={navigation[key][item]}>{intl.formatMessage(messages[`${key}.${item}`])}</MenuLink>
+                      <MenuLink href={navigation[key][item]}>
+                        {messages[`${key}.${item}`] ? intl.formatMessage(messages[`${key}.${item}`]) : item}
+                      </MenuLink>
                     )}
                   </ListItem>
                 ))}

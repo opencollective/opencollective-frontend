@@ -115,9 +115,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     error,
     controlStyles,
     isSearchable,
-    menuPlacement,
   }) => ({
-    menuPlacement,
     isDisabled: disabled || isDisabled,
     placeholder: placeholder || intl.formatMessage(Messages.placeholder),
     loadingMessage: () => intl.formatMessage(Messages.loading),
