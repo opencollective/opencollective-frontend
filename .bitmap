@@ -13,7 +13,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/currency@2.1.0": {
+    "opencollective.design-system/components/currency@3.0.0": {
         "files": [
             {
                 "relativePath": "components/Currency.js",
@@ -37,7 +37,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/formatted-money-amount@2.1.0": {
+    "opencollective.design-system/components/formatted-money-amount@3.0.0": {
         "files": [
             {
                 "relativePath": "components/FormattedMoneyAmount.js",
@@ -73,7 +73,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/private-info-icon@2.1.0": {
+    "opencollective.design-system/components/private-info-icon@3.0.0": {
         "files": [
             {
                 "relativePath": "components/icons/PrivateInfoIcon.js",
@@ -85,7 +85,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-button-set@2.1.0": {
+    "opencollective.design-system/components/styled-button-set@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledButtonSet.js",
@@ -97,7 +97,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-button@2.1.0": {
+    "opencollective.design-system/components/styled-button@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledButton.js",
@@ -121,7 +121,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-checkbox@2.1.0": {
+    "opencollective.design-system/components/styled-checkbox@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledCheckbox.js",
@@ -157,7 +157,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-input-field@2.1.0": {
+    "opencollective.design-system/components/styled-input-field@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledInputField.js",
@@ -169,7 +169,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-input-group@2.1.0": {
+    "opencollective.design-system/components/styled-input-group@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledInputGroup.js",
@@ -181,7 +181,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-input-tags@2.1.0": {
+    "opencollective.design-system/components/styled-input-tags@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledInputTags.js",
@@ -193,7 +193,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-input@2.1.0": {
+    "opencollective.design-system/components/styled-input@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledInput.js",
@@ -217,7 +217,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-link@2.1.0": {
+    "opencollective.design-system/components/styled-link@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledLink.js",
@@ -229,7 +229,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-message@2.1.0": {
+    "opencollective.design-system/components/styled-message@3.0.0": {
         "files": [
             {
                 "relativePath": "components/MessageBox.js",
@@ -241,7 +241,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-modal@2.1.0": {
+    "opencollective.design-system/components/styled-modal@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledModal.js",
@@ -265,7 +265,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-radio-list@2.1.0": {
+    "opencollective.design-system/components/styled-radio-list@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledRadioList.js",
@@ -277,7 +277,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-round-button@2.1.0": {
+    "opencollective.design-system/components/styled-round-button@2.1.1": {
         "files": [
             {
                 "relativePath": "components/StyledRoundButton.js",
@@ -289,7 +289,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-select-creatable@2.1.0": {
+    "opencollective.design-system/components/styled-select-creatable@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledSelectCreatable.js",
@@ -301,7 +301,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-select@2.1.0": {
+    "opencollective.design-system/components/styled-select@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledSelect.js",
@@ -313,7 +313,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-spinner@2.1.0": {
+    "opencollective.design-system/components/styled-spinner@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledSpinner.js",
@@ -337,7 +337,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-tag@2.1.0": {
+    "opencollective.design-system/components/styled-tag@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledTag.js",
@@ -349,7 +349,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-text@2.1.0": {
+    "opencollective.design-system/components/styled-text@3.0.0": {
         "files": [
             {
                 "relativePath": "components/Text.js",
@@ -361,7 +361,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/styled-tooltip@2.1.0": {
+    "opencollective.design-system/components/styled-tooltip@3.0.0": {
         "files": [
             {
                 "relativePath": "components/StyledTooltip.js",
@@ -373,7 +373,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/components/uploaded-file-preview@2.1.0": {
+    "opencollective.design-system/components/uploaded-file-preview@3.0.0": {
         "files": [
             {
                 "relativePath": "components/UploadedFilePreview.js",
@@ -421,7 +421,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/hooks/use-global-blur@2.1.0": {
+    "opencollective.design-system/hooks/use-global-blur@3.0.0": {
         "files": [
             {
                 "relativePath": "lib/hooks/useGlobalBlur.js",
@@ -565,19 +565,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/theme/text-sizes@2.1.0": {
-        "files": [
-            {
-                "relativePath": "lib/theme/text-sizes.js",
-                "test": false,
-                "name": "text-sizes.js"
-            }
-        ],
-        "mainFile": "lib/theme/text-sizes.js",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "opencollective.design-system/theme/variants/button@2.1.0": {
+    "opencollective.design-system/theme/variants/button@3.0.0": {
         "files": [
             {
                 "relativePath": "lib/theme/variants/button.js",
@@ -601,7 +589,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "opencollective.design-system/theme@2.1.0": {
+    "opencollective.design-system/theme@3.0.0": {
         "files": [
             {
                 "relativePath": "lib/theme/index.js",
