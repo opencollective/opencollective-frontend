@@ -154,10 +154,10 @@ const NewContributionFlowStepPayment = ({
 
   // Set default payment method
   useEffect(() => {
-    if (!stepPayment && !isEmpty(paymentOptions)) {
+    if (!loading && !stepPayment && !isEmpty(paymentOptions)) {
       setNewPaymentMethod(first(paymentOptions));
     }
-  }, [paymentOptions, stepPayment]);
+  }, [paymentOptions, stepPayment, loading]);
 
   return (
     <Container width={1} border={['1px solid #DCDEE0', 'none']} borderRadius={15}>
@@ -176,7 +176,7 @@ const NewContributionFlowStepPayment = ({
           keyGetter="key"
           options={paymentOptions}
           onChange={setNewPaymentMethod}
-          value={stepPayment?.key}
+          value={stepPayment?.key || null}
         >
           {({ radio, checked, index, value }) => (
             <PaymentMethodBox
