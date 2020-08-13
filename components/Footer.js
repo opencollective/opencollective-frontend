@@ -293,6 +293,7 @@ const Footer = () => {
                 defaultValue={defaultLanguage}
                 borderRadius="10px"
                 menuPlacement="auto"
+                isSearchable={false}
                 width={1}
               />
             </Container>
