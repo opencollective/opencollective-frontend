@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isUndefined } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import { CardElement, Elements, injectStripe } from 'react-stripe-elements';
 import styled from 'styled-components';
+
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 
 import { Flex } from './Grid';
 import StyledCheckbox from './StyledCheckbox';
@@ -36,6 +39,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     onChange: PropTypes.func,
     onReady: PropTypes.func,
     stripe: PropTypes.object,
+    useLegacyCallback: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -45,8 +49,9 @@ class NewCreditCardFormWithoutStripe extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = { value: null };
     this.messages = defineMessages({
-      'creditcard.save': {
+      save: {
         id: 'creditcard.save',
         defaultMessage: 'Save credit card to {type, select, user {my account} other {{type} account}}',
       },
@@ -65,13 +70,53 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     }
   }
 
+  getProfileType = () => {
+    const { profileType } = this.props;
+    if (!profileType) {
+      return '';
+    } else if (profileType === 'INDIVIDUAL') {
+      return 'user';
+    } else {
+      return profileType.toLowerCase();
+    }
+  };
+
+  onCheckboxChange = e => {
+    if (this.props.useLegacyCallback) {
+      this.props.onChange(e);
+    } else {
+      this.setState(
+        ({ value }) => ({ value: { ...value, isSavedForLater: e.checked } }),
+        () => this.props.onChange(this.state.value),
+      );
+    }
+  };
+
+  onCardChange = e => {
+    if (this.props.useLegacyCallback) {
+      this.props.onChange({ name, type: 'StripeCreditCard', value: e });
+    } else {
+      this.setState(
+        ({ value }) => ({
+          value: {
+            ...value,
+            type: GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD,
+            isSavedForLater: isUndefined(value?.save) || value.save ? true : false,
+            stripeData: e,
+          },
+        }),
+        () => this.props.onChange(this.state.value),
+      );
+    }
+  };
+
   render() {
-    const { intl, name, profileType, onChange, error, hasSaveCheckBox, hidePostalCode } = this.props;
+    const { intl, error, hasSaveCheckBox, hidePostalCode } = this.props;
     return (
       <Flex flexDirection="column" data-cy="new-credit-card-form">
         <StyledCardElement
           hidePostalCode={hidePostalCode}
-          onChange={value => onChange({ name, type: 'StripeCreditCard', value })}
+          onChange={this.onCardChange}
           onReady={input => input.focus()}
         />
         {error && (
@@ -84,8 +129,8 @@ class NewCreditCardFormWithoutStripe extends React.Component {
             <StyledCheckbox
               defaultChecked
               name="save"
-              label={intl.formatMessage(this.messages['creditcard.save'], { type: (profileType || '').toLowerCase() })}
-              onChange={onChange}
+              label={intl.formatMessage(this.messages.save, { type: this.getProfileType() })}
+              onChange={this.onCheckboxChange}
             />
           </Flex>
         )}
@@ -104,6 +149,11 @@ const NewCreditCardForm = props => (
 
 NewCreditCardForm.propTypes = {
   intl: PropTypes.object,
+  useLegacyCallback: PropTypes.bool,
+};
+
+NewCreditCardForm.defaultProps = {
+  useLegacyCallback: true,
 };
 
 export default injectIntl(NewCreditCardForm);

@@ -1,12 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getWebsiteUrl } from '../../lib/utils';
 import { Router } from '../../server/pages';
@@ -17,18 +23,19 @@ import { Box, Grid } from '../../components/Grid';
 import { addSignupMutation } from '../../components/SignInOrJoinFree';
 
 import Loading from '../Loading';
+import MessageBox from '../MessageBox';
 import Steps from '../Steps';
 import { withUser } from '../UserProvider';
 
-import NewContributionFlowButtons from './ContributionFlowButtons';
+import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowMainContainer from './ContributionFlowMainContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import SafeTransactionMessage from './SafeTransactionMessage';
-import { taxesMayApply } from './utils';
+import { getTotalAmount, NEW_CREDIT_CARD_KEY, taxesMayApply } from './utils';
 
 const StepsProgressBox = styled(Box)`
-  min-height: 115px;
+  min-height: 120px;
   max-width: 450px;
 
   @media screen and (max-width: 640px) {
@@ -70,11 +77,14 @@ class ContributionFlow extends React.Component {
     tier: PropTypes.object,
     intl: PropTypes.object,
     createUser: PropTypes.func,
+    createOrder: PropTypes.func.isRequired,
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     step: PropTypes.string,
     verb: PropTypes.oneOf(['new-donate', 'new-contribute']),
+    /** @ignore from withUser */
+    refetchLoggedInUser: PropTypes.func,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
   };
@@ -83,6 +93,11 @@ class ContributionFlow extends React.Component {
     super(props);
     this.mainContainerRef = React.createRef();
     this.state = {
+      error: null,
+      stripe: null,
+      isSubmitted: false,
+      isSubmitting: false,
+      stepProfile: null,
       stepPayment: null,
       stepSummary: null,
       stepDetails: {
@@ -93,8 +108,71 @@ class ContributionFlow extends React.Component {
     };
   }
 
-  onComplete = () => {
-    console.log(this.state);
+  submitOrder = async () => {
+    const { stepDetails, stepProfile, stepSummary } = this.state;
+    // TODO We're still relying on profiles from V1 (LoggedInUser)
+    const fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
+    this.setState({ error: null });
+
+    try {
+      const order = await this.props.createOrder({
+        variables: {
+          order: {
+            quantity: stepDetails.quantity,
+            amount: { valueInCents: stepDetails.amount },
+            frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
+            fromAccount,
+            toAccount: pick(this.props.collective, ['id']),
+            customData: stepDetails.customData,
+            paymentMethod: await this.getPaymentMethod(),
+            platformContributionAmount: stepDetails.feesOnTop && { valueInCents: stepDetails.feesOnTop },
+            taxes: stepSummary && [
+              {
+                type: 'VAT',
+                amount: stepSummary.amount || 0,
+                country: stepSummary.countryISO,
+                idNumber: stepSummary.number,
+              },
+            ],
+          },
+        },
+      });
+
+      // TODO: Handle Stripe errors (3D secure)
+      return this.handleSuccess(order);
+    } catch (e) {
+      this.showError(getErrorFromGraphqlException(e));
+    }
+  };
+
+  handleSuccess = order => {
+    this.setState({ isSubmitted: true });
+    this.props.refetchLoggedInUser(); // to update memberships
+    return this.pushStepRoute('success', { OrderId: order.id });
+  };
+
+  showError = error => {
+    this.setState({ error });
+    this.scrollToTop();
+  };
+
+  getPaymentMethod = async () => {
+    const { stepPayment, stripe } = this.state;
+    if (!stepPayment?.paymentMethod) {
+      return null;
+    } else if (stepPayment.paymentMethod.id) {
+      return pick(stepPayment.paymentMethod, ['id']);
+    } else if (stepPayment.key === NEW_CREDIT_CARD_KEY) {
+      const { token } = await stripe.createToken();
+      const pm = stripeTokenToPaymentMethod(token);
+      return {
+        name: pm.name,
+        isSavedForLater: stepPayment.paymentMethod.isSavedForLater,
+        creditCardInfo: { token: pm.token, ...pm.data },
+      };
+    } else if (stepPayment.paymentMethod.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
+      return pick(stepPayment.paymentMethod, ['type', 'paypalInfo.token', 'paypalInfo.data']);
+    }
   };
 
   getEmailRedirectURL() {
@@ -111,13 +189,13 @@ class ContributionFlow extends React.Component {
   }
 
   createProfileForRecurringContributions = async data => {
-    if (this.state.submitting) {
+    if (this.state.isSubmitting) {
       return false;
     }
 
     const user = pick(data, ['email', 'name']);
 
-    this.setState({ submitting: true });
+    this.setState({ isSubmitting: true });
 
     try {
       await this.props.createUser({
@@ -128,11 +206,10 @@ class ContributionFlow extends React.Component {
         },
       });
       await Router.pushRoute('signinLinkSent', { email: user.email });
-      window.scrollTo(0, 0);
     } catch (error) {
-      console.log(error);
-      this.setState({ error: error.message, submitting: false });
-      window.scrollTo(0, 0);
+      this.setState({ error: error.message, isSubmitting: false });
+    } finally {
+      this.scrollToTop();
     }
   };
 
@@ -178,14 +255,16 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    if (stepName === 'success') {
-      await Router.pushRoute(`${route}/success`);
-    } else if (stepName === 'payment' && !LoggedInUser && stepDetails?.interval) {
+    if (stepName === 'payment' && !LoggedInUser && stepDetails?.interval) {
       await this.createProfileForRecurringContributions(stepProfile);
     } else {
       await Router.pushRoute(route, params);
     }
 
+    this.scrollToTop();
+  };
+
+  scrollToTop = () => {
     if (this.mainContainerRef.current) {
       this.mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
     } else {
@@ -232,10 +311,15 @@ class ContributionFlow extends React.Component {
 
     // Hide step payment if using a free tier with fixed price
     if (!(minAmount === 0 && isFixedContribution)) {
+      let isCompleted = Boolean(noPaymentRequired || stepPayment);
+      if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+        isCompleted = stepPayment.paymentMethod?.stripeData?.complete;
+      }
+
       steps.push({
         name: 'payment',
         label: intl.formatMessage(stepsLabels.payment),
-        isCompleted: Boolean(noPaymentRequired || stepPayment),
+        isCompleted,
       });
     }
 
@@ -251,14 +335,45 @@ class ContributionFlow extends React.Component {
     return steps;
   }
 
+  getPaypalButtonProps() {
+    const { stepPayment, stepDetails, stepSummary } = this.state;
+    if (stepPayment?.paymentMethod?.type === GQLV2_PAYMENT_METHOD_TYPES.PAYPAL) {
+      const { collective, host } = this.props;
+      return {
+        host: host,
+        currency: collective.currency,
+        style: { size: 'responsive', height: 47 },
+        totalAmount: getTotalAmount(stepDetails, stepSummary), // TODO this.getTotalAmountWithTaxes(),
+        onClick: () => this.setState({ isSubmitting: true }),
+        onCancel: () => this.setState({ isSubmitting: false }),
+        onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
+        onAuthorize: pm => {
+          this.setState(
+            state => ({
+              stepPayment: {
+                ...state.stepPayment,
+                paymentMethod: {
+                  type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL,
+                  paypalInfo: pm,
+                },
+              },
+            }),
+            this.submitOrder,
+          );
+        },
+      };
+    }
+  }
+
   render() {
     const { collective, tier, LoggedInUser, skipStepDetails } = this.props;
+    const { error, isSubmitted, isSubmitting } = this.state;
     return (
       <Steps
         steps={this.getSteps()}
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
-        onComplete={this.onComplete}
+        onComplete={this.submitOrder}
         skip={skipStepDetails ? ['details'] : null}
       >
         {({
@@ -297,8 +412,8 @@ class ContributionFlow extends React.Component {
                   stepProfile={this.state.stepProfile}
                   stepDetails={this.state.stepDetails}
                   stepPayment={this.state.stepPayment}
-                  submitted={this.state.submitted}
-                  loading={this.state.loading || this.state.submitting}
+                  isSubmitted={this.state.isSubmitted}
+                  loading={isValidating || isSubmitted || isSubmitting}
                   currency={collective.currency}
                   isFreeTier={this.getTierMinAmount(tier) === 0}
                 />
@@ -315,6 +430,11 @@ class ContributionFlow extends React.Component {
               >
                 <Box />
                 <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
+                  {error && (
+                    <MessageBox type="error" withIcon mb={3}>
+                      {formatErrorMessage(this.props.intl, error)}
+                    </MessageBox>
+                  )}
                   <ContributionFlowMainContainer
                     collective={collective}
                     tier={tier}
@@ -322,16 +442,18 @@ class ContributionFlow extends React.Component {
                     onChange={data => this.setState(data)}
                     step={currentStep}
                     showFeesOnTop={this.canHaveFeesOnTop()}
+                    onNewCardFormReady={({ stripe }) => this.setState({ stripe })}
                   />
                   <Box mt={[4, 5]}>
-                    <NewContributionFlowButtons
+                    <ContributionFlowButtons
                       goNext={goNext}
                       goBack={goBack}
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}
                       isRecurringContributionLoggedOut={!LoggedInUser && this.state.stepDetails?.interval}
-                      isValidating={isValidating}
+                      isValidating={isValidating || isSubmitted || isSubmitting}
+                      paypalButtonProps={this.getPaypalButtonProps()}
                     />
                   </Box>
                 </Box>
@@ -350,4 +472,26 @@ class ContributionFlow extends React.Component {
   }
 }
 
-export default injectIntl(withUser(addSignupMutation(ContributionFlow)));
+// TODO: Use a fragment to retrieve the fields from success page in there
+const addCreateOrderMutation = graphql(
+  gqlV2/* GraphQL */ `
+    mutation CreateOrder($order: OrderCreateInput!) {
+      createOrder(order: $order) {
+        id
+        status
+        frequency
+        amount {
+          valueInCents
+        }
+      }
+    }
+  `,
+  {
+    name: 'createOrder',
+    options: {
+      context: API_V2_CONTEXT,
+    },
+  },
+);
+
+export default injectIntl(withUser(addSignupMutation(addCreateOrderMutation(ContributionFlow))));

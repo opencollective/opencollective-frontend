@@ -90,36 +90,48 @@ const StyledRadioList = ({
 
   return (
     <RadioListContainer id={id} as="fieldset" border="none" m={0} p={0} {...containerProps}>
-      {items.map(({ value, key }, index) => (
-        <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0} {...labelProps}>
-          {children({
-            checked: key === checkedItem,
-            index,
-            key,
-            value,
-            radio: (
-              <RadioInput
-                type="radio"
-                name={name}
-                id={id && key + id}
-                value={key}
-                size={radioSize}
-                defaultChecked={isUndefined(props.defaultValue) ? undefined : defaultValueStr === key}
-                checked={isUndefined(props.value) ? undefined : props.value === key}
-                disabled={disabled || (value && value.disabled)} // disable a specific option or entire options
-                data-cy="radio-select"
-                onChange={event => {
-                  event.stopPropagation();
-                  const target = event.target;
-                  const selectedItem = find(items, item => item.key === target.value);
-                  onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
-                  setSelected(target.value);
-                }}
-              />
-            ),
-          })}
-        </Container>
-      ))}
+      {items.map(({ value, key }, index) => {
+        const isDisabled = disabled || (value && value.disabled); // disable a specific option or entire options
+        return (
+          <Container
+            as="label"
+            cursor={isDisabled ? 'not-allowed' : 'pointer'}
+            htmlFor={id && key + id}
+            key={key}
+            width={1}
+            m={0}
+            disabled={isDisabled}
+            {...labelProps}
+          >
+            {children({
+              checked: key === checkedItem,
+              index,
+              key,
+              value,
+              radio: (
+                <RadioInput
+                  type="radio"
+                  name={name}
+                  id={id && key + id}
+                  value={key}
+                  size={radioSize}
+                  defaultChecked={isUndefined(props.defaultValue) ? undefined : defaultValueStr === key}
+                  checked={isUndefined(props.value) ? undefined : props.value === key}
+                  disabled={isDisabled} // disable a specific option or entire options
+                  data-cy="radio-select"
+                  onChange={event => {
+                    event.stopPropagation();
+                    const target = event.target;
+                    const selectedItem = find(items, item => item.key === target.value);
+                    onChange({ type: 'fieldset', name, key: selectedItem.key, value: selectedItem.value });
+                    setSelected(target.value);
+                  }}
+                />
+              ),
+            })}
+          </Container>
+        );
+      })}
     </RadioListContainer>
   );
 };

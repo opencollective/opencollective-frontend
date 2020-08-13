@@ -11,7 +11,7 @@ import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
-const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
+const ContributorCardWithTier = ({ collective, contribution, ...props }) => {
   return (
     <StyledCollectiveCard {...props} collective={collective} tag={null}>
       <Box px={3}>
@@ -22,7 +22,7 @@ const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
             values={{
               contributors: (
                 <span style={{ color: 'black.900' }}>
-                  <b>{collective.members.nodes.length}</b>
+                  <b>{collective.contributors.totalCount || 1}</b>
                 </span>
               ),
             }}
@@ -92,9 +92,9 @@ const ContributionCardWithTier = ({ collective, contribution, ...props }) => {
   );
 };
 
-ContributionCardWithTier.propTypes = {
+ContributorCardWithTier.propTypes = {
   collective: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
 };
 
-export default withUser(ContributionCardWithTier);
+export default withUser(ContributorCardWithTier);

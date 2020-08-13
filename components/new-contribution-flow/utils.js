@@ -15,8 +15,6 @@ import {
 
 import CreditCardInactive from '../../components/icons/CreditCardInactive';
 
-import { ERROR_MESSAGES } from './constants';
-
 /** Returns true if taxes may apply with this tier/host */
 export const taxesMayApply = (collective, host, tier) => {
   if (!tier) {
@@ -39,47 +37,32 @@ export const taxesMayApply = (collective, host, tier) => {
   }
 };
 
-export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDetails, collective) => {
+export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
+
+export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDetails, stepSummary, collective) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
+  const totalAmount = getTotalAmount(stepDetails, stepSummary);
 
   const paymentMethodsOptions = paymentMethods.map(pm => ({
+    id: pm.id,
     key: `pm-${pm.id}`,
     title: getPaymentMethodName(pm),
-    subtitle: getPaymentMethodMetadata(pm),
+    subtitle: getPaymentMethodMetadata(pm, totalAmount),
     icon: getPaymentMethodIcon(pm),
+    disabled: isPaymentMethodDisabled(pm, totalAmount),
     paymentMethod: pm,
-    disabled: isPaymentMethodDisabled(pm),
-    id: pm.id,
-    CollectiveId: pm.account.id,
-    type: pm.type,
-    limitedToHosts: pm.limitedToHosts || null,
   }));
 
   let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
 
-  if (stepProfile.type === CollectiveType.COLLECTIVE) {
-    // collective to collective balance: only if they are on the same host
-    const hostCollectiveId = get(collective, 'host.legacyId');
-    const stepProfileHostCollectiveId = get(stepProfile, 'host.id');
-    const collectivesHaveSameHost = hostCollectiveId === stepProfileHostCollectiveId;
-    if (stepProfile.type === CollectiveType.COLLECTIVE && !collectivesHaveSameHost) {
-      throw new Error(ERROR_MESSAGES.ERROR_DIFFERENT_HOST);
-    }
-
-    // if the chosen collective balance is too low, throw error
-    uniquePMs.find(pm => {
-      if (pm.type === 'collective' && pm.disabled) {
-        throw new Error(ERROR_MESSAGES.ERROR_LOW_BALANCE);
-      }
-    });
-  }
-
   // if ORG filter out 'collective' type payment
   if (stepProfile.type === CollectiveType.ORGANIZATION) {
-    uniquePMs = uniquePMs.filter(pm => pm.type !== 'collective');
+    uniquePMs = uniquePMs.filter(
+      ({ paymentMethod }) => paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_TYPES.ACCOUNT_BALANCE,
+    );
   }
 
   // prepaid budget: limited to a specific host
@@ -96,12 +79,12 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
     return find(giftcardLimitedToHostCollectiveIds, { id: hostCollectiveId });
   };
 
-  uniquePMs = uniquePMs.filter(pm => {
-    if (pm.type === 'virtualcard' && pm.limitedToHosts) {
-      return matchesHostCollectiveId(pm);
-    } else if (pm.type === 'prepaid') {
-      return matchesHostCollectiveIdPrepaid(pm);
-    } else if (!hostHasStripe && pm.type === 'creditcard') {
+  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.GIFT_CARD && paymentMethod.limitedToHosts) {
+      return matchesHostCollectiveId(paymentMethod);
+    } else if (paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.PREPAID_BUDGET) {
+      return matchesHostCollectiveIdPrepaid(paymentMethod);
+    } else if (!hostHasStripe && paymentMethod.providerType === GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD) {
       return false;
     } else {
       return true;
@@ -109,14 +92,14 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
   });
 
   // Put disabled PMs at the end
-  uniquePMs = sortBy(uniquePMs, ['disabled', 'type', 'id']);
+  uniquePMs = sortBy(uniquePMs, ['disabled', 'paymentMethod.providerType', 'id']);
 
   // adding payment methods
   if (stepProfile.type !== CollectiveType.COLLECTIVE) {
     if (hostHasStripe) {
       // New credit card
       uniquePMs.push({
-        key: 'newCreditCard',
+        key: NEW_CREDIT_CARD_KEY,
         title: <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />,
         icon: <CreditCardInactive />,
       });
@@ -127,7 +110,7 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
-        paymentMethod: { service: 'paypal', type: 'payment' },
+        paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.PAYPAL },
         icon: getPaymentMethodIcon({ service: 'paypal', type: 'payment' }, collective),
       });
     }
@@ -138,16 +121,20 @@ export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDe
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
-        paymentMethod: { type: 'manual' },
+        paymentMethod: { type: GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER },
         icon: getPaymentMethodIcon({ type: 'manual' }, collective),
         instructions: get(collective, 'host.settings.paymentMethods.manual.instructions', null),
       });
     }
   }
 
-  if (!uniquePMs.length) {
-    throw new Error(ERROR_MESSAGES.ERROR_NO_PAYMENT_METHODS);
-  }
-
   return uniquePMs;
+};
+
+export const getTotalAmount = (stepDetails, stepSummary) => {
+  const quantity = get(stepDetails, 'quantity') || 1;
+  const amount = get(stepDetails, 'amount') || 0;
+  const taxAmount = get(stepSummary, 'amount') || 0;
+  const platformFeeAmount = get(stepDetails, 'feesOnTop') || 0;
+  return quantity * (amount + platformFeeAmount) + taxAmount;
 };
