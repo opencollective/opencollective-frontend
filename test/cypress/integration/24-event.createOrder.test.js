@@ -75,7 +75,7 @@ describe('event.createOrder page', () => {
     cy.createHostedCollective().then(({ slug }) => {
       // Activate VAT for collective
       cy.visit(`${slug}/edit`);
-      cy.contains('[data-cy="select"]', 'Please select your country').click();
+      cy.contains('[data-cy="country-select"]', 'Please select your country').click();
       cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
       cy.get('select[name="VAT"]').select('OWN');
       cy.contains('button', 'Save').click();
@@ -110,14 +110,14 @@ describe('event.createOrder page', () => {
       cy.wait(1000);
 
       // Algeria should not have taxes
-      cy.contains('[data-cy="select"]', 'Please select your country').click();
+      cy.contains('[data-cy="country-select"]', 'Please select your country').click();
       cy.contains('[data-cy="select-option"]', 'Algeria').click();
       cy.contains('.breakdown-line', 'VAT').contains('+ $0.00');
       cy.contains('.breakdown-line', 'TOTAL').contains('$80.00');
       cy.contains('button', 'Make contribution').should('not.be.disabled');
 
       // French should have taxes
-      cy.get('[data-cy="select"]').click();
+      cy.get('[data-cy="country-select"]').click();
       cy.contains('[data-cy="select-option"]', 'France - FR').click();
       cy.contains('.breakdown-line', 'VAT').contains('+ $16.80');
       cy.contains('.breakdown-line', 'TOTAL').contains('$96.80');
@@ -155,7 +155,7 @@ describe('event.createOrder page', () => {
 
       // However if it's the same country than the collective than VAT should still apply,
       // even if the contributor is an organization
-      cy.get('[data-cy="select"]').click();
+      cy.get('[data-cy="country-select"]').click();
       cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
       cy.contains('.breakdown-line', 'VAT').contains('+ $16.80');
       cy.contains('.breakdown-line', 'TOTAL').contains('$96.80');

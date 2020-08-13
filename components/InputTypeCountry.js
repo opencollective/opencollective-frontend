@@ -68,6 +68,7 @@ class InputTypeCountry extends Component {
         value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
         defaultValue={defaultValue ? this.getSelectedOption(locale || intl.locale, defaultValue) : undefined}
         placeholder={<FormattedMessage id="InputTypeCountry.placeholder" defaultMessage="Please select your country" />}
+        data-cy="country-select"
         {...props}
       />
     );
