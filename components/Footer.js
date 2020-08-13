@@ -167,6 +167,18 @@ const switchLanguage = key => {
   window.scrollTo(0, 0);
 };
 
+const FooterContainer = styled.div.attrs({
+  id: 'footer',
+})`
+  display: flex;
+  justify-content: center;
+  background: white;
+  border-top: 1px solid #e8e9eb;
+  min-height: 7.5rem;
+  width: 100%;
+  padding: 1rem;
+`;
+
 const Footer = () => {
   const intl = useIntl();
   const languageOptions = Object.keys(languages).map(key => {
@@ -194,16 +206,7 @@ const Footer = () => {
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
 
   return (
-    <Flex
-      id="footer"
-      background="white"
-      borderTop="1px solid #E8E9EB"
-      bottom={0}
-      minHeight="7.5rem"
-      p="1rem"
-      width={1}
-      justifyContent="center"
-    >
+    <FooterContainer>
       <Container
         display="flex"
         flexDirection={['column', null, null, null, 'row']}
@@ -419,7 +422,7 @@ const Footer = () => {
           </Container>
         </Container>
       </Container>
-    </Flex>
+    </FooterContainer>
   );
 };
 
