@@ -7,6 +7,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { GQLV2_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { compose, parseToBoolean } from '../lib/utils';
@@ -21,6 +22,7 @@ import { STEPS } from '../components/new-contribution-flow/constants';
 import NewContributionFlowSuccess from '../components/new-contribution-flow/ContributionFlowSuccess';
 import NewContributionFlowContainer from '../components/new-contribution-flow/index';
 import Page from '../components/Page';
+import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';
 import { withUser } from '../components/UserProvider';
 
@@ -104,6 +106,26 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
+
+  componentDidMount() {
+    this.loadExternalScripts();
+  }
+
+  componentDidUpdate(prevProps) {
+    const hostPath = 'data.account.host';
+    if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
+      this.loadExternalScripts();
+    }
+  }
+
+  loadExternalScripts() {
+    // Load stripe
+    const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
+    const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
+    if (hostHasStripe) {
+      this.props.loadStripe();
+    }
+  }
 
   getCanonicalURL(collective, tier) {
     if (!tier) {
@@ -331,4 +353,4 @@ const addAccountWithTierData = graphql(accountWithTierQuery, {
 
 const addGraphql = compose(addAccountData, addAccountWithTierData);
 
-export default addGraphql(withUser(withRouter(injectIntl(NewContributionFlowPage))));
+export default addGraphql(withUser(withRouter(injectIntl(withStripeLoader(NewContributionFlowPage)))));

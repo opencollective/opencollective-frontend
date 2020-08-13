@@ -1225,6 +1225,7 @@
   "paymentMethod.monthlyLimitPerMember.description": "Defina um limite mensal para permitir que outros membros da equipe da sua organização usem esse cartão de crédito dentro desse limite. Se definido como zero, apenas administradores da organização poderão usar este cartão.",
   "paymentMethod.monthlyLimitPerMember.label": "Limite mensal por membro",
   "paymentMethod.typeSelect": "{type, select, virtualcard {Gift card} creditcard {Credit card} prepaid {Prepaid}}",
+  "PaymentMethodExpiredOn": "Expired on {expiryDate}",
   "paymentMethods.creditcard.add": "Adicione um cartão de crédito",
   "paymentMethods.creditcard.add.info": "Para fazer doações como {contributeAs}",
   "paymentMethods.labelCollective": "{balance} disponível",

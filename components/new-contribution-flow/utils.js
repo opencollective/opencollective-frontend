@@ -1,13 +1,17 @@
 import React from 'react';
 import * as LibTaxes from '@opencollective/taxes';
-import { find, get, uniqBy } from 'lodash';
+import { find, get, sortBy, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
-import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
+import {
+  getPaymentMethodIcon,
+  getPaymentMethodMetadata,
+  isPaymentMethodDisabled,
+} from '../../lib/payment-method-utils';
 
 import CreditCardInactive from '../../components/icons/CreditCardInactive';
 
@@ -35,15 +39,8 @@ export const taxesMayApply = (collective, host, tier) => {
   }
 };
 
-export const generatePaymentMethodOptions = (
-  paymentMethods,
-  supportedPaymentMethods,
-  stepProfile,
-  stepDetails,
-  collective,
-) => {
-  const minBalance = 50; // Minimum usable balance for virtual card and collective to collective
-
+export const generatePaymentMethodOptions = (paymentMethods, stepProfile, stepDetails, collective) => {
+  const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
@@ -54,7 +51,7 @@ export const generatePaymentMethodOptions = (
     subtitle: getPaymentMethodMetadata(pm),
     icon: getPaymentMethodIcon(pm),
     paymentMethod: pm,
-    disabled: pm.balance.value < minBalance,
+    disabled: isPaymentMethodDisabled(pm),
     id: pm.id,
     CollectiveId: pm.account.id,
     type: pm.type,
@@ -92,14 +89,6 @@ export const generatePaymentMethodOptions = (
     return find(prepaidLimitedToHostCollectiveIds, { legacyId: hostCollectiveLegacyId });
   };
 
-  uniquePMs = uniquePMs.filter(pm => {
-    if (pm.type === 'prepaid') {
-      return matchesHostCollectiveIdPrepaid(pm);
-    } else {
-      return pm;
-    }
-  });
-
   // gift card: can be limited to a specific host, see limitedToHosts
   const matchesHostCollectiveId = giftcard => {
     const hostCollectiveId = get(collective, 'host.id');
@@ -110,10 +99,17 @@ export const generatePaymentMethodOptions = (
   uniquePMs = uniquePMs.filter(pm => {
     if (pm.type === 'virtualcard' && pm.limitedToHosts) {
       return matchesHostCollectiveId(pm);
+    } else if (pm.type === 'prepaid') {
+      return matchesHostCollectiveIdPrepaid(pm);
+    } else if (!hostHasStripe && pm.type === 'creditcard') {
+      return false;
     } else {
-      return pm;
+      return true;
     }
   });
+
+  // Put disabled PMs at the end
+  uniquePMs = sortBy(uniquePMs, ['disabled', 'type', 'id']);
 
   // adding payment methods
   if (stepProfile.type !== CollectiveType.COLLECTIVE) {
@@ -147,10 +143,6 @@ export const generatePaymentMethodOptions = (
         instructions: get(collective, 'host.settings.paymentMethods.manual.instructions', null),
       });
     }
-  }
-
-  if (!hostHasStripe) {
-    uniquePMs = uniquePMs.filter(pm => pm.type !== 'creditcard');
   }
 
   if (!uniquePMs.length) {

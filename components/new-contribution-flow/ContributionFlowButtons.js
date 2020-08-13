@@ -29,7 +29,6 @@ class NewContributionFlowButtons extends React.Component {
 
   render() {
     const { goBack, goNext, isValidating } = this.props;
-
     return (
       <Flex justifyContent={'center'} mt={3}>
         <Fragment>

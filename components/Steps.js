@@ -18,11 +18,11 @@ export default class Steps extends React.Component {
         isCompleted: PropTypes.bool,
       }),
     ).isRequired,
-    /** The current step name. The step must be present in `steps`. */
+    /** The current step name. The step must be present in `steps` */
     currentStepName: PropTypes.string.isRequired,
-    /** Called to change step. */
+    /** Called to change step */
     onStepChange: PropTypes.func.isRequired,
-    /** Called the last step is submitted. */
+    /** Called when the last step is submitted */
     onComplete: PropTypes.func.isRequired,
     /** A function that gets passed everything needed to show the current step */
     children: PropTypes.func.isRequired,

@@ -106,7 +106,7 @@ StyledInputField.propTypes = {
   /** If set to false, the field will be marked as optional */
   required: PropTypes.bool,
   /** Font size for the label */
-  labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   labelColor: PropTypes.string,
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,

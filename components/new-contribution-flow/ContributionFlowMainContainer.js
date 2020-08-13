@@ -112,7 +112,7 @@ class NewContributionFlowMainContainer extends React.Component {
 
   renderStep = step => {
     const { collective, mainState, tier } = this.props;
-    const { stepProfile, stepDetails, stepSummary } = mainState;
+    const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
         return (
@@ -147,8 +147,8 @@ class NewContributionFlowMainContainer extends React.Component {
             collective={this.props.collective}
             stepDetails={this.props.mainState.stepDetails}
             stepProfile={this.props.mainState.stepProfile}
-            stepPayment={this.props.mainState.stepPayment}
             onChange={this.props.onChange}
+            stepPayment={stepPayment}
           />
         );
       case 'summary':
