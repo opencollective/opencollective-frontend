@@ -25,10 +25,10 @@ const SocialLink = styled.a`
   border: 1px solid #dcdee0;
   border-radius: 50%;
   display: flex;
-  height: 48px;
+  height: 36px;
   justify-content: center;
   opacity: 0.6;
-  width: 48px;
+  width: 36px;
 
   &:hover,
   &:focus {
@@ -190,6 +190,7 @@ const Footer = () => {
       ),
     };
   });
+  const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
 
   return (
     <Flex
@@ -288,7 +289,7 @@ const Footer = () => {
               <StyledSelect
                 options={languageOptions}
                 onChange={({ value }) => switchLanguage(value)}
-                defaultValue={languageOptions[0]}
+                defaultValue={defaultLanguage}
                 borderRadius="10px"
                 menuPlacement="auto"
                 width={1}
@@ -305,19 +306,19 @@ const Footer = () => {
             maxWidth="288px"
           >
             <SocialLink href="https://blog.opencollective.com/">
-              <Blog size={17} color="#76777A" />
+              <Blog size={16} color="#76777A" />
             </SocialLink>
             <SocialLink href="https://twitter.com/opencollect">
-              <Twitter size={17} color="#76777A" />
+              <Twitter size={16} color="#76777A" />
             </SocialLink>
             <SocialLink href="https://github.com/opencollective">
-              <Github size={17} color="#76777A" />
+              <Github size={16} color="#76777A" />
             </SocialLink>
             <SocialLink href="https://slack.opencollective.com">
-              <Slack size={17} color="#76777A" />
+              <Slack size={16} color="#76777A" />
             </SocialLink>
             <SocialLink href="mailto:info@opencollective.com">
-              <Mail size={19} color="#76777A" />
+              <Mail size={16} color="#76777A" />
             </SocialLink>
           </Container>
         </Flex>
@@ -409,7 +410,7 @@ const Footer = () => {
               data-cy="language-switcher"
               options={languageOptions}
               onChange={({ value }) => switchLanguage(value)}
-              defaultValue={languageOptions[0]}
+              defaultValue={defaultLanguage}
               menuPlacement="auto"
             />
           </Container>
