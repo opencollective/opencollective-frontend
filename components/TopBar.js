@@ -12,6 +12,7 @@ import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
+import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import { withUser } from './UserProvider';
 
@@ -67,6 +68,31 @@ class TopBar extends React.Component {
     },
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { showMobileMenu: false };
+    this.ref = React.createRef();
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.onClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.onClickOutside);
+  }
+
+  onClickOutside = e => {
+    const ref = this.ref.current;
+    if (ref && !ref.contains(e.target)) {
+      this.setState({ showMobileMenu: false });
+    }
+  };
+
+  toggleMobileMenu = () => {
+    this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
+  };
+
   render() {
     const { showSearch, menuItems } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
@@ -79,6 +105,7 @@ class TopBar extends React.Component {
         flexDirection="row"
         justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white' }}
+        ref={this.ref}
       >
         <Link route="home" passHref>
           <Flex as="a" alignItems="center">
@@ -101,22 +128,12 @@ class TopBar extends React.Component {
           </Flex>
         )}
 
-        <Flex alignItems="center" justifyContent="flex-start" flex="1 1 auto">
+        <Flex alignItems="center" justifyContent={['flex-end', 'flex-start']} flex="1 1 auto">
           <Hide lg>
             <Box mx={3}>
               <Link href="/search">
                 <Flex as="a">
                   <SearchIcon fill="#aaaaaa" size={24} />
-                </Flex>
-              </Link>
-            </Box>
-          </Hide>
-
-          <Hide sm md lg>
-            <Box mx={3}>
-              <Link href="#footer">
-                <Flex as="a">
-                  <MenuIcon color="#aaaaaa" size={24} />
                 </Flex>
               </Link>
             </Box>
@@ -162,6 +179,18 @@ class TopBar extends React.Component {
           </Hide>
         </Flex>
         <TopBarProfileMenu />
+        <Hide sm md lg>
+          <TopBarMobileMenu
+            showMobileMenu={this.state.showMobileMenu}
+            menuItems={merged}
+            closeMenu={this.toggleMobileMenu}
+          />
+          <Box mx={3} onClick={this.toggleMobileMenu}>
+            <Flex as="a">
+              <MenuIcon color="#aaaaaa" size={24} />
+            </Flex>
+          </Box>
+        </Hide>
       </Flex>
     );
   }

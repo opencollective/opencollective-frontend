@@ -416,7 +416,9 @@ class TopBarProfileMenu extends React.Component {
           </P>
         </Hide>
         <Avatar collective={get(LoggedInUser, 'collective')} radius="3rem" mr={2} />
-        <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
+        <Hide xs>
+          <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
+        </Hide>
         {showProfileMenu && (
           <React.Fragment>
             <HideGlobalScroll />
