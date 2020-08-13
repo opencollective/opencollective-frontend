@@ -161,7 +161,7 @@ RecurringContributionsCard.propTypes = {
     totalDonations: PropTypes.object.isRequired,
   }),
   status: PropTypes.string.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
+  LoggedInUser: PropTypes.object,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
 };
