@@ -56,6 +56,16 @@ export const getItems = (options, keyGetter) => {
   );
 };
 
+const RadioListContainer = styled(Container)`
+  & > *:first-child > * {
+    border-radius: 15px 15px 0 0;
+  }
+
+  & > *:last-child > * {
+    border-radius: 0 0 15px 15px;
+  }
+`;
+
 /**
  * Component for controlling a list of radio inputs
  */
@@ -79,7 +89,7 @@ const StyledRadioList = ({
   const checkedItem = !isUndefined(props.value) ? props.value : localStateSelected;
 
   return (
-    <Container id={id} as="fieldset" border="none" m={0} p={0} {...containerProps}>
+    <RadioListContainer id={id} as="fieldset" border="none" m={0} p={0} {...containerProps}>
       {items.map(({ value, key }, index) => (
         <Container as="label" cursor="pointer" htmlFor={id && key + id} key={key} width={1} m={0} {...labelProps}>
           {children({
@@ -110,7 +120,7 @@ const StyledRadioList = ({
           })}
         </Container>
       ))}
-    </Container>
+    </RadioListContainer>
   );
 };
 

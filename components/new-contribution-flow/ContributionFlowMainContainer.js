@@ -175,13 +175,13 @@ class NewContributionFlowMainContainer extends React.Component {
       <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
         <Flex flexDirection="column" alignItems="center">
           <Flex width="100%" mb={3}>
-            <Flex width={3 / 4} alignItems="center" justifyContent="center">
-              <H4 fontSize={[20, 24]} fontWeight={500} py={2}>
+            <Flex alignItems="center">
+              <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
                 {this.renderHeader(step.name, LoggedInUser)}
               </H4>
             </Flex>
             <Flex flexGrow={1} alignItems="center" justifyContent="center">
-              <StyledHr width="100%" ml={[null, 3]} borderColor="black.300" />
+              <StyledHr width="100%" ml={3} borderColor="black.300" />
             </Flex>
           </Flex>
           {this.renderStep(step.name)}

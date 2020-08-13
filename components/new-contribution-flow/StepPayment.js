@@ -220,15 +220,15 @@ const NewContributionFlowStepPayment = ({
                 <Box as="span" mr={3} flexWrap="wrap">
                   {radio}
                 </Box>
-                <Flex mr={2} css={{ flexBasis: '26px' }}>
+                <Flex mr={3} css={{ flexBasis: '26px' }}>
                   {value.icon}
                 </Flex>
                 <Flex flexDirection="column">
-                  <P fontSize="15px" fontWeight={400} color="black.900">
+                  <P fontSize="15px" lineHeight="20px" fontWeight={400} color="black.900">
                     {value.title}
                   </P>
                   {value.subtitle && (
-                    <P fontSize="Caption" fontWeight={400} lineHeight="Caption" color="black.500">
+                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
                       {value.subtitle}
                     </P>
                   )}
@@ -245,7 +245,7 @@ const NewContributionFlowStepPayment = ({
                 </Box>
               )}
               {value.key === 'manual' && checked && value.instructions && (
-                <Box my={3} color="black.600" fontSize="Paragraph">
+                <Box my={3} color="black.600" fontSize="14px">
                   {value.instructions}
                 </Box>
               )}

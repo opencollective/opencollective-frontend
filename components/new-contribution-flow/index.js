@@ -13,7 +13,7 @@ import { Router } from '../../server/pages';
 
 import Container from '../../components/Container';
 import NewContributeFAQ from '../../components/faqs/NewContributeFAQ';
-import { Box, Flex } from '../../components/Grid';
+import { Box, Grid } from '../../components/Grid';
 import { addSignupMutation } from '../../components/SignInOrJoinFree';
 
 import Loading from '../Loading';
@@ -301,9 +301,17 @@ class ContributionFlow extends React.Component {
                 />
               </StepsProgressBox>
               {/* main container */}
-              <Flex justifyContent="center" width={1} maxWidth={1340} flexWrap={['wrap', 'nowrap']} px={[2, 3]}>
-                <Box display={['none', null, null, 'block']} width={[0.5, null, null, null, 1 / 3]} />
-                <Box as="form" flex="1 1 50%" onSubmit={e => e.preventDefault()}>
+              <Grid
+                px={[2, 3]}
+                gridTemplateColumns={[
+                  'minmax(200px, 600px)',
+                  null,
+                  '0fr minmax(300px, 600px) 1fr',
+                  '1fr minmax(300px, 600px) 1fr',
+                ]}
+              >
+                <Box />
+                <Box as="form" onSubmit={e => e.preventDefault()} maxWidth="100%">
                   <ContributionFlowMainContainer
                     collective={collective}
                     tier={tier}
@@ -324,13 +332,13 @@ class ContributionFlow extends React.Component {
                     />
                   </Box>
                 </Box>
-                <Box minWidth="300px" width={1 / 3} ml={[0, 4]} mt={[4, 0]}>
-                  <Box maxWidth={['100%', 300]}>
+                <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                  <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                     <SafeTransactionMessage />
                     <NewContributeFAQ mt={4} titleProps={{ mb: 2 }} />
                   </Box>
                 </Box>
-              </Flex>
+              </Grid>
             </Container>
           )
         }
