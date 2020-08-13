@@ -83,7 +83,11 @@ const ExpenseSummary = ({
 
   return (
     <StyledCard p={borderless ? 0 : [16, 24, 32]} borderStyle={borderless ? 'none' : 'solid'} {...props}>
-      <Flex justifyContent="space-between" alignItems="center">
+      <Flex
+        flexDirection={['column-reverse', 'row']}
+        alignItems={['flex-start', 'center']}
+        justifyContent="space-between"
+      >
         <H4 my={2} mr={2} fontWeight="500">
           {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
         </H4>

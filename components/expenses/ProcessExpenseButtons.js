@@ -55,15 +55,21 @@ export const hasProcessButtons = permissions => {
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps }) => {
+const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, showError, onError }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
-  const mutationVariables = { id: expense.id, legacyId: expense.legacyId };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
 
-  const triggerAction = (action, paymentParams) => {
+  const triggerAction = async (action, paymentParams) => {
     setSelectedAction(action);
-    return processExpense({ variables: { ...mutationVariables, action, paymentParams } });
+
+    try {
+      return await processExpense({ variables: { id: expense.id, legacyId: expense.legacyId, action, paymentParams } });
+    } catch (e) {
+      if (onError && selectedAction !== 'PAY') {
+        onError(getErrorFromGraphqlException(error));
+      }
+    }
   };
 
   const getButtonProps = (action, hasOnClick = true) => {
@@ -78,7 +84,7 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
 
   return (
     <React.Fragment>
-      {!loading && error && selectedAction !== 'PAY' && (
+      {!loading && showError && error && selectedAction !== 'PAY' && (
         <MessageBox flex="1 0 100%" type="error" withIcon>
           {getErrorFromGraphqlException(error).message}
         </MessageBox>
@@ -149,6 +155,8 @@ ProcessExpenseButtons.propTypes = {
   host: PropTypes.object,
   /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
+  showError: PropTypes.bool,
+  onError: PropTypes.func,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
@@ -160,6 +168,7 @@ export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
 
 ProcessExpenseButtons.defaultProps = {
   buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
+  showError: true,
 };
 
 export default ProcessExpenseButtons;

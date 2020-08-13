@@ -13,6 +13,7 @@ import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
 import Container from '../Container';
 import DefinedTerm, { Terms } from '../DefinedTerm';
+import ExpenseModal from '../expenses/ExpenseModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
 import { Box, Flex } from '../Grid';
@@ -25,7 +26,6 @@ import TransactionSign from '../TransactionSign';
 import { useUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
-import TransactionModal from './TransactionModal';
 
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
@@ -201,9 +201,9 @@ const TransactionItem = ({ displayActions, ...transaction }) => {
       </Box>
       {isExpanded && !hasExpense && <TransactionDetails {...transaction} displayActions={displayActions} />}
       {isExpanded && hasExpense && (
-        <TransactionModal
-          {...transaction}
-          canDownloadInvoice={canDownloadInvoice}
+        <ExpenseModal
+          expense={transaction.expense}
+          permissions={{ canSeeInvoiceInfo: canDownloadInvoice }}
           onClose={() => setExpanded(false)}
           show={true}
         />

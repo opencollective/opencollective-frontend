@@ -111,7 +111,7 @@ const getVariablesFromQuery = query => {
 
 const HostDashboardExpenses = ({ hostSlug }) => {
   const { query } = useRouter() || {};
-  const { data, error, loading, variables } = useQuery(hostDashboardExpensesQuery, {
+  const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
   });
@@ -208,6 +208,8 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             host={data?.host}
             expenses={data?.expenses?.nodes}
             view="admin"
+            usePreviewModal
+            onDelete={() => refetch()}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

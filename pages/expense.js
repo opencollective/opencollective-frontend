@@ -295,6 +295,15 @@ class ExpensePage extends React.Component {
     return this.setState(() => ({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense }));
   };
 
+  onDelete = async expense => {
+    const collective = expense.account;
+    return Router.replaceRoute('expenses', {
+      parentCollectiveSlug: collective.parent?.slug,
+      collectiveType: collective.parent ? getCollectiveTypeForUrl(collective) : undefined,
+      collectiveSlug: collective.slug,
+    });
+  };
+
   render() {
     const { collectiveSlug, data, loadingLoggedInUser, createSuccess, intl } = this.props;
     const { isRefetchingDataForUser, error, status, editedExpense, successMessageDismissed } = this.state;
@@ -352,6 +361,7 @@ class ExpensePage extends React.Component {
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
+                  onDelete={this.onDelete}
                 />
               )}
             </Flex>
