@@ -93,6 +93,10 @@ class ContributionFlow extends React.Component {
     };
   }
 
+  onComplete = () => {
+    console.log(this.state);
+  };
+
   getEmailRedirectURL() {
     let currentPath = window.location.pathname;
     if (window.location.search) {
@@ -249,13 +253,12 @@ class ContributionFlow extends React.Component {
 
   render() {
     const { collective, tier, LoggedInUser, skipStepDetails } = this.props;
-
     return (
       <Steps
         steps={this.getSteps()}
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
-        onComplete={console.log}
+        onComplete={this.onComplete}
         skip={skipStepDetails ? ['details'] : null}
       >
         {({

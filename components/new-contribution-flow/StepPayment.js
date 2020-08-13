@@ -6,7 +6,6 @@ import { first, get, isEmpty } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { GQLV2_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../../components/Container';
@@ -15,10 +14,10 @@ import Link from '../../components/Link';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import NewCreditCardForm from '../../components/NewCreditCardForm';
-import { withStripeLoader } from '../../components/StripeProvider';
 import StyledRadioList from '../../components/StyledRadioList';
 import { P } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
+
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 
 import { ERROR_MESSAGES } from './constants';
 import { generatePaymentMethodOptions } from './utils';
@@ -36,14 +35,15 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   query ContributionFlowPaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(types: ["creditcard", "virtualcard", "prepaid", "collective"]) {
+      paymentMethods(types: ["creditcard", "virtualcard", "prepaid", "collective"], includeExpired: true) {
         id
         name
         data
         service
         type
+        expiryDate
         balance {
-          value
+          valueInCents
           currency
         }
         account {
@@ -75,128 +75,100 @@ const messages = defineMessages({
   },
 });
 
+const getPaymentObject = (option, paymentObject) => {
+  const optionValue = option.value || option;
+  if (!option.name || option.name === 'PaymentMethod') {
+    return {
+      paymentMethod: optionValue,
+      title: optionValue.title,
+      key: optionValue.key,
+    };
+  } else if (option.name === 'newCreditCardInfo') {
+    return {
+      ...paymentObject,
+      paymentMethod: { type: 'creditcard', service: 'stripe' },
+      key: 'newCreditCard',
+      save: true,
+      isNew: true,
+      data: optionValue,
+      error: null,
+    };
+  } else if (option.name === 'save') {
+    return {
+      ...paymentObject,
+      save: optionValue.checked,
+      isNew: true,
+    };
+  }
+};
+
+const formatPaymentMethodError = (intl, collective, error) => {
+  if (!messages[error.messageId]) {
+    return error.messageId;
+  }
+  return intl.formatMessage(messages[error.messageId], {
+    collective: (
+      <Link route="new-donate" params={{ collectiveSlug: collective.slug, verb: 'new-donate' }}>
+        {collective.name}
+      </Link>
+    ),
+  });
+};
+
 const NewContributionFlowStepPayment = ({
-  LoggedInUser,
   stepDetails,
   stepProfile,
   stepPayment,
   collective,
   onChange,
-  loadStripe,
   hideCreditCardPostalCode,
 }) => {
   const intl = useIntl();
-  const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
   const [paymentMethodsError, setPaymentMethodsError] = useState(false);
-  const [paymentObject, setPaymentObject] = useState(null);
-
-  const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', null);
-  const hostHasStripe = supportedPaymentMethods.includes(GQLV2_PAYMENT_METHOD_TYPES.CREDIT_CARD);
-  const slugForQuery = stepProfile.isIncognito ? LoggedInUser.collective.slug : stepProfile.slug;
-  const skipPaymentMethodsQuery = !stepProfile.slug && !stepProfile.isIncognito;
 
   // GraphQL mutations and queries
-  const { data, loading: loadingPaymentMethodsFromGraphQL } = useQuery(paymentMethodsQuery, {
-    variables: {
-      slug: slugForQuery,
-    },
+  const { loading, data, error } = useQuery(paymentMethodsQuery, {
+    variables: { slug: stepProfile.slug },
     context: API_V2_CONTEXT,
-    skip: skipPaymentMethodsQuery,
+    skip: !stepProfile.id,
   });
-
-  // load stripe on mount
-  useEffect(() => {
-    if (hostHasStripe) {
-      loadStripe();
-    }
-  }, [hostHasStripe]);
 
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
   const paymentOptions = React.useMemo(() => {
-    if (!skipPaymentMethodsQuery && loadingPaymentMethodsFromGraphQL) {
-      return;
-    }
     try {
-      return generatePaymentMethodOptions(
-        paymentMethods,
-        supportedPaymentMethods,
-        stepProfile,
-        stepDetails,
-        collective,
-      );
+      return generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, collective);
     } catch (error) {
       setPaymentMethodsError({ messageId: error.message });
-      setLoadingSelectedPaymentMethod(false);
     }
-  }, [loadingPaymentMethodsFromGraphQL, stepProfile]);
+  }, [paymentMethods, stepProfile, stepDetails, collective]);
 
   const setNewPaymentMethod = option => {
-    if (paymentMethodsError) {
-      return;
-    }
-
-    const optionValue = option.value || option;
-
-    if (!option.name || option.name === 'PaymentMethod') {
-      setPaymentObject({
-        paymentMethod: optionValue,
-        title: optionValue.title,
-        key: optionValue.key,
-      });
-    } else if (option.name === 'newCreditCardInfo') {
-      setPaymentObject({
-        ...paymentObject,
-        paymentMethod: { type: 'creditcard', service: 'stripe' },
-        key: 'newCreditCard',
-        save: true,
-        isNew: true,
-        data: optionValue,
-        error: null,
-      });
-    } else if (option.name === 'save') {
-      setPaymentObject({
-        ...paymentObject,
-        save: optionValue.checked,
-        isNew: true,
-      });
+    if (!paymentMethodsError) {
+      const newPaymentObject = getPaymentObject(option, stepPayment);
+      if (newPaymentObject) {
+        onChange({ stepPayment: newPaymentObject });
+      }
     }
   };
 
-  // set payment methods for radio list
+  // Set default payment method
   useEffect(() => {
-    // guest user stuff
-    if (skipPaymentMethodsQuery) {
+    if (!stepPayment && !isEmpty(paymentOptions)) {
       setNewPaymentMethod(first(paymentOptions));
-      setLoadingSelectedPaymentMethod(false);
-    } else {
-      // logged in user stuff
-      if (!loadingPaymentMethodsFromGraphQL && !isEmpty(paymentOptions)) {
-        setNewPaymentMethod(first(paymentOptions));
-        setLoadingSelectedPaymentMethod(false);
-      }
     }
-  }, [paymentOptions]);
-
-  // set selected payment method in steps progress bar
-  useEffect(() => {
-    onChange({ stepPayment: paymentObject });
-  }, [paymentObject]);
+  }, [paymentOptions, stepPayment]);
 
   return (
     <Container width={1} border={['1px solid #DCDEE0', 'none']} borderRadius={15}>
-      {loadingSelectedPaymentMethod ? (
+      {loading ? (
         <Loading />
       ) : paymentMethodsError ? (
         <MessageBox type="warning" withIcon>
-          {intl.formatMessage(messages[paymentMethodsError.messageId], {
-            collective: (
-              <Link route="new-donate" params={{ collectiveSlug: stepProfile.slug, verb: 'new-donate' }}>
-                {stepProfile.name}
-              </Link>
-            ),
-          })}
+          {formatPaymentMethodError(intl, collective, paymentMethodsError)}
         </MessageBox>
+      ) : error ? (
+        <MessageBoxGraphqlError error={error} />
       ) : (
         <StyledRadioList
           id="PaymentMethod"
@@ -258,8 +230,6 @@ const NewContributionFlowStepPayment = ({
 };
 
 NewContributionFlowStepPayment.propTypes = {
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
   collective: PropTypes.object,
   stepDetails: PropTypes.object,
   stepPayment: PropTypes.object,
@@ -273,4 +243,4 @@ NewContributionFlowStepPayment.defaultProps = {
   hideCreditCardPostalCode: false,
 };
 
-export default withStripeLoader(withUser(NewContributionFlowStepPayment));
+export default NewContributionFlowStepPayment;

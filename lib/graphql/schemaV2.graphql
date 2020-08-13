@@ -1,14 +1,4 @@
 """
-Exposes a URL that specifies the behaviour of this scalar.
-"""
-directive @specifiedBy(
-  """
-  The URL that specifies the behaviour of this scalar.
-  """
-  url: String!
-) on SCALAR
-
-"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -143,18 +133,23 @@ interface Account {
   transferwise: TransferWise
 
   """
-  The list of payout methods that this collective can use to get paid
+  The list of payout methods that this account can use to get paid
   """
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders
+  The list of payment methods that this account can use to pay for Orders
   """
   paymentMethods(
     """
     Filter on given types (creditcard, virtualcard...)
     """
     types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
   ): [PaymentMethod]
 
   """
@@ -590,7 +585,14 @@ type Bot implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -772,7 +774,14 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -2732,7 +2741,14 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3245,14 +3261,19 @@ All supported expense types
 """
 enum ExpenseType {
   """
-  Invoice: Get paid back for a purchase already made.
+  Invoice: Charge for your time or get paid in advance.
   """
   INVOICE
 
   """
-  Receipt: Charge for your time or get paid in advance
+  Receipt:  Get paid back for a purchase already made.
   """
   RECEIPT
+
+  """
+  Funding Request: Request funding for a project or initiative.
+  """
+  FUNDING_REQUEST
 
   """
   Unclassified expense
@@ -3467,7 +3488,14 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3700,7 +3728,14 @@ type Host implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -3966,7 +4001,14 @@ type Individual implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -4714,7 +4756,14 @@ type Organization implements Account {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -4758,6 +4807,7 @@ type PaymentMethod {
   account: Account
   data: JSON
   limitedToHosts: [Host]
+  expiryDate: ISODateTime
 }
 
 input PaymentMethodCreateInput {
@@ -4834,6 +4884,7 @@ enum PayoutMethodType {
   OTHER
   PAYPAL
   BANK_ACCOUNT
+  ACCOUNT_BALANCE
 }
 
 """
@@ -4995,7 +5046,14 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   """
   The list of payment methods that this collective can use to pay for Orders
   """
-  paymentMethods(types: [String]): [PaymentMethod]
+  paymentMethods(
+    types: [String]
+
+    """
+    Wether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)

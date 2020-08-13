@@ -1,16 +1,40 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { remove } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { orderBy } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
 import Avatar from '../../components/Avatar';
 import { Box, Flex } from '../../components/Grid';
 import StyledRadioList from '../../components/StyledRadioList';
 import { P } from '../../components/Text';
 
-const messages = defineMessages({
-  incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
-});
+const prepareProfiles = (profiles, collective, canUseIncognito) => {
+  const filteredProfiles = profiles.filter(p => {
+    // if admin of collective you are donating to, remove it from the list
+    if (p.id === collective.legacyId) {
+      return false;
+    } else if (!canUseIncognito && p.isIncognito) {
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  if (canUseIncognito) {
+    const incognitoProfile = filteredProfiles.find(p => p.type === 'USER' && p.isIncognito);
+    if (!incognitoProfile) {
+      filteredProfiles.push({
+        id: 'incognito',
+        type: 'USER',
+        isIncognito: true,
+        name: <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />,
+      });
+    }
+  }
+
+  // Will put first: User / Not incognito
+  return orderBy(filteredProfiles, ['type', 'isIncognito', 'name'], ['desc', 'desc', 'asc']);
+};
 
 const NewContributionFlowStepProfileLoggedInForm = ({
   profiles,
@@ -19,37 +43,16 @@ const NewContributionFlowStepProfileLoggedInForm = ({
   canUseIncognito,
   collective,
 }) => {
-  const intl = useIntl();
-
   // set initial default profile so it shows in Steps Progress as well
   useEffect(() => {
     onChange({ stepProfile: defaultSelectedProfile });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedProfile]);
 
-  const filteredProfiles = React.useMemo(() => {
-    const filtered = [...profiles];
-
-    // if admin of collective you are donating to, remove it from the list
-    remove(filtered, p => p.id === collective.legacyId);
-
-    // if the user doesn't have an incognito profile yet, we offer to create one
-    if (canUseIncognito) {
-      const incognitoProfile = filtered.find(p => p.type === 'USER' && p.isIncognito);
-      if (!incognitoProfile) {
-        filtered.push({
-          id: 'incognito',
-          type: 'USER',
-          isIncognito: true,
-          name: intl.formatMessage(messages['incognito']),
-        });
-      }
-    } else {
-      remove(filtered, p => p.isIncognito);
-    }
-
-    return filtered;
-  }, [profiles]);
+  const filteredProfiles = React.useMemo(() => prepareProfiles(profiles, collective, canUseIncognito), [
+    profiles,
+    collective,
+    canUseIncognito,
+  ]);
 
   return (
     <Fragment>
