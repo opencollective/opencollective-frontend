@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactTooltip from 'react-tooltip';
+import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-const StyledTooltipContainer = styled(ReactTooltip)`
+import { Box } from './Grid';
+
+const StyledTooltipContainer = styled(`div`)`
   max-width: 320px;
   z-index: 1000000;
   opacity: 0.96 !important;
@@ -22,10 +24,80 @@ const StyledTooltipContainer = styled(ReactTooltip)`
   }
 `;
 
+const Arrow = styled('div')`
+  position: absolute;
+  width: 3em;
+  height: 3em;
+  &[data-placement*='bottom'] {
+    top: 0;
+    left: 0;
+    margin-top: -0.9em;
+    width: 3em;
+    height: 1em;
+    &::before {
+      border-width: 0 1.5em 1em 1.5em;
+      border-color: transparent transparent #ffffff transparent;
+      filter: drop-shadow(0px -3px 3px rgba(20, 20, 20, 0.1));
+    }
+  }
+  &[data-placement*='top'] {
+    bottom: 0;
+    left: 0;
+    margin-bottom: -0.9em;
+    width: 3em;
+    height: 1em;
+    &::before {
+      border-width: 1em 1.5em 0 1.5em;
+      border-color: #ffffff transparent transparent transparent;
+      filter: drop-shadow(0px 3px 3px rgba(20, 20, 20, 0.1));
+    }
+  }
+  &[data-placement*='right'] {
+    left: 0;
+    margin-left: -0.9em;
+    height: 3em;
+    width: 1em;
+    &::before {
+      border-width: 1.5em 1em 1.5em 0;
+      border-color: transparent #ffffff transparent transparent;
+      filter: drop-shadow(-4px 3px 3px rgba(20, 20, 20, 0.1));
+    }
+  }
+  &[data-placement*='left'] {
+    right: 0;
+    margin-right: -0.9em;
+    height: 3em;
+    width: 1em;
+    &::before {
+      border-width: 1.5em 0 1.5em 1em;
+      border-color: transparent transparent transparent #ffffff;
+      filter: drop-shadow(4px 3px 3px rgba(20, 20, 20, 0.1));
+    }
+  }
+  &::before {
+    content: '';
+    margin: auto;
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+`;
+
 const ChildrenContainer = styled.div`
   display: ${props => props.display};
   cursor: help;
 `;
+
+const REACT_POPPER_MODIFIERS = [
+  {
+    name: 'flip',
+    options: {
+      fallbackPlacements: ['right', 'bottom', 'top'],
+      padding: { right: 100 },
+    },
+  },
+];
 
 /**
  * A tooltip to show overlays on hover.
@@ -35,16 +107,10 @@ const ChildrenContainer = styled.div`
  */
 class StyledTooltip extends React.Component {
   static propTypes = {
-    /** Tooltip type */
-    type: PropTypes.oneOf(['success', 'warning', 'error', 'info', 'light', 'dark']),
     /** Tooltip place */
     place: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
     /** The popup content */
     content: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-    /** See react-tooltip */
-    delayHide: PropTypes.number,
-    /** See react-tooltip */
-    delayUpdate: PropTypes.number,
     /** If using a node children, this defines the parent display type */
     display: PropTypes.string,
     /** The component that will be used as a container for the children */
@@ -59,8 +125,6 @@ class StyledTooltip extends React.Component {
   static defaultProps = {
     type: 'dark',
     place: 'top',
-    delayHide: 500,
-    delayUpdate: 500,
     display: 'inline-block',
   };
 
@@ -70,34 +134,38 @@ class StyledTooltip extends React.Component {
     this.setState({ id: `tooltip-${uuid()}` });
   }
 
-  renderContent = () => {
-    const { content } = this.props;
-    return typeof content === 'function' ? content() : content;
-  };
-
   render() {
     const isMounted = Boolean(this.state.id);
     const triggerProps = isMounted ? { 'data-for': this.state.id, 'data-tip': true } : {};
     return (
       <React.Fragment>
-        {typeof this.props.children === 'function' ? (
-          this.props.children(triggerProps)
-        ) : (
-          <ChildrenContainer as={this.props.childrenContainer} display={this.props.display} {...triggerProps}>
-            {this.props.children}
-          </ChildrenContainer>
-        )}
-        {isMounted && (
-          <StyledTooltipContainer
-            id={this.state.id}
-            effect="solid"
-            delayHide={this.props.delayHide}
-            delayUpdate={this.props.delayUpdate}
-            place={this.props.place}
-            type={this.props.type}
-            getContent={this.renderContent}
-          />
-        )}
+        <Manager>
+          <Reference>
+            {({ ref }) => (
+              <Box ref={ref} css={{ display: 'inline' }}>
+                {typeof this.props.children === 'function' ? (
+                  this.props.children(triggerProps)
+                ) : (
+                  <ChildrenContainer as={this.props.childrenContainer} display={this.props.display} {...triggerProps}>
+                    {this.props.children}
+                  </ChildrenContainer>
+                )}
+              </Box>
+            )}
+          </Reference>
+
+          {isMounted && (
+            <Popper placement={this.props.place} modifiers={REACT_POPPER_MODIFIERS}>
+              {({ ref, style, placement, arrowProps }) => (
+                <StyledTooltipContainer ref={ref} style={style}>
+                  {typeof this.props.content === 'function' ? this.props.content() : this.props.content}
+
+                  <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />
+                </StyledTooltipContainer>
+              )}
+            </Popper>
+          )}
+        </Manager>
       </React.Fragment>
     );
   }
