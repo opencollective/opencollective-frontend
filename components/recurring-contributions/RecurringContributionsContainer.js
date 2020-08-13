@@ -9,6 +9,7 @@ import Container from '../Container';
 import { Flex, Grid } from '../Grid';
 import { fadeIn } from '../StyledKeyframes';
 import { P } from '../Text';
+import { withUser } from '../UserProvider';
 
 import RecurringContributionsCard from './RecurringContributionsCard';
 
@@ -34,8 +35,19 @@ const filterContributions = (contributions, filterName) => {
   }
 };
 
-const RecurringContributionsContainer = ({ recurringContributions, filter, createNotification, account }) => {
-  const displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
+const RecurringContributionsContainer = ({
+  recurringContributions,
+  filter,
+  createNotification,
+  account,
+  LoggedInUser,
+}) => {
+  let displayedRecurringContributions = filterContributions(recurringContributions.nodes, filter);
+  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(account);
+  displayedRecurringContributions = isAdmin
+    ? displayedRecurringContributions
+    : displayedRecurringContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
+
   return (
     <Container mt={4}>
       {displayedRecurringContributions.length ? (
@@ -74,6 +86,7 @@ RecurringContributionsContainer.propTypes = {
   filter: PropTypes.string.isRequired,
   createNotification: PropTypes.func,
   account: PropTypes.object.isRequired,
+  LoggedInUser: PropTypes.object,
 };
 
-export default RecurringContributionsContainer;
+export default withUser(RecurringContributionsContainer);
