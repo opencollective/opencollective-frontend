@@ -27,12 +27,13 @@ const SocialLink = styled.a`
   display: flex;
   height: 36px;
   justify-content: center;
-  opacity: 0.6;
   width: 36px;
+  color: #76777a;
+  opacity: 1;
 
   &:hover,
   &:focus {
-    opacity: 1;
+    opacity: 0.8;
   }
 `;
 
@@ -239,9 +240,9 @@ const Footer = () => {
             <P
               textAlign={['center', 'left']}
               color="black.800"
-              fontSize={['12px']}
-              lineHeight={['18px']}
-              letterSpacing={['-0.04px']}
+              fontSize="12px"
+              lineHeight="18px"
+              letterSpacing="-0.04px"
             >
               <FormattedMessage id="footer.OC.description" defaultMessage="Make your community sustainable." />
             </P>
@@ -285,7 +286,7 @@ const Footer = () => {
                 <InfoCircle size={16} />
               </StyledTooltip>
             </P>
-            <Container width={['230px']} my={2}>
+            <Container width="230px" my={2}>
               <StyledSelect
                 options={languageOptions}
                 onChange={({ value }) => switchLanguage(value)}
@@ -298,27 +299,28 @@ const Footer = () => {
           </Container>
           <Container
             display="flex"
-            justifyContent="space-evenly"
+            justifyContent="space-between"
             alignItems="center"
             width={1}
             my={4}
             order={['2', '3', null, null, '2']}
-            maxWidth="288px"
+            maxWidth="230px"
+            flexWrap="wrap"
           >
             <SocialLink href="https://blog.opencollective.com/">
-              <Blog size={16} color="#76777A" />
+              <Blog size={16} />
             </SocialLink>
             <SocialLink href="https://twitter.com/opencollect">
-              <Twitter size={16} color="#76777A" />
+              <Twitter size={16} />
             </SocialLink>
             <SocialLink href="https://github.com/opencollective">
-              <Github size={16} color="#76777A" />
+              <Github size={16} />
             </SocialLink>
             <SocialLink href="https://slack.opencollective.com">
-              <Slack size={16} color="#76777A" />
+              <Slack size={16} />
             </SocialLink>
             <SocialLink href="mailto:info@opencollective.com">
-              <Mail size={16} color="#76777A" />
+              <Mail size={16} />
             </SocialLink>
           </Container>
         </Flex>
