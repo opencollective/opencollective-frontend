@@ -232,9 +232,8 @@ const Footer = () => {
             maxWidth="300px"
           >
             <Flex my="12px">
-              <object
-                type="image/svg+xml"
-                data="/static/images/opencollectivelogo-footer-n.svg"
+              <img
+                src="/static/images/opencollectivelogo-footer-n.svg"
                 height="28px"
                 width="167px"
                 style={{ maxWidth: '100%' }}
