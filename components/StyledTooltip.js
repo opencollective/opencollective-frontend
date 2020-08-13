@@ -16,12 +16,10 @@ const StyledTooltipContainer = styled(`div`)`
   font-size: 12px;
   text-transform: initial;
   white-space: normal;
-
-  &.type-light {
-    background: white;
-    color: ${props => props.theme.colors.black[700]};
-    border: 1px solid rgba(20, 20, 20, 0.08);
-  }
+  color: white;
+  border: 1px solid #f3f3f3;
+  background: black;
+  box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
 `;
 
 const Arrow = styled('div')`
@@ -36,7 +34,7 @@ const Arrow = styled('div')`
     height: 1em;
     &::before {
       border-width: 0 1.5em 1em 1.5em;
-      border-color: transparent transparent #ffffff transparent;
+      border-color: transparent transparent #00000f transparent;
       filter: drop-shadow(0px -3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -48,7 +46,7 @@ const Arrow = styled('div')`
     height: 1em;
     &::before {
       border-width: 1em 1.5em 0 1.5em;
-      border-color: #ffffff transparent transparent transparent;
+      border-color: #00000f transparent transparent transparent;
       filter: drop-shadow(0px 3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -59,7 +57,7 @@ const Arrow = styled('div')`
     width: 1em;
     &::before {
       border-width: 1.5em 1em 1.5em 0;
-      border-color: transparent #ffffff transparent transparent;
+      border-color: transparent #00000f transparent transparent;
       filter: drop-shadow(-4px 3px 3px rgba(20, 20, 20, 0.1));
     }
   }
@@ -70,7 +68,7 @@ const Arrow = styled('div')`
     width: 1em;
     &::before {
       border-width: 1.5em 0 1.5em 1em;
-      border-color: transparent transparent transparent #ffffff;
+      border-color: transparent transparent transparent #00000f;
       filter: drop-shadow(4px 3px 3px rgba(20, 20, 20, 0.1));
     }
   }
