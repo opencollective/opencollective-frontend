@@ -63,6 +63,8 @@ const TransactionDetails = ({
   amount,
   netAmount,
   permissions,
+  order,
+  expense,
 }) => {
   const intl = useIntl();
   const isCredit = type === TransactionTypes.CREDIT;
@@ -124,8 +126,10 @@ const TransactionDetails = ({
                     onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
                     minWidth={140}
                     background="transparent"
+                    textTransform="capitalize"
                   >
-                    <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />
+                    {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
+                    {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
                   </StyledButton>
                 )}
             </React.Fragment>
@@ -160,6 +164,7 @@ TransactionDetails.propTypes = {
     id: PropTypes.string,
     status: PropTypes.string,
   }),
+  expense: PropTypes.object,
   id: PropTypes.string,
   uuid: PropTypes.string,
   type: PropTypes.string,
