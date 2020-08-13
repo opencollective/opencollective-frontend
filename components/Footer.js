@@ -183,8 +183,8 @@ const Footer = () => {
           fontWeight="500"
           letterSpacing="-0.04px"
         >
-          <Span fontSize="24px">{language.flag}</Span>
-          <Span ml={1} whiteSpace="nowrap">
+          <Span fontSize="24px">{language.flag}</Span>&nbsp;
+          <Span whiteSpace="nowrap" ml={1}>
             {language.name} - {language.nativeName} ({language.completion})
           </Span>
         </Flex>
