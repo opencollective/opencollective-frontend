@@ -126,11 +126,19 @@ class StyledTooltip extends React.Component {
     display: 'inline-block',
   };
 
-  state = { id: null }; // We only set `id` on the client to avoid mismatches with SSR
+  state = { id: null, popperOpen: false }; // We only set `id` on the client to avoid mismatches with SSR
 
   componentDidMount() {
     this.setState({ id: `tooltip-${uuid()}` });
   }
+
+  handlePopperOpen = () => {
+    this.setState({ popperOpen: true });
+  };
+
+  handlePopperClose = () => {
+    this.setState({ popperOpen: false });
+  };
 
   render() {
     const isMounted = Boolean(this.state.id);
@@ -140,7 +148,12 @@ class StyledTooltip extends React.Component {
         <Manager>
           <Reference>
             {({ ref }) => (
-              <Box ref={ref} css={{ display: 'inline' }}>
+              <Box
+                ref={ref}
+                css={{ display: 'inline' }}
+                onMouseOver={this.handlePopperOpen}
+                onMouseOut={this.handlePopperClose}
+              >
                 {typeof this.props.children === 'function' ? (
                   this.props.children(triggerProps)
                 ) : (
@@ -152,7 +165,7 @@ class StyledTooltip extends React.Component {
             )}
           </Reference>
 
-          {isMounted && (
+          {isMounted && this.state.popperOpen && (
             <Popper placement={this.props.place} modifiers={REACT_POPPER_MODIFIERS}>
               {({ ref, style, placement, arrowProps }) => (
                 <StyledTooltipContainer ref={ref} style={style}>
