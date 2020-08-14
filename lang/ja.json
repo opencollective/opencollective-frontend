@@ -598,6 +598,7 @@
   "DismissableHelp.DontShowAgain": "Ok, don’t show me again",
   "Donation": "寄付",
   "DownloadInvoice": "請求書ダウンロード",
+  "DownloadReceipt": "Download receipt",
   "DragAndDropOrClickToUpload": "Drag & drop or <i18n-link>click to upload</i18n-link>",
   "DropZone.UploadBox": "Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>.",
   "Edit": "編集",
