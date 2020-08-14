@@ -553,6 +553,7 @@
   "createProfile.faq.persoVSOrg.title": "What's the difference between a personal and an organization profile?",
   "createProfile.faq.privacy.content": "Záleží nám na soukromí. Nepoužíváme cookies. Žádné Google Analytics. Žádné sledování. Proč vás tedy žádáme o vaše osobní informace? Protože z právních důvodů hostitel kolektivu potřebuje vědět, kdo jim dává peníze (KYC je zkratka: znej svého zákazníka). Dáváme vám však plnou kontrolu nad tím, jak se vaše informace zobrazují veřejně (ano, můžete anonymně příspívat, viz níže).",
   "createProfile.faq.privacy.title": "A co soukromí?",
+  "CreateProfile.name.conflict": "You can't use the same name for your Personal profile and your Organization.",
   "CreateProfile.OrgInfo": "Informace organizace",
   "CreateProfile.PersonalInfo": "Vaše osobní informace",
   "createProject.create": "Create a Project",

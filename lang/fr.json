@@ -553,6 +553,7 @@
   "createProfile.faq.persoVSOrg.title": "Quelle est la différence entre un profil personnel et un profil d'organisation ?",
   "createProfile.faq.privacy.content": "La protection de votre vie privée est au cœur d'Open Collective : nous n'utilisons pas de cookies, pas de Google Analytics, pas de pistage. Si nous vous demandons des informations personnelles, c'est parce que pour des raisons légales l'hôte du collectif a besoin de savoir qui est à l'origine d'un don (KYC - Know You Customer). Vous avez toutefois le contrôle sur ce que vous voulez voir partagé publiquement (vous pouvez contribuer incognito).",
   "createProfile.faq.privacy.title": "Qu'en est-il de ma vie privée ?",
+  "CreateProfile.name.conflict": "You can't use the same name for your Personal profile and your Organization.",
   "CreateProfile.OrgInfo": "Informations sur l'organisation",
   "CreateProfile.PersonalInfo": "Vos informations personnelles",
   "createProject.create": "Créer un Projet",
