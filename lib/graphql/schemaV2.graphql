@@ -1,4 +1,14 @@
 """
+Exposes a URL that specifies the behaviour of this scalar.
+"""
+directive @specifiedBy(
+  """
+  The URL that specifies the behaviour of this scalar.
+  """
+  url: String!
+) on SCALAR
+
+"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -1117,6 +1127,7 @@ enum ContributorRole {
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
+  ACCOUNTANT
 }
 
 """
@@ -3303,6 +3314,11 @@ input ExpenseUpdateInput {
   description: String
 
   """
+  Longer text to attach to the expense
+  """
+  longDescription: String
+
+  """
   Tags associated to the expense (ie. Food, Engineering...)
   """
   tags: [String]
@@ -4139,6 +4155,11 @@ type Member {
   Total amount donated
   """
   totalDonations: Amount
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   account: Account
 }
 
@@ -4167,6 +4188,11 @@ type MemberOf {
   Total amount donated
   """
   totalDonations: Amount
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   account: Account
 }
 
@@ -4192,6 +4218,7 @@ enum MemberRole {
   MEMBER
   FUNDRAISER
   FOLLOWER
+  ACCOUNTANT
 }
 
 """
@@ -4547,6 +4574,26 @@ type Mutation {
     """
     transaction: TransactionReferenceInput!
   ): Transaction!
+
+  """
+  Edit the public message for the given Member of a Collective
+  """
+  editPublicMessage(
+    """
+    Reference to an account for the donating Collective
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the receiving Collective
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    New public message
+    """
+    message: String
+  ): Member!
 }
 
 """
