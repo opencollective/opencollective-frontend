@@ -19,7 +19,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 1. Make sure you have Node.js version >= 12.
 
-- We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
+- We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
 ### Install
 
