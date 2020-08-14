@@ -61,8 +61,7 @@ const SectionBudget = ({ collective, stats }) => {
           <MessageBox type="info" withIcon maxWidth={800} fontStyle="italic" fontSize="14px">
             <FormattedMessage
               id="SectionBudget.Empty"
-              defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first
-                  financial contributors or when someone creates an expense."
+              defaultMessage="No transaction or expense created yet. They'll start appearing here as soon as you get your first financial contributors or when someone creates an expense."
             />
           </MessageBox>
         )}

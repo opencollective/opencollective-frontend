@@ -65,7 +65,7 @@ class EditTwitterAccount extends React.Component {
       'tenBackers.tweet': {
         id: 'connectedAccounts.twitter.tenBackers.tweet',
         defaultMessage:
-          '🎉 {collective} just reached 10 backers! Thank you {topBackersTwitterHandles} 🙌  Support them too!',
+          '🎉 {collective} just reached 10 backers! Thank you {topBackersTwitterHandles} 🙌 Support them too!',
       },
       'oneHundredBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.label',
@@ -77,7 +77,7 @@ class EditTwitterAccount extends React.Component {
       },
       'oneHundredBackers.tweet': {
         id: 'connectedAccounts.twitter.oneHundredBackers.tweet',
-        defaultMessage: '🎉 {collective} just reached 100 backers!! 🙌  Support them too!',
+        defaultMessage: '🎉 {collective} just reached 100 backers!! 🙌 Support them too!',
       },
       'oneThousandBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.label',
@@ -89,7 +89,7 @@ class EditTwitterAccount extends React.Component {
       },
       'oneThousandBackers.tweet': {
         id: 'connectedAccounts.twitter.oneThousandBackers.tweet',
-        defaultMessage: '🎉 {collective} just reached 1,000 backers!! 🙌  Support them too!',
+        defaultMessage: '🎉 {collective} just reached 1,000 backers!! 🙌 Support them too!',
       },
     });
 

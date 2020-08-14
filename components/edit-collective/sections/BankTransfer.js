@@ -121,7 +121,7 @@ const BankTransfer = props => {
               {data.host.plan.manualPayments ? (
                 <FormattedMessage
                   id="paymentMethods.manual.add.info"
-                  defaultMessage="To receive donations  directly on your bank account on behalf of the collectives that you are hosting"
+                  defaultMessage="To receive donations directly on your bank account on behalf of the collectives that you are hosting"
                 />
               ) : (
                 <FormattedMessage
