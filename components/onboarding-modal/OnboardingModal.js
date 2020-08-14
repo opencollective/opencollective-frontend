@@ -86,7 +86,7 @@ const ResponsiveModalOverlay = styled(ModalOverlay)`
 
 const ModalWithImage = styled(ResponsiveModal)`
   @media screen and (min-width: 40em) {
-    background: white url('/static/images/create-collective/original/onboardingSuccessIllustration.png');
+    background: white url('/static/images/create-collective/onboardingSuccessIllustration.png');
     background-repeat: no-repeat;
     background-size: 100%;
   }
