@@ -110,7 +110,7 @@ const messages = defineMessages({
   },
   'home.learnMore.blog': {
     id: 'home.learnMore.blog',
-    defaultMessage: 'Come meet the team, chat with the community, and share your questions and stories.',
+    defaultMessage: 'Case studies, news, and how groups around the world use Open Collective.',
   },
   'home.learnMore.blog.buttonText': {
     id: 'home.learnMore.blog.buttonText',
@@ -126,7 +126,8 @@ const messages = defineMessages({
   },
   'home.learnMore.openSourceCode': {
     id: 'home.learnMore.OpenSourceCode',
-    defaultMessage: 'Everything we do is open source.',
+    defaultMessage:
+      'Our code base is open source, you can branch or contribute in different ways in GitHub. Check it out!',
   },
   'home.learnMore.openSourceCode.buttonText': {
     id: 'home.learnMore.openSourceCode.buttonText',
