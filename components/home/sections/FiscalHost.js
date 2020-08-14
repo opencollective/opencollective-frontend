@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { background, display } from 'styled-system';
 
@@ -68,380 +68,297 @@ const DiscoverLink = styled(StyledLink)`
   }
 `;
 
-const FiscalHost = () => (
-  <Wrapper mb={5} pt={4} mt={[null, null, null, null, 7]}>
-    <Flex mx={[3, 4]} flexDirection="column" alignItems="center">
-      <Flex
-        flexDirection={['column', null, null, 'row']}
-        alignItems="center"
-        justifyContent={[null, null, 'space-around', null, 'center']}
-      >
-        <Container
-          display="flex"
-          flexDirection="column"
-          textAlign="left"
-          color="black.900"
-          mr={[null, null, 3, null, 4]}
-          ml={[null, null, null, null, 4]}
+const CollectHostPageLink = styled(StyledLink)`
+  color: #141414;
+
+  &:hover {
+    text-decoration: underline !important;
+    color: #141414;
+  }
+`;
+
+const messages = defineMessages({
+  OCF: {
+    id: 'OCF.description',
+    defaultMessage: 'For US charity initiatives',
+  },
+  OSC: {
+    id: 'OSC.description',
+    defaultMessage: 'For open source projects',
+  },
+  OCE: {
+    id: 'OCE.description',
+    defaultMessage: 'For EU-based groups',
+  },
+});
+
+const featuredHosts = [
+  {
+    id: 'OCF',
+    name: 'Open Collective Foundation',
+    collectivePageLink: '/foundation',
+    imageUrl: 'https://images.opencollective.com/foundation/a7d522f/logo/256.png',
+  },
+  {
+    id: 'OSC',
+    name: 'Open Source Collective',
+    collectivePageLink: '/opensource',
+    imageUrl: 'https://images.opencollective.com/opensource/426badd/logo/256.png',
+  },
+  {
+    id: 'OCE',
+    name: 'Open Collective Europe',
+    collectivePageLink: '/europe',
+    imageUrl: 'https://images.opencollective.com/europe/019a512/logo/256.png',
+  },
+];
+
+const FiscalHost = () => {
+  const intl = useIntl();
+
+  return (
+    <Wrapper mb={5} pt={4} mt={[null, null, null, null, 7]}>
+      <Flex mx={[3, 4]} flexDirection="column" alignItems="center">
+        <Flex
+          flexDirection={['column', null, null, 'row']}
+          alignItems="center"
+          justifyContent={[null, null, 'space-around', null, 'center']}
         >
-          <Box width={['268px', '648px', null, '456px', '657px']} textAlign="left">
-            <SectionTitle
-              display={[null, null, null, null, 'none']}
-              color="black.900"
-              mt={[5, null, null, 0]}
-              fontSize={['32px', '40px']}
-              lineHeight={['40px', '48px']}
-              letterSpacing={['-1.2px', '-1.6px']}
-            >
-              <FormattedMessage
-                id="home.fiscalHostSection.title"
-                defaultMessage="Do you need a fiscal host for your community?"
-              />
-            </SectionTitle>
-            <H2
-              display={['none', null, null, null, 'block']}
-              color="black.900"
-              fontSize={['32px', '40px', null, null, '52px']}
-              lineHeight={['40px', '48px', null, null, '56px']}
-              letterSpacing={['-1.2px', '-1.6px', null, null, '-2px']}
-            >
-              <FormattedMessage id="home.fiscalHostSection.title.xl" defaultMessage="Do you need a fiscal host?" />
-            </H2>
-          </Box>
-          <Box width={['288px', '477px', null, '456px', '444px']}>
-            <P
-              display={[null, null, null, null, 'none']}
-              color="black.800"
-              mt={3}
-              mb={[2, 3]}
-              fontWeight="500"
-              fontSize={['15px', '20px']}
-              lineHeight={['23px', '28px']}
-              letterSpacing="-0.12px"
-            >
-              <FormattedMessage
-                id="home.fiscalHostSection.explanation1"
-                defaultMessage="Are you looking for somewhere to put financial resources and use them in projects or private initiatives?"
-              />
-              <LineBreak display={[null, 'none']} />
-              <LineBreak display={[null, 'none', 'block']} />
-              <Span>
-                {' '}
-                <FormattedMessage id="home.fiscalHostSection.weCanHelp" defaultMessage="We can help you!" />
-              </Span>
-            </P>
-            <P
-              display={['none', null, null, null, 'block']}
-              color="black.800"
-              mt={3}
-              mb={[2, 4]}
-              fontWeight="500"
-              fontSize={'24px'}
-              lineHeight={'32px'}
-              letterSpacing={'-0.8px'}
-            >
-              <FormattedMessage
-                id="home.fiscalHostSection.explanation2"
-                defaultMessage="Need help holding money on behalf of your project? Fiscal hosts handle taxes, accounting, and payments for you."
-              />
-            </P>
-          </Box>
-        </Container>
-        <Flex flexDirection="column" mt={3} width={1} ml={[null, null, 3, null, 5]}>
-          <H5
-            display={[null, null, null, null, 'none']}
-            my={2}
+          <Container
+            display="flex"
+            flexDirection="column"
             textAlign="left"
             color="black.900"
-            fontSize="20px"
-            lineHeight="28px"
-            letterSpacing="-0.6px"
+            mr={[null, null, 3, null, 4]}
+            ml={[null, null, null, null, 4]}
           >
-            <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="There are our fiscal hosts:" />
-          </H5>
-          <H5
-            display={['none', null, null, null, 'block']}
-            my={2}
-            textAlign="left"
-            color="black.800"
-            fontWeight="bold"
-            fontSize="20px"
-            lineHeight="28px"
-            letterSpacing="-0.6px"
-          >
-            <FormattedMessage id="home.OC.fiscalHosts.xl" defaultMessage="Find the right fiscal host for you:" />
-          </H5>
-          <Container display="flex" flexDirection={['column', 'row', null, 'column']}>
-            <FiscalHostCard mr={[null, 2, null, 0]} my={2} background={[null, null, null, 'rgba(255, 255, 255, 0.7)']}>
-              <Box
-                width={['48px', null, null, '72px']}
-                height={['48px', null, null, '72px']}
-                my={2}
-                mr={[null, null, null, 3]}
-              >
-                <Avatar
-                  src="https://images.opencollective.com/foundation/a7d522f/logo/256.png"
-                  name="Open Collective Foundation"
-                />
-              </Box>
-              <Container
-                display={[null, null, null, 'flex']}
-                flexDirection={[null, null, null, 'column']}
-                width={[null, null, null, '292px']}
-              >
-                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
-                  <FormattedMessage id="home.fiscalHostSection.OCF" defaultMessage="Open Collective Foundation" />
-                </H3>
-                <Container
-                  display="flex"
-                  alignItems="center"
-                  justifyContent={['space-between', null, null, 'normal']}
-                  width={1}
-                  mt={[null, 3, null, 1]}
-                >
-                  <Box
-                    fontSize="14px"
-                    lineHeight="21px"
-                    letterSpacing="-0.1px"
-                    color="black.800"
-                    fontWeight="500"
-                    mr={[null, null, null, 3]}
-                  >
-                    <FormattedMessage
-                      id="home.fiscalHostSection.OCF.description"
-                      defaultMessage="For US charity initiatives"
-                    />
-                  </Box>
-                  <Box my={[3, null, null, 0]}>
-                    <StyledLink
-                      as={Link}
-                      route="/foundation/apply"
-                      whiteSpace="nowrap"
-                      fontSize="14px"
-                      lineHeight="21px"
-                      letterSpacing="-0.1px"
-                      color="#DC5F7D"
-                      fontWeight="500"
-                    >
-                      <FormattedMessage
-                        id="home.fiscalHostSection.apply"
-                        defaultMessage="Apply {arrowIcon}"
-                        values={{
-                          arrowIcon: <ArrowRight2 size="14" />,
-                        }}
-                      />
-                    </StyledLink>
-                  </Box>
-                </Container>
-              </Container>
-            </FiscalHostCard>
-            <FiscalHostCard mx={[null, 2, null, 0]} my={2} background={[null, 'rgba(255, 255, 255, 0.7)']}>
-              <Box
-                width={['48px', null, null, '72px']}
-                height={['48px', null, null, '72px']}
-                my={2}
-                mr={[null, null, null, 3]}
-              >
-                <Avatar
-                  src="https://images.opencollective.com/opensource/426badd/logo/256.png"
-                  name="Open Source Collective"
-                />
-              </Box>
-              <Container
-                display={[null, null, null, 'flex']}
-                flexDirection={[null, null, null, 'column']}
-                width={[1, null, null, '292px']}
-              >
-                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
-                  <FormattedMessage id="home.fiscalHostSection.OSC" defaultMessage="Open Source Collective" />
-                </H3>
-                <Container
-                  display="flex"
-                  alignItems="center"
-                  justifyContent={['space-between', null, null, 'normal']}
-                  width={1}
-                  mt={[null, 3, null, 1]}
-                >
-                  <Box
-                    fontSize="14px"
-                    lineHeight="21px"
-                    letterSpacing="-0.1px"
-                    color="black.800"
-                    fontWeight="500"
-                    mr={[null, null, null, 3]}
-                  >
-                    <FormattedMessage
-                      id="home.fiscalHostSection.OSC.description"
-                      defaultMessage="For open source projects"
-                    />
-                  </Box>
-                  <Box my={[3, null, null, 0]}>
-                    <StyledLink
-                      as={Link}
-                      route="/opensouce/apply"
-                      whiteSpace="nowrap"
-                      fontSize="14px"
-                      lineHeight="21px"
-                      letterSpacing="-0.1px"
-                      color="#DC5F7D"
-                      fontWeight="500"
-                    >
-                      <FormattedMessage
-                        id="home.fiscalHostSection.apply"
-                        defaultMessage="Apply {arrowIcon}"
-                        values={{
-                          arrowIcon: <ArrowRight2 size="14" />,
-                        }}
-                      />
-                    </StyledLink>
-                  </Box>
-                </Container>
-              </Container>
-            </FiscalHostCard>
-            <FiscalHostCard
-              ml={[null, 2, null, 0]}
-              my={2}
-              background={[null, 'rgba(255, 255, 255, 0.7)', null, '#fff']}
-            >
-              <Box
-                width={['48px', null, null, '72px']}
-                height={['48px', null, null, '72px']}
-                my={2}
-                mr={[null, null, null, 3]}
-              >
-                <Avatar
-                  src="https://images.opencollective.com/europe/019a512/logo/256.png"
-                  name="Open Collective Europe"
-                />
-              </Box>
-              <Container
-                display={[null, null, null, 'flex']}
-                flexDirection={[null, null, null, 'column']}
-                width={[1, null, null, '292px']}
-              >
-                <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
-                  <FormattedMessage id="home.fiscalHostSection.OCE" defaultMessage="Open Collective Europe" />
-                </H3>
-                <Container
-                  display="flex"
-                  alignItems="center"
-                  justifyContent={['space-between', null, null, 'normal']}
-                  width={1}
-                  mt={[null, 3, null, 1]}
-                >
-                  <Box
-                    fontSize="14px"
-                    lineHeight="21px"
-                    letterSpacing="-0.1px"
-                    color="black.800"
-                    fontWeight="500"
-                    mr={[null, null, null, 3]}
-                  >
-                    <FormattedMessage
-                      id="home.fiscalHostSection.OCE.description"
-                      defaultMessage="For EU-based groups"
-                    />
-                  </Box>
-                  <Box my={[3, null, null, 0]}>
-                    <StyledLink
-                      as={Link}
-                      route="/europe/apply"
-                      whiteSpace="nowrap"
-                      fontSize="14px"
-                      lineHeight="21px"
-                      letterSpacing="-0.1px"
-                      color="#DC5F7D"
-                      fontWeight="500"
-                    >
-                      <FormattedMessage
-                        id="home.fiscalHostSection.apply"
-                        defaultMessage="Apply {arrowIcon}"
-                        values={{
-                          arrowIcon: <ArrowRight2 size="14" />,
-                        }}
-                      />
-                    </StyledLink>
-                  </Box>
-                </Container>
-              </Container>
-            </FiscalHostCard>
-          </Container>
-          <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
-            <DiscoverLink
-              as={Link}
-              route="hosts"
-              fontSize="15px"
-              lineHeight="23px"
-              letterSpacing="-0.12px"
-              color="#1A1E43"
-              fontWeight="500"
-            >
-              <FormattedMessage
-                id="home.fiscalHostSection.discoverMore"
-                defaultMessage="Discover more {arrowIcon}"
-                values={{
-                  arrowIcon: <ArrowRight2 size="15" />,
-                }}
-              />
-            </DiscoverLink>
-          </Box>
-        </Flex>
-      </Flex>
-    </Flex>
-    <Flex mt={4} p={2} backgroundColor="rgba(49, 50, 51, 0.6)" justifyContent="center">
-      <Flex alignItems="center" justifyContent={['space-around', null, null, null, 'flex-start']}>
-        <Box
-          width={['72px', '81px']}
-          height={['48px', '54px']}
-          ml={[null, null, null, null, 5]}
-          mr={[3, null, null, 4]}
-        >
-          <Illustration src="/static/images/home/umbrella-Illustration.png" alt="Umbrella" />
-        </Box>
-        <Container display={['block', 'flex']} alignItems={[null, 'center']}>
-          <Container display={[null, null, 'flex']} mr={[null, 3]} alignItems={[null, null, 'center']}>
-            <H3
-              my={2}
-              mr={[null, null, 3]}
-              fontSize={['20px', null, '24px']}
-              lineHeight={['28px', null, '32px']}
-              letterSpacing={['-0.6px', null, '-0.8px']}
-              color="white.full"
-            >
-              <FormattedMessage id="home.becomeFiscalHost" defaultMessage="Become a Fiscal Host" />
-            </H3>
-            <Box width={['197px', '322px', null, '462px']} ml={[null, null, 3]}>
-              <P
-                mb={2}
-                fontSize={['13px', null, '14px']}
-                lineHeight={['19px', null, '21px']}
-                letterSpacing={['-0.08px', null, '-0.1px']}
-                color="white.full"
+            <Box width={['268px', '648px', null, '456px', '657px']} textAlign="left">
+              <SectionTitle
+                display={[null, null, null, null, 'none']}
+                color="black.900"
+                mt={[5, null, null, 0]}
+                fontSize={['32px', '40px']}
+                lineHeight={['40px', '48px']}
+                letterSpacing={['-1.2px', '-1.6px']}
               >
                 <FormattedMessage
-                  id="home.becomeFiscalHost.description"
-                  defaultMessage="Support your community with fundholding and fiscal sponsorship services. "
+                  id="home.fiscalHostSection.title"
+                  defaultMessage="Do you need a fiscal host for your community?"
+                />
+              </SectionTitle>
+              <H2
+                display={['none', null, null, null, 'block']}
+                color="black.900"
+                fontSize={['32px', '40px', null, null, '52px']}
+                lineHeight={['40px', '48px', null, null, '56px']}
+                letterSpacing={['-1.2px', '-1.6px', null, null, '-2px']}
+              >
+                <FormattedMessage id="home.fiscalHostSection.title.xl" defaultMessage="Do you need a fiscal host?" />
+              </H2>
+            </Box>
+            <Box width={['288px', '477px', null, '456px', '444px']}>
+              <P
+                display={[null, null, null, null, 'none']}
+                color="black.800"
+                mt={3}
+                mb={[2, 3]}
+                fontWeight="500"
+                fontSize={['15px', '20px']}
+                lineHeight={['23px', '28px']}
+                letterSpacing="-0.12px"
+              >
+                <FormattedMessage
+                  id="home.fiscalHostSection.explanation1"
+                  defaultMessage="Are you looking for somewhere to put financial resources and use them in projects or private initiatives?"
+                />
+                <LineBreak display={[null, 'none']} />
+                <LineBreak display={[null, 'none', 'block']} />
+                <Span>
+                  {' '}
+                  <FormattedMessage id="home.fiscalHostSection.weCanHelp" defaultMessage="We can help you!" />
+                </Span>
+              </P>
+              <P
+                display={['none', null, null, null, 'block']}
+                color="black.800"
+                mt={3}
+                mb={[2, 4]}
+                fontWeight="500"
+                fontSize={'24px'}
+                lineHeight={'32px'}
+                letterSpacing={'-0.8px'}
+              >
+                <FormattedMessage
+                  id="home.fiscalHostSection.explanation2"
+                  defaultMessage="Need help holding money on behalf of your project? Fiscal hosts handle taxes, accounting, and payments for you."
                 />
               </P>
             </Box>
           </Container>
-          <StyledLink openInNewTab href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">
-            <StyledButton
+          <Flex flexDirection="column" mt={3} width={1} ml={[null, null, 3, null, 5]}>
+            <H5
+              display={[null, null, null, null, 'none']}
               my={2}
-              ml={[null, 3]}
-              border="1px solid #C4C7CC"
-              padding="12px 20px"
-              borderRadius="100px"
-              color="black.700"
-              whiteSpace="nowrap"
+              textAlign="left"
+              color="black.900"
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.6px"
             >
-              <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
-            </StyledButton>
-          </StyledLink>
-        </Container>
+              <FormattedMessage id="home.OC.fiscalHosts" defaultMessage="There are our fiscal hosts:" />
+            </H5>
+            <H5
+              display={['none', null, null, null, 'block']}
+              my={2}
+              textAlign="left"
+              color="black.800"
+              fontWeight="bold"
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.6px"
+            >
+              <FormattedMessage id="home.OC.fiscalHosts.xl" defaultMessage="Find the right fiscal host for you:" />
+            </H5>
+            <Container display="flex" flexDirection={['column', 'row', null, 'column']}>
+              {featuredHosts.map(host => (
+                <FiscalHostCard mx={[null, 2, null, 0]} my={2} key={host.id}>
+                  <Box
+                    width={['48px', null, null, '72px']}
+                    height={['48px', null, null, '72px']}
+                    my={2}
+                    mr={[null, null, null, 3]}
+                  >
+                    <Avatar src={host.imageUrl} name={host.name} backgroundColor="transparent" />
+                  </Box>
+                  <Container
+                    display={[null, null, null, 'flex']}
+                    flexDirection={[null, null, null, 'column']}
+                    width={[1, null, null, '292px']}
+                  >
+                    <CollectHostPageLink as={Link} route={host.collectivePageLink}>
+                      <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
+                        {host.name}
+                      </H3>
+                    </CollectHostPageLink>
+                    <Container
+                      display="flex"
+                      alignItems="center"
+                      justifyContent={['space-between', null, null, 'normal']}
+                      width={1}
+                      mt={[null, 3, null, 1]}
+                    >
+                      <Box
+                        fontSize="14px"
+                        lineHeight="21px"
+                        letterSpacing="-0.1px"
+                        color="black.800"
+                        fontWeight="500"
+                        mr={[null, null, null, 3]}
+                      >
+                        {intl.formatMessage(messages[host.id])}
+                      </Box>
+                      <Box my={[3, null, null, 0]}>
+                        <StyledLink
+                          as={Link}
+                          route={`${host.collectivePageLink}/apply`}
+                          whiteSpace="nowrap"
+                          fontSize="14px"
+                          lineHeight="21px"
+                          letterSpacing="-0.1px"
+                          color="#DC5F7D"
+                          fontWeight="500"
+                        >
+                          <FormattedMessage
+                            id="home.fiscalHostSection.apply"
+                            defaultMessage="Apply {arrowIcon}"
+                            values={{
+                              arrowIcon: <ArrowRight2 size="14" />,
+                            }}
+                          />
+                        </StyledLink>
+                      </Box>
+                    </Container>
+                  </Container>
+                </FiscalHostCard>
+              ))}
+            </Container>
+            <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
+              <DiscoverLink
+                as={Link}
+                route="hosts"
+                fontSize="15px"
+                lineHeight="23px"
+                letterSpacing="-0.12px"
+                color="#1A1E43"
+                fontWeight="500"
+              >
+                <FormattedMessage
+                  id="home.fiscalHostSection.discoverMore"
+                  defaultMessage="Discover more {arrowIcon}"
+                  values={{
+                    arrowIcon: <ArrowRight2 size="15" />,
+                  }}
+                />
+              </DiscoverLink>
+            </Box>
+          </Flex>
+        </Flex>
       </Flex>
-    </Flex>
-  </Wrapper>
-);
+      <Flex mt={4} p={2} backgroundColor="rgba(49, 50, 51, 0.6)" justifyContent="center">
+        <Flex alignItems="center" justifyContent={['space-around', null, null, null, 'flex-start']}>
+          <Box
+            width={['72px', '81px']}
+            height={['48px', '54px']}
+            ml={[null, null, null, null, 5]}
+            mr={[3, null, null, 4]}
+          >
+            <Illustration src="/static/images/home/umbrella-Illustration.png" alt="Umbrella" />
+          </Box>
+          <Container display={['block', 'flex']} alignItems={[null, 'center']}>
+            <Container display={[null, null, 'flex']} mr={[null, 3]} alignItems={[null, null, 'center']}>
+              <H3
+                my={2}
+                mr={[null, null, 3]}
+                fontSize={['20px', null, '24px']}
+                lineHeight={['28px', null, '32px']}
+                letterSpacing={['-0.6px', null, '-0.8px']}
+                color="white.full"
+              >
+                <FormattedMessage id="home.becomeFiscalHost" defaultMessage="Become a Fiscal Host" />
+              </H3>
+              <Box width={['197px', '322px', null, '462px']} ml={[null, null, 3]}>
+                <P
+                  mb={2}
+                  fontSize={['13px', null, '14px']}
+                  lineHeight={['19px', null, '21px']}
+                  letterSpacing={['-0.08px', null, '-0.1px']}
+                  color="white.full"
+                >
+                  <FormattedMessage
+                    id="home.becomeFiscalHost.description"
+                    defaultMessage="Support your community with fundholding and fiscal sponsorship services. "
+                  />
+                </P>
+              </Box>
+            </Container>
+            <StyledLink openInNewTab href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">
+              <StyledButton
+                my={2}
+                ml={[null, 3]}
+                border="1px solid #C4C7CC"
+                padding="12px 20px"
+                borderRadius="100px"
+                color="black.700"
+                whiteSpace="nowrap"
+              >
+                <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
+              </StyledButton>
+            </StyledLink>
+          </Container>
+        </Flex>
+      </Flex>
+    </Wrapper>
+  );
+};
 
 export default FiscalHost;

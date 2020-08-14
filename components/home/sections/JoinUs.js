@@ -44,6 +44,10 @@ const Wrapper = styled(Container)`
   @media screen and (min-width: 52em) {
     padding: 24px 32px;
   }
+
+  &:focus-within {
+    background-color: #ffffff;
+  }
 `;
 
 const JoinUs = () => (
@@ -146,7 +150,12 @@ const JoinUs = () => (
           </Wrapper>
         </Link>
 
-        <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']}>
+        <Wrapper
+          color="black.900"
+          my={4}
+          width={['288px', '648px', '569px', null, '594px']}
+          className="newsletterWrapper"
+        >
           <Container>
             <H3
               fontSize={['24px', '32px']}
