@@ -469,6 +469,7 @@
   "createCollective.form.error.description": "Por favor, não use mais do que 160 caracteres",
   "createCollective.form.error.name": "Por favor, não use mais do que 50 caracteres",
   "createCollective.form.error.slug": "Por favor, não use mais do que 30 caracteres",
+  "createCollective.form.error.slug.hyphen": "Collective slug can not start nor end with hyphen",
   "createCollective.form.nameLabel": "Qual é o nome do seu Coletivo?",
   "createCollective.form.slugLabel": "Que URL gostaria de usar?",
   "createCollective.form.suggestedLabel": "Sugerido",

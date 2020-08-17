@@ -469,6 +469,7 @@
   "createCollective.form.error.description": "160자보다 적게 사용해주세요",
   "createCollective.form.error.name": "50자보다 적게 사용해주세요",
   "createCollective.form.error.slug": "30자보다 적게 사용해주세요",
+  "createCollective.form.error.slug.hyphen": "Collective slug can not start nor end with hyphen",
   "createCollective.form.nameLabel": "집단의 이름이 무엇인가요?",
   "createCollective.form.slugLabel": "어떤 URL을 사용하시겠어요?",
   "createCollective.form.suggestedLabel": "제안됨",
