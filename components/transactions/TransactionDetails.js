@@ -119,8 +119,8 @@ const TransactionDetails = ({
           </DetailDescription>
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
-              {permissions?.canRefund && <TransactionRefundButton id={id} />}
-              {!permissions?.canRefund && // Just so we don't polute the UI, the Credit transaction will display the Download button
+              {permissions?.canRefund && !isRefunded && <TransactionRefundButton id={id} />}
+              {!(permissions?.canRefund && !isRefunded) && // Just so we don't polute the UI, the Credit transaction will display the Download button
                 permissions?.canDownloadInvoice && (
                   <StyledButton
                     buttonSize="small"
