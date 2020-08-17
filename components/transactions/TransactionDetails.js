@@ -68,6 +68,7 @@ const TransactionDetails = ({
 }) => {
   const intl = useIntl();
   const isCredit = type === TransactionTypes.CREDIT;
+  const hasOrder = order !== null;
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
 
   return (
@@ -110,6 +111,7 @@ const TransactionDetails = ({
               netAmount,
               isCredit,
               isRefunded,
+              hasOrder,
               toAccount,
               fromAccount,
               intl,
