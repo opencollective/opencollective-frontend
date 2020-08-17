@@ -60,6 +60,7 @@ const TransactionItem = ({ displayActions, ...transaction }) => {
   const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
   const displayedAmount =
     (isCredit && hasOrder && !isRefunded) || // Credit from donations should display the full amount donated by the user
+    (hasOrder && !isCredit && isRefunded) || // Refund debits in collective page should also display the full amount
     (!isCredit && !hasOrder) // Expense Debits should display the Amount without Payment Method fees
       ? amount
       : netAmount;
