@@ -6,6 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
+import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
@@ -35,10 +36,11 @@ const budgetSectionQuery = gqlV2/* GraphQL */ `
  * abut the global budget of the collective.
  */
 const SectionBudget = ({ collective, stats }) => {
-  const { data } = useQuery(budgetSectionQuery, {
+  const budgetQuery = useQuery(budgetSectionQuery, {
     variables: { slug: collective.slug, limit: 3 },
     context: API_V2_CONTEXT,
   });
+  const { data } = budgetQuery;
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
@@ -68,7 +70,9 @@ const SectionBudget = ({ collective, stats }) => {
         )}
 
         <Container flex="10" mb={3} width="100%" maxWidth={800}>
-          <TransactionsList transactions={data?.transactions?.nodes} displayActions />
+          <GraphQLContext.Provider value={budgetQuery}>
+            <TransactionsList transactions={data?.transactions?.nodes} displayActions />
+          </GraphQLContext.Provider>
           <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
             <Box flex="1 1" mx={[0, 2]}>
               <Link route="transactions" params={{ collectiveSlug: collective.slug }}>

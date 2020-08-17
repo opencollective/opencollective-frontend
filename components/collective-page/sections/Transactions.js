@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { GraphQLContext } from '../../../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { Dimensions } from '../_constants';
@@ -50,13 +51,14 @@ const ResetAnchor = styled.a`
 `;
 
 const SectionTransactions = props => {
-  const { data, refetch, loading } = useQuery(transactionsSectionQuery, {
+  const transactionsQuery = useQuery(transactionsSectionQuery, {
     variables: { slug: props.collective.slug, limit: NB_DISPLAYED },
     context: API_V2_CONTEXT,
     // We keep notifyOnNetworkStatusChange to remove the flash of collectiveHasNoTransactions bug
     // See https://github.com/apollographql/apollo-client/blob/9c80adf65ccbbb88ea5b9313c002f85976c225e3/src/core/ObservableQuery.ts#L274-L304
     notifyOnNetworkStatusChange: true,
   });
+  const { data, refetch, loading } = transactionsQuery;
   const [filter, setFilter] = React.useState(FILTERS.ALL);
   React.useEffect(() => {
     refetch();
@@ -100,7 +102,9 @@ const SectionTransactions = props => {
           {loading ? (
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (
-            <TransactionsList transactions={data?.transactions?.nodes} displayActions />
+            <GraphQLContext.Provider value={transactionsQuery}>
+              <TransactionsList transactions={data?.transactions?.nodes} displayActions />
+            </GraphQLContext.Provider>
           )}
           {data?.transactions.totalCount === 0 && (
             <MessageBox type="info">

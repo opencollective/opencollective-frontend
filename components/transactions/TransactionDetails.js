@@ -97,7 +97,7 @@ const TransactionDetails = ({
           )}
         </Flex>
       )}
-      <Flex flexDirection="column" width={[1, 0.4]}>
+      <Flex flexDirection="column" width={[1, 0.6]}>
         <Box>
           <DetailTitle>
             <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
