@@ -1,7 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { parseToBoolean } from '../../../lib/utils';
 import { Router } from '../../../server/pages';
 
 import Container from '../../Container';
@@ -11,8 +10,6 @@ import StyledLink from '../../StyledLink';
 import { H1, H3, P, Span } from '../../Text';
 import BackButton from '../BackButton';
 import PricingTable from '../PricingTable';
-
-const isTransferwiseEnabled = parseToBoolean(process.env.TRANSFERWISE_ENABLED);
 
 const headings = ['', 'starter', 'small', 'medium', 'large', 'network'];
 
@@ -164,7 +161,7 @@ const rows = [
     { type: 'check' },
     { type: 'check' },
   ],
-  isTransferwiseEnabled && [
+  [
     {
       type: 'component',
       render() {
@@ -310,15 +307,13 @@ const HostOrganization = () => (
                 values={I18nFormatters}
               />
             </Box>
-            {isTransferwiseEnabled && (
-              <Box as="li" my={3}>
-                <FormattedMessage
-                  id="pricing.starterPlans.transferwisePayouts"
-                  defaultMessage="Pay expenses in local currency with one-click using the <strong>TransferWise</strong> integration."
-                  values={I18nFormatters}
-                />
-              </Box>
-            )}
+            <Box as="li" my={3}>
+              <FormattedMessage
+                id="pricing.starterPlans.transferwisePayouts"
+                defaultMessage="Pay expenses in local currency with one-click using the <strong>TransferWise</strong> integration."
+                values={I18nFormatters}
+              />
+            </Box>
           </Box>
           <H3
             my={2}

@@ -21,7 +21,6 @@ const defaults = {
   RECAPTCHA_ENABLED: false,
   CLIENT_ANALYTICS_ENABLED: false,
   ONBOARDING_MODAL: true,
-  TRANSFERWISE_ENABLED: true,
   NEW_HOST_APPLICATION_FLOW: false,
   TW_API_COLLECTIVE_SLUG: 'opencollective-host',
   OC_APPLICATION: 'frontend',
