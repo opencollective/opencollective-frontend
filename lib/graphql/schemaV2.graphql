@@ -1,4 +1,14 @@
 """
+Exposes a URL that specifies the behaviour of this scalar.
+"""
+directive @specifiedBy(
+  """
+  The URL that specifies the behaviour of this scalar.
+  """
+  url: String!
+) on SCALAR
+
+"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -1117,6 +1127,7 @@ enum ContributorRole {
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
+  ACCOUNTANT
 }
 
 """
@@ -3303,6 +3314,11 @@ input ExpenseUpdateInput {
   description: String
 
   """
+  Longer text to attach to the expense
+  """
+  longDescription: String
+
+  """
   Tags associated to the expense (ie. Food, Engineering...)
   """
   tags: [String]
@@ -4192,6 +4208,7 @@ enum MemberRole {
   MEMBER
   FUNDRAISER
   FOLLOWER
+  ACCOUNTANT
 }
 
 """
@@ -4910,6 +4927,11 @@ input ProcessExpensePaymentParams {
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
   """
   forceManual: Boolean
+
+  """
+  2FA code for if the host account has it turned on and the transaction is large.
+  """
+  twoFactorAuthenticatorCode: String
 }
 
 """
