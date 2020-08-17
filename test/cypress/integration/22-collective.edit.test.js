@@ -1,4 +1,4 @@
-import { Secret, TOTP } from 'otpauth';
+import speakeasy from 'speakeasy';
 
 import { randomEmail } from '../support/faker';
 
@@ -160,12 +160,11 @@ describe('edit user collective', () => {
           cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
           cy.getByDataCy('add-two-factor-auth-error').should('exist');
           // typing the right code passes
-          TOTPCode = new TOTP({
+          TOTPCode = speakeasy.totp({
             algorithm: 'SHA1',
-            digits: 6,
-            period: 30,
-            secret: Secret.fromB32(secret),
-          }).generate();
+            encoding: 'base32',
+            secret,
+          });
           cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
           cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
           cy.getByDataCy('add-two-factor-auth-success').should('exist');

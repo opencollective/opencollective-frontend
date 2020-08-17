@@ -65,7 +65,7 @@ class SetupTwoFactorAuth extends React.Component {
     data: PropTypes.object,
     /** From parent component */
     slug: PropTypes.string,
-    collectiveName: PropTypes.string,
+    userEmail: PropTypes.string,
   };
 
   constructor(props) {
@@ -79,15 +79,22 @@ class SetupTwoFactorAuth extends React.Component {
   }
 
   componentDidMount() {
-    const options = {
-      name: `${this.props.collectiveName}'s Open Collective`,
-      length: 64,
-    };
-    const secret = speakeasy.generateSecret(options);
     // speakeasy options object does not add issuer as expected so we add it ourselves to the otp url
     // do not use URLParams from universal-url or the web API to encode the issuer
     // see https://github.com/opencollective/opencollective-frontend/pull/4520#discussion_r447690237 for discussion
-    const issuer = '&issuer=Open%20Collective';
+    let issuer;
+    if (window.location.hostname === 'localhost') {
+      issuer = '&issuer=Open%20Collective%20Local';
+    } else if (window.location.hostname === 'staging.opencollective.com') {
+      issuer = '&issuer=Open%20Collective%20Staging';
+    } else {
+      issuer = '&issuer=Open%20Collective';
+    }
+    const options = {
+      name: this.props.userEmail,
+      length: 64,
+    };
+    const secret = speakeasy.generateSecret(options);
     const fullOTPUrl = secret.otpauth_url + issuer;
     this.setState({ secret, base32: secret.base32, otpauth_url: fullOTPUrl });
   }
@@ -100,6 +107,7 @@ class SetupTwoFactorAuth extends React.Component {
         secret: this.state.base32,
         encoding: 'base32',
         token: twoFactorAuthenticatorCode,
+        window: 2,
       });
 
       // if not verified, ask the user to try again

@@ -1,4 +1,3 @@
-import { Secret, TOTP } from 'otpauth';
 import speakeasy from 'speakeasy';
 
 import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
@@ -204,12 +203,11 @@ describe('signin with 2FA', () => {
     cy.getByDataCy('signin-message-box').contains(
       'Sign In failed: Two-factor authentication code failed. Please try again',
     );
-    TOTPCode = new TOTP({
+    TOTPCode = speakeasy.totp({
       algorithm: 'SHA1',
-      digits: 6,
-      period: 30,
-      secret: Secret.fromB32(secret.base32),
-    }).generate();
+      encoding: 'base32',
+      secret: secret.base32,
+    });
     cy.getByDataCy('signin-two-factor-auth-input').clear().type(TOTPCode);
     cy.getByDataCy('signin-two-factor-auth-button').click();
     cy.assertLoggedIn();
