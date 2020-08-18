@@ -983,7 +983,6 @@ class CreateOrderPage extends React.Component {
                             stepDetails: {
                               ...state.stepDetails,
                               platformFee: value,
-                              totalAmount: state.stepDetails.totalAmount + value.value,
                             },
                           }));
                         }}
