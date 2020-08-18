@@ -36,11 +36,11 @@ const budgetSectionQuery = gqlV2/* GraphQL */ `
  * abut the global budget of the collective.
  */
 const SectionBudget = ({ collective, stats }) => {
-  const budgetQuery = useQuery(budgetSectionQuery, {
+  const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: { slug: collective.slug, limit: 3 },
     context: API_V2_CONTEXT,
   });
-  const { data } = budgetQuery;
+  const { data } = budgetQueryResult;
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
@@ -70,7 +70,7 @@ const SectionBudget = ({ collective, stats }) => {
         )}
 
         <Container flex="10" mb={3} width="100%" maxWidth={800}>
-          <GraphQLContext.Provider value={budgetQuery}>
+          <GraphQLContext.Provider value={budgetQueryResult}>
             <TransactionsList transactions={data?.transactions?.nodes} displayActions />
           </GraphQLContext.Provider>
           <Flex flexWrap="wrap" justifyContent="space-between" mt={3}>
