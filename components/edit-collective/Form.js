@@ -467,7 +467,7 @@ class EditCollectiveForm extends React.Component {
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <SetupTwoFactorAuth slug={collective.slug} collectiveName={collective.name} />;
+        return <SetupTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
 
       default:
         return null;
