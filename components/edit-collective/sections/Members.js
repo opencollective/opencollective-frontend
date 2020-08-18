@@ -178,6 +178,7 @@ class Members extends React.Component {
      */
     console.log(index);
   };
+
   confirmRemoveMember = memberEntry => {
     return window.confirm(
       this.props.intl.formatMessage(this.messages.removeConfirm, {
