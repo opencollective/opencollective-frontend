@@ -180,7 +180,10 @@ class PayoutMethodSelect extends React.Component {
   getOptions = memoizeOne(payoutMethods => {
     const groupedPms = groupBy(payoutMethods, 'type');
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
-      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
+      if (
+        type === PayoutMethodType.BANK_ACCOUNT &&
+        !this.props.collective.host?.connectedAccounts?.find?.(c => c.service === 'transferwise')
+      ) {
         return false;
       } else if (type === PayoutMethodType.PAYPAL && this.props.collective.host?.settings?.disablePaypalPayouts) {
         return false;
