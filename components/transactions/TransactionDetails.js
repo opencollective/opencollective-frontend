@@ -68,6 +68,7 @@ const TransactionDetails = ({
 }) => {
   const intl = useIntl();
   const isCredit = type === TransactionTypes.CREDIT;
+  const hasOrder = order !== null;
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
 
   return (
@@ -96,7 +97,7 @@ const TransactionDetails = ({
           )}
         </Flex>
       )}
-      <Flex flexDirection="column" width={[1, 0.4]}>
+      <Flex flexDirection="column" width={[1, 0.6]}>
         <Box>
           <DetailTitle>
             <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
@@ -110,6 +111,7 @@ const TransactionDetails = ({
               netAmount,
               isCredit,
               isRefunded,
+              hasOrder,
               toAccount,
               fromAccount,
               intl,
@@ -117,8 +119,8 @@ const TransactionDetails = ({
           </DetailDescription>
           {displayActions && ( // Let us overide so we can hide buttons in the collective page
             <React.Fragment>
-              {permissions?.canRefund && <TransactionRefundButton id={id} />}
-              {!permissions?.canRefund && // Just so we don't polute the UI, the Credit transaction will display the Download button
+              {permissions?.canRefund && !isRefunded && <TransactionRefundButton id={id} />}
+              {!(permissions?.canRefund && !isRefunded) && // Just so we don't polute the UI, the Credit transaction will display the Download button
                 permissions?.canDownloadInvoice && (
                   <StyledButton
                     buttonSize="small"
