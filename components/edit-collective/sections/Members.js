@@ -72,6 +72,9 @@ class Members extends React.Component {
       roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
       addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
       removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
+      requestToBeRemoved: { id: 'members.request', defaultMessage: 'Request to be removed as Admin' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
+      MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
@@ -169,6 +172,12 @@ class Members extends React.Component {
     });
   };
 
+  requestToBeRemoved = index => {
+    /**
+     * TODO: Add functionality for request to be removed
+     */
+    console.log(index);
+  };
   confirmRemoveMember = memberEntry => {
     return window.confirm(
       this.props.intl.formatMessage(this.messages.removeConfirm, {
@@ -253,12 +262,12 @@ class Members extends React.Component {
               )}
               {isSelf ? (
                 <StyledTooltip content={() => intl.formatMessage(this.messages.cantRemoveYourself)}>
-                  <StyledButton my={1} disabled>
-                    {intl.formatMessage(this.messages.removeMember)}
+                  <StyledButton buttonStyle="primary" my={1} onClick={() => this.requestToBeRemoved()}>
+                    {intl.formatMessage(this.messages.requestToBeRemoved)}
                   </StyledButton>
                 </StyledTooltip>
               ) : (
-                <StyledButton my={1} onClick={() => this.removeMember(index)} disabled={isSelf}>
+                <StyledButton my={1} onClick={() => this.removeMember(index)}>
                   {intl.formatMessage(this.messages.removeMember)}
                 </StyledButton>
               )}
