@@ -1103,6 +1103,7 @@
   "menu.logout": "Log out",
   "menu.myAccount": "My account",
   "menu.organizations.none": "No organizations yet",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "定价",
   "menu.profile": "Profile",
   "menu.submitExpense": "Submit Expense",

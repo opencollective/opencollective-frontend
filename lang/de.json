@@ -1103,6 +1103,7 @@
   "menu.logout": "Abmelden",
   "menu.myAccount": "Mein Konto",
   "menu.organizations.none": "Noch keine Organisationen",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "Preisgestaltung",
   "menu.profile": "Profil",
   "menu.submitExpense": "Ausgaben angeben",

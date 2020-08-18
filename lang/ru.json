@@ -1103,6 +1103,7 @@
   "menu.logout": "Выход",
   "menu.myAccount": "Мой профиль",
   "menu.organizations.none": "No organizations yet",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "Цены",
   "menu.profile": "Профиль",
   "menu.submitExpense": "Submit Expense",

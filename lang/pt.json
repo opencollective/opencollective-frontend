@@ -1103,6 +1103,7 @@
   "menu.logout": "Sair",
   "menu.myAccount": "Minha conta",
   "menu.organizations.none": "Sem organizações",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "Preço",
   "menu.profile": "Perfil",
   "menu.submitExpense": "Enviar despesa",
