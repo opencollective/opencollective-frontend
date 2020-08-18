@@ -71,7 +71,7 @@ class PayoutMethodSelect extends React.Component {
     collective: PropTypes.shape({
       host: PropTypes.shape({
         transferwise: PropTypes.shape({
-          availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+          availableCurrencies: PropTypes.arrayOf(PropTypes.object),
         }),
       }),
     }).isRequired,
