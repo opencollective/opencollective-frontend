@@ -561,7 +561,7 @@ ExpenseFormBody.propTypes = {
     slug: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
   }).isRequired,
@@ -631,7 +631,7 @@ ExpenseForm.propTypes = {
     host: PropTypes.shape({
       slug: PropTypes.string.isRequired,
       transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
   }).isRequired,

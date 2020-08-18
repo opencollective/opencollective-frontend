@@ -125,9 +125,6 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
 PayoutMethodForm.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.string),
-    }),
   }),
   /** Set this to nil to create a new one */
   payoutMethod: PropTypes.shape({
