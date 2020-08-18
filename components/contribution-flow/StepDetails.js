@@ -202,13 +202,15 @@ const StepDetails = ({
           </StyledInputField>
         )}
       </Flex>
-      <Flex fontSize="12px" color="black.500" flexDirection="column" alignItems="flex-end" mb={3}>
-        <FormattedMessage
-          id="contribuion.minimumAmount"
-          values={{ minAmount: formatCurrency(minAmount, currency), currency: currency }}
-          defaultMessage={'Minimum amount: {minAmount} {currency}'}
-        />
-      </Flex>
+      {!disabledAmount && (
+        <Flex fontSize="12px" color="black.500" flexDirection="column" alignItems="flex-end" mb={3}>
+          <FormattedMessage
+            id="contribuion.minimumAmount"
+            values={{ minAmount: formatCurrency(minAmount, currency), currency: currency }}
+            defaultMessage={'Minimum amount: {minAmount} {currency}'}
+          />
+        </Flex>
+      )}
       {showInterval && (
         <StyledInputField
           label={<FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />}
