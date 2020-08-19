@@ -88,7 +88,10 @@ const StyledInputAmount = ({
       inputMode="decimal"
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={isControlled ? getValue(value, rawValue, isEmpty) : undefined}
-      onWheel={e => e.preventDefault()}
+      onWheel={e => {
+        e.preventDefault();
+        e.target.blur();
+      }}
       onChange={e => {
         e.stopPropagation();
         dispatchValue(e, parseValueFromEvent(e, precision));
