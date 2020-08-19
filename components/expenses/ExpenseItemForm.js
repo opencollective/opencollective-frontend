@@ -137,7 +137,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
             error={getError('description')}
             htmlFor={`${attachmentKey}-description`}
             label={formatMessage(msg.descriptionLabel)}
-            labelfontSize="13px"
+            labelFontSize="13px"
             required
           >
             {inputProps => <Field as={StyledInput} {...inputProps} />}
@@ -150,7 +150,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
               inputType="date"
               required
               label={formatMessage(msg.dateLabel)}
-              labelfontSize="13px"
+              labelFontSize="13px"
               flex={requireFile ? '1 1 44%' : '1 1 50%'}
               mt={3}
             >
@@ -173,7 +173,7 @@ const ExpenseItemForm = ({ attachment, errors, onRemove, onUploadError, currency
               htmlFor={`${attachmentKey}-amount`}
               label={formatMessage(msg.amountLabel)}
               required
-              labelfontSize="13px"
+              labelFontSize="13px"
               inputType="number"
               flex="1 1 30%"
               minWidth={150}
