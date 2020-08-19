@@ -35,6 +35,7 @@ class EditCollectivePage extends React.Component {
     data: PropTypes.object, // from withData
     LoggedInUser: PropTypes.object, // from withLoggedInUser
     loadingLoggedInUser: PropTypes.bool, // from withLoggedInUser
+    refetchLoggedInUser: PropTypes.func, // from withUser
     editCollective: PropTypes.func.isRequired, // from addEditCollectiveMutation
   };
 
@@ -61,7 +62,7 @@ class EditCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, editCollective, LoggedInUser, loadingLoggedInUser } = this.props;
+    const { data, editCollective, LoggedInUser, loadingLoggedInUser, refetchLoggedInUser } = this.props;
     const collective = get(data, 'Collective') || this.state.Collective;
 
     if ((data && data.loading) || loadingLoggedInUser) {
@@ -93,7 +94,12 @@ class EditCollectivePage extends React.Component {
     return (
       <div>
         <GraphQLContext.Provider value={data}>
-          <EditCollective collective={collective} LoggedInUser={LoggedInUser} editCollective={editCollective} />
+          <EditCollective
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            editCollective={editCollective}
+            refetchLoggedInUser={refetchLoggedInUser}
+          />
         </GraphQLContext.Provider>
       </div>
     );

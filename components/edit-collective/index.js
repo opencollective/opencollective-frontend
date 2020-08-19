@@ -4,6 +4,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { defaultBackgroundImage } from '../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { Router } from '../../server/pages';
 
 import Body from '../Body';
 import CollectiveNavbar from '../CollectiveNavbar';
@@ -18,6 +19,7 @@ class EditCollective extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired, // passed from Page with addCollectiveToEditData
     LoggedInUser: PropTypes.object.isRequired, // passed from Page with withUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // passed from Page with withUser
     editCollective: PropTypes.func.isRequired, // passed from Page with addEditCollectiveMutation
     intl: PropTypes.object.isRequired, // from injectIntl
   };
@@ -70,6 +72,10 @@ class EditCollective extends React.Component {
     try {
       await this.props.editCollective(collective);
       this.setState({ status: 'saved', result: { error: null } });
+      if (Router.router.query.slug !== collective.slug) {
+        Router.replaceRoute('editCollective', { slug: collective.slug });
+        await this.props.refetchLoggedInUser();
+      }
       setTimeout(() => {
         this.setState({ status: null });
       }, 3000);
