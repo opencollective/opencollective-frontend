@@ -203,10 +203,7 @@ class PayoutMethodSelect extends React.Component {
         return false;
       }
 
-      if (
-        type === PayoutMethodType.BANK_ACCOUNT &&
-        !this.props.collective.host?.connectedAccounts?.find?.(c => c.service === 'transferwise')
-      ) {
+      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
         return false;
       } else if (type === PayoutMethodType.PAYPAL && this.props.collective.host?.settings?.disablePaypalPayouts) {
         return false;
