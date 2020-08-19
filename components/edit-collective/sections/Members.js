@@ -9,7 +9,9 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import roles from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import formatMemberRole from '../../../lib/i18n/member-role';
 import { compose } from '../../../lib/utils';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -18,6 +20,7 @@ import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import Link from '../../Link';
 import Loading from '../../Loading';
+import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledTag from '../../StyledTag';
@@ -69,8 +72,6 @@ class Members extends React.Component {
       roleLabel: { id: 'members.role.label', defaultMessage: 'role' },
       addMember: { id: 'members.add', defaultMessage: 'Add Core Contributor' },
       removeMember: { id: 'members.remove', defaultMessage: 'Remove Core Contributor' },
-      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
-      MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
       descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
       sinceLabel: { id: 'user.since.label', defaultMessage: 'since' },
       memberPendingDetails: {
@@ -91,7 +92,7 @@ class Members extends React.Component {
     const getOptions = arr => {
       return arr.map(key => {
         const obj = {};
-        obj[key] = intl.formatMessage(this.messages[key]);
+        obj[key] = formatMemberRole(intl, key);
         return obj;
       });
     };
@@ -100,8 +101,8 @@ class Members extends React.Component {
       {
         name: 'role',
         type: 'select',
-        options: getOptions(['ADMIN', 'MEMBER']),
-        defaultValue: 'ADMIN',
+        options: getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT]),
+        defaultValue: roles.ADMIN,
         label: intl.formatMessage(this.messages.roleLabel),
       },
       {
@@ -265,24 +266,30 @@ class Members extends React.Component {
           </Flex>
         </ResetGlobalStyles>
         <Form horizontal>
-          {this.fields.map(
-            field =>
-              (!field.when || field.when(member)) && (
-                <InputField
-                  className="horizontal"
-                  key={field.name}
-                  name={field.name}
-                  label={field.label}
-                  type={field.type}
-                  disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
-                  defaultValue={get(member, field.name) || field.defaultValue}
-                  options={field.options}
-                  pre={field.pre}
-                  placeholder={field.placeholder}
-                  onChange={value => this.editMember(index, field.name, value)}
-                />
-              ),
-          )}
+          {this.fields.map(field => (
+            <React.Fragment key={field.name}>
+              <InputField
+                className="horizontal"
+                name={field.name}
+                label={field.label}
+                type={field.type}
+                disabled={typeof field.disabled === 'function' ? field.disabled(member) : field.disabled}
+                defaultValue={get(member, field.name) || field.defaultValue}
+                options={field.options}
+                pre={field.pre}
+                placeholder={field.placeholder}
+                onChange={value => this.editMember(index, field.name, value)}
+              />
+              {field.name === 'role' && hasRoleDescription(member.role) && (
+                <Flex mb={3} mt={-2}>
+                  <Box flex="0 1" flexBasis={['0%', '17.5%']} />
+                  <Container flex="1 1" fontSize="12px" color="black.600" fontStyle="italic">
+                    <MemberRoleDescription role={member.role} />
+                  </Container>
+                </Flex>
+              )}
+            </React.Fragment>
+          ))}
         </Form>
       </Container>
     );
@@ -389,7 +396,7 @@ const coreContributorsQuery = gql`
   query CoreContributors($collectiveId: Int!) {
     Collective(id: $collectiveId) {
       id
-      members(roles: ["ADMIN", "MEMBER"]) {
+      members(roles: ["ADMIN", "MEMBER", "ACCOUNTANT"]) {
         ...MemberFields
       }
     }

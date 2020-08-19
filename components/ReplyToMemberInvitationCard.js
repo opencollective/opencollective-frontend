@@ -10,25 +10,13 @@ import formatMemberRole from '../lib/i18n/member-role';
 import Avatar from './Avatar';
 import { Flex } from './Grid';
 import LinkCollective from './LinkCollective';
+import MemberRoleDescription, { hasRoleDescription } from './MemberRoleDescription';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledTag from './StyledTag';
 import { H3, P } from './Text';
 import { withUser } from './UserProvider';
-
-const rolesDetails = defineMessages({
-  [roles.ADMIN]: {
-    id: 'RoleDetails.ADMIN',
-    defaultMessage:
-      'Admins can edit the Collective, change settings, approve expenses, make financial contributions to other Collectives and receive messages from people trying to contact the Collective.',
-  },
-  [roles.MEMBER]: {
-    id: 'RoleDetails.MEMBER',
-    defaultMessage:
-      'Core contributors are major contributors and represent the Collective with their face on the Collective page as part of the team.',
-  },
-});
 
 const messages = defineMessages({
   emailDetails: {
@@ -95,9 +83,9 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
       </LinkCollective>
       <hr />
       <StyledTag textTransform="uppercase">{formatMemberRole(intl, invitation.role)}</StyledTag>
-      {rolesDetails[invitation.role] && (
-        <P my={2} color="black.600">
-          {formatMessage(rolesDetails[invitation.role])}
+      {hasRoleDescription(invitation.role) && (
+        <P my={3} px={2} color="black.600" lineHeight="18px">
+          <MemberRoleDescription role={invitation.role} />
         </P>
       )}
       {hasReplied ? (

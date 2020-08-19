@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { GraphQLContext } from '../lib/graphql/context';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -132,6 +133,23 @@ class TransactionsPage extends React.Component {
     }
   }
 
+  canDownloadInvoices() {
+    const { LoggedInUser } = this.props;
+    const collective = get(this.props, 'data.Collective') || this.state.Collective;
+    if (!collective || !LoggedInUser) {
+      return false;
+    } else if (collective.type !== 'ORGANIZATION' && collective.type !== 'USER') {
+      return false;
+    } else {
+      return (
+        LoggedInUser.isHostAdmin(collective) ||
+        LoggedInUser.canEditCollective(collective) ||
+        LoggedInUser.hasRole(roles.ACCOUNTANT, collective) ||
+        LoggedInUser.hasRole(roles.ACCOUNTANT, collective.host)
+      );
+    }
+  }
+
   render() {
     const { LoggedInUser, query, transactionsData, data, slug } = this.props;
     const collective = get(this.props, 'data.Collective') || this.state.Collective;
@@ -139,9 +157,7 @@ class TransactionsPage extends React.Component {
     const hasFilters = Object.entries(query).some(([key, value]) => {
       return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
     });
-    const canDownloadInvoices =
-      (LoggedInUser?.isHostAdmin(collective) || LoggedInUser?.canEditCollective(collective)) &&
-      (collective.type === 'ORGANIZATION' || collective.type === 'USER');
+    const canDownloadInvoices = this.canDownloadInvoices();
 
     if (!collective && data.loading) {
       return (
