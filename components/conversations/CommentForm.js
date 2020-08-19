@@ -93,7 +93,7 @@ const CommentForm = ({
   const [validationError, setValidationError] = useState();
   const { formatMessage } = intl;
 
-  const submitForm = async () => {
+  const submitForm = async event => {
     event.preventDefault();
     event.stopPropagation();
     if (!html) {
