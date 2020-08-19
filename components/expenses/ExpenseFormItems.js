@@ -58,7 +58,7 @@ class ExpenseFormItems extends React.PureComponent {
 
   componentDidMount() {
     const { values } = this.props.form;
-    if (values.type === expenseTypes.INVOICE) {
+    if (values.type === expenseTypes.INVOICE || values.type === expenseTypes.FUNDING_REQUEST) {
       this.addDefaultItem();
     }
   }
@@ -67,7 +67,7 @@ class ExpenseFormItems extends React.PureComponent {
     const { values, touched } = this.props.form;
 
     if (oldProps.form.values.type !== values.type) {
-      if (values.type === expenseTypes.INVOICE) {
+      if (values.type === expenseTypes.INVOICE && values.type === expenseTypes.FUNDING_REQUEST) {
         this.addDefaultItem();
       } else if (!touched.items && values.items?.length === 1) {
         const firstItem = values.items[0];

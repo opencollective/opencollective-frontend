@@ -2856,6 +2856,11 @@ type Expense {
   description: String!
 
   """
+  Longer description for this expense
+  """
+  longDescription: String
+
+  """
   Total amount of the expense (sum of the item's amounts).
   """
   amount: Int!
@@ -2993,6 +2998,11 @@ input ExpenseCreateInput {
   Main title of the expense
   """
   description: String!
+
+  """
+  Longer text to attach to the expense
+  """
+  longDescription: String
 
   """
   Tags associated to the expense (ie. Food, Engineering...)

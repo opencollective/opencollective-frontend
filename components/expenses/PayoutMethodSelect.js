@@ -6,6 +6,7 @@ import { get, groupBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { CollectiveFamilyTypes } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
@@ -39,6 +40,13 @@ const newPayoutMethodMsg = defineMessages({
 });
 
 const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
+
+const payoutMethodLabels = defineMessages({
+  accountBalance: {
+    id: 'PayoutMethod.AccountBalance',
+    defaultMessage: 'Open Collective (Account Balance)',
+  },
+});
 
 /**
  * An overset of `StyledSelect` specialized for payout methods. Accepts all the props
@@ -75,6 +83,10 @@ class PayoutMethodSelect extends React.Component {
         }),
       }),
     }).isRequired,
+    /** The Acccount being paid with the expense */
+    payee: PropTypes.shape({
+      type: PropTypes.string,
+    }),
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
   };
@@ -85,6 +97,8 @@ class PayoutMethodSelect extends React.Component {
     if (payoutMethod.id) {
       if (payoutMethod.name) {
         return payoutMethod.name;
+      } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
+        return this.props.intl.formatMessage(payoutMethodLabels.accountBalance);
       } else if (payoutMethod.type === PayoutMethodType.PAYPAL) {
         return `PayPal - ${get(payoutMethod.data, 'email')}`;
       } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
@@ -152,7 +166,7 @@ class PayoutMethodSelect extends React.Component {
     return (
       <Flex justifyContent="space-between" alignItems="center">
         <Span fontSize={isMenu ? '13px' : '14px'}>{this.getPayoutMethodLabel(value)}</Span>
-        {isMenu && value.id && this.props.onRemove && (
+        {isMenu && value.id && value.type !== PayoutMethodType.ACCOUNT_BALANCE && this.props.onRemove && (
           <StyledRoundButton
             size={20}
             ml={2}
@@ -180,6 +194,15 @@ class PayoutMethodSelect extends React.Component {
   getOptions = memoizeOne(payoutMethods => {
     const groupedPms = groupBy(payoutMethods, 'type');
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
+      // If the Account is of the "Collective" family, account balance should be the only option
+      if (
+        this.props.payee &&
+        CollectiveFamilyTypes.includes(this.props.payee.type) &&
+        type !== PayoutMethodType.ACCOUNT_BALANCE
+      ) {
+        return false;
+      }
+
       if (
         type === PayoutMethodType.BANK_ACCOUNT &&
         !this.props.collective.host?.connectedAccounts?.find?.(c => c.service === 'transferwise')
@@ -198,12 +221,14 @@ class PayoutMethodSelect extends React.Component {
         // Add existing payout methods for this type
         ...get(groupedPms, pmType, []).map(this.getOptionFromPayoutMethod),
         // Add "+ Create new ..." for this payment type
-        this.getOptionFromPayoutMethod({
-          type: pmType,
-          isSaved: true,
-          data: this.getDefaultData(pmType),
-        }),
-      ],
+        pmType !== PayoutMethodType.ACCOUNT_BALANCE
+          ? this.getOptionFromPayoutMethod({
+              type: pmType,
+              isSaved: true,
+              data: this.getDefaultData(pmType),
+            })
+          : null,
+      ].filter(option => option !== null),
     }));
   });
 

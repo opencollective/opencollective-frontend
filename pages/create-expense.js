@@ -8,6 +8,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { CollectiveType } from '../lib/constants/collectives';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -38,6 +39,8 @@ import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
+
+const { USER, ORGANIZATION } = CollectiveType;
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -200,7 +203,9 @@ class CreateExpensePage extends React.Component {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', []).map(member => member.account);
+      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
+        .map(member => member.account)
+        .filter(account => [USER, ORGANIZATION].includes(account.type) || account.isActive);
       return [loggedInAccount, ...accountsAdminOf];
     }
   });
@@ -222,6 +227,9 @@ class CreateExpensePage extends React.Component {
     const collective = data && data.account;
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
+
+    // Avoid featuring the "Collective" itself
+    const payoutProfiles = this.getPayoutProfiles(loggedInAccount).filter(({ slug }) => slug !== collective.slug);
 
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
@@ -255,7 +263,7 @@ class CreateExpensePage extends React.Component {
                           onSubmit={this.onFormSubmit}
                           expense={this.state.expense}
                           expensesTags={this.getSuggestedTags(collective)}
-                          payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                          payoutProfiles={payoutProfiles}
                           formPersister={this.state.formPersister}
                           shouldLoadValuesFromPersister={this.state.isInitialForm}
                           autoFocusTitle
