@@ -91,6 +91,7 @@ const Input = props => {
           {({ field, meta }) => (
             <StyledInputField
               label={input.name}
+              labelFontSize="13px"
               required={input.required}
               error={(meta.touched || disabled) && meta.error}
             >
@@ -117,6 +118,7 @@ const Input = props => {
           {({ field, meta }) => (
             <StyledInputField
               label={input.name}
+              labelFontSize="13px"
               required={input.required}
               error={(meta.touched || disabled) && meta.error}
             >
@@ -345,7 +347,14 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency })
     <React.Fragment>
       <Field name={currencyFieldName} validate={validateCurrencyMinimumAmount}>
         {({ field, meta }) => (
-          <StyledInputField name={field.name} error={meta.error} label={formatMessage(msg.currency)} mt={3} mb={2}>
+          <StyledInputField
+            name={field.name}
+            error={meta.error}
+            label={formatMessage(msg.currency)}
+            labelFontSize="13px"
+            mt={3}
+            mb={2}
+          >
             {({ id }) => (
               <StyledSelect
                 inputId={id}

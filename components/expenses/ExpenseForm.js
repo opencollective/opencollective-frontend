@@ -357,6 +357,7 @@ const ExpenseFormBody = ({
                           <StyledInputField
                             name={field.name}
                             label={formatMessage(msg.payeeLabel)}
+                            labelFontSize="13px"
                             flex="1"
                             mr={fieldsMarginRight}
                             mt={3}
@@ -385,6 +386,7 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.country)}
+                                labelFontSize="13px"
                                 error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
                                 required
                                 minWidth={250}
@@ -408,6 +410,7 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.address)}
+                                labelFontSize="13px"
                                 error={formatFormErrorMessage(intl, errors.payeeLocation?.address)}
                                 required
                                 minWidth={250}
@@ -430,6 +433,7 @@ const ExpenseFormBody = ({
                               <StyledInputField
                                 name={field.name}
                                 label={formatMessage(msg.invoiceInfo)}
+                                labelFontSize="13px"
                                 required={false}
                                 minWidth={250}
                                 mr={fieldsMarginRight}
@@ -461,6 +465,7 @@ const ExpenseFormBody = ({
                             mt={3}
                             minWidth={250}
                             label={formatMessage(msg.payoutOptionLabel)}
+                            labelFontSize="13px"
                             error={
                               isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
                                 ? formatFormErrorMessage(intl, errors.payoutMethod)
