@@ -13,7 +13,11 @@ import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
 import { getDateRangeFromPeriod } from '../expenses/filters/ExpensesDateFilter';
-import { expensesListAdminFieldsFragment, expensesListFieldsFragment } from '../expenses/graphql/fragments';
+import {
+  expenseHostFields,
+  expensesListAdminFieldsFragment,
+  expensesListFieldsFragment,
+} from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -39,16 +43,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
     $searchTerm: String
   ) {
     host(slug: $hostSlug) {
-      id
-      slug
-      name
-      currency
-      isHost
-      type
-      plan {
-        transferwisePayouts
-        transferwisePayoutsLimit
-      }
+      ...ExpenseHostFields
     }
     expenses(
       host: { slug: $hostSlug }
@@ -88,6 +83,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
 
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const EXPENSES_PER_PAGE = 15;

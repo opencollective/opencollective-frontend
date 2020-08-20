@@ -56,12 +56,14 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const hostFieldsFragment = gqlV2/* GraphQL */ `
-  fragment HostFields on Host {
+export const expenseHostFields = gqlV2/* GraphQL */ `
+  fragment ExpenseHostFields on Host {
     id
     name
     slug
     type
+    currency
+    isHost
     expensePolicy
     website
     settings
@@ -167,7 +169,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
-          ...HostFields
+          ...ExpenseHostFields
         }
       }
 
@@ -178,7 +180,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isActive
         balance
         host {
-          ...HostFields
+          ...ExpenseHostFields
         }
       }
 
@@ -238,7 +240,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
   }
 
   ${commentFieldsFragment}
-  ${hostFieldsFragment}
+  ${expenseHostFields}
 `;
 
 export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
