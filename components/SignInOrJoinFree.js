@@ -185,6 +185,7 @@ class SignInOrJoinFree extends React.Component {
                         fontSize="20px"
                         placeholder="123456"
                         pattern="[0-9]{6}"
+                        inputMode="numeric"
                         autoFocus
                         data-cy="signin-two-factor-auth-input"
                       />
