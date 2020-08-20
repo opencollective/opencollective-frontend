@@ -40,7 +40,7 @@ const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
-const generatePayoutOptions = (intl, payoutMethodType, collective) => {
+const generatePayoutOptions = (intl, payoutMethodType, host) => {
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return [{ label: payoutMethodLabel, value: { forceManual: true, action: 'PAY' } }];
@@ -56,9 +56,9 @@ const generatePayoutOptions = (intl, payoutMethodType, collective) => {
       },
     ];
     if (
-      hasFeature(collective.host, FEATURES.PAYPAL_PAYOUTS) &&
+      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
       payoutMethodType === PayoutMethodType.PAYPAL &&
-      collective.host?.connectedAccounts?.find(ca => ca?.service === 'paypal')
+      host.connectedAccounts?.find(ca => ca?.service === 'paypal')
     ) {
       defaultTypes.unshift({
         label: intl.formatMessage(PAYOUT_ACTION_TYPE.schedule, { payoutMethodLabel }),
@@ -82,10 +82,10 @@ const validate = values => {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const payoutOptions = generatePayoutOptions(intl, payoutMethodType, collective);
+  const payoutOptions = generatePayoutOptions(intl, payoutMethodType, host);
 
   const formik = useFormik({ initialValues: { ...DEFAULT_VALUES, ...payoutOptions[0]?.value }, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
@@ -197,7 +197,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, error }) => {
             <br />
             {/** TODO: Add a proper ID/Type to detect this error */}
             {error.startsWith('Not enough funds in your existing Paypal preapproval') && (
-              <StyledLink href={`https://opencollective.com/${collective.host.slug}/dashboard`}>
+              <StyledLink href={`https://opencollective.com/${host.slug}/dashboard`}>
                 <FormattedMessage
                   id="PayExpenseModal.RefillBalanceError"
                   defaultMessage="Refill balance from dashboard"
@@ -252,11 +252,11 @@ PayExpenseModal.propTypes = {
   collective: PropTypes.shape({
     balance: PropTypes.number,
     currency: PropTypes.string,
-    host: PropTypes.shape({
-      plan: PropTypes.object,
-      slug: PropTypes.string,
-    }),
   }).isRequired,
+  host: PropTypes.shape({
+    plan: PropTypes.object,
+    slug: PropTypes.string,
+  }),
   onClose: PropTypes.func.isRequired,
   /** Function called when users click on one of the "Pay" buttons */
   onSubmit: PropTypes.func.isRequired,

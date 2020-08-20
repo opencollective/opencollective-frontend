@@ -113,6 +113,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
         <PayExpenseModal
           expense={expense}
           collective={collective}
+          host={host}
           onClose={() => showModal(false)}
           error={error}
           onSubmit={async values => {
