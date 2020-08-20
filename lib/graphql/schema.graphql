@@ -252,7 +252,7 @@ type Collective implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -530,7 +530,7 @@ interface CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -1168,7 +1168,7 @@ type Event implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -1399,7 +1399,7 @@ type ExpenseType {
   PayoutMethod: PayoutMethod
   privateMessage: String
   attachment: String
-    @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
+  @deprecated(reason: "2020-01-13 - Expenses now support multiple attachments. Please use attachments instead.")
   attachments: [ExpenseItem] @deprecated(reason: "2020-04-09 - Please use items")
   items: [ExpenseItem]
   attachedFiles: [ExpenseAttachedFile!]
@@ -1600,7 +1600,7 @@ type Fund implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -2690,7 +2690,7 @@ type Organization implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -3103,7 +3103,7 @@ type Project implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int
@@ -3831,7 +3831,7 @@ type UpdateType {
   collective: CollectiveInterface
   tier: Tier
   comments(limit: Int, offset: Int): CommentListType
-    @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
+  @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
 }
 
 """
@@ -4015,7 +4015,7 @@ type User implements CollectiveInterface {
   Get all child collectives (with type=COLLECTIVE, doesn't return events)
   """
   childCollectives: [Collective]
-    @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
+  @deprecated(reason: "2020/01/08 - Connected-collectives are now handled through members")
   paymentMethods(
     service: String
     limit: Int

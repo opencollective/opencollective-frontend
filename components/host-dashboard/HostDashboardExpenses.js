@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { mapValues } from 'lodash';
+import { mapValues, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Router } from '../../server/pages';
 
+import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
 import { parseAmountRange } from '../expenses/filters/ExpensesAmountFilter';
@@ -27,6 +29,8 @@ import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
+import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
+
 const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   query HostDashboardExpenses(
     $hostSlug: String!
@@ -43,6 +47,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   ) {
     host(slug: $hostSlug) {
       ...ExpenseHostFields
+      ...HostInfoCardFields
     }
     expenses(
       host: { slug: $hostSlug }
@@ -83,9 +88,14 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
   ${expenseHostFields}
+  ${hostInfoCardFields}
 `;
 
 const EXPENSES_PER_PAGE = 15;
+
+const isValidStatus = status => {
+  return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
+};
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
@@ -93,8 +103,8 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
+    status: isValidStatus(query.status) ? query.status : null,
     type: query.type,
-    status: query.status,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
@@ -106,6 +116,7 @@ const getVariablesFromQuery = query => {
 
 const HostDashboardExpenses = ({ hostSlug }) => {
   const { query } = useRouter() || {};
+  const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const { data, error, loading, variables, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
@@ -113,10 +124,17 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   const hasFilters = React.useMemo(
     () =>
       Object.entries(query).some(([key, value]) => {
-        return !['view', 'offset', 'limit', 'hostCollectiveSlug'].includes(key) && value;
+        return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'paypalApprovalError'].includes(key) && value;
       }),
     [query],
   );
+
+  React.useEffect(() => {
+    if (query.paypalApprovalError && !paypalPreApprovalError) {
+      setPaypalPreApprovalError(query.paypalApprovalError);
+      Router.replaceRoute('host.dashboard', omit(query, 'paypalApprovalError'), { shallow: true });
+    }
+  }, [query.paypalApprovalError]);
 
   return (
     <Box maxWidth={1000} m="0 auto" py={5} px={2}>
@@ -132,7 +150,17 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
         </Box>
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
+      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      {paypalPreApprovalError && (
+        <DismissibleMessage>
+          {({ dismiss }) => (
+            <MessageBox type="warning" mb={3} withIcon onClose={dismiss}>
+              {paypalPreApprovalError}
+            </MessageBox>
+          )}
+        </DismissibleMessage>
+      )}
+      <Box mb={4}>{loading ? <LoadingPlaceholder height={100} /> : <HostInfoCard host={data.host} />}</Box>
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
