@@ -69,6 +69,7 @@ const Pagination = ({ route, limit, offset, total, scrollToTopOnChange, isDisabl
                 disabled={isDisabled}
                 type="text"
                 pattern="[0-9]+"
+                inputMode="numeric"
                 data-cy="pagination-current"
               />
             ),
