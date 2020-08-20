@@ -325,6 +325,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
           name
           slug
           type
+          supportedPayoutMethods
           plan {
             transferwisePayouts
             transferwisePayoutsLimit

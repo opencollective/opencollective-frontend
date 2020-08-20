@@ -3794,6 +3794,11 @@ type Host implements Account {
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
   supportedPaymentMethods: [PaymentMethodType]
+
+  """
+  The list of payout methods this Host accepts for its expenses
+  """
+  supportedPayoutMethods: [PayoutMethodType]
 }
 
 """
