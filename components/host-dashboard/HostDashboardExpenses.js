@@ -19,7 +19,6 @@ import {
   expensesListFieldsFragment,
 } from '../expenses/graphql/fragments';
 import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -151,19 +150,6 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <LoadingPlaceholder height={70} />
         ) : null}
       </Box>
-      <MessageBox type="info" fontSize="14px" mb={4}>
-        📢&nbsp;&nbsp;
-        <FormattedMessage
-          id="HostDashboardExpenses.Beta"
-          defaultMessage="We are working on a new version of the expenses page for the host dashboard. It's still in progress, but we'd love to hear your thoughts on this! You can provide feedback on the <IssueLink>dedicated Github issue</IssueLink>."
-          values={{
-            IssueLink: getI18nLink({
-              href: 'https://github.com/opencollective/opencollective/issues/3288',
-              openInNewTab: true,
-            }),
-          }}
-        />
-      </MessageBox>
       {error ? (
         <MessageBox type="error" withIcon>
           {getErrorFromGraphqlException(error).message}
@@ -183,7 +169,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                       params={{
                         ...mapValues(query, () => null),
                         hostCollectiveSlug: data.host.slug,
-                        view: 'expenses-beta',
+                        view: 'expenses-legacy',
                       }}
                     >
                       {text}
