@@ -12,6 +12,7 @@ import Footer from '../Footer';
 import Header from '../Header';
 import NotificationBar from '../NotificationBar';
 import SignInOrJoinFree from '../SignInOrJoinFree';
+import { withUser } from '../UserProvider';
 
 import Form from './Form';
 
@@ -72,13 +73,15 @@ class EditCollective extends React.Component {
     try {
       await this.props.editCollective(collective);
       this.setState({ status: 'saved', result: { error: null } });
-      if (Router.router.query.slug !== collective.slug) {
-        Router.replaceRoute('editCollective', { slug: collective.slug });
+      const { slug, eventSlug } = Router.router.query;
+      if ((eventSlug || slug) !== collective.slug) {
+        Router.replaceRoute('editCollective', { ...Router.router.query });
         await this.props.refetchLoggedInUser();
+      } else {
+        setTimeout(() => {
+          this.setState({ status: null });
+        }, 3000);
       }
-      setTimeout(() => {
-        this.setState({ status: null });
-      }, 3000);
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ status: null, result: { error: errorMsg } });
@@ -133,7 +136,7 @@ class EditCollective extends React.Component {
         <Body>
           {collective.isArchived && (
             <NotificationBar
-              status={notification.status || status}
+              status={notification.status}
               title={notification.title}
               description={notification.description}
             />
@@ -174,4 +177,4 @@ class EditCollective extends React.Component {
   }
 }
 
-export default injectIntl(EditCollective);
+export default injectIntl(withUser(EditCollective));

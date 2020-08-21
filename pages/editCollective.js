@@ -62,7 +62,7 @@ class EditCollectivePage extends React.Component {
   }
 
   render() {
-    const { data, editCollective, LoggedInUser, loadingLoggedInUser, refetchLoggedInUser } = this.props;
+    const { data, editCollective, LoggedInUser, loadingLoggedInUser } = this.props;
     const collective = get(data, 'Collective') || this.state.Collective;
 
     if ((data && data.loading) || loadingLoggedInUser) {
@@ -94,12 +94,7 @@ class EditCollectivePage extends React.Component {
     return (
       <div>
         <GraphQLContext.Provider value={data}>
-          <EditCollective
-            collective={collective}
-            LoggedInUser={LoggedInUser}
-            editCollective={editCollective}
-            refetchLoggedInUser={refetchLoggedInUser}
-          />
+          <EditCollective collective={collective} editCollective={editCollective} />
         </GraphQLContext.Provider>
       </div>
     );
