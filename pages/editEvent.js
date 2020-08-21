@@ -30,14 +30,14 @@ class EditEventPage extends React.Component {
   }
 
   render() {
-    const { data, loadingLoggedInUser, LoggedInUser, editCollective } = this.props;
+    const { data, loadingLoggedInUser, editCollective } = this.props;
 
     if (loadingLoggedInUser || !data.Collective) {
       return <ErrorPage loading={loadingLoggedInUser} data={data} />;
     }
 
     const event = data.Collective;
-    return <EditCollective editCollective={editCollective} collective={event} LoggedInUser={LoggedInUser} />;
+    return <EditCollective editCollective={editCollective} collective={event} />;
   }
 }
 
