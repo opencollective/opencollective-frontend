@@ -190,7 +190,7 @@
     "file-loader": "^6.0.0",
     "html-loader": "^1.2.0",
     "husky": "^4.2.5",
-    "jest": "^26.4.0",
+    "jest": "^26.4.1",
     "jest-styled-components": "^7.0.3",
     "lint-staged": "^10.2.11",
     "markdown-loader": "^5.1.0",
