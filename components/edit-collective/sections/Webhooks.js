@@ -62,7 +62,7 @@ class Webhooks extends React.Component {
     super(props);
     this.state = {
       modified: false,
-      webhooks: this.getWebhooksFromProps(props),
+      webhooks: [...this.getWebhooksFromProps(props)],
       isLoaded: false,
       status: null,
       error: '',
@@ -71,7 +71,7 @@ class Webhooks extends React.Component {
 
   componentDidUpdate(oldProps) {
     if (this.getWebhooksFromProps(oldProps) !== this.getWebhooksFromProps(this.props)) {
-      this.setState({ webhooks: this.getWebhooksFromProps(this.props) });
+      this.setState({ webhooks: [...this.getWebhooksFromProps(this.props)] });
     }
   }
 
@@ -239,11 +239,11 @@ class Webhooks extends React.Component {
         <h2>
           <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
         </h2>
-        <StyledHr />
+        <StyledHr borderColor="black.300" />
 
         <div>{webhooks.map(this.renderWebhook)}</div>
 
-        {webhooksCount > 0 && <StyledHr />}
+        {webhooksCount > 0 && <StyledHr borderColor="black.300" />}
 
         <Box width={[0.9, 0.75]} mx={['auto', 0]} my={3}>
           <StyledButton
