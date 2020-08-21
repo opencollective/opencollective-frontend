@@ -56,14 +56,17 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
   const intl = useIntl();
   const { formatMessage } = intl;
   const [accepted, setAccepted] = React.useState();
-  const [sendReplyToInvitation, { loading, error, data }] = useMutation(replyToMemberInvitationMutation);
-  const isDisabled = loading;
+  const [isSubmitting, setSubmitting] = React.useState(false);
+  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
+  const isDisabled = isSubmitting;
   const hasReplied = data && typeof data.replyToMemberInvitation !== 'undefined';
 
   const buildReplyToInvitation = accept => async () => {
+    setSubmitting(true);
     setAccepted(accept);
     await sendReplyToInvitation({ variables: { id: invitation.id, accept } });
     await refetchLoggedInUser();
+    setSubmitting(false);
   };
 
   return (
@@ -88,7 +91,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           <MemberRoleDescription role={invitation.role} />
         </P>
       )}
-      {hasReplied ? (
+      {hasReplied && !isSubmitting ? (
         <P mt={4} color={accepted ? 'green.500' : 'red.500'} textAlign="center" mb={2} fontWeight="bold">
           {accepted ? `✔️ ${formatMessage(messages.accepted)}` : `❌️ ${formatMessage(messages.declined)}`}
         </P>
@@ -107,7 +110,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
               mx={2}
               minWidth={150}
               disabled={isDisabled}
-              loading={loading && accepted === false}
+              loading={isSubmitting && accepted === false}
               onClick={buildReplyToInvitation(false)}
               data-cy="member-invitation-decline-btn"
             >
@@ -118,7 +121,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
               minWidth={150}
               buttonStyle="primary"
               disabled={isDisabled}
-              loading={loading && accepted === true}
+              loading={isSubmitting && accepted === true}
               onClick={buildReplyToInvitation(true)}
               data-cy="member-invitation-accept-btn"
             >
