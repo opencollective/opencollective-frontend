@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
-import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import themeGet from '@styled-system/theme-get';
 import { first, get, pick, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
@@ -22,6 +21,7 @@ import { withStripeLoader } from '../StripeProvider';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledRadioList from '../StyledRadioList';
+import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 
 const PaymentMethodBox = styled(Flex)`
@@ -178,12 +178,13 @@ const UpdatePaymentMethodPopUp = ({
         {showAddPaymentMethod ? (
           <Lock size={20} />
         ) : (
-          <PlusCircle
-            size={20}
+          <StyledRoundButton
+            size={24}
             onClick={() => setShowAddPaymentMethod(true)}
             data-cy="recurring-contribution-add-pm-button"
-            style={{ cursor: 'pointer' }}
-          />
+          >
+            +
+          </StyledRoundButton>
         )}
       </Flex>
       {showAddPaymentMethod ? (
