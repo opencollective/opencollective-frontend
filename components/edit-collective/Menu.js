@@ -179,7 +179,13 @@ const sectionsDisplayConditions = {
     (c.type === CollectiveType.ORGANIZATION && c.isActive),
   [EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: c => isType(c, CollectiveType.ORGANIZATION),
   [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c =>
-    isOneOfTypes(c, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION, CollectiveType.USER) && !isFund(c),
+    isOneOfTypes(
+      c,
+      CollectiveType.COLLECTIVE,
+      CollectiveType.ORGANIZATION,
+      CollectiveType.USER,
+      CollectiveType.EVENT,
+    ) && !isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
