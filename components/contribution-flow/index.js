@@ -795,6 +795,9 @@ class CreateOrderPage extends React.Component {
   getManualPaymentMethod() {
     const pm = get(this.props.host.settings, 'paymentMethods.manual');
     const interval = get(this.state, 'stepDetails.interval');
+    const totalAmount = get(this.state, 'stepDetails.totalAmount');
+    const platformFeeValue = get(this.state, 'stepDetails.platformFee.value', 0);
+    const amount = totalAmount + platformFeeValue;
 
     if (interval || (!pm && !this.props.LoggedInUser.isRoot())) {
       return null;
@@ -813,7 +816,7 @@ class CreateOrderPage extends React.Component {
       disabled,
       subtitle,
       instructions: this.props.intl.formatMessage(messages.manualPm, {
-        amount: formatCurrency(get(this.state, 'stepDetails.totalAmount'), this.getCurrency()),
+        amount: formatCurrency(amount, this.getCurrency()),
         email: get(this.props, 'LoggedInUser.email', ''),
         host: this.props.host.name,
       }),
