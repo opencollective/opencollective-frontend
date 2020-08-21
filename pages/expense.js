@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { CollectiveType } from '../lib/constants/collectives';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -85,6 +86,8 @@ const PrivateNoteLabel = () => {
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
+
+const { USER, ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, createSuccess } }) {
@@ -260,7 +263,14 @@ class ExpensePage extends React.Component {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', []).map(member => member.account);
+      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
+        .map(member => member.account)
+        .filter(
+          account =>
+            [USER, ORGANIZATION].includes(account.type) ||
+            // Same Host
+            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+        );
       return [loggedInAccount, ...accountsAdminOf];
     }
   });
