@@ -111,6 +111,7 @@ class StyledTooltip extends React.Component {
     content: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
     /** If using a node children, this defines the parent display type */
     display: PropTypes.string,
+    delayHide: PropTypes.number,
     /** The component that will be used as a container for the children */
     childrenContainer: PropTypes.any,
     /** The trigger. Either:
@@ -123,10 +124,11 @@ class StyledTooltip extends React.Component {
   static defaultProps = {
     type: 'dark',
     place: 'top',
+    delayHide: 1000,
     display: 'inline-block',
   };
 
-  state = { id: null, popperOpen: false }; // We only set `id` on the client to avoid mismatches with SSR
+  state = { id: null, popperOpen: false, popperDeepOpen: false }; // We only set `id` on the client to avoid mismatches with SSR
 
   componentDidMount() {
     this.setState({ id: `tooltip-${uuid()}` });
@@ -137,12 +139,23 @@ class StyledTooltip extends React.Component {
   };
 
   handlePopperClose = () => {
-    this.setState({ popperOpen: false });
+    if (!this.state.popperDeepOpen) {
+      setTimeout(() => this.setState({ popperOpen: false }), this.props.delayHide);
+    }
+  };
+
+  handledeepPopperOpen = () => {
+    this.setState({ popperDeepOpen: true, popperOpen: true });
+  };
+
+  handledeepPopperClose = () => {
+    this.setState({ popperDeepOpen: false }, () => {
+      this.handlePopperClose();
+    });
   };
 
   render() {
     const isMounted = Boolean(this.state.id);
-    const triggerProps = isMounted ? { 'data-for': this.state.id, 'data-tip': true } : {};
     return (
       <React.Fragment>
         <Manager>
@@ -155,9 +168,9 @@ class StyledTooltip extends React.Component {
                 onMouseOut={this.handlePopperClose}
               >
                 {typeof this.props.children === 'function' ? (
-                  this.props.children(triggerProps)
+                  this.props.children()
                 ) : (
-                  <ChildrenContainer as={this.props.childrenContainer} display={this.props.display} {...triggerProps}>
+                  <ChildrenContainer as={this.props.childrenContainer} display={this.props.display}>
                     {this.props.children}
                   </ChildrenContainer>
                 )}
@@ -165,10 +178,15 @@ class StyledTooltip extends React.Component {
             )}
           </Reference>
 
-          {isMounted && this.state.popperOpen && (
+          {isMounted && (this.state.popperOpen || this.state.popperDeepOpen) && (
             <Popper placement={this.props.place} modifiers={REACT_POPPER_MODIFIERS}>
               {({ ref, style, placement, arrowProps }) => (
-                <StyledTooltipContainer ref={ref} style={style}>
+                <StyledTooltipContainer
+                  ref={ref}
+                  style={style}
+                  onMouseOver={this.handledeepPopperOpen}
+                  onMouseOut={this.handledeepPopperClose}
+                >
                   {typeof this.props.content === 'function' ? this.props.content() : this.props.content}
 
                   <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />
