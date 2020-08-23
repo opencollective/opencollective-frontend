@@ -328,6 +328,8 @@ class ExpensePage extends React.Component {
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
 
+    const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
+
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)} withoutGlobalStyles>
         {createSuccess && !successMessageDismissed && (
@@ -470,7 +472,7 @@ class ExpensePage extends React.Component {
                   loading={loadingLoggedInUser}
                   expense={editedExpense}
                   expensesTags={this.getSuggestedTags(collective)}
-                  payoutProfiles={this.getPayoutProfiles(loggedInAccount)}
+                  payoutProfiles={payoutProfiles}
                   onCancel={() => this.setState({ status: PAGE_STATUS.VIEW, editedExpense: null })}
                   validateOnChange
                   disableSubmitIfUntouched

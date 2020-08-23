@@ -228,8 +228,7 @@ class CreateExpensePage extends React.Component {
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
 
-    // Avoid featuring the "Collective" itself
-    const payoutProfiles = this.getPayoutProfiles(loggedInAccount).filter(({ slug }) => slug !== collective.slug);
+    const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)} withoutGlobalStyles>
