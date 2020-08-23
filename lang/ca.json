@@ -697,6 +697,7 @@
   "EventDetails.showLess": "Show less",
   "EventDetails.showMore": "Show more",
   "Events": "Esdeveniments",
+  "events": "my events",
   "events.create.login": "You need to be logged in as a core contributor of this collective to be able to create an event.",
   "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
   "Expense.Activity.Approved": "Expense approved",

@@ -697,6 +697,7 @@
   "EventDetails.showLess": "Réduire",
   "EventDetails.showMore": "Afficher la suite",
   "Events": "Événements",
+  "events": "my events",
   "events.create.login": "Vous devez vous identifier en tant qu'administrateur de ce collectif pour pouvoir créer un événement.",
   "ExepenseReceipts.count": "{count, plural, one {# reçu} other {# reçus}}",
   "Expense.Activity.Approved": "Dépense approuvée",

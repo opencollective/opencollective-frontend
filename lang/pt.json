@@ -697,6 +697,7 @@
   "EventDetails.showLess": "Mostrar mais",
   "EventDetails.showMore": "Mostrar menos",
   "Events": "Eventos",
+  "events": "my events",
   "events.create.login": "Você precisa estar logado como um colaborador central deste coletivo para poder criar uma atualização.",
   "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
   "Expense.Activity.Approved": "Despesa aprovada",

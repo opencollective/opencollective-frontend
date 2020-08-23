@@ -697,6 +697,7 @@
   "EventDetails.showLess": "Zobrazit méně",
   "EventDetails.showMore": "Zobrazit více",
   "Events": "Události",
+  "events": "my events",
   "events.create.login": "Musíte být přihlášen jako týmový přispěvatel tohoto kolektivu, abyste mohli vytvořit událost.",
   "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
   "Expense.Activity.Approved": "Výdaj schválen",

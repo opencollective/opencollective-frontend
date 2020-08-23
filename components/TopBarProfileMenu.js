@@ -186,6 +186,12 @@ class TopBarProfileMenu extends React.Component {
         return a.collective.slug.localeCompare(b.collective.slug);
       });
 
+    const events = memberships
+      .filter(m => m.collective.type === 'EVENT' && m.collective.isActive)
+      .sort((a, b) => {
+        return a.collective.slug.localeCompare(b.collective.slug);
+      });
+
     const funds = memberships
       .filter(m => m.collective.type === 'FUND')
       .sort((a, b) => {
@@ -328,6 +334,28 @@ class TopBarProfileMenu extends React.Component {
                   </em>
                 </P>
               </Box>
+            )}
+            {events.length > 0 && (
+              <div>
+                <Flex alignItems="center">
+                  <P
+                    color="#4E5052"
+                    fontFamily="montserratlight, arial"
+                    fontSize="1rem"
+                    fontWeight="600"
+                    letterSpacing="1px"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    <FormattedMessage id="events" defaultMessage="my events" />
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                </Flex>
+                <Box as="ul" p={0} my={2}>
+                  {events.map(this.renderMembershipLine)}
+                </Box>
+              </div>
             )}
             {funds.length > 0 && (
               <Fragment>
