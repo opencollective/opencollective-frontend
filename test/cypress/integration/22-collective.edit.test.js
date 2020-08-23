@@ -17,7 +17,7 @@ const addTier = tier => {
   fields.map(field => {
     const action = field.type === 'select' ? 'select' : 'type';
     const value = action === 'type' ? `{selectall}${tier[field.name]}` : tier[field.name];
-    cy.get(`.EditTiers .tier:last .${field.name}.inputField ${field.type}`)[action](value);
+    cy.get(`[data-cy=EditTiers] .tier:last .${field.name}.inputField ${field.type}`)[action](value);
   });
 };
 
@@ -82,15 +82,17 @@ describe('edit collective', () => {
 
   it('edit tiers', () => {
     cy.getByDataCy('menu-item-tiers').click();
-    cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
-    cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
-    cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first .amountType.inputField select').select('FLEXIBLE');
-    cy.get('.EditTiers .tier:first .currency1.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first .currency2.inputField input').type('{selectall}10');
-    cy.get('.EditTiers .tier:first .currency3.inputField input').type('{selectall}20');
-    cy.get('.EditTiers .tier:first .minimumAmount.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first .currency0.inputField input').type('{selectall}{backspace}');
+    cy.get('[data-cy=EditTiers] .tier:first .name.inputField input').type('{selectall}Backer edited');
+    cy.get('[data-cy=EditTiers] .tier:first .description.inputField textarea').type(
+      '{selectall}New description for backers',
+    );
+    cy.get('[data-cy=EditTiers] .tier:first .amount.inputField input').type('{selectall}5');
+    cy.get('[data-cy=EditTiers] .tier:first .amountType.inputField select').select('FLEXIBLE');
+    cy.get('[data-cy=EditTiers] .tier:first .currency1.inputField input').type('{selectall}5');
+    cy.get('[data-cy=EditTiers] .tier:first .currency2.inputField input').type('{selectall}10');
+    cy.get('[data-cy=EditTiers] .tier:first .currency3.inputField input').type('{selectall}20');
+    cy.get('[data-cy=EditTiers] .tier:first .minimumAmount.inputField input').type('{selectall}5');
+    cy.get('[data-cy=EditTiers] .tier:first .currency0.inputField input').type('{selectall}{backspace}');
     addTier({
       name: 'Donor (one time donation)',
       type: 'DONATION',
@@ -127,9 +129,9 @@ describe('edit collective', () => {
     cy.get('#amount > button').should('have.length', 3);
 
     cy.visit(`/${collectiveSlug}/edit/tiers`);
-    cy.get('.EditTiers .tier').first().find('.amountType select').select('FIXED');
-    cy.get('.EditTiers .tier').last().find('.removeTier').click();
-    cy.get('.EditTiers .tier').last().find('.removeTier').click();
+    cy.get('[data-cy=EditTiers] .tier').first().find('.amountType select').select('FIXED');
+    cy.get('[data-cy=EditTiers] .tier').last().find('.removeTier').click();
+    cy.get('[data-cy=EditTiers] .tier').last().find('.removeTier').click();
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
     cy.contains('.actions > .btn', 'Saved');

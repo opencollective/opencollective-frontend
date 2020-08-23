@@ -91,8 +91,8 @@ describe('event.createOrder page', () => {
         .clear()
         .type(`${Cypress.moment().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
         .blur();
-      cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');
-      cy.get('.EditTiers input[name="amount"]').type('10');
+      cy.get('[data-cy=EditTiers] input[name="name"]').type('Ticket with VAT');
+      cy.get('[data-cy=EditTiers] input[name="amount"]').type('10');
       cy.contains('button', 'Create Event').click();
 
       // Go to the contribution flow

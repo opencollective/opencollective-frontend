@@ -3,11 +3,18 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Error from '../Error';
 import MessageBox from '../MessageBox';
 
 import Order from './Order';
+
+const OrderWithDataContainer = styled.div`
+  .comments {
+    margin-top: 3rem;
+  }
+`;
 
 class OrderWithData extends React.Component {
   static propTypes = {
@@ -46,14 +53,7 @@ class OrderWithData extends React.Component {
     const order = data.Order;
 
     return (
-      <div className="OrderWithData">
-        <style jsx>
-          {`
-            .comments {
-              margin-top: 3rem;
-            }
-          `}
-        </style>
+      <OrderWithDataContainer>
         <Order
           key={order.id}
           collective={collective}
@@ -62,7 +62,7 @@ class OrderWithData extends React.Component {
           editable={true}
           LoggedInUser={LoggedInUser}
         />
-      </div>
+      </OrderWithDataContainer>
     );
   }
 }

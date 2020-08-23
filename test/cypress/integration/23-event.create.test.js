@@ -24,12 +24,12 @@ describe('event.create.test.js', () => {
     cy.get('.geosuggest__suggests > :nth-child(1)').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
-    cy.get('.EditTiers .tier .inputField.name input').type('Free ticket');
-    cy.get('.EditTiers .tier .inputField.description textarea').type('Free ticket for students');
-    cy.get('.EditTiers .tier .inputField.maxQuantity input').type('10');
+    cy.get('[data-cy=EditTiers] .tier .inputField.name input').type('Free ticket');
+    cy.get('[data-cy=EditTiers] .tier .inputField.description textarea').type('Free ticket for students');
+    cy.get('[data-cy=EditTiers] .tier .inputField.maxQuantity input').type('10');
     cy.get('.addTier').click();
-    cy.get('.EditTiers .tier').last().find('.inputField.name input').type('Paid ticket');
-    cy.get('.EditTiers .tier').last().find('.inputField.amount input').type(15).blur();
+    cy.get('[data-cy=EditTiers] .tier').last().find('.inputField.name input').type('Paid ticket');
+    cy.get('[data-cy=EditTiers] .tier').last().find('.inputField.amount input').type(15).blur();
     cy.get('.actions button.save').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
@@ -44,15 +44,15 @@ describe('event.create.test.js', () => {
     cy.get('.actions > .btn').contains('Saved');
     // edit event tickets
     cy.getByDataCy('menu-item-tickets').click();
-    cy.get('.EditTiers .tier:nth-child(2) .removeTier').click();
+    cy.get('[data-cy=EditTiers] .tier:nth-child(2) .removeTier').click();
     cy.get('.actions > .btn').click();
     cy.get('.actions > .btn').contains('Saved');
     // edit event tiers
     cy.getByDataCy('menu-item-tiers').click();
     cy.get('.addTier').click();
-    cy.get('.EditTiers .tier .inputField.name input').type('Sponsor');
-    cy.get('.EditTiers .tier .inputField.description textarea').type('Become a sponsor');
-    cy.get('.EditTiers .tier .inputField.amount input').type(200);
+    cy.get('[data-cy=EditTiers] .tier .inputField.name input').type('Sponsor');
+    cy.get('[data-cy=EditTiers] .tier .inputField.description textarea').type('Become a sponsor');
+    cy.get('[data-cy=EditTiers] .tier .inputField.amount input').type(200);
     cy.get('.actions > .btn').click();
     cy.get('.actions > .btn').contains('Saved');
     // verify update

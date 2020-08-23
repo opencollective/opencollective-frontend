@@ -2,10 +2,45 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
 
 import StyledUpdate from './StyledUpdate';
+
+const UpdatesContainer = styled.div`
+  :global(.loadMoreBtn) {
+    margin: 1rem;
+    text-align: center;
+  }
+  .empty {
+    color: ${colors.darkgray};
+  }
+  .itemsList {
+    position: relative;
+  }
+  .loading {
+    color: ${colors.darkgray};
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.85);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: bold;
+    z-index: 10;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(5px);
+  }
+  .update {
+    padding: 0;
+  }
+`;
 
 class Updates extends React.Component {
   static propTypes = {
@@ -43,43 +78,7 @@ class Updates extends React.Component {
     }
 
     return (
-      <div className="Updates">
-        <style jsx>
-          {`
-            :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .empty {
-              color: ${colors.darkgray};
-            }
-            .itemsList {
-              position: relative;
-            }
-            .loading {
-              color: ${colors.darkgray};
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              background: rgba(255, 255, 255, 0.85);
-              text-transform: uppercase;
-              letter-spacing: 3px;
-              font-weight: bold;
-              z-index: 10;
-              -webkit-backdrop-filter: blur(2px);
-              backdrop-filter: blur(5px);
-            }
-            .update {
-              padding: 0;
-            }
-          `}
-        </style>
-
+      <UpdatesContainer>
         <div className="itemsList">
           {this.state.loading && (
             <div className="loading">
@@ -110,7 +109,7 @@ class Updates extends React.Component {
             </div>
           )}
         </div>
-      </div>
+      </UpdatesContainer>
     );
   }
 }

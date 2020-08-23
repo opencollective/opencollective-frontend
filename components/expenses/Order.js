@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import colors from '../../lib/constants/colors';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -21,6 +22,119 @@ import AmountCurrency from './AmountCurrency';
 import MarkOrderAsPaidBtn from './MarkOrderAsPaidBtn';
 import OrderDetails from './OrderDetails';
 import TransactionDetails from './TransactionDetails';
+
+const OrderContainer = styled.div`
+  .order {
+    width: 100%;
+    margin: 0.5em 0;
+    padding: 0.5em;
+    transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+  }
+  .OrderId {
+    color: ${colors.gray};
+    margin-left: 0.5rem;
+  }
+  .order.detailsView {
+    background-color: #fafafa;
+  }
+  a {
+    cursor: pointer;
+  }
+  .fromCollective {
+    float: left;
+    margin-right: 1.6rem;
+  }
+  .body {
+    overflow: hidden;
+    font-size: 1.4rem;
+    width: 100%;
+  }
+  .description {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+  }
+  .meta {
+    color: #919599;
+    font-size: 1.2rem;
+  }
+  .meta .metaItem {
+    margin: 0 0.2rem;
+  }
+  .meta .collective {
+    margin-right: 0.2rem;
+  }
+  .amount .balance {
+    font-size: 1.2rem;
+    color: #919599;
+  }
+  .amount {
+    margin-left: 0.5rem;
+    text-align: right;
+    font-size: 1.5rem;
+    font-weight: 300;
+  }
+  .rejected .status {
+    color: #e21a60;
+  }
+  .approved .status {
+    color: #72ce00;
+  }
+
+  .status {
+    text-transform: uppercase;
+  }
+
+  .actions > div {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0.5rem 0;
+  }
+
+  .actions .leftColumn {
+    width: 72px;
+    margin-right: 1rem;
+    float: left;
+  }
+
+  .orderActions :global(> div) {
+    margin-right: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .order {
+      padding: 2rem 0.5rem;
+    }
+    .order.detailsView {
+      max-height: 45rem;
+    }
+    .details {
+      max-height: 30rem;
+    }
+  }
+
+  .order .actions > div > div {
+    margin-right: 0.5rem;
+  }
+
+  @media screen and (max-width: 700px) {
+    .order .PayOrderBtn ~ .RejectOrderBtn {
+      flex-grow: 1;
+    }
+    .order .SmallButton {
+      flex-grow: 1;
+      margin-top: 1rem;
+    }
+    .order .SmallButton button {
+      width: 100%;
+    }
+  }
+`;
 
 class Order extends React.Component {
   static propTypes = {
@@ -141,125 +255,7 @@ class Order extends React.Component {
     mode = mode || 'summary';
 
     return (
-      <div className={`order ${status} ${this.state.mode}View`}>
-        <style jsx>
-          {`
-            .order {
-              width: 100%;
-              margin: 0.5em 0;
-              padding: 0.5em;
-              transition: max-height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-              overflow: hidden;
-              position: relative;
-              display: flex;
-            }
-            .OrderId {
-              color: ${colors.gray};
-              margin-left: 0.5rem;
-            }
-            .order.detailsView {
-              background-color: #fafafa;
-            }
-            a {
-              cursor: pointer;
-            }
-            .fromCollective {
-              float: left;
-              margin-right: 1.6rem;
-            }
-            .body {
-              overflow: hidden;
-              font-size: 1.4rem;
-              width: 100%;
-            }
-            .description {
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow: hidden;
-              display: block;
-            }
-            .meta {
-              color: #919599;
-              font-size: 1.2rem;
-            }
-            .meta .metaItem {
-              margin: 0 0.2rem;
-            }
-            .meta .collective {
-              margin-right: 0.2rem;
-            }
-            .amount .balance {
-              font-size: 1.2rem;
-              color: #919599;
-            }
-            .amount {
-              margin-left: 0.5rem;
-              text-align: right;
-              font-size: 1.5rem;
-              font-weight: 300;
-            }
-            .rejected .status {
-              color: #e21a60;
-            }
-            .approved .status {
-              color: #72ce00;
-            }
-
-            .status {
-              text-transform: uppercase;
-            }
-
-            .actions > div {
-              align-items: flex-end;
-              display: flex;
-              flex-wrap: wrap;
-              margin: 0.5rem 0;
-            }
-
-            .actions .leftColumn {
-              width: 72px;
-              margin-right: 1rem;
-              float: left;
-            }
-
-            .orderActions :global(> div) {
-              margin-right: 0.5rem;
-            }
-
-            @media (max-width: 600px) {
-              .order {
-                padding: 2rem 0.5rem;
-              }
-              .order.detailsView {
-                max-height: 45rem;
-              }
-              .details {
-                max-height: 30rem;
-              }
-            }
-          `}
-        </style>
-        <style jsx global>
-          {`
-            .order .actions > div > div {
-              margin-right: 0.5rem;
-            }
-
-            @media screen and (max-width: 700px) {
-              .order .PayOrderBtn ~ .RejectOrderBtn {
-                flex-grow: 1;
-              }
-              .order .SmallButton {
-                flex-grow: 1;
-                margin-top: 1rem;
-              }
-              .order .SmallButton button {
-                width: 100%;
-              }
-            }
-          `}
-        </style>
-
+      <OrderContainer className={`order ${status} ${this.state.mode}View`}>
         <div className="fromCollective">
           <LinkCollective collective={order.fromCollective} title={order.fromCollective.name} passHref>
             <Avatar collective={order.fromCollective} key={order.fromCollective.id} radius={40} className="noFrame" />
@@ -331,7 +327,7 @@ class Order extends React.Component {
             {this.state.error}
           </Container>
         )}
-      </div>
+      </OrderContainer>
     );
   }
 }

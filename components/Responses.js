@@ -1,8 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
+import styled from 'styled-components';
 
 import Response from './Response';
+
+const ResponsesContainer = styled.div`
+  width: 100%;
+  display: inline-block;
+
+  .innerResponses {
+    margin: 3rem auto;
+    max-width: 960px;
+  }
+`;
 
 class Responses extends React.Component {
   static propTypes = {
@@ -15,25 +26,13 @@ class Responses extends React.Component {
       return <div />;
     }
     return (
-      <div className="Responses">
-        <style jsx>
-          {`
-            .Responses {
-              width: 100%;
-              display: inline-block;
-            }
-            .innerResponses {
-              margin: 3rem auto;
-              max-width: 960px;
-            }
-          `}
-        </style>
+      <ResponsesContainer>
         <div className="innerResponses">
           {responses.map(response => (
             <Response key={`${get(response, 'user.id', 0)}-${response.createdAt}`} response={response} />
           ))}
         </div>
-      </div>
+      </ResponsesContainer>
     );
   }
 }

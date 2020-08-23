@@ -14,6 +14,37 @@ const getProgressColor = theme => theme.colors.primary[600];
 const getEmptyProgressColor = () => '#e2e2e2';
 const MAX_TITLE_LENGTH = 32;
 
+const GoalsCoverContainer = styled.div`
+  overflow: hidden;
+
+  .barContainer {
+    position: relative;
+    width: 80%;
+    margin: 6rem auto 1rem;
+    min-height: 80px;
+  }
+
+  .barContainer.withGoals {
+    margin-top: 10rem;
+  }
+
+  .barContainer.max-level-above-1 {
+    margin-top: 15rem;
+  }
+
+  @media (max-width: 1400px) {
+    .barContainer {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .barContainer {
+      width: 95%;
+    }
+  }
+`;
+
 const GoalContainer = styled.div`
   position: absolute;
   top: 0;
@@ -477,41 +508,7 @@ class GoalsCover extends React.Component {
     }
 
     return (
-      <div className="GoalsCover">
-        <style jsx>
-          {`
-            .GoalsCover {
-              overflow: hidden;
-            }
-
-            .barContainer {
-              position: relative;
-              width: 80%;
-              margin: 6rem auto 1rem;
-              min-height: 80px;
-            }
-
-            .barContainer.withGoals {
-              margin-top: 10rem;
-            }
-
-            .barContainer.max-level-above-1 {
-              margin-top: 15rem;
-            }
-
-            @media (max-width: 1400px) {
-              .barContainer {
-                width: 90%;
-              }
-            }
-
-            @media (max-width: 420px) {
-              .barContainer {
-                width: 95%;
-              }
-            }
-          `}
-        </style>
+      <GoalsCoverContainer>
         <div>
           {get(collective, 'stats.backers.all') > 0 && (
             <P textAlign="center" color="black.700" mx={2}>
@@ -541,7 +538,7 @@ class GoalsCover extends React.Component {
             </div>
           </div>
         </div>
-      </div>
+      </GoalsCoverContainer>
     );
   }
 }

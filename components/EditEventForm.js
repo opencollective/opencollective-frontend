@@ -1,11 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import Tickets from './edit-collective/sections/Tickets';
 import Button from './Button';
 import InputField from './InputField';
 import TimezonePicker from './TimezonePicker';
+
+const EditEventFormContainer = styled.div`
+  :global(.field) {
+    margin: 1rem;
+  }
+  :global(label) {
+    width: 150px;
+    display: inline-block;
+    vertical-align: top;
+  }
+  :global(input),
+  select,
+  :global(textarea) {
+    width: 300px;
+    font-size: 1.5rem;
+  }
+
+  .FormInputs {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  :global(textarea[name='longDescription']) {
+    height: 50rem;
+  }
+
+  .actions {
+    margin: 5rem auto 1rem;
+    text-align: center;
+  }
+
+  :global(section#location) {
+    margin-top: 0;
+  }
+`;
 
 class EditEventForm extends React.Component {
   static propTypes = {
@@ -172,44 +208,7 @@ class EditEventForm extends React.Component {
     });
 
     return (
-      <div className="EditEventForm">
-        <style jsx>
-          {`
-            :global(.field) {
-              margin: 1rem;
-            }
-            :global(label) {
-              width: 150px;
-              display: inline-block;
-              vertical-align: top;
-            }
-            :global(input),
-            select,
-            :global(textarea) {
-              width: 300px;
-              font-size: 1.5rem;
-            }
-
-            .FormInputs {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-
-            :global(textarea[name='longDescription']) {
-              height: 50rem;
-            }
-
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-
-            :global(section#location) {
-              margin-top: 0;
-            }
-          `}
-        </style>
-
+      <EditEventFormContainer>
         <div className="FormInputs">
           <div className="inputs">
             {this.fields.map(field =>
@@ -260,7 +259,7 @@ class EditEventForm extends React.Component {
             disabled={this.state.disabled ? true : loading}
           />
         </div>
-      </div>
+      </EditEventFormContainer>
     );
   }
 }

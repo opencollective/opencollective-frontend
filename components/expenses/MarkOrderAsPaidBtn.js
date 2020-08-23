@@ -3,8 +3,41 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import SmallButton from '../SmallButton';
+
+const MarkOrderAsPaidBtnContainer = styled.div`
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+
+  .error {
+    display: flex;
+    align-items: center;
+    color: red;
+    font-size: 1.3rem;
+    padding-left: 1rem;
+  }
+
+  .processorFee {
+    margin-right: 1rem;
+    max-width: 16rem;
+  }
+
+  .processorFee label {
+    margin: 0;
+  }
+
+  .processorFee .inputField,
+  .processorFee .form-group {
+    margin: 0;
+  }
+
+  .processorFee .inputField {
+    margin-top: 0.5rem;
+  }
+`;
 
 class MarkOrderAsPaidBtn extends React.Component {
   static propTypes = {
@@ -43,45 +76,7 @@ class MarkOrderAsPaidBtn extends React.Component {
       error = this.state.error;
 
     return (
-      <div className="MarkOrderAsPaidBtn">
-        <style jsx>
-          {`
-            .MarkOrderAsPaidBtn {
-              align-items: flex-end;
-              display: flex;
-              flex-wrap: wrap;
-            }
-            .error {
-              display: flex;
-              align-items: center;
-              color: red;
-              font-size: 1.3rem;
-              padding-left: 1rem;
-            }
-
-            .processorFee {
-              margin-right: 1rem;
-              max-width: 16rem;
-            }
-
-            .processorFee label {
-              margin: 0;
-            }
-          `}
-        </style>
-        <style global jsx>
-          {`
-            .processorFee .inputField,
-            .processorFee .form-group {
-              margin: 0;
-            }
-
-            .processorFee .inputField {
-              margin-top: 0.5rem;
-            }
-          `}
-        </style>
-
+      <MarkOrderAsPaidBtnContainer>
         <SmallButton
           className="MarkOrderAsPaidSmallBtn pay"
           onClick={this.onClick}
@@ -91,7 +86,7 @@ class MarkOrderAsPaidBtn extends React.Component {
           <FormattedMessage id="order.markAsPaid.btn" defaultMessage="Mark as paid" />
         </SmallButton>
         <div className="error">{error}</div>
-      </div>
+      </MarkOrderAsPaidBtnContainer>
     );
   }
 }

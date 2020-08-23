@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import momentTimezone from 'moment-timezone';
 import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
@@ -14,6 +15,30 @@ import EditEventForm from './EditEventForm';
 import Footer from './Footer';
 import Header from './Header';
 import { withUser } from './UserProvider';
+
+const CreateEventContainer = styled.div`
+  .result {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  .success {
+    color: green;
+  }
+  .error {
+    color: red;
+  }
+  .EventTemplatePicker {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .EventTemplatePicker .field {
+    margin: 0;
+  }
+  .login {
+    margin: 0 auto;
+    text-align: center;
+  }
+`;
 
 class CreateEvent extends React.Component {
   static propTypes = {
@@ -91,33 +116,7 @@ class CreateEvent extends React.Component {
     const title = `Create a New ${collective.name} Event`;
 
     return (
-      <div className="CreateEvent">
-        <style jsx>
-          {`
-            .result {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .EventTemplatePicker {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-            .EventTemplatePicker .field {
-              margin: 0;
-            }
-            .login {
-              margin: 0 auto;
-              text-align: center;
-            }
-          `}
-        </style>
-
+      <CreateEventContainer>
         <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
@@ -157,7 +156,7 @@ class CreateEvent extends React.Component {
         </Body>
 
         <Footer />
-      </div>
+      </CreateEventContainer>
     );
   }
 }

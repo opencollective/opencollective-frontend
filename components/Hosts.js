@@ -17,6 +17,22 @@ const CoverSmallCTA = styled.span`
   }
 `;
 
+const HostsContainer = styled.div`
+  .success {
+    color: green;
+  }
+  .error {
+    color: red;
+  }
+  .login {
+    text-align: center;
+  }
+  .actions {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+`;
+
 class Hosts extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -66,25 +82,7 @@ class Hosts extends React.Component {
     );
 
     return (
-      <div className="Hosts">
-        <style jsx>
-          {`
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .login {
-              text-align: center;
-            }
-            .actions {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-          `}
-        </style>
-
+      <HostsContainer>
         <Header
           title={title}
           description={description}
@@ -106,7 +104,7 @@ class Hosts extends React.Component {
           </div>
         </Body>
         <Footer />
-      </div>
+      </HostsContainer>
     );
   }
 }

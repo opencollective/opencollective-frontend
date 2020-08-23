@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import colors from '../lib/constants/colors';
 import { formatCurrency } from '../lib/currency-utils';
@@ -11,6 +12,48 @@ import Avatar from './Avatar';
 import CollectiveCard from './CollectiveCard';
 import { Flex } from './Grid';
 import LinkCollective from './LinkCollective';
+
+const MemberContainer = styled.div`
+  .Member {
+    width: 100%;
+    max-width: 300px;
+    float: left;
+    position: relative;
+  }
+
+  .Member.small {
+    width: 48px;
+  }
+
+  .Member.viewMode-ORGANIZATION {
+    width: 200px;
+    margin: 1rem;
+  }
+
+  .bubble {
+    padding: 1rem;
+    padding-top: 0;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .small .avatar {
+    margin: 0;
+  }
+
+  .small .bubble {
+    display: none;
+  }
+
+  .name {
+    font-size: 1.7rem;
+  }
+
+  .description,
+  .meta {
+    font-size: 1.4rem;
+  }
+`;
 
 class Member extends React.Component {
   static propTypes = {
@@ -89,50 +132,7 @@ ${totalDonationsStr}`;
     }
 
     return (
-      <div className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
-        <style jsx>
-          {`
-            .Member {
-              width: 100%;
-              max-width: 300px;
-              float: left;
-              position: relative;
-            }
-
-            .Member.small {
-              width: 48px;
-            }
-
-            .Member.viewMode-ORGANIZATION {
-              width: 200px;
-              margin: 1rem;
-            }
-
-            .bubble {
-              padding: 1rem;
-              padding-top: 0;
-              text-align: left;
-              overflow: hidden;
-            }
-
-            .small .avatar {
-              margin: 0;
-            }
-
-            .small .bubble {
-              display: none;
-            }
-
-            .name {
-              font-size: 1.7rem;
-            }
-
-            .description,
-            .meta {
-              font-size: 1.4rem;
-            }
-          `}
-        </style>
+      <MemberContainer className={`Member ${className} ${member.type} viewMode-${viewMode}`}>
         <div>
           {viewMode === 'USER' && (
             <LinkCollective collective={this.props.member.member} target="_top" title={title}>
@@ -157,7 +157,7 @@ ${totalDonationsStr}`;
           )}
           {viewMode === 'ORGANIZATION' && <CollectiveCard collective={member} membership={membership} />}
         </div>
-      </div>
+      </MemberContainer>
     );
   }
 }

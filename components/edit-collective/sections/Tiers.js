@@ -5,6 +5,7 @@ import { getStandardVatRate, getVatOriginCountry } from '@opencollective/taxes';
 import { cloneDeep, get, set } from 'lodash';
 import { Button, Form } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -26,6 +27,23 @@ import { editCollectiveSettingsMutation } from './../mutations';
 const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
+
+const EditTiers = styled.div`
+  :global(.tierActions) {
+    text-align: right;
+    font-size: 1.3rem;
+  }
+  :global(.field) {
+    margin: 1rem;
+  }
+  .editTiersActions {
+    text-align: right;
+    margin-top: -10px;
+  }
+  :global(.tier) {
+    margin: 3rem 0;
+  }
+`;
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -412,25 +430,7 @@ class Tiers extends React.Component {
     const displayCustomContributionsSettings = collective.id && defaultType !== TICKET;
 
     return (
-      <div className="EditTiers">
-        <style jsx>
-          {`
-            :global(.tierActions) {
-              text-align: right;
-              font-size: 1.3rem;
-            }
-            :global(.field) {
-              margin: 1rem;
-            }
-            .editTiersActions {
-              text-align: right;
-              margin-top: -10px;
-            }
-            :global(.tier) {
-              margin: 3rem 0;
-            }
-          `}
-        </style>
+      <EditTiers data-cy="EditTiers">
         <H3>{this.props.title}</H3>
         <StyledHr my={4} borderColor="black.200" />
         {displayCustomContributionsSettings && (
@@ -484,7 +484,7 @@ class Tiers extends React.Component {
             {intl.formatMessage(this.messages[`${defaultType}.add`])}
           </Button>
         </div>
-      </div>
+      </EditTiers>
     );
   }
 }

@@ -2,12 +2,63 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import colors from '../../lib/constants/colors';
 
 import { Box } from '../Grid';
 
 import Order from './Order';
+
+const OrdersContainer = styled(Box)`
+  :global(.loadMoreBtn) {
+    margin: 1rem;
+    text-align: center;
+  }
+  .filter {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+  }
+  :global(.filterBtnGroup) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  :global(.filterBtn) {
+    width: 25%;
+  }
+  .empty {
+    text-align: center;
+    margin: 4rem;
+    color: ${colors.darkgray};
+  }
+  .itemsList {
+    position: relative;
+  }
+  .itemsList .item {
+    border-bottom: 1px solid #e8e9eb;
+  }
+  .loading {
+    color: ${colors.darkgray};
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.85);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: bold;
+    z-index: 10;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(5px);
+  }
+`;
 
 class Orders extends React.Component {
   static propTypes = {
@@ -57,59 +108,7 @@ class Orders extends React.Component {
     }
 
     return (
-      <Box className="Orders" mx="auto" maxWidth="80rem">
-        <style jsx>
-          {`
-            :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-              margin-bottom: 20px;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-              display: flex;
-              justify-content: center;
-            }
-            :global(.filterBtn) {
-              width: 25%;
-            }
-            .empty {
-              text-align: center;
-              margin: 4rem;
-              color: ${colors.darkgray};
-            }
-            .itemsList {
-              position: relative;
-            }
-            .itemsList .item {
-              border-bottom: 1px solid #e8e9eb;
-            }
-            .loading {
-              color: ${colors.darkgray};
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              background: rgba(255, 255, 255, 0.85);
-              text-transform: uppercase;
-              letter-spacing: 3px;
-              font-weight: bold;
-              z-index: 10;
-              -webkit-backdrop-filter: blur(2px);
-              backdrop-filter: blur(5px);
-            }
-          `}
-        </style>
-
+      <OrdersContainer className="Orders" mx="auto" maxWidth="80rem">
         {filters && (
           <div className="filter">
             <ButtonGroup className="filterBtnGroup">
@@ -190,7 +189,7 @@ class Orders extends React.Component {
             </div>
           )}
         </div>
-      </Box>
+      </OrdersContainer>
     );
   }
 }

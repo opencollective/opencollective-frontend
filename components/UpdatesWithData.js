@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Error from './Error';
 import { Box, Flex } from './Grid';
@@ -10,6 +11,16 @@ import Link from './Link';
 import SectionTitle from './SectionTitle';
 import StyledButton from './StyledButton';
 import Updates from './Updates';
+
+const UpdatesContainer = styled.div`
+  .FullPage .adminActions {
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.05rem;
+    margin-bottom: 3rem;
+  }
+`;
 
 class UpdatesWithData extends React.Component {
   static propTypes = {
@@ -48,19 +59,7 @@ class UpdatesWithData extends React.Component {
 
     const updates = data.allUpdates;
     return (
-      <div className="UpdatesContainer">
-        <style jsx>
-          {`
-            .FullPage .adminActions {
-              text-transform: uppercase;
-              font-size: 1.3rem;
-              font-weight: 600;
-              letter-spacing: 0.05rem;
-              margin-bottom: 3rem;
-            }
-          `}
-        </style>
-
+      <UpdatesContainer>
         {!compact && (
           <div className="FullPage">
             <SectionTitle
@@ -93,7 +92,7 @@ class UpdatesWithData extends React.Component {
             includeHostedCollectives={includeHostedCollectives}
           />
         </Box>
-      </div>
+      </UpdatesContainer>
     );
   }
 }

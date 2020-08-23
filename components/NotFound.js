@@ -2,28 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { Flex } from './Grid';
 import Link from './Link';
 import StyledButton from './StyledButton';
 import { H1, P } from './Text';
 
+const NotFoundContainer = styled(Flex)`
+  .shrug {
+    font-size: 3.6rem;
+    text-align: center;
+    color: #3385ff;
+  }
+  p {
+    margin: 4rem 0;
+    text-align: center;
+  }
+`;
+
 const NotFound = ({ searchTerm }) => {
   return (
-    <Flex data-cy="not-found" flexDirection="column" alignItems="center">
-      <style jsx>
-        {`
-          .shrug {
-            font-size: 3.6rem;
-            text-align: center;
-            color: #3385ff;
-          }
-          p {
-            margin: 4rem 0;
-            text-align: center;
-          }
-        `}
-      </style>
+    <NotFoundContainer data-cy="not-found" flexDirection="column" alignItems="center">
       <H1 textAlign="center">
         <FormattedMessage id="notFound" defaultMessage="Not found" />
       </H1>
@@ -46,7 +46,7 @@ const NotFound = ({ searchTerm }) => {
           </Link>
         </Flex>
       )}
-    </Flex>
+    </NotFoundContainer>
   );
 };
 

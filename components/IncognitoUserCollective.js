@@ -2,12 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { defineMessages, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { IncognitoAvatar } from './Avatar';
 import Body from './Body';
 import Footer from './Footer';
 import { Flex } from './Grid';
 import Header from './Header';
+
+const UserCollectivePageContainer = styled.div`
+  h1 {
+    font-size: 2rem;
+  }
+`;
 
 class IncognitoUserCollective extends React.Component {
   static propTypes = {
@@ -31,15 +38,7 @@ class IncognitoUserCollective extends React.Component {
     const { intl, collective } = this.props;
 
     return (
-      <div className={classNames('UserCollectivePage')}>
-        <style jsx>
-          {`
-            h1 {
-              font-size: 2rem;
-            }
-          `}
-        </style>
-
+      <UserCollectivePageContainer className={classNames('UserCollectivePage')}>
         <Header
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}
@@ -55,7 +54,7 @@ class IncognitoUserCollective extends React.Component {
           </Flex>
         </Body>
         <Footer />
-      </div>
+      </UserCollectivePageContainer>
     );
   }
 }

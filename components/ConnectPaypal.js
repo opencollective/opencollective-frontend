@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { connectAccount } from '../lib/api';
 
@@ -9,6 +10,41 @@ import Currency from './Currency';
 import MessageBox from './MessageBox';
 import SmallButton from './SmallButton';
 import { P } from './Text';
+
+const CollectivesContainer = styled.div`
+  .collectivesFilter {
+    display: flex;
+    justify-content: center;
+  }
+  .collectiveBalance {
+    text-align: center;
+  }
+  .collectiveBalance label {
+    margin: 1rem 0.5rem 1rem 0;
+  }
+  .amount {
+    font-size: 3.6rem;
+    font-weight: 500;
+    line-height: 1.11;
+    color: #252729;
+    margin: 0.5rem 0;
+  }
+
+  .description,
+  label {
+    font-size: 1.4rem;
+    line-height: 1.5;
+    text-align: right;
+    color: #aaaeb3;
+    font-weight: normal;
+  }
+
+  .description {
+    width: 22rem;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+`;
 
 class ConnectPaypal extends React.Component {
   static propTypes = {
@@ -95,43 +131,7 @@ class ConnectPaypal extends React.Component {
     const paypalPaymentMethod = collective.paymentMethods.find(pm => pm.service === 'paypal');
 
     return (
-      <div className="CollectivesContainer">
-        <style jsx>
-          {`
-            .collectivesFilter {
-              display: flex;
-              justify-content: center;
-            }
-            .collectiveBalance {
-              text-align: center;
-            }
-            .collectiveBalance label {
-              margin: 1rem 0.5rem 1rem 0;
-            }
-            .amount {
-              font-size: 3.6rem;
-              font-weight: 500;
-              line-height: 1.11;
-              color: #252729;
-              margin: 0.5rem 0;
-            }
-
-            .description,
-            label {
-              font-size: 1.4rem;
-              line-height: 1.5;
-              text-align: right;
-              color: #aaaeb3;
-              font-weight: normal;
-            }
-
-            .description {
-              width: 22rem;
-              margin: 0.5rem 0;
-              font-size: 1.1rem;
-            }
-          `}
-        </style>
+      <CollectivesContainer>
         <div className="connectPaypal">
           {paypalPaymentMethod && (
             <div style={{ textAlign: 'center' }}>
@@ -175,7 +175,7 @@ class ConnectPaypal extends React.Component {
             </div>
           )}
         </div>
-      </div>
+      </CollectivesContainer>
     );
   }
 }

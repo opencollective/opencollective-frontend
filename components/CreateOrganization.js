@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
@@ -14,6 +15,33 @@ import Footer from './Footer';
 import Header from './Header';
 import SignInOrJoinFree from './SignInOrJoinFree';
 import { H1, P } from './Text';
+
+const CreateOrganizationContainer = styled.div`
+  .result {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  .success {
+    color: green;
+  }
+  .error {
+    color: red;
+  }
+  .CollectiveTemplatePicker {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .CollectiveTemplatePicker .field {
+    margin: 0;
+  }
+  .login {
+    margin: 0 auto;
+    text-align: center;
+  }
+  .signin {
+    text-align: center;
+  }
+`;
 
 class CreateOrganization extends React.Component {
   static propTypes = {
@@ -85,36 +113,7 @@ class CreateOrganization extends React.Component {
     const title = 'Create a new organization';
 
     return (
-      <div className="CreateOrganization">
-        <style jsx>
-          {`
-            .result {
-              text-align: center;
-              margin-bottom: 5rem;
-            }
-            .success {
-              color: green;
-            }
-            .error {
-              color: red;
-            }
-            .CollectiveTemplatePicker {
-              max-width: 700px;
-              margin: 0 auto;
-            }
-            .CollectiveTemplatePicker .field {
-              margin: 0;
-            }
-            .login {
-              margin: 0 auto;
-              text-align: center;
-            }
-            .signin {
-              text-align: center;
-            }
-          `}
-        </style>
-
+      <CreateOrganizationContainer>
         <Header
           title={title}
           className={this.state.status}
@@ -159,7 +158,7 @@ class CreateOrganization extends React.Component {
         </Body>
 
         <Footer />
-      </div>
+      </CreateOrganizationContainer>
     );
   }
 }

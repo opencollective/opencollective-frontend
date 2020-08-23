@@ -6,11 +6,45 @@ import classNames from 'classnames';
 import { uniqBy } from 'lodash';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Error from './Error';
 import Member from './Member';
 
 const MEMBERS_PER_PAGE = 10;
+
+const MembersContainer = styled.div`
+  :global(.loadMoreBtn) {
+    margin: 1rem;
+    text-align: center;
+  }
+  .filter {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  :global(.filterBtnGroup) {
+    width: 100%;
+  }
+  :global(.filterBtn) {
+    width: 33%;
+  }
+  .Members {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .cardsList .Member.ORGANIZATION {
+    margin: 1rem !important;
+  }
+  .cardsList .Member.USER {
+    margin: 0.5rem 0.25rem;
+  }
+`;
 
 class MembersWithData extends React.Component {
   static propTypes = {
@@ -96,45 +130,7 @@ class MembersWithData extends React.Component {
     }
     const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
     return (
-      <div className="MembersContainer" ref={node => (this.node = node)}>
-        <style jsx>
-          {`
-            .MembersContainer :global(.loadMoreBtn) {
-              margin: 1rem;
-              text-align: center;
-            }
-            .filter {
-              width: 100%;
-              max-width: 400px;
-              margin: 0 auto;
-            }
-            :global(.filterBtnGroup) {
-              width: 100%;
-            }
-            :global(.filterBtn) {
-              width: 33%;
-            }
-            .Members {
-              display: flex;
-              flex-wrap: wrap;
-              flex-direction: row;
-              justify-content: center;
-              overflow: hidden;
-              margin: 1rem 0;
-            }
-          `}
-        </style>
-        <style jsx global>
-          {`
-            .cardsList .Member.ORGANIZATION {
-              margin: 1rem !important;
-            }
-            .cardsList .Member.USER {
-              margin: 0.5rem 0.25rem;
-            }
-          `}
-        </style>
-
+      <MembersContainer ref={node => (this.node = node)}>
         {!role && !tier && (
           <div className="filter">
             <ButtonGroup className="filterBtnGroup">
@@ -190,7 +186,7 @@ class MembersWithData extends React.Component {
             </Button>
           </div>
         )}
-      </div>
+      </MembersContainer>
     );
   }
 }

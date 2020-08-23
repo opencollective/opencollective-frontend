@@ -32,6 +32,25 @@ const Fineprint = styled.div`
   font-size: 14px;
 `;
 
+const EditCollectiveHostSection = styled.div`
+  .suggestedHostsTitle {
+    display: flex;
+    align-items: baseline;
+  }
+  .suggestedHostsTitle :global(a) {
+    font-size: 1.3rem;
+    margin-left: 0.5rem;
+  }
+  .subtitle {
+    color: #666f80;
+    font-size: 1.5rem;
+  }
+  :global(.EditCollectiveHostSection h2 label, .CreateHostForm div.form-group:not(.horizontal) label) {
+    cursor: pointer;
+    width: auto;
+  }
+`;
+
 class Host extends React.Component {
   static propTypes = {
     goals: PropTypes.arrayOf(PropTypes.object),
@@ -254,27 +273,7 @@ class Host extends React.Component {
     }
 
     return (
-      <div className="EditCollectiveHostSection">
-        <style jsx>
-          {`
-            .suggestedHostsTitle {
-              display: flex;
-              align-items: baseline;
-            }
-            .suggestedHostsTitle :global(a) {
-              font-size: 1.3rem;
-              margin-left: 0.5rem;
-            }
-            .subtitle {
-              color: #666f80;
-              font-size: 1.5rem;
-            }
-            :global(.EditCollectiveHostSection h2 label, .CreateHostForm div.form-group:not(.horizontal) label) {
-              cursor: pointer;
-              width: auto;
-            }
-          `}
-        </style>
+      <EditCollectiveHostSection>
         <Option id="noHost">
           <Flex>
             <Box width="50px" mr={2}>
@@ -397,7 +396,7 @@ class Host extends React.Component {
             </Box>
           </Flex>
         </Option>
-      </div>
+      </EditCollectiveHostSection>
     );
   }
 }

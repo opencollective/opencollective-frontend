@@ -3,10 +3,36 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { transactionFieldsFragment, transactionsQuery } from '../../lib/graphql/queries';
 
 import SmallButton from '../SmallButton';
+
+const RefundTransactionBtnContainer = styled.div`
+  .error {
+    color: red;
+    font-weight: bold;
+    padding-top: 20px;
+  }
+  .confirmation {
+    border-top: solid 1px #ddd;
+    margin: 10px 0;
+    padding: 10px 0;
+  }
+  .confirmation strong {
+    display: block;
+    padding-bottom: 5px;
+  }
+  .confirmation-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .confirmation-buttons .SmallButton.refund {
+    margin-right: 10px;
+  }
+`;
 
 class RefundTransactionBtn extends React.Component {
   static propTypes = {
@@ -70,34 +96,7 @@ class RefundTransactionBtn extends React.Component {
 
   render() {
     return (
-      <div>
-        <style jsx>
-          {`
-            .error {
-              color: red;
-              font-weight: bold;
-              padding-top: 20px;
-            }
-            .confirmation {
-              border-top: solid 1px #ddd;
-              margin: 10px 0;
-              padding: 10px 0;
-            }
-            .confirmation strong {
-              display: block;
-              padding-bottom: 5px;
-            }
-            .confirmation-buttons {
-              display: flex;
-              flex-direction: row;
-              justify-content: flex-start;
-            }
-            .confirmation-buttons .SmallButton.refund {
-              margin-right: 10px;
-            }
-          `}
-        </style>
-
+      <RefundTransactionBtnContainer>
         {this.state.showing.error && <div className="error">ERROR: {this.state.error}</div>}
 
         {/* Already refunded so we don't really don't need to show
@@ -134,7 +133,7 @@ class RefundTransactionBtn extends React.Component {
             </div>
           </div>
         )}
-      </div>
+      </RefundTransactionBtnContainer>
     );
   }
 }

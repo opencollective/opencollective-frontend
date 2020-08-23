@@ -4,12 +4,17 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { compose } from '../lib/utils';
 
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
+
+const ErrorDiv = styled.div`
+  font-size: 1.1rem;
+`;
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -70,13 +75,6 @@ class SendMoneyToCollectiveBtn extends React.Component {
     const { amount, currency, toCollective } = this.props;
     return (
       <div className="SendMoneyToCollectiveBtn">
-        <style jsx>
-          {`
-            .error {
-              font-size: 1.1rem;
-            }
-          `}
-        </style>
         <Flex justifyContent="center" mb={1}>
           <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
             {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
@@ -92,7 +90,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
             )}
           </StyledButton>
         </Flex>
-        {this.state.error && <div className="error">{this.state.error}</div>}
+        {this.state.error && <ErrorDiv>{this.state.error}</ErrorDiv>}
       </div>
     );
   }

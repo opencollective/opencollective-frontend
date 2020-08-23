@@ -17,6 +17,36 @@ import StyledInputField from './StyledInputField';
 
 const UpdateFormWrapper = styled(Container)`
   width: 100%;
+  .col {
+    float: left;
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+    margin-top: 1rem;
+  }
+  .row {
+    clear: both;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .row .col.large {
+    width: 100%;
+  }
+  .row.actions {
+    margin-top: 7rem;
+  }
+  label {
+    text-transform: uppercase;
+    color: #aaaeb3;
+    font-weight: 300;
+    white-space: nowrap;
+  }
+  .netAmountInCollectiveCurrency {
+    font-weight: bold;
+  }
+  .error {
+    color: red;
+  }
 `;
 
 const ActionButtonWrapper = styled(Container)`
@@ -113,40 +143,6 @@ class EditUpdateForm extends React.Component {
 
     return (
       <UpdateFormWrapper className={`EditUpdateForm ${this.props.mode}`}>
-        <style jsx>
-          {`
-            .col {
-              float: left;
-              display: flex;
-              flex-direction: column;
-              margin-right: 1rem;
-              margin-top: 1rem;
-            }
-            .row {
-              clear: both;
-              margin-left: 0;
-              margin-right: 0;
-            }
-            .row .col.large {
-              width: 100%;
-            }
-            .row.actions {
-              margin-top: 7rem;
-            }
-            label {
-              text-transform: uppercase;
-              color: #aaaeb3;
-              font-weight: 300;
-              white-space: nowrap;
-            }
-            .netAmountInCollectiveCurrency {
-              font-weight: bold;
-            }
-            .error {
-              color: red;
-            }
-          `}
-        </style>
         <form data-cy="edit-update-form" onSubmit={this.onSubmit}>
           <div className="row">
             <div className="col large">

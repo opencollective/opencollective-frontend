@@ -7,6 +7,7 @@ import { find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
@@ -49,6 +50,61 @@ import VirtualCards from './sections/VirtualCards';
 import Webhooks from './sections/Webhooks';
 import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
+
+const EditCollectiveFormContainer = styled.div`
+  :global(.field) {
+    margin: 1rem;
+  }
+  :global(label) {
+    width: 150px;
+    display: inline-block;
+    vertical-align: top;
+  }
+  :global(input),
+  select,
+  :global(textarea) {
+    width: 300px;
+    font-size: 1.5rem;
+  }
+
+  .EditCollectiveForm :global(textarea[name='expensePolicy']) {
+    height: 30rem;
+  }
+
+  .actions {
+    margin: 5rem auto 1rem;
+    text-align: center;
+  }
+  .backToProfile {
+    font-size: 1.3rem;
+    margin: 1rem;
+  }
+
+  section#location {
+    margin-top: 0;
+  }
+
+  .image .InputTypeDropzone {
+    width: 100px;
+  }
+
+  .backgroundImage-dropzone {
+    max-width: 500px;
+    overflow: hidden;
+  }
+
+  .user .image-dropzone {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .menu {
+    text-align: center;
+    margin: 1rem 0 3rem 0;
+  }
+`;
 
 class EditCollectiveForm extends React.Component {
   static propTypes = {
@@ -738,67 +794,7 @@ class EditCollectiveForm extends React.Component {
     const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
 
     return (
-      <div className="EditCollectiveForm">
-        <style jsx>
-          {`
-            :global(.field) {
-              margin: 1rem;
-            }
-            :global(label) {
-              width: 150px;
-              display: inline-block;
-              vertical-align: top;
-            }
-            :global(input),
-            select,
-            :global(textarea) {
-              width: 300px;
-              font-size: 1.5rem;
-            }
-
-            .EditCollectiveForm :global(textarea[name='expensePolicy']) {
-              height: 30rem;
-            }
-
-            .actions {
-              margin: 5rem auto 1rem;
-              text-align: center;
-            }
-            .backToProfile {
-              font-size: 1.3rem;
-              margin: 1rem;
-            }
-          `}
-        </style>
-        <style global jsx>
-          {`
-            section#location {
-              margin-top: 0;
-            }
-
-            .image .InputTypeDropzone {
-              width: 100px;
-            }
-
-            .backgroundImage-dropzone {
-              max-width: 500px;
-              overflow: hidden;
-            }
-
-            .user .image-dropzone {
-              width: 64px;
-              height: 64px;
-              border-radius: 50%;
-              overflow: hidden;
-            }
-
-            .menu {
-              text-align: center;
-              margin: 1rem 0 3rem 0;
-            }
-          `}
-        </style>
-
+      <EditCollectiveFormContainer>
         <Flex flexWrap="wrap">
           <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
@@ -876,7 +872,7 @@ class EditCollectiveForm extends React.Component {
               this.renderSection(section)}
           </Flex>
         </Flex>
-      </div>
+      </EditCollectiveFormContainer>
     );
   }
 }

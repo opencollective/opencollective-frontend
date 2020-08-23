@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import CollectiveCard from './CollectiveCard';
+
+const MembershipContainer = styled.div`
+  float: left;
+  margin: 1rem;
+`;
 
 class Membership extends React.Component {
   static propTypes = {
@@ -30,18 +36,9 @@ class Membership extends React.Component {
 
     return (
       <React.Fragment>
-        <style jsx>
-          {`
-            .Membership {
-              float: left;
-              margin: 1rem;
-            }
-          `}
-        </style>
-
-        <div className="Membership">
+        <MembershipContainer>
           <CollectiveCard memberships={memberships} collective={collective} LoggedInUser={LoggedInUser} />
-        </div>
+        </MembershipContainer>
       </React.Fragment>
     );
   }
