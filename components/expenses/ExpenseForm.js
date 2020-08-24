@@ -469,7 +469,6 @@ const ExpenseFormBody = ({
                           >
                             {({ id }) => (
                               <CollectivePicker
-                                types={[CollectiveType.ORGANIZATION]}
                                 inputId={id}
                                 collectives={payoutProfiles}
                                 getDefaultOptions={build => values.payee && build(values.payee)}
