@@ -4166,6 +4166,11 @@ type Member {
   Total amount donated
   """
   totalDonations: Amount
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   account: Account
 }
 
@@ -4194,6 +4199,11 @@ type MemberOf {
   Total amount donated
   """
   totalDonations: Amount
+
+  """
+  Custom user message from member to the collective
+  """
+  publicMessage: String
   account: Account
 }
 
@@ -4580,6 +4590,26 @@ type Mutation {
     """
     transaction: TransactionReferenceInput!
   ): Transaction!
+
+  """
+  Edit the public message for the given Member of a Collective
+  """
+  editPublicMessage(
+    """
+    Reference to an account for the donating Collective
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the receiving Collective
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    New public message
+    """
+    message: String
+  ): Member!
 }
 
 """
