@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
 
 import { uploadImageWithXHR } from '../lib/api';
 import { getErrorFromXhrUpload } from '../lib/errors';
+import { allSettled } from '../lib/utils';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -120,7 +121,7 @@ const StyledDropzone = ({
       async acceptedFiles => {
         setUploading(true);
         const filesToUpload = isMulti ? acceptedFiles : [acceptedFiles[0]];
-        const results = await Promise.allSettled(
+        const results = await allSettled(
           filesToUpload.map((file, index) =>
             uploadImageWithXHR(file, {
               mockImage: mockImageGenerator && mockImageGenerator(index),
