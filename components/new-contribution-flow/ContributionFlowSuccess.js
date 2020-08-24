@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
@@ -10,6 +9,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../../components/Container';
@@ -25,10 +25,26 @@ import ContributorCardWithTier from './ContributorCardWithTier';
 
 // Styled components
 const ContainerWithImage = styled(Container)`
-  background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: left;
+  @media screen and (max-width: 40em) {
+    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png');
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+  }
+
+  @media screen and (min-width: 40em) and (max-width: 52em) {
+    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+  }
+
+  @media screen and (min-width: 52em) {
+    background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+  }
 `;
 
 const CTAContainer = styled(Container)`
@@ -69,16 +85,6 @@ ShareLink.defaultProps = {
   target: '_blank',
 };
 
-// GraphQL
-const orderSuccessMemberQuery = gql`
-  query OrderSuccessMember($collectiveId: Int!, $memberCollectiveId: Int!, $tierId: Int) {
-    member(CollectiveId: $collectiveId, MemberCollectiveId: $memberCollectiveId, TierId: $tierId) {
-      id
-      publicMessage
-    }
-  }
-`;
-
 class NewContributionFlowSuccess extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -87,8 +93,6 @@ class NewContributionFlowSuccess extends React.Component {
     router: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     data: PropTypes.object,
-    stepProfile: PropTypes.object,
-    contribution: PropTypes.object,
   };
 
   constructor(props) {
@@ -225,19 +229,17 @@ class NewContributionFlowSuccess extends React.Component {
     if (!LoggedInUser) {
       return null;
     }
-    return (
-      <PublicMessageForm
-        stepProfile={this.props.stepProfile}
-        publicMessage={publicMessage}
-        collective={this.props.collective}
-      />
-    );
+    return <PublicMessageForm order={this.props.data.order} publicMessage={publicMessage} />;
   };
 
   render() {
-    const { loadingLoggedInUser, LoggedInUser, data, collective, contribution } = this.props;
+    const { loadingLoggedInUser, LoggedInUser, collective, data } = this.props;
+    const { order } = data;
     const shareURL = `${process.env.WEBSITE_URL}${collective.path}`;
-    const publicMessage = data && get(data, 'member.publicMessage', null);
+
+    const getPublicMessage = order => {
+      return get(order, 'fromAccount.memberOf.nodes[0].publicMessage');
+    };
 
     return loadingLoggedInUser || data.loading ? (
       <Loading />
@@ -253,28 +255,27 @@ class NewContributionFlowSuccess extends React.Component {
                 <FormattedMessage
                   id="NewContributionFlow.Success.NowSupporting"
                   defaultMessage="You are now supporting {collective}."
-                  values={{ collective: collective.name }}
+                  values={{ collective: order.toAccount.name }}
                 />
               </P>
             </Box>
-            <ContributorCardWithTier
-              width={250}
-              height={380}
-              collective={collective}
-              contribution={contribution}
-              my={2}
-            />
+            <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
             <Box my={4}>
               <P fontColor="black.800" fontWeight={500}>
                 <FormattedMessage
                   id="NewContributionFlow.Success.DiscoverMore"
                   defaultMessage="Discover more Collectives like {collective} &rarr;"
-                  values={{ collective: collective.name }}
+                  values={{ collective: order.toAccount.name }}
                 />
               </P>
             </Box>
             <Flex justifyContent="center" mt={2}>
-              <ShareLink href={tweetURL({ url: shareURL, text: `I've just donated to {collective.name}` })}>
+              <ShareLink
+                href={tweetURL({
+                  url: shareURL,
+                  text: `I've just donated to {order.toAccount.name}`,
+                })}
+              >
                 <Twitter size="1.2em" color="#4E5052" />
                 <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
               </ShareLink>
@@ -283,7 +284,7 @@ class NewContributionFlowSuccess extends React.Component {
                 <FormattedMessage id="shareIt" defaultMessage="Share it" />
               </ShareLink>
             </Flex>
-            {this.renderCommentForm(LoggedInUser, publicMessage)}
+            {this.renderCommentForm(LoggedInUser, getPublicMessage(order))}
           </Flex>
         </ContainerWithImage>
         <Flex flexDirection="column" alignItems="center" justifyContent="center" width={[1, 1 / 2]}>
@@ -294,11 +295,51 @@ class NewContributionFlowSuccess extends React.Component {
   }
 }
 
-const addOrderSuccessMemberData = graphql(orderSuccessMemberQuery, {
-  options: () => {
-    const variables = { collectiveId: this.props.collective.legacyId, memberCollectiveId: this.props.stepProfile.id };
-    return { variables };
-  },
+// GraphQL
+const orderSuccessQuery = gqlV2/* GraphQL */ `
+  query NewContributionFlowOrderSuccess($order: OrderReferenceInput!, $memberAccount: AccountReferenceInput) {
+    order(order: $order) {
+      id
+      amount {
+        value
+        currency
+      }
+      platformContributionAmount {
+        value
+      }
+      tier {
+        name
+      }
+      fromAccount {
+        id
+        name
+        memberOf(account: $memberAccount) {
+          totalCount
+          nodes {
+            id
+            publicMessage
+          }
+        }
+      }
+      toAccount {
+        id
+        name
+        slug
+        ... on AccountWithContributions {
+          contributors {
+            totalCount
+          }
+        }
+      }
+    }
+  }
+`;
+
+const addOrderSuccessQuery = graphql(orderSuccessQuery, {
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: { order: { id: props.router.query.OrderId }, memberAccount: { id: props.collective.id } },
+  }),
 });
 
-export default injectIntl(withUser(withRouter(addOrderSuccessMemberData(NewContributionFlowSuccess))));
+export default injectIntl(withUser(withRouter(addOrderSuccessQuery(NewContributionFlowSuccess))));
