@@ -6,6 +6,7 @@ import { cloneDeep, orderBy, partition, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
@@ -29,7 +30,7 @@ import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
-import { H3, P } from '../../Text';
+import { H3, H4, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
@@ -44,6 +45,13 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
     return <LoadingPlaceholder height={400} />;
   },
 });
+
+/** The container for Top Contributors view */
+const TopContributorsContainer = styled.div`
+  padding: 32px 16px;
+  margin-top: 48px;
+  background-color: #f5f7fa;
+`;
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
 
@@ -450,11 +458,21 @@ class SectionContribute extends React.PureComponent {
               </ContainerSectionContent>
             )}
             {!isEvent && (topOrganizations.length !== 0 || topIndividuals.length !== 0) && (
-              <TopContributors
-                organizations={topOrganizations}
-                individuals={topIndividuals}
-                currency={collective.currency}
-              />
+              <TopContributorsContainer>
+                <Container maxWidth={1090} m="0 auto" px={[15, 30]}>
+                  <H4 fontWeight="normal" color="black.700" mb={3}>
+                    <FormattedMessage
+                      id="SectionContribute.TopContributors"
+                      defaultMessage="Top financial contributors"
+                    />
+                  </H4>
+                  <TopContributors
+                    organizations={topOrganizations}
+                    individuals={topIndividuals}
+                    currency={collective.currency}
+                  />
+                </Container>
+              </TopContributorsContainer>
             )}
           </Fragment>
         )}
