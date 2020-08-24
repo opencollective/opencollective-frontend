@@ -131,12 +131,10 @@ const NewContributionFlowStepProfileGuestForm = ({ stepDetails, onChange, data }
         <P fontSize="14px" mr={2}>
           <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
         </P>
-        <Link route={'/signin'} passHref>
-          <StyledLink fontSize="14px">
-            <FormattedMessage id="signIn" defaultMessage="Sign In" />
-            &nbsp;→
-          </StyledLink>
-        </Link>
+        <StyledLink as={Link} route="/signin" fontSize="14px">
+          <FormattedMessage id="signIn" defaultMessage="Sign In" />
+          &nbsp;→
+        </StyledLink>
       </Flex>
     </Container>
   );

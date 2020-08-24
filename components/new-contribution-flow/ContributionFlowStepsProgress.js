@@ -84,7 +84,7 @@ const ContributionFlowStepsProgress = ({
   stepProfile,
   stepDetails,
   stepPayment,
-  submitted,
+  isSubmitted,
   loading,
   steps,
   currentStep,
@@ -98,8 +98,8 @@ const ContributionFlowStepsProgress = ({
     <StepsProgress
       steps={steps}
       focus={currentStep}
-      allCompleted={submitted}
-      onStepSelect={!loading && !submitted ? goToStep : undefined}
+      allCompleted={isSubmitted}
+      onStepSelect={!loading && !isSubmitted ? goToStep : undefined}
       loadingStep={loading ? currentStep : undefined}
       disabledStepNames={steps.slice(lastVisitedStep.index + 1, steps.length).map(s => s.name)}
     >
@@ -131,7 +131,7 @@ ContributionFlowStepsProgress.propTypes = {
   stepProfile: PropTypes.object,
   stepDetails: PropTypes.object,
   stepPayment: PropTypes.object,
-  submitted: PropTypes.bool,
+  isSubmitted: PropTypes.bool,
   loading: PropTypes.bool,
   lastVisitedStep: PropTypes.object,
   currency: PropTypes.string,

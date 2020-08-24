@@ -24,7 +24,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop }) => {
   const intl = useIntl();
   const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
   const dispatchChange = (field, value) => {
-    onChange({ stepDetails: { ...data, [field]: value } });
+    onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
   return (

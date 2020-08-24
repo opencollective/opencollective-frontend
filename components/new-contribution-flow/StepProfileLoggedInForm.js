@@ -1,19 +1,28 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { orderBy } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../../components/Avatar';
 import { Box, Flex } from '../../components/Grid';
 import StyledRadioList from '../../components/StyledRadioList';
 import { P } from '../../components/Text';
 
-const prepareProfiles = (profiles, collective, canUseIncognito) => {
+const msg = defineMessages({
+  incognito: {
+    id: 'profile.incognito',
+    defaultMessage: 'Incognito',
+  },
+});
+
+const prepareProfiles = (intl, profiles, collective, canUseIncognito) => {
   const filteredProfiles = profiles.filter(p => {
     // if admin of collective you are donating to, remove it from the list
     if (p.id === collective.legacyId) {
       return false;
     } else if (!canUseIncognito && p.isIncognito) {
+      return false;
+    } else if (p.type === 'COLLECTIVE' && (!p.host || p.host.id !== collective.host?.legacyId)) {
       return false;
     } else {
       return true;
@@ -27,7 +36,7 @@ const prepareProfiles = (profiles, collective, canUseIncognito) => {
         id: 'incognito',
         type: 'USER',
         isIncognito: true,
-        name: <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />,
+        name: intl.formatMessage(msg.incognito), // has to be a string for avatar's title
       });
     }
   }
@@ -43,12 +52,14 @@ const NewContributionFlowStepProfileLoggedInForm = ({
   canUseIncognito,
   collective,
 }) => {
+  const intl = useIntl();
+
   // set initial default profile so it shows in Steps Progress as well
   useEffect(() => {
-    onChange({ stepProfile: defaultSelectedProfile });
+    onChange({ stepProfile: defaultSelectedProfile, stepPayment: null, stepSummary: null });
   }, [defaultSelectedProfile]);
 
-  const filteredProfiles = React.useMemo(() => prepareProfiles(profiles, collective, canUseIncognito), [
+  const filteredProfiles = React.useMemo(() => prepareProfiles(intl, profiles, collective, canUseIncognito), [
     profiles,
     collective,
     canUseIncognito,

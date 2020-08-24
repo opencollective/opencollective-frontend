@@ -25,6 +25,7 @@ class NewContributionFlowMainContainer extends React.Component {
     tier: PropTypes.object,
     onChange: PropTypes.func,
     showFeesOnTop: PropTypes.bool,
+    onNewCardFormReady: PropTypes.func,
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
@@ -147,8 +148,10 @@ class NewContributionFlowMainContainer extends React.Component {
             collective={this.props.collective}
             stepDetails={this.props.mainState.stepDetails}
             stepProfile={this.props.mainState.stepProfile}
+            stepSummary={this.props.mainState.stepSummary}
             onChange={this.props.onChange}
             stepPayment={stepPayment}
+            onNewCardFormReady={this.props.onNewCardFormReady}
           />
         );
       case 'summary':
