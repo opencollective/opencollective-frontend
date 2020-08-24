@@ -78,7 +78,7 @@ Avatar.propTypes = {
 export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
   const image = contributor.isIncognito
     ? defaultImage['ANONYMOUS']
-    : getCollectiveImage({ slug: contributor.collectiveSlug });
+    : getCollectiveImage({ slug: contributor.collectiveSlug, imageUrl: contributor.image });
 
   return <StyledAvatar size={radius} type={contributor.type} src={image} title={contributor.name} {...styleProps} />;
 };
@@ -87,6 +87,7 @@ ContributorAvatar.propTypes = {
   /** Collective object */
   contributor: PropTypes.shape({
     name: PropTypes.string,
+    image: PropTypes.string,
     collectiveSlug: PropTypes.string,
     isIncognito: PropTypes.bool,
     type: PropTypes.oneOf(['USER', 'COLLECTIVE', 'FUND', 'ORGANIZATION', 'CHAPTER', 'ANONYMOUS']),
