@@ -1186,7 +1186,7 @@
   "order.cancelled": "annulé",
   "Order.Confirm.Processing": "Confirmation du moyen de paiement…",
   "Order.Confirm.Success": "Votre moyen de paiement a été confirmé et le paiement a fonctionné.",
-  "order.created.tweet": "Je viens de contribuer {amount} à {collective}. Toi aussi, contribue!",
+  "order.created.tweet": "I've just donated to {collective}. Consider donating too, every little helps!",
   "order.created.tweet.event": "Je viens de réserver ma place pour {event}. Rejoins-moi!",
   "order.error": "erreur",
   "order.expired": "expiré",
