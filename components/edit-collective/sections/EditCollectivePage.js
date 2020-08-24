@@ -208,8 +208,7 @@ const loadSectionsForCollective = collective => {
   const collectiveSections = get(collective, 'settings.collectivePage.sections');
   let defaultSections = getDefaultSectionsForCollective(collective.type, collective.isActive);
 
-  // Funds MVP, to refactor
-  if (collective.settings?.fund === true) {
+  if (collective.type === CollectiveType.FUND) {
     defaultSections = difference(defaultSections, [Sections.GOALS, Sections.CONVERSATIONS]);
   }
 

@@ -604,14 +604,7 @@ class CreateOrderPage extends React.Component {
           m.collective.type !== 'EVENT' &&
           m.collective.type !== 'PROJECT',
       )
-      .map(({ collective }) => collective)
-      .map(collective => {
-        // Funds MVP, to refactor
-        if (collective.settings?.fund) {
-          collective.type = 'FUND';
-        }
-        return collective;
-      });
+      .map(({ collective }) => collective);
   }
 
   /** Guess the country, from the more pricise method (settings) to the less */

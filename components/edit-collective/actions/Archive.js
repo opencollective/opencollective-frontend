@@ -30,7 +30,6 @@ const unarchiveCollectiveMutation = gql`
 `;
 
 const ArchiveCollective = ({ collective }) => {
-  const collectiveType = collective.settings?.fund ? 'FUND' : collective.type; // Funds MVP, to refactor
   const [archiveStatus, setArchiveStatus] = useState({
     processing: false,
     isArchived: collective.isArchived,
@@ -88,7 +87,7 @@ const ArchiveCollective = ({ collective }) => {
           defaultMessage={
             'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
           }
-          values={{ type: collectiveType }}
+          values={{ type: collective.type }}
         />
       </H2>
       {!isArchived && (
@@ -98,7 +97,7 @@ const ArchiveCollective = ({ collective }) => {
             defaultMessage={
               'Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
           &nbsp;
           {collective.type === 'COLLECTIVE' && (
@@ -121,7 +120,7 @@ const ArchiveCollective = ({ collective }) => {
             defaultMessage={
               'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </StyledButton>
       )}
@@ -132,7 +131,7 @@ const ArchiveCollective = ({ collective }) => {
             defaultMessage={
               "Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your fiscal host using the 'empty balance' option."
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </P>
       )}
@@ -143,7 +142,7 @@ const ArchiveCollective = ({ collective }) => {
             defaultMessage={
               "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host, please deactivate as Host first."
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </P>
       )}
@@ -160,7 +159,7 @@ const ArchiveCollective = ({ collective }) => {
             defaultMessage={
               'Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
             }
-            values={{ type: collectiveType }}
+            values={{ type: collective.type }}
           />
         </StyledButton>
       )}
@@ -189,7 +188,7 @@ const ArchiveCollective = ({ collective }) => {
                 defaultMessage={
                   'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
                 }
-                values={{ type: collectiveType }}
+                values={{ type: collective.type }}
               />
             )}
             {modal.type === 'Unarchive' && (
@@ -198,7 +197,7 @@ const ArchiveCollective = ({ collective }) => {
                 defaultMessage={
                   'Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
                 }
-                values={{ type: collectiveType }}
+                values={{ type: collective.type }}
               />
             )}
           </P>

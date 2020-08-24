@@ -86,7 +86,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
-  const isFund = collective.type === CollectiveType.FUND || collective.settings?.fund === true; // Funds MVP, to refactor
+  const isFund = collective.type === CollectiveType.FUND;
 
   const handleHeroMessage = msg => {
     if (!msg) {
