@@ -38,8 +38,8 @@ import TransactionsFilters from '../components/transactions/TransactionsFilters'
 import TransactionsList from '../components/transactions/TransactionsList';
 import { withUser } from '../components/UserProvider';
 
-const transactionsQuery = gqlV2/* GraphQL */ `
-  query Transactions(
+const transactionsPageQuery = gqlV2/* GraphQL */ `
+  query TransactionsPage(
     $slug: String!
     $limit: Int!
     $offset: Int!
@@ -290,7 +290,7 @@ class TransactionsPage extends React.Component {
   }
 }
 
-const addTransactionsData = graphql(transactionsQuery, {
+const addTransactionsData = graphql(transactionsPageQuery, {
   name: 'transactionsData',
   options: props => {
     return {

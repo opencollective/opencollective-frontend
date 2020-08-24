@@ -23,7 +23,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
 const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query TransactionsSection($slug: String!, $limit: Int!) {
+  query BudgetSection($slug: String!, $limit: Int!) {
     transactions(account: { slug: $slug }, limit: $limit) {
       ...TransactionsQueryCollectionFragment
     }
