@@ -26,7 +26,6 @@ import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
@@ -40,9 +39,6 @@ import TopContributors from '../TopContributors';
 // Dynamic imports
 const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
   ssr: false,
-  loading() {
-    return <LoadingPlaceholder height={400} />;
-  },
 });
 
 const TIERS_ORDER_KEY = 'collectivePage.tiersOrder';
@@ -99,16 +95,9 @@ class SectionContribute extends React.PureComponent {
     isSaving: false,
   };
 
-  componentDidUpdate() {
-    if (!this.state.showTiersAdmin && !this.showTiersAdminTimeout) {
-      // Allow some time for the tiers admin component to load
-      this.showTiersAdminTimeout = setTimeout(() => this.setState({ showTiersAdmin: true }), 1500);
-    }
-  }
-
-  componentWillUnmount() {
-    this.showTiersAdminTimeout = null;
-  }
+  onTiersAdminReady = () => {
+    this.setState({ showTiersAdmin: true });
+  };
 
   getTopContributors = memoizeOne(contributors => {
     const topOrgs = [];
@@ -365,12 +354,13 @@ class SectionContribute extends React.PureComponent {
                           </ContributeCardsContainer>
                         )}
                         {isAdmin && (
-                          <Container display={showTiersAdmin ? 'block' : 'none'}>
+                          <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
                             <AdminContributeCardsContainer
                               collective={collective}
                               cards={waysToContribute}
                               onContributionCardMove={this.onContributionCardMove}
                               onContributionCardDrop={this.onContributionCardDrop}
+                              onMount={this.onTiersAdminReady}
                             />
                           </Container>
                         )}

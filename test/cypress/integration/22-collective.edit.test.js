@@ -110,10 +110,11 @@ describe('edit collective', () => {
     });
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
+    cy.contains('.actions > .btn', 'Saved');
     cy.get('.backToProfile a').click(); // back to profile
-    const tierCardSelector = '[data-cy="financial-contributions"] [data-cy="contribute-card-tier"]';
+    const tierCardSelector = '[data-cy="admin-contribute-cards"] [data-cy="contribute-card-tier"]';
     cy.disableSmoothScroll();
-    cy.get(tierCardSelector, { timeout: 5000 });
+    cy.get(tierCardSelector);
     cy.get(tierCardSelector).first().find('[data-cy="contribute-title"]').contains('Backer edited');
     cy.get(tierCardSelector).first().find('[data-cy="contribute-description"]').contains('New description for backers');
     cy.get(tierCardSelector).first().contains('$5 USD / month');
@@ -131,9 +132,9 @@ describe('edit collective', () => {
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
     cy.wait(500);
     cy.get('.actions > .btn').click(); // save changes
+    cy.contains('.actions > .btn', 'Saved');
     cy.get('.backToProfile a').click(); // back to profile
-    cy.wait(500);
-    cy.get(tierCardSelector, { timeout: 10000 }).should('have.length', 2);
+    cy.get(tierCardSelector).should('have.length', 2);
   });
 });
 
