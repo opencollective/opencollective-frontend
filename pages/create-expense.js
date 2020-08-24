@@ -205,7 +205,12 @@ class CreateExpensePage extends React.Component {
     } else {
       const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
         .map(member => member.account)
-        .filter(account => [USER, ORGANIZATION].includes(account.type) || account.isActive);
+        .filter(
+          account =>
+            [USER, ORGANIZATION].includes(account.type) ||
+            // Same Host
+            (account.isActive && this.props.data?.account?.host?.id === account.host?.id),
+        );
       return [loggedInAccount, ...accountsAdminOf];
     }
   });

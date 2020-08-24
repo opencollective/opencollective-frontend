@@ -39,6 +39,11 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
               id
             }
           }
+          ... on Organization {
+            host {
+              id
+            }
+          }
           location {
             address
             country

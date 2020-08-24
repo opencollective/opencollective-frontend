@@ -78,6 +78,7 @@ class PayoutMethodSelect extends React.Component {
     /** The Collective paying the expense */
     collective: PropTypes.shape({
       host: PropTypes.shape({
+        id: PropTypes.string,
         transferwise: PropTypes.shape({
           availableCurrencies: PropTypes.arrayOf(PropTypes.object),
         }),
@@ -86,6 +87,9 @@ class PayoutMethodSelect extends React.Component {
     /** The Acccount being paid with the expense */
     payee: PropTypes.shape({
       type: PropTypes.string,
+      host: PropTypes.shape({
+        id: PropTypes.string,
+      }),
     }),
     onChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
@@ -194,13 +198,16 @@ class PayoutMethodSelect extends React.Component {
   getOptions = memoizeOne(payoutMethods => {
     const groupedPms = groupBy(payoutMethods, 'type');
     const pmTypes = Object.values(PayoutMethodType).filter(type => {
-      // If the Account is of the "Collective" family, account balance should be the only option
-      if (
-        this.props.payee &&
-        CollectiveFamilyTypes.includes(this.props.payee.type) &&
-        type !== PayoutMethodType.ACCOUNT_BALANCE
-      ) {
-        return false;
+      if (type == PayoutMethodType.ACCOUNT_BALANCE) {
+        // Account Balance only on Same Host
+        if (this.props.payee && this.props.payee.host?.id != this.props.collective.host?.id) {
+          return false;
+        }
+      } else {
+        // If the Account is of the "Collective" family, account balance should be the only option
+        if (this.props.payee && CollectiveFamilyTypes.includes(this.props.payee.type)) {
+          return false;
+        }
       }
 
       if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
