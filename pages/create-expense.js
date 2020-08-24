@@ -354,6 +354,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
     transferwise {
       availableCurrencies
     }
+    supportedPayoutMethods
   }
 `;
 

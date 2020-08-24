@@ -72,14 +72,11 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
-    connectedAccounts {
-      id
-      service
-    }
     location {
       address
       country
     }
+    supportedPayoutMethods
     plan {
       transferwisePayouts
       transferwisePayoutsLimit

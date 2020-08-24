@@ -79,9 +79,7 @@ class PayoutMethodSelect extends React.Component {
     collective: PropTypes.shape({
       host: PropTypes.shape({
         id: PropTypes.string,
-        transferwise: PropTypes.shape({
-          availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-        }),
+        connectedAccounts: PropTypes.arrayOf(PropTypes.shape({ service: PropTypes.string })),
       }),
     }).isRequired,
     /** The Acccount being paid with the expense */
@@ -197,27 +195,26 @@ class PayoutMethodSelect extends React.Component {
 
   getOptions = memoizeOne(payoutMethods => {
     const groupedPms = groupBy(payoutMethods, 'type');
-    const pmTypes = Object.values(PayoutMethodType).filter(type => {
-      if (type == PayoutMethodType.ACCOUNT_BALANCE) {
-        // Account Balance only on Same Host
-        if (this.props.payee && this.props.payee.host?.id != this.props.collective.host?.id) {
-          return false;
-        }
-      } else {
-        // If the Account is of the "Collective" family, account balance should be the only option
-        if (this.props.payee && CollectiveFamilyTypes.includes(this.props.payee.type)) {
-          return false;
-        }
-      }
+    const payeeIsCollectiveFamilyType =
+      this.props.payee &&
+      CollectiveFamilyTypes.includes(this.props.payee.type) &&
+      this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE);
 
-      if (type === PayoutMethodType.BANK_ACCOUNT && !this.props.collective.host?.transferwise) {
-        return false;
-      } else if (type === PayoutMethodType.PAYPAL && this.props.collective.host?.settings?.disablePaypalPayouts) {
-        return false;
-      } else {
-        return true;
-      }
-    });
+    // If the Account is of the "Collective" family, account balance should be the only option
+    const pmTypes = payeeIsCollectiveFamilyType
+      ? [PayoutMethodType.ACCOUNT_BALANCE]
+      : Object.values(PayoutMethodType).filter(type => {
+          // Account Balance only on Same Host
+          if (
+            type === PayoutMethodType.ACCOUNT_BALANCE &&
+            this.props.collective.host?.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
+            this.props.payee?.host?.id != this.props.collective.host?.id
+          ) {
+            return false;
+          } else {
+            return this.props.collective.host?.supportedPayoutMethods?.includes(type);
+          }
+        });
 
     return pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(this.props.intl, pmType),
