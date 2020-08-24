@@ -1946,6 +1946,11 @@ type Mutation {
     Force expense with paypal method to be paid manually
     """
     forceManual: Boolean
+
+    """
+    2FA code for if the host account has it turned on and the transaction is large.
+    """
+    twoFactorAuthenticatorCode: String
   ): ExpenseType
   markOrderAsPaid(id: Int!): OrderType
   markPendingOrderAsExpired(id: Int!): OrderType
@@ -2391,13 +2396,15 @@ input OrderInputType {
 Possible statuses for an Order
 """
 enum OrderStatus {
-  PENDING
+  NEW
+  REQUIRE_CLIENT_CONFIRMATION
   PAID
+  ERROR
   ACTIVE
   CANCELLED
-  REJECTED
-  ERROR
+  PENDING
   EXPIRED
+  PLEDGED
 }
 
 """
