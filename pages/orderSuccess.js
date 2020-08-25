@@ -9,7 +9,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../lib/confettis';
-import { formatCurrency } from '../lib/currency-utils';
 import { facebookShareURL, tweetURL } from '../lib/url_helpers';
 
 import ErrorPage from '../components/ErrorPage';
@@ -114,7 +113,7 @@ class OrderSuccessPage extends React.Component {
     this.messages = defineMessages({
       tweet: {
         id: 'order.created.tweet',
-        defaultMessage: "I've just donated {amount} to {collective}. Consider donating too, every little helps!",
+        defaultMessage: "I've just donated to {collective}. Consider donating too, every little helps!",
       },
       'tweet.event': {
         id: 'order.created.tweet.event',
@@ -138,11 +137,10 @@ class OrderSuccessPage extends React.Component {
   }
 
   getTwitterMessage() {
-    const { collective, totalAmount, currency } = this.props.data.Order;
+    const { collective } = this.props.data.Order;
     let msgId = 'tweet';
     const values = {
       collective: collective.twitterHandle ? `@${collective.twitterHandle}` : collective.name,
-      amount: formatCurrency(totalAmount, currency, { precision: 0 }),
     };
     if (collective.type === 'EVENT') {
       msgId = 'tweet.event';
