@@ -52,6 +52,7 @@ class CreateEvent extends React.Component {
     this.setState({ status: 'loading' });
     EventInputType.type = 'EVENT';
     EventInputType.ParentCollectiveId = parentCollective.id;
+    EventInputType.tiers = EventInputType.tiers.filter(tier => tier.name);
     try {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;

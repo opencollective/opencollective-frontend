@@ -23,6 +23,7 @@ const nextConfig = {
         TRANSFERWISE_ENABLED: null,
         NEW_HOST_APPLICATION_FLOW: null,
         TW_API_COLLECTIVE_SLUG: null,
+        OC_ENV: null,
       }),
     );
 

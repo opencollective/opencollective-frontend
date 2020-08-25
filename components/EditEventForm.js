@@ -240,15 +240,17 @@ class EditEventForm extends React.Component {
               ),
             )}
           </div>
-          <Tickets
-            title="Tickets"
-            types={['TICKET']}
-            tiers={this.state.tiers}
-            collective={{ ...event, type: 'EVENT' }}
-            currency={event.parentCollective.currency}
-            onChange={tiers => this.setState({ tiers })}
-            defaultType="TICKET"
-          />
+          {['e2e', 'ci'].includes(process.env.OC_ENV) && (
+            <Tickets
+              title="Tickets"
+              types={['TICKET']}
+              tiers={this.state.tiers}
+              collective={{ ...event, type: 'EVENT' }}
+              currency={event.parentCollective.currency}
+              onChange={tiers => this.setState({ tiers })}
+              defaultType="TICKET"
+            />
+          )}
         </div>
         <div className="actions">
           <Button
