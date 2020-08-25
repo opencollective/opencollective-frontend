@@ -1,5 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Settings } from '@styled-icons/feather/Settings';
@@ -25,6 +27,14 @@ import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
 import { P } from './Text';
 import { withUser } from './UserProvider';
+
+const memberInvitationsCountQuery = gql`
+  query MemberInvitationsCount($memberCollectiveId: Int!) {
+    memberInvitations(MemberCollectiveId: $memberCollectiveId) {
+      id
+    }
+  }
+`;
 
 const CollectiveListItem = styled(ListItem)`
   @media (hover: hover) {
@@ -229,6 +239,30 @@ class TopBarProfileMenu extends React.Component {
                   </StyledLink>
                 </Link>
               </ListItem>
+              <Query
+                query={memberInvitationsCountQuery}
+                variables={{ memberCollectiveId: LoggedInUser.CollectiveId }}
+                fetchPolicy="network-only"
+              >
+                {({ data, loading }) =>
+                  loading === false &&
+                  data &&
+                  data.memberInvitations &&
+                  data.memberInvitations.length > 0 && (
+                    <ListItem py={1}>
+                      <Link route="member-invitations" passHref>
+                        <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">
+                          <FormattedMessage
+                            id="menu.pendingInvitations"
+                            defaultMessage="Pending Invitations ({numberOfInvitations})"
+                            values={{ numberOfInvitations: data.memberInvitations.length }}
+                          />
+                        </StyledLink>
+                      </Link>
+                    </ListItem>
+                  )
+                }
+              </Query>
               <ListItem py={1}>
                 <Link route="editCollective" params={{ slug: LoggedInUser.collective.slug }} passHref>
                   <StyledLink color="#494D52" fontSize="1.2rem" fontFamily="montserratlight, arial">

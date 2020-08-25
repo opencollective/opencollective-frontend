@@ -1117,6 +1117,7 @@
   "menu.logout": "로그아웃",
   "menu.myAccount": "내 계정",
   "menu.organizations.none": "No organizations yet",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "요금제",
   "menu.profile": "프로필",
   "menu.submitExpense": "Submit Expense",

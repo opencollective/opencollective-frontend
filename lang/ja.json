@@ -1117,6 +1117,7 @@
   "menu.logout": "ログアウト",
   "menu.myAccount": "アカウント",
   "menu.organizations.none": "まだ組織がありません",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "料金",
   "menu.profile": "プロフィール",
   "menu.submitExpense": "経費申請する",
