@@ -14,7 +14,7 @@ describe('Pledges', () => {
     });
 
     it('join an existing pledge individual pledge', () => {
-      cy.visit('/opencollective');
+      cy.visit('/opencollective-frontend');
       let value1 = '';
       cy.get('[data-cy="currencyAmount"]').then($val => {
         value1 = $val.text();
@@ -46,7 +46,7 @@ describe('Pledges', () => {
 
       cy.get('[data-cy="user-menu-trigger"]').click();
       cy.get('[data-cy="logout"]').click();
-      cy.visit('/opencollective/pledges/new');
+      cy.visit('/opencollective-frontend/pledges/new');
       cy.get('[data-cy="amountPledgedTotal"] > span').should('contain', amountOutside);
     });
   });
@@ -97,17 +97,17 @@ describe('check FAQ context in each pledge is valid or not', () => {
 
 describe('Pledges Logged out', () => {
   it('verify if user can make a pledge without being loggedin', () => {
-    cy.visit('/opencollective/pledges/new');
+    cy.visit('/opencollective-frontend/pledges/new');
     cy.get('[data-cy="signupOrLogin"]').should('contain', 'Sign in or join free');
   });
   it('verify if loggedout pledged amount is same as logged in', () => {
-    cy.visit('/opencollective/pledges/new');
+    cy.visit('/opencollective-frontend/pledges/new');
     let amountOutside = '';
     cy.get('[data-cy="amountPledgedTotal"]').then($val => {
       amountOutside = $val.text();
     });
     cy.login();
-    cy.visit('/opencollective');
+    cy.visit('/opencollective-frontend');
     cy.get('[data-cy="currencyAmount"]').should('contain', amountOutside);
   });
 });
