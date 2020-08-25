@@ -4255,6 +4255,21 @@ enum MemberRole {
 This is the root mutation
 """
 type Mutation {
+  """
+  Add funds to the given account
+  """
+  addFunds(
+    fromAccount: AccountReferenceInput!
+    account: AccountReferenceInput!
+    amount: AmountInput!
+    description: String!
+    hostFeePercent: Int!
+
+    """
+    Can only be set if root
+    """
+    platformFeePercent: Int
+  ): Order!
   createCollective(
     """
     Information about the collective to create (name, slug, description, tags, ...)
