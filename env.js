@@ -30,11 +30,11 @@ const defaults = {
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
 };
 
-if (process.env.NODE_ENV === 'production') {
+if (['production', 'staging'].includes(process.env.OC_ENV)) {
   defaults.TW_API_COLLECTIVE_SLUG = 'opencollectiveinc';
 }
 
-if (process.env.NODE_ENV === 'e2e') {
+if (['e2e'].includes(process.env.OC_ENV)) {
   defaults.API_URL = 'http://localhost:3060';
   defaults.API_KEY = 'dvl-1510egmf4a23d80342403fb599qd';
 }

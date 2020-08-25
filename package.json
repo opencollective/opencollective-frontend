@@ -105,7 +105,7 @@
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
-    "build:e2e": "cross-env NODE_ENV=e2e npm run build",
+    "build:e2e": "cross-env NODE_ENV=production OC_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
     "build:langs": "npm run langs:update",
     "build:next": "cross-env scripts/build_next.sh",
@@ -138,7 +138,7 @@
     "prettier:write": "npm run prettier -- --write",
     "start": "node --icu-data-dir=node_modules/full-icu dist/server",
     "start:ci": "nyc --silent --exclude \".next/**\" node server",
-    "start:e2e": "cross-env TZ=UTC NODE_ENV=e2e node --icu-data-dir=node_modules/full-icu server",
+    "start:e2e": "cross-env TZ=UTC NODE_ENV=production OC_ENV=e2e node --icu-data-dir=node_modules/full-icu server",
     "styleguide:build": "styleguidist build",
     "styleguide:dev": "styleguidist server",
     "test": "npm run test:jest",
@@ -149,7 +149,7 @@
     "test:e2e:1": "CYPRESS_TEST_FILES=1*.js npm run cypress:run",
     "test:e2e:2": "CYPRESS_TEST_FILES=2*.js npm run cypress:run",
     "test:e2e:3": "CYPRESS_TEST_FILES=3*.js npm run cypress:run",
-    "test:jest": "cross-env TZ=UTC jest components lib pages",
+    "test:jest": "cross-env NODE_ENV=test TZ=UTC jest components lib pages",
     "test:update": "npm run test:jest -- --updateSnapshot"
   },
   "devDependencies": {

@@ -563,7 +563,7 @@ class CreateOrderPage extends React.Component {
   };
 
   isValidRedirect(url) {
-    const validationParams = process.env.NODE_ENV === 'production' ? {} : { require_tld: false };
+    const validationParams = process.env.OC_ENV === 'production' ? {} : { require_tld: false };
 
     return isURL(url, validationParams);
   }

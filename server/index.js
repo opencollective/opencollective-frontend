@@ -21,8 +21,7 @@ const app = express();
 
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
-const env = process.env.NODE_ENV;
-const dev = env === 'development';
+const dev = process.env.NODE_ENV === 'development';
 
 const nextApp = next({ dev, dir: path.dirname(__dirname) });
 

@@ -12,7 +12,8 @@ on:
 
 env:
   TZ: UTC
-  NODE_ENV: ci
+  OC_ENV: ci
+  NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
