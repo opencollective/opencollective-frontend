@@ -1117,6 +1117,7 @@
   "menu.logout": "Log out",
   "menu.myAccount": "My account",
   "menu.organizations.none": "No organizations yet",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "Preu",
   "menu.profile": "Perfil",
   "menu.submitExpense": "Envia la despesa",
