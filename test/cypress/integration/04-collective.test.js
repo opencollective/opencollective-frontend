@@ -83,7 +83,7 @@ describe('Collective page', () => {
 
   describe('Contribute section', () => {
     it('Show tiers with default descriptions', () => {
-      const oneTimeContributionMsg = 'Make a custom one time or recurring contribution to support this collective.';
+      const oneTimeContributionMsg = 'Make a custom one time or recurring contribution.';
       cy.contains('#section-contribute', 'Custom contribution');
       cy.contains('#section-contribute', 'Donation');
       cy.contains('#section-contribute', oneTimeContributionMsg);
