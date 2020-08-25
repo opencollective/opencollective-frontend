@@ -700,6 +700,7 @@
   "EventDetails.showLess": "少なく表示",
   "EventDetails.showMore": "もっと見る",
   "Events": "イベント",
+  "events": "my events",
   "events.create.login": "コアメンバーとしてイベントを作成するためにはログインする必要があります。",
   "ExepenseReceipts.count": "{count, plural, one {# receipt} other {# receipts}}",
   "Expense.Activity.Approved": "Expense approved",
