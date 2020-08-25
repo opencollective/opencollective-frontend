@@ -6,7 +6,7 @@ describe('Pledges', () => {
   describe('creating an individual pledge', () => {
     it('Create the pledge', () => {
       cy.get('[data-cy=nameInput]').clear().type('samcaspus');
-      cy.get('[data-cy=slugInput]').clear().type('opencollective');
+      cy.get('[data-cy=slugInput]').clear().type('opencollective-frontend');
       cy.get('[data-cy=githubHandleInput]').clear().type('opencollective/opencollective-frontend');
       cy.get('[id=publicMessage]').clear().type('publicMessage');
       cy.get('[data-cy="submit"]').click();
@@ -32,7 +32,7 @@ describe('Pledges', () => {
 
     it('creating a pledge and ensuring the amount is visible loggedout', () => {
       cy.get('[data-cy=nameInput]').clear().type('samcaspus');
-      cy.get('[data-cy=slugInput]').clear().type('opencollective');
+      cy.get('[data-cy=slugInput]').clear().type('opencollective-frontend');
       cy.get('[data-cy=githubHandleInput]').clear().type('opencollective/opencollective-frontend');
       cy.get('[id=publicMessage]').clear().type('publicMessage');
       cy.get('[data-cy="submit"]').click();
