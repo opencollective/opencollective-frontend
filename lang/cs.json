@@ -1117,6 +1117,7 @@
   "menu.logout": "Odhlásit se",
   "menu.myAccount": "Můj účet",
   "menu.organizations.none": "Zatím žádné organizace",
+  "menu.pendingInvitations": "Pending Invitations ({numberOfInvitations})",
   "menu.pricing": "Ceník",
   "menu.profile": "Profil",
   "menu.submitExpense": "Odeslat výdaj",
