@@ -29,7 +29,6 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-menu-payment-option').click();
       cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
       cy.getByDataCy('recurring-contribution-add-pm-button').click();
-      cy.getByDataCy('new-credit-card-form').should('exist');
       cy.wait(5000);
       cy.fillStripeInput({
         card: { creditCardNumber: 5555555555554444, expirationDate: '07/23', cvcCode: 713, postalCode: 12345 },
