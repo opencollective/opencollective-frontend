@@ -33,7 +33,7 @@ const defaults = {
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
-  defaults.TW_API_COLLECTIVE_SLUG = 'opencollectiveinc';
+  defaults.TW_API_COLLECTIVE_SLUG = 'opencollective';
 }
 
 if (['e2e'].includes(process.env.OC_ENV)) {
