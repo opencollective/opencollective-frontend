@@ -9,7 +9,7 @@ import { Box } from '../../Grid';
 import { P } from '../../Text';
 
 const totalCollectiveContributionsQuery = gql`
-  query TotalCollectiveContributions($id: Int) {
+  query HeroTotalCollectiveContributions($id: Int) {
     Collective(id: $id) {
       id
       currency
