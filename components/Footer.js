@@ -234,6 +234,7 @@ const Footer = () => {
             <Flex my="12px">
               <img
                 src="/static/images/opencollectivelogo-footer-n.svg"
+                alt="Open Collective logo"
                 height="28px"
                 width="167px"
                 style={{ maxWidth: '100%' }}
@@ -310,19 +311,19 @@ const Footer = () => {
             maxWidth="230px"
             flexWrap="wrap"
           >
-            <SocialLink href="https://blog.opencollective.com/">
+            <SocialLink href="https://blog.opencollective.com/" aria-label="Open Collective Blog link">
               <Blog size={16} />
             </SocialLink>
-            <SocialLink href="https://twitter.com/opencollect">
+            <SocialLink href="https://twitter.com/opencollect" aria-label="Open Collective Twitter link">
               <Twitter size={16} />
             </SocialLink>
-            <SocialLink href="https://github.com/opencollective">
+            <SocialLink href="https://github.com/opencollective" aria-label="Open Collective Github link">
               <Github size={16} />
             </SocialLink>
-            <SocialLink href="https://slack.opencollective.com">
+            <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack Channel link">
               <Slack size={16} />
             </SocialLink>
-            <SocialLink href="mailto:info@opencollective.com">
+            <SocialLink href="mailto:info@opencollective.com" aria-label="Email to Open Collective link">
               <Mail size={16} />
             </SocialLink>
           </Container>
