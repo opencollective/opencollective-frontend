@@ -73,7 +73,7 @@ const StyledInput = styled.input`
     color: ${themeGet('colors.black.400')};
   }
 
-  &[type="date"] {
+  &[type='date'] {
     font-family: inherit;
   }
 `;

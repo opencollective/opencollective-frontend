@@ -16,7 +16,7 @@ const SectionTitle = styled.h2`
     line-height: 40px;
     letter-spacing: -1.2px;
   }
-  
+
   @media screen and (min-width: 88em) {
     font-size: 40px;
     line-height: 48px;
