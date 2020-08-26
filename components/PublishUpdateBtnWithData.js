@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { compose } from '../lib/utils';
 
@@ -11,6 +12,19 @@ import Container from './Container';
 import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
 import { H5, Span } from './Text';
+
+const Notice = styled.div`
+  color: #525866;
+  font-size: 12px;
+  margin-top: 8px;
+`;
+
+const StyledPublishUpdateBtn = styled.div`
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #e8e9eb;
+  margin-top: 32px;
+`;
 
 class PublishUpdateBtn extends React.Component {
   static propTypes = {
@@ -100,22 +114,7 @@ class PublishUpdateBtn extends React.Component {
     }
 
     return (
-      <div data-cy="PublishUpdateBtn" className="PublishUpdateBtn">
-        <style jsx>
-          {`
-            .PublishUpdateBtn {
-              display: flex;
-              align-items: center;
-              border-top: 1px solid #e8e9eb;
-              margin-top: 32px;
-            }
-            .notice {
-              color: #525866;
-              font-size: 12px;
-              margin-top: 8px;
-            }
-          `}
-        </style>
+      <StyledPublishUpdateBtn data-cy="PublishUpdateBtn">
         <Container mt="4" mb="5" display="flex" flexDirection="column" alignItems="left" width="100%" maxWidth={400}>
           {isHost && (
             <Span>
@@ -131,7 +130,7 @@ class PublishUpdateBtn extends React.Component {
               />
             </Span>
           )}
-          {!isLoading && <div className="notice">{notice}</div>}
+          {!isLoading && <Notice>{notice}</Notice>}
           <Container mt="3" display="flex" alignItems="center">
             <StyledButton
               buttonStyle="primary"
@@ -144,7 +143,7 @@ class PublishUpdateBtn extends React.Component {
             </StyledButton>
           </Container>
         </Container>
-      </div>
+      </StyledPublishUpdateBtn>
     );
   }
 }
