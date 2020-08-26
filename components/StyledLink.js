@@ -19,6 +19,12 @@ const StyledLink = styled.a.attrs(props => {
       rel: 'noopener noreferrer',
     };
   }
+  if (props.openInNewTabNoFollow) {
+    return {
+      target: '_blank',
+      rel: 'noopener noreferrer nofollow',
+    };
+  }
 })`
   color: ${props => themeGet(`colors.primary.${props.colorShade}`)};
   cursor: pointer;
@@ -106,6 +112,8 @@ StyledLink.propTypes = {
   truncateOverflow: PropTypes.bool,
   /** If true, the link will open in a new tab when clicked */
   openInNewTab: PropTypes.bool,
+  /** If true, the link will open in a new tab and also adds rel=nofollow */
+  openInNewTabNoFollow: PropTypes.bool,
   /** Color Shade, defaults to 500 */
   colorShade: PropTypes.number,
 };

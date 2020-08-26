@@ -222,7 +222,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange, callsToAction, 
                     href={collective.website}
                     title={intl.formatMessage(Translations.website)}
                     aria-label="Website link"
-                    openInNewTab
+                    openInNewTabNoFollow
                   >
                     <StyledRoundButton size={32} mr={3}>
                       <Globe size={14} />
