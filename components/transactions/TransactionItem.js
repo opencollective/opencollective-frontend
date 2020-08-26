@@ -30,7 +30,7 @@ import TransactionDetails from './TransactionDetails';
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const TransactionItem = ({ displayActions, ...transaction }) => {
+const TransactionItem = ({ displayActions, collective, ...transaction }) => {
   const {
     toAccount,
     fromAccount,
@@ -43,6 +43,7 @@ const TransactionItem = ({ displayActions, ...transaction }) => {
     usingVirtualCardFromCollective,
     createdAt,
     isRefunded,
+    isRefund,
   } = transaction;
   const { LoggedInUser } = useUser();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -58,12 +59,15 @@ const TransactionItem = ({ displayActions, ...transaction }) => {
   const isFromCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(fromAccount);
   const isToCollectiveAdmin = LoggedInUser && LoggedInUser.canEditCollective(toAccount);
   const canDownloadInvoice = isRoot || isHostAdmin || isFromCollectiveAdmin || isToCollectiveAdmin;
-  const displayedAmount =
-    (isCredit && hasOrder && !isRefunded) || // Credit from donations should display the full amount donated by the user
-    (hasOrder && !isCredit && isRefunded) || // Refund debits in collective page should also display the full amount
+  let displayedAmount =
+    (isCredit && hasOrder) || // Credit from donations should display the full amount donated by the user
     (!isCredit && !hasOrder) // Expense Debits should display the Amount without Payment Method fees
       ? amount
       : netAmount;
+  // The refunded transaction logic because it's a bit messy, the conditional was conceived by trial
+  if (isRefunded) {
+    displayedAmount = (fromAccount.slug == collective.slug && !isRefund) || (isRefund && isCredit) ? netAmount : amount;
+  }
 
   return (
     <Item data-cy="transaction-item">
@@ -217,6 +221,10 @@ TransactionItem.propTypes = {
   /* Display Refund and Download buttons in transactions */
   displayActions: PropTypes.bool,
   isRefunded: PropTypes.bool,
+  isRefund: PropTypes.bool,
+  collective: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+  }).isRequired,
   fromAccount: PropTypes.shape({
     id: PropTypes.string,
     slug: PropTypes.string.isRequired,
