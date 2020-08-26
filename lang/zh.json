@@ -186,7 +186,7 @@
   "collective.editHost.removeHost": "您确定要删除 {name} 群组吗？",
   "collective.editHost.withdrawApp": "Are you sure you want to withdraw application from {name}?",
   "collective.emptyBalance.body": "Are you sure you want to {action} to {collective}?",
-  "collective.emptyBalance.header": "{action} Balance",
+  "collective.emptyBalance.header": "{action} 余额",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.",
   "collective.expensePolicy.description": "It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters.",
   "collective.expensePolicy.label": "集合支出政策",
