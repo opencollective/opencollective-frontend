@@ -78,8 +78,8 @@ const HTMLContent = styled(({ content, ...props }) => {
 
   pre {
     font-size: 1em;
-    background: #F7F8FA;
-    color: #76777A;
+    background: #f7f8fa;
+    color: #76777a;
     border: none;
     padding: 8px 16px;
     font-familly: Courier;
