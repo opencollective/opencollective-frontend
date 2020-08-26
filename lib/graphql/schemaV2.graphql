@@ -96,6 +96,7 @@ interface Account {
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): MemberOfCollection
   transactions(
     limit: Int = 100
@@ -2430,6 +2431,7 @@ type Credit implements Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  isRefund: Boolean
   paymentMethod: PaymentMethod
 
   """
@@ -2609,6 +2611,7 @@ type Debit implements Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  isRefund: Boolean
   paymentMethod: PaymentMethod
 
   """
@@ -5724,6 +5727,7 @@ interface Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  isRefund: Boolean
   paymentMethod: PaymentMethod
   permissions: TransactionPermissions
 }
