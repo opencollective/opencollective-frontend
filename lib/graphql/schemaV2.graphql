@@ -96,6 +96,11 @@ interface Account {
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
+
+    """
+    Specific account to query the membership of.
+    """
+    account: AccountReferenceInput
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): MemberOfCollection
   transactions(
@@ -516,6 +521,7 @@ type Bot implements Account {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -705,6 +711,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -2686,6 +2693,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -3448,6 +3456,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -3688,6 +3697,7 @@ type Host implements Account {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -3966,6 +3976,7 @@ type Individual implements Account {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -4836,6 +4847,7 @@ type Organization implements Account {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -5176,6 +5188,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     offset: Int
     role: [MemberRole]
     accountType: [AccountType]
+    account: AccountReferenceInput
 
     """
     Filter on whether the account is a host or not
@@ -5549,6 +5562,12 @@ type Query {
     """
     tags: [String]
   ): HostCollection
+  order(
+    """
+    Identifiers to retrieve the Order
+    """
+    order: OrderReferenceInput!
+  ): Order
   tier(
     """
     Identifiers to retrieve the tier

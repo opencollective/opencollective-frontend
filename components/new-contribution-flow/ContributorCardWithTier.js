@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -11,7 +11,17 @@ import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
-const ContributorCardWithTier = ({ collective, contribution, ...props }) => {
+const messages = defineMessages({
+  contributor: {
+    id: 'Member.Role.CONTRIBUTOR',
+    defaultMessage: 'Contributor',
+  },
+});
+
+const ContributorCardWithTier = ({ contribution, ...props }) => {
+  const collective = contribution.toAccount;
+  const intl = useIntl();
+
   return (
     <StyledCollectiveCard {...props} collective={collective} tag={null}>
       <Box px={3}>
@@ -33,46 +43,45 @@ const ContributorCardWithTier = ({ collective, contribution, ...props }) => {
       <Container display="flex" flexDirection="column" justifyContent="center" px={3} height={150}>
         <Box mb={3}>
           <P textTransform="uppercase" fontSize="10px" fontWeight="400" color="black.500">
-            <FormattedMessage
-              id="NewContributionFlow.AmountContributedToDate"
-              defaultMessage="Amount contributed to date"
-            />
+            <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
           </P>
           <Flex>
             <P fontSize="14px" lineHeight="20px" fontWeight="bold">
               <FormattedMoneyAmount
-                amount={(contribution.amount.value + contribution.platformFee.value) * 100}
+                amount={(contribution.amount.value + (contribution.platformContributionAmount?.value || 0)) * 100}
                 currency={contribution.amount.currency}
               />
             </P>
-            <StyledTooltip
-              content={() => (
-                <FormattedMessage
-                  id="Subscriptions.FeesOnTopTooltip"
-                  defaultMessage="Contribution to collective plus contribution to the platform"
-                />
-              )}
-            >
-              <P fontSize="12px" lineHeight="20px" color="primary.600" ml={1}>
-                (
-                <FormattedMoneyAmount
-                  amount={contribution.amount.value * 100}
-                  currency={contribution.amount.currency}
-                  showCurrencyCode={false}
-                  precision={0}
-                  amountStyles={{ fontWeight: 'normal', color: 'primary.600' }}
-                />{' '}
-                +{' '}
-                <FormattedMoneyAmount
-                  amount={contribution.platformFee.value * 100}
-                  currency={contribution.amount.currency}
-                  showCurrencyCode={false}
-                  precision={0}
-                  amountStyles={{ fontWeight: 'normal', color: 'primary.600' }}
-                />
-                )
-              </P>
-            </StyledTooltip>
+            {contribution.platformContributionAmount?.value && (
+              <StyledTooltip
+                content={() => (
+                  <FormattedMessage
+                    id="Subscriptions.FeesOnTopTooltip"
+                    defaultMessage="Contribution to collective plus contribution to the platform"
+                  />
+                )}
+              >
+                <P fontSize="12px" lineHeight="20px" color="primary.600" ml={1}>
+                  (
+                  <FormattedMoneyAmount
+                    amount={contribution.amount.value * 100}
+                    currency={contribution.amount.currency}
+                    showCurrencyCode={false}
+                    precision={0}
+                    amountStyles={{ fontWeight: 'normal', color: 'primary.600' }}
+                  />{' '}
+                  +{' '}
+                  <FormattedMoneyAmount
+                    amount={contribution.platformContributionAmount?.value * 100}
+                    currency={contribution.amount.currency}
+                    showCurrencyCode={false}
+                    precision={0}
+                    amountStyles={{ fontWeight: 'normal', color: 'primary.600' }}
+                  />
+                  )
+                </P>
+              </StyledTooltip>
+            )}
           </Flex>
         </Box>
         <Box mb={3}>
@@ -83,7 +92,10 @@ const ContributorCardWithTier = ({ collective, contribution, ...props }) => {
             <FormattedMessage
               id="NewContributionFlow.CollectiveAndTier"
               defaultMessage="{collective} - {tier}"
-              values={{ collective: collective.name, tier: contribution.exampleTier }}
+              values={{
+                collective: collective.name,
+                tier: contribution.tier?.name || intl.formatMessage(messages.contributor),
+              }}
             />
           </P>
         </Box>
@@ -93,8 +105,8 @@ const ContributorCardWithTier = ({ collective, contribution, ...props }) => {
 };
 
 ContributorCardWithTier.propTypes = {
-  collective: PropTypes.object.isRequired,
   contribution: PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default withUser(ContributorCardWithTier);

@@ -148,7 +148,7 @@ class ContributionFlow extends React.Component {
   handleSuccess = order => {
     this.setState({ isSubmitted: true });
     this.props.refetchLoggedInUser(); // to update memberships
-    return this.pushStepRoute('success', { OrderId: order.id });
+    return this.pushStepRoute('success', { OrderId: order.data.createOrder.id });
   };
 
   showError = error => {
