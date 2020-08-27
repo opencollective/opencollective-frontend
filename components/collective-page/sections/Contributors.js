@@ -140,7 +140,7 @@ export default class SectionContributors extends React.PureComponent {
             </React.Fragment>
           ) : (
             <SectionTitle data-cy="section-contributors-title">
-              <FormattedMessage id="ContributorsFilter.Core" defaultMessage="Core contributors" />
+              <FormattedMessage id="ContributorsFilter.Core" defaultMessage="Team" />
             </SectionTitle>
           )}
         </ContainerSectionContent>
