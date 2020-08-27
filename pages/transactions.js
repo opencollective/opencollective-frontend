@@ -266,6 +266,7 @@ class TransactionsPage extends React.Component {
                 <React.Fragment>
                   <TransactionsList
                     isLoading={loading}
+                    collective={collective}
                     nbPlaceholders={variables.limit}
                     transactions={transactions?.nodes}
                     displayActions

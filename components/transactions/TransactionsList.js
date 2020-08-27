@@ -14,7 +14,7 @@ const Container = styled.div`
     `}
 `;
 
-const TransactionsList = ({ transactions, displayActions }) => {
+const TransactionsList = ({ transactions, collective, displayActions }) => {
   if (!transactions?.length) {
     return null;
   }
@@ -24,7 +24,7 @@ const TransactionsList = ({ transactions, displayActions }) => {
       {transactions.map((transaction, idx) => {
         return (
           <Container key={transaction?.id || idx} isFirst={!idx} data-cy="single-transaction">
-            <TransactionItem {...transaction} displayActions={displayActions} />
+            <TransactionItem {...transaction} collective={collective} displayActions={displayActions} />
           </Container>
         );
       })}

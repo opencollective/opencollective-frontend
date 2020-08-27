@@ -2431,6 +2431,7 @@ type Credit implements Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  isRefund: Boolean
   paymentMethod: PaymentMethod
 
   """
@@ -2610,6 +2611,7 @@ type Debit implements Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  isRefund: Boolean
   paymentMethod: PaymentMethod
 
   """
@@ -5728,6 +5730,7 @@ interface Transaction {
   expense: Expense
   order: Order
   isRefunded: Boolean
+  isRefund: Boolean
   paymentMethod: PaymentMethod
   permissions: TransactionPermissions
 }

@@ -103,7 +103,7 @@ const SectionTransactions = props => {
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (
             <GraphQLContext.Provider value={transactionsQueryResult}>
-              <TransactionsList transactions={data?.transactions?.nodes} displayActions />
+              <TransactionsList collective={collective} transactions={data?.transactions?.nodes} displayActions />
             </GraphQLContext.Provider>
           )}
           {data?.transactions.totalCount === 0 && (
