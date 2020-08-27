@@ -96,6 +96,7 @@ interface Account {
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): MemberOfCollection
   transactions(
     limit: Int = 100
@@ -4732,10 +4733,13 @@ All order statuses
 enum OrderStatus {
   ACTIVE
   CANCELLED
-  PENDING
-  PAID
   ERROR
   EXPIRED
+  NEW
+  PAID
+  PENDING
+  PLEDGED
+  REQUIRE_CLIENT_CONFIRMATION
 }
 
 """

@@ -278,7 +278,10 @@ const ExpenseFormBody = ({
         name="type"
         onChange={handleChange}
         value={values.type}
-        options={{ fundingRequest: [CollectiveType.FUND].includes(collective.type) }}
+        options={{
+          fundingRequest:
+            [CollectiveType.FUND].includes(collective.type) || collective.settings?.fundingRequest === true,
+        }}
       />
       {values.type && (
         <Box width="100%">
@@ -675,6 +678,7 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
+    settings: PropTypes.object,
   }).isRequired,
 };
 
@@ -745,6 +749,7 @@ ExpenseForm.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
+    settings: PropTypes.object,
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({

@@ -24,7 +24,7 @@ export const pledgedCollectivePageQuery = gql`
   query PledgedCollectivePage($id: Int!) {
     Collective(id: $id) {
       id
-      pledges: orders(status: PENDING) {
+      pledges: orders(status: PLEDGED) {
         id
         currency
         interval

@@ -13,7 +13,6 @@ const getExpenseStatusMsgType = (status, isRefund) => {
 
   switch (status) {
     case ORDER_STATUS.CANCELLED:
-    case ORDER_STATUS.REJECTED:
     case ORDER_STATUS.ERROR:
       return 'error';
     case ORDER_STATUS.EXPIRED:
@@ -32,10 +31,6 @@ const msg = defineMessages({
     id: 'order.cancelled',
     defaultMessage: 'cancelled',
   },
-  [ORDER_STATUS.REJECTED]: {
-    id: 'Order.Status.Rejected',
-    defaultMessage: 'Rejected',
-  },
   [ORDER_STATUS.ERROR]: {
     id: 'order.error',
     defaultMessage: 'error',
@@ -47,6 +42,18 @@ const msg = defineMessages({
   [ORDER_STATUS.PENDING]: {
     id: 'order.pending',
     defaultMessage: 'pending',
+  },
+  [ORDER_STATUS.NEW]: {
+    id: 'order.new',
+    defaultMessage: 'new',
+  },
+  [ORDER_STATUS.REQUIRE_CLIENT_CONFIRMATION]: {
+    id: 'order.require_client_confirmation',
+    defaultMessage: 'require client confirmation',
+  },
+  [ORDER_STATUS.PLEDGED]: {
+    id: 'order.pledged',
+    defaultMessage: 'pledged',
   },
   completed: {
     id: 'Order.Status.Completed',
