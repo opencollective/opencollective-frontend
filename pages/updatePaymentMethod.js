@@ -96,9 +96,11 @@ class UpdatePaymentPage extends React.Component {
         }
         const paymentMethod = stripeTokenToPaymentMethod(token);
         const res = await this.props.replaceCreditCard({
-          CollectiveId: this.props.LoggedInUser.collective.id,
-          ...paymentMethod,
-          id: parseInt(this.props.id),
+          variables: {
+            CollectiveId: this.props.LoggedInUser.collective.id,
+            ...paymentMethod,
+            id: parseInt(this.props.id),
+          },
         });
         const updatedCreditCard = res.data.replaceCreditCard;
 
