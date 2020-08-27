@@ -7,14 +7,10 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { parseToBoolean } from '../../../lib/utils';
-
 import Button from '../../Button';
 import Loading from '../../Loading';
 import StyledTooltip from '../../StyledTooltip';
 import { H3 } from '../../Text';
-
-const isTransferwiseEnabled = parseToBoolean(process.env.TRANSFERWISE_ENABLED);
 
 const LimitsInfoCircle = styled(InfoCircle)`
   vertical-align: baseline;
@@ -91,14 +87,12 @@ const GenericPlanFeatures = ({ plan }) => {
       <li>
         <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
       </li>
-      {isTransferwiseEnabled && (
-        <li>
-          <FormattedMessage
-            id="Host.Plan.TransferwisePayouts.unlimited"
-            defaultMessage="Unlimited payouts with TranferWise"
-          />
-        </li>
-      )}
+      <li>
+        <FormattedMessage
+          id="Host.Plan.TransferwisePayouts.unlimited"
+          defaultMessage="Unlimited payouts with TranferWise"
+        />
+      </li>
     </ul>
   );
 };
@@ -176,16 +170,14 @@ const HostPlan = props => {
                 <br />
                 (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
               </li>
-              {isTransferwiseEnabled && (
-                <li>
-                  <FormattedMessage
-                    id="Host.Plan.TransferwisePayouts.limited"
-                    defaultMessage="Up to $1000 in payouts with TransferWise"
-                  />
-                  <br />
-                  (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
-                </li>
-              )}
+              <li>
+                <FormattedMessage
+                  id="Host.Plan.TransferwisePayouts.limited"
+                  defaultMessage="Up to $1000 in payouts with TransferWise"
+                />
+                <br />
+                (<FormattedMessage id="Host.Plan.acrossCollectives" defaultMessage="across all collectives" />)
+              </li>
             </ul>
           </PlanFeatures>
           <PlanPrice>Free</PlanPrice>
@@ -242,14 +234,12 @@ const HostPlan = props => {
               <li>
                 <FormattedMessage id="Host.Plan.BankTransfers.unlimited" defaultMessage="Unlimited bank transfers" />
               </li>
-              {isTransferwiseEnabled && (
-                <li>
-                  <FormattedMessage
-                    id="Host.Plan.TransferwisePayouts.unlimited"
-                    defaultMessage="Unlimited payouts with TranferWise"
-                  />
-                </li>
-              )}
+              <li>
+                <FormattedMessage
+                  id="Host.Plan.TransferwisePayouts.unlimited"
+                  defaultMessage="Unlimited payouts with TranferWise"
+                />
+              </li>
             </ul>
           </PlanFeatures>
           <PlanPrice>Talk to Us</PlanPrice>
@@ -320,30 +310,28 @@ const HostPlan = props => {
             <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
           )}
         </li>
-        {isTransferwiseEnabled && (
-          <li>
-            <strong>Payouts with TransferWise Limit</strong>{' '}
-            <StyledTooltip
-              content={() => (
-                <FormattedMessage
-                  id="collective.hostSettings.help."
-                  defaultMessage="You can pay expenses with one-click using TransferWise."
-                />
-              )}
-            >
-              <LimitsInfoCircle size={12} />
-            </StyledTooltip>
-            :{' '}
-            {collective.plan.transferwisePayoutsLimit && (
-              <span>
-                ${collective.plan.transferwisePayouts / 100} of ${collective.plan.transferwisePayoutsLimit / 100}
-              </span>
+        <li>
+          <strong>Payouts with TransferWise Limit</strong>{' '}
+          <StyledTooltip
+            content={() => (
+              <FormattedMessage
+                id="collective.hostSettings.help."
+                defaultMessage="You can pay expenses with one-click using TransferWise."
+              />
             )}
-            {!collective.plan.transferwisePayoutsLimit && (
-              <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
-            )}
-          </li>
-        )}
+          >
+            <LimitsInfoCircle size={12} />
+          </StyledTooltip>
+          :{' '}
+          {collective.plan.transferwisePayoutsLimit && (
+            <span>
+              ${collective.plan.transferwisePayouts / 100} of ${collective.plan.transferwisePayoutsLimit / 100}
+            </span>
+          )}
+          {!collective.plan.transferwisePayoutsLimit && (
+            <FormattedMessage id="collective.hostSettings.unlimited" defaultMessage="Unlimited" />
+          )}
+        </li>
       </ul>
     </div>
   );
