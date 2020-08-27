@@ -13,6 +13,7 @@ export const tierPageQuery = gql`
       currency
       interval
       endsAt
+      button
 
       stats {
         id

@@ -114,6 +114,7 @@ class TierPage extends Component {
       interval: PropTypes.string.isRequired,
       currency: PropTypes.string,
       endsAt: PropTypes.string,
+      button: PropTypes.string,
       goal: PropTypes.number,
       description: PropTypes.string,
       longDescription: PropTypes.string,
@@ -356,7 +357,7 @@ class TierPage extends Component {
                       }}
                     >
                       <StyledButton buttonStyle="primary" width={1} my={4} minWidth={128} data-cy="ContributeBtn">
-                        <FormattedMessage id="Contribute" defaultMessage="Contribute" />
+                        {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
                       </StyledButton>
                     </Link>
                   )}
