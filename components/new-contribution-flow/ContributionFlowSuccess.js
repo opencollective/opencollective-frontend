@@ -9,19 +9,26 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { ORDER_STATUS } from '../../lib/constants/order-status';
+import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { facebookShareURL, tweetURL } from '../../lib/url_helpers';
 
 import Container from '../../components/Container';
+import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
 import Newsletter from '../../components/home/Newsletter';
+import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
+import Link from '../../components/Link';
 import Loading from '../../components/Loading';
+import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
 import { H3, P, Span } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
+import { orderSuccessFragment } from './index';
 
 // Styled components
 const ContainerWithImage = styled(Container)`
@@ -43,7 +50,7 @@ const ContainerWithImage = styled(Container)`
     background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
     background-position: left;
     background-repeat: no-repeat;
-    background-size: auto 100%;
+    background-size: cover;
   }
 `;
 
@@ -84,6 +91,12 @@ ShareLink.defaultProps = {
   mb: 2,
   target: '_blank',
 };
+
+const BankTransferInfoContainer = styled(Container)`
+  border: 1px solid ${themeGet('colors.black.400')};
+  border-radius: 12px;
+  background-color: white;
+`;
 
 class NewContributionFlowSuccess extends React.Component {
   static propTypes = {
@@ -232,64 +245,144 @@ class NewContributionFlowSuccess extends React.Component {
     return <PublicMessageForm order={this.props.data.order} publicMessage={publicMessage} />;
   };
 
-  render() {
-    const { loadingLoggedInUser, LoggedInUser, collective, data } = this.props;
-    const { order } = data;
-    const shareURL = `${process.env.WEBSITE_URL}${collective.path}`;
+  renderInstructions = (instructions, formatValues) => {
+    return instructions.replace(/{([\s\S]+?)}/g, (match, p1) => {
+      if (p1) {
+        const key = p1.toLowerCase();
+        if (formatValues[key] !== undefined) {
+          return formatValues[key];
+        }
+      }
+      return match;
+    });
+  };
 
-    const getPublicMessage = order => {
-      return get(order, 'fromAccount.memberOf.nodes[0].publicMessage');
+  renderBankTransferInformation = () => {
+    let instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
+    const bankAccount = get(this.props.data, 'order.toAccount.host.payoutMethods[0].data', null);
+    const amount =
+      (get(this.props.data, 'order.amount.value') + get(this.props.data, 'order.platformContributionAmount.value', 0)) *
+      100;
+    const currency = get(this.props.data, 'order.amount.currency');
+    const formattedAmount = formatCurrency(amount, currency);
+
+    const formatValues = {
+      account: formatAccountDetails(bankAccount),
+      reference: get(this.props.data, 'order.id', null),
+      amount: formattedAmount,
+      collective: get(this.props.data, 'order.toAccount.name', null),
     };
 
-    return loadingLoggedInUser || data.loading ? (
-      <Loading />
-    ) : (
-      <Flex justifyContent="center" width={1} minHeight={[400, 800]} flexDirection={['column', 'row']}>
-        <ContainerWithImage display="flex" alignItems="center" justifyContent="center" width={[1, 1 / 2]}>
-          <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
-            <H3 mb={3}>
-              <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
-            </H3>
-            <Box mb={3}>
-              <P fontSize="20px" fontColor="black.700" fontWeight={500}>
-                <FormattedMessage
-                  id="NewContributionFlow.Success.NowSupporting"
-                  defaultMessage="You are now supporting {collective}."
-                  values={{ collective: order.toAccount.name }}
-                />
-              </P>
-            </Box>
-            <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
-            <Box my={4}>
-              <P fontColor="black.800" fontWeight={500}>
-                <FormattedMessage
-                  id="NewContributionFlow.Success.DiscoverMore"
-                  defaultMessage="Discover more Collectives like {collective} &rarr;"
-                  values={{ collective: order.toAccount.name }}
-                />
-              </P>
-            </Box>
-            <Flex justifyContent="center" mt={2}>
-              <ShareLink
-                href={tweetURL({
-                  url: shareURL,
-                  text: `I've just donated to {order.toAccount.name}`,
-                })}
-              >
-                <Twitter size="1.2em" color="#4E5052" />
-                <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-              </ShareLink>
-              <ShareLink href={facebookShareURL({ url: shareURL })}>
-                <Facebook size="1.2em" color="#4E5052" />
-                <FormattedMessage id="shareIt" defaultMessage="Share it" />
-              </ShareLink>
-            </Flex>
-            {this.renderCommentForm(LoggedInUser, getPublicMessage(order))}
+    instructions = this.renderInstructions(instructions, formatValues);
+
+    return (
+      <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
+        <MessageBox type="warning" fontSize="12px">
+          <FormattedMessage
+            id="collective.user.orderProcessing.manual"
+            defaultMessage="<strong>Your donation is pending.</strong> Please follow the instructions in the confirmation email to manually pay the host of the collective."
+            values={I18nFormatters}
+          />
+        </MessageBox>
+        <BankTransferInfoContainer my={3} p={4}>
+          <H3>
+            <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
+          </H3>
+          <Flex mt={2}>
+            <Flex style={{ whiteSpace: 'pre-wrap' }}>{instructions}</Flex>
           </Flex>
-        </ContainerWithImage>
-        <Flex flexDirection="column" alignItems="center" justifyContent="center" width={[1, 1 / 2]}>
-          {this.renderCallsToAction()}
+        </BankTransferInfoContainer>
+        <Flex px={3}>
+          <P fontSize="16px" color="black.700">
+            <FormattedMessage
+              id="NewContributionFlow.InTheMeantime"
+              defaultMessage="In the meantime, you can follow {collective} and see how they are spending the money <CollectiveLink>on their collective page</CollectiveLink>."
+              values={{
+                collective: this.props.data.order.toAccount.name,
+                CollectiveLink: getI18nLink({
+                  as: Link,
+                  route: 'collective',
+                  params: { slug: this.props.data.order.toAccount.slug },
+                }),
+              }}
+            />
+          </P>
         </Flex>
+      </Flex>
+    );
+  };
+
+  render() {
+    const { LoggedInUser, collective, data } = this.props;
+    const { order } = data;
+    const shareURL = `${process.env.WEBSITE_URL}${collective.path}`;
+    const pendingOrder = order && order.status === ORDER_STATUS.PENDING;
+
+    const getPublicMessage = order => {
+      return get(order, 'membership.publicMessage');
+    };
+
+    return (
+      <Flex justifyContent="center" width={1} minHeight={[400, 800]} flexDirection={['column', 'row']}>
+        {data.loading ? (
+          <Container display="flex" alignItems="center" justifyContent="center">
+            <Loading />
+          </Container>
+        ) : (
+          <Fragment>
+            <ContainerWithImage
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              width={[1, '523px', '762px']}
+              flexShrink={0}
+            >
+              <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
+                <H3 mb={3}>
+                  <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
+                </H3>
+                <Box mb={3}>
+                  <P fontSize="20px" fontColor="black.700" fontWeight={500} textAlign="center">
+                    <FormattedMessage
+                      id="NewContributionFlow.Success.NowSupporting"
+                      defaultMessage="You are now supporting {collective}."
+                      values={{ collective: order.toAccount.name }}
+                    />
+                  </P>
+                </Box>
+                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} />
+                <Box my={4}>
+                  <P fontColor="black.800" fontWeight={500}>
+                    <FormattedMessage
+                      id="NewContributionFlow.Success.DiscoverMore"
+                      defaultMessage="Discover more Collectives like {collective} &rarr;"
+                      values={{ collective: order.toAccount.name }}
+                    />
+                  </P>
+                </Box>
+                <Flex justifyContent="center" mt={2}>
+                  <ShareLink
+                    href={tweetURL({
+                      url: shareURL,
+                      text: `I've just donated to {order.toAccount.name}`,
+                    })}
+                  >
+                    <Twitter size="1.2em" color="#4E5052" />
+                    <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
+                  </ShareLink>
+                  <ShareLink href={facebookShareURL({ url: shareURL })}>
+                    <Facebook size="1.2em" color="#4E5052" />
+                    <FormattedMessage id="shareIt" defaultMessage="Share it" />
+                  </ShareLink>
+                </Flex>
+                {this.renderCommentForm(LoggedInUser, getPublicMessage(order))}
+              </Flex>
+            </ContainerWithImage>
+            <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
+              {pendingOrder ? this.renderBankTransferInformation() : this.renderCallsToAction()}
+            </Flex>
+          </Fragment>
+        )}
       </Flex>
     );
   }
@@ -297,48 +390,18 @@ class NewContributionFlowSuccess extends React.Component {
 
 // GraphQL
 const orderSuccessQuery = gqlV2/* GraphQL */ `
-  query NewContributionFlowOrderSuccess($order: OrderReferenceInput!, $memberAccount: AccountReferenceInput) {
+  query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
-      id
-      amount {
-        value
-        currency
-      }
-      platformContributionAmount {
-        value
-      }
-      tier {
-        name
-      }
-      fromAccount {
-        id
-        name
-        memberOf(account: $memberAccount) {
-          totalCount
-          nodes {
-            id
-            publicMessage
-          }
-        }
-      }
-      toAccount {
-        id
-        name
-        slug
-        ... on AccountWithContributions {
-          contributors {
-            totalCount
-          }
-        }
-      }
+      ...OrderSuccessFragment
     }
   }
+  ${orderSuccessFragment}
 `;
 
 const addOrderSuccessQuery = graphql(orderSuccessQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
-    variables: { order: { id: props.router.query.OrderId }, memberAccount: { id: props.collective.id } },
+    variables: { order: { id: props.router.query.OrderId } },
   }),
 });
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { startCase, toUpper } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -8,6 +7,8 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
+
+import { formatAccountDetails } from './utils';
 
 const List = styled.ul`
   margin: 0;
@@ -50,47 +51,9 @@ class UpdateBankDetailsForm extends React.Component {
     );
   }
 
-  formatAccountDetails(payoutMethodData) {
-    const ignoredKeys = ['type', 'isManualBankTransfer', 'currency'];
-    const labels = {
-      abartn: 'Routing Number: ',
-      firstLine: '',
-    };
-
-    const formatKey = s => {
-      if (labels[s] !== undefined) {
-        return labels[s];
-      }
-      if (toUpper(s) === s) {
-        return `${s}: `;
-      }
-      return `${startCase(s)}: `;
-    };
-
-    const renderObject = (object, prefix = '') =>
-      Object.entries(object)
-        .sort(a => (typeof a[1] == 'object' ? 1 : -1))
-        .reduce((acc, [key, value]) => {
-          if (ignoredKeys.includes(key)) {
-            return acc;
-          }
-          if (typeof value === 'object') {
-            if (key === 'details') {
-              return [...acc, ...renderObject(value, '')];
-            }
-            return [...acc, formatKey(key), ...renderObject(value, '  ')];
-          }
-          return [...acc, `${prefix}${formatKey(key)}${value}`];
-        }, []);
-
-    const lines = renderObject(payoutMethodData);
-
-    return lines.join('\n');
-  }
-
   renderInstructions() {
     const formatValues = {
-      account: this.props.bankAccount ? this.formatAccountDetails(this.props.bankAccount) : '',
+      account: this.props.bankAccount ? formatAccountDetails(this.props.bankAccount) : '',
       reference: '76400',
       OrderId: '76400',
       amount: '$30',
